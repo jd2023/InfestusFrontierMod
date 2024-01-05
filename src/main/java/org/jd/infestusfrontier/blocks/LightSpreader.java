@@ -9,12 +9,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
+import org.jd.infestusfrontier.ZgBlocks;
 import org.slf4j.Logger;
 
-public class LightSpreaderBlock extends Block{
+public class LightSpreader extends Block{
 
+    public static final String ID = "light_spreader";
     private static final Logger LOGGER = LogUtils.getLogger();
-    public LightSpreaderBlock() {
+    public LightSpreader() {
         super(Properties.of(Material.STONE)
                 .strength(1.5f, 6.0f)
                 .lightLevel(state -> 15)
@@ -30,10 +32,10 @@ public class LightSpreaderBlock extends Block{
         if (!world.isClientSide) {
             // Coordinates of the block below
             BlockPos infectionPos = pos.below().east(5).south(5);
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 11; i++) {
                 var nextPos = infectionPos.north();
-                for (int j = 0; j < 10; j++) {
-                    world.setBlockAndUpdate(infectionPos, Blocks.SLIME_BLOCK.defaultBlockState());
+                for (int j = 0; j < 11; j++) {
+                    world.setBlockAndUpdate(infectionPos, ZgBlocks.CREEP.get().defaultBlockState());
                     infectionPos = infectionPos.west();
                 }
                 infectionPos = nextPos;
