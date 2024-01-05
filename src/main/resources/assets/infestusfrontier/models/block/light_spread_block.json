@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "infestusfrontier:block/light_spread_block"
+  }
+}
