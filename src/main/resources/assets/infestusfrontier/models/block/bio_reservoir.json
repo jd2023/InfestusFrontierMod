@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "infestusfrontier:block/bio_reservoir_variant_1",
+    "down": "infestusfrontier:block/bio_reservoir_variant_2",
+    "up": "infestusfrontier:block/bio_reservoir_variant_2",
+    "north": "infestusfrontier:block/bio_reservoir_variant_1",
+    "east": "infestusfrontier:block/bio_reservoir_variant_1",
+    "south": "infestusfrontier:block/bio_reservoir_variant_1",
+    "west": "infestusfrontier:block/bio_reservoir_variant_1"
+  }
+}

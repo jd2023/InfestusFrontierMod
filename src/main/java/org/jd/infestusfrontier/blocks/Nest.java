@@ -7,9 +7,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.ZgBlocks;
+import org.jd.infestusfrontier.precomp.Circle;
 import org.slf4j.Logger;
 
 public class Nest extends Block{
@@ -27,27 +31,49 @@ public class Nest extends Block{
         LOGGER.info("Placed Nest at {}", pos);
 
         if (!world.isClientSide) {
-            // Coordinates of the block below
-            BlockPos infectionPos = pos.below().east(5).south(5);
-            for (int i = 0; i < 11; i++) {
-                var nextPos = infectionPos.north();
-                for (int j = 0; j < 11; j++) {
-                    world.setBlockAndUpdate(infectionPos, ZgBlocks.CREEP_TWO.get().defaultBlockState());
-                    infectionPos = infectionPos.west();
-                }
-                infectionPos = nextPos;
+            BlockPos nestPos = pos.below();
+            if (!canBeInfested(nestPos, world)) {
+                return;
             }
-
-            var blockBelow = pos.below();
-            // Example: Converting adjacent blocks
-            BlockPos[] adjacentPositions = new BlockPos[]{
-                    blockBelow, blockBelow.north(), blockBelow.east(), blockBelow.south(), blockBelow.west()
-            };
-
-            for (BlockPos adjacentPos : adjacentPositions) {
-                // Check if conversion condition is met, then convert
-                world.setBlockAndUpdate(adjacentPos, ZgBlocks.CREEP.get().defaultBlockState());
+            for (int[][] level : Circle.data) {
+                for (int[] offset : level) {
+                    var posToInfest = nestPos.offset(offset[0], 0, offset[1]);
+                    if (canBeInfested(posToInfest, world)) {
+                        world.setBlockAndUpdate(posToInfest, ZgBlocks.CREEP.get().defaultBlockState());
+                        for (int i = 1; i < 4; i++) {
+                            if (!canBeInfested(posToInfest.above(i), world)) {
+                                break;
+                            }
+                            world.setBlockAndUpdate(posToInfest.above(i), ZgBlocks.CREEP.get().defaultBlockState());
+                        }
+                    } else {
+                        for (int i = 1; i < 4; i++) {
+                            if (canBeInfested(posToInfest.below(i), world)) {
+                                world.setBlockAndUpdate(posToInfest.below(i), ZgBlocks.CREEP.get().defaultBlockState());
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private static boolean isInfested(BlockPos pos, Level world) {
+        Block block = world.getBlockState(pos).getBlock();
+        var key = ForgeRegistries.BLOCKS.getKey(block);
+        LOGGER.info("Checking if {} is infested at {}. key: {}, namespace: {}", block, pos, key, key.getNamespace());
+        return key.toString().startsWith(InfestusFrontier.MODID);
+    }
+
+    private static boolean canBeInfested(BlockPos pos, Level world) {
+        BlockState blockState = world.getBlockState(pos);
+        Block block = blockState.getBlock();
+
+        return blockState.getMaterial().isSolidBlocking()
+                && !blockState.getMaterial().isLiquid()
+                && !(block instanceof BushBlock)
+                && block != Blocks.AIR
+                && !isInfested(pos, world);
     }
 }
