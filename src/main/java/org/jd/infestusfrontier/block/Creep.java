@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.blocks;
+package org.jd.infestusfrontier.block;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Material;
