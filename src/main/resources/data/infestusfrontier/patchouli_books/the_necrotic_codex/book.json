@@ -1,7 +1,7 @@
 {
-  "name": "My First Book!",
+  "name": "The Necrotic Codex",
   "landing_text": "Welcome to Patchouli",
   "version": 1,
-  "creative_tab": "minecraft:tools",
+  "creative_tab": "infestus_frontier_tab",
   "use_resource_pack": true
 }
