@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.item;
 
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.ZgItems;
 
 public class ModCreativeModeTab {
