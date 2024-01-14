@@ -14,13 +14,13 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 
-public class NestBlockEntity extends BlockEntity {
+public class InfesterBlockEntity extends BlockEntity {
     private int ticks = 0;
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private final Queue<BlockPos> blocksToConvert = new ArrayDeque<>();
 
-    public NestBlockEntity(BlockPos pos, BlockState state) {
+    public InfesterBlockEntity(BlockPos pos, BlockState state) {
         super(ZgBlockEntities.NEST_BLOCK_ENTITY_TYPE.get(), pos, state);
         LOGGER.warn("Creating NestBlockEntity at {}", pos);
     }
@@ -32,7 +32,7 @@ public class NestBlockEntity extends BlockEntity {
     private static final int MAX_DEV = 2;
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
-        NestBlockEntity nest = (NestBlockEntity) be;
+        InfesterBlockEntity nest = (InfesterBlockEntity) be;
         if (level.isClientSide() || nest.blocksToConvert.isEmpty()) return;
         nest.ticks++;
         if (nest.ticks % MAX_DEV == 0) {
