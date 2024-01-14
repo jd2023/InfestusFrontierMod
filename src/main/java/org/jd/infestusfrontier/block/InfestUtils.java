@@ -49,4 +49,20 @@ public class InfestUtils {
                 && block != Blocks.AIR
                 && !isInfested(pos, world);
     }
+
+    public static boolean isExposed(BlockPos pos, Level world) {
+        return isOpen(pos.above(), world)
+                || isOpen(pos.below(), world)
+                || isOpen(pos.north(), world)
+                || isOpen(pos.south(), world)
+                || isOpen(pos.east(), world)
+                || isOpen(pos.west(), world);
+    }
+
+    private static boolean isOpen(BlockPos pos, Level world) {
+        BlockState blockState = world.getBlockState(pos);
+        var result = !blockState.getMaterial().isSolidBlocking();
+        LOGGER.info("isOpen: {}, block: {}", result, blockState);
+        return result;
+    }
 }

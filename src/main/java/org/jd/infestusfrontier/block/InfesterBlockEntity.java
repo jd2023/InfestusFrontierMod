@@ -38,19 +38,10 @@ public class InfesterBlockEntity extends BlockEntity {
         if (nest.ticks % MAX_DEV == 0) {
             if (level instanceof ServerLevel serverLevel) {
                 var posToInfest = nest.blocksToConvert.poll();
-                if (InfestUtils.canBeInfested(posToInfest, serverLevel)) {
-                    InfestUtils.replaceBlockWithParticles(serverLevel, posToInfest, ZgBlocks.CREEP.get().defaultBlockState());
-                }
                 for (int i = -4; i < 4; i++) {
                     var mayBeInfestPos = posToInfest.offset(0, i, 0);
-                    if (InfestUtils.canBeInfested(mayBeInfestPos, serverLevel) && !(
-                            InfestUtils.canBeInfested(mayBeInfestPos.east(), serverLevel) &&
-                                    InfestUtils.canBeInfested(mayBeInfestPos.north(), serverLevel) &&
-                                    InfestUtils.canBeInfested(mayBeInfestPos.west(), serverLevel) &&
-                                    InfestUtils.canBeInfested(mayBeInfestPos.south(), serverLevel)
-                    )) {
-                        nest.enqueueInitialBlocks(mayBeInfestPos);
-                        break;
+                    if (InfestUtils.canBeInfested(mayBeInfestPos, serverLevel) && InfestUtils.isExposed(mayBeInfestPos, serverLevel)) {
+                        InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, ZgBlocks.CREEP.get().defaultBlockState());
                     }
                 }
             }
