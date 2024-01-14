@@ -10,7 +10,6 @@ import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
 import org.slf4j.Logger;
 
-
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -31,6 +30,7 @@ public class NestBlockEntity extends BlockEntity {
     }
 
     private static final int MAX_DEV = 2;
+
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
         NestBlockEntity nest = (NestBlockEntity) be;
         if (level.isClientSide() || nest.blocksToConvert.isEmpty()) return;
@@ -45,10 +45,10 @@ public class NestBlockEntity extends BlockEntity {
                     var mayBeInfestPos = posToInfest.offset(0, i, 0);
                     if (InfestUtils.canBeInfested(mayBeInfestPos, serverLevel) && !(
                             InfestUtils.canBeInfested(mayBeInfestPos.east(), serverLevel) &&
-                            InfestUtils.canBeInfested(mayBeInfestPos.north(), serverLevel) &&
-                            InfestUtils.canBeInfested(mayBeInfestPos.west(), serverLevel) &&
-                            InfestUtils.canBeInfested(mayBeInfestPos.south(), serverLevel)
-                            )) {
+                                    InfestUtils.canBeInfested(mayBeInfestPos.north(), serverLevel) &&
+                                    InfestUtils.canBeInfested(mayBeInfestPos.west(), serverLevel) &&
+                                    InfestUtils.canBeInfested(mayBeInfestPos.south(), serverLevel)
+                    )) {
                         nest.enqueueInitialBlocks(mayBeInfestPos);
                         break;
                     }

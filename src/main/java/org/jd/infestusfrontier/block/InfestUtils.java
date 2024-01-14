@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 public class InfestUtils {
 
     private static final Logger LOGGER = LogUtils.getLogger();
+
     public static void replaceBlockWithParticles(ServerLevel serverLevel, BlockPos pos, BlockState newBlockState) {
         serverLevel.setBlockAndUpdate(pos, newBlockState);
         pos = pos.above();

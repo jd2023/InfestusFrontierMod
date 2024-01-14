@@ -5,16 +5,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
-import net.minecraftforge.registries.ForgeRegistries;
-import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.ZgBlockEntities;
-import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.precomp.Circle;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -26,6 +24,7 @@ public class Nest extends BaseEntityBlock {
 
     public static final String ID = "nest";
     private static final Logger LOGGER = LogUtils.getLogger();
+
     public Nest() {
         super(Properties.of(Material.STONE));
     }
@@ -44,7 +43,7 @@ public class Nest extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> betype) {
-        return createTickerHelper(betype, ZgBlockEntities.NEST_BLOCK_ENTITY_TYPE.get(),NestBlockEntity::tick);
+        return createTickerHelper(betype, ZgBlockEntities.NEST_BLOCK_ENTITY_TYPE.get(), NestBlockEntity::tick);
     }
 
     @Override
