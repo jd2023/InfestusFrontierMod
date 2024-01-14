@@ -34,6 +34,7 @@ public class InfestusFrontier
 
         ZgBlocks.register(modEventBus);
         ZgItems.register(modEventBus);
+        ZgBlockEntities.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 

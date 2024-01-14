@@ -5,18 +5,24 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.precomp.Circle;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-public class Nest extends Block{
+import java.util.Arrays;
+import java.util.Collections;
+
+public class Nest extends BaseEntityBlock {
 
     public static final String ID = "nest";
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -25,55 +31,44 @@ public class Nest extends Block{
     }
 
     @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        LOGGER.info("Creating Nest Block Entity at {}", pos);
+        return ZgBlockEntities.NEST_BLOCK_ENTITY_TYPE.get().create(pos, state);
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> betype) {
+        return createTickerHelper(betype, ZgBlockEntities.NEST_BLOCK_ENTITY_TYPE.get(),NestBlockEntity::tick);
+    }
+
+    @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
-
         LOGGER.info("Placed Nest at {}", pos);
-
         if (!world.isClientSide) {
             BlockPos nestPos = pos.below();
-            if (!canBeInfested(nestPos, world)) {
+            if (!InfestUtils.canBeInfested(nestPos, world)) {
                 return;
             }
-            for (int[][] level : Circle.data) {
-                for (int[] offset : level) {
-                    var posToInfest = nestPos.offset(offset[0], 0, offset[1]);
-                    if (canBeInfested(posToInfest, world)) {
-                        world.setBlockAndUpdate(posToInfest, ZgBlocks.CREEP.get().defaultBlockState());
-                        for (int i = 1; i < 4; i++) {
-                            if (!canBeInfested(posToInfest.above(i), world)) {
-                                break;
-                            }
-                            world.setBlockAndUpdate(posToInfest.above(i), ZgBlocks.CREEP.get().defaultBlockState());
-                        }
-                    } else {
-                        for (int i = 1; i < 4; i++) {
-                            if (canBeInfested(posToInfest.below(i), world)) {
-                                world.setBlockAndUpdate(posToInfest.below(i), ZgBlocks.CREEP.get().defaultBlockState());
-                                break;
-                            }
-                        }
+            var someEntity = world.getBlockEntity(pos);
+            if (someEntity instanceof NestBlockEntity entity) {
+                for (int[][] level : Circle.data) {
+                    var randomLevel = Arrays.asList(level);
+                    Collections.shuffle(randomLevel);
+                    for (int[] offset : randomLevel) {
+                        var posToInfest = nestPos.offset(offset[0], 0, offset[1]);
+                        entity.enqueueInitialBlocks(posToInfest);
                     }
                 }
+            } else {
+                LOGGER.error("Unexpected NestBlockEntity type: {}", someEntity);
             }
         }
-    }
-
-    private static boolean isInfested(BlockPos pos, Level world) {
-        Block block = world.getBlockState(pos).getBlock();
-        var key = ForgeRegistries.BLOCKS.getKey(block);
-        LOGGER.info("Checking if {} is infested at {}. key: {}, namespace: {}", block, pos, key, key.getNamespace());
-        return key.toString().startsWith(InfestusFrontier.MODID);
-    }
-
-    private static boolean canBeInfested(BlockPos pos, Level world) {
-        BlockState blockState = world.getBlockState(pos);
-        Block block = blockState.getBlock();
-
-        return blockState.getMaterial().isSolidBlocking()
-                && !blockState.getMaterial().isLiquid()
-                && !(block instanceof BushBlock)
-                && block != Blocks.AIR
-                && !isInfested(pos, world);
     }
 }
