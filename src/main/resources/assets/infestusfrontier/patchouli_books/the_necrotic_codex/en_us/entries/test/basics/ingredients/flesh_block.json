@@ -1,0 +1,16 @@
+{
+  "name": "Flesh Block",
+  "icon": "infestusfrontier:flesh_block",
+  "category": "infestusfrontier:basics_folder/ingredients",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/ingredients/flesh_block/flesh_block_intro",
+      "text": "This will cover how to make a flesh block."
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:flesh_block_from_crafting",
+      "title": "Flesh Block",
+      "text": "This is how to craft a flesh block."}
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Ingredients",
+  "description": "This category shows all the basic Ingredients",
+  "parent": "infestusfrontier:basics",
+  "icon": "minecraft:glass_bottle"
+}
