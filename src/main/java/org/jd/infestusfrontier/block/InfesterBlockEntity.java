@@ -21,8 +21,8 @@ public class InfesterBlockEntity extends BlockEntity {
     private final Queue<BlockPos> blocksToConvert = new ArrayDeque<>();
 
     public InfesterBlockEntity(BlockPos pos, BlockState state) {
-        super(ZgBlockEntities.NEST_BLOCK_ENTITY_TYPE.get(), pos, state);
-        LOGGER.warn("Creating NestBlockEntity at {}", pos);
+        super(ZgBlockEntities.INFESTER_BLOCK_ENTITY_TYPE.get(), pos, state);
+        LOGGER.warn("Creating InfesterBlockEntity at {}", pos);
     }
 
     public void enqueueInitialBlocks(BlockPos pos) {
@@ -32,10 +32,12 @@ public class InfesterBlockEntity extends BlockEntity {
     private static final int MAX_DEV = 2;
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
+        LOGGER.error("InfesterBlockEntity tick at {}", pos);
         InfesterBlockEntity nest = (InfesterBlockEntity) be;
         if (level.isClientSide() || nest.blocksToConvert.isEmpty()) return;
         nest.ticks++;
         if (nest.ticks % MAX_DEV == 0) {
+            LOGGER.info("InfesterBlockEntity tick at {}", pos);
             if (level instanceof ServerLevel serverLevel) {
                 var posToInfest = nest.blocksToConvert.poll();
                 for (int i = -4; i < 4; i++) {

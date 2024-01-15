@@ -11,7 +11,8 @@ import org.jd.infestusfrontier.block.InfesterBlockEntity;
 public class ZgBlockEntities {
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, InfestusFrontier.MODID);
 
-    public static final RegistryObject<BlockEntityType<InfesterBlockEntity>> NEST_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(Nest.ID, () -> BlockEntityType.Builder.of(InfesterBlockEntity::new, ZgBlocks.NEST.get()).build(null));
+    public static final RegistryObject<BlockEntityType<InfesterBlockEntity>> INFESTER_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(Nest.ID,
+            () -> BlockEntityType.Builder.of(InfesterBlockEntity::new, ZgBlocks.NEST.get(), ZgBlocks.TUMOR.get()).build(null));
     public static void register(IEventBus modEventBus) {
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }

@@ -33,8 +33,7 @@ public class Nest extends BaseEntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        LOGGER.info("Creating Nest Block Entity at {}", pos);
-        return ZgBlockEntities.NEST_BLOCK_ENTITY_TYPE.get().create(pos, state);
+        return ZgBlockEntities.INFESTER_BLOCK_ENTITY_TYPE.get().create(pos, state);
     }
 
     @Override
@@ -44,7 +43,7 @@ public class Nest extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> betype) {
-        return createTickerHelper(betype, ZgBlockEntities.NEST_BLOCK_ENTITY_TYPE.get(), InfesterBlockEntity::tick);
+        return createTickerHelper(betype, ZgBlockEntities.INFESTER_BLOCK_ENTITY_TYPE.get(), InfesterBlockEntity::tick);
     }
 
     @Override
@@ -71,7 +70,8 @@ public class Nest extends BaseEntityBlock {
             }
             var someEntity = world.getBlockEntity(pos);
             if (someEntity instanceof InfesterBlockEntity entity) {
-                for (int[][] level : Circle.data) {
+                for (int i = 0; i < 4; i++) {
+                    var level = Circle.data[i];
                     var randomLevel = Arrays.asList(level);
                     Collections.shuffle(randomLevel);
                     for (int[] offset : randomLevel) {
