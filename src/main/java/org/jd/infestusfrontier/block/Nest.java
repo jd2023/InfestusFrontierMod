@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -13,8 +14,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import org.jd.infestusfrontier.ZgBlockEntities;
+import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.precomp.Circle;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
@@ -40,16 +42,28 @@ public class Nest extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
-    @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> betype) {
         return createTickerHelper(betype, ZgBlockEntities.NEST_BLOCK_ENTITY_TYPE.get(), InfesterBlockEntity::tick);
     }
 
     @Override
+    public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
+        BlockPos posBelow = context.getClickedPos().below();
+        BlockState stateBelow = context.getLevel().getBlockState(posBelow);
+
+        if (stateBelow.is(ZgBlocks.CREEP.get())) {
+            return null;
+        }
+
+        return super.getStateForPlacement(context);
+    }
+
+    @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
         LOGGER.info("Placed Nest at {}", pos);
+
         if (!world.isClientSide) {
             BlockPos nestPos = pos.below();
             if (!InfestUtils.canBeInfested(nestPos, world)) {
