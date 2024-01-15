@@ -3,7 +3,7 @@
   "pattern": [
     "#W#",
     "WIW",
-    "# #"
+    "#F#"
   ],
   "key": {
     "#": {
@@ -14,6 +14,9 @@
     },
     "I": {
       "item": "minecraft:bucket"
+    },
+    "F": {
+      "item": "infestusfrontier:infested_connector"
     }
   },
   "result": {

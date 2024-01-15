@@ -1,0 +1,16 @@
+{
+  "name": "Infested Connector",
+  "icon": "infestusfrontier:infested_connector",
+  "category": "infestusfrontier:basics_folder/ingredients",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/ingredients/infested_connector_intro",
+      "text": "This will cover how to make a infested connector."
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:infested_connector_from_crafting",
+      "title": "Infested Connector",
+      "text": "This is how to craft a infested connector."}
+  ]
+}

@@ -23,6 +23,7 @@ public class ZgItems {
 //            () -> new BlockItem(ZgBlocks.BIO_RESERVOIR.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
 //    public static final RegistryObject<Item> TUMOR = ITEMS.register(Tumor.ID,
 //            () -> new BlockItem(ZgBlocks.TUMOR.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> INFESTED_CONNECTOR = ITEMS.register("infested_connector", () -> new Item(new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static void register(IEventBus modEventBus) {
         ITEMS.register(modEventBus);
     }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " W ",
+    "WIW",
+    " W "
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:rotten_flesh"
+    },
+    "I": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "item": "infestusfrontier:infested_connector"
+  }
+}

@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -27,8 +28,8 @@ public class Nest extends BaseEntityBlock {
     public static final String ID = "nest";
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public Nest(Properties properties) {
-        super(properties);
+    public Nest() {
+        super(Properties.copy(Blocks.STONE));
     }
 
     @Override

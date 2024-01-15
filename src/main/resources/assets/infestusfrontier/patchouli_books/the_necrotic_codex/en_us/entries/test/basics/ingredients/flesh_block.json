@@ -4,7 +4,7 @@
   "category": "infestusfrontier:basics_folder/ingredients",
   "pages": [
     {
-      "type": "infestusfrontier:basics/ingredients/flesh_block/flesh_block_intro",
+      "type": "infestusfrontier:basics/ingredients/flesh_block_intro",
       "text": "This will cover how to make a flesh block."
     },
     {

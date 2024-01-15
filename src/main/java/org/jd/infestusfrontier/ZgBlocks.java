@@ -22,16 +22,15 @@ import java.util.function.Supplier;
 public class ZgBlocks {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, InfestusFrontier.MODID);
     public static final RegistryObject<Block> LIGHT_SPREADER = registerBlock(LightSpreader.ID,
-            () -> new LightSpreader(BlockBehaviour.Properties.copy(Blocks.STONE)), ModCreativeModeTab.INFESTUS_TAB);
+            LightSpreader::new, ModCreativeModeTab.INFESTUS_TAB);
     public static final RegistryObject<Block> FLESH_BLOCK = registerBlock("flesh_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT)), ModCreativeModeTab.INFESTUS_TAB);
     public static final RegistryObject<Block> CREEP = BLOCKS.register(Creep.ID, Creep::new);
 
     public static final RegistryObject<Block> CREEP_TWO = BLOCKS.register(CreepTwo.ID, CreepTwo::new);
-    public static final RegistryObject<Block> NEST = registerBlock(Nest.ID,
-            () -> new Nest(BlockBehaviour.Properties.of(Material.STONE)), ModCreativeModeTab.INFESTUS_TAB);
-    public static final RegistryObject<Block> BIO_RESERVOIR = BLOCKS.register(BioReservoir.ID, BioReservoir::new);
-    public static final RegistryObject<Block> TUMOR = BLOCKS.register(Tumor.ID, Tumor::new);
+    public static final RegistryObject<Block> NEST = registerBlock(Nest.ID, Nest::new, ModCreativeModeTab.INFESTUS_TAB);
+    public static final RegistryObject<Block> BIO_RESERVOIR = registerBlock(BioReservoir.ID, BioReservoir::new, ModCreativeModeTab.INFESTUS_TAB);
+    public static final RegistryObject<Block> TUMOR = registerBlock(Tumor.ID, Tumor::new, ModCreativeModeTab.INFESTUS_TAB);
 
     private static  <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block, CreativeModeTab tab){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
