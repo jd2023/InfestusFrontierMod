@@ -27,8 +27,8 @@ public class Nest extends BaseEntityBlock {
     public static final String ID = "nest";
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public Nest() {
-        super(Properties.of(Material.STONE));
+    public Nest(Properties properties) {
+        super(properties);
     }
 
     @Override

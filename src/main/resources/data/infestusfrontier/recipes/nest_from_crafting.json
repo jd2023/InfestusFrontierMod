@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#W#",
+    "WIW",
+    "# #"
+  ],
+  "key": {
+    "#": {
+      "item": "infestusfrontier:flesh_block"
+    },
+    "W": {
+      "item": "minecraft:bone_block"
+    },
+    "I": {
+      "item": "minecraft:bucket"
+    }
+  },
+  "result": {
+    "item": "infestusfrontier:nest"
+  }
+}

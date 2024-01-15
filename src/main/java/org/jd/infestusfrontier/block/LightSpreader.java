@@ -17,11 +17,8 @@ public class LightSpreader extends Block {
     public static final String ID = "light_spreader";
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public LightSpreader() {
-        super(Properties.of(Material.STONE)
-                .strength(1.5f, 6.0f)
-                .lightLevel(state -> 15)
-        );
+    public LightSpreader(Properties properties) {
+        super(properties);
     }
 
     @Override
