@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.block;
+package org.jd.infestusfrontier.enity;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
+import org.jd.infestusfrontier.block.InfestUtils;
 import org.slf4j.Logger;
 
 import java.util.ArrayDeque;
@@ -32,12 +33,10 @@ public class InfesterBlockEntity extends BlockEntity {
     private static final int MAX_DEV = 2;
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
-        LOGGER.error("InfesterBlockEntity tick at {}", pos);
         InfesterBlockEntity nest = (InfesterBlockEntity) be;
         if (level.isClientSide() || nest.blocksToConvert.isEmpty()) return;
         nest.ticks++;
         if (nest.ticks % MAX_DEV == 0) {
-            LOGGER.info("InfesterBlockEntity tick at {}", pos);
             if (level instanceof ServerLevel serverLevel) {
                 var posToInfest = nest.blocksToConvert.poll();
                 for (int i = -4; i < 4; i++) {
