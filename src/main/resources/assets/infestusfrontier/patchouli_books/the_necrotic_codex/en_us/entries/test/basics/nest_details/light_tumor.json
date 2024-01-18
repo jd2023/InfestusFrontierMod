@@ -1,0 +1,16 @@
+{
+  "name": "Light Tumor",
+  "icon": "infestusfrontier:light_spreader",
+  "category": "infestusfrontier:basics_folder/nest",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/nest_details/light_tumor",
+      "text": ""
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:light_tumor_from_crafting",
+      "title": "Light Tumor",
+      "text": "This is how to craft a light tumor."}
+  ]
+}

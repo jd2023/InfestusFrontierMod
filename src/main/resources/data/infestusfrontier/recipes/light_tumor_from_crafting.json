@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "WIW",
+    "#F#"
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:rotten_flesh"
+    },
+    "#": {
+      "item": "infestusfrontier:flesh_block"
+    },
+    "I": {
+      "item": "minecraft:stone"
+    },
+    "F": {
+      "item": "infestusfrontier:infested_connector"
+    }
+  },
+  "result": {
+    "item": "infestusfrontier:light_spreader"
+  }
+}

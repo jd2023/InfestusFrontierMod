@@ -1,0 +1,10 @@
+{
+  "components": [
+    {
+      "type": "patchouli:text",
+      "text": "The light tumor can only be placed on creep, it expands the creep.",
+      "x": 0,
+      "y": 0
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Nest",
+  "icon": "infestusfrontier:nest",
+  "category": "infestusfrontier:basics_folder/nest",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/nest_details/nest",
+      "text": ""
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:nest_from_crafting",
+      "title": "Nest Recipe",
+      "text": "This is how to craft a nest."}
+  ]
+}

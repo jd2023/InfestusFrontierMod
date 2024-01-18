@@ -2,7 +2,11 @@ package org.jd.infestusfrontier.block;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -12,10 +16,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
 import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
-import org.jd.infestusfrontier.enity.InfesterBlockEntity;
+
+import org.jd.infestusfrontier.block_entity.InfesterBlockEntity;
 import org.jd.infestusfrontier.precomp.Circle;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -24,7 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class Nest extends BaseEntityBlock {
-
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final String ID = "nest";
     private static final Logger LOGGER = LogUtils.getLogger();
 

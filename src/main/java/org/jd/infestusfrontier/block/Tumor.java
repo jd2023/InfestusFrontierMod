@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
-import org.jd.infestusfrontier.enity.InfesterBlockEntity;
+import org.jd.infestusfrontier.block_entity.InfesterBlockEntity;
 import org.jd.infestusfrontier.precomp.Circle;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
