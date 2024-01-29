@@ -1,0 +1,11 @@
+{
+  "name": "Infestus_network",
+  "icon": "infestusfrontier:infestus_network",
+  "category": "infestusfrontier:basics_folder/nest",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/nest_details/infestus_network",
+      "text": ""
+    }
+  ]
+}

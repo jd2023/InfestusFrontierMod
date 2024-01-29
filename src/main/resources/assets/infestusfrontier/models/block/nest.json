@@ -1,8 +1,8 @@
 {
   "parent": "block/cube",
   "textures": {
-    "particle": "infestusfrontier:block/creep_one",
-    "down": "infestusfrontier:block/creep_one",
+    "particle": "infestusfrontier:block/infestus_network_one",
+    "down": "infestusfrontier:block/infestus_network_one",
     "up": "infestusfrontier:block/nest_top",
     "north": "infestusfrontier:block/nest_side_1",
     "east": "infestusfrontier:block/nest_side_2",

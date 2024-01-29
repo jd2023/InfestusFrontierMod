@@ -2,7 +2,7 @@
   "components": [
     {
       "type": "patchouli:text",
-      "text": "The light tumor can only be placed on creep, it expands the creep.",
+      "text": "The light tumor can only be placed on infestus_network, it expands the infestus_network.",
       "x": 0,
       "y": 0
     }

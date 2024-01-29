@@ -2,7 +2,7 @@
   "parent": "block/cube_all",
   "textures": {
     "particle": "infestusfrontier:block/light_pod_top",
-    "down": "infestusfrontier:block/creep_one_32",
+    "down": "infestusfrontier:block/infestus_network_one_32",
     "up": "infestusfrontier:block/light_pod_top",
     "north": "infestusfrontier:block/light_pod_side",
     "east": "infestusfrontier:block/light_pod_side",

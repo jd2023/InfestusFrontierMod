@@ -61,7 +61,7 @@ public class Nest extends BaseEntityBlock {
         BlockPos posBelow = context.getClickedPos().below();
         BlockState stateBelow = context.getLevel().getBlockState(posBelow);
 
-        if (stateBelow.is(ZgBlocks.CREEP.get())) {
+        if (stateBelow.is(ZgBlocks.INFESTUS_NETWORK.get())) {
             return null;
         }
 

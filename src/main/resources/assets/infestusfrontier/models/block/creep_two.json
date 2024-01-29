@@ -1,6 +1,6 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "all": "infestusfrontier:block/creep_5"
+    "all": "infestusfrontier:block/infestus_network_5"
   }
 }

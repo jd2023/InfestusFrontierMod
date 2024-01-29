@@ -71,7 +71,7 @@ public class InfesterBlockEntity extends BlockEntity {
                 for (int i = -4; i < 4; i++) {
                     var mayBeInfestPos = posToInfest.offset(0, i, 0);
                     if (InfestUtils.canBeInfested(mayBeInfestPos, serverLevel) && InfestUtils.isExposed(mayBeInfestPos, serverLevel)) {
-                        InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, ZgBlocks.CREEP.get().defaultBlockState());
+                        InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, ZgBlocks.INFESTUS_NETWORK.get().defaultBlockState());
                     }
                 }
             }

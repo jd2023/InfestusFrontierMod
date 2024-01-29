@@ -36,7 +36,7 @@ public class LightSpreader extends Block {
             for (int i = 0; i < 11; i++) {
                 var nextPos = infectionPos.north();
                 for (int j = 0; j < 11; j++) {
-                    world.setBlockAndUpdate(infectionPos, ZgBlocks.CREEP.get().defaultBlockState());
+                    world.setBlockAndUpdate(infectionPos, ZgBlocks.INFESTUS_NETWORK.get().defaultBlockState());
                     infectionPos = infectionPos.west();
                 }
                 infectionPos = nextPos;
