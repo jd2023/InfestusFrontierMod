@@ -1,0 +1,16 @@
+{
+  "name": "Corruption Core",
+  "icon": "infestusfrontier:corruption_core",
+  "category": "infestusfrontier:basics_folder/corruption_core",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/corruption_core_details/corruption_core",
+      "text": ""
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:corruption_core_from_crafting",
+      "title": "Corruption Core Recipe",
+      "text": "This is how to craft a Corruption Core."}
+  ]
+}

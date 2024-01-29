@@ -1,9 +1,9 @@
 {
   "block.infestusfrontier.bio_reservoir": "Bio Reservoir",
-  "block.infestusfrontier.infestus_network": "Infestus_network",
-  "block.infestusfrontier.infestus_network_two": "Infestus_network 2",
+  "block.infestusfrontier.infestus_network": "Infestus network",
+  "block.infestusfrontier.infestus_network_two": "Infestus network 2",
   "block.infestusfrontier.light_spreader": "Light Spreader Spore",
-  "block.infestusfrontier.nest": "Nest",
+  "block.infestusfrontier.corruption_core": "cCorruption Core",
   "block.infestusfrontier.corrupt_chunk": "Block Of Flesh",
   "itemGroup.infestus_frontier_tab": "Infestus Frontier",
   "item.infestusfrontier.infested_connector": "Infested Connector",

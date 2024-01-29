@@ -2,11 +2,7 @@ package org.jd.infestusfrontier.block;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -19,8 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
 
@@ -32,12 +26,12 @@ import org.slf4j.Logger;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class Nest extends BaseEntityBlock {
+public class CorruptionCore extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-    public static final String ID = "nest";
+    public static final String ID = "corruption_core";
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public Nest() {
+    public CorruptionCore() {
         super(Properties.of(Material.STONE));
     }
 
@@ -71,11 +65,11 @@ public class Nest extends BaseEntityBlock {
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
-        LOGGER.info("Placed Nest at {}", pos);
+        LOGGER.info("Placed corruption_core at {}", pos);
 
         if (!world.isClientSide) {
-            BlockPos nestPos = pos.below();
-            if (!InfestUtils.canBeInfested(nestPos, world)) {
+            BlockPos corruption_corePos = pos.below();
+            if (!InfestUtils.canBeInfested(corruption_corePos, world)) {
                 return;
             }
             var someEntity = world.getBlockEntity(pos);
@@ -85,12 +79,12 @@ public class Nest extends BaseEntityBlock {
                     var randomLevel = Arrays.asList(level);
                     Collections.shuffle(randomLevel);
                     for (int[] offset : randomLevel) {
-                        var posToInfest = nestPos.offset(offset[0], 0, offset[1]);
+                        var posToInfest = corruption_corePos.offset(offset[0], 0, offset[1]);
                         entity.enqueueInitialBlocks(posToInfest);
                     }
                 }
             } else {
-                LOGGER.error("Unexpected NestBlockEntity type: {}", someEntity);
+                LOGGER.error("Unexpected corruption_coreBlockEntity type: {}", someEntity);
             }
         }
     }

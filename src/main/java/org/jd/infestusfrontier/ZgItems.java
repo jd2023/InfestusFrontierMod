@@ -16,8 +16,8 @@ public class ZgItems {
             () -> new BlockItem(ZgBlocks.LIGHT_SPREADER.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> CORRUPT_CHUNK = ITEMS.register(CorruptChunk.ID,
             () -> new BlockItem(ZgBlocks.CORRUPT_CHUNK.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
-    public static final RegistryObject<Item> NEST = ITEMS.register(Nest.ID,
-            () -> new BlockItem(ZgBlocks.NEST.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> corruption_core = ITEMS.register(CorruptionCore.ID,
+            () -> new BlockItem(ZgBlocks.corruption_core.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> BIO_RESERVOIR = ITEMS.register(BioReservoir.ID,
             () -> new BlockItem(ZgBlocks.BIO_RESERVOIR.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> TUMOR = ITEMS.register(Tumor.ID,

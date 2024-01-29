@@ -6,7 +6,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.block.BioReservoir;
-import org.jd.infestusfrontier.block.Nest;
+import org.jd.infestusfrontier.block.CorruptionCore;
 
 import org.jd.infestusfrontier.block_entity.BioReservoirBlockEntity;
 import org.jd.infestusfrontier.block_entity.InfesterBlockEntity;
@@ -16,8 +16,8 @@ public class ZgBlockEntities {
 
 
 
-    public static final RegistryObject<BlockEntityType<InfesterBlockEntity>> INFESTER_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(Nest.ID,
-            () -> BlockEntityType.Builder.of(InfesterBlockEntity::new, ZgBlocks.NEST.get(), ZgBlocks.TUMOR.get()).build(null));
+    public static final RegistryObject<BlockEntityType<InfesterBlockEntity>> INFESTER_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(CorruptionCore.ID,
+            () -> BlockEntityType.Builder.of(InfesterBlockEntity::new, ZgBlocks.corruption_core.get(), ZgBlocks.TUMOR.get()).build(null));
 
 
 

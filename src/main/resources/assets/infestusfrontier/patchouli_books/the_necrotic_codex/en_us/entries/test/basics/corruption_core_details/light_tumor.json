@@ -1,10 +1,10 @@
 {
   "name": "Light Tumor",
   "icon": "infestusfrontier:light_spreader",
-  "category": "infestusfrontier:basics_folder/nest",
+  "category": "infestusfrontier:basics_folder/corruption_core",
   "pages": [
     {
-      "type": "infestusfrontier:basics/nest_details/light_tumor",
+      "type": "infestusfrontier:basics/corruption_core_details/light_tumor",
       "text": ""
     },
     {

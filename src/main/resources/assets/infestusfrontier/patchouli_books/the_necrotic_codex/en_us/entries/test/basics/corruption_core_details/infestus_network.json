@@ -1,0 +1,11 @@
+{
+  "name": "Infestus network",
+  "icon": "infestusfrontier:infestus_network",
+  "category": "infestusfrontier:basics_folder/corruption_core",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/corruption_core_details/infestus_network",
+      "text": ""
+    }
+  ]
+}

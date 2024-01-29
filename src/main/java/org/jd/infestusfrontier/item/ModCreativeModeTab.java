@@ -9,7 +9,7 @@ public class ModCreativeModeTab {
     public static final CreativeModeTab INFESTUS_TAB = new CreativeModeTab("infestus_frontier_tab") {
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(ZgBlocks.NEST.get());
+            return new ItemStack(ZgBlocks.corruption_core.get());
         }
     };
 }

@@ -16,7 +16,7 @@ import java.awt.*;
 
 public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu> {
     public static final ResourceLocation TEXTURE =
-            new ResourceLocation(InfestusFrontier.MODID, "textures/gui/nest_biomass_gui.png");
+            new ResourceLocation(InfestusFrontier.MODID, "textures/gui/corruption_core_biomass_gui.png");
 
     public BioReservoirScreen(BioReservoirMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);

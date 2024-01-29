@@ -65,7 +65,7 @@ public class Tumor extends BaseEntityBlock {
         LOGGER.info("Placed InfestusPod at {}", pos);
 
         if (!world.isClientSide) {
-            BlockPos nestPos = pos.below();
+            BlockPos corruption_corePos = pos.below();
             var someEntity = world.getBlockEntity(pos);
             if (someEntity instanceof InfesterBlockEntity entity) {
                 for (int i = 0; i < 8; i++) {
@@ -73,7 +73,7 @@ public class Tumor extends BaseEntityBlock {
                     var randomLevel = Arrays.asList(level);
                     Collections.shuffle(randomLevel);
                     for (int[] offset : randomLevel) {
-                        var posToInfest = nestPos.offset(offset[0], 0, offset[1]);
+                        var posToInfest = corruption_corePos.offset(offset[0], 0, offset[1]);
                         entity.enqueueInitialBlocks(posToInfest);
                     }
                 }
