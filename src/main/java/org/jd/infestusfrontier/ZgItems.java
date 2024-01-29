@@ -14,8 +14,8 @@ public class ZgItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, InfestusFrontier.MODID);
     public static final RegistryObject<Item> LIGHT_SPREADER = ITEMS.register(LightSpreader.ID,
             () -> new BlockItem(ZgBlocks.LIGHT_SPREADER.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
-    public static final RegistryObject<Item> FLESH_BLOCK = ITEMS.register(FleshBlock.ID,
-            () -> new BlockItem(ZgBlocks.FLESH_BLOCK.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> CORRUPT_CHUNK = ITEMS.register(CorruptChunk.ID,
+            () -> new BlockItem(ZgBlocks.CORRUPT_CHUNK.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> NEST = ITEMS.register(Nest.ID,
             () -> new BlockItem(ZgBlocks.NEST.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> BIO_RESERVOIR = ITEMS.register(BioReservoir.ID,
