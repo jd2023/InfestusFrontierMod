@@ -23,12 +23,12 @@ import org.slf4j.Logger;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class Tumor extends BaseEntityBlock {
-    public static final String ID = "tumor";
+public class InfestusPod extends BaseEntityBlock {
+    public static final String ID = "infestus_pod";
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public Tumor() {
+    public InfestusPod() {
         super(Properties.of(Material.STONE));
     }
 

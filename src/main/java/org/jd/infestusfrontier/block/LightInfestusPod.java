@@ -12,12 +12,12 @@ import net.minecraft.world.level.material.Material;
 import org.jd.infestusfrontier.ZgBlocks;
 import org.slf4j.Logger;
 
-public class LightSpreader extends Block {
+public class LightInfestusPod extends Block {
 
-    public static final String ID = "light_spreader";
+    public static final String ID = "light_infestus_pod";
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public LightSpreader() {
+    public LightInfestusPod() {
         super(Properties.of(Material.STONE)
                 .strength(1.5f, 6.0f)
                 .lightLevel(state -> 15)
