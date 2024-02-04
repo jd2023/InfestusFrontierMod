@@ -17,7 +17,7 @@ public class ZgBlockEntities {
 
 
     public static final RegistryObject<BlockEntityType<InfesterBlockEntity>> INFESTER_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(CorruptionCore.ID,
-            () -> BlockEntityType.Builder.of(InfesterBlockEntity::new, ZgBlocks.corruption_core.get(), ZgBlocks.INFESTUS_POD.get()).build(null));
+            () -> BlockEntityType.Builder.of(InfesterBlockEntity::new, ZgBlocks.CORRUPTION_CORE.get(), ZgBlocks.INFESTUS_POD.get()).build(null));
 
 
 
