@@ -1,0 +1,10 @@
+{
+  "components": [
+    {
+      "type": "patchouli:text",
+      "text": "This is the most primitive shovel, later you will be able to mutate with the mutation pool it so it will be able to swing faster and do more damage.",
+      "x": 0,
+      "y": 0
+    }
+  ]
+}

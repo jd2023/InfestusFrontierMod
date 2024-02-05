@@ -1,0 +1,16 @@
+{
+  "name": "Meat Hoe",
+  "icon": "infestusfrontier:meat_hoe",
+  "category": "infestusfrontier:basics_folder/basic_tier_one_tools",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/tools/tier_one/meat_hoe",
+      "text": ""
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:meat_hoe_from_crafting",
+      "title": "Meat Hoe Recipe",
+      "text": "This is how to craft the meat hoe."}
+  ]
+}

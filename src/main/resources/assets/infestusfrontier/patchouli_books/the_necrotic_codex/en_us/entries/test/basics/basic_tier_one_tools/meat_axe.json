@@ -1,0 +1,16 @@
+{
+  "name": "Meat Axe",
+  "icon": "infestusfrontier:meat_axe",
+  "category": "infestusfrontier:basics_folder/basic_tier_one_tools",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/tools/tier_one/meat_axe",
+      "text": ""
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:meat_axe_from_crafting",
+      "title": "Meat Axe Recipe",
+      "text": "This is how to craft the meat axe."}
+  ]
+}

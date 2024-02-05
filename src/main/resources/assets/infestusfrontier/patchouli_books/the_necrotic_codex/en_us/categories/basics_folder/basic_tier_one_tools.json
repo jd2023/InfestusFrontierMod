@@ -1,0 +1,6 @@
+{
+  "name": "Basic Meat Tools",
+  "description": "This will explain everything about the basic meat tools.",
+  "parent": "infestusfrontier:basics",
+  "icon": "infestusfrontier:meat_sword"
+}

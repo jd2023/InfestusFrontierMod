@@ -1,0 +1,16 @@
+{
+  "name": "Meat Shovel",
+  "icon": "infestusfrontier:meat_shovel",
+  "category": "infestusfrontier:basics_folder/basic_tier_one_tools",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/tools/tier_one/meat_shovel",
+      "text": ""
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:meat_shovel_from_crafting",
+      "title": "Meat Shovel Recipe",
+      "text": "This is how to craft the meat shovel."}
+  ]
+}

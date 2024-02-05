@@ -1,0 +1,16 @@
+{
+  "name": "Meat Pickaxe",
+  "icon": "infestusfrontier:meat_pickaxe",
+  "category": "infestusfrontier:basics_folder/basic_tier_one_tools",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/tools/tier_one/meat_pickaxe",
+      "text": ""
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:meat_pickaxe_from_crafting",
+      "title": "Meat Pickaxe Recipe",
+      "text": "This is how to craft the meat pickaxe."}
+  ]
+}
