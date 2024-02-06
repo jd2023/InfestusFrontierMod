@@ -5,12 +5,20 @@
   "block.infestusfrontier.light_infestus_pod": "Light Infestus Pod",
   "block.infestusfrontier.corruption_core": "Corruption Core",
   "block.infestusfrontier.corrupt_chunk": "Block Of Flesh",
+
   "itemGroup.infestus_frontier_tab": "Infestus Frontier",
+
   "item.infestusfrontier.infested_connector": "Infested Connector",
   "item.infestusfrontier.meat_sword": "Meat Sword Tier 1",
   "item.infestusfrontier.meat_shovel": "Meat Shovel Tier 1",
   "item.infestusfrontier.meat_axe": "Meat Axe Tier 1",
   "item.infestusfrontier.meat_hoe": "Meat Hoe Tier 1",
   "item.infestusfrontier.meat_pickaxe": "Meat Pickaxe Tier 1",
+
+  "item.infestusfrontier.meat_helmet": "Meat Helmet Tier 1",
+  "item.infestusfrontier.meat_chestplate": "Meat Chestplate Tier 1",
+  "item.infestusfrontier.meat_leggings": "Meat Leggings Tier 1",
+  "item.infestusfrontier.meat_boots": "Meat Boots Tier 1",
+
   "block.infestusfrontier.infestus_pod": "Infestus pod"
 }

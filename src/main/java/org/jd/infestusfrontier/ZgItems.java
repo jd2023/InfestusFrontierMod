@@ -1,5 +1,6 @@
 package org.jd.infestusfrontier;
 
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -21,19 +22,31 @@ public class ZgItems {
     public static final RegistryObject<Item> INFESTUS_POD = ITEMS.register(InfestusPod.ID,
             () -> new BlockItem(ZgBlocks.INFESTUS_POD.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_SWORD = ITEMS.register(MeatSword.ID,
-            () -> new SwordItem(ToolTiers.TIER1TOOLS, 1, 1,
+            () -> new SwordItem(ZgToolTiers.TIER1TOOLS, 1, 1,
                     new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_AXE = ITEMS.register(MeatAxe.ID,
-            () -> new AxeItem(ToolTiers.TIER1TOOLS, 1, 1,
+            () -> new AxeItem(ZgToolTiers.TIER1TOOLS, 1, 1,
                     new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_HOE = ITEMS.register(MeatHoe.ID,
-            () -> new HoeItem(ToolTiers.TIER1TOOLS, 1, 1,
+            () -> new HoeItem(ZgToolTiers.TIER1TOOLS, 1, 1,
                     new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_SHOVEL = ITEMS.register(MeatShovel.ID,
-            () -> new ShovelItem(ToolTiers.TIER1TOOLS, 1, 1,
+            () -> new ShovelItem(ZgToolTiers.TIER1TOOLS, 1, 1,
                     new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_PICKAXE = ITEMS.register(MeatPickaxe.ID,
-            () -> new PickaxeItem(ToolTiers.TIER1TOOLS, 1, 1,
+            () -> new PickaxeItem(ZgToolTiers.TIER1TOOLS, 1, 1,
+                    new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> MEAT_HELMET = ITEMS.register(MeatHelmet.ID,
+            () -> new ArmorItem(ZgArmorMaterials.FLESH_TIER_ONE, EquipmentSlot.HEAD,
+                    new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> MEAT_CHESTPLATE = ITEMS.register(MeatChestplate.ID,
+            () -> new ArmorItem(ZgArmorMaterials.FLESH_TIER_ONE, EquipmentSlot.CHEST,
+                    new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> MEAT_LEGGINGS = ITEMS.register(MeatLeggings.ID,
+            () -> new ArmorItem(ZgArmorMaterials.FLESH_TIER_ONE, EquipmentSlot.LEGS,
+                    new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> MEAT_BOOTS= ITEMS.register(MeatBoots.ID,
+            () -> new ArmorItem(ZgArmorMaterials.FLESH_TIER_ONE, EquipmentSlot.FEET,
                     new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> INFESTED_CONNECTOR = ITEMS.register(InfestedConnector.ID, InfestedConnector::new);
 
