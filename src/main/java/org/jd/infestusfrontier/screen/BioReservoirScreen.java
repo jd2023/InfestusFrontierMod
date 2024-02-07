@@ -2,17 +2,12 @@ package org.jd.infestusfrontier.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.jd.infestusfrontier.InfestusFrontier;
-import org.jd.infestusfrontier.block_entity.BioReservoirBlockEntity;
-
-
-import java.awt.*;
 
 public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu> {
     public static final ResourceLocation TEXTURE =

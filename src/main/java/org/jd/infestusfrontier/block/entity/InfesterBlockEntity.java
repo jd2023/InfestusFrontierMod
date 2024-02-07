@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.block_entity;
+package org.jd.infestusfrontier.block.entity;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;

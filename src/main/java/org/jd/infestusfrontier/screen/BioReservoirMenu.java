@@ -7,13 +7,10 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
-import org.jd.infestusfrontier.block_entity.BioReservoirBlockEntity;
-import org.jetbrains.annotations.Nullable;
+import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
 
 public class BioReservoirMenu extends AbstractContainerMenu {
     public final BioReservoirBlockEntity blockEntity;

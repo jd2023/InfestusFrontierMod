@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.precomp;
+package org.jd.infestusfrontier.utils;
 
 public class Circle {
     public static int[][][] data = {

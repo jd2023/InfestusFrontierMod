@@ -8,8 +8,8 @@ import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.block.BioReservoir;
 import org.jd.infestusfrontier.block.CorruptionCore;
 
-import org.jd.infestusfrontier.block_entity.BioReservoirBlockEntity;
-import org.jd.infestusfrontier.block_entity.InfesterBlockEntity;
+import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
+import org.jd.infestusfrontier.block.entity.InfesterBlockEntity;
 
 public class ZgBlockEntities {
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, InfestusFrontier.MODID);
