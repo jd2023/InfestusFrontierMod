@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "#3#",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "infestusfrontier:corrupt_chunk"
+    },
+    "3": {
+      "item": "infestusfrontier:book"
+    }
+  },
+  "result": {
+    "item": "patchouli:book",
+    "nbt": {
+      "patchouli:book": "infestusfrontier:the_necrotic_codex"
+    }
+  }
+}

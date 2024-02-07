@@ -1,0 +1,10 @@
+{
+  "components": [
+    {
+      "type": "patchouli:text",
+      "text": "This is the most primitive helmet, later you will be able to mutate with the mutation pool it so you will be able to have night vision and water breathing...",
+      "x": 0,
+      "y": 0
+    }
+  ]
+}

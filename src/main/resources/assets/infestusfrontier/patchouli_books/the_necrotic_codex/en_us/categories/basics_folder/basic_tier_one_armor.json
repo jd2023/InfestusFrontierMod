@@ -1,0 +1,6 @@
+{
+  "name": "Basic Meat Armor",
+  "description": "This will explain everything about the basic meat armor.",
+  "parent": "infestusfrontier:basics",
+  "icon": "infestusfrontier:meat_chestplate"
+}

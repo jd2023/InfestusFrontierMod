@@ -1,0 +1,16 @@
+{
+  "name": "Meat Boots",
+  "icon": "infestusfrontier:meat_boots",
+  "category": "infestusfrontier:basics_folder/basic_tier_one_armor",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/armor/tier_one/meat_boots",
+      "text": ""
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:meat_boots_from_crafting",
+      "title": "Meat Boots Recipe",
+      "text": "This is how to craft the meat boots."}
+  ]
+}

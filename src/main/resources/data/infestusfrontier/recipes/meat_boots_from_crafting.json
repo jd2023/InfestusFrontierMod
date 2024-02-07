@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "# #",
+    "# #"
+  ],
+  "key": {
+    "#": {
+      "item": "infestusfrontier:corrupt_chunk"
+    }
+  },
+  "result": {
+    "item": "infestusfrontier:meat_boots"
+  }
+}
