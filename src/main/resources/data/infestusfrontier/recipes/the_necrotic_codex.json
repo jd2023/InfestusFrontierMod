@@ -7,14 +7,14 @@
   ],
   "key": {
     "#": {
-      "item": "infestusfrontier:corrupt_chunk"
+      "item": "minecraft:rotten_flesh"
     },
     "3": {
-      "item": "infestusfrontier:book"
+      "item": "minecraft:book"
     }
   },
   "result": {
-    "item": "patchouli:book",
+    "item": "patchouli:guide_book",
     "nbt": {
       "patchouli:book": "infestusfrontier:the_necrotic_codex"
     }
