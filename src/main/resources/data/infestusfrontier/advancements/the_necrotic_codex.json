@@ -1,0 +1,44 @@
+{
+  "display": {
+    "title": {
+      "text": "The Necrotic Codex",
+      "color": "red"
+    },
+    "description": {
+      "text": "Learn the secrets of the Necrotic Codex"
+    },
+    "icon": {
+      "item": "minecraft:rotten_flesh"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false,
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png"
+  },
+  "criteria": {
+    "gotSomeFlesh": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "count": {
+              "min": 8
+            },
+            "item": "minecraft:rotten_flesh"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "gotSomeFlesh"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "infestusfrontier:the_necrotic_codex"
+    ]
+  }
+}
