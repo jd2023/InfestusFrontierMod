@@ -1,10 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "###",
-    "#3#",
-    "###"
-  ],
   "key": {
     "#": {
       "item": "minecraft:rotten_flesh"
@@ -13,6 +8,11 @@
       "item": "minecraft:book"
     }
   },
+  "pattern": [
+    "###",
+    "#3#",
+    "###"
+  ],
   "result": {
     "item": "patchouli:guide_book",
     "nbt": {
