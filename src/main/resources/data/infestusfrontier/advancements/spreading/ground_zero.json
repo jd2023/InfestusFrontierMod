@@ -1,0 +1,61 @@
+{
+  "parent": "infestusfrontier:spreading/root",
+  "display": {
+
+    "title": {
+
+      "text": "Ground Zero",
+
+      "color": "gold"
+
+    },
+
+    "description": {
+
+      "text": "Place a corruption core"
+
+    },
+
+    "icon": {
+
+      "item": "minecraft:book"
+
+    },
+
+    "frame": "task",
+
+    "show_toast": true,
+
+    "announce_to_chat": true,
+
+    "hidden": false
+
+  },
+
+  "criteria": {
+
+    "placedBlock": {
+
+      "trigger": "minecraft:placed_block",
+
+      "conditions": {
+
+        "block": "infestusfrontier:corruption_core"
+
+      }
+
+    }
+
+  },
+
+  "requirements": [
+
+    [
+
+      "placedBlock"
+
+    ]
+
+  ]
+
+}
