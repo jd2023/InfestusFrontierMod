@@ -1,0 +1,143 @@
+{
+
+  "parent": "infestusfrontier:spreading/meaty",
+
+  "display": {
+
+    "title": {
+
+      "text": "Slow and Steady.",
+
+      "color": "red"
+
+    },
+
+    "description": {
+
+      "text": "Obtain a piece of meat armor"
+
+    },
+
+    "icon": {
+
+      "item": "infestusfrontier:meat_chestplate"
+
+    },
+
+    "frame": "task",
+
+    "show_toast": true,
+
+    "announce_to_chat": true,
+
+    "hidden": false
+
+  },
+
+  "criteria": {
+
+    "hasMeatHelmet": {
+
+      "trigger": "minecraft:inventory_changed",
+
+      "conditions": {
+
+        "items": [
+
+          {
+
+            "items": ["infestusfrontier:meat_helmet"]
+
+          }
+
+        ]
+
+      }
+
+    },
+
+    "hasMeatChestplate": {
+
+      "trigger": "minecraft:inventory_changed",
+
+      "conditions": {
+
+        "items": [
+
+          {
+
+            "items": ["infestusfrontier:meat_chestplate"]
+
+          }
+
+        ]
+
+      }
+
+    },
+
+    "hasMeatLeggings": {
+
+      "trigger": "minecraft:inventory_changed",
+
+      "conditions": {
+
+        "items": [
+
+          {
+
+            "items": ["infestusfrontier:meat_leggings"]
+
+          }
+
+        ]
+
+      }
+
+    },
+
+    "hasMeatBoots": {
+
+      "trigger": "minecraft:inventory_changed",
+
+      "conditions": {
+
+        "items": [
+
+          {
+
+            "items": ["infestusfrontier:meat_boots"]
+
+          }
+
+        ]
+
+      }
+
+    }
+
+  },
+
+  "requirements": [
+
+    [
+
+      "hasMeatHelmet",
+
+      "hasMeatChestplate",
+
+      "hasMeatLeggings",
+
+      "hasMeatBoots"
+
+    ]
+
+  ],
+
+  "rewards": {
+
+    "experience": 10
+
+  }
+
+}

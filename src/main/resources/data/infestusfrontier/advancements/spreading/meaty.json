@@ -1,0 +1,66 @@
+{
+
+  "parent": "infestusfrontier:spreading/root",
+
+  "display": {
+
+    "title": {
+
+      "text": "Meaty!",
+
+      "color": "gold"
+
+    },
+
+    "description": {
+
+      "text": "Obtain a corrupt chunk"
+
+    },
+
+    "icon": {
+
+      "item": "infestusfrontier:corrupt_chunk"
+
+    },
+
+    "frame": "task",
+
+    "show_toast": true,
+
+    "announce_to_chat": true,
+
+    "hidden": false
+
+  },
+
+  "criteria": {
+    "has_item": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "infestusfrontier:corrupt_chunk"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+
+    [
+
+      "has_item"
+
+    ]
+
+  ],
+
+  "rewards": {
+
+    "experience": 5
+
+  }
+}

@@ -1,0 +1,164 @@
+{
+
+  "parent": "infestusfrontier:spreading/meaty",
+
+  "display": {
+
+    "title": {
+
+      "text": "One by one...",
+
+      "color": "red"
+
+    },
+
+    "description": {
+
+      "text": "Obtain a piece of meat tools/weapons"
+
+    },
+
+    "icon": {
+
+      "item": "infestusfrontier:meat_sword"
+
+    },
+
+    "frame": "task",
+
+    "show_toast": true,
+
+    "announce_to_chat": true,
+
+    "hidden": false
+
+  },
+
+  "criteria": {
+
+    "hasMeatAxe": {
+
+      "trigger": "minecraft:inventory_changed",
+
+      "conditions": {
+
+        "items": [
+
+          {
+
+            "items": ["infestusfrontier:meat_axe"]
+
+          }
+
+        ]
+
+      }
+
+    },
+
+    "hasMeatSword": {
+
+      "trigger": "minecraft:inventory_changed",
+
+      "conditions": {
+
+        "items": [
+
+          {
+
+            "items": ["infestusfrontier:meat_sword"]
+
+          }
+
+        ]
+
+      }
+
+    },
+
+    "hasMeatHoe": {
+
+      "trigger": "minecraft:inventory_changed",
+
+      "conditions": {
+
+        "items": [
+
+          {
+
+            "items": ["infestusfrontier:meat_hoe"]
+
+          }
+
+        ]
+
+      }
+
+    },
+
+    "hasMeatPickaxe": {
+
+      "trigger": "minecraft:inventory_changed",
+
+      "conditions": {
+
+        "items": [
+
+          {
+
+            "items": ["infestusfrontier:meat_pickaxe"]
+
+          }
+
+        ]
+
+      }
+
+    },
+
+    "hasMeatShovel": {
+
+      "trigger": "minecraft:inventory_changed",
+
+      "conditions": {
+
+        "items": [
+
+          {
+
+            "items": ["infestusfrontier:meat_shovel"]
+
+          }
+
+        ]
+
+      }
+
+    }
+
+  },
+
+  "requirements": [
+
+    [
+
+      "hasMeatAxe",
+
+      "hasMeatSword",
+
+      "hasMeatHoe",
+
+      "hasMeatPickaxe",
+      "hasMeatShovel"
+
+    ]
+
+  ],
+
+  "rewards": {
+
+    "experience": 10
+
+  }
+
+}

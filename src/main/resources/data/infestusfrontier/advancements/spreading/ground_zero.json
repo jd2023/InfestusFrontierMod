@@ -1,12 +1,12 @@
 {
-  "parent": "infestusfrontier:spreading/root",
+  "parent": "infestusfrontier:spreading/connector",
   "display": {
 
     "title": {
 
       "text": "Ground Zero",
 
-      "color": "gold"
+      "color": "red"
 
     },
 
@@ -18,7 +18,7 @@
 
     "icon": {
 
-      "item": "minecraft:book"
+      "item": "infestusfrontier:corruption_core"
 
     },
 
@@ -56,6 +56,11 @@
 
     ]
 
-  ]
+  ],
+  "rewards": {
+
+    "experience": 10
+
+  }
 
 }

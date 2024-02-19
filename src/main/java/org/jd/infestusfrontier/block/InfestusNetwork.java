@@ -9,4 +9,5 @@ public class InfestusNetwork extends Block {
     public InfestusNetwork() {
         super(Properties.of(Material.MOSS));
     }
+
 }

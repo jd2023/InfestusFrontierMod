@@ -1,0 +1,66 @@
+{
+  "parent": "infestusfrontier:spreading/ground_zero",
+  "display": {
+
+    "title": {
+
+      "text": "Basic Deployment",
+
+      "color": "black"
+
+    },
+
+    "description": {
+
+      "text": "Place a infestus pod"
+
+    },
+
+    "icon": {
+
+      "item": "infestusfrontier:infestus_pod"
+
+    },
+
+    "frame": "task",
+
+    "show_toast": true,
+
+    "announce_to_chat": true,
+
+    "hidden": false
+
+  },
+
+  "criteria": {
+
+    "placedBlock": {
+
+      "trigger": "minecraft:placed_block",
+
+      "conditions": {
+
+        "block": "infestusfrontier:infestus_pod"
+
+      }
+
+    }
+
+  },
+
+  "requirements": [
+
+    [
+
+      "placedBlock"
+
+    ]
+
+  ],
+  "rewards": {
+
+    "experience": 15
+
+  }
+
+}
