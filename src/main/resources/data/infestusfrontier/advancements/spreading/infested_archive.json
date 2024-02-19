@@ -1,10 +1,10 @@
 {
-  "parent": "infestusfrontier:spreading/ground_zero",
+  "parent": "infestusfrontier:spreading/slimy",
   "display": {
 
     "title": {
 
-      "text": "Basic Deployment",
+      "text": "Infested Archive",
 
       "color": "red"
 
@@ -12,13 +12,13 @@
 
     "description": {
 
-      "text": "Place a infestus pod"
+      "text": "Place a bio reservoir"
 
     },
 
     "icon": {
 
-      "item": "infestusfrontier:infestus_pod"
+      "item": "infestusfrontier:bio_reservoir"
 
     },
 
@@ -40,7 +40,7 @@
 
       "conditions": {
 
-        "block": "infestusfrontier:infestus_pod"
+        "block": "infestusfrontier:bio_reservoir"
 
       }
 
@@ -59,7 +59,7 @@
   ],
   "rewards": {
 
-    "experience": 15
+    "experience": 10
 
   }
 

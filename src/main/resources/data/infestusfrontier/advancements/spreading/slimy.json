@@ -1,0 +1,66 @@
+{
+
+  "parent": "infestusfrontier:spreading/root",
+
+  "display": {
+
+    "title": {
+
+      "text": "Slimy!",
+
+      "color": "gold"
+
+    },
+
+    "description": {
+
+      "text": "Obtain a slime ball"
+
+    },
+
+    "icon": {
+
+      "item": "minecraft:slime_ball"
+
+    },
+
+    "frame": "task",
+
+    "show_toast": true,
+
+    "announce_to_chat": true,
+
+    "hidden": false
+
+  },
+
+  "criteria": {
+    "has_item": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:slime_ball"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+
+    [
+
+      "has_item"
+
+    ]
+
+  ],
+
+  "rewards": {
+
+    "experience": 5
+
+  }
+}
