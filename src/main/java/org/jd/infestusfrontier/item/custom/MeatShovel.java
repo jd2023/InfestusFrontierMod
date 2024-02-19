@@ -1,6 +1,7 @@
-package org.jd.infestusfrontier.item;
+package org.jd.infestusfrontier.item.custom;
 
 import net.minecraft.world.item.Item;
+import org.jd.infestusfrontier.item.ModCreativeModeTab;
 
 
 public class MeatShovel extends Item {

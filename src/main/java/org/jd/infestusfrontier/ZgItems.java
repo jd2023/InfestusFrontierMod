@@ -8,6 +8,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.block.*;
 import org.jd.infestusfrontier.item.*;
+import org.jd.infestusfrontier.item.custom.*;
 
 public class ZgItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, InfestusFrontier.MODID);
@@ -37,7 +38,7 @@ public class ZgItems {
             () -> new PickaxeItem(ZgToolTiers.TIER1TOOLS, 1, 1,
                     new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_HELMET = ITEMS.register(MeatHelmet.ID,
-            () -> new ArmorItem(ZgArmorMaterials.FLESH_TIER_ONE, EquipmentSlot.HEAD,
+            () -> new ZgArmorItem(ZgArmorMaterials.FLESH_TIER_ONE, EquipmentSlot.HEAD,
                     new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_CHESTPLATE = ITEMS.register(MeatChestplate.ID,
             () -> new ArmorItem(ZgArmorMaterials.FLESH_TIER_ONE, EquipmentSlot.CHEST,
