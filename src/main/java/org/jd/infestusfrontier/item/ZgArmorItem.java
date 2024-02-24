@@ -79,7 +79,6 @@ public class ZgArmorItem extends ArmorItem {
     }
     private boolean isOnInfestusNetwork(Player player) {
         boolean isOnNetwork = false;
-        int y = player.getBlockY()-1;
         if (player.getBlockStateOn().getBlock() == ZgBlocks.INFESTUS_NETWORK.get()) {
             isOnNetwork = true;
         }
