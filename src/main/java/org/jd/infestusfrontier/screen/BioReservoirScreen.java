@@ -16,8 +16,8 @@ public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu
 
     public BioReservoirScreen(BioReservoirMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
-        this.imageWidth = 184;
-        this.imageHeight = 184;
+        this.imageWidth = 256;
+        this.imageHeight = 256;
     }
 
     @Override
@@ -30,8 +30,8 @@ public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
-        int x = (this.width - this.imageWidth) / 2;
-        int y = (this.height - this.imageHeight) / 2;
+        int x = ((this.width - this.imageWidth) / 2);
+        int y = ((this.height - this.imageHeight) / 2);
         blit(stack, x, y, 0, 0, this.imageWidth, this.imageHeight);
     }
 
