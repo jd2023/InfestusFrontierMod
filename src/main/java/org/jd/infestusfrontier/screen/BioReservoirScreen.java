@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
 
 public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu> {
     public static final ResourceLocation TEXTURE =
@@ -30,7 +31,22 @@ public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         blit(stack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
-        blit(stack, this.leftPos+10, this.topPos+16, 177, 94, 18, 56);
+        blit(stack, this.leftPos+140, this.topPos+16, 177, 94, 18, 56);
+        blit(stack, this.leftPos+100, this.topPos+20, 177, 61, 22, 15);
+        renderProgressArrow(stack, this.leftPos, this.topPos);
+        blit(stack, this.leftPos+70, this.topPos+20, 1, 185, 18, 18);
+    }
+    private void renderProgressArrow(PoseStack stack, int x, int y) {
+        if (menu.isCrafting()) {
+            blit(stack, x +100, y+20, 177, 77, menu.getScaledProgress(), 16);
+        }
+    }
+
+    @Override
+    public void render(PoseStack stack, int mouseX, int mouseY, float delta) {
+        renderBackground(stack);
+        super.render(stack, mouseX, mouseY, delta);
+        renderTooltip(stack, mouseX, mouseY);
     }
 }
 

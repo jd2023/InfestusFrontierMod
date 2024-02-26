@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.screen;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -15,24 +16,37 @@ import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
 public class BioReservoirMenu extends AbstractContainerMenu {
     public final BioReservoirBlockEntity blockEntity;
     private final Level level;
+    public final ContainerData data;
+
 
     public BioReservoirMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        this(id, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()));
+        this(id, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()),new SimpleContainerData(2));
     }
-    public BioReservoirMenu(int id, Inventory inv, BlockEntity entity) {
+    public BioReservoirMenu(int id, Inventory inv, BlockEntity entity, ContainerData data) {
         super(ModMenuTypes.BIO_RESERVOIR_MENU.get(), id);
-        checkContainerSize(inv, 2);
+        checkContainerSize(inv, 1);
         blockEntity = (BioReservoirBlockEntity) entity;
         this.level = inv.player.level;
+        this.data = data;
 
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
 
         this.blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler->{
-            this.addSlot(new SlotItemHandler(handler, 0, 0, 0));
-            this.addSlot(new SlotItemHandler(handler, 0, 50, 50));
+            this.addSlot(new SlotItemHandler(handler, 0, 71, 21));
         });
     }
+    public boolean isCrafting() {
+       System.out.println(blockEntity.getProgress());
+       return blockEntity.getProgress()>0;
+    }
+    public int getScaledProgress() {
+        int progress = this.data.get(0);
+        int maxProgress = this.data.get(1);
+        int progressArrowSize = 22;
+        return maxProgress != 0 && progress != 0 ? progress * progressArrowSize / maxProgress : 0;
+    }
+
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
     // must assign a slot number to each of the slots used by the GUI.
@@ -50,7 +64,7 @@ public class BioReservoirMenu extends AbstractContainerMenu {
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
 
     // THIS YOU HAVE TO DEFINE!
-    private static final int TE_INVENTORY_SLOT_COUNT = 2;  // must be the number of slots you have!
+    private static final int TE_INVENTORY_SLOT_COUNT = 1;  // must be the number of slots you have!
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
@@ -93,15 +107,16 @@ public class BioReservoirMenu extends AbstractContainerMenu {
     private void addPlayerInventory(Inventory playerInventory) {
         for(int i = 0; i < 3; ++i) {
             for(int j = 0; j < 9; ++j) {
-                this.addSlot(new Slot(playerInventory, j + i * 18 + 5, 8 + j * 18, 102 + i * 18));
+                this.addSlot(new Slot(playerInventory, i*9+j+9, 8 + j * 18, 102 + i * 18));
             }
         }
     }
 
     private void addPlayerHotbar(Inventory playerInventory) {
         for(int k = 0; k < 9; ++k) {
-            this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 142));
+            this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 160));
         }
     }
+
 }
 
