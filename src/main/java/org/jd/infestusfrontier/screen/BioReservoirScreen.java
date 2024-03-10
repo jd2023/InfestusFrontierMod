@@ -35,6 +35,7 @@ public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu
         blit(stack, this.leftPos+100, this.topPos+20, 177, 61, 22, 15);
         renderProgressArrow(stack, this.leftPos, this.topPos);
         blit(stack, this.leftPos+70, this.topPos+20, 1, 185, 18, 18);
+        this.font.draw(stack, "Progress: " + this.menu.data.get(0), this.leftPos+20, this.topPos+40, 0xFFFFFF);
     }
     private void renderProgressArrow(PoseStack stack, int x, int y) {
         if (menu.isCrafting()) {

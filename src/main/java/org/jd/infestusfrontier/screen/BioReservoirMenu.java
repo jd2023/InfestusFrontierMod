@@ -1,44 +1,45 @@
 package org.jd.infestusfrontier.screen;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.Container;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
+import org.jd.infestusfrontier.screen.sync.BioReservoidData;
 
 public class BioReservoirMenu extends AbstractContainerMenu {
-    public final BioReservoirBlockEntity blockEntity;
-    private final Level level;
+    private final ContainerLevelAccess containerAccess;
     public final ContainerData data;
 
 
-    public BioReservoirMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        this(id, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()),new SimpleContainerData(2));
+    public BioReservoirMenu(int id, Inventory inv) {
+        this(id, inv, new ItemStackHandler(1), BlockPos.ZERO, new SimpleContainerData(2));
     }
-    public BioReservoirMenu(int id, Inventory inv, BlockEntity entity, ContainerData data) {
+    public BioReservoirMenu(int id, Inventory inv, IItemHandler slots, BlockPos pos, ContainerData data) {
         super(ModMenuTypes.BIO_RESERVOIR_MENU.get(), id);
         checkContainerSize(inv, 1);
-        blockEntity = (BioReservoirBlockEntity) entity;
-        this.level = inv.player.level;
+        this.containerAccess = ContainerLevelAccess.create(inv.player.level, pos);
         this.data = data;
 
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
 
-        this.blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler->{
-            this.addSlot(new SlotItemHandler(handler, 0, 71, 21));
-        });
+        this.addSlot(new SlotItemHandler(slots, 0, 71, 21));
+        addDataSlots(this.data);
     }
+
+    public static MenuConstructor getServerContainer(BioReservoirBlockEntity reservoir, BlockPos pos) {
+        return (id, playerInv, player) -> new BioReservoirMenu(id, playerInv, reservoir.itemHandler, pos,
+                new BioReservoidData(reservoir, 2));
+    }
+
     public boolean isCrafting() {
-       System.out.println(blockEntity.getProgress());
-       return blockEntity.getProgress()>0;
+       return this.data.get(0)>0;
     }
     public int getScaledProgress() {
         int progress = this.data.get(0);
@@ -101,8 +102,7 @@ public class BioReservoirMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
-                player, ZgBlocks.BIO_RESERVOIR.get());
+        return stillValid(this.containerAccess, player, ZgBlocks.BIO_RESERVOIR.get());
     }
     private void addPlayerInventory(Inventory playerInventory) {
         for(int i = 0; i < 3; ++i) {

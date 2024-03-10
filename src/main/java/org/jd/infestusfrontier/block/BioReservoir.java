@@ -4,6 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -18,7 +20,9 @@ import net.minecraftforge.network.NetworkHooks;
 import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
 
+import org.jd.infestusfrontier.screen.BioReservoirMenu;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.network.chat.Component;
 
 public class BioReservoir extends BaseEntityBlock {
     public static final String ID = "bio_reservoir";
@@ -43,18 +47,16 @@ public class BioReservoir extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos,
-                                 Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (!pLevel.isClientSide()) {
-            BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(entity instanceof BioReservoirBlockEntity) {
-                NetworkHooks.openScreen(((ServerPlayer)pPlayer), (BioReservoirBlockEntity)entity, pPos);
-            } else {
-                throw new IllegalStateException("Our Container provider is missing!");
-            }
+    public InteractionResult use(BlockState state, Level level, BlockPos pos,
+                                 Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof BioReservoirBlockEntity reservoir) {
+            final MenuProvider container = new SimpleMenuProvider(
+                    BioReservoirMenu.getServerContainer(reservoir, pos),
+                    Component.literal("Bio Reservoir"));
+            NetworkHooks.openScreen(((ServerPlayer) player), container, pos);
         }
 
-        return InteractionResult.sidedSuccess(pLevel.isClientSide());
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override

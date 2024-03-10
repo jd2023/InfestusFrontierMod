@@ -14,12 +14,7 @@ public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, InfestusFrontier.MODID);
 
     public static final RegistryObject<MenuType<BioReservoirMenu>> BIO_RESERVOIR_MENU =
-            registerMenuTypes(BioReservoirMenu::new, "bio_reservoir_menu");
-
-    public static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuTypes(IContainerFactory<T> factory,
-                                                                                                  String name) {
-        return MENUS.register(name, () -> IForgeMenuType.create(factory));
-    }
+            MENUS.register("bio_reservoir_menu",() -> new MenuType<>(BioReservoirMenu::new));
 
     public static void register(IEventBus eventBus) {
         MENUS.register(eventBus);
