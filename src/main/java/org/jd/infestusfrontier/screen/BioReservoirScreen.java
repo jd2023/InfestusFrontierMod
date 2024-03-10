@@ -13,11 +13,14 @@ import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
 public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu> {
     public static final ResourceLocation TEXTURE =
             new ResourceLocation(InfestusFrontier.MODID, "textures/gui/background.png");
+    public int biomass =
+            0;
 
     public BioReservoirScreen(BioReservoirMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
         this.imageWidth = 176;
         this.imageHeight = 184;
+
     }
 
     @Override
@@ -34,9 +37,17 @@ public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu
         blit(stack, this.leftPos+140, this.topPos+16, 177, 94, 18, 56);
         blit(stack, this.leftPos+100, this.topPos+20, 177, 61, 22, 15);
         renderProgressArrow(stack, this.leftPos, this.topPos);
+        renderBiomassStorage(stack, this.leftPos, this.topPos);
         blit(stack, this.leftPos+70, this.topPos+20, 1, 185, 18, 18);
         this.font.draw(stack, "Progress: " + this.menu.data.get(0), this.leftPos+20, this.topPos+40, 0xFFFFFF);
+        this.font.draw(stack, "Biomass Stored: " + this.menu.data.get(2), this.leftPos+60, this.topPos+50, 0xFFFFFF);
     }
+    private void renderBiomassStorage(PoseStack stack, int x, int y) {
+
+        int scaledHeight = (int) this.menu.data.get(2) * 50 / 70;
+        blit(stack, x +143, y+67-scaledHeight, 196, 97, 12, scaledHeight);
+    }
+
     private void renderProgressArrow(PoseStack stack, int x, int y) {
         if (menu.isCrafting()) {
             blit(stack, x +100, y+20, 177, 77, menu.getScaledProgress(), 16);

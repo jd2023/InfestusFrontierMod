@@ -24,7 +24,9 @@ import org.jetbrains.annotations.Nullable;
 public class BioReservoirBlockEntity extends BlockEntity {
     public int progress = 0;
     public int maxProgress = 26;
-    protected final ContainerData data;
+
+    public int biomass=0;
+
 
     public final ItemStackHandler itemHandler = new ItemStackHandler(1) {
         @Override
@@ -49,33 +51,9 @@ public class BioReservoirBlockEntity extends BlockEntity {
 
     public BioReservoirBlockEntity(BlockPos pos, BlockState state) {
         super(ZgBlockEntities.BIOMASS_RESERVOIR.get(), pos, state);
-        this.data = new ContainerData() {
-            @Override
-            public int get(int index) {
-                return switch (index) {
-                    case 0-> BioReservoirBlockEntity.this.progress;
-                    case 1-> BioReservoirBlockEntity.this.maxProgress;
-                    default -> 0;
-                };
-            }
 
-            @Override
-            public void set(int index, int value) {
-                switch (index) {
-                    case 0-> BioReservoirBlockEntity.this.progress = value;
-                    case 1-> BioReservoirBlockEntity.this.maxProgress = value;
-                };
-            }
+    }
 
-            @Override
-            public int getCount() {
-                return 2;
-            }
-        };
-    }
-    public int getProgress() {
-        return this.progress;
-    }
 
 
     @Override
@@ -127,6 +105,7 @@ public class BioReservoirBlockEntity extends BlockEntity {
             setChanged(level, pos, state);
             if (entity.progress >= entity.maxProgress) {
                 entity.itemHandler.extractItem(0, 1, false);
+                entity.biomass++;
                 entity.resetProgress();
             }
         }else{

@@ -18,7 +18,7 @@ public class BioReservoirMenu extends AbstractContainerMenu {
 
 
     public BioReservoirMenu(int id, Inventory inv) {
-        this(id, inv, new ItemStackHandler(1), BlockPos.ZERO, new SimpleContainerData(2));
+        this(id, inv, new ItemStackHandler(1), BlockPos.ZERO, new SimpleContainerData(3));
     }
     public BioReservoirMenu(int id, Inventory inv, IItemHandler slots, BlockPos pos, ContainerData data) {
         super(ModMenuTypes.BIO_RESERVOIR_MENU.get(), id);
@@ -35,7 +35,7 @@ public class BioReservoirMenu extends AbstractContainerMenu {
 
     public static MenuConstructor getServerContainer(BioReservoirBlockEntity reservoir, BlockPos pos) {
         return (id, playerInv, player) -> new BioReservoirMenu(id, playerInv, reservoir.itemHandler, pos,
-                new BioReservoidData(reservoir, 2));
+                new BioReservoidData(reservoir, 3));
     }
 
     public boolean isCrafting() {

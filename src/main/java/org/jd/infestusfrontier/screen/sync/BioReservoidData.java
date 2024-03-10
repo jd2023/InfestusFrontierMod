@@ -16,6 +16,7 @@ public class BioReservoidData extends SimpleContainerData {
         return switch (index) {
             case 0 -> this.reservoirBlockEntity.progress;
             case 1 -> this.reservoirBlockEntity.maxProgress;
+            case 2 -> this.reservoirBlockEntity.biomass;
             default -> throw new IllegalArgumentException("Unknown data index: " + index);
         };
     }
@@ -23,9 +24,15 @@ public class BioReservoidData extends SimpleContainerData {
     @Override
     public void set(int index, int value) {
         switch (index) {
-            case 0 -> this.reservoirBlockEntity.progress = value;
-            case 1 -> this.reservoirBlockEntity.maxProgress = value;
-            default -> throw new IllegalArgumentException("Unknown data index: " + index);
+            case 0: this.reservoirBlockEntity.progress = value;
+            case 1: this.reservoirBlockEntity.maxProgress = value;
+            case 2:
+                    if (value > 70) {
+                        this.reservoirBlockEntity.biomass = 70;
+                    }else {
+                        this.reservoirBlockEntity.biomass = value;
+                    }
+            default: throw new IllegalArgumentException("Unknown data index: " + index);
         }
     }
 }
