@@ -77,6 +77,8 @@ public class BioReservoirBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag nbt) {
         nbt.put("inventory", itemHandler.serializeNBT());
+        nbt.putInt("bioreservoir.biomass", biomass);
+        nbt.putInt("bioreservoir.progress", progress);
         super.saveAdditional(nbt);
     }
 
@@ -84,6 +86,8 @@ public class BioReservoirBlockEntity extends BlockEntity {
     public void load(CompoundTag nbt) {
         super.load(nbt);
         itemHandler.deserializeNBT(nbt.getCompound("inventory"));
+        biomass = nbt.getInt("bioreservoir.biomass");
+        progress = nbt.getInt("bioreservoir.progress");
     }
     public void drops() {
         SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
@@ -105,7 +109,10 @@ public class BioReservoirBlockEntity extends BlockEntity {
             setChanged(level, pos, state);
             if (entity.progress >= entity.maxProgress) {
                 entity.itemHandler.extractItem(0, 1, false);
-                entity.biomass++;
+                if (entity.biomass < 70) {
+                    entity.biomass++;
+                }
+
                 entity.resetProgress();
             }
         }else{
