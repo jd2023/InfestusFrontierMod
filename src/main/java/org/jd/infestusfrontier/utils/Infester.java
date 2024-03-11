@@ -20,10 +20,11 @@ public class Infester {
     }
 
     public boolean infestNext(ServerLevel serverLevel, BlockPos center) {
+        System.out.println("Infesting next at " + center);
         if (!done) {
             ticks++;
             if (ticks % rate == 0) {
-                while (radius < 4) {
+                while (radius < maxRadius) {
                     while (idx < Circle.data[radius].length) {
                         while (height < 4) {
                             var mayBeInfestPos = center.offset(Circle.data[radius][idx][0], height, Circle.data[radius][idx][1]);

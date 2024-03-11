@@ -62,7 +62,6 @@ public class InfestUtils {
     private static boolean isOpen(BlockPos pos, Level world) {
         BlockState blockState = world.getBlockState(pos);
         var result = !blockState.getMaterial().isSolidBlocking();
-        LOGGER.info("isOpen: {}, block: {}", result, blockState);
         return result;
     }
 }

@@ -28,9 +28,11 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
     }
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
+        System.out.println("CorruptionCoreBlockEntity ticking at " + pos);
         if (level.isClientSide()) return;
         if (level instanceof ServerLevel serverLevel) {
             if (be instanceof CorruptionCoreBlockEntity corruptionCoreBlockEntity) {
+                System.out.println("[SERVER] CorruptionCoreBlockEntity ticking at " + pos);
                 corruptionCoreBlockEntity.infester.infestNext(serverLevel, pos);
             }
         }

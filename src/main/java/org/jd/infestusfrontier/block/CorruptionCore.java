@@ -32,7 +32,7 @@ public class CorruptionCore extends BaseEntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ZgBlockEntities.INFESTUS_POD_BLOCK_ENTITY_TYPE.get().create(pos, state);
+        return ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get().create(pos, state);
     }
 
     @Override
@@ -42,6 +42,7 @@ public class CorruptionCore extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> betype) {
+        System.out.println("[DEBUG] Check corruption core entity: " +betype + ", " +  ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get() + ", " + (betype == ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get()));
         return createTickerHelper(betype, ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get(), CorruptionCoreBlockEntity::tick);
     }
 
