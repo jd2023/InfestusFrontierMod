@@ -12,8 +12,6 @@ import org.jd.infestusfrontier.item.custom.*;
 
 public class ZgItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, InfestusFrontier.MODID);
-    public static final RegistryObject<Item> LIGHT_INFESTUS_POD = ITEMS.register(LightInfestusPod.ID,
-            () -> new BlockItem(ZgBlocks.LIGHT_INFESTUS_POD.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> CORRUPT_CHUNK = ITEMS.register(CorruptChunk.ID,
             () -> new BlockItem(ZgBlocks.CORRUPT_CHUNK.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> corruption_core = ITEMS.register(CorruptionCore.ID,
@@ -22,6 +20,8 @@ public class ZgItems {
             () -> new BlockItem(ZgBlocks.BIO_RESERVOIR.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> INFESTUS_POD = ITEMS.register(InfestusPod.ID,
             () -> new BlockItem(ZgBlocks.INFESTUS_POD.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> LUMINESCENT_INFESTUS_POD = ITEMS.register(LuminescentInfestusPod.ID,
+            () -> new BlockItem(ZgBlocks.LUMINESCENT_INFESTUS_POD.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_SWORD = ITEMS.register(MeatSword.ID,
             () -> new SwordItem(ZgToolTiers.TIER1TOOLS, 1, 1,
                     new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
