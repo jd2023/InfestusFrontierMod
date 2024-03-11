@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.block;
+package org.jd.infestusfrontier.utils;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
@@ -13,6 +13,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.ZgBlocks;
+import org.jd.infestusfrontier.block.InfestusNetwork;
+import org.jd.infestusfrontier.block.InfestusNetworkAdvanced;
+import org.jd.infestusfrontier.block.InfestusNetworkDense;
+import org.jd.infestusfrontier.block.InfestusNetworkFinal;
 import org.slf4j.Logger;
 
 public class InfestUtils {
@@ -69,7 +73,6 @@ public class InfestUtils {
     public static BlockState nextLevelInfesting(BlockPos pos, Level world) {
         Block block = world.getBlockState(pos).getBlock();
         var key = ForgeRegistries.BLOCKS.getKey(block);
-        System.out.println("key: " + key);
         return switch (key.toString().split(":")[1]) {
             case InfestusNetwork.ID -> ZgBlocks.INFESTUS_NETWORK_DENSE.get().defaultBlockState();
             case InfestusNetworkDense.ID -> ZgBlocks.INFESTUS_NETWORK_ADVANCED.get().defaultBlockState();

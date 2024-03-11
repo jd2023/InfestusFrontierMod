@@ -89,6 +89,7 @@ public class BioReservoirBlockEntity extends BlockEntity {
         biomass = nbt.getInt("bioreservoir.biomass");
         progress = nbt.getInt("bioreservoir.progress");
     }
+
     public void drops() {
         SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
         for (int i = 0; i < itemHandler.getSlots(); i++) {

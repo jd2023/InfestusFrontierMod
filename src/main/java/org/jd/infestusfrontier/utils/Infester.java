@@ -1,11 +1,12 @@
 package org.jd.infestusfrontier.utils;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import org.jd.infestusfrontier.ZgBlocks;
-import org.jd.infestusfrontier.block.InfestUtils;
 
 public class Infester {
+    public static final String TAG = "infester";
     private boolean done;
     private int height = -4;
     private int radius;
@@ -45,5 +46,23 @@ public class Infester {
             }
         }
         return done;
+    }
+
+    public CompoundTag serializeNBT() {
+        CompoundTag inventory = new CompoundTag();
+        inventory.putInt("radius", radius);
+        inventory.putInt("idx", idx);
+        inventory.putInt("height", height);
+        inventory.putInt("ticks", ticks);
+        inventory.putBoolean("done", done);
+        return inventory;
+    }
+
+    public void deserializeNBT(CompoundTag nbt) {
+        radius = nbt.getInt("radius");
+        idx = nbt.getInt("idx");
+        height = nbt.getInt("height");
+        ticks = nbt.getInt("ticks");
+        done = nbt.getBoolean("done");
     }
 }

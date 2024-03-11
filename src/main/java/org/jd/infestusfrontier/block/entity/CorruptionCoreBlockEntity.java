@@ -2,18 +2,14 @@ package org.jd.infestusfrontier.block.entity;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.ZgBlockEntities;
-import org.jd.infestusfrontier.ZgBlocks;
-import org.jd.infestusfrontier.block.InfestUtils;
 import org.jd.infestusfrontier.utils.Infester;
 import org.slf4j.Logger;
-
-import java.util.ArrayDeque;
-import java.util.Queue;
 
 
 public class CorruptionCoreBlockEntity extends BlockEntity {
@@ -34,5 +30,17 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
                 corruptionCoreBlockEntity.infester.infestNext(serverLevel, pos);
             }
         }
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag nbt) {
+        nbt.put(Infester.TAG, infester.serializeNBT());
+        super.saveAdditional(nbt);
+    }
+
+    @Override
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
+        infester.deserializeNBT(nbt.getCompound(Infester.TAG));
     }
 }
