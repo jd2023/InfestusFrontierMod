@@ -42,7 +42,6 @@ public class CorruptionCore extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> betype) {
-        System.out.println("[DEBUG] Check corruption core entity: " +betype + ", " +  ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get() + ", " + (betype == ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get()));
         return createTickerHelper(betype, ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get(), CorruptionCoreBlockEntity::tick);
     }
 

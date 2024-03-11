@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.ZgBlocks;
 import org.slf4j.Logger;
 
 public class InfestUtils {
@@ -33,7 +34,13 @@ public class InfestUtils {
         serverLevel.sendParticles(particleType, x, y, z, count, xOffset, yOffset, zOffset, speed);
     }
 
-    public static boolean isInfested(BlockPos pos, Level world) {
+    public static boolean isInfestusNetwork(BlockPos pos, Level world) {
+        Block block = world.getBlockState(pos).getBlock();
+        var key = ForgeRegistries.BLOCKS.getKey(block);
+        return key.toString().startsWith(InfestusFrontier.MODID + ":" + InfestusNetwork.ID);
+    }
+
+    public static boolean isInfestusBlock(BlockPos pos, Level world) {
         Block block = world.getBlockState(pos).getBlock();
         var key = ForgeRegistries.BLOCKS.getKey(block);
         return key.toString().startsWith(InfestusFrontier.MODID);
@@ -47,7 +54,7 @@ public class InfestUtils {
                 && !blockState.getMaterial().isLiquid()
                 && !(block instanceof BushBlock)
                 && block != Blocks.AIR
-                && !isInfested(pos, world);
+                && !isInfestusBlock(pos, world);
     }
 
     public static boolean isExposed(BlockPos pos, Level world) {
@@ -57,6 +64,19 @@ public class InfestUtils {
                 || isOpen(pos.south(), world)
                 || isOpen(pos.east(), world)
                 || isOpen(pos.west(), world);
+    }
+
+    public static BlockState nextLevelInfesting(BlockPos pos, Level world) {
+        Block block = world.getBlockState(pos).getBlock();
+        var key = ForgeRegistries.BLOCKS.getKey(block);
+        System.out.println("key: " + key);
+        return switch (key.toString().split(":")[1]) {
+            case InfestusNetwork.ID -> ZgBlocks.INFESTUS_NETWORK_DENSE.get().defaultBlockState();
+            case InfestusNetworkDense.ID -> ZgBlocks.INFESTUS_NETWORK_ADVANCED.get().defaultBlockState();
+            case InfestusNetworkAdvanced.ID -> ZgBlocks.INFESTUS_NETWORK_FINAL.get().defaultBlockState();
+            case InfestusNetworkFinal.ID -> ZgBlocks.INFESTUS_NETWORK_FINAL.get().defaultBlockState();
+            default -> throw new IllegalStateException("Unexpected value: " + key);
+        };
     }
 
     private static boolean isOpen(BlockPos pos, Level world) {

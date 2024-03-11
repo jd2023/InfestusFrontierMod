@@ -20,7 +20,6 @@ public class Infester {
     }
 
     public boolean infestNext(ServerLevel serverLevel, BlockPos center) {
-        System.out.println("Infesting next at " + center);
         if (!done) {
             ticks++;
             if (ticks % rate == 0) {
@@ -28,7 +27,9 @@ public class Infester {
                     while (idx < Circle.data[radius].length) {
                         while (height < 4) {
                             var mayBeInfestPos = center.offset(Circle.data[radius][idx][0], height, Circle.data[radius][idx][1]);
-                            if (InfestUtils.canBeInfested(mayBeInfestPos, serverLevel) && InfestUtils.isExposed(mayBeInfestPos, serverLevel)) {
+                            if (InfestUtils.isInfestusNetwork(mayBeInfestPos, serverLevel)) {
+                                InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, InfestUtils.nextLevelInfesting(mayBeInfestPos, serverLevel));
+                            } else if (InfestUtils.canBeInfested(mayBeInfestPos, serverLevel) && InfestUtils.isExposed(mayBeInfestPos, serverLevel)) {
                                 InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, ZgBlocks.INFESTUS_NETWORK.get().defaultBlockState());
                             }
                             height++;

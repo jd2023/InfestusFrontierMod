@@ -14,6 +14,9 @@ public class ZgBlocks {
     public static final RegistryObject<Block> LIGHT_INFESTUS_POD = BLOCKS.register(LightInfestusPod.ID, LightInfestusPod::new);
     public static final RegistryObject<Block> CORRUPT_CHUNK = BLOCKS.register("corrupt_chunk", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT)));
     public static final RegistryObject<Block> INFESTUS_NETWORK = BLOCKS.register(InfestusNetwork.ID, InfestusNetwork::new);
+    public static final RegistryObject<Block> INFESTUS_NETWORK_DENSE = BLOCKS.register(InfestusNetworkDense.ID, InfestusNetworkDense::new);
+    public static final RegistryObject<Block> INFESTUS_NETWORK_ADVANCED = BLOCKS.register(InfestusNetworkAdvanced.ID, InfestusNetworkAdvanced::new);
+    public static final RegistryObject<Block> INFESTUS_NETWORK_FINAL = BLOCKS.register(InfestusNetworkFinal.ID, InfestusNetworkFinal::new);
     public static final RegistryObject<Block> CORRUPTION_CORE = BLOCKS.register(CorruptionCore.ID, CorruptionCore::new);
     public static final RegistryObject<Block> BIO_RESERVOIR = BLOCKS.register(BioReservoir.ID, BioReservoir::new);
     public static final RegistryObject<Block> INFESTUS_POD = BLOCKS.register(InfestusPod.ID, InfestusPod::new);
