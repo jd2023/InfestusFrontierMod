@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
@@ -58,7 +59,8 @@ public class InfestUtils {
                 && !blockState.getMaterial().isLiquid()
                 && !(block instanceof BushBlock)
                 && block != Blocks.AIR
-                && !isInfestusBlock(pos, world);
+                && !isInfestusBlock(pos, world)
+                && !(block instanceof EntityBlock);
     }
 
     public static boolean isExposed(BlockPos pos, Level world) {
