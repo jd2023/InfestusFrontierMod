@@ -20,9 +20,9 @@ public class ZgBlockEntities {
 
     public static final RegistryObject<BlockEntityType<CorruptionCoreBlockEntity>> CORRUPTION_CORE_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(CorruptionCore.ID,
             () -> BlockEntityType.Builder.of(CorruptionCoreBlockEntity::new, ZgBlocks.CORRUPTION_CORE.get()).build(null));
-
-    public static final RegistryObject<BlockEntityType<BioReservoirBlockEntity>> BIOMASS_RESERVOIR = BLOCK_ENTITY_TYPES.register(BioReservoir.ID,
-            () -> BlockEntityType.Builder.of(BioReservoirBlockEntity::new, ZgBlocks.BIO_RESERVOIR.get()).build(null));
+//
+//    public static final RegistryObject<BlockEntityType<BioReservoirBlockEntity>> BIOMASS_RESERVOIR = BLOCK_ENTITY_TYPES.register(BioReservoir.ID,
+//            () -> BlockEntityType.Builder.of(BioReservoirBlockEntity::new, ZgBlocks.BIO_RESERVOIR.get()).build(null));
 
     public static void register(IEventBus modEventBus) {
         BLOCK_ENTITY_TYPES.register(modEventBus);

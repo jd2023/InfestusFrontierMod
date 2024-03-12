@@ -9,19 +9,19 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import org.jd.infestusfrontier.ZgBlocks;
-import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
-import org.jd.infestusfrontier.screen.sync.BioReservoidData;
+import org.jd.infestusfrontier.block.entity.CorruptionCoreBlockEntity;
+import org.jd.infestusfrontier.screen.sync.CorruptionCoreData;
 
-public class BioReservoirMenu extends AbstractContainerMenu {
+public class CorruptionCoreMenu extends AbstractContainerMenu {
     private final ContainerLevelAccess containerAccess;
     public final ContainerData data;
 
 
-    public BioReservoirMenu(int id, Inventory inv) {
+    public CorruptionCoreMenu(int id, Inventory inv) {
         this(id, inv, new ItemStackHandler(1), BlockPos.ZERO, new SimpleContainerData(3));
     }
-    public BioReservoirMenu(int id, Inventory inv, IItemHandler slots, BlockPos pos, ContainerData data) {
-        super(ModMenuTypes.BIO_RESERVOIR_MENU.get(), id);
+    public CorruptionCoreMenu(int id, Inventory inv, IItemHandler slots, BlockPos pos, ContainerData data) {
+        super(ModMenuTypes.CORRUPTION_CORE_MENU.get(), id);
         checkContainerSize(inv, 1);
         this.containerAccess = ContainerLevelAccess.create(inv.player.level, pos);
         this.data = data;
@@ -33,9 +33,9 @@ public class BioReservoirMenu extends AbstractContainerMenu {
         addDataSlots(this.data);
     }
 
-    public static MenuConstructor getServerContainer(BioReservoirBlockEntity reservoir, BlockPos pos) {
-        return (id, playerInv, player) -> new BioReservoirMenu(id, playerInv, reservoir.itemHandler, pos,
-                new BioReservoidData(reservoir, 3));
+    public static MenuConstructor getServerContainer(CorruptionCoreBlockEntity reservoir, BlockPos pos) {
+        return (id, playerInv, player) -> new CorruptionCoreMenu(id, playerInv, reservoir.itemHandler, pos,
+                new CorruptionCoreData(reservoir, 3));
     }
 
     public boolean isCrafting() {

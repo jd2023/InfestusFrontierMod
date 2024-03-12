@@ -8,15 +8,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.jd.infestusfrontier.InfestusFrontier;
-import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
 
-public class BioReservoirScreen extends AbstractContainerScreen<BioReservoirMenu> {
+public class CorruptionCoreScreen extends AbstractContainerScreen<CorruptionCoreMenu> {
     public static final ResourceLocation TEXTURE =
             new ResourceLocation(InfestusFrontier.MODID, "textures/gui/background.png");
-    public int biomass =
-            0;
 
-    public BioReservoirScreen(BioReservoirMenu menu, Inventory inventory, Component component) {
+    public CorruptionCoreScreen(CorruptionCoreMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
         this.imageWidth = 176;
         this.imageHeight = 184;

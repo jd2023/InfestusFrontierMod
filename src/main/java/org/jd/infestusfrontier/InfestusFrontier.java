@@ -15,7 +15,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jd.infestusfrontier.screen.BioReservoirScreen;
+import org.jd.infestusfrontier.screen.CorruptionCoreScreen;
 import org.jd.infestusfrontier.screen.ModMenuTypes;
 import org.slf4j.Logger;
 
@@ -76,7 +76,7 @@ public class InfestusFrontier
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-            MenuScreens.register(ModMenuTypes.BIO_RESERVOIR_MENU.get(), BioReservoirScreen::new);
+            MenuScreens.register(ModMenuTypes.CORRUPTION_CORE_MENU.get(), CorruptionCoreScreen::new);
         }
     }
 }

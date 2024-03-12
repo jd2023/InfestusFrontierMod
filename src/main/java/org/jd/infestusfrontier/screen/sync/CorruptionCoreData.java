@@ -1,12 +1,12 @@
 package org.jd.infestusfrontier.screen.sync;
 
 import net.minecraft.world.inventory.SimpleContainerData;
-import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
+import org.jd.infestusfrontier.block.entity.CorruptionCoreBlockEntity;
 
-public class BioReservoidData extends SimpleContainerData {
-    private final BioReservoirBlockEntity reservoirBlockEntity;
+public class CorruptionCoreData extends SimpleContainerData {
+    private final CorruptionCoreBlockEntity reservoirBlockEntity;
 
-    public BioReservoidData(BioReservoirBlockEntity reservoirBlockEntity, int size) {
+    public CorruptionCoreData(CorruptionCoreBlockEntity reservoirBlockEntity, int size) {
         super(size);
         this.reservoirBlockEntity = reservoirBlockEntity;
     }
