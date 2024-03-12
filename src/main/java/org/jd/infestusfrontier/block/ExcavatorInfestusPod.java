@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.block;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.material.Material;
 import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.block.entity.ExcavatorInfestusPodBlockEntity;
+import org.jd.infestusfrontier.block.entity.InfestusPodBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -59,5 +61,15 @@ public class ExcavatorInfestusPod extends BaseEntityBlock {
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
         LOGGER.info("Placed ExcavatorInfestusPod at {}", pos);
+    }
+
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!level.isClientSide) {
+            if (level.getBlockEntity(pos) instanceof ExcavatorInfestusPodBlockEntity blockEntity) {
+                blockEntity.remove(state, (ServerLevel)level, pos);
+            }
+        }
+
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 }

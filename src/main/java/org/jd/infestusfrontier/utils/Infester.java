@@ -42,7 +42,7 @@ public class Infester {
                     while (idx < Circle.data[radius].length) {
                         while (height < maxHeight) {
                             var mayBeInfestPos = center.offset(Circle.data[radius][idx][0], height, Circle.data[radius][idx][1]);
-                            if (InfestUtils.isInfestusNetwork(mayBeInfestPos, serverLevel) && !this.breakBlocks) {
+                            if (InfestUtils.isInfestusNetwork(mayBeInfestPos, serverLevel)) {
                                 InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, InfestUtils.nextLevelInfesting(mayBeInfestPos, serverLevel));
                             } else if (InfestUtils.canBeInfested(mayBeInfestPos, serverLevel) && (this.breakBlocks || InfestUtils.isExposed(mayBeInfestPos, serverLevel))) {
                                 if (this.breakBlocks) {

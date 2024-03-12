@@ -42,4 +42,8 @@ public class LuminescentInfestusPodBlockEntity extends BlockEntity {
         super.load(nbt);
         infester.deserializeNBT(nbt.getCompound(Infester.TAG));
     }
+
+    public void remove(BlockState state, ServerLevel level, BlockPos pos) {
+        infester.downgradeNetwork(state, level, pos);
+    }
 }
