@@ -19,7 +19,7 @@ public class ExcavatorInfestusPodBlockEntity extends BlockEntity {
 
     public ExcavatorInfestusPodBlockEntity(BlockPos pos, BlockState state) {
         super(ZgBlockEntities.EXCAVATOR_INFESTUS_POD_BLOCK_ENTITY_TYPE.get(), pos, state);
-        this.infester = new Infester(16, 5, 8, true, false);
+        this.infester = new Infester(16, 3, 8, true, false);
         LOGGER.warn("Creating ExcavatorInfestusPodBlockEntity at {}", pos);
     }
 
@@ -41,5 +41,9 @@ public class ExcavatorInfestusPodBlockEntity extends BlockEntity {
     public void load(CompoundTag nbt) {
         super.load(nbt);
         infester.deserializeNBT(nbt.getCompound(Infester.TAG));
+    }
+
+    public void remove(BlockState state, ServerLevel level, BlockPos pos) {
+        infester.downgradeNetwork(state, level, pos);
     }
 }

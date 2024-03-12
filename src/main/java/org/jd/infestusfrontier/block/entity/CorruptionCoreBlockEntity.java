@@ -66,6 +66,32 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
         }
         return super.getCapability(cap, side);
     }
+
+    public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
+        if (level.isClientSide()) return;
+        if (level instanceof ServerLevel serverLevel) {
+            if (be instanceof CorruptionCoreBlockEntity entity) {
+                entity.infester.infestNext(serverLevel, pos);
+                if (entity.itemHandler.getStackInSlot(0).getItem() == Items.ROTTEN_FLESH ||entity.itemHandler.getStackInSlot(0).getItem() == ZgItems.CORRUPT_CHUNK.get()) {
+                    entity.progress++;
+                    setChanged(level, pos, state);
+                    if (entity.progress >= entity.maxProgress) {
+                        entity.itemHandler.extractItem(0, 1, false);
+                        if (entity.biomass < 70) {
+                            entity.biomass++;
+                        }
+
+                        entity.resetProgress();
+                    }
+                }else{
+                    entity.resetProgress();
+                    setChanged(level, pos, state);
+                }
+            }
+        }
+
+    }
+
     @Override
     protected void saveAdditional(CompoundTag nbt) {
         nbt.put(Infester.TAG, infester.serializeNBT());
@@ -101,30 +127,7 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
     private void resetProgress() {
         this.progress = 0;
     }
-
-    public static void tick(Level level, BlockPos pos, BlockState state, CorruptionCoreBlockEntity entity) {
-        if (level.isClientSide()) return;
-        if (level instanceof ServerLevel serverLevel) {
-
-            entity.infester.infestNext(serverLevel, pos);
-
-        }
-        if (entity.itemHandler.getStackInSlot(0).getItem() == Items.ROTTEN_FLESH ||entity.itemHandler.getStackInSlot(0).getItem() == ZgItems.CORRUPT_CHUNK.get()) {
-            entity.progress++;
-            setChanged(level, pos, state);
-            if (entity.progress >= entity.maxProgress) {
-                entity.itemHandler.extractItem(0, 1, false);
-                if (entity.biomass < 70) {
-                    entity.biomass++;
-                }
-
-                entity.resetProgress();
-            }
-        }else{
-            entity.resetProgress();
-            setChanged(level, pos, state);
-        }
+    public void remove(BlockState state, ServerLevel level, BlockPos pos) {
+        infester.downgradeNetwork(state, level, pos);
     }
-
-
 }

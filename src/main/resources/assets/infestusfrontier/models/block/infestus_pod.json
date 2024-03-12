@@ -1,7 +1,7 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "particle": "infestusfrontier:block/infestus_network_one",
+    "particle": "infestusfrontier:block/infestus_pod_top",
     "down": "infestusfrontier:block/infestus_pod_top",
     "up": "infestusfrontier:block/infestus_pod_top",
     "north": "infestusfrontier:block/infestus_pod_side",

@@ -17,10 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.ZgBlocks;
-import org.jd.infestusfrontier.block.InfestusNetwork;
-import org.jd.infestusfrontier.block.InfestusNetworkAdvanced;
-import org.jd.infestusfrontier.block.InfestusNetworkDense;
-import org.jd.infestusfrontier.block.InfestusNetworkFinal;
+import org.jd.infestusfrontier.block.*;
 import org.slf4j.Logger;
 
 public class InfestUtils {
@@ -80,6 +77,7 @@ public class InfestUtils {
         Block block = world.getBlockState(pos).getBlock();
         var key = ForgeRegistries.BLOCKS.getKey(block);
         return switch (key.toString().split(":")[1]) {
+            case InfestusNetworkDead.ID -> ZgBlocks.INFESTUS_NETWORK.get().defaultBlockState();
             case InfestusNetwork.ID -> ZgBlocks.INFESTUS_NETWORK_DENSE.get().defaultBlockState();
             case InfestusNetworkDense.ID -> ZgBlocks.INFESTUS_NETWORK_ADVANCED.get().defaultBlockState();
             case InfestusNetworkAdvanced.ID -> ZgBlocks.INFESTUS_NETWORK_FINAL.get().defaultBlockState();
@@ -97,5 +95,18 @@ public class InfestUtils {
     public static boolean isBlockFeaturesCannotReplace(BlockState state) {
         TagKey<Block> tagKey = BlockTags.create(new ResourceLocation("minecraft", "features_cannot_replace"));
         return state.is(tagKey);
+    }
+
+    public static BlockState previousLevelInfesting(BlockPos pos, ServerLevel serverLevel) {
+        Block block = serverLevel.getBlockState(pos).getBlock();
+        var key = ForgeRegistries.BLOCKS.getKey(block);
+        return switch (key.toString().split(":")[1]) {
+            case InfestusNetworkFinal.ID -> ZgBlocks.INFESTUS_NETWORK_ADVANCED.get().defaultBlockState();
+            case InfestusNetworkAdvanced.ID -> ZgBlocks.INFESTUS_NETWORK_DENSE.get().defaultBlockState();
+            case InfestusNetworkDense.ID -> ZgBlocks.INFESTUS_NETWORK.get().defaultBlockState();
+            case InfestusNetwork.ID -> ZgBlocks.INFESTUS_NETWORK_DEAD.get().defaultBlockState();
+            case InfestusNetworkDead.ID -> ZgBlocks.INFESTUS_NETWORK_DEAD.get().defaultBlockState();
+            default -> throw new IllegalStateException("Unexpected value: " + key);
+        };
     }
 }
