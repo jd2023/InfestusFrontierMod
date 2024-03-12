@@ -2,7 +2,13 @@ package org.jd.infestusfrontier.block;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -22,6 +28,7 @@ import net.minecraftforge.network.NetworkHooks;
 import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.block.entity.CorruptionCoreBlockEntity;
+import org.jd.infestusfrontier.screen.CorruptionCoreMenu;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -68,7 +75,7 @@ public class CorruptionCore extends BaseEntityBlock {
     }
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.getBlock() != state1.getBlock()) {
+        if (state.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof CorruptionCoreBlockEntity) {
                 ((CorruptionCoreBlockEntity) blockEntity).drops();
