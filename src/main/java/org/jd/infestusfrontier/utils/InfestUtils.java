@@ -4,7 +4,10 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -60,6 +63,7 @@ public class InfestUtils {
                 && !(block instanceof BushBlock)
                 && block != Blocks.AIR
                 && !isInfestusBlock(pos, world)
+                && !isBlockFeaturesCannotReplace(blockState)
                 && !(block instanceof EntityBlock);
     }
 
@@ -88,5 +92,10 @@ public class InfestUtils {
         BlockState blockState = world.getBlockState(pos);
         var result = !blockState.getMaterial().isSolidBlocking();
         return result;
+    }
+
+    public static boolean isBlockFeaturesCannotReplace(BlockState state) {
+        TagKey<Block> tagKey = BlockTags.create(new ResourceLocation("minecraft", "features_cannot_replace"));
+        return state.is(tagKey);
     }
 }

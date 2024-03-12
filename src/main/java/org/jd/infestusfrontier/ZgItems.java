@@ -20,6 +20,8 @@ public class ZgItems {
             () -> new BlockItem(ZgBlocks.BIO_RESERVOIR.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> INFESTUS_POD = ITEMS.register(InfestusPod.ID,
             () -> new BlockItem(ZgBlocks.INFESTUS_POD.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> EXCAVATOR_INFESTUS_POD = ITEMS.register(ExcavatorInfestusPod.ID,
+            () -> new BlockItem(ZgBlocks.EXCAVATOR_INFESTUS_POD.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> LUMINESCENT_INFESTUS_POD = ITEMS.register(LuminescentInfestusPod.ID,
             () -> new BlockItem(ZgBlocks.LUMINESCENT_INFESTUS_POD.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_SWORD = ITEMS.register(MeatSword.ID,

@@ -13,6 +13,7 @@ public class ZgBlocks {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, InfestusFrontier.MODID);
     public static final RegistryObject<Block> CORRUPT_CHUNK = BLOCKS.register("corrupt_chunk", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT)));
     public static final RegistryObject<Block> INFESTUS_NETWORK = BLOCKS.register(InfestusNetwork.ID, InfestusNetwork::new);
+    public static final RegistryObject<Block> EXCAVATOR_INFESTUS_POD = BLOCKS.register(ExcavatorInfestusPod.ID, ExcavatorInfestusPod::new);
     public static final RegistryObject<Block> INFESTUS_NETWORK_DENSE = BLOCKS.register(InfestusNetworkDense.ID, InfestusNetworkDense::new);
     public static final RegistryObject<Block> INFESTUS_NETWORK_ADVANCED = BLOCKS.register(InfestusNetworkAdvanced.ID, InfestusNetworkAdvanced::new);
     public static final RegistryObject<Block> INFESTUS_NETWORK_FINAL = BLOCKS.register(InfestusNetworkFinal.ID, InfestusNetworkFinal::new);
