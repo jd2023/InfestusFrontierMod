@@ -88,4 +88,24 @@ public class Infester {
         ticks = nbt.getInt("ticks");
         done = nbt.getBoolean("done");
     }
+
+    public void downgradeNetwork(BlockState state, ServerLevel serverLevel, BlockPos center) {
+        height--;
+        while (radius >= 0) {
+            while (idx >= 0) {
+                while (height >= -maxHeight) {
+                    var mayBeInfestPos = center.offset(Circle.data[radius][idx][0], height, Circle.data[radius][idx][1]);
+                    if (InfestUtils.isInfestusNetwork(mayBeInfestPos, serverLevel)) {
+                        InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, InfestUtils.previousLevelInfesting(mayBeInfestPos, serverLevel));
+                    }
+                    height--;
+                }
+                idx--;
+                height = maxHeight-1;
+            }
+            radius--;
+            if (radius < 0) break;
+            idx = Circle.data[radius].length-1;
+        }
+    }
 }
