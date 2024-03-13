@@ -12,13 +12,13 @@ import org.jd.infestusfrontier.utils.Infester;
 import org.slf4j.Logger;
 
 
-public class ExcavatorInfestusPodBlockEntity extends BlockEntity {
+public class InfestedVeinVaporizerEntity extends BlockEntity {
 
     private Infester infester;
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public ExcavatorInfestusPodBlockEntity(BlockPos pos, BlockState state) {
-        super(ZgBlockEntities.EXCAVATOR_INFESTUS_POD_BLOCK_ENTITY_TYPE.get(), pos, state);
+    public InfestedVeinVaporizerEntity(BlockPos pos, BlockState state) {
+        super(ZgBlockEntities.infested_vein_vaporizer_BLOCK_ENTITY_TYPE.get(), pos, state);
         this.infester = new Infester(16, 3, 8, true, false);
         LOGGER.warn("Creating ExcavatorInfestusPodBlockEntity at {}", pos);
     }
@@ -26,7 +26,7 @@ public class ExcavatorInfestusPodBlockEntity extends BlockEntity {
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
         if (level.isClientSide()) return;
         if (level instanceof ServerLevel serverLevel) {
-            if (be instanceof ExcavatorInfestusPodBlockEntity infestusPodBlockEntity) {
+            if (be instanceof InfestedVeinVaporizerEntity infestusPodBlockEntity) {
                 infestusPodBlockEntity.infester.infestNext(serverLevel, pos);
             }
         }

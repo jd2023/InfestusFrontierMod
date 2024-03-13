@@ -13,8 +13,8 @@ public class ZgBlockEntities {
 
     public static final RegistryObject<BlockEntityType<InfestusPodBlockEntity>> INFESTUS_POD_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(InfestusPod.ID,
             () -> BlockEntityType.Builder.of(InfestusPodBlockEntity::new, ZgBlocks.INFESTUS_POD.get()).build(null));
-    public static final RegistryObject<BlockEntityType<ExcavatorInfestusPodBlockEntity>> EXCAVATOR_INFESTUS_POD_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(ExcavatorInfestusPod.ID,
-            () -> BlockEntityType.Builder.of(ExcavatorInfestusPodBlockEntity::new, ZgBlocks.EXCAVATOR_INFESTUS_POD.get()).build(null));
+    public static final RegistryObject<BlockEntityType<InfestedVeinVaporizerEntity>> infested_vein_vaporizer_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(InfestedVeinVaporizer.ID,
+            () -> BlockEntityType.Builder.of(InfestedVeinVaporizerEntity::new, ZgBlocks.infested_vein_vaporizer.get()).build(null));
     public static final RegistryObject<BlockEntityType<LuminescentInfestusPodBlockEntity>> LUMINESCENT_INFESTUS_POD_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(LuminescentInfestusPod.ID,
             () -> BlockEntityType.Builder.of(LuminescentInfestusPodBlockEntity::new, ZgBlocks.LUMINESCENT_INFESTUS_POD.get()).build(null));
 

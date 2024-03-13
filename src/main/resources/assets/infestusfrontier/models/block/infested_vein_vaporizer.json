@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "particle": "infestusfrontier:block/infested_vein_vaporizer",
+    "down": "infestusfrontier:block/infested_vein_vaporizer",
+    "up": "infestusfrontier:block/infested_vein_vaporizer",
+    "north": "infestusfrontier:block/infested_vein_vaporizer",
+    "east": "infestusfrontier:block/infested_vein_vaporizer",
+    "south": "infestusfrontier:block/infested_vein_vaporizer",
+    "west": "infestusfrontier:block/infested_vein_vaporizer"
+  }
+}

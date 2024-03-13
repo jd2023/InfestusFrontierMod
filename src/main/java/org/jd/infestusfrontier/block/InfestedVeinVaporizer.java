@@ -16,24 +16,23 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
-import org.jd.infestusfrontier.block.entity.ExcavatorInfestusPodBlockEntity;
-import org.jd.infestusfrontier.block.entity.InfestusPodBlockEntity;
+import org.jd.infestusfrontier.block.entity.InfestedVeinVaporizerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-public class ExcavatorInfestusPod extends BaseEntityBlock {
-    public static final String ID = "excavator_infestus_pod";
+public class InfestedVeinVaporizer extends BaseEntityBlock {
+    public static final String ID = "infested_vein_vaporizer";
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public ExcavatorInfestusPod() {
+    public InfestedVeinVaporizer() {
         super(Properties.of(Material.STONE));
     }
 
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ZgBlockEntities.EXCAVATOR_INFESTUS_POD_BLOCK_ENTITY_TYPE.get().create(pos, state);
+        return ZgBlockEntities.infested_vein_vaporizer_BLOCK_ENTITY_TYPE.get().create(pos, state);
     }
     @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
@@ -49,7 +48,7 @@ public class ExcavatorInfestusPod extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> betype) {
-        return createTickerHelper(betype, ZgBlockEntities.EXCAVATOR_INFESTUS_POD_BLOCK_ENTITY_TYPE.get(), ExcavatorInfestusPodBlockEntity::tick);
+        return createTickerHelper(betype, ZgBlockEntities.infested_vein_vaporizer_BLOCK_ENTITY_TYPE.get(), InfestedVeinVaporizerEntity::tick);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class ExcavatorInfestusPod extends BaseEntityBlock {
 
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!level.isClientSide) {
-            if (level.getBlockEntity(pos) instanceof ExcavatorInfestusPodBlockEntity blockEntity) {
+            if (level.getBlockEntity(pos) instanceof InfestedVeinVaporizerEntity blockEntity) {
                 blockEntity.remove(state, (ServerLevel)level, pos);
             }
         }
