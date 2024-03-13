@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.screen;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -12,13 +13,15 @@ import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.block.entity.CorruptionCoreBlockEntity;
 import org.jd.infestusfrontier.screen.sync.CorruptionCoreData;
 
+import java.util.List;
+
 public class CorruptionCoreMenu extends AbstractContainerMenu {
     private final ContainerLevelAccess containerAccess;
     public final ContainerData data;
 
 
     public CorruptionCoreMenu(int id, Inventory inv) {
-        this(id, inv, new ItemStackHandler(1), BlockPos.ZERO, new SimpleContainerData(3));
+        this(id, inv, new ItemStackHandler(1), BlockPos.ZERO, new SimpleContainerData(4));
     }
     public CorruptionCoreMenu(int id, Inventory inv, IItemHandler slots, BlockPos pos, ContainerData data) {
         super(ModMenuTypes.CORRUPTION_CORE_MENU.get(), id);
@@ -118,6 +121,7 @@ public class CorruptionCoreMenu extends AbstractContainerMenu {
             this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 160));
         }
     }
+
 
 }
 

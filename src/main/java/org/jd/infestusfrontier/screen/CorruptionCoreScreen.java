@@ -8,6 +8,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.utils.MouseUtil;
+
+import java.util.Optional;
 
 public class CorruptionCoreScreen extends AbstractContainerScreen<CorruptionCoreMenu> {
     public static final ResourceLocation TEXTURE =
@@ -31,7 +34,7 @@ public class CorruptionCoreScreen extends AbstractContainerScreen<CorruptionCore
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         blit(stack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
-        blit(stack, this.leftPos+140, this.topPos+16, 177, 94, 18, 56);
+        blit(stack, this.leftPos+140, this.topPos+16, 177, 94, 18, 56);//Biomass Storage
         blit(stack, this.leftPos+100, this.topPos+20, 177, 61, 22, 15);
         renderProgressArrow(stack, this.leftPos, this.topPos);
         renderBiomassStorage(stack, this.leftPos, this.topPos);
@@ -50,6 +53,11 @@ public class CorruptionCoreScreen extends AbstractContainerScreen<CorruptionCore
             blit(stack, x +100, y+20, 177, 77, menu.getScaledProgress(), 16);
         }
     }
+
+
+
+
+
 
     @Override
     public void render(PoseStack stack, int mouseX, int mouseY, float delta) {

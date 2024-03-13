@@ -1,7 +1,10 @@
 package org.jd.infestusfrontier.screen.sync;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.SimpleContainerData;
 import org.jd.infestusfrontier.block.entity.CorruptionCoreBlockEntity;
+
+import java.util.List;
 
 public class CorruptionCoreData extends SimpleContainerData {
     private final CorruptionCoreBlockEntity blockEntity;
@@ -17,6 +20,7 @@ public class CorruptionCoreData extends SimpleContainerData {
             case 0 -> this.blockEntity.progress;
             case 1 -> this.blockEntity.maxProgress;
             case 2 -> this.blockEntity.biomass;
+            case 3 -> this.blockEntity.maxBiomass;
             default -> throw new IllegalArgumentException("Unknown data index: " + index);
         };
     }
@@ -32,7 +36,9 @@ public class CorruptionCoreData extends SimpleContainerData {
                     }else {
                         this.blockEntity.biomass = value;
                     }
+            case 3 : this.blockEntity.maxBiomass = value;
             default: throw new IllegalArgumentException("Unknown data index: " + index);
         }
     }
+
 }

@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 public class CorruptionCoreBlockEntity extends BlockEntity {
     public int progress = 0;
     public int maxProgress = 26;
-
+    public int maxBiomass = 70;
     public int biomass=0;
     public final ItemStackHandler itemHandler = new ItemStackHandler(1) {
         @Override
