@@ -26,11 +26,11 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 import org.jd.infestusfrontier.ZgBlockEntities;
-import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.block.entity.CorruptionCoreBlockEntity;
+import org.jd.infestusfrontier.network.NetworkManager;
 import org.jd.infestusfrontier.screen.CorruptionCoreMenu;
+import org.jd.infestusfrontier.utils.InfestUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 public class CorruptionCore extends BaseEntityBlock {
@@ -59,19 +59,25 @@ public class CorruptionCore extends BaseEntityBlock {
 
     @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        BlockPos posBelow = context.getClickedPos().below();
-        BlockState stateBelow = context.getLevel().getBlockState(posBelow);
-
-        if (stateBelow.is(ZgBlocks.INFESTUS_NETWORK.get())) {
+        LOGGER.info("Getting state for placement {} by {}", context.getClickedPos(), context.getPlayer());
+        if (InfestUtils.isInfestusNetwork(context.getClickedPos().below(), context.getLevel())) {
             return null;
         }
-
+        if (NetworkManager.doesNetworkExistForPlayer(context.getPlayer().getStringUUID())) {
+            LOGGER.info("Player {} already has a network", context.getPlayer().getStringUUID());
+            return null;
+        }
+        NetworkManager.createNetwork(context.getPlayer().getStringUUID());
         return super.getStateForPlacement(context);
     }
 
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        if (world.getBlockEntity(pos) instanceof CorruptionCoreBlockEntity blockEntity) {
+            blockEntity.setNetworkId(placer.getStringUUID());
+        }
         super.setPlacedBy(world, pos, state, placer, stack);
+        LOGGER.info("Placed corruption_core at {}", pos);
     }
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -83,7 +89,7 @@ public class CorruptionCore extends BaseEntityBlock {
         }
         if (!level.isClientSide) {
             if (level.getBlockEntity(pos) instanceof CorruptionCoreBlockEntity blockEntity) {
-                blockEntity.remove(state, (ServerLevel)level, pos);
+                blockEntity.remove(state, (ServerLevel) level, pos);
             }
         }
 

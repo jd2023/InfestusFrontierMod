@@ -14,6 +14,8 @@ public class ZgItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, InfestusFrontier.MODID);
     public static final RegistryObject<Item> CORRUPT_CHUNK = ITEMS.register(CorruptChunk.ID,
             () -> new BlockItem(ZgBlocks.CORRUPT_CHUNK.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> EXCAVATED = ITEMS.register(ExcavatedBlock.ID,
+            () -> new BlockItem(ZgBlocks.EXCAVATED.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> corruption_core = ITEMS.register(CorruptionCore.ID,
             () -> new BlockItem(ZgBlocks.CORRUPTION_CORE.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> BIO_RESERVOIR = ITEMS.register(BioReservoir.ID,

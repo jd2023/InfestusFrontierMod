@@ -52,6 +52,7 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     private Infester infester;
+    private String networkId;
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public CorruptionCoreBlockEntity(BlockPos pos, BlockState state) {
@@ -92,12 +93,13 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
 
     }
 
+    public void setNetworkId(String networkId) {
+        this.networkId = networkId;
+    }
+
     @Override
     protected void saveAdditional(CompoundTag nbt) {
         nbt.put(Infester.TAG, infester.serializeNBT());
-        nbt.put("inventory", itemHandler.serializeNBT());
-        nbt.putInt("corruption_core.biomass", biomass);
-        nbt.putInt("corruption_core.progress", progress);
         super.saveAdditional(nbt);
     }
 

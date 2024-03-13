@@ -21,6 +21,7 @@ public class ZgBlocks {
     public static final RegistryObject<Block> CORRUPTION_CORE = BLOCKS.register(CorruptionCore.ID, CorruptionCore::new);
     public static final RegistryObject<Block> BIO_RESERVOIR = BLOCKS.register(BioReservoir.ID, BioReservoir::new);
     public static final RegistryObject<Block> INFESTUS_POD = BLOCKS.register(InfestusPod.ID, InfestusPod::new);
+    public static final RegistryObject<Block> EXCAVATED = BLOCKS.register(ExcavatedBlock.ID, ExcavatedBlock::new);
     public static final RegistryObject<Block> LUMINESCENT_INFESTUS_POD = BLOCKS.register(LuminescentInfestusPod.ID, LuminescentInfestusPod::new);
 
     public static void register(IEventBus eventBus) {
