@@ -30,6 +30,7 @@ import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.block.entity.CorruptionCoreBlockEntity;
 import org.jd.infestusfrontier.screen.CorruptionCoreMenu;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 public class CorruptionCore extends BaseEntityBlock {
@@ -71,7 +72,6 @@ public class CorruptionCore extends BaseEntityBlock {
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
-        LOGGER.info("Placed corruption_core at {}", pos);
     }
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -99,8 +99,8 @@ public class CorruptionCore extends BaseEntityBlock {
                     Component.literal("Corruption Core"));
             NetworkHooks.openScreen(((ServerPlayer) player), container, pos);
         }
-
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
+
 
 }

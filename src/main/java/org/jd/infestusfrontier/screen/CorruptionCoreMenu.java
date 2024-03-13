@@ -33,9 +33,10 @@ public class CorruptionCoreMenu extends AbstractContainerMenu {
         addDataSlots(this.data);
     }
 
-    public static MenuConstructor getServerContainer(CorruptionCoreBlockEntity reservoir, BlockPos pos) {
-        return (id, playerInv, player) -> new CorruptionCoreMenu(id, playerInv, reservoir.itemHandler, pos,
-                new CorruptionCoreData(reservoir, 3));
+    public static MenuConstructor getServerContainer(CorruptionCoreBlockEntity entity, BlockPos pos) {
+
+        return (id, playerInv, player) -> new CorruptionCoreMenu(id, playerInv, entity.itemHandler, pos,
+                new CorruptionCoreData(entity, 3));
     }
 
     public boolean isCrafting() {
@@ -102,7 +103,7 @@ public class CorruptionCoreMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(this.containerAccess, player, ZgBlocks.BIO_RESERVOIR.get());
+        return stillValid(this.containerAccess, player, ZgBlocks.CORRUPTION_CORE.get());
     }
     private void addPlayerInventory(Inventory playerInventory) {
         for(int i = 0; i < 3; ++i) {
