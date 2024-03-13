@@ -22,8 +22,8 @@ public class ZgItems {
             () -> new BlockItem(ZgBlocks.BIO_RESERVOIR.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> INFESTUS_POD = ITEMS.register(InfestusPod.ID,
             () -> new BlockItem(ZgBlocks.INFESTUS_POD.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
-    public static final RegistryObject<Item> infested_vein_vaporizer = ITEMS.register(InfestedVeinVaporizer.ID,
-            () -> new BlockItem(ZgBlocks.infested_vein_vaporizer.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
+    public static final RegistryObject<Item> INFESTED_VEIN_VAPORIZER = ITEMS.register(InfestedVeinVaporizer.ID,
+            () -> new BlockItem(ZgBlocks.INFESTED_VEIN_VAPORIZER.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> LUMINESCENT_INFESTUS_POD = ITEMS.register(LuminescentInfestusPod.ID,
             () -> new BlockItem(ZgBlocks.LUMINESCENT_INFESTUS_POD.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> MEAT_SWORD = ITEMS.register(MeatSword.ID,

@@ -2,7 +2,6 @@ package org.jd.infestusfrontier.block;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -32,7 +31,7 @@ public class InfestedVeinVaporizer extends BaseEntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ZgBlockEntities.infested_vein_vaporizer_BLOCK_ENTITY_TYPE.get().create(pos, state);
+        return ZgBlockEntities.INFESTED_VEIN_VAPORIZER_BLOCK_ENTITY_TYPE.get().create(pos, state);
     }
     @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
@@ -48,7 +47,7 @@ public class InfestedVeinVaporizer extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> betype) {
-        return createTickerHelper(betype, ZgBlockEntities.infested_vein_vaporizer_BLOCK_ENTITY_TYPE.get(), InfestedVeinVaporizerEntity::tick);
+        return createTickerHelper(betype, ZgBlockEntities.INFESTED_VEIN_VAPORIZER_BLOCK_ENTITY_TYPE.get(), InfestedVeinVaporizerEntity::tick);
     }
 
     @Override
@@ -59,16 +58,6 @@ public class InfestedVeinVaporizer extends BaseEntityBlock {
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
-        LOGGER.info("Placed ExcavatorInfestusPod at {}", pos);
-    }
-
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!level.isClientSide) {
-            if (level.getBlockEntity(pos) instanceof InfestedVeinVaporizerEntity blockEntity) {
-                blockEntity.remove(state, (ServerLevel)level, pos);
-            }
-        }
-
-        super.onRemove(state, level, pos, newState, isMoving);
+        LOGGER.info("Placed InfestedVeinVaporizer at {}", pos);
     }
 }

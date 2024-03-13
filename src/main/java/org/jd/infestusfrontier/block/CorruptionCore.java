@@ -63,10 +63,10 @@ public class CorruptionCore extends BaseEntityBlock {
         if (InfestUtils.isInfestusNetwork(context.getClickedPos().below(), context.getLevel())) {
             return null;
         }
-        if (NetworkManager.doesNetworkExistForPlayer(context.getPlayer().getStringUUID())) {
-            LOGGER.info("Player {} already has a network", context.getPlayer().getStringUUID());
-            return null;
-        }
+//        if (NetworkManager.doesNetworkExistForPlayer(context.getPlayer().getStringUUID())) {
+//            LOGGER.info("Player {} already has a network", context.getPlayer().getStringUUID());
+//            return null;
+//        }
         NetworkManager.createNetwork(context.getPlayer().getStringUUID());
         return super.getStateForPlacement(context);
     }
