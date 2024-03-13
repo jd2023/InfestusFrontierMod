@@ -3,6 +3,8 @@ package org.jd.infestusfrontier;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -77,6 +79,8 @@ public class InfestusFrontier
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
             MenuScreens.register(ModMenuTypes.CORRUPTION_CORE_MENU.get(), CorruptionCoreScreen::new);
+            ItemBlockRenderTypes.setRenderLayer(ZgBlocks.BIO_RESERVOIR.get(), RenderType.translucent()); // Replace ModBlocks.INFUSER_BLOCK.get() with your block
+
         }
     }
 }

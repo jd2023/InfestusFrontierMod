@@ -1,6 +1,20 @@
 {
   "variants": {
-    "": { "model": "infestusfrontier:block/bio_reservoir" }
+    "facing=north": {
+      "model": "infestusfrontier:block/bio_reservoir"
+    },
+    "facing=south": {
+      "model": "infestusfrontier:block/bio_reservoir",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "infestusfrontier:block/bio_reservoir",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "infestusfrontier:block/bio_reservoir",
+      "y": 90
+    }
   }
 }
 
