@@ -16,7 +16,7 @@ public class ZgItems {
             () -> new BlockItem(ZgBlocks.CORRUPT_CHUNK.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> EXCAVATED = ITEMS.register(ExcavatedBlock.ID,
             () -> new BlockItem(ZgBlocks.EXCAVATED.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
-    public static final RegistryObject<Item> LOOT_LEECH = ITEMS.register(InfesusLootLeech.ID,
+    public static final RegistryObject<Item> LOOT_LEECH = ITEMS.register(InfesusLootLeechBlock.ID,
             () -> new BlockItem(ZgBlocks.LOOT_LEECH.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));
     public static final RegistryObject<Item> corruption_core = ITEMS.register(CorruptionCore.ID,
             () -> new BlockItem(ZgBlocks.CORRUPTION_CORE.get(), new Item.Properties().tab(ModCreativeModeTab.INFESTUS_TAB)));

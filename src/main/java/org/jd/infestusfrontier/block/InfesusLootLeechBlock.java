@@ -6,19 +6,20 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
+import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jetbrains.annotations.Nullable;
 
-public class InfesusLootLeech extends BaseEntityBlock {
+public class InfesusLootLeechBlock extends BaseEntityBlock {
     public static final String ID = "infestus_loot_leech";
 
-    public InfesusLootLeech() {
+    public InfesusLootLeechBlock() {
         super(Properties.of(Material.STONE));
     }
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos p_153215_, BlockState p_153216_) {
-        return null;
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return ZgBlockEntities.LOOT_LEECH_ENTITY.get().create(pos, state);
     }
     @Override
     public RenderShape getRenderShape(BlockState state) {

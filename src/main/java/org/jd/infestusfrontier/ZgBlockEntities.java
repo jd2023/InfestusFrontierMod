@@ -23,6 +23,8 @@ public class ZgBlockEntities {
 
     public static final RegistryObject<BlockEntityType<BioReservoirBlockEntity>> BIOMASS_RESERVOIR = BLOCK_ENTITY_TYPES.register(BioReservoir.ID,
             () -> BlockEntityType.Builder.of(BioReservoirBlockEntity::new, ZgBlocks.BIO_RESERVOIR.get()).build(null));
+    public static final RegistryObject<BlockEntityType<InfestusLootLeechBlockEntity>> LOOT_LEECH_ENTITY = BLOCK_ENTITY_TYPES.register(InfesusLootLeechBlock.ID,
+            () -> BlockEntityType.Builder.of(InfestusLootLeechBlockEntity::new, ZgBlocks.LOOT_LEECH.get()).build(null));
 
     public static void register(IEventBus modEventBus) {
         BLOCK_ENTITY_TYPES.register(modEventBus);
