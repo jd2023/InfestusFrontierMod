@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SGS",
+    "GIG",
+    "SGS"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "item": "infestusfrontier:infestus_pod"
+    },
+    "S": {
+      "item": "infestusfrontier:biomass_crystal_shard"
+    }
+  },
+  "result": {
+    "item": "infestusfrontier:infested_vein_vaporizer"
+  }
+}

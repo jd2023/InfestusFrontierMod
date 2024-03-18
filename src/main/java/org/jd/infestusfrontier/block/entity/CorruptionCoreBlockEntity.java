@@ -7,6 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -24,12 +25,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class CorruptionCoreBlockEntity extends BlockEntity {
     public int progress = 0;
     public int maxProgress = 26;
     public int maxBiomass = 70;
     public int biomass=0;
+    public HashMap<ItemStack, Integer> biomassItemValue = new HashMap<>();
     public final ItemStackHandler itemHandler = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -59,6 +64,10 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
         super(ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get(), pos, state);
         this.infester = new Infester(4, 4);
         LOGGER.warn("Creating CorruptionCoreBlockEntity at {}", pos);
+        biomassItemValue.put(Items.ROTTEN_FLESH.getDefaultInstance(), 1);
+        biomassItemValue.put(ZgItems.CORRUPT_CHUNK.get().getDefaultInstance(), 10);
+        biomassItemValue.put(ZgItems.BIOMASS_CRYSTAL_SHARD.get().getDefaultInstance(), 20);
+
     }
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
@@ -73,13 +82,13 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
         if (level instanceof ServerLevel serverLevel) {
             if (be instanceof CorruptionCoreBlockEntity entity) {
                 entity.infester.infestNext(serverLevel, pos);
-                if (entity.itemHandler.getStackInSlot(0).getItem() == Items.ROTTEN_FLESH ||entity.itemHandler.getStackInSlot(0).getItem() == ZgItems.CORRUPT_CHUNK.get()) {
+                if (entity.biomassItemValue.containsKey(entity.itemHandler.getStackInSlot(0))) {//itemHandler.getStackInSlot(0).getItem()
                     entity.progress++;
                     setChanged(level, pos, state);
                     if (entity.progress >= entity.maxProgress) {
                         entity.itemHandler.extractItem(0, 1, false);
                         if (entity.biomass < 70) {
-                            entity.biomass++;
+                            entity.biomass+=entity.biomassItemValue.get(entity.itemHandler.getStackInSlot(0));
                         }
 
                         entity.resetProgress();
