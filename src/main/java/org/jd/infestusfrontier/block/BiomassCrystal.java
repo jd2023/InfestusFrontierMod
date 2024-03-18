@@ -7,6 +7,6 @@ public class BiomassCrystal extends Block {
     public static final String ID = "biomass_crystal_block";
 
     public BiomassCrystal() {
-        super(Properties.of(Material.AMETHYST));
+        super(Properties.of(Material.AMETHYST).strength(5f).lightLevel(state -> 5));
     }
 }

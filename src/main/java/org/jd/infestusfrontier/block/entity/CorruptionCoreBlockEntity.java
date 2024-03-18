@@ -82,13 +82,13 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
         if (level instanceof ServerLevel serverLevel) {
             if (be instanceof CorruptionCoreBlockEntity entity) {
                 entity.infester.infestNext(serverLevel, pos);
-                if (entity.biomassItemValue.containsKey(entity.itemHandler.getStackInSlot(0))) {//itemHandler.getStackInSlot(0).getItem()
+                if (entity.itemHandler.getStackInSlot(0).getItem() == Items.ROTTEN_FLESH ||entity.itemHandler.getStackInSlot(0).getItem() == ZgItems.CORRUPT_CHUNK.get()||entity.itemHandler.getStackInSlot(0).getItem() == ZgItems.BIOMASS_CRYSTAL_SHARD.get()) {
                     entity.progress++;
                     setChanged(level, pos, state);
                     if (entity.progress >= entity.maxProgress) {
                         entity.itemHandler.extractItem(0, 1, false);
                         if (entity.biomass < 70) {
-                            entity.biomass+=entity.biomassItemValue.get(entity.itemHandler.getStackInSlot(0));
+                            entity.biomass++;
                         }
 
                         entity.resetProgress();

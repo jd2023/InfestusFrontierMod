@@ -19,6 +19,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jd.infestusfrontier.screen.CorruptionCoreScreen;
 import org.jd.infestusfrontier.screen.ModMenuTypes;
+import org.jd.infestusfrontier.world.feature.ZgConfiguredFeatures;
+import org.jd.infestusfrontier.world.feature.ZgPlacedFeatures;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -40,6 +42,8 @@ public class InfestusFrontier
         ZgBlocks.register(modEventBus);
         ZgItems.register(modEventBus);
         ZgBlockEntities.register(modEventBus);
+        ZgConfiguredFeatures.register(modEventBus);
+        ZgPlacedFeatures.register(modEventBus);
         ModMenuTypes.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);

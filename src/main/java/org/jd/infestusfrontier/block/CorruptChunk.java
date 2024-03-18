@@ -7,6 +7,6 @@ public class CorruptChunk extends Block {
     public static final String ID = "corrupt_chunk";
 
     public CorruptChunk() {
-        super(Properties.of(Material.FROGLIGHT));
+        super(Properties.of(Material.SCULK));
     }
 }
