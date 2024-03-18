@@ -83,7 +83,7 @@ public class InfestusFrontier
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
             MenuScreens.register(ModMenuTypes.CORRUPTION_CORE_MENU.get(), CorruptionCoreScreen::new);
-            ItemBlockRenderTypes.setRenderLayer(ZgBlocks.BIO_RESERVOIR.get(), RenderType.translucent()); // Replace ModBlocks.INFUSER_BLOCK.get() with your block
+            ItemBlockRenderTypes.setRenderLayer(ZgBlocks.BIO_RESERVOIR.get(), RenderType.translucent());
 
         }
     }
