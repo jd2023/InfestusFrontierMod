@@ -1,0 +1,11 @@
+{
+  "name": "Infestus network",
+  "icon": "infestusfrontier:infestus_network",
+  "category": "infestusfrontier:basics_folder/spreading",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/spreading_details/infestus_network",
+      "text": ""
+    }
+  ]
+}

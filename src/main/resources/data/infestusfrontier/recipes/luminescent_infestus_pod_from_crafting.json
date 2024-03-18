@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " W ",
+    "WIW",
+    " W "
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:torch"
+    },
+    "I": {
+      "item": "infestusfrontier:infestus_pod"
+    }
+  },
+  "result": {
+    "item": "infestusfrontier:luminescent_infestus_pod"
+  }
+}

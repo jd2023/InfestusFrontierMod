@@ -1,0 +1,16 @@
+{
+  "name": "Luminescent infestus pod",
+  "icon": "infestusfrontier:luminescent_infestus_pod",
+  "category": "infestusfrontier:basics_folder/spreading",
+  "pages": [
+    {
+      "type": "infestusfrontier:basics/spreading_details/luminescent_infestus_pod",
+      "text": ""
+    },
+    {
+      "type": "crafting",
+      "recipe": "infestusfrontier:luminescent_infestus_pod_from_crafting",
+      "title": "Luminescent infestus Pod",
+      "text": "This is how to craft a Luminescent infestus Pod."}
+  ]
+}

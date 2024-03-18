@@ -1,0 +1,10 @@
+{
+  "components": [
+    {
+      "type": "patchouli:text",
+      "text": "The luminescent infestus pod can only be placed on infestus network, it expands the infestus network much more than the normal infestus pod, and it glows.",
+      "x": 0,
+      "y": 0
+    }
+  ]
+}

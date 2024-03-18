@@ -1,10 +1,10 @@
 {
   "name": "Infestus pod",
   "icon": "infestusfrontier:infestus_pod",
-  "category": "infestusfrontier:basics_folder/corruption_core",
+  "category": "infestusfrontier:basics_folder/spreading",
   "pages": [
     {
-      "type": "infestusfrontier:basics/corruption_core_details/infestus_pod",
+      "type": "infestusfrontier:basics/spreading_details/infestus_pod",
       "text": ""
     },
     {

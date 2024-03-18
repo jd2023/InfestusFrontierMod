@@ -1,10 +1,10 @@
 {
   "name": "Corruption Core",
   "icon": "infestusfrontier:corruption_core",
-  "category": "infestusfrontier:basics_folder/corruption_core",
+  "category": "infestusfrontier:basics",
   "pages": [
     {
-      "type": "infestusfrontier:basics/corruption_core_details/corruption_core",
+      "type": "infestusfrontier:basics/corruption_core",
       "text": ""
     },
     {
