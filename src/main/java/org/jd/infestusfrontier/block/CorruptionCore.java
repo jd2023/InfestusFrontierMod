@@ -63,21 +63,24 @@ public class CorruptionCore extends BaseEntityBlock {
         if (InfestUtils.isInfestusNetwork(context.getClickedPos().below(), context.getLevel())) {
             return null;
         }
-//        if (NetworkManager.doesNetworkExistForPlayer(context.getPlayer().getStringUUID())) {
-//            LOGGER.info("Player {} already has a network", context.getPlayer().getStringUUID());
-//            return null;
-//        }
+
         NetworkManager.createNetwork(context.getPlayer().getStringUUID());
         return super.getStateForPlacement(context);
     }
 
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        var placerStringUUID = placer.getStringUUID();
         if (world.getBlockEntity(pos) instanceof CorruptionCoreBlockEntity blockEntity) {
-            blockEntity.setNetworkId(placer.getStringUUID());
+            blockEntity.setNetworkId(placerStringUUID);
         }
         super.setPlacedBy(world, pos, state, placer, stack);
-        LOGGER.info("Placed corruption_core at {}", pos);
+
+        LOGGER.info("Placed corruption_core at {} by {}", pos, placerStringUUID);
+        if (NetworkManager.getNetwork(placerStringUUID) == null) {
+            NetworkManager.createNetwork(placerStringUUID);
+            LOGGER.info("New network is created. NetworkId: {}", placerStringUUID);
+        }
     }
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {

@@ -24,11 +24,17 @@ import org.jetbrains.annotations.Nullable;
 
 public class BioReservoirBlockEntity extends BlockEntity {
 
+    private String networkId;
+
     public BioReservoirBlockEntity(BlockPos pos, BlockState state) {
         super(ZgBlockEntities.BIOMASS_RESERVOIR.get(), pos, state);
-
-
     }
 
+    public void setNetworkId(String networkId) {
+        this.networkId = networkId;
+    }
 
+    public String getNetworkId() {
+        return networkId;
+    }
 }

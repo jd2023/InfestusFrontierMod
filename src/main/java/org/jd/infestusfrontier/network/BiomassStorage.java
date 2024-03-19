@@ -1,9 +1,13 @@
 package org.jd.infestusfrontier.network;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import org.slf4j.Logger;
 
 public class BiomassStorage {
+
+    private static final Logger LOGGER = LogUtils.getLogger();
     private int totalCapacity;
     private int usedCapacity;
 
@@ -24,18 +28,18 @@ public class BiomassStorage {
         return usedCapacity;
     }
 
-    public void addTotalCapacity(String networkId, int additionalCapacity) {
+    public void addTotalCapacity(int additionalCapacity) {
         this.totalCapacity += additionalCapacity;
     }
 
-    public void reduceTotalCapacity(String networkId, int additionalCapacity) {
+    public void reduceTotalCapacity(int additionalCapacity) {
         this.totalCapacity -= additionalCapacity;
         if (this.totalCapacity < 0) {
             this.totalCapacity = 0;
         }
     }
 
-    public void addBiomass(String networkId, int amount) {
+    public void addBiomass(int amount) {
         this.usedCapacity += amount;
         if (this.usedCapacity > this.totalCapacity) {
             this.usedCapacity = this.totalCapacity;

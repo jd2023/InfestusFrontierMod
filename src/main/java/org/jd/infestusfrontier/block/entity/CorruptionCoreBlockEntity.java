@@ -34,6 +34,10 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
     public int maxProgress = 26;
     public int maxBiomass = 70;
     public int biomass=0;
+    private String networkId;
+    private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private Infester infester;
     public HashMap<ItemStack, Integer> biomassItemValue = new HashMap<>();
     public final ItemStackHandler itemHandler = new ItemStackHandler(1) {
         @Override
@@ -54,11 +58,8 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
             }
         }
     };
-    private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
-    private Infester infester;
-    private String networkId;
-    private static final Logger LOGGER = LogUtils.getLogger();
+
 
     public CorruptionCoreBlockEntity(BlockPos pos, BlockState state) {
         super(ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get(), pos, state);
