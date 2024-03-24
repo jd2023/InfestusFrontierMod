@@ -1,0 +1,9 @@
+{
+  "type": "infestusfrontier:corruption_core_biomass",
+  "ingredients": [
+    {
+      "item": "minecraft:rotten_flesh"
+    }
+  ],
+  "output": 1
+}

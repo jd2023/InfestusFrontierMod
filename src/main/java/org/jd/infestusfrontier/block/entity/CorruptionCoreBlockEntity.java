@@ -20,6 +20,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgItems;
+import org.jd.infestusfrontier.recipe.CorruptionCoreBiomassConversionRecipe;
 import org.jd.infestusfrontier.utils.Infester;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 public class CorruptionCoreBlockEntity extends BlockEntity {
@@ -38,7 +40,6 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
     private static final Logger LOGGER = LogUtils.getLogger();
     private Infester infester;
-    public HashMap<ItemStack, Integer> biomassItemValue = new HashMap<>();
     public final ItemStackHandler itemHandler = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -46,9 +47,10 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
         }
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+
             if (level != null) {
                 return switch (slot) {
-                    case 0 -> stack.getItem() == ZgItems.CORRUPT_CHUNK.get() || stack.getItem() == Items.ROTTEN_FLESH;
+                    case 0 -> true;
                     default -> super.isItemValid(slot, stack);
                 };
 
@@ -65,9 +67,7 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
         super(ZgBlockEntities.CORRUPTION_CORE_ENTITY_TYPE.get(), pos, state);
         this.infester = new Infester(4, 4);
         LOGGER.warn("Creating CorruptionCoreBlockEntity at {}", pos);
-        biomassItemValue.put(Items.ROTTEN_FLESH.getDefaultInstance(), 1);
-        biomassItemValue.put(ZgItems.CORRUPT_CHUNK.get().getDefaultInstance(), 10);
-        biomassItemValue.put(ZgItems.BIOMASS_CRYSTAL_SHARD.get().getDefaultInstance(), 20);
+
 
     }
     @Override
@@ -83,13 +83,24 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
         if (level instanceof ServerLevel serverLevel) {
             if (be instanceof CorruptionCoreBlockEntity entity) {
                 entity.infester.infestNext(serverLevel, pos);
-                if (entity.itemHandler.getStackInSlot(0).getItem() == Items.ROTTEN_FLESH ||entity.itemHandler.getStackInSlot(0).getItem() == ZgItems.CORRUPT_CHUNK.get()||entity.itemHandler.getStackInSlot(0).getItem() == ZgItems.BIOMASS_CRYSTAL_SHARD.get()) {
+                if (hasRecipe(entity)) {
                     entity.progress++;
                     setChanged(level, pos, state);
                     if (entity.progress >= entity.maxProgress) {
+                        if (entity.biomass < entity.maxBiomass) {
+                        SimpleContainer inventory = new SimpleContainer(entity.itemHandler.getSlots());
+                        for (int i = 0; i<entity.itemHandler.getSlots(); i++) {
+                            inventory.setItem(i, entity.itemHandler.getStackInSlot(i));
+                        }
+                        Optional<CorruptionCoreBiomassConversionRecipe> recipe = level.getRecipeManager()
+                                .getRecipeFor(CorruptionCoreBiomassConversionRecipe.Type.INSTANCE, inventory, level);
                         entity.itemHandler.extractItem(0, 1, false);
-                        if (entity.biomass < 70) {
-                            entity.biomass++;
+
+                            entity.biomass+=recipe.get().getBiomassValue();
+                            entity.resetProgress();
+                        }else{
+                            entity.biomass=entity.maxBiomass;
+
                         }
 
                         entity.resetProgress();
@@ -101,6 +112,16 @@ public class CorruptionCoreBlockEntity extends BlockEntity {
             }
         }
 
+    }
+    private static boolean hasRecipe(CorruptionCoreBlockEntity entity) {
+        Level level = entity.level;
+        SimpleContainer inventory = new SimpleContainer(entity.itemHandler.getSlots());
+        for (int i = 0; i<entity.itemHandler.getSlots(); i++) {
+            inventory.setItem(i, entity.itemHandler.getStackInSlot(i));
+        }
+        Optional<CorruptionCoreBiomassConversionRecipe> recipe = level.getRecipeManager()
+                .getRecipeFor(CorruptionCoreBiomassConversionRecipe.Type.INSTANCE, inventory, level);
+        return recipe.isPresent();
     }
 
     public void setNetworkId(String networkId) {

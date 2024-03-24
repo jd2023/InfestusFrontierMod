@@ -17,6 +17,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jd.infestusfrontier.recipe.ZgRecipes;
 import org.jd.infestusfrontier.screen.CorruptionCoreScreen;
 import org.jd.infestusfrontier.screen.ModMenuTypes;
 import org.jd.infestusfrontier.world.feature.ZgConfiguredFeatures;
@@ -44,6 +45,7 @@ public class InfestusFrontier
         ZgBlockEntities.register(modEventBus);
         ZgConfiguredFeatures.register(modEventBus);
         ZgPlacedFeatures.register(modEventBus);
+        ZgRecipes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
