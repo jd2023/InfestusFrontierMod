@@ -7,7 +7,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public interface InfestusLootLeech extends Container {
-    VoxelShape SUCK = Block.box(-48.0D, 80.0D, -48.0D, 102.0D, -96.0D, 102.0D);
+    VoxelShape SUCK = Block.box(-48.0D, 0, -48.0D, 56.0D, 96.0D, 56.0D);
 
     default VoxelShape getSuckShape() {
         return SUCK;

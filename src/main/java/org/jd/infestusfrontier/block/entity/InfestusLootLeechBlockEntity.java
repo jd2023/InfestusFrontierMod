@@ -159,7 +159,7 @@ public class InfestusLootLeechBlockEntity extends BlockEntity implements Infestu
         System.out.println("Adding Item");
         boolean flag = false;
         ItemStack itemstack = entity.getItem().copy();
-        ItemStack itemstack1 = addItem((Container)null, container, itemstack, (Direction)null);
+        ItemStack itemstack1 = addItem((Container)null, container, itemstack, Direction.UP);
         if (itemstack1.isEmpty()) {
             flag = true;
             entity.discard();
@@ -172,7 +172,7 @@ public class InfestusLootLeechBlockEntity extends BlockEntity implements Infestu
     public static ItemStack addItem(@Nullable Container container, Container container2, ItemStack stack, @Nullable Direction direction) {
         System.out.println("Adding Item");
 
-        if (container2 instanceof WorldlyContainer worldlycontainer && direction != null) {
+        if (container2 instanceof WorldlyContainer worldlycontainer) {
             int[] aint = worldlycontainer.getSlotsForFace(direction);
 
             for(int k = 0; k < aint.length && !stack.isEmpty(); ++k) {
