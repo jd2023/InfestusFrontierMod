@@ -11,6 +11,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -25,6 +26,8 @@ import org.jetbrains.annotations.Nullable;
 public class BioReservoirBlockEntity extends BlockEntity {
 
     private String networkId;
+    public static final IntegerProperty BIOMASS = IntegerProperty.create("biomass", 0, 10);
+
 
     public BioReservoirBlockEntity(BlockPos pos, BlockState state) {
         super(ZgBlockEntities.BIOMASS_RESERVOIR.get(), pos, state);
@@ -37,4 +40,5 @@ public class BioReservoirBlockEntity extends BlockEntity {
     public String getNetworkId() {
         return networkId;
     }
+
 }
