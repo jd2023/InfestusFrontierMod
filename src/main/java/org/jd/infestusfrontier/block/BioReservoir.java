@@ -19,6 +19,10 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -29,6 +33,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
+import org.jd.infestusfrontier.ZgBlockEntities;
 import org.jd.infestusfrontier.ZgBlocks;
 import org.jd.infestusfrontier.block.entity.BioReservoirBlockEntity;
 import org.jd.infestusfrontier.block.entity.CorruptionCoreBlockEntity;
@@ -38,6 +43,8 @@ import org.jd.infestusfrontier.utils.InfestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+
+import java.text.ParsePosition;
 
 public class BioReservoir extends BaseEntityBlock {
     public static final String ID = "bio_reservoir";
@@ -58,16 +65,17 @@ public class BioReservoir extends BaseEntityBlock {
             Block.box(2, 2, 2, 14, 16, 14);
 
     @Override
-    public VoxelShape getShape(BlockState p_60555_, BlockGetter p_60556_, BlockPos p_60557_, CollisionContext p_60558_) {
-        return SHAPE;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
 
 
 
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+
+      @Override
+      protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BIOMASS);
     }
 
@@ -102,29 +110,29 @@ public class BioReservoir extends BaseEntityBlock {
         return BIOMASS;
     }
     public int getMaxBiomass() {
-        return 10;
+        return 100;
     }
 
 
     protected int getBiomass(BlockState pState) {
-        return pState.getValue(this.getBiomassProperty());
+        return 2;// pState.getValue(this.getBiomassProperty());
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
         return new BioReservoirBlockEntity(pPos, pState);
-    }
+   }
     public BlockState getStateForBiomass(int biomass) {
         return this.defaultBlockState().setValue(this.getBiomassProperty(), Integer.valueOf(biomass));
     }
-    public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
+   public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         if (!pLevel.isAreaLoaded(pPos, 1)) return; // Forge: prevent loading unloaded chunks when checking neighbor's light
-
         int i = this.getBiomass(pState);
+        System.out.println(i);
         if (i <= this.getMaxBiomass()) {
 
-            pLevel.setBlock(pPos, this.getStateForBiomass(i + 1), 2);
+            pLevel.setBlock(pPos, this.getStateForBiomass((int) i * 11 / 100 ), 2);
 
         }
 

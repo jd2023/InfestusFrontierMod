@@ -6,7 +6,7 @@
 		"1": "infestusfrontier:block/bioreservoir_jar",
 		"2": "infestusfrontier:block/bioreservoir_lid",
 		"3": "infestusfrontier:block/bioreservoir_stand",
-		"particle": "infestusfrontier:block/infestus_network_01_32"
+		"particle": "infestusfrontier:block/infestus_network_04_32"
 	},
 	"elements": [
 		{

@@ -11,6 +11,8 @@
     "biomass=8": {"model": "infestusfrontier:block/stage8_bioreservoir"},
     "biomass=9": {"model": "infestusfrontier:block/stage9_bioreservoir"},
     "biomass=10": {"model": "infestusfrontier:block/stage10_bioreservoir"}
+
+
   }
 }
 
