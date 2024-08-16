@@ -1,9 +1,0 @@
-{
-  "type": "infestusfrontier:corruption_core_biomass",
-  "ingredients": [
-    {
-      "item": "infestusfrontier:corrupt_chunk"
-    }
-  ],
-  "output": 10
-}

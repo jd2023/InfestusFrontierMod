@@ -1,9 +1,0 @@
-{
-  "type": "infestusfrontier:corruption_core_biomass",
-  "ingredients": [
-    {
-      "item": "infestusfrontier:biomass_crystal_shard"
-    }
-  ],
-  "output": 20
-}
