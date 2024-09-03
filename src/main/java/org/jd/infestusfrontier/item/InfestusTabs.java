@@ -22,6 +22,8 @@ public class InfestusTabs {
                         pOutput.accept(InfestusItems.FERMENTED_FLESH.get());
                         pOutput.accept(InfestusItems.EYE_OF_THE_SWARM.get());
                         pOutput.accept(InfestusBlocks.ROTTEN_FLESH_BLOCK.get());
+                        pOutput.accept(InfestusBlocks.FERMENTED_FLESH_BLOCK.get());
+
                     })
                     .build());
 

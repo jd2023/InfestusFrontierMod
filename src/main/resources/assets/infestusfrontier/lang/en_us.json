@@ -4,5 +4,7 @@
   "item.infestusfrontier.fermented_flesh": "Fermented Flesh",
   "item.infestusfrontier.eye_of_the_swarm": "Eye Of The Swarm",
 
-  "block.infestusfrontier.rotten_flesh_block": "Block Of Flesh"
+  "block.infestusfrontier.rotten_flesh_block": "Block Of Flesh",
+  "block.infestusfrontier.fermented_flesh_block": "Block Of Fermented Flesh"
+
 }

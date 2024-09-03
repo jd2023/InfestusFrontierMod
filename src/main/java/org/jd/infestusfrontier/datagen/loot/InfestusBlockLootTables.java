@@ -17,6 +17,8 @@ public class InfestusBlockLootTables extends BlockLootSubProvider {
     protected void generate() {
         this.dropSelf(InfestusBlocks.ROTTEN_FLESH_BLOCK.get());
 
+        this.dropSelf(InfestusBlocks.FERMENTED_FLESH_BLOCK.get());
+
 
 
     }

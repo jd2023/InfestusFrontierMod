@@ -14,10 +14,16 @@ public class InfestusBlockStateProvider extends BlockStateProvider {
     }
     @Override
     protected void registerStatesAndModels() {
+        blockWithItem(InfestusBlocks.FERMENTED_FLESH_BLOCK);
         blockWithItem(InfestusBlocks.ROTTEN_FLESH_BLOCK);
     }
     private void blockWithItem(RegistryObject<Block> blockRegistryObject) {
         simpleBlockWithItem(blockRegistryObject.get(), cubeAll(blockRegistryObject.get()));
+
+    }
+    private void blockWithoutItem(RegistryObject<Block> blockRegistryObject) {
+        simpleBlock(blockRegistryObject.get(), cubeAll(blockRegistryObject.get()));
+
     }
 
 }

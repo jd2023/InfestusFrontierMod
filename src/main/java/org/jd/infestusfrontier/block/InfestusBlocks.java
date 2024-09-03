@@ -19,7 +19,10 @@ public class InfestusBlocks {
             DeferredRegister.create(ForgeRegistries.BLOCKS, InfestusFrontier.MODID);
 
     public static final RegistryObject<Block> ROTTEN_FLESH_BLOCK = registerBlock("rotten_flesh_block",
-            ()->new Block(BlockBehaviour.Properties.copy(Blocks.SLIME_BLOCK).strength(3)));
+            ()->new Block(BlockBehaviour.Properties.copy(Blocks.SLIME_BLOCK).strength(0.5f)));
+
+    public static final RegistryObject<Block> FERMENTED_FLESH_BLOCK = registerBlock("fermented_flesh_block",
+            ()->new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1)));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
