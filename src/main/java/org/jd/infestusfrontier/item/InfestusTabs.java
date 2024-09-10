@@ -16,13 +16,15 @@ public class InfestusTabs {
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, InfestusFrontier.MODID);
     public static final RegistryObject<CreativeModeTab> INFESTUS_TAB = CREATIVE_MODE_TABS.register("infestusfrontier",
             () -> CreativeModeTab.builder()
-                    .icon(()->new ItemStack(InfestusItems.EYE_OF_THE_SWARM.get()))
+                    .icon(()->new ItemStack(InfestusItems.EYE_OF_CORRUPTION.get()))
                     .title(Component.translatable("creativetab.infestus_tab"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(InfestusItems.FERMENTED_FLESH.get());
-                        pOutput.accept(InfestusItems.EYE_OF_THE_SWARM.get());
+                        pOutput.accept(InfestusItems.EYE_OF_CORRUPTION.get());
                         pOutput.accept(InfestusBlocks.ROTTEN_FLESH_BLOCK.get());
                         pOutput.accept(InfestusBlocks.FERMENTED_FLESH_BLOCK.get());
+                        pOutput.accept(InfestusBlocks.INFESTUS_NETWORK.get());
+
 
                     })
                     .build());

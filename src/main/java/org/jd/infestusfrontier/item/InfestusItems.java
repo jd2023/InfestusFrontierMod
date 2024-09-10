@@ -12,7 +12,7 @@ public class InfestusItems {
 
     public static RegistryObject<Item> FERMENTED_FLESH = ITEMS.register("fermented_flesh",
             ()->new Item(new Item.Properties().stacksTo(64)));
-    public static RegistryObject<Item> EYE_OF_THE_SWARM = ITEMS.register("eye_of_the_swarm",
+    public static RegistryObject<Item> EYE_OF_CORRUPTION = ITEMS.register("eye_of_corruption",
             ()->new Item(new Item.Properties().stacksTo(16)));
 
 

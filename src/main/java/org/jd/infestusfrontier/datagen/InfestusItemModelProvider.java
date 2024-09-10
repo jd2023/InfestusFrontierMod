@@ -17,7 +17,7 @@ public class InfestusItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        simpleItem(InfestusItems.EYE_OF_THE_SWARM);
+        simpleItem(InfestusItems.EYE_OF_CORRUPTION);
         simpleItem(InfestusItems.FERMENTED_FLESH);
     }
     private ItemModelBuilder simpleItem(RegistryObject<Item> item) {

@@ -42,13 +42,13 @@ public class InfestusRecipeProvider extends RecipeProvider implements ICondition
                 .define('Y', Items.BROWN_MUSHROOM)
                 .unlockedBy(getHasName(InfestusItems.FERMENTED_FLESH.get()), has(InfestusItems.FERMENTED_FLESH.get()))
                 .save(writer, "infestusfrontier:fermented_flesh_from_crafting");
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusItems.EYE_OF_THE_SWARM.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusItems.EYE_OF_CORRUPTION.get())
                 .pattern(" X ")
                 .pattern("XEX")
                 .pattern(" X ")
                 .define('X', InfestusItems.FERMENTED_FLESH.get())
                 .define('E', Items.ENDER_PEARL)
-                .unlockedBy(getHasName(InfestusItems.EYE_OF_THE_SWARM.get()), has(InfestusItems.EYE_OF_THE_SWARM.get()))
+                .unlockedBy(getHasName(InfestusItems.EYE_OF_CORRUPTION.get()), has(InfestusItems.EYE_OF_CORRUPTION.get()))
                 .save(writer, "infestusfrontier:eye_of_swarm_from_crafting");
     }
     protected void buildShapelessItemRecipes(Consumer<FinishedRecipe> writer){
