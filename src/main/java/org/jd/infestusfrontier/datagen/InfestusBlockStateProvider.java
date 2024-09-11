@@ -19,7 +19,12 @@ public class InfestusBlockStateProvider extends BlockStateProvider {
         blockWithItem(InfestusBlocks.FERMENTED_FLESH_BLOCK);
         blockWithItem(InfestusBlocks.ROTTEN_FLESH_BLOCK);
         blockWithItem(InfestusBlocks.INFESTUS_NETWORK);
-
+        simpleBlockWithItem(InfestusBlocks.CORRUPTION_CORE.get(), models().cube("corruption_core",
+                blockTexture(InfestusBlocks.INFESTUS_NETWORK.get()), modLoc("block/corruption_core_top")
+                , modLoc("block/corruption_core_side_1")
+                , modLoc("block/corruption_core_side_1")
+                , modLoc("block/corruption_core_side_2")
+                , modLoc("block/corruption_core_side_2")));
 
 
     }

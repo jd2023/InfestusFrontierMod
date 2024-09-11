@@ -19,6 +19,7 @@ public class InfestusBlockLootTables extends BlockLootSubProvider {
 
         this.dropSelf(InfestusBlocks.FERMENTED_FLESH_BLOCK.get());
 
+        this.dropSelf(InfestusBlocks.CORRUPTION_CORE.get());
 
 
 

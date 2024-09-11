@@ -69,6 +69,14 @@ public class InfestusRecipeProvider extends RecipeProvider implements ICondition
     protected void buildCoreBlockRecipes(Consumer<FinishedRecipe> writer){
         //Blocks that have their own class and are made for progression not decor
         //Ingredients Dont Count,    Rotten flesh block...
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusBlocks.CORRUPTION_CORE.get())
+                .pattern(" X ")
+                .pattern("XYX")
+                .pattern(" X ")
+                .define('X', InfestusBlocks.FERMENTED_FLESH_BLOCK.get())
+                .define('Y', InfestusItems.EYE_OF_CORRUPTION.get())
+                .unlockedBy(getHasName(InfestusBlocks.CORRUPTION_CORE.get()), has(InfestusBlocks.CORRUPTION_CORE.get()))
+                .save(writer, "infestusfrontier:corruption_core_from_crafting");
 
     }
     protected void buildDecorationBlockRecipes(Consumer<FinishedRecipe> writer){
