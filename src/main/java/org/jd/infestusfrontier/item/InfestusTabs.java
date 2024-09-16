@@ -25,6 +25,8 @@ public class InfestusTabs {
                         pOutput.accept(InfestusBlocks.FERMENTED_FLESH_BLOCK.get());
                         pOutput.accept(InfestusBlocks.CORRUPTION_CORE.get());
                         pOutput.accept(InfestusBlocks.INFESTUS_NETWORK.get());
+                        pOutput.accept(InfestusBlocks.BIOMASS_RESERVOIR.get());
+
 
 
                     })

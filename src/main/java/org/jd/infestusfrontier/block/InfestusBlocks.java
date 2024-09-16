@@ -10,6 +10,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.block.custom.BiomassReservoirBlock;
 import org.jd.infestusfrontier.block.custom.CorruptionCoreBlock;
 import org.jd.infestusfrontier.block.custom.CorruptionCoreBlock;
 import org.jd.infestusfrontier.item.InfestusItems;
@@ -30,6 +31,8 @@ public class InfestusBlocks {
             ()->new Block(BlockBehaviour.Properties.copy(Blocks.SCULK).strength(1).noLootTable()));
     public static final RegistryObject<Block> CORRUPTION_CORE = registerBlockWithItem("corruption_core",
             ()->new CorruptionCoreBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_CATALYST).strength(1)));
+    public static final RegistryObject<Block> BIOMASS_RESERVOIR = registerBlockWithItem("bio_reservoir",
+            ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(1)));
     private static <T extends Block> RegistryObject<T> registerBlockWithItem(String name, Supplier<T> block){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn);

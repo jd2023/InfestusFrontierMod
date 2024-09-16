@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.InfestusFrontier;
@@ -25,8 +26,19 @@ public class InfestusBlockStateProvider extends BlockStateProvider {
                 , modLoc("block/corruption_core_side_1")
                 , modLoc("block/corruption_core_side_2")
                 , modLoc("block/corruption_core_side_2")));
+        simpleBlockWithItem(InfestusBlocks.BIOMASS_RESERVOIR.get(), new ModelFile.UncheckedModelFile(modLoc("block/bio_reserve_001")));
 
 
+
+    }
+
+
+
+    private void registerOnlyState(Block block, String registry) {
+        simpleBlock(block, getUncheckedModel(registry));
+    }
+    public static ModelFile getUncheckedModel(String registry) {
+        return new ModelFile.UncheckedModelFile("infestusfrontier:block/" + registry);
     }
     private void blockWithItem(RegistryObject<Block> blockRegistryObject) {
         simpleBlockWithItem(blockRegistryObject.get(), cubeAll(blockRegistryObject.get()));
