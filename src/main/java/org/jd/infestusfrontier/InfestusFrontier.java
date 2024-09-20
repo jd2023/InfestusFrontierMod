@@ -2,6 +2,8 @@ package org.jd.infestusfrontier;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
@@ -28,6 +30,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.block.InfestusBlocks;
+import org.jd.infestusfrontier.block.entity.InfestusBlockEntities;
 import org.jd.infestusfrontier.item.InfestusItems;
 import org.jd.infestusfrontier.item.InfestusTabs;
 import org.slf4j.Logger;
@@ -56,6 +59,8 @@ public class InfestusFrontier
         InfestusItems.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         InfestusTabs.register(modEventBus);
+
+        InfestusBlockEntities.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -99,6 +104,7 @@ public class InfestusFrontier
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+            ItemBlockRenderTypes.setRenderLayer(InfestusBlocks.BIOMASS_RESERVOIR.get(), RenderType.translucent());
         }
     }
 }

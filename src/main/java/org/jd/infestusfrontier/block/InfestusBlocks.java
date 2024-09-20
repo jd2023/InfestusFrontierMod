@@ -30,9 +30,9 @@ public class InfestusBlocks {
     public static final RegistryObject<Block> INFESTUS_NETWORK = registerBlockWithItem("infestus_network",
             ()->new Block(BlockBehaviour.Properties.copy(Blocks.SCULK).strength(1).noLootTable()));
     public static final RegistryObject<Block> CORRUPTION_CORE = registerBlockWithItem("corruption_core",
-            ()->new CorruptionCoreBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_CATALYST).strength(1)));
+            ()->new CorruptionCoreBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_CATALYST).strength(1).noOcclusion()));
     public static final RegistryObject<Block> BIOMASS_RESERVOIR = registerBlockWithItem("bio_reservoir",
-            ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(1)));
+            ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1)));
     private static <T extends Block> RegistryObject<T> registerBlockWithItem(String name, Supplier<T> block){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn);

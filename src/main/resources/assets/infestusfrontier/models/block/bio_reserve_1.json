@@ -1,8 +1,8 @@
 {
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "block/bio_reserve_001_texture",
-		"particle": "block/bio_reserve_001_texture"
+		"0": "block/bio_reserve_1_texture",
+		"particle": "block/bio_reserve_1_texture"
 	},
 	"elements": [
 		{
@@ -17,12 +17,5 @@
 				"down": {"uv": [8, 8, 0, 16], "texture": "#0"}
 			}
 		}
-	],
-	"display": {
-		"thirdperson_righthand": {
-			"rotation": [37, -64, 31],
-			"translation": [-1, 1.25, -0.25],
-			"scale": [0.5, 0.5, 0.5]
-		}
-	}
+	]
 }
