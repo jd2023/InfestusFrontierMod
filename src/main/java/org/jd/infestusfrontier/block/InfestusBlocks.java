@@ -4,7 +4,9 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -32,7 +34,7 @@ public class InfestusBlocks {
     public static final RegistryObject<Block> CORRUPTION_CORE = registerBlockWithItem("corruption_core",
             ()->new CorruptionCoreBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_CATALYST).strength(1).noOcclusion()));
     public static final RegistryObject<Block> BIOMASS_RESERVOIR = registerBlockWithItem("bio_reservoir",
-            ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1)));
+            ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1).noOcclusion()));
     private static <T extends Block> RegistryObject<T> registerBlockWithItem(String name, Supplier<T> block){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn);

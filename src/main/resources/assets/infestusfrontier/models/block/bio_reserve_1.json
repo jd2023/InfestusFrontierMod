@@ -1,8 +1,10 @@
 {
+	"parent": "block/cube_all",
+	"render_type": "cutout",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "block/bio_reserve_1_texture",
-		"particle": "block/bio_reserve_1_texture"
+		"0": "infestusfrontier:block/bio_reserve_1_texture",
+		"particle": "infestusfrontier:block/bio_reserve_1_texture"
 	},
 	"elements": [
 		{
