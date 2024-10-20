@@ -15,7 +15,6 @@ public class InfestusItems {
     public static RegistryObject<Item> EYE_OF_CORRUPTION = ITEMS.register("eye_of_corruption",
             ()->new Item(new Item.Properties().stacksTo(16)));
 
-
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
     }

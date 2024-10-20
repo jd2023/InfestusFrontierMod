@@ -1,0 +1,23 @@
+{
+	"parent": "block/cube_all",
+	"render_type": "cutout",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "infestusfrontier:block/bio_reserve_1_texture",
+		"particle": "infestusfrontier:block/bio_reserve_1_texture"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 9, 16],
+			"faces": {
+				"north": {"uv": [8, 8, 0, 0], "texture": "#0"},
+				"east": {"uv": [8, 8, 0, 0], "texture": "#0"},
+				"south": {"uv": [8, 8, 0, 0], "texture": "#0"},
+				"west": {"uv": [8, 8, 0, 0], "texture": "#0"},
+				"up": {"uv": [8, 8, 0, 0], "texture": "#0"},
+				"down": {"uv": [8, 8, 0, 0], "texture": "#0"}
+			}
+		}
+	]
+}

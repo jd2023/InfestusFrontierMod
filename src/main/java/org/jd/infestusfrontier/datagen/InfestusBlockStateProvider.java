@@ -4,12 +4,20 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.block.InfestusBlocks;
+import org.jd.infestusfrontier.block.custom.BiomassReservoirBlock;
+import net.minecraftforge.client.model.generators.BlockModelProvider;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
+import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.client.model.generators.ModelFile.ExistingModelFile;
+
+import java.util.function.Function;
 
 public class InfestusBlockStateProvider extends BlockStateProvider {
     public InfestusBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
@@ -31,9 +39,6 @@ public class InfestusBlockStateProvider extends BlockStateProvider {
 
 
     }
-
-
-
     private void registerOnlyState(Block block, String registry) {
         simpleBlock(block, getUncheckedModel(registry));
     }
