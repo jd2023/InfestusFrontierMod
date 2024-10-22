@@ -50,6 +50,46 @@ public class InfestusRecipeProvider extends RecipeProvider implements ICondition
                 .define('E', Items.ENDER_PEARL)
                 .unlockedBy(getHasName(InfestusItems.EYE_OF_CORRUPTION.get()), has(InfestusItems.EYE_OF_CORRUPTION.get()))
                 .save(writer, "infestusfrontier:eye_of_swarm_from_crafting");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusItems.MEAT_SWORD.get())
+                .pattern(" E ")
+                .pattern(" E ")
+                .pattern(" X ")
+                .define('X', Items.STICK)
+                .define('E', InfestusItems.FERMENTED_FLESH.get())
+                .unlockedBy(getHasName(InfestusItems.MEAT_SWORD.get()), has(InfestusItems.MEAT_SWORD.get()))
+                .save(writer, "infestusfrontier:meat_sword_from_crafting");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusItems.MEAT_AXE.get())
+                .pattern("EE ")
+                .pattern("EX ")
+                .pattern(" X ")
+                .define('X', Items.STICK)
+                .define('E', InfestusItems.FERMENTED_FLESH.get())
+                .unlockedBy(getHasName(InfestusItems.MEAT_AXE.get()), has(InfestusItems.MEAT_AXE.get()))
+                .save(writer, "infestusfrontier:meat_axe_from_crafting");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusItems.MEAT_PICKAXE.get())
+                .pattern("EEE")
+                .pattern(" X ")
+                .pattern(" X ")
+                .define('X', Items.STICK)
+                .define('E', InfestusItems.FERMENTED_FLESH.get())
+                .unlockedBy(getHasName(InfestusItems.MEAT_PICKAXE.get()), has(InfestusItems.MEAT_PICKAXE.get()))
+                .save(writer, "infestusfrontier:meat_pickaxe_from_crafting");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusItems.MEAT_HOE.get())
+                .pattern("EE ")
+                .pattern(" X ")
+                .pattern(" X ")
+                .define('X', Items.STICK)
+                .define('E', InfestusItems.FERMENTED_FLESH.get())
+                .unlockedBy(getHasName(InfestusItems.MEAT_HOE.get()), has(InfestusItems.MEAT_HOE.get()))
+                .save(writer, "infestusfrontier:meat_hoe_from_crafting");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusItems.MEAT_SHOVEL.get())
+                .pattern(" E ")
+                .pattern(" X ")
+                .pattern(" X ")
+                .define('X', Items.STICK)
+                .define('E', InfestusItems.FERMENTED_FLESH.get())
+                .unlockedBy(getHasName(InfestusItems.MEAT_SHOVEL.get()), has(InfestusItems.MEAT_SHOVEL.get()))
+                .save(writer, "infestusfrontier:meat_shovel_from_crafting");
     }
     protected void buildShapelessItemRecipes(Consumer<FinishedRecipe> writer){
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.ROTTEN_FLESH, 9)
