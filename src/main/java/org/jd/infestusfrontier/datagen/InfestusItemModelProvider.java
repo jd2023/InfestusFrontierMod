@@ -19,10 +19,20 @@ public class InfestusItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
         simpleItem(InfestusItems.EYE_OF_CORRUPTION);
         simpleItem(InfestusItems.FERMENTED_FLESH);
+        handheldItem(InfestusItems.MEAT_SWORD);
+        handheldItem(InfestusItems.MEAT_AXE);
+        handheldItem(InfestusItems.MEAT_HOE);
+        handheldItem(InfestusItems.MEAT_SHOVEL);
+        handheldItem(InfestusItems.MEAT_PICKAXE);
     }
     private ItemModelBuilder simpleItem(RegistryObject<Item> item) {
         return withExistingParent(item.getId().getPath(),
                 new ResourceLocation("item/generated")).texture("layer0",
+                new ResourceLocation(InfestusFrontier.MODID,"item/" + item.getId().getPath()));
+    }
+    private ItemModelBuilder handheldItem(RegistryObject<Item> item) {
+        return withExistingParent(item.getId().getPath(),
+                new ResourceLocation("item/handheld")).texture("layer0",
                 new ResourceLocation(InfestusFrontier.MODID,"item/" + item.getId().getPath()));
     }
 }

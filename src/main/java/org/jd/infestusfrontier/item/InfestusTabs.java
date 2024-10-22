@@ -26,6 +26,13 @@ public class InfestusTabs {
                         pOutput.accept(InfestusBlocks.CORRUPTION_CORE.get());
                         pOutput.accept(InfestusBlocks.INFESTUS_NETWORK.get());
                         pOutput.accept(InfestusBlocks.BIOMASS_RESERVOIR.get());
+                        pOutput.accept(InfestusItems.MEAT_SWORD.get());
+                        pOutput.accept(InfestusItems.MEAT_AXE.get());
+                        pOutput.accept(InfestusItems.MEAT_HOE.get());
+                        pOutput.accept(InfestusItems.MEAT_PICKAXE.get());
+                        pOutput.accept(InfestusItems.MEAT_SHOVEL.get());
+
+
 
 
 

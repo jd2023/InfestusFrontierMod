@@ -1,6 +1,6 @@
 package org.jd.infestusfrontier.item;
 
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -15,6 +15,19 @@ public class InfestusItems {
     public static RegistryObject<Item> EYE_OF_CORRUPTION = ITEMS.register("eye_of_corruption",
             ()->new Item(new Item.Properties().stacksTo(16)));
 
+    public static final RegistryObject<Item> MEAT_SWORD = ITEMS.register("meat_sword",
+            () -> new SwordItem(InfestusToolTiers.TIER1TOOLS, 1, 1, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MEAT_AXE = ITEMS.register("meat_axe",
+            () -> new AxeItem(InfestusToolTiers.TIER1TOOLS, 1, 1,
+                    new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MEAT_HOE = ITEMS.register("meat_hoe",
+            () -> new HoeItem(InfestusToolTiers.TIER1TOOLS, 1, 1,
+                    new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MEAT_SHOVEL = ITEMS.register("meat_shovel",
+            () -> new ShovelItem(InfestusToolTiers.TIER1TOOLS, 1, 1,
+                    new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MEAT_PICKAXE = ITEMS.register("meat_pickaxe",
+            () -> new PickaxeItem(InfestusToolTiers.TIER1TOOLS, 1, 1, new Item.Properties().stacksTo(1)));
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
     }
