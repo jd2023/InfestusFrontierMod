@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_eye_of_corruption": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "infestusfrontier:eye_of_corruption"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "infestusfrontier:eye_of_swarm_from_crafting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_eye_of_corruption",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "infestusfrontier:eye_of_swarm_from_crafting"
+    ]
+  },
+  "sends_telemetry_event": false
+}

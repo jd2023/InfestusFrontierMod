@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": {
+      "item": "infestusfrontier:fermented_flesh"
+    },
+    "X": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    " E ",
+    " E ",
+    " X "
+  ],
+  "result": {
+    "item": "infestusfrontier:meat_sword"
+  },
+  "show_notification": true
+}

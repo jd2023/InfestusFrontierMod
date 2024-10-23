@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_corruption_core": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "infestusfrontier:corruption_core"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "infestusfrontier:corruption_core_from_crafting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_corruption_core",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "infestusfrontier:corruption_core_from_crafting"
+    ]
+  },
+  "sends_telemetry_event": false
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "X": {
+      "item": "infestusfrontier:fermented_flesh_block"
+    },
+    "Y": {
+      "item": "infestusfrontier:eye_of_corruption"
+    }
+  },
+  "pattern": [
+    " X ",
+    "XYX",
+    " X "
+  ],
+  "result": {
+    "item": "infestusfrontier:corruption_core"
+  },
+  "show_notification": true
+}

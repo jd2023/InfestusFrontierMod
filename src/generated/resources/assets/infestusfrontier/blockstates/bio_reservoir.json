@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "amount=1": {
+      "model": "infestusfrontier:block/bio_reserve_1"
+    },
+    "amount=2": {
+      "model": "infestusfrontier:block/bio_reserve_2"
+    },
+    "amount=3": {
+      "model": "infestusfrontier:block/bio_reserve_3"
+    },
+    "amount=4": {
+      "model": "infestusfrontier:block/bio_reserve_4"
+    },
+    "amount=5": {
+      "model": "infestusfrontier:block/bio_reserve_5"
+    },
+    "amount=6": {
+      "model": "infestusfrontier:block/bio_reserve_6"
+    },
+    "amount=7": {
+      "model": "infestusfrontier:block/bio_reserve_7"
+    },
+    "amount=8": {
+      "model": "infestusfrontier:block/bio_reserve_8"
+    },
+    "amount=9": {
+      "model": "infestusfrontier:block/bio_reserve_9"
+    },
+    "amount=10": {
+      "model": "infestusfrontier:block/bio_reserve_10"
+    }
+  }
+}
