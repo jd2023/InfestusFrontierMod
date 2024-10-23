@@ -31,7 +31,10 @@ public class InfestusTabs {
                         pOutput.accept(InfestusItems.MEAT_HOE.get());
                         pOutput.accept(InfestusItems.MEAT_PICKAXE.get());
                         pOutput.accept(InfestusItems.MEAT_SHOVEL.get());
-
+                        pOutput.accept(InfestusItems.MEAT_CHESTPLATE.get());
+                        pOutput.accept(InfestusItems.MEAT_BOOTS.get());
+                        pOutput.accept(InfestusItems.MEAT_LEGGINGS.get());
+                        pOutput.accept(InfestusItems.MEAT_HELMET.get());
 
 
 
