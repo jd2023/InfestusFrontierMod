@@ -4,16 +4,14 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.block.custom.BiomassReservoirBlock;
-import org.jd.infestusfrontier.block.custom.CorruptionCoreBlock;
+import org.jd.infestusfrontier.block.custom.CorruptedBlock;
 import org.jd.infestusfrontier.block.custom.CorruptionCoreBlock;
 import org.jd.infestusfrontier.item.InfestusItems;
 
@@ -29,10 +27,8 @@ public class InfestusBlocks {
     public static final RegistryObject<Block> FERMENTED_FLESH_BLOCK = registerBlockWithItem("fermented_flesh_block",
             ()->new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1)));
 
-    public static final RegistryObject<Block> INFESTUS_NETWORK = registerBlockWithItem("infestus_network",
-            ()->new Block(BlockBehaviour.Properties.copy(Blocks.SCULK).strength(1).noLootTable()));
-    public static final RegistryObject<Block> CORRUPTION_CORE = registerBlockWithItem("corruption_core",
-            ()->new CorruptionCoreBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_CATALYST).strength(1).noOcclusion()));
+    public static final RegistryObject<Block> CORRUPTED_BLOCK = registerBlockWithItem(CorruptedBlock.ID, CorruptedBlock::new);
+    public static final RegistryObject<Block> CORRUPTION_CORE = registerBlockWithItem(CorruptionCoreBlock.ID, CorruptionCoreBlock::new);
     public static final RegistryObject<Block> BIOMASS_RESERVOIR = registerBlockWithItem("bio_reservoir",
             ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1).noOcclusion()));
     private static <T extends Block> RegistryObject<T> registerBlockWithItem(String name, Supplier<T> block){
