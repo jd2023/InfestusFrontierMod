@@ -25,7 +25,8 @@ public class InfestusBlocks {
 
     public static final RegistryObject<Block> ROTTEN_FLESH_BLOCK = registerBlockWithItem("rotten_flesh_block",
             ()->new Block(BlockBehaviour.Properties.copy(Blocks.SLIME_BLOCK).strength(0.5f)));
-
+    public static final RegistryObject<Block> BIOMASS_CRYSTAL_BLOCK = registerBlockWithItem("biomass_crystal_block",
+            ()->new Block(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).strength(0.25f)));
     public static final RegistryObject<Block> FERMENTED_FLESH_BLOCK = registerBlockWithItem("fermented_flesh_block",
             ()->new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1)));
 

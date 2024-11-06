@@ -1,6 +1,6 @@
 {
   "creativetab.infestus_tab": "Infestus Frontier",
-
+  "item.infestusfrontier.biomass_shard": "Biomass Shard",
   "item.infestusfrontier.fermented_flesh": "Fermented Flesh",
   "item.infestusfrontier.eye_of_corruption": "Eye Of Corruption",
   "item.infestusfrontier.meat_sword": "Meat Sword",
@@ -20,7 +20,7 @@
   "block.infestusfrontier.fermented_flesh_block": "Block Of Fermented Flesh",
   "block.infestusfrontier.infestus_network": "Infestus Network",
   "block.infestusfrontier.bio_reservoir": "Biomass Reservoir",
-
+  "block.infestusfrontier.biomass_crystal_block": "Biomass Crystal Block",
   "block.infestusfrontier.corruption_core": "Corruption Core"
 
 

@@ -134,6 +134,13 @@ public class InfestusRecipeProvider extends RecipeProvider implements ICondition
                 .define('X', InfestusItems.FERMENTED_FLESH.get())
                 .unlockedBy(getHasName(InfestusBlocks.FERMENTED_FLESH_BLOCK.get()), has(InfestusBlocks.FERMENTED_FLESH_BLOCK.get()))
                 .save(writer, "infestusfrontier:fermented_block_from_crafting");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusBlocks.FERMENTED_FLESH_BLOCK.get())
+                .pattern("XXX")
+                .pattern("XXX")
+                .pattern("XXX")
+                .define('X', InfestusItems.BIOMASS_SHARD.get())
+                .unlockedBy(getHasName(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get()), has(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get()))
+                .save(writer, "infestusfrontier:biomass_crystal_block_from_crafting");
     }
 
 

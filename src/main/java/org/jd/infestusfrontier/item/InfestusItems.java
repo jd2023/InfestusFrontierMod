@@ -14,6 +14,8 @@ public class InfestusItems {
             ()->new Item(new Item.Properties().stacksTo(64)));
     public static RegistryObject<Item> EYE_OF_CORRUPTION = ITEMS.register("eye_of_corruption",
             ()->new Item(new Item.Properties().stacksTo(16)));
+    public static RegistryObject<Item> BIOMASS_SHARD = ITEMS.register("biomass_shard",
+            ()->new Item(new Item.Properties().stacksTo(9)));
 
     public static final RegistryObject<Item> MEAT_SWORD = ITEMS.register("meat_sword",
             () -> new SwordItem(InfestusToolTiers.TIER1TOOLS, 1, 1, new Item.Properties().stacksTo(1)));

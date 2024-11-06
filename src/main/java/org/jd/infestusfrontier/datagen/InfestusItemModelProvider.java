@@ -39,6 +39,7 @@ public class InfestusItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         simpleItem(InfestusItems.EYE_OF_CORRUPTION);
+        simpleItem(InfestusItems.BIOMASS_SHARD);
         simpleItem(InfestusItems.FERMENTED_FLESH);
         handheldItem(InfestusItems.MEAT_SWORD);
         handheldItem(InfestusItems.MEAT_AXE);

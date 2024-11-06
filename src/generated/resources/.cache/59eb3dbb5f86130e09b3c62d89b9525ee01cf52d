@@ -1,5 +1,6 @@
-// 1.20.1	2024-09-15T20:39:56.807914449	Loot Tables
+// 1.20.1	2024-11-05T16:10:04.426590133	Loot Tables
 b4bde335847928ef08ae5b2e3853354a6ce106df data/infestusfrontier/loot_tables/blocks/bio_reservoir.json
+eee7ad740c734812ce09b10bf9028f4cca0a685f data/infestusfrontier/loot_tables/blocks/biomass_crystal_block.json
 393ead4a8b8cd05302464483014097d25e1d8193 data/infestusfrontier/loot_tables/blocks/corruption_core.json
 05840314f06b8f04dce371303cf04feba7e68a69 data/infestusfrontier/loot_tables/blocks/fermented_flesh_block.json
 41f1c7ef1fe9af2275501987314d1a77240cd808 data/infestusfrontier/loot_tables/blocks/rotten_flesh_block.json
