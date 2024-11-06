@@ -1,9 +1,0 @@
-// 1.20.1	2024-11-05T16:10:04.425090469	Tags for minecraft:block mod id infestusfrontier
-a0dbc133a198a77845540789989ff5642333a2cf data/forge/tags/blocks/needs_netherite_tool.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/minecraft/tags/blocks/mineable/axe.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/minecraft/tags/blocks/mineable/hoe.json
-a0dbc133a198a77845540789989ff5642333a2cf data/minecraft/tags/blocks/mineable/pickaxe.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/minecraft/tags/blocks/mineable/shovel.json
-a0dbc133a198a77845540789989ff5642333a2cf data/minecraft/tags/blocks/needs_diamond_tool.json
-a0dbc133a198a77845540789989ff5642333a2cf data/minecraft/tags/blocks/needs_iron_tool.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/minecraft/tags/blocks/needs_stone_tool.json

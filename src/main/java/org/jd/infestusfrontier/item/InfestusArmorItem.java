@@ -78,7 +78,7 @@ public class InfestusArmorItem extends ArmorItem {
     }
     private boolean isOnInfestusNetwork(Player player) {
         boolean isOnNetwork = false;
-        if (player.getBlockStateOn().getBlock() == InfestusBlocks.INFESTUS_NETWORK.get()) {
+        if (player.getBlockStateOn().getBlock() == InfestusBlocks.CORRUPTED_BLOCK.get()) {
             isOnNetwork = true;
         }
         return isOnNetwork;
