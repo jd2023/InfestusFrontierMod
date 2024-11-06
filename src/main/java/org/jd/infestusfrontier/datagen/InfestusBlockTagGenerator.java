@@ -20,7 +20,7 @@ public class InfestusBlockTagGenerator extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-//ex :  this.tag(BlockTags.NEEDS_IRON_TOOL).add(InfestusBlocks.ROTTEN_FLESH_BLOCK);
+//ex    this.tag(BlockTags.NEEDS_IRON_TOOL).add(InfestusBlocks.ROTTEN_FLESH_BLOCK);
         this.tag(BlockTags.NEEDS_IRON_TOOL).add(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get());
         this.tag(BlockTags.NEEDS_DIAMOND_TOOL).add(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get());
         this.tag(Tags.Blocks.NEEDS_NETHERITE_TOOL).add(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get());

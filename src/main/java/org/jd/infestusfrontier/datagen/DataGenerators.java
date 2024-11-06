@@ -29,7 +29,7 @@ public class DataGenerators {
         InfestusBlockTagGenerator blockTagGen = gen.addProvider(event.includeServer(),
                 new InfestusBlockTagGenerator(output, provider, fileHelper));
         gen.addProvider(event.includeServer(), new InfestusItemTagGenerator(output, provider, blockTagGen.contentsGetter(), fileHelper));
-
+        gen.addProvider(event.includeServer() ,new InfestusBiomeTagProvider(output, provider, fileHelper));
 
 
 

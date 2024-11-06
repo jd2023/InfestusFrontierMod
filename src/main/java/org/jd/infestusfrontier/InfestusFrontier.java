@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -19,6 +20,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jd.infestusfrontier.block.InfestusBlocks;
 import org.jd.infestusfrontier.block.InfestusBlockEntities;
+import org.jd.infestusfrontier.datagen.registry.ConfiguredFeatureRegistry;
+import org.jd.infestusfrontier.datagen.registry.FeatureRegistry;
+import org.jd.infestusfrontier.datagen.registry.PlacedFeatureRegistry;
 import org.jd.infestusfrontier.item.InfestusItems;
 import org.jd.infestusfrontier.item.InfestusTabs;
 import org.slf4j.Logger;
@@ -56,6 +60,15 @@ public class InfestusFrontier
         // Register the item to a creative tab
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+    }
+    public static ResourceLocation createResource(String s){
+        return new ResourceLocation(MODID, s);
+    }
+    public static void init() {
+        FeatureRegistry.init();
+        //GeodePlusEntityRegistry.init();
+        PlacedFeatureRegistry.init();
+        ConfiguredFeatureRegistry.init();
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
