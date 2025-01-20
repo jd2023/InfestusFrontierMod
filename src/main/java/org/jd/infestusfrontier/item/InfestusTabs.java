@@ -37,6 +37,7 @@ public class InfestusTabs {
                         pOutput.accept(InfestusItems.MEAT_LEGGINGS.get());
                         pOutput.accept(InfestusItems.MEAT_HELMET.get());
                         pOutput.accept(InfestusItems.BIOMASS_SHARD.get());
+                        pOutput.accept(InfestusBlocks.MUTATION_POOL.get());
 
 
 

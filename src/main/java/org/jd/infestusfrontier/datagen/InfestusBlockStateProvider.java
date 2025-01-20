@@ -26,6 +26,7 @@ public class InfestusBlockStateProvider extends BlockStateProvider {
                 , modLoc("block/corruption_core_side_2")
                 , modLoc("block/corruption_core_side_2")));
         simpleBlockWithItem(InfestusBlocks.BIOMASS_RESERVOIR.get(), getUncheckedModel("bio_reserve_1"));
+        simpleBlockWithItem(InfestusBlocks.MUTATION_POOL.get(), getUncheckedModel("mutation_pool"));
 
 
 

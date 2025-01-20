@@ -13,6 +13,7 @@ import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.block.custom.BiomassReservoirBlock;
 import org.jd.infestusfrontier.block.custom.CorruptedBlock;
 import org.jd.infestusfrontier.block.custom.CorruptionCoreBlock;
+import org.jd.infestusfrontier.block.custom.MutationPoolBlock;
 import org.jd.infestusfrontier.item.InfestusItems;
 
 import java.util.function.Supplier;
@@ -32,6 +33,8 @@ public class InfestusBlocks {
     public static final RegistryObject<Block> CORRUPTION_CORE = registerBlockWithItem(CorruptionCoreBlock.ID, CorruptionCoreBlock::new);
     public static final RegistryObject<Block> BIOMASS_RESERVOIR = registerBlockWithItem("bio_reservoir",
             ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1).noOcclusion()));
+    public static final RegistryObject<Block> MUTATION_POOL = registerBlockWithItem("mutation_pool",
+            ()->new MutationPoolBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SHRIEKER).strength(1).noOcclusion()));
     private static <T extends Block> RegistryObject<T> registerBlockWithItem(String name, Supplier<T> block){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn);

@@ -28,6 +28,7 @@ public class InfestusBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(InfestusBlocks.FERMENTED_FLESH_BLOCK.get());
 
         this.dropSelf(InfestusBlocks.CORRUPTION_CORE.get());
+        this.dropSelf(InfestusBlocks.MUTATION_POOL.get());
         this.dropSelf(InfestusBlocks.BIOMASS_RESERVOIR.get());
         this.add(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get(),
                 block -> createCrystalLikeDrops(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get(), InfestusItems.BIOMASS_SHARD.get()));
