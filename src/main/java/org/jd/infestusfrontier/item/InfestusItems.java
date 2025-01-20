@@ -5,6 +5,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.jd.infestusfrontier.item.custom.InfestusArmorItem;
 
 public class InfestusItems {
     public static DeferredRegister<Item> ITEMS =
@@ -31,13 +32,13 @@ public class InfestusItems {
     public static final RegistryObject<Item> MEAT_PICKAXE = ITEMS.register("meat_pickaxe",
             () -> new PickaxeItem(InfestusToolTiers.TIER1TOOLS, 1, 1, new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> MEAT_CHESTPLATE = ITEMS.register("meat_chestplate",
-            () -> new ArmorItem(InfestusArmorMaterials.FLESH_TIER_ONE, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+            () -> new InfestusArmorItem(InfestusArmorMaterials.FLESH_TIER_ONE, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
     public static final RegistryObject<Item> MEAT_HELMET = ITEMS.register("meat_helmet",
-            () -> new ArmorItem(InfestusArmorMaterials.FLESH_TIER_ONE, ArmorItem.Type.HELMET, new Item.Properties()));
+            () -> new InfestusArmorItem(InfestusArmorMaterials.FLESH_TIER_ONE, ArmorItem.Type.HELMET, new Item.Properties()));
     public static final RegistryObject<Item> MEAT_BOOTS = ITEMS.register("meat_boots",
-            () -> new ArmorItem(InfestusArmorMaterials.FLESH_TIER_ONE, ArmorItem.Type.BOOTS, new Item.Properties()));
+            () -> new InfestusArmorItem(InfestusArmorMaterials.FLESH_TIER_ONE, ArmorItem.Type.BOOTS, new Item.Properties()));
     public static final RegistryObject<Item> MEAT_LEGGINGS = ITEMS.register("meat_leggings",
-            () -> new ArmorItem(InfestusArmorMaterials.FLESH_TIER_ONE, ArmorItem.Type.LEGGINGS, new Item.Properties()));
+            () -> new InfestusArmorItem(InfestusArmorMaterials.FLESH_TIER_ONE, ArmorItem.Type.LEGGINGS, new Item.Properties()));
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
     }

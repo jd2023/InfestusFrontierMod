@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.item;
+package org.jd.infestusfrontier.item.custom;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -9,6 +9,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jd.infestusfrontier.block.InfestusBlocks;
+import org.jd.infestusfrontier.item.InfestusArmorMaterials;
 
 
 import java.util.Map;
@@ -17,7 +18,7 @@ public class InfestusArmorItem extends ArmorItem {
     private static final Map<ArmorMaterial, MobEffectInstance> MATERIAL_TO_EFFECT_MAP =
             (new ImmutableMap.Builder<ArmorMaterial, MobEffectInstance>())
                     .put(InfestusArmorMaterials.FLESH_TIER_ONE,
-                            new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 10, 0)).build();
+                            new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 10, 0, false, true, true)).build();
 
     public InfestusArmorItem(ArmorMaterial material, ArmorItem.Type slot, Properties settings) {
         super(material, slot, settings);
@@ -68,6 +69,11 @@ public class InfestusArmorItem extends ArmorItem {
     }
 
     private boolean hasCorrectArmorOn(ArmorMaterial material, Player player) {
+        for (ItemStack armorstack:player.getInventory().armor){
+            if (!(armorstack.getItem() instanceof ArmorItem)) {
+                return false;
+            }
+        }
         ArmorItem boots = ((ArmorItem)player.getInventory().getArmor(0).getItem());
         ArmorItem leggings = ((ArmorItem)player.getInventory().getArmor(1).getItem());
         ArmorItem breastplate = ((ArmorItem)player.getInventory().getArmor(2).getItem());
