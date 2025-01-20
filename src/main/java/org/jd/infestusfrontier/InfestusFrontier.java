@@ -20,9 +20,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jd.infestusfrontier.block.InfestusBlocks;
 import org.jd.infestusfrontier.block.InfestusBlockEntities;
-import org.jd.infestusfrontier.datagen.registry.ConfiguredFeatureRegistry;
-import org.jd.infestusfrontier.datagen.registry.FeatureRegistry;
-import org.jd.infestusfrontier.datagen.registry.PlacedFeatureRegistry;
+
 import org.jd.infestusfrontier.item.InfestusItems;
 import org.jd.infestusfrontier.item.InfestusTabs;
 import org.slf4j.Logger;
@@ -51,8 +49,8 @@ public class InfestusFrontier
         InfestusItems.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         InfestusTabs.register(modEventBus);
-
         InfestusBlockEntities.register(modEventBus);
+
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -64,12 +62,7 @@ public class InfestusFrontier
     public static ResourceLocation createResource(String s){
         return new ResourceLocation(MODID, s);
     }
-    public static void init() {
-        FeatureRegistry.init();
-        //GeodePlusEntityRegistry.init();
-        PlacedFeatureRegistry.init();
-        ConfiguredFeatureRegistry.init();
-    }
+
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
