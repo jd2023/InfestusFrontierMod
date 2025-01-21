@@ -55,14 +55,10 @@ public class CorruptionCoreBlock extends BaseEntityBlock {
 
         return super.getStateForPlacement(context);
     }
+
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.getBlock() != newState.getBlock()) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof CorruptionCoreBlockEntity) {
-//                ((CorruptionCoreBlockEntity) blockEntity).drops();
-            }
-        }
+
         if (!level.isClientSide) {
             if (level.getBlockEntity(pos) instanceof CorruptionCoreBlockEntity blockEntity) {
                 blockEntity.remove(state, (ServerLevel) level, pos);

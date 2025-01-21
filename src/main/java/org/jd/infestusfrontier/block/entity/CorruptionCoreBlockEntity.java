@@ -26,6 +26,7 @@ public class CorruptionCoreBlockEntity extends BlockEntity implements MenuProvid
     private static final Logger LOGGER = LogUtils.getLogger();
     private Infester infester;
 
+
     public CorruptionCoreBlockEntity(BlockPos pos, BlockState state) {
         super(InfestusBlockEntities.CORRUPTION_CORE_ENTITY.get(), pos, state);
         this.infester = new Infester(2, 8);
@@ -51,6 +52,7 @@ public class CorruptionCoreBlockEntity extends BlockEntity implements MenuProvid
             }
         }
     }
+
     public void remove(BlockState state, ServerLevel level, BlockPos pos) {
         infester.downgradeNetwork(state, level, pos);
     }

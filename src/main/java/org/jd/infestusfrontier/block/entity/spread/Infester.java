@@ -35,39 +35,39 @@ public class Infester {
     }
 
     public boolean infestNext(ServerLevel serverLevel, BlockPos center) {
-//        if (!done) {
-//            ticks++;
-//            if (ticks % rate == 0) {
-//                while (radius < maxRadius) {
-//                    while (idx < Circle.data[radius].length) {
-//                        while (height < maxHeight) {
-//                            var mayBeInfestPos = center.offset(Circle.data[radius][idx][0], height, Circle.data[radius][idx][1]);
-//                            if (InfestUtils.isInfestusNetwork(mayBeInfestPos, serverLevel)) {
-//                                InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, InfestUtils.nextLevelInfesting(mayBeInfestPos, serverLevel));
-//                            } else if (InfestUtils.canBeInfested(mayBeInfestPos, serverLevel) && (this.breakBlocks || InfestUtils.isExposed(mayBeInfestPos, serverLevel))) {
-//                                if (this.breakBlocks) {
-//                                    BlockState blockState = serverLevel.getBlockState(mayBeInfestPos);
-//                                    Block block = blockState.getBlock();
-//                                    if (block.getCloneItemStack(serverLevel, mayBeInfestPos, blockState) != ItemStack.EMPTY) {
-//                                        BlockEntity blockEntity = blockState.hasBlockEntity() ? serverLevel.getBlockEntity(mayBeInfestPos) : null;
-//                                        Block.dropResources(blockState, serverLevel, center.above(), blockEntity); // Drops items at the block's location
-//                                        block.popExperience(serverLevel, center, block.getExpDrop(blockState, serverLevel, serverLevel.random, mayBeInfestPos, 0, 0));
-//                                    }
-//                                }
-//                                InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, InfestusBlocks.CORRUPTED_BLOCK.get().defaultBlockState());
-//                            }
-//                            height++;
-//                            return done;
-//                        }
-//                        height = -maxHeight;
-//                        idx++;
-//                    }
-//                    idx = 0;
-//                    radius++;
-//                }
-//                done = true;
-//            }
-//        }
+        if (!done) {
+            ticks++;
+            if (ticks % rate == 0) {
+                while (radius < maxRadius) {
+                    while (idx < Circle.data[radius].length) {
+                        while (height < maxHeight) {
+                            var mayBeInfestPos = center.offset(Circle.data[radius][idx][0], height, Circle.data[radius][idx][1]);
+                            if (InfestUtils.isInfestusNetwork(mayBeInfestPos, serverLevel)) {
+                                InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, InfestUtils.nextLevelInfesting(mayBeInfestPos, serverLevel));
+                            } else if (InfestUtils.canBeInfested(mayBeInfestPos, serverLevel) && (this.breakBlocks || InfestUtils.isExposed(mayBeInfestPos, serverLevel))) {
+                                if (this.breakBlocks) {
+                                    BlockState blockState = serverLevel.getBlockState(mayBeInfestPos);
+                                    Block block = blockState.getBlock();
+                                    if (block.getCloneItemStack(serverLevel, mayBeInfestPos, blockState) != ItemStack.EMPTY) {
+                                        BlockEntity blockEntity = blockState.hasBlockEntity() ? serverLevel.getBlockEntity(mayBeInfestPos) : null;
+                                        Block.dropResources(blockState, serverLevel, center.above(), blockEntity); // Drops items at the block's location
+                                        block.popExperience(serverLevel, center, block.getExpDrop(blockState, serverLevel, serverLevel.random, mayBeInfestPos, 0, 0));
+                                    }
+                                }
+                                InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, InfestusBlocks.BASIC_CORRUPTED_BLOCK.get().defaultBlockState());
+                            }
+                            height++;
+                            return done;
+                        }
+                        height = -maxHeight;
+                        idx++;
+                    }
+                    idx = 0;
+                    radius++;
+                }
+                done = true;
+            }
+        }
         return done;
     }
 
@@ -96,7 +96,7 @@ public class Infester {
                 while (height >= -maxHeight) {
                     var mayBeInfestPos = center.offset(Circle.data[radius][idx][0], height, Circle.data[radius][idx][1]);
                     if (InfestUtils.isInfestusNetwork(mayBeInfestPos, serverLevel)) {
-//                        InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, InfestUtils.previousLevelInfesting(mayBeInfestPos, serverLevel));
+                        InfestUtils.replaceBlockWithParticles(serverLevel, mayBeInfestPos, InfestUtils.previousLevelInfesting(mayBeInfestPos, serverLevel));
                     }
                     height--;
                 }
