@@ -25,7 +25,11 @@ public class InfestusTabs {
                         pOutput.accept(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get());
                         pOutput.accept(InfestusBlocks.FERMENTED_FLESH_BLOCK.get());
                         pOutput.accept(InfestusBlocks.CORRUPTION_CORE.get());
-                        pOutput.accept(InfestusBlocks.CORRUPTED_BLOCK.get());
+                        pOutput.accept(InfestusBlocks.DEAD_CORRUPTED_BLOCK.get());
+                        pOutput.accept(InfestusBlocks.BASIC_CORRUPTED_BLOCK.get());
+                        pOutput.accept(InfestusBlocks.DENSE_CORRUPTED_BLOCK.get());
+                        pOutput.accept(InfestusBlocks.ADVANCE_CORRUPTED_BLOCK.get());
+                        pOutput.accept(InfestusBlocks.FINAL_CORRUPTED_BLOCK.get());
                         pOutput.accept(InfestusBlocks.BIOMASS_RESERVOIR.get());
                         pOutput.accept(InfestusItems.MEAT_SWORD.get());
                         pOutput.accept(InfestusItems.MEAT_AXE.get());

@@ -10,13 +10,10 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.BushBlock;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
-import org.jd.infestusfrontier.block.custom.CorruptedBlock;
+import org.jd.infestusfrontier.block.custom.network.BasicCorruptedBlock;
 import org.slf4j.Logger;
 
 public class InfestUtils {
@@ -41,7 +38,7 @@ public class InfestUtils {
     public static boolean isInfestusNetwork(BlockPos pos, Level world) {
         Block block = world.getBlockState(pos).getBlock();
         var key = ForgeRegistries.BLOCKS.getKey(block);
-        return key.toString().startsWith(InfestusFrontier.MODID + ":" + CorruptedBlock.ID);
+        return key.toString().startsWith(InfestusFrontier.MODID + ":" + BasicCorruptedBlock.ID);
     }
 
     public static boolean isInfestusBlock(BlockPos pos, Level world) {

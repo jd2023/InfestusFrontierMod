@@ -11,7 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.block.custom.BiomassReservoirBlock;
-import org.jd.infestusfrontier.block.custom.CorruptedBlock;
+import org.jd.infestusfrontier.block.custom.network.*;
 import org.jd.infestusfrontier.block.custom.CorruptionCoreBlock;
 import org.jd.infestusfrontier.block.custom.MutationPoolBlock;
 import org.jd.infestusfrontier.item.InfestusItems;
@@ -29,7 +29,12 @@ public class InfestusBlocks {
     public static final RegistryObject<Block> FERMENTED_FLESH_BLOCK = registerBlockWithItem("fermented_flesh_block",
             ()->new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1)));
 
-    public static final RegistryObject<Block> CORRUPTED_BLOCK = registerBlockWithItem(CorruptedBlock.ID, CorruptedBlock::new);
+    public static final RegistryObject<Block> DEAD_CORRUPTED_BLOCK = registerBlockWithItem(DeadCorruptedBlock.ID, DeadCorruptedBlock::new);
+    public static final RegistryObject<Block> BASIC_CORRUPTED_BLOCK = registerBlockWithItem(BasicCorruptedBlock.ID, BasicCorruptedBlock::new);
+    public static final RegistryObject<Block> DENSE_CORRUPTED_BLOCK = registerBlockWithItem(DenseCorruptedBlock.ID, DenseCorruptedBlock::new);
+    public static final RegistryObject<Block> ADVANCE_CORRUPTED_BLOCK = registerBlockWithItem(AdvanceCorruptedBlock.ID, AdvanceCorruptedBlock::new);
+    public static final RegistryObject<Block> FINAL_CORRUPTED_BLOCK = registerBlockWithItem(FinalCorruptedBlock.ID, FinalCorruptedBlock::new);
+
     public static final RegistryObject<Block> CORRUPTION_CORE = registerBlockWithItem(CorruptionCoreBlock.ID, CorruptionCoreBlock::new);
     public static final RegistryObject<Block> BIOMASS_RESERVOIR = registerBlockWithItem("bio_reservoir",
             ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1).noOcclusion()));

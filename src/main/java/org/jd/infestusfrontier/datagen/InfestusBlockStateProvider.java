@@ -8,6 +8,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.block.InfestusBlocks;
+import org.jd.infestusfrontier.block.custom.CorruptionCoreBlock;
 
 public class InfestusBlockStateProvider extends BlockStateProvider {
     public InfestusBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
@@ -17,19 +18,24 @@ public class InfestusBlockStateProvider extends BlockStateProvider {
     protected void registerStatesAndModels() {
         blockWithItem(InfestusBlocks.FERMENTED_FLESH_BLOCK);
         blockWithItem(InfestusBlocks.ROTTEN_FLESH_BLOCK);
-        blockWithItem(InfestusBlocks.CORRUPTED_BLOCK);
         blockWithItem(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK);
-        simpleBlockWithItem(InfestusBlocks.CORRUPTION_CORE.get(), models().cube("corruption_core",
-                blockTexture(InfestusBlocks.CORRUPTED_BLOCK.get()), modLoc("block/corruption_core_top")
-                , modLoc("block/corruption_core_side_1")
-                , modLoc("block/corruption_core_side_1")
-                , modLoc("block/corruption_core_side_2")
-                , modLoc("block/corruption_core_side_2")));
+        simpleBlockWithItem(InfestusBlocks.CORRUPTION_CORE.get(), models().cube(
+                CorruptionCoreBlock.ID,
+                modLoc("block/corruption_core_top"),
+                modLoc("block/corruption_core_top"),
+                modLoc("block/corruption_core_side_1"),
+                modLoc("block/corruption_core_side_1"),
+                modLoc("block/corruption_core_side_2"),
+                modLoc("block/corruption_core_side_2")
+        ));
         simpleBlockWithItem(InfestusBlocks.BIOMASS_RESERVOIR.get(), getUncheckedModel("bio_reserve_1"));
         simpleBlockWithItem(InfestusBlocks.MUTATION_POOL.get(), getUncheckedModel("mutation_pool"));
 
-
-
+        blockWithItem(InfestusBlocks.DEAD_CORRUPTED_BLOCK);
+        blockWithItem(InfestusBlocks.BASIC_CORRUPTED_BLOCK);
+        blockWithItem(InfestusBlocks.DENSE_CORRUPTED_BLOCK);
+        blockWithItem(InfestusBlocks.ADVANCE_CORRUPTED_BLOCK);
+        blockWithItem(InfestusBlocks.FINAL_CORRUPTED_BLOCK);
     }
     private void registerOnlyState(Block block, String registry) {
         simpleBlock(block, getUncheckedModel(registry));
