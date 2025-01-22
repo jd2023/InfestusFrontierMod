@@ -25,6 +25,7 @@ public class InfestusTabs {
                         pOutput.accept(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get());
                         pOutput.accept(InfestusBlocks.FERMENTED_FLESH_BLOCK.get());
                         pOutput.accept(InfestusBlocks.CORRUPTION_CORE.get());
+                        pOutput.accept(InfestusBlocks.CORRUPTION_POD.get());
                         pOutput.accept(InfestusBlocks.DEAD_CORRUPTED_BLOCK.get());
                         pOutput.accept(InfestusBlocks.BASIC_CORRUPTED_BLOCK.get());
                         pOutput.accept(InfestusBlocks.DENSE_CORRUPTED_BLOCK.get());

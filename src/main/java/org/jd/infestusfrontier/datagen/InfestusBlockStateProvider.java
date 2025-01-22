@@ -9,6 +9,7 @@ import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.block.InfestusBlocks;
 import org.jd.infestusfrontier.block.custom.CorruptionCoreBlock;
+import org.jd.infestusfrontier.block.custom.CorruptionPodBlock;
 
 public class InfestusBlockStateProvider extends BlockStateProvider {
     public InfestusBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
@@ -28,6 +29,16 @@ public class InfestusBlockStateProvider extends BlockStateProvider {
                 modLoc("block/corruption_core_side_2"),
                 modLoc("block/corruption_core_side_2")
         ));
+        simpleBlockWithItem(InfestusBlocks.CORRUPTION_POD.get(), models().cube(
+                CorruptionPodBlock.ID,
+                modLoc("block/corruption_pod_top"),
+                modLoc("block/corruption_pod_top"),
+                modLoc("block/corruption_pod_side"),
+                modLoc("block/corruption_pod_side"),
+                modLoc("block/corruption_pod_side"),
+                modLoc("block/corruption_pod_side")
+        ));
+
         simpleBlockWithItem(InfestusBlocks.BIOMASS_RESERVOIR.get(), getUncheckedModel("bio_reserve_1"));
         simpleBlockWithItem(InfestusBlocks.MUTATION_POOL.get(), getUncheckedModel("mutation_pool"));
 
@@ -36,6 +47,7 @@ public class InfestusBlockStateProvider extends BlockStateProvider {
         blockWithItem(InfestusBlocks.DENSE_CORRUPTED_BLOCK);
         blockWithItem(InfestusBlocks.ADVANCE_CORRUPTED_BLOCK);
         blockWithItem(InfestusBlocks.FINAL_CORRUPTED_BLOCK);
+
     }
     private void registerOnlyState(Block block, String registry) {
         simpleBlock(block, getUncheckedModel(registry));

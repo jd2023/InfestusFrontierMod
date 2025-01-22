@@ -11,6 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.block.custom.BiomassReservoirBlock;
+import org.jd.infestusfrontier.block.custom.CorruptionPodBlock;
 import org.jd.infestusfrontier.block.custom.network.*;
 import org.jd.infestusfrontier.block.custom.CorruptionCoreBlock;
 import org.jd.infestusfrontier.block.custom.MutationPoolBlock;
@@ -36,6 +37,7 @@ public class InfestusBlocks {
     public static final RegistryObject<Block> FINAL_CORRUPTED_BLOCK = registerBlockWithItem(FinalCorruptedBlock.ID, FinalCorruptedBlock::new);
 
     public static final RegistryObject<Block> CORRUPTION_CORE = registerBlockWithItem(CorruptionCoreBlock.ID, CorruptionCoreBlock::new);
+    public static final RegistryObject<Block> CORRUPTION_POD = registerBlockWithItem(CorruptionPodBlock.ID, CorruptionPodBlock::new);
     public static final RegistryObject<Block> BIOMASS_RESERVOIR = registerBlockWithItem("bio_reservoir",
             ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1).noOcclusion()));
     public static final RegistryObject<Block> MUTATION_POOL = registerBlockWithItem("mutation_pool",

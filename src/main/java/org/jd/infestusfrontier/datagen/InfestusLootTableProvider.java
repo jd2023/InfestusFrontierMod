@@ -17,5 +17,4 @@ public class InfestusLootTableProvider {
                 new LootTableProvider.SubProviderEntry(InfestusBlockLootTables::new, LootContextParamSets.BLOCK)
         ));
     }
-
 }
