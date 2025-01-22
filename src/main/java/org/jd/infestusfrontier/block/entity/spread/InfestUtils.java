@@ -40,9 +40,12 @@ public class InfestUtils {
     }
 
     public static boolean isInfestusNetwork(BlockPos pos, Level world) {
+        var state = world.getBlockState(pos);
+
         Block block = world.getBlockState(pos).getBlock();
+
         var key = ForgeRegistries.BLOCKS.getKey(block);
-        return key.toString().startsWith(InfestusFrontier.MODID + ":" + BasicCorruptedBlock.ID);
+        return key.toString().startsWith(InfestusFrontier.MODID + ":corrupted_block_");
     }
 
     public static boolean isInfestusBlock(BlockPos pos, Level world) {

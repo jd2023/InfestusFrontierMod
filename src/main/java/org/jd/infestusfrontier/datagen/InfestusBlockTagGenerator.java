@@ -29,9 +29,5 @@ public class InfestusBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get());
         this.tag(BlockTags.MINEABLE_WITH_SHOVEL);
         this.tag(BlockTags.MINEABLE_WITH_HOE);
-
-
-
-
     }
 }

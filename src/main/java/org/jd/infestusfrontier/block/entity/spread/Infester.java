@@ -19,17 +19,19 @@ public class Infester {
     private final int rate;
     private final int maxRadius;
     private final int maxHeight;
+    private final int maxDepth;
     private final boolean breakBlocks;
     private final boolean cutTrees;
 
     public Infester(int rate, int maxRadius) {
-        this(rate, maxRadius, 4, false, false);
+        this(rate, maxRadius, 4, 10, false, false);
     }
-    public Infester(int rate, int maxRadius, int maxHeight, boolean breakBlocks, boolean cutTrees) {
+    public Infester(int rate, int maxRadius, int maxDepth, int maxHeight, boolean breakBlocks, boolean cutTrees) {
         this.rate = rate;
         this.maxRadius = maxRadius;
+        this.maxDepth = maxDepth;
         this.maxHeight = maxHeight;
-        this.height = -maxHeight;
+        this.height = -maxDepth;
         this.breakBlocks = breakBlocks;
         this.cutTrees = cutTrees;
     }
@@ -59,7 +61,7 @@ public class Infester {
                             height++;
                             return done;
                         }
-                        height = -maxHeight;
+                        height = -maxDepth;
                         idx++;
                     }
                     idx = 0;
