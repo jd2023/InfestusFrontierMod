@@ -2,6 +2,7 @@ package org.jd.infestusfrontier;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -23,6 +24,9 @@ import org.jd.infestusfrontier.block.InfestusBlockEntities;
 
 import org.jd.infestusfrontier.item.InfestusItems;
 import org.jd.infestusfrontier.item.InfestusTabs;
+import org.jd.infestusfrontier.screen.InfestusMenuTypes;
+import org.jd.infestusfrontier.screen.MutationPoolMenu;
+import org.jd.infestusfrontier.screen.MutationPoolScreen;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -50,6 +54,7 @@ public class InfestusFrontier
         // Register the Deferred Register to the mod event bus so tabs get registered
         InfestusTabs.register(modEventBus);
         InfestusBlockEntities.register(modEventBus);
+        InfestusMenuTypes.register(modEventBus);
 
 
         // Register ourselves for server and other game events we are interested in
@@ -99,6 +104,7 @@ public class InfestusFrontier
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
             ItemBlockRenderTypes.setRenderLayer(InfestusBlocks.BIOMASS_RESERVOIR.get(), RenderType.translucent());
+            MenuScreens.register(InfestusMenuTypes.MUTATION_POOL_MENU.get(), MutationPoolScreen::new);
         }
     }
 }

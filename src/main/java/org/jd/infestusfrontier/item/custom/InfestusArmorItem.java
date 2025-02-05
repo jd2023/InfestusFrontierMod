@@ -8,6 +8,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import org.jd.infestusfrontier.block.InfestusBlocks;
 import org.jd.infestusfrontier.item.InfestusArmorMaterials;
 
@@ -18,7 +19,7 @@ public class InfestusArmorItem extends ArmorItem {
     private static final Map<ArmorMaterial, MobEffectInstance> MATERIAL_TO_EFFECT_MAP =
             (new ImmutableMap.Builder<ArmorMaterial, MobEffectInstance>())
                     .put(InfestusArmorMaterials.FLESH_TIER_ONE,
-                            new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 10, 0, false, true, true)).build();
+                            new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 10, 0, false, true, false)).build();
 
     public InfestusArmorItem(ArmorMaterial material, ArmorItem.Type slot, Properties settings) {
         super(material, slot, settings);
@@ -83,10 +84,16 @@ public class InfestusArmorItem extends ArmorItem {
                 leggings.getMaterial() == material && boots.getMaterial() == material;
     }
     private boolean isOnInfestusNetwork(Player player) {
-        boolean isOnNetwork = false;
-        if (player.getBlockStateOn().getBlock() == InfestusBlocks.BASIC_CORRUPTED_BLOCK.get()) {
-            isOnNetwork = true;
+        Block block = player.getBlockStateOn().getBlock();
+        if (InfestusBlocks.BASIC_CORRUPTED_BLOCK.get().equals(block)) {
+            return true;
+        } else if (InfestusBlocks.ADVANCE_CORRUPTED_BLOCK.get().equals(block)) {
+            return true;
+        } else if (InfestusBlocks.DENSE_CORRUPTED_BLOCK.get().equals(block)) {
+            return true;
+        } else if (InfestusBlocks.FINAL_CORRUPTED_BLOCK.get().equals(block)) {
+            return true;
         }
-        return isOnNetwork;
+        return false;
     }
 }

@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.block;
 
 
 
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -25,9 +26,9 @@ public class InfestusBlockEntities {
     public static final RegistryObject<BlockEntityType<CorruptionPodBlockEntity>> CORRUPTION_POD_ENTITY = BLOCK_ENTITIES.register(
             CorruptionPodBlock.ID,
             () -> BlockEntityType.Builder.of(CorruptionPodBlockEntity::new, InfestusBlocks.CORRUPTION_POD.get()).build(null));
-
-//    public static final RegistryObject<BlockEntityType<MutationPoolBlockEntity>> MUTATION_POOL_ENTITY=BLOCK_ENTITIES.register(MutationPoolBlock.ID
-//            ,()-> BlockEntityType.Builder.of(MutationPoolBlockEntity::new, InfestusBlocks.MUTATION_POOL.get()).build(null));
+   public static final RegistryObject<BlockEntityType<MutationPoolBlockEntity>> MUTATION_POOL_ENTITY = BLOCK_ENTITIES.register(
+            MutationPoolBlock.ID,
+            () -> BlockEntityType.Builder.of(MutationPoolBlockEntity::new, InfestusBlocks.MUTATION_POOL.get()).build(null));
 
     public static void register(IEventBus bus){
         BLOCK_ENTITIES.register(bus);

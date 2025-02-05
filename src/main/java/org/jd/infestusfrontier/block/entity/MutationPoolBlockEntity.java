@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,24 +21,26 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import org.jd.infestusfrontier.block.InfestusBlockEntities;
 import org.jd.infestusfrontier.block.custom.MutationPoolBlock;
+import org.jd.infestusfrontier.screen.MutationPoolMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 
 public class MutationPoolBlockEntity extends BlockEntity implements MenuProvider {
-    private final ItemStackHandler itemHandler=new ItemStackHandler(9);
-    //Input slots are 0-7
-    //Output slot is 8
+    private final ItemStackHandler itemHandler=new ItemStackHandler(8);
+    //Input slots are 0-6
+    //Output slot is 7
     private LazyOptional<IItemHandler> lazyItemHandler=LazyOptional.empty();
     protected final ContainerData data;
     private int progress = 0;
     private int maxProgress=78;
     private int biomass=0;
     private int maxBiomass=500;
-    public MutationPoolBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state);
+    public MutationPoolBlockEntity(BlockPos pos, BlockState state) {
+        super(InfestusBlockEntities.MUTATION_POOL_ENTITY.get(), pos, state);
         this.data = new ContainerData() {
             @Override
             public int get(int PIndex) {
@@ -101,8 +104,8 @@ public class MutationPoolBlockEntity extends BlockEntity implements MenuProvider
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int p_39954_, Inventory p_39955_, Player p_39956_) {
-        return null;
+    public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
+        return new MutationPoolMenu(id, inv, this, this.data);
     }
 
     @Override
@@ -120,5 +123,9 @@ public class MutationPoolBlockEntity extends BlockEntity implements MenuProvider
         itemHandler.deserializeNBT(tag.getCompound("mutation_pool.inventory"));
         progress=tag.getInt("mutation_pool.progress");
         biomass=tag.getInt("mutation_pool.biomass");
+    }
+
+    public void tick(Level pLevel1, BlockPos pPos, BlockState pState1) {
+
     }
 }
