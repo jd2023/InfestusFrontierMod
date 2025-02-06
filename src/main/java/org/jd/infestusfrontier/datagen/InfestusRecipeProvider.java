@@ -118,6 +118,23 @@ public class InfestusRecipeProvider extends RecipeProvider implements ICondition
                 .define('I', Items.DIAMOND)
                 .unlockedBy(getHasName(InfestusBlocks.CORRUPTION_CORE.get()), has(InfestusBlocks.CORRUPTION_CORE.get()))
                 .save(writer, "infestusfrontier:corruption_core_from_crafting");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusBlocks.CORRUPTION_CORE.get())
+                .pattern("IXI")
+                .pattern("X X")
+                .pattern("IXI")
+                .define('X', InfestusBlocks.FERMENTED_FLESH_BLOCK.get())
+                .define('I', Items.EMERALD)
+                .unlockedBy(getHasName(InfestusBlocks.CORRUPTION_CORE.get()), has(InfestusBlocks.CORRUPTION_CORE.get()))
+                .save(writer, "infestusfrontier:corruption_pod_from_crafting");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfestusBlocks.CORRUPTION_CORE.get())
+                .pattern("IXI")
+                .pattern("XYX")
+                .pattern("IXI")
+                .define('X', InfestusBlocks.FERMENTED_FLESH_BLOCK.get())
+                .define('I', InfestusItems.EYE_OF_CORRUPTION.get())
+                .define('Y', InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get())
+                .unlockedBy(getHasName(InfestusBlocks.CORRUPTION_CORE.get()), has(InfestusBlocks.CORRUPTION_CORE.get()))
+                .save(writer, "infestusfrontier:mutation_pool_from_crafting");
 
     }
     protected void buildDecorationBlockRecipes(Consumer<FinishedRecipe> writer){

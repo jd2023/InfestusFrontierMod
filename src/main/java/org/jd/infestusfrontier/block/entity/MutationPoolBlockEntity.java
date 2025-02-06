@@ -12,6 +12,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,11 +26,13 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.block.InfestusBlockEntities;
 import org.jd.infestusfrontier.block.custom.MutationPoolBlock;
+import org.jd.infestusfrontier.recipe.MutationByMutationPoolRecipe;
 import org.jd.infestusfrontier.screen.MutationPoolMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
+import java.util.Optional;
 
 public class MutationPoolBlockEntity extends BlockEntity implements MenuProvider {
     private final ItemStackHandler itemHandler=new ItemStackHandler(8);
@@ -35,7 +40,7 @@ public class MutationPoolBlockEntity extends BlockEntity implements MenuProvider
     //Output slot is 7
     private LazyOptional<IItemHandler> lazyItemHandler=LazyOptional.empty();
     protected final ContainerData data;
-    private int progress = 0;
+    private int progress = 12;
     private int maxProgress=78;
     private int biomass=0;
     private int maxBiomass=500;
@@ -125,7 +130,72 @@ public class MutationPoolBlockEntity extends BlockEntity implements MenuProvider
         biomass=tag.getInt("mutation_pool.biomass");
     }
 
-    public void tick(Level pLevel1, BlockPos pPos, BlockState pState1) {
+    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+        if(hasRecipe()) {
+            increaseCraftingProgress();
+            setChanged(pLevel, pPos, pState);
 
+            if(hasProgressFinished()) {
+                craftItem();
+                resetProgress();
+            }
+        } else {
+            resetProgress();
+        }
+    }
+    private void resetProgress() {
+        progress = 0;
+    }
+
+    private void craftItem() {
+        Optional<MutationByMutationPoolRecipe> recipe = getCurrentRecipe();
+        ItemStack result = recipe.get().getResultItem(null);
+        for (int i =0; i<7;i++){
+            if (itemHandler.getStackInSlot(i)==ItemStack.EMPTY){
+                break;
+            }else{
+                this.itemHandler.extractItem(i, 1, false);
+            }
+        }
+
+
+        this.itemHandler.setStackInSlot(7, new ItemStack(result.getItem(),
+                this.itemHandler.getStackInSlot(7).getCount() + result.getCount()));
+    }
+
+    private boolean hasRecipe() {
+        Optional<MutationByMutationPoolRecipe> recipe = getCurrentRecipe();
+
+        if(recipe.isEmpty()) {
+            return false;
+        }
+        ItemStack result = recipe.get().getResultItem(getLevel().registryAccess());
+
+        return canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
+    }
+
+    private Optional<MutationByMutationPoolRecipe> getCurrentRecipe() {
+        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots());
+        for(int i = 0; i < itemHandler.getSlots(); i++) {
+            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
+        }
+
+        return this.level.getRecipeManager().getRecipeFor(MutationByMutationPoolRecipe.Type.INSTANCE, inventory, level);
+    }
+
+    private boolean canInsertItemIntoOutputSlot(Item item) {
+        return this.itemHandler.getStackInSlot(7).isEmpty() || this.itemHandler.getStackInSlot(7).is(item);
+    }
+
+    private boolean canInsertAmountIntoOutputSlot(int count) {
+        return this.itemHandler.getStackInSlot(7).getCount() + count <= this.itemHandler.getStackInSlot(7).getMaxStackSize();
+    }
+
+    private boolean hasProgressFinished() {
+        return progress >= maxProgress;
+    }
+
+    private void increaseCraftingProgress() {
+        progress++;
     }
 }

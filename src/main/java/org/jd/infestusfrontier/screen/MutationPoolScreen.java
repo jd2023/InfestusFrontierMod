@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 import org.jd.infestusfrontier.InfestusFrontier;
 
 public class MutationPoolScreen extends AbstractContainerScreen<MutationPoolMenu> {
+    final int NUMBER_OF_SLOTS = 8;
     private static final ResourceLocation TEXTURE =
             new ResourceLocation(InfestusFrontier.MODID, "textures/gui/gui.png");
 
@@ -35,6 +36,9 @@ public class MutationPoolScreen extends AbstractContainerScreen<MutationPoolMenu
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight+16);
 
         renderProgressArrow(guiGraphics, x, y);
+        for (int i =menu.slots.size()-NUMBER_OF_SLOTS; i<menu.slots.size();i++){
+            renderCustomSlots(guiGraphics, x+menu.slots.get(i).x-1, y+menu.slots.get(i).y-1);
+        }
     }
 
     private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
@@ -42,6 +46,11 @@ public class MutationPoolScreen extends AbstractContainerScreen<MutationPoolMenu
             //blit(texture, x, y, Uoffset, Voffset, UWidth, UHeight)
             guiGraphics.blit(TEXTURE, x + 85, y + 30, 176, 0, 8, menu.getScaledProgress());
         }
+    }
+    private void renderCustomSlots(GuiGraphics guiGraphics, int x, int y) {
+
+        guiGraphics.blit(TEXTURE, x, y, 1, 185, 18, 18);
+
     }
 
     @Override

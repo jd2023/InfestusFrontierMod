@@ -37,12 +37,12 @@ public class MutationPoolMenu extends AbstractContainerMenu {
 
         this.blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
             this.addSlot(new SlotItemHandler(iItemHandler, 0, 80, 11));
-            this.addSlot(new SlotItemHandler(iItemHandler, 1, 40, 23));
-            this.addSlot(new SlotItemHandler(iItemHandler, 2, 120, 23));
+            this.addSlot(new SlotItemHandler(iItemHandler, 1, 60, 23));
+            this.addSlot(new SlotItemHandler(iItemHandler, 2, 100, 23));
             this.addSlot(new SlotItemHandler(iItemHandler, 3, 30, 35));
             this.addSlot(new SlotItemHandler(iItemHandler, 4, 130, 35));
-            this.addSlot(new SlotItemHandler(iItemHandler, 5, 40, 47));
-            this.addSlot(new SlotItemHandler(iItemHandler, 6, 120, 47));
+            this.addSlot(new SlotItemHandler(iItemHandler, 5, 60, 47));
+            this.addSlot(new SlotItemHandler(iItemHandler, 6, 100, 47));
             this.addSlot(new SlotItemHandler(iItemHandler, 7, 80, 59));
         });
 

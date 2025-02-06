@@ -24,6 +24,7 @@ import org.jd.infestusfrontier.block.InfestusBlockEntities;
 
 import org.jd.infestusfrontier.item.InfestusItems;
 import org.jd.infestusfrontier.item.InfestusTabs;
+import org.jd.infestusfrontier.recipe.InfestusRecipes;
 import org.jd.infestusfrontier.screen.InfestusMenuTypes;
 import org.jd.infestusfrontier.screen.MutationPoolMenu;
 import org.jd.infestusfrontier.screen.MutationPoolScreen;
@@ -55,6 +56,8 @@ public class InfestusFrontier
         InfestusTabs.register(modEventBus);
         InfestusBlockEntities.register(modEventBus);
         InfestusMenuTypes.register(modEventBus);
+        InfestusRecipes.register(modEventBus);
+
 
 
         // Register ourselves for server and other game events we are interested in
