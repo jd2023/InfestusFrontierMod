@@ -36,14 +36,14 @@ public class MutationPoolMenu extends AbstractContainerMenu {
         addPlayerHotbar(inv);
 
         this.blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
-            this.addSlot(new SlotItemHandler(iItemHandler, 0, 80, 11));
-            this.addSlot(new SlotItemHandler(iItemHandler, 1, 60, 23));
-            this.addSlot(new SlotItemHandler(iItemHandler, 2, 100, 23));
-            this.addSlot(new SlotItemHandler(iItemHandler, 3, 30, 35));
-            this.addSlot(new SlotItemHandler(iItemHandler, 4, 130, 35));
-            this.addSlot(new SlotItemHandler(iItemHandler, 5, 60, 47));
-            this.addSlot(new SlotItemHandler(iItemHandler, 6, 100, 47));
-            this.addSlot(new SlotItemHandler(iItemHandler, 7, 80, 59));
+            this.addSlot(new SlotItemHandler(iItemHandler, 0, 80, 15));
+            this.addSlot(new SlotItemHandler(iItemHandler, 1, 40, 20));
+            this.addSlot(new SlotItemHandler(iItemHandler, 2, 120, 20));
+            this.addSlot(new SlotItemHandler(iItemHandler, 3, 10, 45));
+            this.addSlot(new SlotItemHandler(iItemHandler, 7, 150, 45));
+            this.addSlot(new SlotItemHandler(iItemHandler, 5, 40, 69));
+            this.addSlot(new SlotItemHandler(iItemHandler, 6, 120, 69));
+            this.addSlot(new SlotItemHandler(iItemHandler, 4, 80, 74));
         });
 
         addDataSlots(data);
@@ -58,6 +58,7 @@ public class MutationPoolMenu extends AbstractContainerMenu {
         int progressArrowSize = 22;
         return maxProgress!=0 && progress!=0 ? progress*progressArrowSize/maxProgress : 0;
     }
+
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
     // must assign a slot number to each of the slots used by the GUI.

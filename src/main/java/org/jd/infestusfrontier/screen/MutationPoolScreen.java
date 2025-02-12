@@ -42,10 +42,10 @@ public class MutationPoolScreen extends AbstractContainerScreen<MutationPoolMenu
     }
 
     private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
-        if(menu.isCrafting()) {
-            //blit(texture, x, y, Uoffset, Voffset, UWidth, UHeight)
-            guiGraphics.blit(TEXTURE, x + 85, y + 30, 176, 0, 8, menu.getScaledProgress());
-        }
+
+        guiGraphics.blit(TEXTURE, x + 102, y + 45, 199, 61, menu.getScaledProgress()-22, 15);
+        guiGraphics.blit(TEXTURE, x +80, y + 45, 177, 77, menu.getScaledProgress(), 15);
+
     }
     private void renderCustomSlots(GuiGraphics guiGraphics, int x, int y) {
 

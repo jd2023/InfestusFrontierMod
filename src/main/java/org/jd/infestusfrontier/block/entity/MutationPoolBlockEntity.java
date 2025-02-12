@@ -150,10 +150,18 @@ public class MutationPoolBlockEntity extends BlockEntity implements MenuProvider
     private void craftItem() {
         Optional<MutationByMutationPoolRecipe> recipe = getCurrentRecipe();
         ItemStack result = recipe.get().getResultItem(null);
+        int count=0;
         for (int i =0; i<7;i++){
             if (itemHandler.getStackInSlot(i)==ItemStack.EMPTY){
+                count++;
                 break;
+
             }else{
+                count++;
+            }
+        }
+        if (count==7){
+            for (int i =0; i<7;i++) {
                 this.itemHandler.extractItem(i, 1, false);
             }
         }
@@ -169,7 +177,7 @@ public class MutationPoolBlockEntity extends BlockEntity implements MenuProvider
         if(recipe.isEmpty()) {
             return false;
         }
-        ItemStack result = recipe.get().getResultItem(getLevel().registryAccess());
+        ItemStack result = recipe.get().getResultItem(null);
 
         return canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
     }
