@@ -29,7 +29,7 @@ public class MutationPoolScreen extends AbstractContainerScreen<MutationPoolMenu
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
-        inventoryLabelY=inventoryLabelY-18;
+        inventoryLabelY=92;
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
 
