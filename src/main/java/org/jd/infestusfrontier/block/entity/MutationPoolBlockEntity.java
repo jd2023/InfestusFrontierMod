@@ -132,6 +132,7 @@ public class MutationPoolBlockEntity extends BlockEntity implements MenuProvider
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         if(hasRecipe()) {
+            System.out.println("Crafting");
             increaseCraftingProgress();
             setChanged(pLevel, pPos, pState);
 
