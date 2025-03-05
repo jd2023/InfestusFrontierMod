@@ -2,8 +2,13 @@
   "type": "infestusfrontier:mutation_by_mutation_pool",
   "ingredients": [
     {
+      "item": "minecraft:coal",
+      "item": "minecraft:coal",
+      "item": "minecraft:coal",
+      "item": "minecraft:coal",
+      "item": "minecraft:coal",
+      "item": "minecraft:coal",
       "item": "minecraft:coal"
-
     }
   ],
   "output": {
