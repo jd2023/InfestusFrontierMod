@@ -16,6 +16,9 @@ public class InfestusMenuTypes {
 
     public static final RegistryObject<MenuType<MutationPoolMenu>> MUTATION_POOL_MENU =
             registryMenuType("mutation_pool_menu",MutationPoolMenu::new);
+    public static final RegistryObject<MenuType<CollectorMenu>> COLLECTOR_MENU =
+            registryMenuType("collector_menu",CollectorMenu::new);
+
 
     private static <T extends AbstractContainerMenu>RegistryObject<MenuType<T>> registryMenuType(String name, IContainerFactory<T> factory){
         return MENUS.register(name, ()-> IForgeMenuType.create(factory));

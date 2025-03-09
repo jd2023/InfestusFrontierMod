@@ -25,6 +25,7 @@ import org.jd.infestusfrontier.block.InfestusBlockEntities;
 import org.jd.infestusfrontier.item.InfestusItems;
 import org.jd.infestusfrontier.item.InfestusTabs;
 import org.jd.infestusfrontier.recipe.InfestusRecipes;
+import org.jd.infestusfrontier.screen.CollectorScreen;
 import org.jd.infestusfrontier.screen.InfestusMenuTypes;
 import org.jd.infestusfrontier.screen.MutationPoolMenu;
 import org.jd.infestusfrontier.screen.MutationPoolScreen;
@@ -107,7 +108,12 @@ public class InfestusFrontier
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
             ItemBlockRenderTypes.setRenderLayer(InfestusBlocks.BIOMASS_RESERVOIR.get(), RenderType.translucent());
+
+            MenuScreens.register(InfestusMenuTypes.COLLECTOR_MENU.get(), CollectorScreen::new);
+
             MenuScreens.register(InfestusMenuTypes.MUTATION_POOL_MENU.get(), MutationPoolScreen::new);
+
+
         }
     }
 }
