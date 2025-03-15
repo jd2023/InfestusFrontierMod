@@ -37,7 +37,7 @@ public class InfestusBlocks {
     public static final RegistryObject<Block> CORRUPTION_POD = registerBlockWithItem(CorruptionPodBlock.ID, CorruptionPodBlock::new);
     public static final RegistryObject<Block> BIOMASS_RESERVOIR = registerBlockWithItem("bio_reservoir",
             ()->new BiomassReservoirBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(1).noOcclusion()));
-    public static final RegistryObject<Block> COLLECTOR = registerBlockWithItem("collector",
+    public static final RegistryObject<Block> COLLECTOR = registerBlockWithItem(CollectorBlock.ID,
             ()->new CollectorBlock(BlockBehaviour.Properties.copy(Blocks.HOPPER).strength(1).noOcclusion()));
     public static final RegistryObject<Block> MUTATION_POOL = registerBlockWithItem("mutation_pool",
             ()->new MutationPoolBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SHRIEKER).strength(1).noOcclusion()));

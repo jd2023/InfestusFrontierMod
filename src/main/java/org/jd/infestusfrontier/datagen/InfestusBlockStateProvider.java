@@ -19,6 +19,8 @@ public class InfestusBlockStateProvider extends BlockStateProvider {
     protected void registerStatesAndModels() {
         blockWithItem(InfestusBlocks.FERMENTED_FLESH_BLOCK);
         blockWithItem(InfestusBlocks.ROTTEN_FLESH_BLOCK);
+        blockWithItem(InfestusBlocks.COLLECTOR);
+
         blockWithItem(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK);
         simpleBlockWithItem(InfestusBlocks.CORRUPTION_CORE.get(), models().cube(
                 CorruptionCoreBlock.ID,

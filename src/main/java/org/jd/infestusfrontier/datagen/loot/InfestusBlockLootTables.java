@@ -29,6 +29,8 @@ public class InfestusBlockLootTables extends BlockLootSubProvider {
 
         this.dropSelf(InfestusBlocks.CORRUPTION_CORE.get());
         this.dropSelf(InfestusBlocks.MUTATION_POOL.get());
+        this.dropSelf(InfestusBlocks.COLLECTOR.get());
+
         this.dropSelf(InfestusBlocks.BIOMASS_RESERVOIR.get());
         this.dropSelf(InfestusBlocks.CORRUPTION_POD.get());
         this.add(InfestusBlocks.BIOMASS_CRYSTAL_BLOCK.get(),
