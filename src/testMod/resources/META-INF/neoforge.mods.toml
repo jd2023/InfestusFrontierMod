@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="Development-only test fixture; see repository LICENSE.txt"
+[[mods]]
+modId="infestusfrontier_tests"
+version="1.0.0"
+displayName="Infestus Frontier development tests"
+[[dependencies.infestusfrontier_tests]]
+modId="infestusfrontier"
+type="required"
+versionRange="[0.1.0-dev.1]"
+ordering="AFTER"
+side="BOTH"

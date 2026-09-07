@@ -20,6 +20,15 @@ build
 # other
 eclipse
 run
+runs/
+.ktask/logs/
+.ktask/queue/
+.ktask/*.lock
+.env
+.env.*
+!.env.example
+*.hprof
+hs_err_pid*
 
 # Files from Forge MDK
 forge*changelog.txt

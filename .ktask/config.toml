@@ -1,0 +1,14 @@
+project_dir = "."
+timeout = 3600
+idle_timeout = 900
+max_retries = 2
+max_remediation_attempts = 1
+# Runner default only; choose executor/model with the owner before enabling work.
+executor = "codex"
+# No model or pricing assumption is established by this bootstrap.
+verify_task_report = true
+verify_issue_closed = false
+verify_remote_mainline = false
+mainline_remote = "origin"
+mainline_branch = "main"
+limit_auto_wait = false

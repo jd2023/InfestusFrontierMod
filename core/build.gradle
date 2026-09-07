@@ -1,0 +1,20 @@
+plugins { id 'java-library' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+repositories { mavenCentral() }
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.named('test', Test) { useJUnitPlatform() }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+// The domain/infrastructure side has no platform classpath, in production or tests.
+tasks.register('verifyBoundary') {
+    inputs.files(configurations.compileClasspath, configurations.runtimeClasspath)
+    doLast { task ->
+        if (!task.inputs.files.files.empty)
+            throw new GradleException('Core must remain dependency-free Java. Review a boundary change explicitly.')
+    }
+}
+tasks.named('check') { dependsOn 'verifyBoundary' }

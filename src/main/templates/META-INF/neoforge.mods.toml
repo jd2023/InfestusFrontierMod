@@ -1,0 +1,24 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="See LICENSE.txt; production licensing decision pending"
+
+[[mods]]
+modId="infestusfrontier"
+version="${mod_version}"
+displayName="Infestus Frontier"
+authors="etf, jd"
+description='''A living, evolving colony across Minecraft's dimensions. Production foundation; no gameplay content yet.'''
+
+[[dependencies.infestusfrontier]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.249]"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.infestusfrontier]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"
