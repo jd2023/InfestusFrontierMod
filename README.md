@@ -30,6 +30,8 @@ pure core, but not the development test mod or archived Forge content.
 ## Project map
 
 - [Vision](VISION.md): user commitments, proposed pillars, open questions.
+- [Progression map](docs/PROGRESSION_MAP.md): conceptual player ranks, alternative
+  routes, dimensional economies, equipment tradeoffs and the long-term horizon.
 - [Developer guide](docs/DEVELOPER_GUIDE.md): mandatory deep modularity and workflow.
 - [Performance](docs/PERFORMANCE.md): bounds, back-pressure and adversarial cases.
 - [Architecture](docs/ARCHITECTURE.md): module ownership and test-mod isolation.

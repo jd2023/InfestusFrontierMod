@@ -1,7 +1,11 @@
-# Infestus Frontier — vision draft 0.1
+# Infestus Frontier — vision draft 0.2
 
 Status: **first draft for discussion, not a ratified content specification**.
 Owner: etf. Established: 2026-09-06. Decisions live in `docs/DECISIONS.md`.
+
+Updated with subsequent owner clarifications. The companion
+[progression map](docs/PROGRESSION_MAP.md) explores possible ranks and routes;
+its named content and mechanics remain proposals.
 
 ## North star
 
@@ -18,15 +22,26 @@ and the player's equipment becomes another living part of that system.
 ## Established direction from our discussions
 
 - Biology, mutation and DNA manipulation are the mod's central language.
-- Living Substrate spreads in three dimensions and visibly transforms its ecology.
-  Grass, bushes and trees should change meaningfully, not just disappear.
+- Living Substrate expands under player control in three dimensions and visibly
+  transforms its ecology. No indefinite autonomous expansion or hostile takeover.
+  Manual growth remains the baseline; a finite-area, biomass-loaded deployment
+  spore is a candidate, not an approved implementation.
+- The colony becomes a varied, functional living ecosystem, not a cleared desert.
+  Preserve ground cover, undergrowth and canopy. The exact useful roles and
+  transformation rules for grass, bushes and trees require a separate discussion.
 - Genetic research accumulates samples toward a complete capture. A DNA bank
   enables directed evolution. Exact sample counts and catalogs are not decided.
 - Living armor, weapons and tools evolve through **use** and **captured DNA**.
   Running can inform mobility adaptation; a captured organism can unlock a new
-  kind of ability. Enchantments remain possible alongside biological evolution.
+  kind of ability. The owner has reopened enchantment support on bio armor;
+  removal is not decided. Potion integration is a promising design direction.
 - Equipment supports multiple evolutionary directions. Some colony functions
   require a complete bio suit with appropriate maturity or mutations.
+- Environmental specialists must remain meaningfully stronger at their jobs than
+  generalists. Even late-game armor must not become universally protective.
+- Player levels should unlock more capable multiblocks and mutations. Long,
+  demanding progression should require automation, base planning and design/DNA
+  optimization, not inflated resource bills or repeated exercise grinding.
 - Overworld, Nether and End must form one sustained progression. The player needs
   real reasons to build and operate bases in the Nether and End, not merely visit
   them for ingredients. Reaching the End is not the end of meaningful play.
@@ -131,8 +146,9 @@ stopped. Pack authors own quest chains and can tune supported data-driven system
 - A fixed mutation or DNA chamber, expandable fleshy storage and configurable organs.
 - A living vertical transit mechanism. The prototype lift is **parked**, not an
   approved production feature or a problem that must be solved with custom fluid.
-- Boss-linked discoveries and an additional dimension, only where they create a
-  distinct systemic role. Neither new bosses nor a fourth dimension is promised.
+- A special dimension and new boss are now requested as a very-long-term design
+  horizon. Their proposed roles appear in the progression map; neither is a
+  first-release commitment or authorization to begin implementation.
 
 Prototype names, models, recipes, thresholds, hard caps and save formats are
 experiments. They are not the production ontology or a migration commitment.
@@ -151,12 +167,14 @@ experiments. They are not the production ontology or a migration commitment.
 ## Decisions for the next conversation
 
 - [ ] Ratify or rewrite the north star and five pillars.
-- [ ] Is the organism controlled infrastructure, a risky symbiote, an independent
-  intelligence, or deliberately ambiguous? What can spread without permission?
+- [x] Colony growth remains under player control; no indefinite autonomous spread.
+- [ ] Define bounded vegetation transformation and any optional deployment spore.
 - [ ] Who owns a colony, its research, networks and equipment in multiplayer?
 - [ ] What does the player discover and accomplish in the first 30 minutes?
 - [ ] What are the continuing jobs of the Overworld, Nether and End bases?
 - [ ] How do usage-based evolution and directed DNA mutation interact?
+- [ ] Decide bio-armor enchantment policy and potion interactions after testing
+  specialist/generalist combinations; keep ordinary vanilla systems intact.
 - [ ] How costly/reversible is specialization, and how much randomness is welcome?
 - [ ] What construction components create the first genuinely different solutions?
 - [ ] What danger, loss, recovery and containment experience do we want?

@@ -59,3 +59,30 @@ behavior. Neither a new dimension nor helper mobs are promised for first release
 Track stable ktask instructions and HUMAN gates in Git; ignore execution logs and
 mutable runner artifacts. Model selection and hard gate enforcement in the executor
 are still to approve. No AI worker runs or human-gate acknowledgments in bootstrap.
+
+## D010 — repository scope clarification (user requirement)
+
+The owner rejected the unrequested rearrangement of existing repository code
+described in D002. That historical record is not authority for future moves or
+replacement. The owner subsequently requested publishing the then-current state
+to `V3_1.21.1`; that branch is now the working branch. This does not authorize
+further repository rearrangement, mainline changes or automatic future pushes.
+
+## D011 — controlled growth and living ecology (user requirement)
+
+Supersedes the colony-control question in D008: the colony stays under player
+control. No indefinite autonomous ground expansion. Keep the manual-growth
+baseline; a biomass-loaded spore with finite area and fuel is a candidate only.
+The transformed landscape should be a varied, useful living ecosystem, not bare
+decorative ground. Exact tree and vegetation behavior remains to discuss.
+
+## D012 — progression and equipment clarification (user requirement / design open)
+
+Draft a long, difficult, puzzle-oriented progression with player levels, automation,
+powerful multiblocks, DNA combinations and persistent dimensional bases. Armor
+must remain specialized; a universal loadout sacrifices specialist capability.
+The earlier commitment to enchantment support on bio armor is reopened, not
+replaced with a decision to prohibit it. Explore potion integration. Include a
+special dimension and boss as a very-long-term horizon, not first-release scope.
+`PROGRESSION_MAP.md` proposes one detailed map and alternatives; its ranks, names,
+gates, quantities and mechanisms are not yet ratified or implementation tasks.

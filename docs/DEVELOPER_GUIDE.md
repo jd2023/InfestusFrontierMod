@@ -71,8 +71,10 @@ human-only exception with a documented partial automated check.
 Names and IDs come from an approved catalog. Recipes, tags, translations,
 advancements and the guide must explain how players discover and use the feature.
 Use original biological art with provenance, deliberate UVs and readable silhouettes.
-Items for blocks should render their block models. Preserve vanilla relevance and
-enchantments; cross-mod behavior belongs in optional adapters.
+Items for blocks should render their block models. Preserve vanilla relevance;
+bio-armor enchantment support is an open owner decision (see D012), not permission
+to remove enchantments or change ordinary vanilla equipment. Cross-mod behavior
+belongs in optional adapters.
 
 FTB Quests is outside the mod's responsibility. Advancements remain required.
 Dependencies are added only for a concrete feature with absence/presence tests and
