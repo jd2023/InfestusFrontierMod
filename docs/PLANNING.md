@@ -5,6 +5,11 @@ It is historical planning input; unchecked concepts are not automatically approv
 scope. This file tracks the first production steps. Do not equate a draft document
 with an accepted design or a working gameplay system.
 
+Current discussion starts from the owner's expanded
+[ideas and progression notebook](ideas_and_progression_feedback.md), especially
+its prioritized decision queue, and the [critical assessment](IDEAS_REVIEW.md).
+Resolve the relevant open choices before promoting any organ family into a task.
+
 ## Foundation
 
 - [x] Use the owner's repository and a descriptive feature branch.

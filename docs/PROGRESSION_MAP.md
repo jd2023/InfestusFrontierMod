@@ -6,6 +6,12 @@ structures, trials and numbers below are proposals unless identified as an owner
 requirement. Names are working labels, not registry IDs or a finalized ontology.
 This describes the full ambition, not the scope of the first release.
 
+**Subsequent owner feedback:** this map did not convey enough of how play feels.
+Read the newer [design notebook](ideas_and_progression_feedback.md) and
+[assessment](IDEAS_REVIEW.md) before developing a stage. They expand the owner's
+specific ideas and propose revisions to resources and experiences. This older
+rank sequence remains a reference, not a requirement to preserve every named reagent.
+
 For a quick read, start with the [rank map](#3-the-map-at-a-glance),
 [alternative campaign routes](#52-four-viable-campaign-routes) and
 [armor tradeoffs](#57-armor-exceptional-within-a-role-limited-across-roles).

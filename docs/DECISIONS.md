@@ -86,3 +86,24 @@ replaced with a decision to prohibit it. Explore potion integration. Include a
 special dimension and boss as a very-long-term horizon, not first-release scope.
 `PROGRESSION_MAP.md` proposes one detailed map and alternatives; its ranks, names,
 gates, quantities and mechanisms are not yet ratified or implementation tasks.
+
+## D013 — downward mining and traversable excavation (user requirement, 2026-09-07)
+
+Downward mining is a primary capability, not an optional addition to horizontal
+excavation. Players must be able to explore/traverse the resulting tunnels or
+shafts. The owner deliberately leaves the descent/access method open. Staircase,
+spiral, shaft, depth, dimensions, turning and supporting transport proposals are
+not approved implementations. Resources still come from actual terrain. The
+horizontal prototype is evidence, not an acceptable production limitation.
+
+## D014 — owner ideas as leading planning input (user request / proposals open)
+
+The owner found the earlier progression map too generic to convey play experience
+and supplied `ideas_and_progression_feedback.md`. Preserve that original submission
+(Git checkpoint `5b536bc`), critically assess it, and expand each subject with
+concrete experiences, missing systems, alternatives and consequences for ongoing
+discussion. `IDEAS_REVIEW.md` and the expanded notebook fulfill that planning task.
+Their assistant recommendations, names, material families, levels and quantities
+are not ratified mechanics or authorization to start gameplay implementation.
+Questions in the owner's source—including helpers, sails, enchantments and exact
+resource/extraction mechanics—remain questions until answered explicitly.

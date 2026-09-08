@@ -7,6 +7,11 @@ Updated with subsequent owner clarifications. The companion
 [progression map](docs/PROGRESSION_MAP.md) explores possible ranks and routes;
 its named content and mechanics remain proposals.
 
+For the owner's newer ideas and concrete play experience, read the
+[design notebook](docs/ideas_and_progression_feedback.md) and its
+[critical review](docs/IDEAS_REVIEW.md). These are leading discussion inputs, not
+ratification of the assistant's proposed mechanics or organ catalog.
+
 ## North star
 
 **Grow a distributed living civilization across Minecraft's dimensions. Discover
