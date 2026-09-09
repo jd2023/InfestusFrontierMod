@@ -12,6 +12,13 @@ Read the newer [design notebook](ideas_and_progression_feedback.md) and
 specific ideas and propose revisions to resources and experiences. This older
 rank sequence remains a reference, not a requirement to preserve every named reagent.
 
+**2026-09-08 experiment update:** notebook version 0.3 records Manual Leaching as
+an explicit owner-selected feature, multiple distinct downward mining approaches,
+ground-level construction/lit access, and suit fuel/HUD evidence. Read §§3 and 18
+before assigning mining or armor unlocks. Hazardous biomass overflow (§§8, 33) and
+leaching-assisted burrowing (§26) remain proposals; no rank below implicitly
+approves them or a random reservoir-rupture rule. Exact levels remain open.
+
 For a quick read, start with the [rank map](#3-the-map-at-a-glance),
 [alternative campaign routes](#52-four-viable-campaign-routes) and
 [armor tradeoffs](#57-armor-exceptional-within-a-role-limited-across-roles).

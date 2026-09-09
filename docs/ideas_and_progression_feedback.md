@@ -1,6 +1,6 @@
 # Living colony design notebook — ideas and progression
 
-Version 0.2, expanded 2026-09-07. **Working design, not approved implementation scope.**
+Version 0.3, updated 2026-09-08. **Working design, not approved implementation scope.**
 Owner: etf. Read the [assessment](IDEAS_REVIEW.md) first for highlights, objections
 and the reasoning behind substantial changes.
 
@@ -46,6 +46,28 @@ Read in four passes:
 - [Building](#30-building-assistance-and-safe-relocation) · [Operations](#31-operations-monitoring-and-ergonomic-controls) · [Multiplayer](#32-multiplayer-ownership-and-trade) · [Recovery](#33-failure-recovery-and-intentional-danger)
 - [Integrations](#34-integrations-and-pack-author-boundaries) · [Story/teaching](#35-discovery-story-and-accessibility) · [Visuals](#36-visual-identity-and-biological-construction)
 - [Organ catalog](#37-candidate-organ-catalog-families-not-a-shopping-list) · [Eight gameplay scenarios](#38-connected-scenarios-to-judge-before-making-implementation-tasks) · [Dependency review](#39-dependency-safety-and-scope-review) · [Discussion queue](#40-discussion-queue-and-source-coverage)
+
+### Recent discussion and prototype evidence — 2026-09-08
+
+The latest discussion develops §§3, 8, 18, 26 and 33. Read those sections before
+turning the older organ catalog or rank map into tasks. **Tested in the prototype**
+does not mean shipped, balanced, approved for a particular tier, or implemented in
+this production repository. Evidence is in the sibling prototype's
+[downward mining notes](../../InfestusFrontierModV3/docs/DOWNWARD_MINING.md),
+[excavation showcase](../../InfestusFrontierModV3/docs/EXCAVATION_SHOWCASE.md) and
+[testing record](../../InfestusFrontierModV3/docs/TESTING.md); these relative links
+require the sibling checkout. Prototype checkpoint `1e1a9bb` contains the latest
+HUD changes. Keep production recipes, names, limits and save formats uncommitted.
+
+| Subject | Evidence / current state | Planning status |
+|---|---|---|
+| Manual Leaching | Exposed host rock becomes translucent and easy to mine; ores stay unchanged | **Owner explicitly wants this mechanic in the mod**; tier and balance open |
+| Three downward approaches | Descending platform, branching root/stair excavation, contained digestion/recovery | Playable experiments, not three approved production machines |
+| Surface-to-depth strip | Finite real excavation, output storage and lit climbing access | Owner likes multiple progression options; prefers a narrow one-block strip later |
+| Ground-level boundaries and access | Mutated substrate perimeter, luminous stairs/tendons and increased root headroom | Preferred construction language; final geometry open |
+| Suit biomass and HUD | Persistent reserve, explicit feeding, full-set display, half-transparent movable/hideable HUD | Display experiment tested; broad activity/repair costs requested for future work |
+| Aggressive biomass spills | Discussed only; no flowing spill or rupture test | Owner idea; pressure, containment and failure policy are proposals |
+| Burrowing | Renewed discussion of underground movement | Meaning/implementation not confirmed; not a tested suit ability |
 
 ### Working vocabulary
 
@@ -246,6 +268,35 @@ decisions rather than one mathematically dominant armor bar.
 **Open:** host feeding severity; practice versus Minecraft XP semantics; archive
 loss/cost; whether partial-genome traits can be installed; exact enchantment policy.
 No illustrative capacity or training threshold is yet balance data.
+
+### Latest experiment: a visible metabolic reserve
+
+**Owner direction, reaffirmed 2026-09-08:** a complete bio suit should show its
+biomass supply. Activities should eventually consume that supply, including
+combat and self-mending. Those costs remain future work; combat was unchanged
+during the HUD experiment. The display needs a half-transparent
+background and player options to move or disable it.
+
+**Tested prototype:** the chest piece owns a persistent reserve, initially empty;
+removing a suit piece hides the meter without deleting fuel. Explicit feeding and
+native item synchronization work. The HUD uses a roughly 50%-opaque background,
+four-corner placement and adjustable offsets, with a client-only visibility switch.
+Native configuration controls/save and eight client capture states were checked.
+The prototype's 1,000 capacity and 250-per-flesh dose are test tuning, not production
+requirements. Fighting a spider currently does **not** drain this reserve.
+
+**Proposal:** account separately for successful powered actions, sustained active
+functions and actual repaired durability. Do not charge for both an attempted hit
+and its damage callback, or spend repair fuel when nothing was repaired. Distinguish
+fuel consumption from practice awards so self-inflicted damage cannot cheaply
+train the suit. Ordinary activity accounting should be bounded event handling or
+coarse active intervals, not a new scan/ticker on every piece of equipment.
+
+**Open:** which ordinary actions cost fuel; whether basic protection works when
+empty; repair rate and cost; priority between emergency defense, travel and repair;
+refill from colony stores; full-set versus per-piece reserve behavior. Warn before
+losing a powered function. A disabled HUD must not disable costs or grant immunity.
+Later burrowing must explain its empty-reserve escape behavior before implementation.
 
 ## 4. Tools: field precision survives industrial automation
 
@@ -474,13 +525,65 @@ A self-sustaining farm is different: growing organisms use explicit environmenta
 inputs and time. Credit that external contribution instead of describing it as
 an impossible lossless closed loop.
 
-**Storage behavior:** visible fill, deliberate priorities, bounded ports, clear
-overflow refusal and portable safe handling. Existing prototype buckets/bottles
+**Storage baseline:** visible fill, deliberate priorities, bounded ports, clear
+overflow refusal and portable safe handling. The hazardous-mode proposal below
+does not yet replace ordinary safe refusal. Existing prototype buckets/bottles
 are reference experiments, not production promises. Decide a consistent manual
 container early so players can bootstrap without a network.
 
 **Open:** raw-input families; whether any refined nutrient grade is necessary;
 manual container sizes; reserve defaults; treatment of food from other mods.
+
+### New direction to explore: biomass as a hazardous living fluid
+
+**Owner idea, 2026-09-08:** biomass could physically flow and be aggressive when
+spilled. Excess production with no remaining storage might burst a reservoir and
+release biomass, making overflow disposal and mitigation a base-design puzzle.
+The owner suggested a random storage failure as one possibility. This is not yet
+an approved rule, and no rupture/spill system was tested in the latest experiments.
+
+**Assistant recommendation, not ratified:** make the incident causal and readable.
+A particular overloaded organ swells and leaks before rupturing; an unrelated tank
+should not fail arbitrarily because some other district filled up. Separate
+**capacity** from **pressure/activity**: a full idle reservoir can be safe, while a
+still-metabolizing high-output culture may need space for its residual production.
+Pressure is one candidate gameplay state, not a commitment to a hydraulic simulator.
+
+An early safe producer can stop at a full output. A later efficient culture could
+require a controlled shutdown interval. The player then chooses among:
+
+- extra reserve capacity sized for the unfinished batch;
+- priority overflow routing into another useful consumer;
+- a relief organ that sacrifices material to stop escalation;
+- emergency solidification or neutralization;
+- a sacrificial basin, lined channel or isolated storage district containing a leak.
+
+These are candidate components, not five mandatory machines. A passive safety
+solution should remain viable; a beginner must not need sophisticated control
+logic merely to leave their first base safely. More efficient dangerous processes
+must earn their extra complexity through a real benefit.
+
+**Playable scene:** a Nether culture is finishing a high-yield batch when the
+receiving workshop stops. The reservoir becomes visibly tense. Your buffer absorbs
+some output; a relief organ routes the rest into a protected neutralization bed.
+You lose some yield but keep the base. Another player avoids the loss with larger
+storage and scheduling; a third keeps a secondary process ready to consume overflow.
+No single layout wins on space, efficiency, construction cost and fault tolerance.
+
+**Safety contract to specify before coding:** a released quantity comes out of
+stored/in-flight material exactly once; it cannot make infinite source blocks or
+grow by digesting itself. Bound active spill cells, work per tick across all spills,
+lifetime, affected area, reactions and saved state. Loaded chunks only, no hidden
+catch-up explosion on restart, no uncontrolled item/XP drops or cascading reactions.
+Decide whether the spill attacks entities, natural terrain, constructed blocks or
+some explicit combination. Claims and ownership must constrain damage; a bio suit
+does not give permission to harm someone else's base.
+
+**Open:** is all biomass physically hazardous, or only an active/refined state?
+What neutralizes it; can it be reclaimed; how much may be lost; what happens at a
+chunk border or when a reservoir splits? Does warning give time to act without
+requiring constant attendance? Is failure deterministic, or is there disclosed
+local risk after clear thresholds? Containment acceptance cases live in §33.
 
 ## 9. Steam, water, lava and electricity
 
@@ -910,6 +1013,88 @@ does not leave an invisible worker destroying terrain elsewhere.
 **Open:** descent geometry, turns/branch planning, survey disclosure, allowed natural
 terrain, hazard policies, lining costs and reclaiming obsolete excavation organs.
 
+### What the downward experiments taught us
+
+The owner asked for fundamentally different methods, not three tunnel sizes.
+The prototype now provides a comparison vocabulary:
+
+| Approach / working name | What the player does and receives | Distinctive design question |
+|---|---|---|
+| Descending Cradle | Supply a moving excavation deck; descend with the work and keep climbing access | How do the moving worksite, rider safety and hauling cooperate? |
+| Excavating Rootstock | Authorize finite branching descents; walk the luminous stair route | Which branch/site should receive the next section and supply? |
+| Digestive Crucible | Digest a bounded batch into captured material, then recover it | How much material can be held safely, and when should a batch be recovered? |
+| Strata Maw / deep strip | Open a long surface footprint downward and retain a climbing spine | How do terrain impact, depth, spoil capacity and supply constrain a large site? |
+| Manual Leaching | Weaken visible host rock, inspect through it, then hand-mine | Where is selective preparation more useful than bulk excavation? |
+
+The first three were the distinct downward experiments; strip mining and manual
+leaching are additions, not replacements. Captured digestate in the crucible is
+currently **solid, non-flowing** material—not proof that aggressive liquid spills
+work. Local functional/capture tests do not certify multiplayer rider prediction,
+all claim mods, maximum-depth soaks or many loaded mines.
+
+**Owner feedback to preserve:**
+
+- Multiple methods should coexist according to player progression, rather than
+  selecting one winner for the whole campaign. Exact levels remain open.
+- Mutate exposed Living Substrate **at ground level** to define an area. Raised
+  border blocks feel less seamless. Do not require targeting hidden blocks.
+- Excavation should introduce light. Angled descents need stairs and enough
+  headroom to walk comfortably, including beneath the entry boundary.
+- Finite, one-shot structures are acceptable: another site can be built to go
+  farther. Automatic endless extension is not a requirement. Preserve useful
+  access from earlier jobs; restarting cannot erase or duplicate their output.
+- The preferred long-strip form is **one block wide**, beginning with the liked
+  ladder-like climbing tendon. The owner explicitly deferred changing the existing
+  showcase: its current 5×24 width/length is evidence, **not** the desired final width.
+  How narrow-strip access remains comfortable needs a later geometry test.
+
+### Manual Leaching is a keeper, not just a disposable experiment
+
+**Explicit owner selection, 2026-09-08:** keep the mechanic that dissolves/weakens
+non-ore rock for the actual mod. Its distinctive contribution is preparing terrain
+for the player's tools while leaving valuable deposits intact. This is a selected
+feature concept, not approval of an exact recipe, area, tier or implementation.
+
+**What was actually tested:** a Leaching Nodule treats up to a clicked-face-aligned
+3×3 plane of six supported host-rock types. Rock becomes translucent/porous but
+keeps solid collision until mined. Ores and unknown materials are untouched. A
+correct pickaxe removes treated host rock instantly with no ordinary abrasion and
+salvages its host material; ores retain normal tool tier, time and durability.
+The demonstration works on walls, floors or ceilings, not just horizontal ground.
+Its visual perimeter is a label/fixture, not a required leaching multiblock.
+Nearby unsafe geology, protection or unloaded targets can refuse treatment.
+
+This is **not** a volumetric ore scanner, automated ore lift, fluid solvent or
+device that removes all surrounding stone by itself. The earlier idea of moving
+ores upward into a randomized collection column was discussed but not implemented.
+Do not silently substitute that much more automatic mechanic for manual leaching.
+
+**Proposed play loop:** choose an exposed face, spend a reagent to prepare it,
+read the nearby geology through the weakened material, remove the host rock with
+your tool, and extract the revealed ore normally. Carry it for selective work
+even after acquiring bulk excavators. A prepared cavern wall or precise sampling
+site can justify hand work without forcing the player to hand-mine an industrial pit.
+
+The prototype's instant/zero-wear host removal is deliberately strong. Balance
+can involve reagent production, eligible geology, treatment extent or slower
+breaking, but must preserve the satisfying reveal-and-extract experience. More
+repeated clicks or waiting are not automatically better balance. Test survival
+tool use, salvage, ore visibility and return trips—not Creative breaking alone.
+
+**Candidate progression, not fixed ranks:** manual leaching can provide an early
+useful expedition tool; modest finite descents can establish the first mine;
+branching routes, moving work platforms or batch recovery can introduce different
+mid-game planning roles; large/deep strip jobs can demand sustained supply and
+automated spoil storage later. Not every player must build every method in order.
+An advanced reagent or optional suit synergy could extend manual leaching's niche
+without granting free ore, universal wall passage or bypassing mining tiers.
+
+**Next design questions:** settle leaching's first acquisition and cost; choose
+which automated family joins it first; define light/access guarantees and cave
+interruptions; compare relocation versus new one-shot organs; test the narrow-strip
+entry before selecting its geometry. Production caps must follow performance
+review rather than copying the prototype's depth presets.
+
 ## 19. Ore processing: recovery choices, not free multiplication loops
 
 **Owner direction:** ore processing should connect to real mining and automation.
@@ -1219,6 +1404,26 @@ eligible natural terrain with validated exit and fail-without-moving behavior.
 Do not claim the specific remembered Ars spell has been identified; the checked
 Burrowing reference is an excavation ritual, as noted in the review.
 
+**Renewed discussion, 2026-09-08:** the owner asked about "borrowing capability."
+The assistant interpreted this as **burrowing**, consistent with the earlier
+underground-travel idea, but the owner has not yet confirmed the exact meaning.
+Do not turn that interpretation into an approved armor mutation.
+
+One new **proposal** connects it to Manual Leaching: a specialized suit might
+burrow efficiently through prepared rock, while untouched geology requires a
+stronger expression and more biomass. Two different experiments would be needed:
+
+- **Excavating movement:** the player leaves an actual traversable passage. Account
+  for block removal, protected terrain, native ore/tool rules and bounded spoil.
+- **Non-excavating passage:** the player crosses eligible material without harvest.
+  Validate a short route and safe endpoint; never leave them embedded, stranded
+  when fuel runs out, or able to pass through claims, bedrock and arbitrary buildings.
+
+The synergy should not make a second treatment step mandatory for ordinary mining.
+First clarify the movement fantasy, whether a tunnel remains, what ores do, and
+how interruption or depleted fuel returns the player to safety. Neither option
+is currently a tested suit capability. The parked hostile-fluid lift stays parked.
+
 An advanced gate connects prepared, authorized endpoints. Portable field anchors
 could speed deployment but must not remove the reason to build a permanent station.
 Passenger travel is not bulk freight capacity. Public/private access, mounts,
@@ -1522,6 +1727,35 @@ tone/risk decisions and conflict with safe player-controlled colonies if hidden.
 
 **Open:** acceptable local damage, whether player mistakes can destroy valuable
 batches, gear death loss, backup costs and warning/override policy.
+
+### Containment and recovery scenario for the biomass proposal
+
+Apply §8's hypothetical hazardous-fluid system without silently changing the
+safe-full-output baseline. A proposed incident sequence is: consumer stalls →
+residual production fills reserve → local organ signals stress → relief diverts
+excess, or a bounded leak occurs → player isolates and neutralizes/reclaims it.
+A warning must identify the affected organ and cause, not merely display a generic
+network alarm. Flesh tension, pulse changes and a gauge can agree; color alone
+is insufficient. Sensors and an emergency manual control should work together.
+
+Before approving this mechanic, test scenarios on paper and then in an isolated world:
+
+- [ ] A full idle reservoir remains safe under the proposed pressure policy.
+- [ ] A routine stopped consumer cannot cause an unexplained remote rupture.
+- [ ] Available buffer/relief capacity can absorb the disclosed shutdown output.
+- [ ] Cutting power, disconnecting a vein or losing a chunk does not erase the
+  incident state, duplicate material or turn a paused process into hidden production.
+- [ ] A leak stays within its amount, area, lifetime and shared processing limits;
+  dangerous reactions cannot generate an unlimited chain or loose-item storm.
+- [ ] Another player's claim, protected build or shared public route is not an
+  unrestricted spill target. Network access and damage permissions are distinct.
+- [ ] Recovery is possible with equipment available before the dangerous process;
+  a failed advanced machine is not the sole source of its own antidote.
+- [ ] Restart and save/load preserve containment and expose what remains to clean up.
+
+These are proposed acceptance questions, **not completed tests**. We still need the
+owner's choice on rupture rules, destructive severity and safe versus hazardous
+biomass states. No random disaster behavior or fluid-simulation dependency is approved.
 
 ## 34. Integrations and pack-author boundaries
 
@@ -1828,6 +2062,23 @@ Production implementation remains HUMAN-gated under the existing ktask process.
 
 ## 40. Discussion queue and source coverage
 
+### Follow up on the latest experiments
+
+- [x] Keep Manual Leaching's selective host-rock preparation concept for the actual
+  mod (owner selection only; production implementation remains future work).
+- [ ] Choose its starting tier, acquisition, reagent cost, area and host-rock policy;
+  preserve normal ore extraction and a useful late-game selective-work niche.
+- [ ] Assign roles/levels to multiple downward mining methods, rather than replacing
+  them all with one increasingly large tunnel. Decide the first automated family.
+- [ ] Prototype the preferred one-block-wide strip with climbing-tendon entry;
+  verify headroom, lighting, return access and finite next-site construction.
+- [ ] Specify suit costs for activities, combat and actual self-mending; define
+  empty-reserve priorities and an understandable refill loop. HUD is not metabolism.
+- [ ] Decide whether biomass spills become a feature, which processes can become
+  hazardous, and whether local warned pressure failure replaces the random-tank idea.
+- [ ] Clarify burrowing: actual tunnel or non-excavating passage, and whether the
+  proposed leaching/suit relationship matches the owner's intent.
+
 ### Decide first: choices with the most downstream consequences
 
 - [ ] **Dramatic premise:** is hungry armor dangerous by default, or an explicit
@@ -1898,3 +2149,9 @@ recent assistant paragraph become authority merely by repetition.
   candidates, critique, cross-system economies, organ catalog, safety/recovery,
   ownership, integration and a decision queue. All new mechanics remain proposals.
   The factual inspiration references and their limits are in [IDEAS_REVIEW.md](IDEAS_REVIEW.md).
+- **0.3 — experiment/discussion update, 2026-09-08:** records the owner's explicit
+  selection of Manual Leaching; distinguishes five tested mining approaches and
+  ground-level access/site feedback; documents the tested suit reserve/HUD versus
+  future activity costs; develops the unimplemented hazardous-biomass proposal and
+  its recovery questions; preserves burrowing as an unconfirmed implementation
+  direction. No prototype code, balance or recipe is promoted to production.

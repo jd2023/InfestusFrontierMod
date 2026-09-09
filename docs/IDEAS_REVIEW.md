@@ -6,6 +6,49 @@ owner document is preserved in Git commit `5b536bc` at its original path.
 
 ## What the ideas reveal
 
+### Update after prototype experiments — 2026-09-08
+
+The notebook is now version 0.3. The strongest new result is **Manual Leaching**:
+preparing non-ore rock into a translucent, easily mined host lets players see and
+extract real deposits themselves. The owner explicitly wants this mechanic in the
+actual mod. It gives evolving tools a job alongside later automation, rather than
+making them irrelevant. Its instant/no-wear prototype behavior and reagent recipe
+are not yet balance decisions. Preserve the reveal-and-extract experience while
+testing costs; do not bury it in repeated treatment chores.
+
+Downward mining now has concrete comparisons: a descending work platform, branching
+stair excavation, contained batch digestion/recovery, and a surface-to-depth strip.
+These differ by worksite, access, recovery and supply, not only cross-section.
+The owner wants multiple progression options, likes flush mutated-substrate
+boundaries and lit access, accepts finite one-shot sites, and prefers a later
+one-block-wide strip with climbing-tendon entry. The current wide strip is not
+that requested narrow geometry. Do not select exact levels by copying test limits.
+
+The suit has a tested persistent reserve and configurable half-transparent HUD.
+It does **not** yet have general activity/combat/repair drain. The owner's request
+for future metabolism should become one coherent accounting design, not scattered
+fuel deductions in unrelated events. Decide depleted-fuel behavior before tying
+life-critical travel to it.
+
+**Promising but risky:** aggressive flowing biomass and overflow incidents can
+reward buffer sizing, secondary consumers, containment and emergency isolation.
+The owner proposed random reservoir rupture; my recommendation is instead a
+warned local failure caused by the affected organ's operating state. Neither rule
+is approved. Safe early back-pressure and later residual-production risk can
+coexist. A finite conserved spill, hard shared work limits, claim protection and
+recoverable cleanup are prerequisites, not details to add after a disaster demo.
+The crucible's solid digestate is not a tested fluid implementation.
+
+**Still ambiguous:** the renewed "borrowing" question was interpreted as burrowing.
+The earlier notebook already includes underground traversal, but the exact desired
+behavior remains unanswered. Leaching-assisted suit excavation and non-excavating
+passage are alternatives to discuss, not accepted features or working experiments.
+
+See notebook §§3, 8, 18, 26, 33 and the new discussion checklist in §40. The existing
+critique below remains relevant; these additions do not ratify the broader catalog.
+
+### Original assessment
+
 The strongest identity is **a relationship between the player and a living base**.
 Your equipment begins as a poor imitation of ordinary gear, awakens, learns from
 your expeditions and depends on the colony you construct. The colony, in turn,

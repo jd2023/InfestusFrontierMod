@@ -107,3 +107,50 @@ Their assistant recommendations, names, material families, levels and quantities
 are not ratified mechanics or authorization to start gameplay implementation.
 Questions in the owner's source—including helpers, sails, enchantments and exact
 resource/extraction mechanics—remain questions until answered explicitly.
+
+## D015 — mining experiments and construction feedback (user direction / details open, 2026-09-08)
+
+Keep multiple mining methods with different progression roles rather than selecting
+one universal method. Prefer exposed, ground-level mutated-substrate area markers;
+provide light, stair-like angled access and usable headroom. Finite, one-shot sites
+with another structure for further excavation are acceptable, not a mandatory rule
+for every organ. The owner prefers a one-block-wide long strip beginning with the
+liked climbing tendon, but explicitly deferred changing the wider prototype.
+Exact level assignments, geometry, extensions and production families remain open.
+
+## D016 — retain Manual Leaching (user requirement / balance open, 2026-09-08)
+
+The owner explicitly wants the tested non-ore dissolving/weakening mechanic in
+the actual mod. The relevant prototype prepares host rock into translucent, easily
+mined material while leaving ores for ordinary tool extraction. Keep that feature
+concept in planning. This is not approval of the prototype's recipe, 3×3 plane,
+instant/zero-wear tuning, fixed host list or a production nodule/multiblock format.
+Automatic ore lifting, fluid simulation and through-wall travel are not included
+in this selection. Production implementation and progression specification follow.
+
+## D017 — suit biomass and display (user direction / metabolism deferred, 2026-09-08)
+
+Show biomass when wearing a full bio suit; use a half-transparent background and
+offer placement/visibility settings. The prototype now tests that display and
+explicit refueling. The owner wants activities, including combat and self-mending,
+to consume biomass in future development. The current readout does not implement
+those costs. Activity categories, capacities, feeding rates, repair policy and
+empty-reserve behavior are open, not inherited from test tuning.
+
+## D018 — hazardous biomass and overflow (owner idea / assistant alternatives open, 2026-09-08)
+
+Explore biomass as aggressive flowing material whose overflow/leak would create
+containment and disposal puzzles. The owner suggested a random storage rupture.
+The assistant recommends a visible local pressure/operating-state failure, safe
+early producers, optional later residual-production risk and multiple relief
+solutions. Neither failure rule is ratified or implemented. Existing safe refusal
+remains the baseline; decide destructive severity, finite conserved spills, shared
+budgets, ownership and recovery before authorizing gameplay changes.
+
+## D019 — renewed burrowing discussion (open, 2026-09-08)
+
+The owner's "borrowing capability" question was interpreted as burrowing, matching
+the earlier underground-travel interest, but that interpretation and exact behavior
+still need confirmation. Excavating a real tunnel and crossing terrain without
+harvesting are distinct candidates. Efficient suit movement through leached rock
+is a new assistant proposal, not an accepted mutation or tested capability.
