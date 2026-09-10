@@ -5,6 +5,13 @@ It is historical planning input; unchecked concepts are not automatically approv
 scope. This file tracks the first production steps. Do not equate a draft document
 with an accepted design or a working gameplay system.
 
+Current discussion starts from the owner's expanded
+[ideas and progression notebook](ideas_and_progression_feedback.md), especially
+its prioritized decision queue, and the [critical assessment](IDEAS_REVIEW.md).
+Resolve the relevant open choices before promoting any organ family into a task.
+
+Use [Guide Tree](GUIDE_PROGRESSION_TREE.md) for chapter gates, [Item Catalog](ITEM_CATALOG.md) for prepared ingredients and [Armor Evolution](ARMOR_EVOLUTION.md) for equipment. Complete and ratify recipe quantities per first-slice feature rather than treating catalog breadth as implementation approval.
+
 ## Foundation
 
 - [x] Use the owner's repository and a descriptive feature branch.
@@ -14,15 +21,15 @@ with an accepted design or a working gameplay system.
 - [x] Add pure tests, development-only GameTests and production JAR checks.
 - [x] Provide one local verification command and a HUMAN-gated ktask skeleton.
 - [ ] Ratify vision, player fantasy, tone and non-goals.
-- [ ] Resolve infection control, ownership and multiplayer research scope.
+- [ ] Resolve colony ownership and multiplayer research scope; player-controlled bounded growth is already required.
 - [ ] Resolve source/asset licensing mismatch.
-- [ ] Approve remote branch publication/PR and the eventual CI/branch-protection policy.
+- [ ] Approve eventual CI/branch-protection policy. This documentation PR is specifically authorized, not blanket permission for future publishing.
 
 ## Interview sequence
 
 - [ ] First 30 minutes: discovery, usefulness, teaching and first adaptation.
 - [ ] DNA: specimen acquisition, completion, bank ownership, sharing and anti-grind rules.
-- [ ] Equipment: usage progression, directed mutation, branches, compatibility and recovery.
+- [ ] Equipment: tune the permanent per-piece tree, symbiosis ownership/pain and costs; decide enchantments and recovery.
 - [ ] Construction: reusable parts, structure constraints and meaningful alternate layouts.
 - [ ] Ecology/economy: assimilation, biomass, containment, cleanup and renewable inputs.
 - [ ] Logistics/transit: 3D terrain, junctions, cross-dimensional endpoints and costs.
@@ -45,5 +52,5 @@ with an accepted design or a working gameplay system.
 - [ ] Approve structured implementation tasks; do not queue ambiguous product design.
 
 Proposed eras—not committed milestones: discovery → local adaptation → compositional
-colony → sustained Nether operations → inter-colony transit → sustained End ecology
+colony → sustained Nether operations → sustained End ecology → inter-colony transit
 → open-ended specialization. Discuss dependencies and playable exit criteria first.

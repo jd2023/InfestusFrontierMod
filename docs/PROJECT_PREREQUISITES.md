@@ -259,7 +259,10 @@ Design replayability around:
 - [ ] Base geography.
 - [ ] Alternative dimension-colonization strategies.
 - [ ] Cooperative player roles.
-- [ ] Reversible but costly specialization.
+- [ ] Specify permanent armor branch commitments and independently grown alternatives; decide organ/tool reversibility separately.
+- [ ] Ratify body/piece symbiosis ownership, hunger-pain severity and fed-use adaptation thresholds.
+- [ ] Validate real-food auto-feeding, biomass auto-healing/refueling and actual Elytra fusion without duplication.
+- [ ] Complete prepared-item recipes: raw ingredient → activation organ → consumable graft → eligible target, with no circular first recipe.
 
 Define late-game power primarily through:
 

@@ -7,6 +7,13 @@ Updated with subsequent owner clarifications. The companion
 [progression map](docs/PROGRESSION_MAP.md) explores possible ranks and routes;
 its named content and mechanics remain proposals.
 
+For the owner's newer ideas and concrete play experience, read the
+[design notebook](docs/ideas_and_progression_feedback.md) and its
+[critical review](docs/IDEAS_REVIEW.md). These are leading discussion inputs, not
+ratification of the assistant's proposed mechanics or organ catalog.
+
+Concrete proposed designs: [blocks](docs/BLOCK_CATALOG.md), [items and biological preparation](docs/ITEM_CATALOG.md), [substrate](docs/LIVING_SUBSTRATE_MUTATIONS.md), [armor](docs/ARMOR_EVOLUTION.md) and [guide tree](docs/GUIDE_PROGRESSION_TREE.md). Their recipe numbers are drafts; explicit owner decisions remain binding.
+
 ## North star
 
 **Grow a distributed living civilization across Minecraft's dimensions. Discover
@@ -35,8 +42,10 @@ and the player's equipment becomes another living part of that system.
   Running can inform mobility adaptation; a captured organism can unlock a new
   kind of ability. The owner has reopened enchantment support on bio armor;
   removal is not decided. Potion integration is a promising design direction.
-- Equipment supports multiple evolutionary directions. Some colony functions
-  require a complete bio suit with appropriate maturity or mutations.
+- Each armor piece evolves independently through permanent material and trait branches. No branch exchange or respec; grow and keep different specialized pieces. Fusion raises protection, durability and learning caps without granting earned counters. Rigid versus flexible anatomy is a lasting tradeoff.
+- Armor uses biomass for self-mending and active features. Tiny early reserves can run empty; hungry armor hurts its wearer until full mutual symbiosis. Afterwards hungry features stop without armor hunger pain. Auto-feeding uses real food, auto-healing spends biomass, and flight requires fusing an actual Elytra. Exact adaptation ownership and tuning remain open.
+- Raw materials can craft basic bodies. Functional mutations consume biologically activated or fused ingredients prepared in organs; advanced reinforcement cannot consume raw ingots or diamonds directly.
+- Some colony functions require a complete bio suit with appropriate maturity or mutations.
 - Environmental specialists must remain meaningfully stronger at their jobs than
   generalists. Even late-game armor must not become universally protective.
 - Player levels should unlock more capable multiblocks and mutations. Long,
@@ -74,7 +83,7 @@ able to read the colony's state through its appearance and clear diagnostics.
 
 Mutation adds new behaviors and combinations, not only larger numbers. Different
 equipment and colony builds should excel at different jobs. Costs, incompatibility,
-capacity and reversibility are candidate ways to preserve decisions—not yet rules.
+capacity and permanent armor branches preserve decisions. Tissue reconfiguration and organ operating profiles are separate mechanisms, not permission to respecialize armor.
 Experimentation should be informed, understandable and worth trying.
 
 ### 3. Dimensions remain interdependent
@@ -175,7 +184,7 @@ experiments. They are not the production ontology or a migration commitment.
 - [ ] How do usage-based evolution and directed DNA mutation interact?
 - [ ] Decide bio-armor enchantment policy and potion interactions after testing
   specialist/generalist combinations; keep ordinary vanilla systems intact.
-- [ ] How costly/reversible is specialization, and how much randomness is welcome?
+- [ ] Set costs for permanent armor advancement and independently grown specialists; decide reversibility separately for tools and organ traits.
 - [ ] What construction components create the first genuinely different solutions?
 - [ ] What danger, loss, recovery and containment experience do we want?
 - [ ] What belongs in the first playable vertical slice, versus the first release?

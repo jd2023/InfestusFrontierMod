@@ -7,6 +7,14 @@ accepted entries in `DECISIONS.md` constrain every implementation. A draft idea,
 prototype behavior, or unchecked backlog item is not a ratified requirement.
 Ask when a decision changes scope, progression, player risk, dependencies or saves.
 
+Design ownership: `ITEM_CATALOG.md` defines items and preparation recipes;
+`BLOCK_CATALOG.md` defines organs and construction; `LIVING_SUBSTRATE_MUTATIONS.md`
+defines tissue anatomy; `ARMOR_EVOLUTION.md` defines equipment;
+`GUIDE_PROGRESSION_TREE.md` defines proposed instructional dependencies. The vision,
+progression narrative and ideas notebook must not introduce conflicting copies of
+those rules. Historical decisions stay recorded; a newer decision explicitly
+supersedes an older one. Draft numbers are not implementation authorization.
+
 The bootstrap establishes build/test infrastructure only. It does not begin the
 content roadmap. Do not promote prototype implementations wholesale.
 

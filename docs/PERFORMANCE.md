@@ -32,6 +32,15 @@ stress/soak acceptance criteria. Distinguish tested bounds from measured TPS/FPS
 
 ## Required adversarial cases
 
+Prepared ingredients and armor add specific future costs: recipe transactions,
+bounded inventory queries, per-wearer ability accounting and adaptation storage.
+Discuss/prove their budgets before implementation. Use fixed item fields, four
+wearer-slot tracks at most under the current proposal, and bounded per-piece
+state—not an ever-growing wearer/item-pair history. Automatic feeding/refueling
+checks only configured slots on a bounded cadence. Hunger damage shares one
+wearer cadence, not four independent damage timers. No item-wide decay ticker,
+recursive portable inventory, or flight-induced chunk loading is authorized.
+
 Full outputs; broken/split/merged structures; cycles; unloaded endpoints; restart
 with in-flight resources; corrupted/versioned saves; simultaneous players;
 ownership changes; stale/dead drone reservations; dense mobs; packet spam; item

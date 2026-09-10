@@ -6,6 +6,12 @@ GameTests and rejects severe output. There is no skip flag. Use Bash and ripgrep
 
 Current layers:
 
+- `python3 scripts/check_design_docs.py --self-test` and its normal invocation:
+  prerequisite grammar, unknown references/cycles, block and armor-family guide
+  coverage, permanent material parents, unique catalog IDs, intact Markdown tables
+  and local links. Both run in the authoritative gate. These are structural documentation
+  checks, not proof of recipe balance, gameplay implementation or artistic quality.
+
 - `./gradlew :core:test`: three pure tests covering quota exhaustion, repeated
   refusal, invalid limits, next tick, clock rewind and long timestamp extremes.
 - `:core:verifyBoundary`: rejects production dependencies in the Java-only module.

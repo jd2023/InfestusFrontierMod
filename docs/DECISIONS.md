@@ -86,3 +86,118 @@ replaced with a decision to prohibit it. Explore potion integration. Include a
 special dimension and boss as a very-long-term horizon, not first-release scope.
 `PROGRESSION_MAP.md` proposes one detailed map and alternatives; its ranks, names,
 gates, quantities and mechanisms are not yet ratified or implementation tasks.
+
+## D013 — downward mining and traversable excavation (user requirement, 2026-09-07)
+
+Downward mining is a primary capability, not an optional addition to horizontal
+excavation. Players must be able to explore/traverse the resulting tunnels or
+shafts. The owner deliberately leaves the descent/access method open. Staircase,
+spiral, shaft, depth, dimensions, turning and supporting transport proposals are
+not approved implementations. Resources still come from actual terrain. The
+horizontal prototype is evidence, not an acceptable production limitation.
+
+## D014 — owner ideas as leading planning input (user request / proposals open)
+
+The owner found the earlier progression map too generic to convey play experience
+and supplied `ideas_and_progression_feedback.md`. Preserve that original submission
+(Git checkpoint `5b536bc`), critically assess it, and expand each subject with
+concrete experiences, missing systems, alternatives and consequences for ongoing
+discussion. `IDEAS_REVIEW.md` and the expanded notebook fulfill that planning task.
+Their assistant recommendations, names, material families, levels and quantities
+are not ratified mechanics or authorization to start gameplay implementation.
+Questions in the owner's source—including helpers, sails, enchantments and exact
+resource/extraction mechanics—remain questions until answered explicitly.
+
+## D015 — mining experiments and construction feedback (user direction / details open, 2026-09-08)
+
+Keep multiple mining methods with different progression roles rather than selecting
+one universal method. Prefer exposed, ground-level mutated-substrate area markers;
+provide light, stair-like angled access and usable headroom. Finite, one-shot sites
+with another structure for further excavation are acceptable, not a mandatory rule
+for every organ. The owner prefers a one-block-wide long strip beginning with the
+liked climbing tendon, but explicitly deferred changing the wider prototype.
+Exact level assignments, geometry, extensions and production families remain open.
+
+## D016 — retain Manual Leaching (user requirement / balance open, 2026-09-08)
+
+The owner explicitly wants the tested non-ore dissolving/weakening mechanic in
+the actual mod. The relevant prototype prepares host rock into translucent, easily
+mined material while leaving ores for ordinary tool extraction. Keep that feature
+concept in planning. This is not approval of the prototype's recipe, 3×3 plane,
+instant/zero-wear tuning, fixed host list or a production nodule/multiblock format.
+Automatic ore lifting, fluid simulation and through-wall travel are not included
+in this selection. Production implementation and progression specification follow.
+
+## D017 — suit biomass and display (user direction / metabolism deferred, 2026-09-08)
+
+Show biomass when wearing a full bio suit; use a half-transparent background and
+offer placement/visibility settings. The prototype now tests that display and
+explicit refueling. The owner wants activities, including combat and self-mending,
+to consume biomass in future development. The current readout does not implement
+those costs. Activity categories, capacities, feeding rates, repair policy and
+empty-reserve behavior are open, not inherited from test tuning.
+
+## D018 — hazardous biomass and overflow (owner idea / assistant alternatives open, 2026-09-08)
+
+Explore biomass as aggressive flowing material whose overflow/leak would create
+containment and disposal puzzles. The owner suggested a random storage rupture.
+The assistant recommends a visible local pressure/operating-state failure, safe
+early producers, optional later residual-production risk and multiple relief
+solutions. Neither failure rule is ratified or implemented. Existing safe refusal
+remains the baseline; decide destructive severity, finite conserved spills, shared
+budgets, ownership and recovery before authorizing gameplay changes.
+
+## D019 — renewed burrowing discussion (open, 2026-09-08)
+
+The owner's "borrowing capability" question was interpreted as burrowing, matching
+the earlier underground-travel interest, but that interpretation and exact behavior
+still need confirmation. Excavating a real tunnel and crossing terrain without
+harvesting are distinct candidates. Efficient suit movement through leached rock
+is a new assistant proposal, not an accepted mutation or tested capability.
+
+## D020 — confirmed Burrowing (user direction, 2026-09-09)
+
+Supersedes the interpretation question in D019. Burrowing is temporary non-excavating
+passage through eligible ground, in all directions, not open-air flight. Nearby
+solid terrain appears shadowed/transparent. Standing still allows restoration and
+can cause suffocation. The introductory test window is 10 seconds; later mutations
+can extend it. Use fuel and cooldown, never a persistent disabled flag after
+entrapment or mode changes. Leaching remains a separate mining mechanic.
+
+## D021 — permanent per-piece armor evolution (user direction, 2026-09-09)
+
+Each piece owns its counters, learning caps, anatomy and chosen evolutionary
+branches. Branches cannot be exchanged; a different specialization requires another
+piece. Material fusion uses biologically prepared ingredients, raises limits and
+protection/durability, and retains earned history. Rigid protection competes with
+flexibility and mutation capacity. No late-game profile switch may bypass those
+choices. The proposed exact frame tree and counter thresholds remain reviewable.
+
+## D022 — hungry armor and mutual symbiosis (user direction / tuning open)
+
+Resolves D017's empty-reserve question: early reserves are very small. Hungry armor
+hurts its wearer until mutual symbiosis is achieved. Afterwards it stops causing
+armor hunger pain; unfunded biological features stop. Self-mending and powered
+movement, light and related abilities consume biomass. Add automatic feeding,
+healing and flight after incorporating an actual Elytra. Food and suit fuel are
+distinct supplies. Enchantment policy in D012 remains open.
+
+The proposed four wearer tracks plus per-piece maturation, fed-use thresholds,
+damage cadence/severity, fatality and flight-rank numbers are not owner-approved
+rules. No optional health-to-biomass converter substitutes for the confirmed pain.
+
+## D023 — item catalog and prepared biological upgrades (user direction)
+
+Maintain a catalog covering the planned mod items. Use organs to bioactivate and
+fuse ingredients into treatments consumable by organs, tissues and equipment;
+direct raw-item application is not the universal improvement mechanism. Normal
+crafting remains useful for weak starter bodies. The Item Catalog owns preparation,
+with proposed Activation Cyst/Fusion Chrysalis roles and explicit early Bowl routes.
+Exact item recipes, source yields and availability require review before coding.
+
+## D024 — documentation review and publication (task-specific authorization)
+
+The owner requested cross-document consistency, a review PR, and inclusion of the
+item catalog and updated ingredient chains in that PR. Publish the documentation
+feature branch against V3_1.21.1; do not merge, change main or implement gameplay.
+This approval does not authorize unrelated future remote actions.
