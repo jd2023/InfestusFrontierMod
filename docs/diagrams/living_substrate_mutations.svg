@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1010" viewBox="0 0 1400 1010" role="img" aria-labelledby="title desc">
+  <title id="title">Living Substrate mutation and reinforcement</title>
+  <desc id="desc">Basic substrate is deliberately fed into young and then mature substrate. Mature tissue receives one primary function: plain foundation, transport, cultivation, defense, or services. Structural reinforcement and one protective lining are separate choices that preserve the selected function. Native bed families are described separately in the companion document.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L10 5L0 10Z" fill="#4e6553"/></marker>
+    <style>
+      text { font-family: DejaVu Sans, sans-serif; fill: #21382a; }
+      .title { font-size: 30px; font-weight: 700; }
+      .heading { font-size: 22px; font-weight: 700; }
+      .body { font-size: 18px; }
+      .small { font-size: 16px; fill: #4e6553; }
+      .line { fill: none; stroke: #4e6553; stroke-width: 2.5; }
+      .box { stroke: #739077; stroke-width: 2; }
+    </style>
+  </defs>
+  <rect width="1400" height="1010" rx="20" fill="#f7f6ee"/>
+  <text x="40" y="48" class="title">Living Substrate</text>
+  <text x="1360" y="46" text-anchor="end" class="small">Proposed growth and mutation paths</text>
+
+  <rect x="50" y="90" width="280" height="115" rx="24" class="box" fill="#eee5cf"/>
+  <text x="190" y="127" text-anchor="middle" class="heading">BASIC</text>
+  <text x="190" y="158" text-anchor="middle" class="body">Culture on exposed ground</text>
+  <text x="190" y="185" text-anchor="middle" class="small">Supports starter organs</text>
+  <path d="M330 147H551" class="line" marker-end="url(#arrow)"/>
+  <text x="440" y="119" text-anchor="middle" class="small">Bone meal or biomass</text>
+  <text x="440" y="179" text-anchor="middle" class="small">Player-selected feeding</text>
+
+  <rect x="560" y="90" width="280" height="115" rx="24" class="box" fill="#e0ecd4"/>
+  <text x="700" y="127" text-anchor="middle" class="heading">YOUNG</text>
+  <text x="700" y="158" text-anchor="middle" class="body">Joined veins, small pores</text>
+  <text x="700" y="185" text-anchor="middle" class="small">Established living ground</text>
+  <path d="M840 147H1061" class="line" marker-end="url(#arrow)"/>
+  <text x="950" y="119" text-anchor="middle" class="small">Further growth treatment</text>
+  <text x="950" y="179" text-anchor="middle" class="small">No uncontrolled spread</text>
+
+  <rect x="1070" y="90" width="280" height="115" rx="24" class="box" fill="#c8dfbc"/>
+  <text x="1210" y="127" text-anchor="middle" class="heading">MATURE</text>
+  <text x="1210" y="158" text-anchor="middle" class="body">Ready for specialization</text>
+  <text x="1210" y="185" text-anchor="middle" class="small">Maturity survives upgrades</text>
+
+  <path d="M1210 205V242H150V300M150 242H1250V300M425 242V300M700 242V300M975 242V300" class="line"/>
+  <rect x="480" y="261" width="440" height="32" rx="12" fill="#f7f6ee"/>
+  <text x="700" y="284" text-anchor="middle" class="heading">Choose ONE primary function</text>
+  <path d="M150 291V305" class="line" marker-end="url(#arrow)"/>
+  <path d="M425 291V305" class="line" marker-end="url(#arrow)"/>
+  <path d="M700 291V305" class="line" marker-end="url(#arrow)"/>
+  <path d="M975 291V305" class="line" marker-end="url(#arrow)"/>
+  <path d="M1250 291V305" class="line" marker-end="url(#arrow)"/>
+
+  <rect x="30" y="310" width="240" height="220" rx="20" class="box" fill="#edf0df"/>
+  <text x="50" y="346" class="heading">FOUNDATION</text>
+  <text x="50" y="385" class="body">Keep it plain</text>
+  <text x="50" y="418" class="body">Root organs</text>
+  <text x="50" y="451" class="body">Support living cover</text>
+  <text x="50" y="501" class="small">No functional graft</text>
+
+  <rect x="305" y="310" width="240" height="220" rx="20" class="box" fill="#dcecdf"/>
+  <text x="325" y="346" class="heading">TRANSPORT</text>
+  <text x="325" y="381" class="body">Biomass / fluid veins</text>
+  <text x="325" y="414" class="body">Item veins</text>
+  <text x="325" y="447" class="body">Steam / electricity</text>
+  <text x="325" y="480" class="body">Nerve signals</text>
+  <text x="325" y="510" class="small">One carrier per route</text>
+
+  <rect x="580" y="310" width="240" height="220" rx="20" class="box" fill="#e4edcc"/>
+  <text x="600" y="346" class="heading">CULTIVATION</text>
+  <text x="600" y="385" class="body">Crop beds</text>
+  <text x="600" y="418" class="body">Aquaculture beds</text>
+  <text x="600" y="451" class="body">Chorus orchard beds</text>
+  <text x="600" y="501" class="small">Match plant and habitat</text>
+
+  <rect x="855" y="310" width="240" height="220" rx="20" class="box" fill="#f0ded4"/>
+  <text x="875" y="346" class="heading">DEFENSE</text>
+  <text x="875" y="385" class="body">Digestive tissue</text>
+  <text x="875" y="418" class="body">Restraining tissue</text>
+  <text x="875" y="501" class="small">Damage OR restraint</text>
+
+  <rect x="1130" y="310" width="240" height="220" rx="20" class="box" fill="#e3e2ef"/>
+  <text x="1150" y="346" class="heading">SERVICES</text>
+  <text x="1150" y="381" class="body">Light / travel</text>
+  <text x="1150" y="414" class="body">Healing</text>
+  <text x="1150" y="447" class="body">Mining boundaries</text>
+  <text x="1150" y="480" class="body">Worker waypoints</text>
+  <text x="1150" y="510" class="small">One selected service</text>
+
+  <text x="700" y="568" text-anchor="middle" class="body">All forms remain substrate. An organ still requires its specified footing and bed family.</text>
+
+  <rect x="30" y="600" width="1340" height="370" rx="24" fill="#efede2" stroke="#b7b59e"/>
+  <text x="55" y="638" class="heading">Independent reinforcement — keep the maturity and function</text>
+  <rect x="65" y="665" width="300" height="90" rx="20" class="box" fill="#f7f6ee"/>
+  <text x="215" y="701" text-anchor="middle" class="heading">Unreinforced</text>
+  <text x="215" y="730" text-anchor="middle" class="small">Starter organs and paths</text>
+  <path d="M365 710H542" class="line" marker-end="url(#arrow)"/>
+  <text x="455" y="689" text-anchor="middle" class="small">Bone Plates</text>
+  <rect x="550" y="665" width="300" height="90" rx="20" class="box" fill="#e9dfc7"/>
+  <text x="700" y="701" text-anchor="middle" class="heading">Bone-ribbed</text>
+  <text x="700" y="730" text-anchor="middle" class="small">Stronger footing and veins</text>
+  <path d="M850 710H1027" class="line" marker-end="url(#arrow)"/>
+  <text x="940" y="682" text-anchor="middle" class="small">Tempered</text>
+  <text x="940" y="701" text-anchor="middle" class="small">Bone Plates</text>
+  <rect x="1035" y="665" width="300" height="90" rx="20" class="box" fill="#d8d6bd"/>
+  <text x="1185" y="701" text-anchor="middle" class="heading">Tempered-ribbed</text>
+  <text x="1185" y="730" text-anchor="middle" class="small">Industrial organ foundations</text>
+
+  <text x="55" y="800" class="body">PLUS one compatible lining — these are alternatives, not successive levels:</text>
+  <rect x="65" y="820" width="295" height="65" rx="18" fill="#f7f6ee" stroke="#b7b59e"/>
+  <text x="212" y="859" text-anchor="middle" class="heading">None / open pores</text>
+  <rect x="390" y="820" width="295" height="65" rx="18" fill="#dcecdf" stroke="#b7b59e"/>
+  <text x="537" y="859" text-anchor="middle" class="heading">Sealed membrane</text>
+  <rect x="715" y="820" width="295" height="65" rx="18" fill="#f0ded4" stroke="#b7b59e"/>
+  <text x="862" y="859" text-anchor="middle" class="heading">Heat lining</text>
+  <rect x="1040" y="820" width="295" height="65" rx="18" fill="#e3e2ef" stroke="#b7b59e"/>
+  <text x="1187" y="859" text-anchor="middle" class="heading">Spatial weave</text>
+  <text x="700" y="930" text-anchor="middle" class="body">Example: mature substrate + fluid vein + bone ribs + heat lining = a reinforced hot-fluid route.</text>
+  <text x="700" y="995" text-anchor="middle" class="small">Native bed families: ordinary, Nether thermal, End anchored, and long-term Fold adaptive.</text>
+</svg>
