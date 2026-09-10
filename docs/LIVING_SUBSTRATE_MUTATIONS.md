@@ -24,31 +24,31 @@ Maturity does not decay when the player leaves. An unfed active function pauses;
 
 Each cell has **one primary function**. Mutating it does not remove its ability to serve as a foundation, but an organ may require particular cells in its footprint to remain plain, reinforced or dimension-native. It must show those requirements before construction.
 
-The ingredients below are proposed grafts applied to the existing cell, not recipes for replacing it with an unrelated machine. Operating supplies are separate from graft ingredients.
+[Item Catalog](ITEM_CATALOG.md) defines how the prepared ingredients are grown. Raw ingredients are not applied directly as functional mutations. The ingredients below are proposed grafts applied to the existing cell, not recipes for replacing it with an unrelated machine. Operating supplies are separate from graft ingredients.
 
 | Functional form | Apply / requirement | What the cell does | Operating supply |
 |---|---|---|---|
 | **Plain mature foundation** | No functional graft. | Roots ordinary organs; leaves the surface available for living ground cover. | No idle upkeep. |
-| **Lumen Tissue** | Glow ink sac; glowstone dust alternative. | Lights a floor, wall or ceiling through luminous pores. | No continuing fuel. |
-| **Biomass Vein** | Slime ball + biomass. | Carries biomass through a recessed green lumen. | A supplied pumping junction; the vein creates no biomass. |
-| **Fluid Vein** | Glass bottle + Membrane Sheet. | Carries one selected liquid; hot liquids require heat lining. | Pumping supply and a receiving tank/consumer. |
-| **Item Vein** | String + leather. | Carries item packets along configured faces. | Connected transfer organs and free destination space. |
-| **Nerve Tissue** | Redstone dust + string. | Carries control signals, separate from resources and power. | Input signal; no biomass upkeep. |
+| **Lumen Tissue** | Lumen Secretion. | Lights a floor, wall or ceiling through luminous pores. | No continuing fuel. |
+| **Biomass Vein** | Capillary Gel. | Carries biomass through a recessed green lumen. | A supplied pumping junction; the vein creates no biomass. |
+| **Fluid Vein** | Filter Membrane + Sealing Resin. | Carries one selected liquid; hot liquids require heat lining. | Pumping supply and a receiving tank/consumer. |
+| **Item Vein** | Contractile Fiber. | Carries item packets along configured faces. | Connected transfer organs and free destination space. |
+| **Nerve Tissue** | Synaptic Gel. | Carries control signals, separate from resources and power. | Input signal; no biomass upkeep. |
 | **Steam Vein** | Mutate a Fluid Vein with Thermal Lining + Bone Plate. | Carries steam; uses the heat lining slot and needs a condensate outlet. | Supplied steam; pressure falls as work and heat are lost. |
-| **Conductive Tissue** | Copper + redstone dust. | Carries electricity through a separate circuit. | Actual electrical input. |
-| **Cultivation Tissue** | Hoe the mature cell, then apply the selected seed. The hoe is not consumed. | Grows crops with separate seed and harvest reserves. | Water; optional biomass-assisted growth. |
-| **Aquaculture Bed** | Kelp + prismarine shard, while submerged. | Supports the selected aquatic planting or husbandry recipe. | Water habitat, stock and nutrients. |
-| **Chorus Orchard Tissue** | Chorus flower + bone meal on mature Anchored Substrate in the End. | Supports a tended, harvestable chorus garden. | Planting stock and nutrients. |
-| **Digestive Tissue** | Fermented spider eye + slime ball. | Damages susceptible occupants without the required full bio suit; collects biomass from actual damage. | No continuous feed in the basic form; export its finite collected reserve. Full storage stops collection, not the damage. |
-| **Restraining Tissue** | Cobweb + slime ball; spider genome. | Slows or holds a susceptible target instead of harvesting it. | Biomass while restraining. |
-| **Travel Tissue** | Sugar + rabbit hide. | Speeds an eligible full bio suit with a locomotion mutation. | The wearer's suit biomass. It does not give unaided flight. |
-| **Restorative Tissue** | Golden apple + honey bottle. | Gradually heals an authorized injured occupant. | Biomass per actual healing. |
-| **Surveyed Tissue** | Amethyst shard + bone meal; configure its boundary with the tool. | Defines a finite mining footprint flush with the ground. | No idle upkeep; the mining organ supplies the work. |
-| **Worker Waypoint** — optional | String + paper; link to a nursery. | Marks a route or separate waiting berth without a raised trail block. | No independent upkeep; the worker uses its own supply. |
+| **Conductive Tissue** | Conductive Myelin; SR4. | Carries electricity through a separate circuit. | Actual electrical input. |
+| **Cultivation Tissue** | Hoe the mature cell, then apply Rooting Gel and the selected seed. The hoe is not consumed. | Grows crops with separate seed and harvest reserves. | Water; optional biomass-assisted growth. |
+| **Aquaculture Bed** | Aquaculture Graft, while submerged. | Supports the selected aquatic planting or husbandry recipe. | Water habitat, stock and nutrients. |
+| **Chorus Orchard Tissue** | Chorus Orchard Graft on mature Anchored Substrate in the End. | Supports a tended, harvestable chorus garden. | Planting stock and nutrients. |
+| **Digestive Tissue** | Digestive Enzyme. | Damages susceptible occupants without the required full bio suit; collects biomass from actual damage. | No continuous feed in the basic form; export its finite collected reserve. Full storage stops collection, not the damage. |
+| **Restraining Tissue** | Restraining Graft; spider genome. | Slows or holds a susceptible target instead of harvesting it. | Biomass while restraining. |
+| **Travel Tissue** | Locomotor Gel. | Speeds an eligible full bio suit with a locomotion mutation. | The wearer's suit biomass. It does not give unaided flight. |
+| **Restorative Tissue** | Restorative Serum. | Gradually heals an authorized injured occupant. | Biomass per actual healing. |
+| **Surveyed Tissue** | Survey Gel; configure its boundary with the tool. | Defines a finite mining footprint flush with the ground. | No idle upkeep; the mining organ supplies the work. |
+| **Worker Waypoint** — optional | Waymark Secretion; link to a nursery. | Marks a route or separate waiting berth without a raised trail block. | No independent upkeep; the worker uses its own supply. |
 
 **Further mutations refine that function.** Examples: a rabbit-genome graft improves a Travel Tissue route's acceleration; a slime graft improves Item Vein packet handling; a spider graft changes Digestive Tissue's damage/slow balance. These are not additional simultaneous primary functions.
 
-**Crossings and steps are route modifications.** A Membrane Sheet + Bone Plate creates a Septum Crossing with two isolated passages of the same carrier type. String + Membrane Sheet creates a Vascular Stitch over a visible terrain step. A crossing does not join its routes. A junction does. Floor, wall and ceiling placement use the same functional forms.
+**Crossings and steps are route modifications.** A Membrane Sheet + Bone Plate creates a Septum Crossing with two isolated passages of the same carrier type. Contractile Fiber + Membrane Sheet creates a Vascular Stitch over a visible terrain step. A crossing does not join its routes. A junction does. Floor, wall and ceiling placement use the same functional forms.
 
 ## 3. Reinforce it without changing its job
 
@@ -59,8 +59,8 @@ A cell has **one structural framework** and **one optional lining**, independent
 | Framework | Apply | Benefit | Cost / limit | Visible change |
 |---|---|---|---|---|
 | **Unreinforced** | Starting form. | Supports starter organs and ordinary paths. | Does not satisfy an advanced organ's reinforced-footprint requirement. | Soft continuous tissue. |
-| **Bone-ribbed** | Bone Plates grown in the Bone Loom. | Greater physical resistance; reinforced mounting points; a vein can use a higher pressure/transfer rating when its pump also supports it. | Costs plates on each upgraded cell. Does not add a second route or pump. | Curved pale ribs around the edges, leaving the functional center visible. |
-| **Tempered-ribbed** | Upgrade existing bone ribs with Tempered Bone Plates from a Nether Thermal Mantle. | Stronger industrial footing for large mining bodies, pressure organs and heavy defense. | Higher material cost and harder removal with an ordinary tool. Not indestructible and not a universal boss-proof surface. | Thicker, darker ribs; still organic rather than a flat metal casing. |
+| **Bone-ribbed** | Skeletal Graft grown in the Bone Loom. | Greater physical resistance; reinforced mounting points; a vein can use a higher pressure/transfer rating when its pump also supports it. | Costs plates on each upgraded cell. Does not add a second route or pump. | Curved pale ribs around the edges, leaving the functional center visible. |
+| **Tempered-ribbed** | Upgrade existing bone ribs with a Tempered Skeletal Graft made from a Nether-tempered plate. | Stronger industrial footing for large mining bodies, pressure organs and heavy defense. | Higher material cost and harder removal with an ordinary tool. Not indestructible and not a universal boss-proof surface. | Thicker, darker ribs; still organic rather than a flat metal casing. |
 
 Tempered ribs replace the bone-rib grade; the two grades are not separately stacked bonuses. The original investment remains part of the block's recovered form. Reinforcing a support cell does not improve the speed, armor or fuel economy of every machine above it: the host receives only the benefit its anatomy specifies.
 
@@ -69,7 +69,7 @@ Tempered ribs replace the bone-rib grade; the two grades are not separately stac
 | Lining | Apply | Where it helps | Where it does not |
 |---|---|---|---|
 | **None** | Starting form. | Open pores for ordinary foundation and crop beds. | No specialized chemical, thermal or spatial protection. |
-| **Sealed membrane** | Membrane Sheets + resin or slime binder. | Biomass-handling floors, recovery channels and process-room containment against the specified biological fluids. | Not a blanket immunity to every modded fluid. An open root-growing crop cell cannot also be sealed. |
+| **Sealed membrane** | Sealing Resin. | Biomass-handling floors, recovery channels and process-room containment against the specified biological fluids. | Not a blanket immunity to every modded fluid. An open root-growing crop cell cannot also be sealed. |
 | **Heat lining** | Thermal Lining grown in a Nether Thermal Nursery. | Lava-carrying Fluid Veins, Steam Veins and hot-workshop surfaces. Insulates the tissue itself and raises its permitted operating temperature. | Does not grant the player fire resistance or turn an Overworld bed into Nether-native substrate. |
 | **Spatial weave** | Spatial Membrane grown and conditioned in the End. | Anchor/gate foundations and declared spatial-process connections. Supports their stabilization requirements. | Does not provide heat lining, free teleportation or End-native production outside the End. |
 
@@ -81,15 +81,17 @@ Native mutation changes the **kind of living bed**, not its reinforcement grade.
 
 | Native bed | Treatment and place | What it enables |
 |---|---|---|
-| **Thermal Substrate** | Magma cream + netherrack, followed by local feeding in the Nether. | Thermal Nursery and Nether-native Thermal Mantle foundations. |
-| **Anchored Substrate** | End stone + chorus fruit + ender pearl, followed by local conditioning in the End. | Spatial Nursery, Spatial Conditioner and Chorus Orchard foundations. |
-| **Adaptive Substrate** — long-term | Culture + Spatial Membrane grafted into local root-bearing ground in the Fold, followed by local phase exposure. | Founder Nursery and phase-dependent native habitats. This branch starts from the local ground, not from an imported ordinary bed. |
+| **Thermal Substrate** | Thermal Seed, followed by local feeding in the Nether. | Thermal Nursery and Nether-native Thermal Mantle foundations. |
+| **Anchored Substrate** | Anchor Seed, followed by local conditioning in the End. | Spatial Nursery, Spatial Conditioner and Chorus Orchard foundations. |
+| **Adaptive Substrate** — long-term | Adaptive Seed grafted into local root-bearing ground in the Fold, followed by local phase exposure. | Founder Nursery and phase-dependent native habitats. This branch starts from the local ground, not from an imported ordinary bed. |
 
 Changing family preserves installed reinforcement only if compatible; the preview identifies any lining that must be replaced. The new native bed needs local maturation before native production starts. Removing and placing it elsewhere preserves the block, but cannot transplant the dimension's growing conditions.
 
 Ordinary veins and service surfaces may use a native bed where their recipe and environment permit. That does not make ordinary crops grow in lava or allow an Anchored Substrate block to operate a Thermal Nursery.
 
 ## 5. Rework and preserve the base
+
+These are **tissue reconfiguration** rules. Armor branches are permanent; a tissue tool cannot remove or exchange an armor graft.
 
 - **Change function:** Isolate the cell, drain fluid or return held items to storage, then remove the functional graft with the configuration tool and apply the new recipe. Keep maturity and compatible reinforcement. Used graft ingredients are not refunded, preventing free repeated recipe changes.
 - **Change lining:** Keep the old lining until a compatible replacement is confirmed. Refuse the change if it would expose a hot/chemical route, break an occupied structure or require somewhere to put material that has no available container.

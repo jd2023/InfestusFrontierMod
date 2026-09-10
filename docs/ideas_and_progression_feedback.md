@@ -1,5 +1,9 @@
 # Living colony design notebook — ideas and progression
 
+Specific designs: [Item Catalog](ITEM_CATALOG.md) owns ingredients and preparation; [Block Catalog](BLOCK_CATALOG.md) owns organs; [Armor Evolution](ARMOR_EVOLUTION.md) owns permanent equipment branches; [Guide Tree](GUIDE_PROGRESSION_TREE.md) owns the chapter dependency map. This notebook explores play and alternatives, not a second competing recipe table.
+
+Raw ingredients build basic bodies; Culture Bowl/Activation Cyst prepare active treatments, mineral organs prepare fusion media, and Fusion Chrysalis makes target-specific consumable grafts. Materials are biologically processed before functional improvement, not merely clicked onto equipment. Ordinary food, fuel, planting stock, dyes and maturity bone meal remain direct supplies.
+
 Version 0.3, updated 2026-09-08. **Working design, not approved implementation scope.**
 Owner: etf. Read the [assessment](IDEAS_REVIEW.md) first for highlights, objections
 and the reasoning behind substantial changes.
@@ -67,7 +71,7 @@ HUD changes. Keep production recipes, names, limits and save formats uncommitted
 | Ground-level boundaries and access | Mutated substrate perimeter, luminous stairs/tendons and increased root headroom | Preferred construction language; final geometry open |
 | Suit biomass and HUD | Persistent reserve, explicit feeding, full-set display, half-transparent movable/hideable HUD | Display experiment tested; broad activity/repair costs requested for future work |
 | Aggressive biomass spills | Discussed only; no flowing spill or rupture test | Owner idea; pressure, containment and failure policy are proposals |
-| Burrowing | Renewed discussion of underground movement | Meaning/implementation not confirmed; not a tested suit ability |
+| Burrowing | Ground-only temporary solid passage | Owner-confirmed movement; finite fuel/cooldown, 10-second introductory stopping window; suffocation risk remains |
 
 ### Working vocabulary
 
@@ -101,8 +105,10 @@ not ten fixed machines, not a universal endgame suit.
 small culture. The guide shows a sheltered patch beside your existing home; you
 do not abandon vanilla equipment or build a laboratory first. A dormant flesh
 chestpiece looks folded and unresponsive. You awaken it in a simple fed cradle.
-Its seams flex, and a small repair happens visibly. If host feeding is accepted,
-the tutorial warns before demonstrating it; the beginner is not ambushed by damage.
+Its seams flex; installing Repair Membrane allows visible mending using real fuel.
+Before awakening, the guide warns that empty reserves cause pain until full
+symbiosis. The player learns to fill the piece before wearing it, not by a forced
+injury demonstration.
 
 You immediately face a small choice: spend the next biomass on the chestpiece's
 reserve, extend the substrate to your garden, or save enough to awaken boots.
@@ -136,27 +142,27 @@ not a fixed time promise.
 
 ## 2. Progression: changes in responsibility, not just bigger machines
 
-Keep the old R0–R9 labels only as reference coordinates for now. A player's visible
+Use SR0–SR9 as the chapter coordinates defined in the Guide Tree. The scenes below illustrate play within each chapter, not additional mandatory rank gates. A player's visible
 rank should follow useful achievements and understandable research, not be a
 separate bureaucracy. Several routes can meet each capability milestone; teams
 should not repeat the same infrastructure ceremony for every member.
 
 | Reference era | A concrete first reward | What the player now designs | A useful proof of readiness |
 |---|---|---|---|
-| R0 Contact | Awaken one useful equipment piece | A fed patch and a safe first repair | Make and use the piece; understand its food |
-| R1 Circulation | Automatic refilling and basic harvest support | Shared supply with a protected starter reserve | Two useful services replenish without hand feeding |
-| R2 Differentiation | First directed specialist adaptation | Sample sorting, research and a configurable chamber | Resolve a chosen common genome and grow a usable expression |
-| R3 Thermal work | Larger downward excavation and thermal processing | A Nether-native nursery plus heat/steam support | Export a useful native product without stranding the outpost |
-| R4 Precision | Better rare-sample recovery and regulated processes | Electrical support, separation and competing service demands | A valuable precision batch survives an input interruption |
-| R5 End foothold | Local anchoring and spatial conditioning | An accessible, defensible End workshop | Produce locally and preserve a safe return method |
-| R6 Distributed colony | Constructed transit and bounded freight | Several autonomous buffered districts | Complete a useful cross-world order through staged operation |
-| R7 Mastery | Richer organ assemblies and coordinated loadouts | Efficiency, resilience, footprint or expedition readiness | Finish a chosen ambitious build, not one mandatory megafactory |
-| R8–R9 Horizon | A distinct alien ecology and new boss chapter | Responsive local habitats and combined combat/infrastructure | Establish a foothold, understand and overcome an optional encounter |
+| SR0 Contact | Awaken one useful equipment piece | A fed patch and a safe first repair | Make and use the piece; understand its food |
+| SR1 Circulation | Automatic refilling and basic harvest support | Shared supply with a protected starter reserve | Two useful services replenish without hand feeding |
+| SR2 Directed Mutation | First directed specialist adaptation | Sample sorting, research and a configurable chamber | Resolve a chosen common genome and grow a usable expression |
+| SR3 Thermal Colony | Larger downward excavation and thermal processing | A Nether-native nursery plus heat/steam support | Export a useful native product without stranding the outpost |
+| SR4 Precision | Better rare-sample recovery and regulated processes | Electrical support, separation and competing service demands | A valuable precision batch survives an input interruption |
+| SR5 End Colony | Local anchoring and spatial conditioning | An accessible, defensible End workshop | Produce locally and preserve a safe return method |
+| SR6 Distributed colony | Constructed transit and bounded freight | Several autonomous buffered districts | Complete a useful cross-world order through staged operation |
+| SR7 Synthesis | Richer organ assemblies and coordinated loadouts | Efficiency, resilience, footprint or expedition readiness | Finish a chosen ambitious build, not one mandatory megafactory |
+| SR8–SR9 Horizon | A distinct alien ecology and new boss chapter | Responsive local habitats and combined combat/infrastructure | Establish a foothold, understand and overcome an optional encounter |
 
 **Important revision proposal:** steam and electrical precision give the owner's
 resource ideas a stronger role than the earlier map's long list of invented fluids.
 Do not retain every old reagent on top of these services by default. Older names
-such as catalytic ichor and regulatory matrix are still candidates, not obligations.
+are role descriptions: early precision material maps to Prepared Genetic Suspension; later catalyst service maps to Catalyst Culture; Fold regulatory material maps to Adaptive Gel in the Item Catalog, not additional unnamed currencies.
 
 Three campaign styles illustrate choices without becoming classes:
 
@@ -195,9 +201,8 @@ limited improvement budget; extractable/reusable counters and XP.
    no arbitrary list of new metals is needed.
 5. **Directed specialist.** Install researched expressions that solve a chosen job.
 6. **Practiced specialist.** Ordinary use improves handling or efficiency within
-   that chosen design. A refit can preserve relevant learning.
-7. **Mature lineage.** Archive learning, grow a successor or reconfigure an existing
-   piece. New architecture does not erase the relationship with the old equipment.
+   that chosen design. A forward fusion preserves relevant learning without exchanging the chosen lineage.
+7. **Mature lineage.** Archive compatible learning or grow another specialized piece. New architecture does not erase the relationship with the old equipment.
 
 ### Ways to evolve it, and why they are not interchangeable
 
@@ -209,7 +214,7 @@ limited improvement budget; extractable/reusable counters and XP.
 | Material fusion | Structural support, durability or a particular interface | Knowledge or free fuel |
 | Reservoir growth | Field endurance | Higher instantaneous output or universal specialization |
 | Metabolic development | Sustainable output and recovery behavior | A second incompatible body plan |
-| Colony-assisted conditioning | Reliable expression/refitting in a chamber | Passive permanent upgrades from merely standing at home |
+| Colony-assisted conditioning | Reliable forward growth in a chamber | Passive permanent upgrades from merely standing at home |
 | Consumable chemistry | Temporary expedition preparation | A permanent mutation or duplicated potion |
 | Curios support organ | A useful adjunct or control function | Unlimited extra suit capacity |
 | Memory transfer | Moves earned, compatible learning | Cloned progress or conversion of running into combat mastery |
@@ -237,17 +242,15 @@ specialists' demanding sustained tasks.
 
 Individual pieces provide local benefits. Full-suit functions require a coherent
 attuned set and specified traits, not any four vaguely biological items. Mixed
-sets cannot collect several complete-set bonuses. Refit previews show what turns
-off before the player commits. Dye, visible player skin, trims where supported,
+sets cannot collect several complete-set bonuses. Fusion previews show permanent exclusions before the player commits. Dye, visible player skin, trims where supported,
 durability, name and relevant item data remain explicit compatibility requirements;
 mutation should not silently wipe cosmetic identity.
 
 ### Feeding, learning transfer and loss
 
-**Recommendation, not a settled change to the owner's premise:** host feeding is
-a taught, bounded emergency option, with a minimum-health stop and no unattended
-death. An empty tank disables demanding functions before repeatedly injuring the
-wearer. A different, harsher hunger model can be discussed explicitly.
+**Owner direction:** empty biomass reserves hurt the wearer until full mutual symbiosis. Afterwards, armor no longer causes hunger pain; unpaid biological features stop. This is not an opt-in health converter. Warn before reserves run out; teach refueling and removal without promising safety when already inside rock or lava.
+
+Each armor piece has permanent material and trait branches, its own counters and finite anatomy. Start another piece for an incompatible specialization. Auto-feeding consumes real food, auto-healing spends biomass, and Nutrient Intake transfers real stored biomass. Elytral flight incorporates an actual Elytra. [Armor Evolution](ARMOR_EVOLUTION.md) owns the complete proposed counters, material tree and ability costs; its wearer-versus-piece adaptation representation remains an open proposal.
 
 An archive capsule should transfer typed learning in a chamber. The source loses
 the transferred amount in the same operation that the destination gains it.
@@ -256,7 +259,7 @@ only into compatible anatomy; dormant knowledge can wait without supplying an
 active bonus. Minecraft XP, if used at all, is a separate disclosed catalyst,
 not an exchange rate turning any counter into any ability.
 
-A routine refit preserves progress; death consequences remain open. Recommend a
+Forward evolution preserves progress and permanent choices; death consequences remain open. Recommend a
 recoverable dormant item and optional prepared memory backup over erasing weeks
 of practice. Backup recovery must consume/reconcile the archived value, not duplicate
 it while the original suit is still usable. Swapping gear must preserve cooldowns.
@@ -265,38 +268,15 @@ it while the original suit is still usable. Swapping gear must preserve cooldown
 of refill outposts and install richer traversal functions. Both create base/travel
 decisions rather than one mathematically dominant armor bar.
 
-**Open:** host feeding severity; practice versus Minecraft XP semantics; archive
-loss/cost; whether partial-genome traits can be installed; exact enchantment policy.
+**Open:** hunger-pain severity and symbiosis ownership/thresholds; practice versus Minecraft XP semantics; archive
+loss/cost; exact enchantment policy. Creature-derived armor grafts require complete matching DNA; host grafts do not.
 No illustrative capacity or training threshold is yet balance data.
 
-### Latest experiment: a visible metabolic reserve
+### Metabolic play
 
-**Owner direction, reaffirmed 2026-09-08:** a complete bio suit should show its
-biomass supply. Activities should eventually consume that supply, including
-combat and self-mending. Those costs remain future work; combat was unchanged
-during the HUD experiment. The display needs a half-transparent
-background and player options to move or disable it.
+A complete suit displays combined fuel and metabolic output with movable, hideable HUD and half-transparent background. Each piece retains its own real reserve. Low fuel names the abilities that will pause; warning controls are separate from routine HUD visibility.
 
-**Tested prototype:** the chest piece owns a persistent reserve, initially empty;
-removing a suit piece hides the meter without deleting fuel. Explicit feeding and
-native item synchronization work. The HUD uses a roughly 50%-opaque background,
-four-corner placement and adjustable offsets, with a client-only visibility switch.
-Native configuration controls/save and eight client capture states were checked.
-The prototype's 1,000 capacity and 250-per-flesh dose are test tuning, not production
-requirements. Fighting a spider currently does **not** drain this reserve.
-
-**Proposal:** account separately for successful powered actions, sustained active
-functions and actual repaired durability. Do not charge for both an attempted hit
-and its damage callback, or spend repair fuel when nothing was repaired. Distinguish
-fuel consumption from practice awards so self-inflicted damage cannot cheaply
-train the suit. Ordinary activity accounting should be bounded event handling or
-coarse active intervals, not a new scan/ticker on every piece of equipment.
-
-**Open:** which ordinary actions cost fuel; whether basic protection works when
-empty; repair rate and cost; priority between emergency defense, travel and repair;
-refill from colony stores; full-set versus per-piece reserve behavior. Warn before
-losing a powered function. A disabled HUD must not disable costs or grant immunity.
-Later burrowing must explain its empty-reserve escape behavior before implementation.
+Pay for useful powered actions and actual repair, not attempted actions or repeated callbacks. Self-inflicted injury and fuel transfer do not create practice. Armor's five counters and maturation are bounded state, not a log of every action. Shared fuel, priorities and early hunger pain follow Armor Evolution. Burrowing interruption may leave a player inside terrain: prepare light, fuel, stability and an exit; there is no guaranteed rescue.
 
 ## 4. Tools: field precision survives industrial automation
 
@@ -1396,33 +1376,11 @@ cross-dimensional connections; explore flight and moving underground/through wal
 | Cross-dimensional gate | Connect established colonies | Native conditioning, endpoint ownership and safe transaction |
 | Freight link | Move bulk production | Independent throughput, buffers and reservations |
 
-Burrowing has two fundamentally different meanings: excavating a real passage,
-or temporarily crossing terrain without harvesting it. Keep them separate. The
-latter cannot give both free ore and teleportation, bypass protected walls or
-leave a player inside a solid block. Consider an inspected short path through
-eligible natural terrain with validated exit and fail-without-moving behavior.
-Do not claim the specific remembered Ars spell has been identified; the checked
-Burrowing reference is an excavation ritual, as noted in the review.
+**Burrowing is confirmed non-excavating travel.** While active inside eligible ground, nearby hard terrain appears shadowed/transparent and the player can move through it in all directions, including up and down. No mined items or permanent tunnel are produced. It cannot become open-air flight.
 
-**Renewed discussion, 2026-09-08:** the owner asked about "borrowing capability."
-The assistant interpreted this as **burrowing**, consistent with the earlier
-underground-travel idea, but the owner has not yet confirmed the exact meaning.
-Do not turn that interpretation into an approved armor mutation.
+Stopping permits terrain to return; remaining embedded can cause suffocation. The introductory proposed stopping window is 10 seconds, with later mutations extending it. Fuel and cooldown limit use, with no permanent disabled state after entrapment, spectator recovery or mode changes. Light is a separate helmet capability, not automatically supplied by Stone Sense.
 
-One new **proposal** connects it to Manual Leaching: a specialized suit might
-burrow efficiently through prepared rock, while untouched geology requires a
-stronger expression and more biomass. Two different experiments would be needed:
-
-- **Excavating movement:** the player leaves an actual traversable passage. Account
-  for block removal, protected terrain, native ore/tool rules and bounded spoil.
-- **Non-excavating passage:** the player crosses eligible material without harvest.
-  Validate a short route and safe endpoint; never leave them embedded, stranded
-  when fuel runs out, or able to pass through claims, bedrock and arbitrary buildings.
-
-The synergy should not make a second treatment step mandatory for ordinary mining.
-First clarify the movement fantasy, whether a tunnel remains, what ores do, and
-how interruption or depleted fuel returns the player to safety. Neither option
-is currently a tested suit capability. The parked hostile-fluid lift stays parked.
+Manual Leaching remains a different tool: weaken real host rock and leave ores to mine normally. Leaching is not a compulsory Burrowing prerequisite. Safe excavated stairs/tunnels remain valuable for repeated traffic. Exact eligible terrain, protection checks and implementation budgets still require specification. The hostile-fluid lift remains parked.
 
 An advanced gate connects prepared, authorized endpoints. Portable field anchors
 could speed deployment but must not remove the reason to build a permanent station.
@@ -1710,8 +1668,7 @@ configuration is explained and repairable. A dangerous operating mode may cause 
 bounded, warned local incident only when the player has chosen to run it under
 understood conditions. Hardware lag is not a biological disaster mechanic.
 
-Starvation should first reduce demanding work, protect a declared reserve and leave
-the colony recoverable. An expensive batch needs a disclosed suspension/abort rule.
+Organ starvation reduces demanding work, protects a declared reserve and leaves the colony recoverable. Armor separately inflicts hunger pain before full symbiosis. An expensive batch needs a disclosed suspension/abort rule.
 Buffers, valves and starter reserves are available before the dangerous process.
 The restoration path must not require the product the stopped machine uniquely makes.
 
@@ -1866,43 +1823,43 @@ Earliest eras are provisional; native foundations still apply where specified.
 
 | Family / working function | Earliest era | Operating service | Material in → useful out | Configuration that earns its existence |
 |---|---|---|---|---|
-| Awakening cradle | R0 | Small B batch/manual organic feed | Dormant item + culture → awakened item | Safe first process; later chamber mode candidate |
-| Digestion organ | R1 | Consumes organic input; optional B starter | Permitted surplus → B | Feed protection, yield/rate, accepted inputs |
-| Reservoir | R1 | Passive storage | B or compatible fluid in → same fluid out | Shape, reserve and access; no transmutation |
-| Vascular junction/stalk | R1 | Small active B cost if justified | Routed material → selected destinations | Direction, split, priority, reservoir mounting |
-| Item capsule/access organ | R1 | Passive local storage; powered remote requests later | Items in → identical data-bearing items out | Bulk/mixed policy, filters, growth, access |
-| Rooted tender | R1 | B; real water/feed where required | Mature permitted crops → harvest/replanted plot | Work area and seed reserve; drone alternative |
-| Husbandry station | R1–R2 | B + feed | Managed animals → byproducts/controlled harvest | Population, young/adult policy, output reserve |
-| Aquaculture nursery | R2 optional | B + real feed/water habitat | Stock/bait → fish or declared specimens | Food versus specimen profile; no free treasure |
-| Kitchen/conditioning chamber | R1–R2 optional | B and optional T | Actual food ingredients → meals/provisions | Batch versus flexible orders; chemistry attachment later |
-| Sample preparation attachment | R2 | B; T/E improve defined profiles | Specimens → prepared material | Separation/yield, protect rare evidence |
-| Genome resolving chamber | R2 | B; T/E for precision modes | Prepared specimens → material + new knowledge | Precision, throughput, evidence categories |
-| DNA bank/archive | R2 | Passive retained knowledge; powered active work | Specimens/templates in; authorized queries/transfers out | Finite queue, atlas, ownership; not a resource generator |
-| Mutation chamber | R2 | B; T/E for demanding expressions | Target + stock + materials → modified target | Anatomy, exchange/support attachments, previews |
-| Memory transfer attachment | R2 | B; E optional advanced handling | Typed learning in source → compatible archive/target | Atomic transfer, retained identity; no progress cloning |
-| Repair/refill station | R1–R2 | B | Stored feed → repaired/refuelled eligible equipment | Reserve/priority and access; shares chamber anatomy |
-| Exploration borer | R2 | B | Real selected terrain → loot + traversable descent | Extent, depth, route, spoil and safe access |
-| Industrial excavator | R3–R4 | B + T; E optional precision | Real terrain + supplied access parts → galleries/shaft access | Profile, lining, branches and sustained hauling |
-| Mineral separation chamber | R2–R4 | B; T then E by profile | Actual ore → recipe-accounted outputs | Speed, recovery, byproduct choice and support |
-| Native thermal nursery | R3, Nether only | B + local heat | Starter culture/local inputs → thermal lining | Native maturity; dry bootstrap and improved exchange |
-| Heat/steam exchange organ | R3 | B + heat input; water for steam mode | Declared thermal/water inputs → work and recovery outputs | Buffer, pressure/profile, relief and recovery |
-| Condensing/recovery attachment | R3 | Uses supplied spent process stream | Spent steam/medium → bounded recovered inputs | Useful recovery versus footprint; no positive-energy loop |
-| Electrocyte generator | R4 | B and a defined metabolic/thermal input | Actual feed/work → E with losses | Steady versus burst support; no E needed to bootstrap itself |
-| Charge sac/interface | R4 | E storage/exchange | Charge in → bounded charge out | Reserve and optional approved FE adapter |
-| Regulator/sensor organ | R1 simple; R4 advanced | Passive/simple signal; B/E for advanced service | Local state → bounded commands | Threshold, hysteresis, priority and safe shutdown |
-| Watch/attraction/repulsion organ | R2 optional | B; E for selected expression | Supplied service → eligible local behavior | Targets/radius/cooldown; not universal boss control |
-| Ground/aerial defense family | R2; stronger R3–R4 | B, T or E by expression; real ammunition if used | Supplies → bounded attacks/control | Range, line of sight, target and reload tradeoffs |
-| Restorative/restraint tissue support | R2–R4 optional | B; E/T only if function needs it | Supplies → local eligible effect | Deliberate active area; safe public corridors |
-| Brood station | R2 optional | B + growth materials | Reserved population slots → bounded workers | Assigned jobs, hatch clearance, recall and relocation |
-| Temporary interceptor nursery | R3 optional | B + selected material | Finite deployment stock → temporary helper | Lifetime/cap/role; may be a brood profile |
-| Sail roost/support station | R2+ optional | B while actively supporting | Supplies → selected local support | Stationary alternative; loader is separate unapproved mode |
-| Native spatial nursery/conditioner | R5, End only | B + prepared thermal/precision inputs | Earlier starter + local inputs → spatial membranes | Local substrate, phase/profile and safe suspension |
-| Landing/vertical transit organ | R2 local; R5 spatial | B; S only for spatial mode | Actual supplied service → safe movement | Declared exits, blocked-arrival refusal and fallback |
-| Constructed gate | R6 | B + conditioned components/S | Authorized passenger → prepared destination | Loading/access/arrival transaction; not freight throughput |
-| Freight transfer organ | R6 | B + conditioned components/S | Reserved cargo → receiving buffer | Capacity, priority and unload-safe reconciliation |
-| Construction grower | R2 assistance; R4 larger jobs | B; T/E only for defined advanced work | Supplied parts/template → bounded real build | Region, order, obstruction, cancellation/recovery |
-| Synthesis assembly | R7 | Selected combination of B/T/E/S | Defined earlier products → demanding expression/components | Several legal attachment/topology solutions |
-| Native adaptive habitat family | R8–R9 horizon | Existing support + native local process | Declared inputs → alternative regulation capability | Complementary modes, safe transitions; boss-independent bootstrap |
+| Awakening cradle | SR0 | Small B batch/manual organic feed | Dormant item + culture → awakened item | Safe first process; later chamber mode candidate |
+| Digestion organ | SR1 | Consumes organic input; optional B starter | Permitted surplus → B | Feed protection, yield/rate, accepted inputs |
+| Reservoir | SR1 | Passive storage | B or compatible fluid in → same fluid out | Shape, reserve and access; no transmutation |
+| Vascular junction/stalk | SR1 | Small active B cost if justified | Routed material → selected destinations | Direction, split, priority, reservoir mounting |
+| Item capsule/access organ | SR1 | Passive local storage; powered remote requests later | Items in → identical data-bearing items out | Bulk/mixed policy, filters, growth, access |
+| Rooted tender | SR1 | B; real water/feed where required | Mature permitted crops → harvest/replanted plot | Work area and seed reserve; drone alternative |
+| Husbandry station | SR1–SR2 | B + feed | Managed animals → byproducts/controlled harvest | Population, young/adult policy, output reserve |
+| Aquaculture nursery | SR2 optional | B + real feed/water habitat | Stock/bait → fish or declared specimens | Food versus specimen profile; no free treasure |
+| Kitchen/conditioning chamber | SR2 optional | B and optional T | Actual food ingredients → meals/provisions | Batch versus flexible orders; chemistry attachment later |
+| Sample preparation attachment | SR2 | B; T/E improve defined profiles | Specimens → prepared material | Separation/yield, protect rare evidence |
+| Genome resolving chamber | SR2 | B; T/E for precision modes | Prepared specimens → material + new knowledge | Precision, throughput, evidence categories |
+| DNA bank/archive | SR2 | Passive retained knowledge; powered active work | Specimens/templates in; authorized queries/transfers out | Finite queue, atlas, ownership; not a resource generator |
+| Mutation chamber | SR2 | B; T/E for demanding expressions | Target + prepared graft/medium + fuel → modified target | Anatomy, exchange/support attachments, previews |
+| Memory transfer attachment | SR2 | B; E optional advanced handling | Typed learning in source → compatible archive/target | Atomic transfer, retained identity; no progress cloning |
+| Repair/refill station | SR0 Cradle refueling; SR2 Repair Dock | B | Stored feed → repaired/refuelled eligible equipment | Reserve/priority and access; shares chamber anatomy |
+| Exploration borer | SR2 | B | Real selected terrain → loot + traversable descent | Extent, depth, route, spoil and safe access |
+| Industrial excavator | SR3–SR4 | B + T; E optional precision | Real terrain + supplied access parts → galleries/shaft access | Profile, lining, branches and sustained hauling |
+| Mineral separation chamber | SR2–SR4 | B; T then E by profile | Actual ore → recipe-accounted outputs | Speed, recovery, byproduct choice and support |
+| Native thermal nursery | SR3, Nether only | B + local heat | Starter culture/local inputs → thermal lining | Native maturity; dry bootstrap and improved exchange |
+| Heat/steam exchange organ | SR3 | B + heat input; water for steam mode | Declared thermal/water inputs → work and recovery outputs | Buffer, pressure/profile, relief and recovery |
+| Condensing/recovery attachment | SR3 | Uses supplied spent process stream | Spent steam/medium → bounded recovered inputs | Useful recovery versus footprint; no positive-energy loop |
+| Electrocyte generator | SR4 | B and a defined metabolic/thermal input | Actual feed/work → E with losses | Steady versus burst support; no E needed to bootstrap itself |
+| Charge sac/interface | SR4 | E storage/exchange | Charge in → bounded charge out | Reserve and optional approved FE adapter |
+| Regulator/sensor organ | SR1 simple; SR4 advanced | Passive/simple signal; B/E for advanced service | Local state → bounded commands | Threshold, hysteresis, priority and safe shutdown |
+| Watch/attraction/repulsion organ | SR2 optional | B; E for selected expression | Supplied service → eligible local behavior | Targets/radius/cooldown; not universal boss control |
+| Ground/aerial defense family | SR2; stronger SR3–SR4 | B, T or E by expression; real ammunition if used | Supplies → bounded attacks/control | Range, line of sight, target and reload tradeoffs |
+| Restorative/restraint tissue support | SR2–SR4 optional | B; E/T only if function needs it | Supplies → local eligible effect | Deliberate active area; safe public corridors |
+| Brood station | SR2 optional | B + growth materials | Reserved population slots → bounded workers | Assigned jobs, hatch clearance, recall and relocation |
+| Temporary interceptor nursery | SR7 optional | B + selected material | Finite deployment stock → temporary helper | Lifetime/cap/role; may be a brood profile |
+| Sail roost/support station | SR2+ optional | B while actively supporting | Supplies → selected local support | Stationary alternative; loader is separate unapproved mode |
+| Native spatial nursery/conditioner | SR5, End only | B + prepared thermal/precision inputs | Earlier starter + local inputs → spatial membranes | Local substrate, phase/profile and safe suspension |
+| Landing/vertical transit organ | SR3 local; SR5 spatial | B; S only for spatial mode | Actual supplied service → safe movement | Declared exits, blocked-arrival refusal and fallback |
+| Constructed gate | SR6 | B + conditioned components/S | Authorized passenger → prepared destination | Loading/access/arrival transaction; not freight throughput |
+| Freight transfer organ | SR6 | B + conditioned components/S | Reserved cargo → receiving buffer | Capacity, priority and unload-safe reconciliation |
+| Construction grower | SR2 assistance; SR4 larger jobs | B; T/E only for defined advanced work | Supplied parts/template → bounded real build | Region, order, obstruction, cancellation/recovery |
+| Synthesis assembly | SR7 | Selected combination of B/T/E/S | Defined earlier products → demanding expression/components | Several legal attachment/topology solutions |
+| Native adaptive habitat family | SR8–SR9 horizon | Existing support + native local process | Declared inputs → alternative regulation capability | Complementary modes, safe transitions; boss-independent bootstrap |
 
 This is deliberately a *family* inventory. A kitchen, sample preparer and mutation
 chamber may share frame parts while remaining different processes; memory transfer
@@ -2076,13 +2033,11 @@ Production implementation remains HUMAN-gated under the existing ktask process.
   empty-reserve priorities and an understandable refill loop. HUD is not metabolism.
 - [ ] Decide whether biomass spills become a feature, which processes can become
   hazardous, and whether local warned pressure failure replaces the random-tank idea.
-- [ ] Clarify burrowing: actual tunnel or non-excavating passage, and whether the
-  proposed leaching/suit relationship matches the owner's intent.
+- [ ] Specify eligible terrain and protection rules for confirmed non-excavating Burrowing; do not require Manual Leaching.
 
 ### Decide first: choices with the most downstream consequences
 
-- [ ] **Dramatic premise:** is hungry armor dangerous by default, or an explicit
-  emergency pact? What biological/gore tone is enjoyable?
+- [ ] **Symbiosis tuning:** decide damage severity, adaptation ownership and thresholds for automatic early hunger pain; the dangerous premise is confirmed.
 - [ ] **Research economy:** distinguish coverage, consumed compatible genetic stock,
   practice and Minecraft XP; select the initial deterministic evidence model or
   a clearly described alternative.
@@ -2153,5 +2108,5 @@ recent assistant paragraph become authority merely by repetition.
   selection of Manual Leaching; distinguishes five tested mining approaches and
   ground-level access/site feedback; documents the tested suit reserve/HUD versus
   future activity costs; develops the unimplemented hazardous-biomass proposal and
-  its recovery questions; preserves burrowing as an unconfirmed implementation
+  its recovery questions; records the earlier burrowing discussion; current direction is non-excavating ground travel
   direction. No prototype code, balance or recipe is promoted to production.

@@ -91,13 +91,13 @@
   <text x="215" y="701" text-anchor="middle" class="heading">Unreinforced</text>
   <text x="215" y="730" text-anchor="middle" class="small">Starter organs and paths</text>
   <path d="M365 710H542" class="line" marker-end="url(#arrow)"/>
-  <text x="455" y="689" text-anchor="middle" class="small">Bone Plates</text>
+  <text x="455" y="689" text-anchor="middle" class="small">Skeletal Graft</text>
   <rect x="550" y="665" width="300" height="90" rx="20" class="box" fill="#e9dfc7"/>
   <text x="700" y="701" text-anchor="middle" class="heading">Bone-ribbed</text>
   <text x="700" y="730" text-anchor="middle" class="small">Stronger footing and veins</text>
   <path d="M850 710H1027" class="line" marker-end="url(#arrow)"/>
   <text x="940" y="682" text-anchor="middle" class="small">Tempered</text>
-  <text x="940" y="701" text-anchor="middle" class="small">Bone Plates</text>
+  <text x="940" y="701" text-anchor="middle" class="small">Skeletal Graft</text>
   <rect x="1035" y="665" width="300" height="90" rx="20" class="box" fill="#d8d6bd"/>
   <text x="1185" y="701" text-anchor="middle" class="heading">Tempered-ribbed</text>
   <text x="1185" y="730" text-anchor="middle" class="small">Industrial organ foundations</text>

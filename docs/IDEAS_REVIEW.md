@@ -39,15 +39,9 @@ coexist. A finite conserved spill, hard shared work limits, claim protection and
 recoverable cleanup are prerequisites, not details to add after a disaster demo.
 The crucible's solid digestate is not a tested fluid implementation.
 
-**Still ambiguous:** the renewed "borrowing" question was interpreted as burrowing.
-The earlier notebook already includes underground traversal, but the exact desired
-behavior remains unanswered. Leaching-assisted suit excavation and non-excavating
-passage are alternatives to discuss, not accepted features or working experiments.
+**Burrowing clarification:** the owner confirmed temporary, non-excavating passage through ground in all directions, with fuel/cooldown and a 10-second introductory stopping window. Staying embedded risks suffocation. No permanent disabling or guaranteed escape is intended. Manual Leaching remains separate.
 
-See notebook §§3, 8, 18, 26, 33 and the new discussion checklist in §40. The existing
-critique below remains relevant; these additions do not ratify the broader catalog.
-
-### Original assessment
+## Original assessment
 
 The strongest identity is **a relationship between the player and a living base**.
 Your equipment begins as a poor imitation of ordinary gear, awakens, learns from
@@ -71,7 +65,7 @@ experiences, not in place of them.
    useful organism can supply a memorable, visible first-session reward. The first
    result needs immediate utility; don't require a complete factory to make bad
    armor merely equivalent to cheap vanilla equipment.
-2. **Equipment history creates attachment.** Preserving learning across a refit
+2. **Equipment history creates attachment.** Preserving learning across forward evolution
    makes the suit feel like a long-lived companion. Extractable experience also
    supports retirement, backups and trade, provided extraction transfers rather
    than copies valuable progress.
@@ -164,11 +158,7 @@ querying a large network are server questions. Neither deserves a blanket “che
 
 ### 9. Armor that eats its owner is distinctive and easy to make unpleasant
 
-Make the first feeding event taught and avoid surprise fatal repair, repeated
-damage ticks or losing gear history. The notebook recommends opt-in emergency
-host feeding with a safety threshold, but that is a change for discussion—not an
-assumption that you no longer want the darker premise. Hunger, blood and gore
-intensity need a tone decision.
+The owner confirmed automatic hunger pain before full mutual symbiosis, followed by pain-free suspension of hungry abilities when fuel is empty. Teach the risk before awakening and show refueling/removal options. Pain cannot generate biomass or profitable practice. Exact damage severity and body-versus-piece adaptation ownership still need approval; making the entire mechanic opt-in would contradict the decision.
 
 ### 10. Too many simultaneous currencies would bury the choices
 
@@ -181,7 +171,7 @@ relevant constraints; advanced dashboards can reveal the rest.
 
 - The player's first useful session and several concrete middle/late-game situations.
 - A common vocabulary distinguishing substrate, fluids, specimens, knowledge and traits.
-- Equipment maturation, training transfer, death recovery, respecialization and abuse cases.
+- Equipment maturation, training transfer, death recovery, permanent specialization and abuse cases.
 - Species identification versus material quantity, precision, coverage and boss evidence.
 - Ecology choices for grass/bushes/trees without silently choosing a tree mechanic.
 - Farm budgets, herd management, fish production, cooking and brewing as different systems.

@@ -1,6 +1,6 @@
 # Block and organ catalog
 
-Draft recipes and tier assignments for discussion. Entries describe proposed gameplay, not implementation status. Quantities in **Create** are crafting ingredients; a multiblock's additional parts are stated separately. Process yields and operating costs still need recipe-by-recipe balancing.
+Draft recipes and tier assignments for discussion. Entries describe proposed gameplay, not implementation status. Quantities in **Create** are crafting ingredients; a multiblock's additional parts are stated separately. Process yields and operating costs still need recipe-by-recipe balancing. [Item Catalog](ITEM_CATALOG.md) owns consumable names and preparation. Construction may use raw structural components; functional mutations use prepared treatments. Growth shorthand such as “rabbit-genome mutation” means a target-specific Organ Trait Graft, not applying a raw mob drop. Armor follows its separate irreversible tree: no regulator, transplanter, adaptive material or profile switch may exchange committed branches, refund choices or transfer incompatible-lineage learning. Armor presets change only settings of installed compatible anatomy.
 
 **Tier** is when a block first becomes available. **Organ level** is earned by using that particular organ; it does not reset when the colony reaches another tier. Unless an entry says otherwise, an active organ gains one count per completed batch, not per tick or failed attempt. At 32, 128 and 512 counts, choose one improvement from that organ's **Growth** options. Each choice gives +10% to the selected property, at most three choices total. New functions require the listed mutation or physical addition; levels alone do not add every function.
 
@@ -15,28 +15,28 @@ One starting ingredient is an item, not a block: **Spore Culture = 1 rotten fles
 Available from ordinary Overworld materials. No completed genome, electricity or Nether trip is required.
 
 ### T0-01 — Living Substrate
-- **Does:** Replaces exposed ground with living, mottled tissue. Young, mature and old patches differ in pores, veins and undergrowth. Ordinary occupants are slowed; a full bio suit avoids the penalty.
-- **Input → output:** Applied Spore Culture and a small biomass dose → converted exposed soil or stone. No autonomous unlimited spreading; applying culture does not produce terrain loot.
+- **Does:** Replaces exposed ground with living, mottled tissue. Basic, young and mature patches differ in pores, veins and undergrowth. Ordinary occupants are slowed; a full bio suit avoids the penalty.
+- **Input → output:** Applied Spore Culture → converted exposed soil or stone. No autonomous unlimited spreading; applying culture does not produce terrain loot.
 - **Create:** Apply Spore Culture to a visible eligible ground block; use bone meal to mature that cell. Cultured dirt is also craftable from 1 dirt + 1 Spore Culture.
 - **Growth:** Mutate individual cells into conduits, farms, defense or travel surfaces. Each cell has one primary function; a fast path is not simultaneously a damaging floor.
 
 ### T0-02 — Culture Bowl
 - **Does:** Grows small batches of construction cultures on a shallow, rooted dish. Its first batches are slow and loaded by hand.
-- **Input → output:** Mushroom, seeds and water → Spore Culture; 1 Spore Culture + 2 rotten flesh + 1 bone meal → an Organ Bud. No biomass input is needed to start this supply chain.
+- **Input → output:** 1 mushroom + 1 wheat seed + 100 mB water → 1 Spore Culture; 1 Spore Culture + 2 rotten flesh + 1 bone meal → an Organ Bud. No biomass input is needed to start this supply chain.
 - **Create:** 1 flower pot + 1 Spore Culture + 1 wheat seed; place on substrate.
-- **Growth:** Choose shorter incubation or lower water use. A honeycomb mutation accepts honey as an alternative nutrient; an Intake Mouth later automates supplies.
+- **Growth:** Choose shorter incubation or lower water use. A Honey Culture treatment accepts honey as an alternative nutrient; an Intake Mouth later automates supplies.
 
 ### T0-03 — Digestive Sac
 - **Does:** Converts unwanted organic matter into the first usable biomass. Food-rich inputs give more than woody scraps; mineral blocks are not food.
 - **Input → output:** Rotten flesh, surplus crops, leaves or fish + water → biomass. Bones are returned as mineral residue rather than silently converted into flesh.
 - **Create:** 1 Organ Bud + 2 rotten flesh + 1 bowl.
-- **Growth:** Choose processing speed or biomass recovery. Slime-ball mutation accepts fibrous leaves; add Intake/Output Mouths for a continuous feed line. It stops accepting batches when output has no room.
+- **Growth:** Choose processing speed or biomass recovery. Elastic Gel treatment accepts fibrous leaves; add Intake/Output Mouths for a continuous feed line. It stops accepting batches when output has no room.
 
 ### T0-04 — Biomass Bladder
 - **Does:** A one-block, translucent feed tank for a first workshop. The contents visibly rise inside its fleshy shell.
 - **Input → output:** Biomass from buckets or an attached organ → stored biomass, then bucket or organ output. Other fluids are refused.
 - **Create:** 1 Organ Bud + 2 glass + 1 slime ball; an early leather replacement for the slime ball makes a smaller bladder.
-- **Growth:** Bone-plate mutation reinforces its capacity. It can later become a Biomass Reservoir Cell without discarding its stored feed.
+- **Growth:** Skeletal Graft treatment reinforces its capacity. It can later become a Biomass Reservoir Cell without discarding its stored feed.
 
 ### T0-05 — Membrane Rack
 - **Does:** Stretches cultivated skin over a bone rack to make the common flexible construction material.
@@ -46,27 +46,27 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 
 ### T0-06 — Bone Loom
 - **Does:** Grows curved plates and load-bearing ribs from existing calcium, rather than fabricating mineral mass from biomass.
-- **Input → output:** Bones or bone blocks + biomass → Bone Plates. A calcite recipe uses extra biomass to supply the organic binder.
+- **Input → output:** 1 bone + 50 BU → 1 Bone Plate. Bone blocks require a separately accounted calcium recipe, not an assumed unpacking into nine bones. A calcite recipe uses extra biomass to supply the organic binder.
 - **Create:** 1 Organ Bud + 2 bones + 2 sticks.
-- **Growth:** Choose speed or biomass economy. Iron mutation produces reinforced plates using additional iron; adding frame blocks increases batch size, not mineral yield.
+- **Growth:** Choose speed or biomass economy. Ferrocyte Paste treatment produces reinforced plates using additional prepared iron; adding frame blocks increases batch size, not mineral yield.
 
 ### T0-07 — Bio-Furnace
 - **Does:** A small stomach-like furnace. Initially slower and more fuel-hungry than a vanilla furnace, but it accumulates permanent processing experience.
 - **Input → output:** A normal smelting ingredient + biomass → its normal smelting result. Starting target: 16 seconds per item; no free ore multiplication or extra XP from recooking outputs.
 - **Create:** 1 furnace + 1 Organ Bud + 2 Membrane Sheets.
-- **Growth:** Choose speed or biomass economy at each level. L1 permits a charcoal mutation for solid-fuel feeding; Hearth Lungs improve combustion. Mouths automate loading; a T3 Thermal Mantle enables hotter recipes on this same core.
+- **Growth:** Choose speed or biomass economy at each level. L1 permits a Char Gland Feed treatment for solid-fuel feeding; Hearth Lungs improve combustion. Mouths automate loading; a T3 Thermal Mantle enables hotter recipes on this same core.
 
 ### T0-08 — Awakening Cradle
 - **Does:** Turns crafted dormant bio equipment into living equipment. Holds one armor piece, tool or weapon at a time; the body of the cradle folds around it.
 - **Input → output:** Dormant equipment + Spore Culture + biomass → awakened equipment with the same identity. It does not supply free repair or an infinite personal fuel reserve.
 - **Create:** 1 Organ Bud + 2 Bone Plates + 2 Membrane Sheets.
-- **Growth:** Choose shorter awakening or lower biomass cost. Honey mutation softens the initial feeding burden. Later mutation converts the cradle into a Repair Dock, preserving its history.
+- **Growth:** Choose shorter awakening or lower biomass cost. Honey Culture treatment reduces awakening's processing biomass cost, not the wearer's starvation pain. Later mutation converts the cradle into a Repair Dock, preserving its history.
 
 ### T0-09 — Seed Pouch
 - **Does:** A rooted, accessible store for seeds and planting stock; reserves a chosen amount for replanting before offering surplus to automation.
 - **Input → output:** Seeds, saplings, carrots or potatoes → the same stored items, supplied on request.
 - **Create:** 1 leather + 1 Membrane Sheet + 1 Spore Culture.
-- **Growth:** Add neighboring pouches for more stock types. String mutation adds named planting filters; it never changes one seed species into another.
+- **Growth:** Add neighboring pouches for more stock types. Contractile Fiber treatment adds named planting filters; it never changes one seed species into another.
 
 ### T0-10 — Living Skin
 - **Does:** The basic biological building material: full blocks, slabs, stairs, rounded corners and thin wall coverings. Neighboring pieces blend their skin pattern.
@@ -78,7 +78,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Does:** A visibly curved skeletal block used as a beam, corner or arch support. The first reusable multiblock frame part.
 - **Input → output:** No running input → structural support.
 - **Create:** 2 Bone Plates + 1 Membrane Sheet → 2 frames.
-- **Growth:** Iron reinforces a frame; a Thermal Lining makes a heat-safe version. Upgrading an existing frame keeps the attached structure in place.
+- **Growth:** Ferrocyte Paste reinforces a frame; a Thermal Lining makes a heat-safe version. Upgrading an existing frame keeps the attached structure in place.
 
 ### T0-12 — Membrane Window
 - **Does:** Transparent living skin held by thin ribs. Connected windows remove interior borders, so a large chamber looks like one enclosed body.
@@ -89,7 +89,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 ### T0-13 — Lumen Tissue
 - **Does:** A flush, softly luminous substrate surface. Can line a floor, wall or ceiling without a torch sticking into a tunnel.
 - **Input → output:** No continuing fuel → local light; its initial graft is the material cost.
-- **Create:** Apply 1 glow ink sac to a substrate cell; glowstone dust is an alternative ingredient.
+- **Create:** Apply 1 Lumen Secretion to a mature substrate cell; the Bowl prepares it from glow ink, glow berries or glowstone.
 - **Growth:** Bone meal changes pore size and brightness. A later Nerve Tissue connection switches it on/off or makes it an alarm indicator.
 
 ### T0-14 — Leaching Gland
@@ -117,20 +117,20 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 ### T1-01 — Biomass Vein
 - **Does:** A recessed green vein within substrate, carrying biomass along configured faces. Pulses follow actual transfer direction.
 - **Input → output:** Biomass at an open intake → biomass at connected outlets; no conversion or generation.
-- **Create:** Mutate substrate with 1 slime ball and a biomass dose. A junction supplies the pumping action.
+- **Create:** Mutate mature substrate with 1 Capillary Gel. A junction supplies the pumping action.
 - **Growth:** Bone reinforcement raises transfer capacity. Routes run on floors, walls and ceilings; corners are part of the same block, not separate straight-only pipes.
 
 ### T1-02 — Fluid Vein
 - **Does:** Moves one selected liquid through a tissue route. Its visible inner fluid differs from the always-green biomass vein.
 - **Input → output:** Water or another compatible liquid → the same liquid at a tank or consumer. Incompatible liquids do not silently mix.
-- **Create:** Mutate substrate with 1 glass bottle + 1 Membrane Sheet.
+- **Create:** Mutate mature substrate with 1 Filter Membrane + 1 Sealing Resin.
 - **Growth:** Thermal Lining enables lava service. Changing the filter requires draining the old fluid or moving it to a recovery tank first.
 
 ### T1-03 — Item Vein
 - **Does:** Moves item packets through buried tissue, including vertically. A stationary alternative to helper creatures.
 - **Input → output:** Items accepted by a source mouth → unchanged items at a destination with space.
-- **Create:** Mutate substrate with 1 string + 1 leather.
-- **Growth:** Slime mutation groups matching items into larger packets; a Filter Valve chooses destinations. Full outputs leave items at the source or in the vein's finite transit space.
+- **Create:** Mutate mature substrate with 1 Contractile Fiber.
+- **Growth:** Elastic Gel treatment groups matching items into larger packets; a Filter Valve chooses destinations. Full outputs leave items at the source or in the vein's finite transit space.
 
 ### T1-04 — Vascular Junction
 - **Does:** A configurable pumping, splitting and joining organ. A reservoir can sit above it while sources feed in from the side and consumers draw from another side.
@@ -147,7 +147,7 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 ### T1-06 — Vascular Stitch
 - **Does:** Bridges a one-block terrain step between two visible vein cells. A recessed tendon curves over the shared terrain edge; no buried target must be clicked.
 - **Input → output:** One route's items or fluid → its continuation above, below or around the corner.
-- **Create:** Apply 1 string + 1 Membrane Sheet to the exposed edge between the selected cells.
+- **Create:** Apply 1 Contractile Fiber + 1 Membrane Sheet to the exposed edge between the selected cells.
 - **Growth:** Bone reinforcement supports a short free-standing span. Longer hills use repeated visible steps; a stitch does not discover an invisible route automatically.
 
 ### T1-07 — Biomass Reservoir Cell
@@ -166,42 +166,42 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Does:** Stores a small number of item types in a fleshy cabinet. A large icon on its front shows the selected contents; joined capsules provide more compartments.
 - **Input → output:** Inserted items → the same items through hand access or Item Veins.
 - **Create:** 1 chest + 2 Membrane Sheets + 1 Spore Culture.
-- **Growth:** Add neighboring capsules for capacity. Bone mutation improves compression of stackable items but does not merge different equipment histories. Display icons can be hidden per capsule.
+- **Growth:** Add neighboring capsules for capacity. Skeletal Graft treatment improves compression of stackable items but does not merge different equipment histories. Display icons can be hidden per capsule.
 
 ### T1-10 — Intake Mouth
 - **Does:** Attaches to an organ or store and pulls from the inventory immediately facing its mouth. Makes a hand-fed organ accessible to ordinary storage automation.
 - **Input → output:** Selected items from a chest, hopper or Item Vein → a chosen input slot of the attached organ.
 - **Create:** 1 Organ Bud + 1 hopper + 1 Membrane Sheet.
-- **Growth:** Paper graft adds an item filter; a Nerve Tissue connection permits on/off control. Multiple mouths may serve separate ingredients, but never bypass the organ's recipe requirements.
+- **Growth:** Route Imprint treatment adds an item filter; a Nerve Tissue connection permits on/off control. Multiple mouths may serve separate ingredients, but never bypass the organ's recipe requirements.
 
 ### T1-11 — Output Mouth
 - **Does:** Extracts completed products from a machine, without stealing its ingredients, fuel or reserved seed stock.
 - **Input → output:** Completed items from the host → a neighboring inventory or Item Vein. No space means no extraction.
 - **Create:** 1 Organ Bud + 1 hopper + 1 bone.
-- **Growth:** Paper graft chooses output/byproduct filters. Pair with Intake Mouths to automate the original Bio-Furnace instead of replacing it with a new machine.
+- **Growth:** Route Imprint treatment chooses output/byproduct filters. Pair with Intake Mouths to automate the original Bio-Furnace instead of replacing it with a new machine.
 
 ### T1-12 — Filter Valve
 - **Does:** Gives a vein branch an explicit destination/filter and minimum source reserve. Its open or sealed throat is visible from outside.
 - **Input → output:** A permitted item or fluid stream → admitted flow; rejected material stays upstream.
 - **Create:** 1 Bone Plate + 1 slime ball + 1 paper, applied to a vein face.
-- **Growth:** Redstone graft adds signal control. Later electrical mutation offers proportional flow rather than only open/closed operation.
+- **Growth:** Synaptic Gel treatment adds signal control. Later electrical mutation offers proportional flow rather than only open/closed operation.
 
 ### T1-13 — Overflow Valve
 - **Does:** Diverts excess to a selected spare tank or disposal line when the main store reaches its configured threshold.
 - **Input → output:** Excess biomass or fluid → the relief destination. It never deletes material merely because both routes are full.
 - **Create:** 1 Filter Valve + 1 comparator + 1 Membrane Sheet.
-- **Growth:** Bone mutation adds a reserved emergency outlet. A tank visible through the valve's window lets the player distinguish a full reserve from a blocked relief route.
+- **Growth:** Skeletal Graft treatment adds a reserved emergency outlet. A tank visible through the valve's window lets the player distinguish a full reserve from a blocked relief route.
 
 ### T1-14 — Sensor Polyp
 - **Does:** Measures one attached organ or storage: fullness, low fuel, blocked output or completed batch. Useful before a central control system exists.
 - **Input → output:** A selected measured value → redstone strength or a nerve signal.
 - **Create:** 1 Organ Bud + 1 comparator + 1 spider eye.
-- **Growth:** Amethyst graft gives separate upper/lower thresholds to prevent rapid switching. It observes its configured target, not every inventory in the base.
+- **Growth:** Survey Gel treatment gives separate upper/lower thresholds to prevent rapid switching. It observes its configured target, not every inventory in the base.
 
 ### T1-15 — Nerve Tissue
 - **Does:** A thin, flush signal path on substrate. Carries commands separately from resource veins; intersections can be joined or insulated.
 - **Input → output:** Redstone or organ-control signal → the configured connected outputs. No transport of items, fluids or electrical power.
-- **Create:** Apply 1 redstone dust + 1 string to substrate.
+- **Create:** Apply 1 Synaptic Gel to mature substrate.
 - **Growth:** Membrane graft insulates a crossing. Glow ink gives visible pulses for diagnosis; turning those visuals off does not stop the signal.
 
 ### T1-16 — Synaptic Console
@@ -213,8 +213,8 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 ### T1-17 — Cultivation Tissue
 - **Does:** Replaces farmland with rooted crop beds. Separate settings reserve water, seed stock and harvest surplus, so a field need not consume all of its own food.
 - **Input → output:** Seeds/plants + water + optional biomass → grown crops. Biomass accelerates growth but does not make the crop-to-biomass loop profitable by itself.
-- **Create:** Mutate exposed Living Substrate with 1 hoe + 1 wheat seed; the hoe is used as a tool, not consumed per cell.
-- **Growth:** Honey mutation favors pollinated crops; bone meal favors rapid first growth. Upgraded beds can support unusual crops only after their genome and growing conditions are available.
+- **Create:** Hoe mature exposed Living Substrate, then apply 1 Rooting Gel and a real seed; the hoe is not consumed.
+- **Growth:** Honey Culture treatment favors pollinated crops; bone meal favors rapid first growth. Upgraded beds can support unusual crops only after their genome and growing conditions are available.
 
 ### T1-18 — Harvest Corolla
 - **Does:** Harvests a player-marked small field and replants from reserved seed stock. Its tendrils reach only the configured bed, not an entire biome.
@@ -237,38 +237,38 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 ### T1-21 — Digestive Tissue
 - **Does:** A defensive floor that damages occupants lacking the required full bio suit and gathers biomass from damage actually dealt.
 - **Input → output:** Successful damage to a vulnerable living target → a small biomass reserve, extractable by an adjacent vein. Armor-protected or invulnerable contact gives no biomass.
-- **Create:** Mutate substrate with 1 fermented spider eye + 1 slime ball.
+- **Create:** Mutate mature substrate with 1 Digestive Enzyme.
 - **Growth:** Spider DNA permits a damage-versus-slowing specialization. Connecting a Nerve Tissue shutoff lets a public path be opened safely; it does not become permanently safe merely because storage is full.
 
 ### T1-22 — Travel Tissue
 - **Does:** A deliberately marked fast surface for full bio suits with a locomotion mutation. Everyone else receives ordinary substrate movement, not a launch effect.
 - **Input → output:** An eligible moving wearer and suit biomass → faster travel along the surface.
-- **Create:** Mutate substrate with 1 sugar + 1 rabbit hide.
+- **Create:** Mutate mature substrate with 1 Locomotor Gel.
 - **Growth:** Rabbit-genome graft improves acceleration; slime-genome graft improves cornering. Wall/ceiling climbing requires its own suit mutation, not just a faster floor.
 
 ### T1-23 — Climbing Tendon
 - **Does:** A slim, luminous climbing strip rooted flush into a shaft wall. Gives mines a reusable physical route even without specialized armor.
 - **Input → output:** Player movement → climbing; no ongoing machine fuel.
-- **Create:** 1 vine + 1 string + 1 Spore Culture → 4 tendon sections. Glow ink adds the luminous form.
+- **Create:** 1 vine + 1 string + 1 Spore Culture → 4 tendon sections. Lumen Secretion adds the luminous form.
 - **Growth:** Bone-plate graft creates resting ledges. Mining organs can place supplied sections behind their cutting front; a missing supply pauses work before access is lost.
 
 ### T1-24 — Hearth Lung
 - **Does:** A bellows-like attachment for the Bio-Furnace. Improves airflow but requires free space at its breathing face.
 - **Input → output:** Air + a host's ongoing fuel consumption → increased furnace heat delivery. It has no independent smelting slots.
 - **Create:** 2 leather + 1 Bone Plate + 1 Organ Bud; attach to a furnace side.
-- **Growth:** Add a second opposed lung for batch work. Feather mutation favors speed; charcoal mutation favors fuel economy. Blocking a lung removes its benefit rather than destroying the furnace.
+- **Growth:** Add a second opposed lung for batch work. Contractile Fiber treatment favors speed; charcoal mutation favors fuel economy. Blocking a lung removes its benefit rather than destroying the furnace.
 
 ### T1-25 — Sapping Bush
 - **Does:** Useful low ground cover for living paths and gardens. Its growth settings select berries, fiber or biomass feedstock, so the colony does not become a bare carpet.
 - **Input → output:** Water, light and nutrients → the selected harvest; harvest reserves enough plant body for regrowth.
-- **Create:** Graft a sweet berry bush with Spore Culture, or plant its recovered cutting on substrate. Converting an existing bush retains a seed/cutting for the player.
-- **Growth:** String mutation favors fiber; honey favors berries. A Harvest Corolla gathers the crop into storage; decorative unharvested bushes remain alive without constant manual trimming.
+- **Create:** Graft a sweet berry bush with Rooting Gel, or plant its recovered cutting on substrate. Converting an existing bush retains a seed/cutting for the player.
+- **Growth:** Contractile Fiber treatment favors fiber; honey favors berries. A Harvest Corolla gathers the crop into storage; decorative unharvested bushes remain alive without constant manual trimming.
 
 ### T1-26 — Living Wood
 - **Does:** The grafted trunk of a colony tree and a reusable building material. Axis, branches and original wood species remain recognizable.
 - **Input → output:** Deliberate harvest → the original species' wood plus a retained planting option at the Arbor Root; it does not also pay a second full biomass harvest.
-- **Create:** An Arbor Root transforms the selected tree gradually while supplied, or culture is applied manually to an exposed log.
-- **Growth:** Bone mutation makes reinforced structural wood. The player can keep a productive trunk or choose salvage, but regrowing harvested wood needs time, water and nutrients.
+- **Create:** An Arbor Root transforms the selected tree gradually while supplied, or Rooting Gel is applied manually to an exposed log.
+- **Growth:** Skeletal Graft treatment makes reinforced structural wood. The player can keep a productive trunk or choose salvage, but regrowing harvested wood needs time, water and nutrients.
 
 ### T1-27 — Canopy Cyst
 - **Does:** A leaf replacement with hanging translucent pods. Maintains a tree's canopy while supplying one selected kind of fruit, resin or planting stock.
@@ -288,6 +288,12 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Create:** 2 Membrane Sheets + 1 Rib Frame → one two-block doorway.
 - **Growth:** Thermal Lining makes a sealed process hatch; bone reinforcement makes a stronger gate. It does not automatically close on an occupied doorway to trap its authorized user.
 
+### T1-30 — Activation Cyst
+- **Does:** Cultures raw ingredients into consumable active gels, enzymes and secretions. Its side windows show separate source and carrier chambers.
+- **Input → output:** Listed ingredient + biological carrier and feed → the Item Catalog's named active treatment; returned containers go to a reserved slot.
+- **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 Bone Plate. No advanced graft is needed to build it.
+- **Growth:** Choose batch speed or biomass economy. Intake/Output Mouths automate it; one recipe mode at a time. Bowl-compatible recipes run faster, but give the same yield.
+
 ## T2 — Directed mutation: genomes, specialized organs and planned excavation
 
 Build sample processing and a DNA bank. Individual genomes unlock particular grafts; collecting unrelated samples is not a substitute.
@@ -302,7 +308,7 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 - **Does:** Stores accumulated genome knowledge, shows missing coverage and makes completed genomes available to connected mutation organs. Knowledge is distinct from consumable Genetic Stock.
 - **Input → output:** Extracted fragments → increased coverage for the correct source; research queries → available traits and compatible mutation recipes.
 - **Create:** 1 Organ Bud + 1 amethyst shard + 2 glass + 2 Bone Plates.
-- **Growth:** Attach Archive Lobes for more genome slots. Amethyst mutation compares related fragments; it does not award coverage for repeatedly inserting the same previously consumed fragment.
+- **Growth:** Attach Archive Lobes for more genome slots. Survey Gel treatment compares related fragments; it does not award coverage for repeatedly inserting the same previously consumed fragment.
 
 ### T2-03 — Archive Lobe
 - **Does:** A physical memory extension to a DNA Bank, showing stored species on its membrane. Later control organs use the same lobe for recipe or index records instead of needing a second memory-block family.
@@ -314,31 +320,31 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 - **Does:** A precision eye attached to an extractor. It selects which missing portion of a specimen's genome the next batch should resolve.
 - **Input → output:** A specimen being processed by the host + bank's missing-coverage selection → better-targeted fragments, not extra mob loot.
 - **Create:** 2 glass + 1 amethyst shard + 1 spider eye + 1 Membrane Sheet.
-- **Growth:** Glowstone mutation improves weak-sample visibility; electrical drive supports finer rare-genome work. Multiple lenses cover different sample channels, not unlimited yield multipliers on one specimen.
+- **Growth:** Lumen Secretion treatment improves weak-sample visibility; electrical drive supports finer rare-genome work. Multiple lenses cover different sample channels, not unlimited yield multipliers on one specimen.
 
 ### T2-05 — Genetic Culture Vat
 - **Does:** Maintains consumable genetic cultures after the source genome is understood. Avoids requiring another boss kill for every routine use of an already-developed mutation.
-- **Input → output:** Completed genome access + a seed of matching Genetic Stock + recipe-specific feed and biomass → more stock of that same culture. No bones, pearls, stars or other mob loot are produced.
+- **Input → output:** Completed genome access + a seed of matching Genetic Stock + recipe-specific feed and biomass → more stock of that same culture. No bones, pearls, stars or other mob loot are produced. A separate material-binding mode grows Fusion Binder and mineral fusion media without creature DNA, using the Item Catalog recipes.
 - **Create:** 1 Fluid Cyst + 1 Organ Bud + 1 Sequencing Lens.
 - **Growth:** Choose culture speed or biomass economy. Rare cultures require later precision attachments and their own compatible feed; wheat alone is not a substitute for every source.
 
 ### T2-06 — Mutation Chamber
 - **Does:** Applies chosen genetic and material changes to one equipment item or recoverable organ core. Shows the resulting properties and incompatible mutations before starting.
-- **Input → output:** Target + selected Genetic Stock + listed graft materials + biomass + genome access → the same target with the chosen mutation; its counters and identity remain.
+- **Input → output:** Target + prepared target-specific Mutation Graft or fusion medium + biomass + genome access → the same target with the chosen mutation; its counters and identity remain.
 - **Create:** Core recipe: 1 Awakening Cradle + 1 Sequencing Lens + 2 Bone Plates. Form a 3×3 floor, corner Rib Frames and a two-block-high Membrane Window enclosure around the central treatment space.
-- **Growth:** Choose treatment speed or biomass economy. Silverfish stock + slime grafts burrowing; glow ink grafts helmet illumination. Further burrowing mutations extend the safe stopping window and reduce biomass use, competing with other suit improvements. Add a Memory Gland or later a potion-infusion bay; a larger body accepts larger organ cores.
+- **Growth:** Choose treatment speed or biomass economy. Burrowing armor uses enderman-derived prepared grafts and Diamond-Fiber Matrix under Armor Evolution. Further burrowing mutations extend the safe stopping window and reduce biomass use, competing with other suit improvements. Add a Memory Gland or later a potion-infusion bay; a larger body accepts larger organ cores. Precision Chamber means this core/body with a T4-07 Precision Sequencer service bay, electrical supply and access to T4-05 prepared outputs; it is not an unlisted new block.
 
 ### T2-07 — Memory Gland
 - **Does:** An attachment that transfers earned equipment or organ experience into a reusable physical memory sample. It is a way to retain invested play, not a universal XP converter.
-- **Input → output:** Source + empty glass bottle + biomass → a typed Memory Sample; the extracted counts are removed from the source. Compatible sample + target → transferred counts, consuming the sample.
+- **Input → output:** Source + empty glass bottle + biomass → a typed Memory Sample; the extracted counts are removed from the source. Compatible sample + target → transferred counts, consuming that amount from the sample; capped remainders stay in the sample. Armor additionally requires matching permanent lineage and slot, with no transfer of symbiosis or grafts.
 - **Create:** 1 Organ Bud + 1 amethyst shard + 1 book + 1 Membrane Sheet.
 - **Growth:** Choose transfer speed or biomass economy. Enderman-genome mutation preserves more specialized categories. Furnace processing history cannot be installed as running history in boots.
 
 ### T2-08 — Repair Dock
 - **Does:** Refills and self-mends worn bio equipment using colony supplies. Supports one wearer or one stored equipment set; it is useful beside mine exits and travel stations.
 - **Input → output:** Damaged bio equipment + biomass + any recipe-specific repair material → repaired equipment and a filled suit reserve.
-- **Create:** Mutate an Awakening Cradle with 1 golden apple + 2 Membrane Sheets.
-- **Growth:** Choose repair speed or biomass economy. Add hanger-like Rib Frames for a stored set; an extra mouth reserves repair material separately from suit fuel. Repairs do not award the equipment's activity counters.
+- **Create:** Mutate an Awakening Cradle with 2 Restorative Serum + 2 Membrane Sheets.
+- **Growth:** Choose repair speed or biomass economy. Add hanger-like Rib Frames for a stored set; an extra mouth reserves repair material separately from suit fuel. Only eligible chest wear can grant bounded C-R repair practice under Armor Evolution; service grants no unrelated movement/combat counters.
 
 ### T2-09 — Grafting Bench
 - **Does:** Joins a known plant trait to compatible planting stock, so crop and tree selection affects the farm layout and its products.
@@ -361,7 +367,7 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 ### T2-12 — Aquaculture Bed
 - **Does:** A submerged version of cultivation tissue for kelp, seagrass and selected aquatic stock. Keeps an ocean branch useful independently of Nether industry.
 - **Input → output:** Planting stock + water habitat + nutrients → aquatic crops or raised fish, using separate recipes. Plants do not become fish without brood stock.
-- **Create:** Mutate submerged substrate with 1 kelp + 1 prismarine shard.
+- **Create:** Mutate submerged mature substrate with 1 Aquaculture Graft.
 - **Growth:** Fish-genome graft improves husbandry; kelp-genome graft improves plant production. Add sheltered cells and a Harvest Corolla for automation; crowding reduces output rather than generating unlimited fish entities.
 
 ### T2-13 — Brood Nursery [optional helper branch]
@@ -373,14 +379,14 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 ### T2-14 — Worker Waypoint [optional helper branch]
 - **Does:** A nearly flush marked tissue cell defining a worker's route or waiting place. Routes can follow stairs, terraces and climb-capable paths.
 - **Input → output:** Nursery assignment → a named route point and visible occupied/free state.
-- **Create:** Mutate substrate with 1 string + 1 paper, then link it to a nursery.
-- **Growth:** Feather graft makes it a waiting perch for an eligible flying helper. Adding waypoints refines a route; it does not authorize a worker to search unloaded terrain.
+- **Create:** Mutate mature substrate with 1 Waymark Secretion, then link it to a nursery.
+- **Growth:** Contractile Fiber treatment makes it a waiting perch for an eligible flying helper. Adding waypoints refines a route; it does not authorize a worker to search unloaded terrain.
 
 ### T2-15 — Sail Roost [optional helper branch]
 - **Does:** Feeds and houses one Nutrient Sail. The player assigns the sail to named nearby nurseries, giving it a useful colony-support role rather than mandatory ownership of every chunk.
 - **Input → output:** Biomass + an installed sail organism → supplied local worker coordination and status display.
 - **Create:** 2 Rib Frames + 1 Organ Bud + 2 Membrane Sheets + 1 feather.
-- **Growth:** Sugar mutation increases feeding throughput; amethyst mutation improves its monitoring role. Chunk loading, if selected later, is a separate mutation with a separate upkeep requirement, not a free roost effect.
+- **Growth:** Locomotor Gel treatment increases feeding throughput; Survey Gel treatment improves its monitoring role. Chunk loading, if selected later, is a separate mutation with a separate upkeep requirement, not a free roost effect.
 
 ### T2-16 — Aerocyte Bloom
 - **Does:** Air defense: tracks a selected hostile flying target and fires a single visible green biological pellet. It needs a clear shot and does not target everything through walls.
@@ -403,38 +409,38 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 ### T2-19 — Restraining Tissue
 - **Does:** Holds or heavily slows susceptible creatures on a small sampling/defense floor. It is separate from lethal Digestive Tissue.
 - **Input → output:** Supplied biomass + contact with a permitted target → restraint until duration or fuel runs out.
-- **Create:** Mutate substrate with 1 cobweb + 1 slime ball and spider-genome access.
+- **Create:** Mutate mature substrate with 1 Restraining Graft and spider-genome access.
 - **Growth:** Slime-genome graft improves restraint strength; spider-genome graft improves duration. Stronger mobs resist more; players and bosses require explicit targeting rules, not automatic indefinite immobilization.
 
 ### T2-20 — Structure Grower
 - **Does:** Builds a selected small biological wall, room or repeated pattern from supplied parts. Useful for enclosing organs without hand-placing every decorative rib.
 - **Input → output:** A player-marked template + actual blocks + biomass → those blocks placed at clear authorized positions. Obstructions are reported, not consumed.
 - **Create:** 1 Organ Bud + 1 crafting table + 1 amethyst shard + 2 Rib Frames.
-- **Growth:** Choose placement speed or biomass economy. Bone mutation supports larger spans; later electrical control adds material requests and multi-step plans. It never generates the template's blocks from biomass alone.
+- **Growth:** Choose placement speed or biomass economy. Skeletal Graft treatment supports larger spans; later electrical control adds material requests and multi-step plans. It never generates the template's blocks from biomass alone.
 
 ### T2-21 — Descending Rootstock
 - **Does:** Mines a lit, walkable staircase into real ground. Its tip can be assigned a new branch at a prepared landing; a finite section finishes and then waits.
 - **Input → output:** Biomass + stair/tendon/light supplies + real terrain → mined materials in storage and a descending passage with three clear blocks of headroom above each tread.
 - **Create:** 1 Organ Bud + 1 iron pickaxe + 2 Bone Plates + 1 Leaching Gland; plant at a Surveyed Tissue collar.
-- **Growth:** Choose cutting speed or biomass economy. Iron mutation accepts tougher host rock; additional root collars authorize another section. Missing spoil space or access parts stops excavation before the next cut.
+- **Growth:** Choose cutting speed or biomass economy. Ferrocyte Paste treatment accepts tougher host rock; additional root collars authorize another section. Missing spoil space or access parts stops excavation before the next cut.
 
 ### T2-22 — Surveyed Tissue
 - **Does:** Marks a mining boundary as part of the ground, without raised border blocks. A visible line and corner pores show the actual selected footprint.
 - **Input → output:** Player corner/depth selections → a finite plan accepted by its mining organ; no resource output itself.
-- **Create:** Apply 1 amethyst shard + 1 bone meal to exposed substrate; configure the resulting marked cells with the tool.
-- **Growth:** A redstone graft adds a pause point; luminous graft marks shaft edges. Changing a plan shows its new extent before work resumes, including a one-block-wide strip option.
+- **Create:** Apply 1 Survey Gel to exposed mature substrate; configure the resulting marked cells with the tool.
+- **Growth:** A Synaptic Gel treatment adds a pause point; luminous graft marks shaft edges. Changing a plan shows its new extent before work resumes, including a one-block-wide strip option.
 
 ### T2-23 — Mineral Gizzard
 - **Does:** Crushes mined raw ore and separates coarse host rock. The first ore-processing branch adds recovery at the cost of another organ and more handling.
-- **Input → output:** Supported raw ore + biomass → source-specific mineral concentrate and stone residue. Ingots and metal blocks are not accepted as fresh ore for another yield bonus.
+- **Input → output:** Supported raw ore + biomass → source-specific mineral concentrate and stone residue. Ingots and metal blocks are not accepted as fresh ore for another yield bonus. A separate granulation mode prepares ingots, diamonds and obsidian for fusion with no yield bonus; Washing Kidney cleans each portion.
 - **Create:** 1 Organ Bud + 1 iron pickaxe + 2 Bone Plates + 2 flint.
-- **Growth:** Choose grinding speed or biomass economy. Add a Steam Muscle for bulk batches; a diamond graft permits harder ores. Concentrate carries the mineral amount recovered from its original input, not an unlimited multiplication opportunity.
+- **Growth:** Choose grinding speed or biomass economy. Add a Steam Muscle for bulk batches; a Faceted Chitin treatment permits harder ores. Concentrate carries the mineral amount recovered from its original input, not an unlimited multiplication opportunity.
 
 ### T2-24 — Washing Kidney
 - **Does:** Washes crushed ore before smelting. The player chooses a simple dry furnace route or more recovery with a water supply and waste handling.
 - **Input → output:** Mineral concentrate + water → washed concentrate + tailings containing the unrecovered mineral fraction. Wash water goes to a separate dirty-fluid output.
 - **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 sand + 1 glass bottle.
-- **Growth:** Choose washing speed or water economy. Slime mutation improves fine-particle capture; a later Ion Separator recovers selected tailings. Full waste output stops new batches.
+- **Growth:** Choose washing speed or water economy. Elastic Gel treatment improves fine-particle capture; a later Ion Separator recovers selected tailings. Full waste output stops new batches.
 
 ### T2-25 — Feeding Trough
 - **Does:** Supplies an assigned livestock pen from stored food, with a target population and a breeding reserve. The player chooses food production, sampling or animal growth as the pen's priority.
@@ -463,7 +469,7 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 ### T2-29 — Restorative Tissue
 - **Does:** A safe recovery patch for an authorized wearer or husbandry berth. Useful near hazardous workshops, but not a free regeneration effect over the whole base.
 - **Input → output:** Biomass + contact with an eligible injured target → gradual healing, consuming feed only when healing is delivered.
-- **Create:** Mutate substrate with 1 golden apple + 1 honey bottle.
+- **Create:** Mutate mature substrate with 1 Restorative Serum.
 - **Growth:** Rabbit-genome graft favors recovery after movement; livestock genomes permit controlled pen care. It cannot instantly refill a live specimen's depleted sampling reserve.
 
 ### T2-30 — Spine Sentry
@@ -472,6 +478,12 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 - **Create:** 1 Organ Bud + 1 crossbow + 2 Bone Plates.
 - **Growth:** Choose reload rate or biomass economy. Cactus mutation adds contact deterrence; skeleton DNA adds a piercing specialization. Shot material is not recovered as profitable automatic drops.
 
+### T2-31 — Fusion Chrysalis
+- **Does:** Fuses prepared signatures, carriers and stock into one target-specific graft before installation. It cannot replace a chamber's treatment space.
+- **Input → output:** Named active ingredients + Fusion Binder + matching Genetic Stock and genome access where required → one typed organ, tissue or equipment graft.
+- **Create:** 1 Activation Cyst + 1 Sequencing Lens + 2 Bone Plates; add Rib Frames and Membrane Windows around a clear two-block-high treatment cavity on a 3×3 mature bed.
+- **Growth:** Choose batch speed or biomass economy. Precision attachment enables higher recipes; consumed donors and returned containers are reserved before processing. No complete genome is needed for host or mineral-only recipes.
+
 ## T3 — Thermal colony: a working Nether base and larger mines
 
 The Nether grows Thermal Lining continuously. It is needed for hot-fluid service, high-temperature organ bodies and steam-driven attachments. Heat alone in another dimension does not replace the native growing bed.
@@ -479,7 +491,7 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 ### T3-01 — Thermal Substrate
 - **Does:** A heat-tolerant living foundation that matures only in the Nether. Supports native thermal growth and protects its own tissue from ordinary local heat, not everything standing on it.
 - **Input → output:** Starter substrate + local heat + biomass → mature thermal bed. No lava or ore is generated.
-- **Create:** In the Nether, mutate Living Substrate with 1 magma cream + 1 netherrack. An immature bed can be started with hand-carried biomass.
+- **Create:** In the Nether, mutate mature Living Substrate with 1 Thermal Seed. An immature bed can be started with hand-carried biomass.
 - **Growth:** Mature with continued local feeding. Removed cells retain their form but do not support Nether-native production outside the Nether; ordinary thermal-lined building parts remain usable elsewhere.
 
 ### T3-02 — Thermal Nursery
@@ -526,7 +538,7 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 
 ### T3-09 — Thermal Mantle
 - **Does:** Encloses an existing Bio-Furnace in a larger heat-safe body on mature Nether-native substrate. Unlocks tempered biological construction materials while retaining the furnace's counters and chosen traits; an ordinary unmantled furnace still works elsewhere.
-- **Input → output:** 2 Bone Plates + 1 iron ingot + heat → 2 Tempered Bone Plates. Washed iron, copper or gold concentrate + heat → the corresponding ingots and retained residue, according to the concentrate's mineral content.
+- **Input → output:** 1 Bone Plate + 1 Thermal Lining + 100 BU + heat → 1 Tempered Bone Plate. Washed iron, copper or gold concentrate + heat → the corresponding ingots and retained residue, according to the concentrate's mineral content. Item Catalog owns these yields; thermal processing does not require an additional raw iron reinforcement recipe.
 - **Create:** Surround the furnace with an eight-block 3×3 Thermal Substrate ring, four lined corner Rib Frames and four Thermal Linings on its chamber faces. Leave its service and output faces accessible.
 - **Growth:** A Steam Muscle adds batch pressure; additional lungs trade space for rate. Tempered plates reinforce large mining heads and electrical organs. Ordinary ingots do not become extra metal merely by passing through the mantle.
 
@@ -546,11 +558,11 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 - **Does:** A shaped mining head attached to a cradle or fixed gallery organ. Teeth cut a declared cross-section; the head itself does not contain a second miner or independent inventory.
 - **Input → output:** Host power + physical contact with marked terrain → cut blocks delivered to the host's output route.
 - **Create:** 2 Tempered Bone Plates + 2 iron pickaxes + 1 Thermal Lining; assemble head segments around the chosen clear passage.
-- **Growth:** Diamond mutation accepts harder ores; membrane mutation favors clean host-rock separation. A wider head requires more power and spoil handling rather than providing a free size increase.
+- **Growth:** Faceted Chitin treatment accepts harder ores; membrane mutation favors clean host-rock separation. A wider head requires more power and spoil handling rather than providing a free size increase.
 
 ### T3-13 — Digestion Crucible
 - **Does:** Dissolves host rock inside a sealed, finite excavation pit, then drains the medium so ores can be recovered. This trades a continuous tunnel for a prepared recovery site.
-- **Input → output:** Marked real host rock + leaching medium + biomass → accounted host residue, exposed untouched ores and recoverable spent medium.
+- **Input → output:** Marked real host rock + Bioactive Leaching Charge + biomass → accounted host residue, exposed untouched ores and Spent Leach Cake. The finite internal medium is not a world-placeable fluid.
 - **Create:** 1 Leaching Gland + 2 Thermal Linings + 2 Bone Plates as the core; line a Surveyed Tissue footprint with Living Skin grafted with one Thermal Lining per cell, and reserve a drain route.
 - **Growth:** Choose treatment speed or reagent economy. More lining increases depth; access tendons and a drained recovery landing are required before opening the pit. Full drains pause treatment.
 
@@ -570,7 +582,7 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 - **Does:** A short-range vertical launcher for prepared landings, mine entrances or glider takeoff. It is not a free-flight field or a revived acid-filled lift.
 - **Input → output:** A charged steam reserve + an occupant's deliberate activation → one directed launch, then recharge.
 - **Create:** 1 Steam Muscle + 2 Rib Frames + 1 slime block; install on a clearly marked launch pad.
-- **Growth:** Choose recharge speed or steam economy. Feather mutation softens takeoff; the destination still needs a safe landing surface. Covering the launch path prevents activation.
+- **Growth:** Choose recharge speed or steam economy. Contractile Fiber treatment softens takeoff; the destination still needs a safe landing surface. Covering the launch path prevents activation.
 
 ## T4 — Electrical precision: better recovery and controlled automation
 
@@ -585,7 +597,7 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 ### T4-02 — Conductive Tissue
 - **Does:** Carries electrical power through substrate, separately from control signals. Branches draw from one actual supply rather than duplicating it.
 - **Input → output:** Electrical input → delivered electrical power with transfer loss.
-- **Create:** Mutate substrate with 1 copper ingot + 1 redstone dust.
+- **Create:** Mutate mature substrate with 1 Conductive Myelin.
 - **Growth:** Gold graft lowers loss; Thermal Lining tolerates greater current. A Septum Crossing can separate two electrical circuits without shorting them together.
 
 ### T4-03 — Charge Sac
@@ -634,7 +646,7 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Does:** Sends a short configured sequence to attached organs: reserve materials, run a batch, wait for output, then start the next batch.
 - **Input → output:** Player-set steps + sensor conditions + electricity → commands to named connected organs. It does not manufacture missing inputs.
 - **Create:** 1 Synaptic Console + 1 clock + 1 comparator + 1 Organ Bud.
-- **Growth:** Amethyst mutation supports more conditions; additional ganglia divide a workshop into independently scheduled lines. A failed step displays its blocked dependency instead of silently skipping it.
+- **Growth:** Survey Gel treatment supports more conditions; additional ganglia divide a workshop into independently scheduled lines. A failed step displays its blocked dependency instead of silently skipping it.
 
 ### T4-11 — Display Membrane
 - **Does:** A readable wall display for one machine or configured district: stock, flow, reserve, pressure or an alarm. Adjacent panels form a larger display.
@@ -676,7 +688,7 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Does:** Keeps a steam/process line between chosen pressure limits, reserves room for shutdown output and operates a specific relief valve.
 - **Input → output:** Pressure/fullness measurements + electricity → throttled inlet, held reserve and controlled relief commands.
 - **Create:** 1 Sensor Polyp + 1 Overflow Valve + 1 copper ingot + 1 comparator.
-- **Growth:** Amethyst mutation coordinates several connected vessels. A nearby Charge Sac keeps the shutdown path alive during power loss; the regulator does not make an undersized relief route adequate.
+- **Growth:** Survey Gel treatment coordinates several connected vessels. A nearby Charge Sac keeps the shutdown path alive during power loss; the regulator does not make an undersized relief route adequate.
 
 ### T4-18 — Folded Shelter
 - **Does:** A transportable biological building kit for a dangerous outpost. It unfolds into a small ribbed shelter with an entrance, service face and floor, using material packed into it beforehand.
@@ -694,7 +706,7 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Does:** Stores ordinary Minecraft experience separately from typed organ/equipment counters. Gives an enchanting corner a place to bank experience without loose XP orbs.
 - **Input → output:** Experience deliberately deposited by a player → stored experience points → deliberate withdrawal or an attached permitted enchanting process.
 - **Create:** 1 Organ Bud + 1 enchanting table + 1 amethyst shard + 2 Membrane Sheets.
-- **Growth:** Join Mnemonic Vessels for capacity. Amethyst mutation improves transfer rate. It cannot turn furnace maturity into player XP; bio-armor enchantment support remains a separate choice, not a consequence of owning this block.
+- **Growth:** Join Mnemonic Vessels for capacity. Survey Gel treatment improves transfer rate. It cannot turn furnace maturity into player XP; bio-armor enchantment support remains a separate choice, not a consequence of owning this block.
 
 ## T5 — End colony: spatial materials and a defended settlement
 
@@ -703,7 +715,7 @@ Starter structures use T4 products plus local End materials. Mature spatial tiss
 ### T5-01 — Anchored Substrate
 - **Does:** The End-native foundation for spatial growth. Rooted veins visibly hold separate fragments of the tissue together above the pale ground.
 - **Input → output:** Living Substrate + End-local conditioning + biomass → mature anchored bed.
-- **Create:** In the End, mutate substrate with 1 end stone + 1 chorus fruit + 1 ender pearl.
+- **Create:** In the End, mutate mature substrate with 1 Anchor Seed.
 - **Growth:** Continued native growth permits spatial nurseries. Moving it to another dimension preserves the block but suspends End-native production; a relocated bed is not a portable End workshop.
 
 ### T5-02 — Spatial Nursery
@@ -745,7 +757,7 @@ Starter structures use T4 products plus local End materials. Mature spatial tiss
 ### T5-08 — Chorus Orchard Tissue
 - **Does:** Supports an End garden producing reliable nursery feed and construction stock. Can maintain an accessible low canopy rather than a tangled field of tall plants.
 - **Input → output:** Chorus planting stock + nutrients + End-local conditions → chorus fruit and retained replanting stock.
-- **Create:** Mutate Anchored Substrate with 1 chorus flower + 1 bone meal.
+- **Create:** Mutate mature Anchored Substrate with 1 Chorus Orchard Graft.
 - **Growth:** Grafting Bench variants favor compact fruit production or larger structural growth. Add a Harvest Corolla for automated collection; its output remains ordinary chorus-derived material, not arbitrary End loot.
 
 ### T5-09 — Targeting Eye
@@ -764,7 +776,7 @@ Starter structures use T4 products plus local End materials. Mature spatial tiss
 - **Does:** A physical safety net beneath a work platform, catching falling items before they disappear into the void. It must actually occupy the catch area.
 - **Input → output:** Items falling onto the membrane → retained items in an attached Item Capsule; a full capsule leaves them safely held within the net's finite storage.
 - **Create:** 1 Spatial Membrane + 2 string + 1 Rib Frame → 4 net sections.
-- **Growth:** Add supported sections for a wider net. Slime mutation cushions ordinary falls but is not a remote player-rescue ability. Breaking it preserves its held inventory rather than duplicating the items above.
+- **Growth:** Add supported sections for a wider net. Elastic Gel treatment cushions ordinary falls but is not a remote player-rescue ability. Breaking it preserves its held inventory rather than duplicating the items above.
 
 ### T5-12 — Phase Isolator
 - **Does:** Separates incompatible spatial workshop pulses without requiring distant bases. Provides a real reason to enclose nursery and precision rooms differently.
@@ -862,7 +874,7 @@ The player designs assemblies with separate working, supply and control parts. M
 - **Does:** Lets an organ change between two installed, compatible operating profiles without pretending that both are active simultaneously. Useful for a batch refinery or a defense station sharing scarce power.
 - **Input → output:** Explicit switch command + electricity + a drained/idle host → the other profile after its changeover delay.
 - **Create:** 1 Trait Regulator + 1 Scheduler Ganglion + 2 precision-conditioned Spatial Membranes.
-- **Growth:** Amethyst mutation shortens changeover. A second profile still occupies anatomy and needs its own installed materials; switching cannot refund consumed ingredients or erase processing waste.
+- **Growth:** Survey Gel treatment shortens changeover. A second profile still occupies anatomy and needs its own installed materials; switching cannot refund consumed ingredients or erase processing waste.
 
 ### T7-05 — Organ Transplanter
 - **Does:** Moves one matured core from a temporary body into a prepared permanent assembly. Lets an early organ become the heart of a late workshop without destroying its accumulated value.
@@ -892,7 +904,7 @@ The player designs assemblies with separate working, supply and control parts. M
 - **Does:** Opens the route to a fourth dimension, provisionally called **the Fold**. It is a prepared expedition gate, not a random world rupture or an automatic end to the campaign.
 - **Input → output:** Biomass/electric reserve + passenger-conditioned membranes + an attuned destination seed → a maintained passage to one expedition landing.
 - **Create:** 1 Transit Maw + 1 Spatial Conditioner core + 2 Catalyst Lobes + 4 Anchor Roots. Assemble on an End-native 5×5 anchored bed with a working return reserve.
-- **Growth:** Choose gate recharge or feed economy. Stabilizing a real Fold settlement permits a larger permanent route. Make the first destination seed in an End Spatial Conditioner from 1 ender pearl and silverfish, blaze and enderman Genetic Stock, with all three genomes complete.
+- **Growth:** Choose gate recharge or feed economy. Stabilizing a real Fold settlement permits a larger permanent route. Make the first Attuned Destination Seed using the Item Catalog recipe: an ender pearl, prepared passenger/precision membranes, silverfish/blaze/enderman stock and 500 BU in an End Spatial Conditioner, with all three genomes complete.
 
 ## T8 — The Fold: native adaptation and a new settlement
 
@@ -901,7 +913,7 @@ Long-term dimension branch. Its local growth alternates between two environmenta
 ### T8-01 — Adaptive Substrate
 - **Does:** A native foundation whose pores open during feeding conditions and close during hardening conditions. Supports Fold growth but cannot replace Thermal or Anchored Substrate for their native recipes.
 - **Input → output:** A cultured sample of local ground + biomass + local phase exposure → mature adaptive bed.
-- **Create:** Apply Spore Culture and a Spatial Membrane to an exposed sample of the Fold's root-bearing ground. Ordinary Living Substrate supports the initial shelter while this bed matures.
+- **Create:** Apply 1 Adaptive Seed to exposed Fold root-bearing ground and mature it locally. Ordinary Living Substrate supports the initial shelter while this bed matures.
 - **Growth:** Local plant genomes tune its phase preference. Its current condition is visible; relocating it preserves the block but suspends native production outside the Fold.
 
 ### T8-02 — Founder Nursery

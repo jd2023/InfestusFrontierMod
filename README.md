@@ -9,7 +9,7 @@ These are deliberate inherited pins, not a claim to use the newest releases.
 
 ## Development
 
-Install Java 21, Git, Bash and ripgrep; first Gradle use requires dependency access.
+Install Java 21, Git, Bash, Python 3 and ripgrep; first Gradle use requires dependency access.
 Import the root Gradle project in your IDE. From this directory:
 
 ```bash
@@ -32,6 +32,11 @@ pure core, but not the development test mod or archived Forge content.
 - [Vision](VISION.md): user commitments, proposed pillars, open questions.
 - [Progression map](docs/PROGRESSION_MAP.md): conceptual player ranks, alternative
   routes, dimensional economies, equipment tradeoffs and the long-term horizon.
+- [Block catalog](docs/BLOCK_CATALOG.md): organs, structures and construction.
+- [Item catalog](docs/ITEM_CATALOG.md): ingredients, biological preparation and consumables.
+- [Substrate mutations](docs/LIVING_SUBSTRATE_MUTATIONS.md): growth, functions and reinforcement.
+- [Armor evolution](docs/ARMOR_EVOLUTION.md): permanent per-piece branches, counters and metabolism.
+- [Guide tree](docs/GUIDE_PROGRESSION_TREE.md): proposed page prerequisites and observable unlocks.
 - [Developer guide](docs/DEVELOPER_GUIDE.md): mandatory deep modularity and workflow.
 - [Performance](docs/PERFORMANCE.md): bounds, back-pressure and adversarial cases.
 - [Architecture](docs/ARCHITECTURE.md): module ownership and test-mod isolation.

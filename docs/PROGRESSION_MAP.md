@@ -6,18 +6,9 @@ structures, trials and numbers below are proposals unless identified as an owner
 requirement. Names are working labels, not registry IDs or a finalized ontology.
 This describes the full ambition, not the scope of the first release.
 
-**Subsequent owner feedback:** this map did not convey enough of how play feels.
-Read the newer [design notebook](ideas_and_progression_feedback.md) and
-[assessment](IDEAS_REVIEW.md) before developing a stage. They expand the owner's
-specific ideas and propose revisions to resources and experiences. This older
-rank sequence remains a reference, not a requirement to preserve every named reagent.
+Read [Guide Tree](GUIDE_PROGRESSION_TREE.md) for exact proposed node dependencies, [Block Catalog](BLOCK_CATALOG.md) for structures, [Item Catalog](ITEM_CATALOG.md) for ingredients, [Substrate Mutations](LIVING_SUBSTRATE_MUTATIONS.md) for foundations and [Armor Evolution](ARMOR_EVOLUTION.md) for permanent equipment branches. This map describes play within those chapters; alternative architecture examples are not extra mandatory gates.
 
-**2026-09-08 experiment update:** notebook version 0.3 records Manual Leaching as
-an explicit owner-selected feature, multiple distinct downward mining approaches,
-ground-level construction/lit access, and suit fuel/HUD evidence. Read §§3 and 18
-before assigning mining or armor unlocks. Hazardous biomass overflow (§§8, 33) and
-leaching-assisted burrowing (§26) remain proposals; no rank below implicitly
-approves them or a random reservoir-rupture rule. Exact levels remain open.
+Manual Leaching and ground-only, temporary Burrowing are distinct selected mechanics. Hazardous biomass spills remain a separate open decision, not an implicit rule of progression.
 
 For a quick read, start with the [rank map](#3-the-map-at-a-glance),
 [alternative campaign routes](#52-four-viable-campaign-routes) and
@@ -102,9 +93,7 @@ commissioning, not the right to place ordinary building blocks or visit dimensio
 
 ### Research: a branching genetic atlas
 
-The DNA bank accumulates specimens until a species' genome is complete. A partial
-capture can teach a basic trait; completion makes reliable directed mutation
-possible. Exact sample counts are deliberately absent here.
+The DNA bank accumulates specimens until a species' genome is complete. Partial capture reveals the source and remaining research. Complete matching DNA is required for creature-derived armor grafts; host-grown introductory grafts need no creature genome. Exact sample counts are deliberately absent here.
 
 The atlas branches by biological function: structure, locomotion, exchange,
 perception and regulation. Nether and End research extend those branches rather
@@ -127,32 +116,32 @@ These levels are milestone labels, not yet balance numbers or a quest chain.
 
 | Rank | Era | New design problem | Signature unlock | Permanent base consequence |
 |---|---|---|---|---|
-| R0 | Contact | Learn the biological language | Culture, sampler, controlled substrate | A useful living garden |
-| R1 | Circulation | Balance supply and demand | Digestion, reservoir, tissue transport | A serviceable resource backbone |
-| R2 | Differentiation | Choose capabilities under constraints | DNA bank, mutation chamber, first specialist suits | Research and equipment workshops |
-| R3 | Thermogenesis | Establish production in a hostile environment | Nether-native Emberbed and thermal organs | A working Nether outpost |
-| R4 | Containment | Operate high-grade substances safely | Catalytic organs, isolation and recovery | Separated production districts |
-| R5 | Anchoring | Build where local conditions invalidate old assumptions | End-native Anchorbed and spatial organs | A working End outpost |
-| R6 | Confluence | Coordinate three persistent economies | Cross-dimensional circulation and graft transit | A distributed base |
-| R7 | Synthesis | Optimize competing outputs and withstand disruption | Configurable synthesis arrays and advanced DNA combinations | A resilient biological civilization |
-| R8 | Foreign Symbiosis | Establish a foothold in an alien ecology | Fourth-dimension Reciprocity Bed | A fourth operational settlement |
-| R9 | Coexistence | Solve a combined ecological and combat challenge | New boss discovery and alternative organ architectures | Open-ended specialization, not godhood |
+| SR0 | Contact | Learn the biological language | Culture, sampler, controlled substrate | A useful living garden |
+| SR1 | Circulation | Balance supply and demand | Digestion, reservoir, tissue transport | A serviceable resource backbone |
+| SR2 | Directed Mutation | Choose capabilities under constraints | DNA bank, mutation chamber, first specialist suits | Research and equipment workshops |
+| SR3 | Thermal Colony | Establish production in a hostile environment | Nether-native Thermal Substrate and thermal organs | A working Nether outpost |
+| SR4 | Precision | Operate high-grade substances safely | Catalytic organs, isolation and recovery | Separated production districts |
+| SR5 | End Colony | Build where local conditions invalidate old assumptions | End-native Anchored Substrate and spatial organs | A working End outpost |
+| SR6 | Distributed Colony | Coordinate three persistent economies | Cross-dimensional circulation and graft transit | A distributed base |
+| SR7 | Synthesis | Optimize competing outputs and withstand disruption | Configurable synthesis arrays and advanced DNA combinations | A resilient biological civilization |
+| SR8 | Foreign Symbiosis | Establish a foothold in an alien ecology | Fourth-dimension Adaptive Substrate | A fourth operational settlement |
+| SR9 | The Manyfold | Solve a combined ecological and combat challenge | New boss discovery and alternative organ architectures | Open-ended specialization, not godhood |
 
-R0–R7 form a proposed complete three-dimension campaign. R8–R9 are an expansion
-horizon; R7 must be satisfying without them.
+SR0–SR7 form a proposed complete three-dimension campaign. SR8–SR9 are an expansion
+horizon; SR7 must be satisfying without them.
 
 **Read each row as an era entered at that rank.** Its listed tools are available
 for research/construction during that era; its exit demonstration qualifies the
-next rank. R0 is the starting state. For example, R2 tools let the player earn R3;
-R3's native Nether nursery does not require completing its own R3 exit first.
-R7's optional expansion preparation leads to R8; R8 settlement opens R9's boss
-chapter. R9 completion closes that chapter, not an automatic R10 power tier.
+next rank. SR0 is the starting state. For example, SR2 tools let the player earn SR3;
+SR3's native Nether nursery does not require completing its own SR3 exit first.
+SR7's optional expansion preparation leads to SR8; SR8 settlement opens SR9's boss
+chapter. SR9 completion closes that chapter, not an automatic SR10 power tier.
 
 The rows show a recommended commissioning sequence, not a prohibition on
 exploration or parallel research. Aquatic, field/combat and ecological research
-branch from R2 and contribute alternative solutions through later eras; they are
+branch from SR2 and contribute alternative solutions through later eras; they are
 not three compulsory completions. Vanilla Nether/End travel remains ungated by
-rank. An experienced player can scout the End before R4 and settle it later.
+rank. An experienced player can scout the End before SR4 and settle it later.
 
 ## 4. Stage-by-stage journey
 
@@ -161,7 +150,7 @@ an exit demonstration and a reason its infrastructure survives the next stage.
 “Demonstration” means a bounded, inspectable scenario using the player's build—not
 an instruction to stand still while a progress bar fills.
 
-### R0 — Contact: make a small place come alive
+### SR0 — Contact: make a small place come alive
 
 **Fantasy:** discover that life can be a building material and a tool.
 
@@ -188,8 +177,7 @@ indefinitely merely because it exists.
 **Puzzle:** where should the garden go so it can connect to storage and workshops
 without demolishing the landscape? The first tissue path climbs or follows terrain.
 
-**Exit demonstration:** create and use one intentional patch, obtain a useful
-biological output and identify what fed it. No mandatory tree removal or armor set.
+**Exit demonstration (SR1):** produce biomass, store it and make a Membrane Sheet and Bone Plate. No mandatory tree removal or armor set.
 
 **Continuing value:** starter cultures remain construction stock; low-grade inputs
 feed later local services. Visual growth adds undergrowth and variation rather than
@@ -197,7 +185,7 @@ erasing the garden after harvest.
 
 **Review:** a hidden recipe or a mandatory rare drop makes this onboarding fail.
 
-### R1 — Circulation: your first automated organism
+### SR1 — Circulation: your first automated organism
 
 **Fantasy:** the base begins doing useful work while you do something else.
 
@@ -221,10 +209,7 @@ construction. One large tank is easy, but separate reserves and priorities preve
 a construction order from starving the workshop. Long paths and uphill runs must
 have clear, finite transport rules—not an expensive real-fluid simulation.
 
-**Exit demonstration:** with inputs supplied automatically, serve two bounded
-demands without hand-feeding the machines. Stop an output and show that processing
-pauses safely; restore it and recover. Initial reserve is disclosed rather than
-secretly forbidden. Repeated demand must reveal a functioning replenishment path.
+**Exit demonstration (SR2):** run three useful automatically supplied batches and demonstrate a replenishable feed source with planting/breeding stock reserved (CI-01/02). Blocking and restoring an output is an optional diagnostic branch, not a second hidden rank gate.
 
 **Continuing value:** reservoirs, digestion and low-grade conduits remain useful
 as local branches. New tiers add specialized services rather than replace every
@@ -232,7 +217,7 @@ block with a differently colored version.
 
 **Review:** if the only challenge is filling a larger tank, redesign this stage.
 
-### R2 — Differentiation: choose what your biology is good at
+### SR2 — Directed Mutation: choose what your biology is good at
 
 **Fantasy:** grow equipment and organs around an intended job.
 
@@ -256,18 +241,19 @@ while the base continues serving other consumers. Decide whether to add a buffer
 separate a route or use a slower chamber profile. Usage practice refines a chosen
 trait; it does not require AFK-running or repeatedly injuring yourself.
 
-**Exit demonstration:** complete one genome, grow a meaningful adaptation and use
-it for its intended task; supply a repeatable chamber cycle automatically. The
-player can compare two plausible mutation previews before committing resources.
+**Exit demonstration (SR3):** complete one genome and use one meaningful researched
+expression in a plant, organ or equipment item. No automatic Mutation Chamber
+cycle or specific armor set is an additional rank gate.
 
 **Continuing value:** the atlas, chamber and workshop become the place for suit
-refits. Early movement, utility and ecological traits participate in late designs.
+forward evolution and growing additional specialists. Early movement, utility and
+ecological traits participate in late designs.
 
 **Review:** a mandatory perfect suit before any trait becomes useful is too steep.
 
 ### Parallel branch — the deep ocean is a destination, not a detour tax
 
-Available from R2, with later refinements. An aquatic suit emphasizes breathing,
+Available from SR2, with later refinements. An aquatic suit emphasizes breathing,
 swimming, underwater visibility and stable underwater work. A prepared habitat or
 vanilla breathing supplies provide an alternative to fully specializing armor.
 
@@ -280,7 +266,7 @@ Do not invent a global pressure-damage mechanic just to make the suit necessary.
 Any special deep-water hazard would need a separate proposal. Standard oceans
 remain understandable Minecraft environments.
 
-### R3 — Thermogenesis: the Nether becomes home territory
+### SR3 — Thermal Colony: the Nether becomes home territory
 
 **Fantasy:** make a place that is hostile to you hospitable to useful organisms.
 
@@ -288,8 +274,8 @@ Enter through an ordinary Nether portal with ordinary protective planning. Initi
 biological settlement uses common cultured material, local Nether resources and
 a modest imported nutrient reserve. It must not require the product it will make.
 
-Propose **Emberbed**, substrate that can be matured only in the Nether. A thermal
-organ operates only on an active Emberbed foundation in that dimension. Lava in an
+Propose **Thermal Substrate**, substrate that can be matured only in the Nether. A thermal
+organ operates only on an active Thermal Substrate foundation in that dimension. Lava in an
 Overworld room does not substitute for the native environmental condition. Exported
 products are useful elsewhere; the producing ecology must stay in the Nether.
 
@@ -310,9 +296,7 @@ cooling/heat-recovery path is available before advanced imported membranes.
 processing. Keep the reserve needed for restarting separate from production stock.
 Design around slopes and caverns; do not require a perfectly flat industrial slab.
 
-**Exit demonstration:** mature Emberbed locally and repeatedly produce a stabilized
-thermal output with automatic feeding and safe shutdown. An unloaded support chunk
-must pause the process, not secretly continue heating it.
+**Exit demonstration (SR4):** produce Tempered Bone Plates and three automatically fed Nether-native Thermal Lining batches. Loaded-only operation pauses on unavailable support; safe shutdown is taught, not a request to damage the site.
 
 **Continuing value:** Nether-grown thermal membranes and high-grade reagents are
 consumed by advanced synthesis and mutation. A bag of first-visit loot cannot
@@ -321,7 +305,7 @@ replace the production facility forever.
 **Review:** carrying a charged vesicle home is allowed; moving the entire productive
 Nether ecology home must not be the optimal solution.
 
-### R4 — Containment: power becomes a design responsibility
+### SR4 — Precision: power becomes a design responsibility
 
 **Fantasy:** master a process powerful enough to demand architecture.
 
@@ -329,7 +313,7 @@ Unlock catalytic processing, specialized conduit linings, sensing/priority organ
 isolation valves and recovery chambers. These must all be available before the
 first dangerous operating mode. Danger is opt-in operation, never rogue colony growth.
 
-Propose **catalytic ichor**, a high-grade reaction medium produced using Nether
+Propose **Prepared Genetic Suspension**, a high-grade reaction medium produced using Nether
 thermal output and a refined biological input. It enables more demanding mutation
 and membrane production. It is not simply “biomass, but worth a thousand times more.”
 
@@ -344,10 +328,7 @@ Two operating strategies:
 loop. More cooling competes with productive organ space. Aggressive throughput can
 increase consumable and recovery cost rather than offer a free linear upgrade.
 
-**Exit demonstration:** meet a specified product grade, then survive a disclosed
-input interruption or output blockage. A controller must perform the response;
-the player cannot pass by babysitting every valve. The challenge is short and
-diagnostic, not a long endurance timer.
+**Exit demonstration (SR5):** complete one useful precision process and demonstrate a controlled stop/resume with inputs retained. No spill or forced accident is required.
 
 **Failure:** warn, throttle, isolate; if the player deliberately overrides safety,
 a bounded local incident may ruin a batch and injure an exposed operator. Recovery
@@ -360,7 +341,7 @@ lines serve particular grades. Mature players still choose where risk is worth i
 **Review:** if a restart or chunk boundary can cause an accident, the design fails
 before balance is considered. Hardware lag is not a gameplay challenge.
 
-### R5 — Anchoring: build a real End settlement
+### SR5 — End Colony: build a real End settlement
 
 **Fantasy:** turn precarious footholds into a connected, productive habitat.
 
@@ -369,9 +350,8 @@ research uses encounter evidence or a renewable aftermath sample, never exclusiv
 ownership of the dragon egg. Players who arrive after another team killed the
 dragon need a valid route. No repeated dragon kills for routine production.
 
-A portable starter nursery uses R4 material and locally available End resources.
-It creates **Anchorbed**, matured only in the End. Spatial organs require active
-Anchorbed in the End even if their finished membranes can be exported.
+A prepared Anchor Seed uses earlier processing and locally obtainable End ingredients. Apply it to selected mature substrate in the End to create **Anchored Substrate**, then build the Spatial Nursery on that bed. Spatial organs require active
+Anchored Substrate in the End even if their finished membranes can be exported.
 
 Unlock an anchor nursery, spatial membrane organ, local landing/return support and
 End-specialized adaptations. Starter settlement is possible without advanced
@@ -389,9 +369,7 @@ much as production speed. High-grade spatial output needs a timed active cycle,
 not permanent ticking of every decorative block. Timing is local process phase,
 not “come back next real-world Tuesday.”
 
-**Exit demonstration:** operate a native organ, produce repeated spatial membranes,
-and prove safe arrival/refusal at the local transfer point when its destination
-is obstructed. Return travel is secured before a risky field objective.
+**Exit demonstration (SR6):** condition a Spatial Membrane and complete three automatically fed native End batches. Native transit organs are later SR6 construction, so an operational Transit Maw cannot be required to enter SR6.
 
 **Continuing value:** the End conditions spatial membranes used in distant links,
 precision mutation and advanced synthesis. Shipping chorus fruit home does not
@@ -400,7 +378,7 @@ replace this function.
 **Review:** make the End settlement worthwhile before giving it an export quota.
 Its mobility, staging and spatial crafting should help the player while building it.
 
-### R6 — Confluence: three worlds, one designed system
+### SR6 — Distributed Colony: three worlds, one designed system
 
 **Fantasy:** your distant bases function as organs of one organism.
 
@@ -413,7 +391,7 @@ capacity so one does not silently grant the other for free.
 The three persistent specialties now interlock:
 
 - Overworld biological cultivation supplies refined nutrients and recovery media.
-- Nether thermal organs produce high-grade catalysts and thermal membranes.
+- Nether thermal organs produce Thermal Lining and tempered materials used by later precision and catalyst recipes.
 - End organs condition spatial membranes and phase-sensitive products.
 
 Each settlement has a low-throughput local restart path; advanced throughput depends
@@ -433,10 +411,7 @@ A higher rate at one organ may make the whole system worse by monopolizing a lin
 Choose priorities, batch size, reserves and recovery paths rather than lay a single
 universal vein and forget about it.
 
-**Exit demonstration:** satisfy a combined production order with genuine native
-processing in all three dimensions; then recover from a scheduled link outage
-without loss or manual relaying. No requirement for all dimensions to remain loaded
-simultaneously: bounded endpoint buffers and staged active sessions are valid.
+**Exit demonstration (SR7):** deliver actual products from working Overworld, Nether and End installations and use their contributions in one product. Manual carriage through ordinary portals remains a solo fallback until native gate loading is approved. Local production must be automated; all destinations need not be loaded simultaneously.
 
 **Continuing value:** travel convenience makes the multi-base game enjoyable. It
 does not remove native production conditions or turn every dimension into a lobby.
@@ -444,7 +419,7 @@ does not remove native production conditions or turn every dimension into a lobb
 **Review:** without an approved chunk-loading system, no trial may require one.
 Remote suspension is normal operation, not a punishment to work around.
 
-### R7 — Synthesis: the long post-End game
+### SR7 — Synthesis: the long post-End game
 
 **Fantasy:** design a biological solution other players might want to study.
 
@@ -473,7 +448,7 @@ Decide between dedicated lines, buffered batch sharing and parallel arrays.
 Capturing maximum yield everywhere may lose to a simpler design with fewer
 transport steps and lower service overhead.
 
-**Exit demonstration:** choose one mastery project and meet an understandable
+**Three-world capstone, not an additional SR8 prerequisite:** choose one mastery project and meet an understandable
 service envelope. This recognizes achievement, not the only “correct” base.
 There is no obligatory million-item trophy or single universal final machine.
 
@@ -485,13 +460,13 @@ The campaign has a satisfying conclusion here even if no fourth dimension ships.
 the early chamber. If it erases intermediates, risk and specialization, revise it.
 
 **Optional expansion preparation:** a bounded three-world synthesis experiment
-produces the first aperture seed using only R7-or-earlier resources. It reveals
-evidence of a different regulatory ecology and qualifies entry to R8. Neither the
+produces the first Attuned Destination Seed using only SR7-or-earlier resources. It reveals
+evidence of a different regulatory ecology and qualifies entry to SR8. Neither the
 seed nor the return kit requires material from the still-unvisited fourth world.
 
-### R8 — Foreign Symbiosis: a fourth world with a different rule
+### SR8 — Foreign Symbiosis: a fourth world with a different rule
 
-**Very-long-term expansion concept. Working name: the Palimpsest.**
+**Very-long-term expansion concept. Working name: the Fold.**
 
 This is a layered alien biosphere: older mineralized growth supports newer
 membranes, hanging gardens and immense dormant organs. It is not another Nether
@@ -502,12 +477,12 @@ The colony remains yours. The dimension has its own native ecology; it cannot
 hijack your substrate or spread into other worlds. Large environmental shifts
 should be visual or localized to registered habitats, not world-wide block rewrites.
 
-The entry aperture is constructed from R7 capabilities distributed across the
+The entry aperture is constructed from SR7 capabilities distributed across the
 three existing dimensions. Its first expedition kit contains a protected return
 method that does not require killing the new boss or receiving another shipment.
 
-On arrival, a low-grade native starter process establishes **Reciprocity Bed**.
-It can exist actively only here. Its first functional output, **regulatory matrix**,
+On arrival, a low-grade native starter process establishes **Adaptive Substrate**.
+It can exist actively only here. Its first functional output, **Adaptive Gel**,
 allows an organ to switch between two incompatible *modes* safely. It does not
 allow both modes at full strength simultaneously.
 
@@ -528,18 +503,18 @@ single decorative arrangement under the guise of ecology.
 return route through a local operating-cycle change. Imports support advanced
 production, but the starter ecology can restart on previously unlocked materials.
 
-**Continuing value:** native regulatory matrix enables alternative synthesis and
+**Continuing value:** native Adaptive Gel enables alternative synthesis and
 equipment architectures across the colony. It complements the other dimensions'
 exports rather than replacing all of them with a superior universal substance.
 
 **Review:** exploration and settlement must be enjoyable before the boss is available.
 If this is merely a boss room and a rare ore, it does not justify a dimension.
 
-### R9 — Coexistence: a boss that tests the civilization you built
+### SR9 — The Manyfold: a boss that tests the civilization you built
 
 **Very-long-term boss concept. Working name: the First Pattern.**
 
-A vast native organism regulates a region of the Palimpsest. It responds to a
+A vast native organism regulates a region of the Fold. It responds to a
 player-initiated challenge within a defined arena; it does not raid unattended
 bases. Its anatomy and behavior express biological regulation rather than a
 reskinned familiar franchise creature.
@@ -632,10 +607,10 @@ native substrate, a valid structure and that dimension's conditions.**
 
 | Site | Native substrate proposal | Work that stays local | Export and recurring use | Imports for advanced operation |
 |---|---|---|---|---|
-| Overworld | Verdant Bed, a specialized living substrate | Diverse culture renewal and high-grade recovery media | Nutrient cultures and repair media for mutation/processing | Thermal refinement products; later spatial conditioning |
-| Nether | Emberbed | Thermal maturation and high-grade catalyst production | Thermal membranes and catalyst charges for advanced organs | Refined nutrients, exchange membranes and recovery media |
-| End | Anchorbed | Spatial membrane conditioning and anchor growth | Membranes consumed by advanced synthesis, freight and gate operation | Nutrient cultures and stabilized thermal products |
-| Palimpsest, horizon only | Reciprocity Bed | Regulatory matrix maturation in a native habitat | Mode-regulation material for alternative high-tier designs | Products and support from all three established worlds |
+| Overworld | Mature Living Substrate with Cultivation Tissue | Diverse culture renewal and high-grade recovery media | Nutrient cultures and repair media for mutation/processing | Thermal refinement products; later spatial conditioning |
+| Nether | Thermal Substrate | Thermal maturation and high-grade catalyst production | Thermal membranes and catalyst charges for advanced organs | Refined nutrients, exchange membranes and recovery media |
+| End | Anchored Substrate | Spatial membrane conditioning and anchor growth | Membranes consumed by advanced synthesis, freight and gate operation | Nutrient cultures and stabilized thermal products |
+| Fold, horizon only | Adaptive Substrate | Adaptive Gel maturation in a native habitat | Mode-regulation material for alternative high-tier designs | Products and support from all three established worlds |
 
 These are proposed *local process requirements*, not universal dimension checks on
 all items. Players can carry products, samples and ordinary substrate freely.
@@ -643,7 +618,7 @@ Special beds moved elsewhere become dormant or unsuitable foundations; they do
 not silently disappear or damage the environment. Revalidation after moving,
 reforming or reloading must prevent an active foreign machine from bypassing this.
 
-Start the specialized Overworld bed at R2 using only early materials. Keep the
+Start ordinary cultivation in SR1 using starter materials; SR2 genetics diversifies its crops and cultures without inventing another foundation grade. Keep the
 ordinary starter substrate useful anywhere it is deliberately placed. Native beds
 add visible ecological identities, not four colors of the same flat surface.
 
@@ -741,8 +716,7 @@ distinct recipes with distinct limits, not one copyable universal bonus.
 and receives refinement while performing its useful activity. DNA mutation can
 establish a usable baseline without exercise grinding. Practice can improve
 efficiency or handling but cannot unlock every incompatible branch simultaneously.
-Refitting is deliberate at a workshop, with a modest disclosed cost and preview;
-no reroll lottery, hidden failure chance or permanently ruined unique equipment.
+Armor choices are permanent and previewed at the workshop. Forward fusion preserves history; a sibling material or exclusive trait branch needs another independently grown piece. Organ production settings and tissue reconfiguration have separate rules.
 
 Design against obvious optimal chores: running into walls, falling onto healing
 loops, repeatedly equipping gear, and sampling the same entity every tick. Use
@@ -751,7 +725,7 @@ or a promise of perfect anti-AFK detection.
 
 ### 5.7 Armor: exceptional within a role, limited across roles
 
-Each suit has three proposed constraints: finite organ capacity, a sustainable
+Each piece has finite anatomy; a full suit adds shared metabolism. Together these create three constraints: finite organ capacity, a sustainable
 metabolic output, and physiological compatibility. Fuel storage affects endurance;
 it does not expand anatomy or make incompatible systems coexist. Higher ranks
 unlock better architectures and refinements while retaining a final hard ceiling.
@@ -765,12 +739,9 @@ unlock better architectures and refinements while retaining a final hard ceiling
 | Spatial | Controlled short displacement, landing support and End work | Unlimited flight, arbitrary teleports and immunity to falling into the void |
 | Generalist | Convenient travel and brief exposure to several conditions | Specialist endurance, peak movement or the highest protective operating envelope |
 
-Illustrative thought experiment, **not balance values**: a mature suit has 12
-capacity units. A sustained thermal suite uses 9; an aquatic suite uses 9. A
-4/4/4 generalist can carry several useful minor traits, but cannot fit either
-complete specialist architecture. Traits need meaningful thresholds and curves;
-this cannot be solved merely by attaching a small penalty to an otherwise universal
-set. Later research must not quietly raise capacity until both specialist suites fit.
+Anatomy belongs to each piece, not a pooled twelve-slot suit. The armor specification gives G1 four slots per piece; rigid and flexible child frames have different slot and counter ceilings. Thermal and pelagic linings are permanent exclusive choices on every piece. A generalist can install compatible lesser conveniences, but never exchange its committed body plan before each encounter.
+
+Raw mineral cannot be clicked onto armor or an organ to improve it. The player builds activation and fusion organs, prepares the relevant medium/graft, then treats the existing target. Early gels work in the Culture Bowl; later Activation Cysts, Fusion Chrysalises and native material chains give the workshop continuing jobs.
 
 Separate reserves and output: enough biomass to operate for an hour is not enough
 metabolic output to regenerate, sprint, shield and blink at maximum simultaneously.
@@ -789,12 +760,13 @@ hidden counter expires is not desirable balance.
 
 Equipment swapping remains useful preparation, but must not yield instantaneous
 universal protection: show acclimation/activation rules, clear effects on removal,
-and preserve ability cooldowns across unequipping. Do not punish ordinary gear
-changes or require a long wait every time someone leaves their base.
+and preserve ability cooldowns across unequipping. Established symbiosis is retained when owned pieces are swapped; newly grown equipment may still need maturation under the final adaptation model.
 
 Weapons and tools follow the same logic: selective harvesting versus bulk work,
 reach versus speed, precision sampling versus destructive output. A boss reward
 may unlock a new attack or harvesting approach, not a universal one-hit tool.
+
+Hungry immature armor automatically hurts its wearer; after full symbiosis it stops causing armor hunger pain and simply pauses unpaid abilities. Tiny starting reserves make refueling important from the first trip. Self-mending, auto-healing, sprint assistance, light, jumping and burrowing spend real biomass. Auto-feeding consumes real food; a separate intake draws real fuel. Elytral flight requires incorporating an actual Elytra, with glide before powered climbing and hovering.
 
 #### Candidate mutation paths through the ranks
 
@@ -803,11 +775,11 @@ real biological mechanisms. Species and effects still need their own design revi
 
 | Path | Early usable expression | Later directed DNA combination | Mastery remains limited by |
 |---|---|---|---|
-| Thermal | Brief heat tolerance and visible reserve at R2 | Magma-cube/blaze-inspired heat handling, completed captures and Nether membranes at R3–R4 | Exchange capacity and specialist anatomy; no blanket combat immunity |
-| Pelagic | Longer breathing or better underwater work at R2 | Turtle/squid/dolphin-derived alternatives for protection, sensing or movement | Choose a durable working suit or agile exploration suit; neither becomes a lava suit |
-| Locomotion | Practiced efficient movement at R2 | Alternative climbing, bracing or burst-movement expressions from captured organisms | Activity-specific output and incompatible body plans, not unlimited speed stacking |
-| Spatial | Safe landing support during R5 settlement | Complete enderman research plus End-conditioned organs permits a controlled blink variant | Valid destinations, finite range/output and persistent cooldown; no wall/claim bypass |
-| Regulatory | R7 predictable switching of production profiles | Fourth-world research permits richer, deliberately sequenced profiles at R8–R9 | Transition cost and one active incompatible mode at a time |
+| Thermal | Ordinary fire-resistance preparations and a visible reserve at SR2 | Magma-cube/blaze-inspired heat handling, completed captures and Nether membranes at SR3–SR4 | Exchange capacity and specialist anatomy; no blanket combat immunity |
+| Pelagic | Longer breathing or better underwater work at SR2 | Turtle/squid/dolphin-derived alternatives for protection, sensing or movement | Choose a durable working suit or agile exploration suit; neither becomes a lava suit |
+| Locomotion | Practiced efficient movement at SR2 | Alternative climbing, bracing or burst-movement expressions from captured organisms | Activity-specific output and incompatible body plans, not unlimited speed stacking |
+| Spatial | Safe landing support during SR5 settlement | Complete enderman research plus End-conditioned organs permits a controlled blink variant | Valid destinations, finite range/output and persistent cooldown; no wall/claim bypass |
+| Regulatory — organs, not armor | SR7 predictable switching of production profiles | Fourth-world research permits richer, deliberately sequenced profiles at SR8–SR9 | Transition cost and one active incompatible mode at a time |
 
 Thermal and aquatic examples must have several viable genomes or trait expressions
 where practical, not a mandatory checklist of every species named in the row.
@@ -862,12 +834,12 @@ replaces every ingredient, energy source, catalyst and gene.
 
 | Introduction | Proposed resource/condition | Useful capability | New handling problem | Safe low-tech response |
 |---|---|---|---|---|
-| R0–R1 | Bulk biomass and ordinary nutrients | Growth, repair, basic work | Supply balance and full storage | Pause intake/consumption; retain contents |
-| R2 | Refined culture and selective membranes | Reliable mutation and separation | Grade versus yield; clean versus mixed streams | Segregate or reprocess a batch |
-| R3 | Heat-bearing vesicles | Thermal work and specialized materials | Rate of charging/discharging; heat recovery | Stop feeding and use the supplied dry recovery path |
-| R4 | Catalytic ichor | High-grade synthesis and demanding mutations | Concentration, incompatible contacts, recovery capacity | Isolate and neutralize in a bounded chamber |
-| R5–R6 | Conditioned spatial membranes | Anchoring, precision work and transport | Destination validity and active process phase | Refuse, buffer, pause and resume |
-| R8 | Regulatory matrix | Deliberate switching between organ profiles | Complementary habitat conditions and mode transitions | Retreat to a stable local mode |
+| SR0–SR1 | Bulk biomass and ordinary nutrients | Growth, repair, basic work | Supply balance and full storage | Pause intake/consumption; retain contents |
+| SR2 | Refined culture and selective membranes | Reliable mutation and separation | Grade versus yield; clean versus mixed streams | Segregate or reprocess a batch |
+| SR3 | Heat-bearing vesicles | Thermal work and specialized materials | Rate of charging/discharging; heat recovery | Stop feeding and use the supplied dry recovery path |
+| SR4 | Prepared Genetic Suspension | High-grade synthesis and demanding mutations | Concentration, incompatible contacts, recovery capacity | Isolate and neutralize in a bounded chamber |
+| SR5–SR6 | Conditioned spatial membranes | Anchoring, precision work and transport | Destination validity and active process phase | Refuse, buffer, pause and resume |
+| SR8 | Adaptive Gel | Deliberate switching between organ profiles | Complementary habitat conditions and mode transitions | Retreat to a stable local mode |
 
 Matter and useful work are accounted for separately. Byproduct recycling recovers
 some inputs or useful work; it cannot multiply substrate, free energy and catalysts
@@ -968,7 +940,7 @@ was reviewed first for its new decision, then for its dependency and failure pat
 | Efficiency means stripping every plant | Functional habitat options and retained visual layers | At least two useful ecological layouts beat the cleared-floor default for relevant jobs |
 | Automation proof becomes a chore or exclusive pipe requirement | Useful commissioning batches and interface-observed service contracts | Manual hand-feeding is insufficient, but legitimate external automation works |
 | Dangerous materials punish crashes instead of mistakes | Safe pause/restart and bounded explicit operating incidents | Failure injection never produces runaway world effects |
-| New boss requires its own exclusive loot to reach it | R7 entry kit and R8 starter ecology precede boss rewards | First encounter is reachable without trading or prior kills |
+| New boss requires its own exclusive loot to reach it | SR7 entry kit and SR8 starter ecology precede boss rewards | First encounter is reachable without trading or prior kills |
 | Final reward deletes the game | New modes, architectural options and prestige, not universal upgrades | Existing specialist suites and dimension roles remain relevant |
 
 ### A worked design comparison to test early
@@ -1043,7 +1015,7 @@ validate the reusable systems with narrow vertical slices.
 - [ ] Establish two useful configurations for the first modular multiblock family.
 - [ ] Set duration and difficulty targets from playtests; distinguish active problem
   solving, construction, travel, repeated gathering and passive waiting.
-- [ ] Ratify a satisfying three-dimension R7 endpoint independently of expansion.
+- [ ] Ratify a satisfying three-dimension SR7 endpoint independently of expansion.
 - [ ] Keep the fourth dimension and boss in a horizon backlog until the base game
   has demonstrated depth, stability and acceptable server cost.
 

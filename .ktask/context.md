@@ -21,3 +21,5 @@ Authoritative local gate: `./.ktask/verify.sh`. Its log is in build/verification
 No automatic publication, merging to main, remote writes, license changes or
 golden replacement. HUMAN gates are owner-only. This queue has no approved
 implementation tasks yet.
+
+Design ownership: docs/ITEM_CATALOG.md owns prepared items; BLOCK_CATALOG.md owns organs; LIVING_SUBSTRATE_MUTATIONS.md owns tissue; ARMOR_EVOLUTION.md owns equipment; GUIDE_PROGRESSION_TREE.md owns proposed chapter prerequisites. Armor branches are permanent per piece. Hungry armor hurts until full symbiosis; afterwards unpaid features stop. Auto-feeding, auto-healing and actual Elytra fusion are requested. Exact symbiosis ownership and balance remain proposals. Raw functional upgrade ingredients require biological preparation; basic construction and ordinary food/fuel remain distinct.
