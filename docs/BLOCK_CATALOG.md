@@ -10,6 +10,66 @@ Free-standing organs root into Living Substrate or a named specialized bed. Atta
 
 One starting ingredient is an item, not a block: **Spore Culture = 1 rotten flesh + 1 red mushroom + 1 wheat seed**. Biomass is the colony's consumable feed, measured as fluid; one bucket holds 1,000 mB. Other new construction materials are introduced by the blocks that produce them below. Colored membranes and skin can use vanilla dyes; color does not change routing or function.
 
+## Building with operations
+
+A working organ owns one operation; a named installation combines organs. Split an operation out when the player could share it, place it differently, bypass it or specialize it independently. Do not require a separate block just to move between two internal steps of the same recipe. A furnace still smelts; a kidney still washes; neither becomes a mandatory chain of six tiny organs.
+
+**Assembly** lists the required component types of a worked installation, not a shapeless crafting recipe. **Create** states quantities, placement and whether there is a distinct controller. Installed components remain physical and recoverable, with their own counters and mutations; an assembly never copies their histories into its controller. Only the organ doing the conversion earns processing counts. A planning core earns at most one count per completed finite section; transferring, waiting or circulating the same output earns none. Passive service/holding parts have no processing levels. Automatic input, output, planting, repair and fueling are separate jobs, not free side effects of gaining a level.
+
+### Reliable sequencing, with room to optimize
+
+- A basic organ can be hand-loaded and explicitly started. A supplied organ can be set to repeat its selected recipe whenever ready. Neither mode requires a scheduler or a redstone clock.
+- Work Bed and organ faces expose **ready, working, result held, blocked**. A result remains visibly held until collected; completion is not a one-tick pulse the next machine can miss. Early vanilla redstone reads these stable states; Nerve Tissue carries the same states and bounded start/acknowledgment commands.
+- Before a step starts, it reserves its target, ingredients, product space, waste space and returned containers. Only one actor can own a particular bed/batch. Holding a start signal high or repeating a command does not repeat the same job. Distinct readiness and completion connections prevent a jaw from breaking a block before treatment.
+- A Reflex Knot combines local conditions; a Selector Ganglion assigns work to one ready branch. A later Scheduler Ganglion can express a bounded sequence. None lets the player skip a physical reaction, capacity limit or native bed. Vanilla comparators, latches and hoppers remain alternatives, not obsolete prerequisites.
+- A blocked next step leaves the current product held. No generic catch-up work happens on chunk reload. The UI names the dependency: “waiting for treatment,” “tailings full,” “no planting stock,” or “destination unloaded.” A safe cancel releases untouched reservations; a committed conversion retains its actual intermediate, not both the input and output. Naturally hazardous thermal operations retain their own shutdown requirements.
+
+The puzzle is where work waits, which equipment is shared, what gets priority, and which recovery stages are worth supplying. A timer may stagger starts or impose a feed budget; it must not be the only way to know that a chemical reaction finished.
+
+### The first mineral workshop
+
+```text
+real ore block → Grasping Root → Work Bed
+                                  │
+                         Reaction Polyp (optional)
+                                  │ treatment complete
+                             Fracture Jaw
+                                  │ retained fragments/raw ore
+                  Collection Cilia OR courier OR manual pickup
+                                  │
+                           capsule / item vein
+                                  │
+                    Mineral Gizzard → Bio-Furnace
+                                  └→ Washing Kidney → furnace
+                                           └→ retained tailings → Ion Separator (T4)
+```
+
+The root presents **one existing block and stops**. It does not identify an ore deposit, treat it, roll its drops or smelt it. A player may place a harvested ore block directly on the bed instead. The polyp applies a prepared penetrant; the jaw fractures the resulting material; the collector exports it. Bare rock can instead go directly from a jaw to a building-material store. Mineral-bearing intermediates never turn back into a fresh ore block after treatment.
+
+| Build | Physical arrangement and control | What the player gains | What they pay or give up |
+|---|---|---|---|
+| Lean outpost | Manual leaching/pickaxe or direct jaw extraction → small capsule → ordinary furnace | Little feed, equipment and supervision; ordinary ore yield | No intact-block treatment bonus; more player work or a low-rate cutter |
+| Careful serial refinery | One bed with root, polyp and jaw on separate service faces; ready/complete interlocks | Better recipe-defined recovery from a scarce deposit; low equipment count | Bed is occupied during treatment; reagent production and waste handling |
+| Parallel nursery of beds | Several independent beds/polyp-jaw sets; selector assigns the next free lane; shared reagent store | Overlap reactions and keep extraction busy | More land and organs; proportionally more feed per minute, not inherently more feed per ore |
+| Shared service line | Several beds feed one gizzard/kidney; capsules buffer bursts; selector alternates ready sources | Avoid duplicating an expensive mature processor; different ores use separate input reserves | Changeover and queueing; enough return/output space for each source; a bottleneck can idle all beds |
+| Fast bulk mine | Skip intact treatment; reinforced jaws → large packets → parallel furnaces | High throughput with a simpler chemical supply chain | Less recovered mineral per excavated block and a larger terrain/spoil footprint |
+| Recovery-focused refinery | Treatment, washing and later tailings separation; reuse suitable water/heat through actual recovery organs | Highest supported recovery for the chosen ore recipe | Longer residence, more power, biomass, cooling and waste capacity; extra stages need not pay off for cheap stone |
+
+Tune these against an explicit recipe sheet, not a hidden universal yield multiplier. For example, **if** extraction and fracture each take 10 s and treatment takes 40 s, a single exclusive bed takes at least 60 s per block before collection. Four parallel beds can overlap that work, but cannot outrun a shared collector or furnace. These times illustrate the scheduling problem, not committed balance. Faster mutations spend their stated extra feed/work; an economical mutation and more parallel space offer a different build. Measure useful products/minute, recovery per ore block, BU/product, water/power use and footprint separately. Server cost is a constraint on every route, not a reward for forcing more updates.
+
+### Reuse beyond mining
+
+| Workshop | Independent jobs | A different viable arrangement |
+|---|---|---|
+| Farm/orchard | Cultivation Tissue or Arbor Root grows; Planting Proboscis plants; Harvest Corolla cuts; Work Bed holds; Collection Cilia exports | Retain perennial bushes/trees and collect only mature pods; or replant annual beds from a shared reserved Seed Pouch. Manual harvest and optional workers remain valid. |
+| Equipment service | Fuel Papilla transfers real biomass; Repair Dock mends; Item Capsule holds gear; mouths move it | A cheap fuel stop near a mine, a shared repair room, or a later Service Pedestal with both attached. Paying for repair need not also authorize filling every reserve. |
+| Sampling | A berth contains the target; Sampling Proboscis takes a sample; Extractor separates it; lens resolves knowledge; bank stores knowledge | Share a sampler between compatible service berths or dedicate it to one rare specimen; do not make an entire laboratory for each species. |
+| Heat and refining | Furnace performs the recipe; lung supplies airflow; muscle supplies pressure/work; gill exchanges heat; condenser recovers water | Passive cooling with more exposed area, compact supplied cooling, or deliberate safe venting where water is cheap. |
+| Spatial/Fold work | Nursery grows material; resonator supplies a condition; conditioner commits a product; collector captures phase work; accumulator stores it | Batch one shared tuned room, isolate parallel rooms, or buffer native phase output instead of powering continuous retuning. |
+| Large structures | Controller selects finite work; installed organs do it; mouths/veins carry results; sockets isolate services | A bigger body adds actual bays or support capacity, not a hidden copy of every function in the core. |
+
+World-editing heads need bounded loaded-only work admission across all machines, not one unrestricted scan per organ. Beds and controllers keep finite current jobs, not ever-growing work histories. Cilia do not poll every inventory in a radius; drones use assigned pickup berths, not searches for thousands of dropped fragments. Treatment visuals are capped client displays of stored state. Exact budgets and stress tests must be agreed before implementation; these layouts are design options, not a server-performance certification.
+
 ## T0 — First organs: hand-fed growth and useful equipment
 
 Available from ordinary Overworld materials. No completed genome, electricity or Nether trip is required.
@@ -211,28 +271,28 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Add a Display Membrane later for wall readouts. Electrical mutation enables schedules; remote access requires an explicitly connected relay rather than unlimited world access.
 
 ### T1-17 — Cultivation Tissue
-- **Does:** Replaces farmland with rooted crop beds. Separate settings reserve water, seed stock and harvest surplus, so a field need not consume all of its own food.
+- **Does:** Replaces farmland with rooted crop beds. Maintains growing conditions; it does not plant, harvest or export the crop. Seed reserves belong to a Seed Pouch and routing rules, not an invisible inventory in every soil cell.
 - **Input → output:** Seeds/plants + water + optional biomass → grown crops. Biomass accelerates growth but does not make the crop-to-biomass loop profitable by itself.
 - **Create:** Hoe mature exposed Living Substrate, then apply 1 Rooting Gel and a real seed; the hoe is not consumed.
 - **Growth:** Honey Culture treatment favors pollinated crops; bone meal favors rapid first growth. Upgraded beds can support unusual crops only after their genome and growing conditions are available.
 
 ### T1-18 — Harvest Corolla
-- **Does:** Harvests a player-marked small field and replants from reserved seed stock. Its tendrils reach only the configured bed, not an entire biome.
-- **Input → output:** Mature crops + replanting items + biomass → harvested produce in its output buffer and replanted beds.
+- **Does:** Cuts one ready crop/pod in its assigned small plot per work cycle. It never replants or distributes its harvest. Its tendrils follow the selected plot, not a biome-wide search.
+- **Input → output:** One eligible mature crop, bush harvest or canopy pod + biomass → that target's actual produce in a reserved adjacent Work Bed or capsule; the target becomes its declared harvested state. No free second seed or wood yield.
 - **Create:** 1 Organ Bud + 1 iron hoe + 2 Membrane Sheets.
-- **Growth:** Choose harvest speed or biomass economy. Add adjacent Cultivation Tissue and a second intake to serve a larger field or multiple crop types; new area costs more operating feed.
+- **Growth:** Choose harvest speed or biomass economy. A skeletal cutting graft allows declared Living Wood pruning/salvage recipes; an aquatic graft serves supported submerged crops. A separate Planting Proboscis replants annual beds; Collection Cilia or a courier exports the harvest. Wider reach needs supplied physical tendril segments and a bounded selected plot, not extra simultaneous crops per free cycle.
 
 ### T1-19 — Compost Gland
 - **Does:** Recovers fertilizer from low-value organic scraps. It complements digestion rather than being a second machine with the same biomass output.
 - **Input → output:** Leaves, crop scraps and spoiled feed + water → bone meal. Food can be digested or composted, not processed through both for full yield.
 - **Create:** 1 composter + 1 Organ Bud + 1 Membrane Sheet.
-- **Growth:** Choose processing speed or water economy. Mushroom mutation accepts woody residue; an attached Output Mouth feeds the farm without dropping fertilizer on the ground.
+- **Growth:** Choose processing speed or water economy. Mushroom mutation accepts woody residue; an attached Output Mouth feeds the farm without dropping fertilizer on the ground. The T2 Spent Penetrant compost recipe returns fertilizer with real leaf/water input; ore treatment need not wait for T4 waste disposal.
 
 ### T1-20 — Arbor Root
-- **Does:** Grafts a selected tree into the colony. The player chooses either a living resource tree or one-time salvage, rather than automatically stripping every nearby tree.
-- **Input → output:** Sapling/log, water and nutrients → a tended tree; pruning yields branches/wood while preserving a chosen trunk and canopy. Salvage consumes existing wood and routes that finite harvest to storage.
+- **Does:** Binds and tends one selected tree, preserving a trunk/canopy plan and allocating its growth between wood, pods and resin. It does not cut, collect or replant the tree.
+- **Input → output:** A real planted tree + water/nutrients → supplied Living Wood and canopy growth. Mature branches/pods become harvestable by a player or Harvest Corolla; a Sap Tap draws resin from the same growth budget.
 - **Create:** 1 Organ Bud + 1 sapling + 1 iron axe; place against the selected trunk on substrate.
-- **Growth:** Choose regrowth speed or nutrient economy. Birch, oak and other completed tree genomes unlock species-specific grafts and alternate canopy outputs.
+- **Growth:** Choose regrowth speed or nutrient economy. Species genomes unlock particular grafts. Marking finite salvage authorizes a suitable cutter to consume selected existing wood rather than maintain it; the root never pays the wood yield itself. A Planting Proboscis can establish a replacement from retained real stock.
 
 ### T1-21 — Digestive Tissue
 - **Does:** A defensive floor that damages occupants lacking the required full bio suit and gathers biomass from damage actually dealt.
@@ -253,9 +313,9 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Bone-plate graft creates resting ledges. Mining organs can place supplied sections behind their cutting front; a missing supply pauses work before access is lost.
 
 ### T1-24 — Hearth Lung
-- **Does:** A bellows-like attachment for the Bio-Furnace. Improves airflow but requires free space at its breathing face.
-- **Input → output:** Air + a host's ongoing fuel consumption → increased furnace heat delivery. It has no independent smelting slots.
-- **Create:** 2 leather + 1 Bone Plate + 1 Organ Bud; attach to a furnace side.
+- **Does:** Supplies airflow to one attached furnace, drying rack or compatible culture chamber. Requires free space at its breathing face; it does not provide heat or perform the host recipe.
+- **Input → output:** Air + the host's declared work/feed cost → airflow service. A furnace can burn its actual fuel more effectively; a rack can dry faster without receiving free furnace heat. No independent processing slots.
+- **Create:** 2 leather + 1 Bone Plate + 1 Organ Bud; attach to a compatible host's service face.
 - **Growth:** Add a second opposed lung for batch work. Contractile Fiber treatment favors speed; charcoal mutation favors fuel economy. Blocking a lung removes its benefit rather than destroying the furnace.
 
 ### T1-25 — Sapping Bush
@@ -293,6 +353,42 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Input → output:** Listed ingredient + biological carrier and feed → the Item Catalog's named active treatment; returned containers go to a reserved slot.
 - **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 Bone Plate. No advanced graft is needed to build it.
 - **Growth:** Choose batch speed or biomass economy. Intake/Output Mouths automate it; one recipe mode at a time. Bowl-compatible recipes run faster, but give the same yield.
+
+### T1-31 — Planting Proboscis
+- **Does:** Plants one supplied seed, sapling or cutting into a selected eligible empty growing cell, then stops or waits for another ready cell. Separate from growth and harvesting.
+- **Input → output:** Real planting stock from its slot/Seed Pouch + biomass + a valid prepared site → one planted crop/tree. Failed placement consumes neither seed nor biomass.
+- **Create:** 1 Organ Bud + 1 wooden hoe + 1 Rooting Gel + 1 Membrane Sheet.
+- **Growth:** Choose planting rate or biomass economy. A graft supports submerged planting; a shared Seed Pouch can feed several planters with species filters. Plot and occupancy checks prevent planting a sapling inside a mature canopy or replacing a player block.
+
+### T1-32 — Work Bed
+- **Does:** A flush mature-substrate work surface. Holds either one presented block or one finite item batch for nearby organs to work on. A translucent lip and visible sample show its state; there is no standing border around the mining site.
+- **Input → output:** Hand placement, a mouth or Grasping Root → one retained target; processing changes that target in place. Proposed item mode: four ordinary stack slots, not a general-purpose storage network. Block mode occupies the space directly above the bed and excludes item mode. An idle mineral target can be wrapped as a Mineral Workpiece for transport to another bed; its process state is retained, not reset.
+- **Create:** Mutate one exposed mature substrate cell with 1 Membrane Sheet + 1 Sealing Resin. Require one clear block above it for a block specimen.
+- **Growth:** No processing XP. A Filter Membrane liner admits declared wet treatments; Thermal Lining admits hot ones. Additional beds create independent work positions, not one unlimited merged inventory. A local ready/working/result-held/blocked readout and comparator face are included; a tool selects the expected process sequence.
+
+### T1-33 — Collection Cilia
+- **Does:** Exports the completed contents of one facing Work Bed into one adjacent inventory or Item Vein. It does not harvest, break specimens or gather every item in a radius. The cilia lie against the bed's edge.
+- **Input → output:** A released batch or wrapped Mineral Workpiece + accepting destination + biomass → those same items transferred, leaving the bed ready. Unreleased specimens and working targets are inaccessible; wrapping for transport never marks an untreated specimen as chemically treated.
+- **Create:** 1 Organ Bud + 1 string + 1 Contractile Fiber + 1 Membrane Sheet; attach to a bed edge.
+- **Growth:** Elastic Gel treatment increases packet size within its fixed limit. No counters from shuttling items. A courier may serve several beds instead, accepting travel delay and bounded pathfinding cost; neither method requires loose item entities.
+
+### T1-34 — Reflex Knot
+- **Does:** A small local control organ with one chosen function: ALL conditions, ANY condition, or set/reset latch. At most four named input states and one held output; combine knots for larger logic.
+- **Input → output:** Redstone levels or connected ready/complete/blocked states → a stable permit/start condition. A latch retains its state across unloading; it does not replay elapsed ticks.
+- **Create:** 1 Organ Bud + 2 redstone dust + 1 Synaptic Gel. No quartz, electricity or completed genome is required.
+- **Growth:** No processing XP. Insulating membrane separates crossing signals. It has no recipe slots, script language, scanning radius or request queue. State changes trigger work; a delayed safety timeout reports a fault rather than forcing the next processing step.
+
+### T1-35 — Selector Ganglion
+- **Does:** Selects one branch at a split or one source at a merge: one common endpoint and at most three named branches. Select fixed priority with reserves or round-robin among ready branches; show which branch owns the exclusive grant. Transport remains a separate operation.
+- **Input → output:** A source's held request and destination readiness → one exclusive grant until completion or safe cancellation. It carries no item/fluid itself; mouths, veins and valves perform transport.
+- **Create:** 1 Reflex Knot + 1 Filter Valve + 1 Synaptic Gel.
+- **Growth:** No processing XP. Add another selector for a separate work group, not an unbounded central queue. Round-robin prevents a busy common-ore line starving a rare-ore bed; fixed priority deliberately favors emergency feed. A stale grant is revalidated after reload, never awarded twice.
+
+### T1-36 — Fuel Papilla
+- **Does:** Fills one authorized worn or stored bio-equipment target from an actual connected biomass reserve. A cheap refueling stop with no repair, food supply or inventory sorting.
+- **Input → output:** Stored biomass + a selected target with room → equal biomass transferred into that target's reserve. Source reserve and maximum fill are configurable separately from production priorities.
+- **Create:** 1 Organ Bud + 1 Capillary Gel + 1 Membrane Sheet; root beside a marked standing berth or equipment holder.
+- **Growth:** Capillary treatment increases transfer rate, not transferred volume. No XP from refilling or circulating fuel. Later attach it to a repair bay or service station. T0 manual container refueling remains available without building this organ.
 
 ## T2 — Directed mutation: genomes, specialized organs and planned excavation
 
@@ -341,10 +437,10 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 - **Growth:** Choose transfer speed or biomass economy. Enderman-genome mutation preserves more specialized categories. Furnace processing history cannot be installed as running history in boots.
 
 ### T2-08 — Repair Dock
-- **Does:** Refills and self-mends worn bio equipment using colony supplies. Supports one wearer or one stored equipment set; it is useful beside mine exits and travel stations.
-- **Input → output:** Damaged bio equipment + biomass + any recipe-specific repair material → repaired equipment and a filled suit reserve.
+- **Does:** Mends one authorized worn piece or stored bio-equipment target using colony supplies. It neither refuels the target nor moves inventory. A mine can have a cheap fuel berth without paying for a full repair installation.
+- **Input → output:** Damaged bio equipment + biomass + any recipe-specific repair material → restored durability on that same piece. Repair feed is spent on mending, not also deposited into its reserve.
 - **Create:** Mutate an Awakening Cradle with 2 Restorative Serum + 2 Membrane Sheets.
-- **Growth:** Choose repair speed or biomass economy. Add hanger-like Rib Frames for a stored set; an extra mouth reserves repair material separately from suit fuel. Only eligible chest wear can grant bounded C-R repair practice under Armor Evolution; service grants no unrelated movement/combat counters.
+- **Growth:** Choose repair speed or biomass economy. Hanger-like frames hold a set serviced one piece at a time; more repair heads enable independent work. Add a Fuel Papilla for a separate fill operation and mouths for materials. Only eligible chest wear can grant bounded C-R repair practice under Armor Evolution; service grants no unrelated movement/combat counters.
 
 ### T2-09 — Grafting Bench
 - **Does:** Joins a known plant trait to compatible planting stock, so crop and tree selection affects the farm layout and its products.
@@ -366,9 +462,9 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 
 ### T2-12 — Aquaculture Bed
 - **Does:** A submerged version of cultivation tissue for kelp, seagrass and selected aquatic stock. Keeps an ocean branch useful independently of Nether industry.
-- **Input → output:** Planting stock + water habitat + nutrients → aquatic crops or raised fish, using separate recipes. Plants do not become fish without brood stock.
+- **Input → output:** Existing aquatic planting/brood stock + valid water habitat + supplied nutrients → growth of that stock. It provides the habitat, not automatic planting, breeding, hatching or collection; plants do not become fish.
 - **Create:** Mutate submerged mature substrate with 1 Aquaculture Graft.
-- **Growth:** Fish-genome graft improves husbandry; kelp-genome graft improves plant production. Add sheltered cells and a Harvest Corolla for automation; crowding reduces output rather than generating unlimited fish entities.
+- **Growth:** Fish-genome graft improves husbandry; kelp-genome graft improves plant production. Use an aquatic Planting Proboscis and Harvest Corolla for crops, or Feeding Trough/Incubation Basket service for supported animals. Shared population limits and reserved berths constrain every hatch; there is no independent fish-spawning timer per bed.
 
 ### T2-13 — Brood Nursery [optional helper branch]
 - **Does:** Hatches a small set of larvae, then accepts a chosen worker mutation. A 3×3 living bed provides separate berths around the core rather than one shared spawn point.
@@ -414,15 +510,16 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 
 ### T2-20 — Structure Grower
 - **Does:** Builds a selected small biological wall, room or repeated pattern from supplied parts. Useful for enclosing organs without hand-placing every decorative rib.
-- **Input → output:** A player-marked template + actual blocks + biomass → those blocks placed at clear authorized positions. Obstructions are reported, not consumed.
+- **Input → output:** A player-marked template + actual blocks or declared prepared tissue grafts + biomass → construction at clear authorized positions, or mutation of eligible exposed support cells. This lets a mine grow flush light/access tissue without raised floor markers. Obstructions are reported, not consumed; grafting does not also award the replaced terrain's loot.
 - **Create:** 1 Organ Bud + 1 crafting table + 1 amethyst shard + 2 Rib Frames.
 - **Growth:** Choose placement speed or biomass economy. Skeletal Graft treatment supports larger spans; later electrical control adds material requests and multi-step plans. It never generates the template's blocks from biomass alone.
 
 ### T2-21 — Descending Rootstock
-- **Does:** Mines a lit, walkable staircase into real ground. Its tip can be assigned a new branch at a prepared landing; a finite section finishes and then waits.
-- **Input → output:** Biomass + stair/tendon/light supplies + real terrain → mined materials in storage and a descending passage with three clear blocks of headroom above each tread.
-- **Create:** 1 Organ Bud + 1 iron pickaxe + 2 Bone Plates + 1 Leaching Gland; plant at a Surveyed Tissue collar.
-- **Growth:** Choose cutting speed or biomass economy. Ferrocyte Paste treatment accepts tougher host rock; additional root collars authorize another section. Missing spoil space or access parts stops excavation before the next cut.
+- **Does:** Plans and advances a finite descending staircase using attached cutting, holding, collection and construction organs. The core does not mine, place lights or process ore itself.
+- **Input → output:** Approved section + supplied working organs → successive authorized cutting/access steps, ending at a prepared landing. The assembled result is a lit walkable passage with three clear blocks of headroom above each tread and actual materials retained.
+- **Create:** Controller: 1 Organ Bud + 1 Survey Imprint + 2 Bone Plates. Plant at a Surveyed Tissue collar; attach a Reflex Knot, Fracture Jaw, Work Bed, Collection Cilia and Structure Grower with actual stair/light/tendon supplies. Grow supplied skin/ribs as its physical working root advances; no detached invisible cutting point.
+- **Assembly:** T2-22, T2-34, T1-32, T1-33, T2-20, T0-13, T1-23, T1-34.
+- **Growth:** Choose section-advance rate or controller biomass economy; cutting rate belongs to the jaw. Add a Grasping Root for intact eligible blocks, with treatment at a separate workshop. New collars authorize new finite sections. Lack of spoil space or access parts pauses before advancing beyond the last safe landing; dismantling recovers each organ's own history.
 
 ### T2-22 — Surveyed Tissue
 - **Does:** Marks a mining boundary as part of the ground, without raised border blocks. A visible line and corner pores show the actual selected footprint.
@@ -431,8 +528,8 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 - **Growth:** A Synaptic Gel treatment adds a pause point; luminous graft marks shaft edges. Changing a plan shows its new extent before work resumes, including a one-block-wide strip option.
 
 ### T2-23 — Mineral Gizzard
-- **Does:** Crushes mined raw ore and separates coarse host rock. The first ore-processing branch adds recovery at the cost of another organ and more handling.
-- **Input → output:** Supported raw ore + biomass → source-specific mineral concentrate and stone residue. Ingots and metal blocks are not accepted as fresh ore for another yield bonus. A separate granulation mode prepares ingots, diamonds and obsidian for fusion with no yield bonus; Washing Kidney cleans each portion.
+- **Does:** Grinds supplied mineral material into concentrate. It neither extracts a world block nor performs the Work Bed's intact-block reaction. Its coarse residue is an output of grinding, not a second automatic recovery process.
+- **Input → output:** Supported raw ore OR Mineral Fragments from a fractured treated block + biomass → source-specific concentrate and rock residue according to that input's recipe. Fragments have their own single recovery allowance, not a second raw-ore multiplier. Separate no-bonus granulation prepares ingots, diamonds and obsidian for fusion; Washing Kidney cleans those portions.
 - **Create:** 1 Organ Bud + 1 iron pickaxe + 2 Bone Plates + 2 flint.
 - **Growth:** Choose grinding speed or biomass economy. Add a Steam Muscle for bulk batches; a Faceted Chitin treatment permits harder ores. Concentrate carries the mineral amount recovered from its original input, not an unlimited multiplication opportunity.
 
@@ -484,6 +581,24 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 - **Create:** 1 Activation Cyst + 1 Sequencing Lens + 2 Bone Plates; add Rib Frames and Membrane Windows around a clear two-block-high treatment cavity on a 3×3 mature bed.
 - **Growth:** Choose batch speed or biomass economy. Precision attachment enables higher recipes; consumed donors and returned containers are reserved before processing. No complete genome is needed for host or mineral-only recipes.
 
+### T2-32 — Grasping Root
+- **Does:** Removes one explicitly targeted adjacent eligible block intact and presents it above an adjacent Work Bed. It stops while that bed is occupied. It does not survey for ores, break drops, treat the specimen or deliver ingots.
+- **Input → output:** One real permitted block + biomass + an empty bed → that same block held at the bed, with the source position empty. No loot roll occurs during extraction. A hand-supplied block is a valid alternative.
+- **Create:** 1 Organ Bud + 2 Bone Plates + 1 Contractile Fiber + 1 iron pickaxe.
+- **Growth:** Choose extraction rate or biomass economy. Prepared cutting reinforcement admits harder explicitly supported blocks. A mining assembly can advance its physical mount along a finite plan; a free-standing root only reaches its facing block. Work Bed specimens and permitted building blocks are reusable targets; inventories, arbitrary block entities, protected blocks and unsupported modded states are refused.
+
+### T2-33 — Reaction Polyp
+- **Does:** Applies one prepared reagent recipe to one locked Work Bed target. The bed shows the changing specimen while other heads wait. A thermally lined head can instead dose one admitted exposed pit face under a Digestion Crucible's finite plan. It does not fracture, collect, grow cultures or prepare its own reagents.
+- **Input → output:** Eligible target + named reagent + biomass and recipe water → a treated target plus retained spent reagent. Initial recipes: intact ore + Mineral Penetrant; ordinary log + Rooting Gel → one Living Wood block for construction, without a second wood drop; host rock + Leaching Nodule → Leached Rock. Later thermal service admits hot leaching recipes. Item Catalog owns these recipe states.
+- **Create:** 1 Organ Bud + 1 glass bottle + 1 Filter Membrane + 1 Activation Cyst.
+- **Growth:** Choose treatment rate or biomass economy. Add a fluid mouth, supported liner or pressure service for named recipes; those do not grant every treatment automatically. Several beds need actual separate heads or explicit sequential service; no radius-wide free treatment aura.
+
+### T2-34 — Fracture Jaw
+- **Does:** Breaks one presented specimen or one explicitly selected facing terrain block using its installed cutting grade. It is useful for mineral recovery, rock supply or bounded demolition without a mine controller.
+- **Input → output:** Untreated eligible block + biomass → its permitted ordinary drops; treated ore → Mineral Fragments under that treatment's fixed recipe, never ordinary ore loot as well. Products stay in the Work Bed or a pre-reserved adjacent inventory. It has no ore search, sorting or smelting function.
+- **Create:** 1 Organ Bud + 1 iron pickaxe + 2 flint + 2 Bone Plates.
+- **Growth:** Choose break rate or biomass economy. Prepared reinforcement increases cutting grade. A thermal upgrade becomes a Boring Jaw and retains this jaw's counters. For a bed job, start requires the bed's declared treatment-complete state; direct breaking uses a separately selected mode. Occupied/protected targets, unsafe falling terrain and insufficient output room cause refusal.
+
 ## T3 — Thermal colony: a working Nether base and larger mines
 
 The Nether grows Thermal Lining continuously. It is needed for hot-fluid service, high-temperature organ bodies and steam-driven attachments. Heat alone in another dimension does not replace the native growing bed.
@@ -510,6 +625,7 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 - **Does:** Boils water in a bone-braced pressure body. The starting heart is hand-fed; a larger jacket and automated supplies support continuous steam work.
 - **Input → output:** Water + heat from consumed fuel or a configured lava process → pressurized steam and disclosed spent material. Heat and feedstock are not both returned intact.
 - **Create:** 1 Bio-Furnace + 2 Thermal Linings + 2 Rib Frames; add a sealed Fluid Cyst and a Relief Chimney before pressurized operation.
+- **Assembly:** T0-07, T1-08, T3-07, T0-11.
 - **Growth:** Choose steam rate or fuel economy. Added jacket cells increase throughput and water inventory; they also increase the amount of steam that must be relieved after shutdown.
 
 ### T3-05 — Steam Vein
@@ -540,6 +656,7 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 - **Does:** Encloses an existing Bio-Furnace in a larger heat-safe body on mature Nether-native substrate. Unlocks tempered biological construction materials while retaining the furnace's counters and chosen traits; an ordinary unmantled furnace still works elsewhere.
 - **Input → output:** 1 Bone Plate + 1 Thermal Lining + 100 BU + heat → 1 Tempered Bone Plate. Washed iron, copper or gold concentrate + heat → the corresponding ingots and retained residue, according to the concentrate's mineral content. Item Catalog owns these yields; thermal processing does not require an additional raw iron reinforcement recipe.
 - **Create:** Surround the furnace with an eight-block 3×3 Thermal Substrate ring, four lined corner Rib Frames and four Thermal Linings on its chamber faces. Leave its service and output faces accessible.
+- **Assembly:** T0-07, T3-01, T0-11.
 - **Growth:** A Steam Muscle adds batch pressure; additional lungs trade space for rate. Tempered plates reinforce large mining heads and electrical organs. Ordinary ingots do not become extra metal merely by passing through the mantle.
 
 ### T3-10 — Steam Muscle
@@ -549,22 +666,24 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 - **Growth:** Choose work rate or steam economy. Mounting another muscle enables a larger valid host assembly; disconnected muscles cannot smelt or mine by themselves.
 
 ### T3-11 — Descending Cradle
-- **Does:** A mining platform that descends through a real vertical shaft. The player can ride it or walk the preserved shaft access after work stops.
-- **Input → output:** Steam + biomass + access/lining supplies + actual terrain below → a deeper shaft, stored mined blocks and a maintained climbing route.
-- **Create:** Core: 1 Organ Bud + 1 diamond pickaxe + 2 Thermal Linings + 2 Bone Plates. Build a 3×3 rib-supported deck with two Steam Muscles, a matching Boring Jaw below it and a side Climbing Tendon.
-- **Growth:** Choose descent speed or steam economy. Expand the deck with a matching supported head to increase shaft width. It refuses to move passengers into an obstruction and does not leave them without an exit.
+- **Does:** Controls a supported platform's descent through a finite real shaft. Attached jaws cut; a separate grower installs access; held products leave through collection/logistics. The platform is a mount and safe movement controller, not an ore processor.
+- **Input → output:** Clear authorized next slice + steam + biomass + completed access/collection acknowledgments → one downward movement of the specified platform and its bounded installed equipment. A rider may travel with it; the preserved shaft remains climbable after shutdown.
+- **Create:** Core: 1 Organ Bud + 1 Survey Imprint + 2 Thermal Linings + 2 Bone Plates. Build a 3×3 Rib Frame deck with two Steam Muscles, a Boring Jaw below it, Work Bed, Collection Cilia and Structure Grower; supply a side Climbing Tendon and Lumen Tissue route.
+- **Assembly:** T3-10, T3-12, T0-11, T1-32, T1-33, T2-20, T2-22, T1-23, T0-13.
+- **Growth:** Choose movement rate or steam economy; cutter mutations govern cutting. Expand the supported head/deck within declared limits, or carry a Grasping Root for intact samples. It refuses unsafe passenger movement and unsupported relocation of arbitrary world blocks. Moving payload size, collision checks and update rates require specific performance tests before implementation.
 
 ### T3-12 — Boring Jaw
-- **Does:** A shaped mining head attached to a cradle or fixed gallery organ. Teeth cut a declared cross-section; the head itself does not contain a second miner or independent inventory.
-- **Input → output:** Host power + physical contact with marked terrain → cut blocks delivered to the host's output route.
-- **Create:** 2 Tempered Bone Plates + 2 iron pickaxes + 1 Thermal Lining; assemble head segments around the chosen clear passage.
-- **Growth:** Faceted Chitin treatment accepts harder ores; membrane mutation favors clean host-rock separation. A wider head requires more power and spoil handling rather than providing a free size increase.
+- **Does:** A reinforced Fracture Jaw with a supported multi-tooth cutting face for a cradle, fixed gallery or large specimen bed. It executes bounded individual cuts; it does not scan, advance the installation or carry a hidden inventory.
+- **Input → output:** Host steam/work + one admitted target at its cutting face → that block's allowed products into reserved beds/inventories. Intact extraction still needs a Grasping Root; chemical recovery still needs treatment.
+- **Create:** Upgrade a Fracture Jaw with 2 Tempered Bone Plates + 1 Thermal Lining + 1 Faceted Chitin; mount on rib-supported head segments. Its steam drive is a separate Steam Muscle.
+- **Growth:** Choose cutting rate or steam economy using the retained jaw history. More teeth permit a wider planned face but share the assembly/server work allowance and need extra power/output capacity. Sorting and disposal remain downstream jobs.
 
 ### T3-13 — Digestion Crucible
-- **Does:** Dissolves host rock inside a sealed, finite excavation pit, then drains the medium so ores can be recovered. This trades a continuous tunnel for a prepared recovery site.
+- **Does:** A sealed finite-pit assembly: its controller assigns host-rock treatment, a lined Reaction Polyp doses the admitted face, and fluid outlets drain spent medium. It leaves ores for a player or separately installed recovery heads, rather than granting mined ore as a reaction byproduct.
 - **Input → output:** Marked real host rock + Bioactive Leaching Charge + biomass → accounted host residue, exposed untouched ores and Spent Leach Cake. The finite internal medium is not a world-placeable fluid.
-- **Create:** 1 Leaching Gland + 2 Thermal Linings + 2 Bone Plates as the core; line a Surveyed Tissue footprint with Living Skin grafted with one Thermal Lining per cell, and reserve a drain route.
-- **Growth:** Choose treatment speed or reagent economy. More lining increases depth; access tendons and a drained recovery landing are required before opening the pit. Full drains pause treatment.
+- **Create:** Controller: 1 Organ Bud + 1 Survey Imprint + 2 Thermal Linings + 2 Bone Plates. Enclose a Surveyed Tissue footprint in thermally lined Living Skin; install a lined Reaction Polyp, Fluid Vein and separate Fluid Cyst for spent medium. A Leaching Gland supplies charges from outside; provide luminous access tendons before work.
+- **Assembly:** T2-22, T2-33, T0-10, T1-02, T1-08, T1-23, T0-13.
+- **Growth:** Controller levels improve section-handling speed or feed economy; the polyp owns reagent economy. Additional lined cells enlarge the finite authorized pit, not reaction reach for free. Drained landings precede opening; full drains stop further dosing. Products are host residue, untouched ores and spent treatment, never both dissolved rock drops and full residue.
 
 ### T3-14 — Heat-Exchange Gill
 - **Does:** Transfers heat between a hot process and a cooler fluid without mixing their contents. Makes a compact heat-reuse layout possible.
@@ -619,10 +738,11 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Growth:** Choose separation speed or electrical economy. Gold mutation unlocks finer separation. Retreatment recovers only remaining material; repeatedly cycling clean output cannot create more mineral or genome coverage.
 
 ### T4-06 — Live Sampling Cradle
-- **Does:** Takes controlled samples from a housed living creature rather than consuming only its death drops. Restraint and target recovery become part of the pen design.
-- **Input → output:** A permitted living specimen + biomass + electricity → a source-labeled tissue sample while dealing disclosed damage to that specimen.
-- **Create:** 1 Specimen Extractor + 1 Ion Separator + 2 Rib Frames; add a clear target berth with Restraining Tissue and an access gate.
-- **Growth:** Choose recovery quality or lower damage per sample. A target has a replenishing sample reserve; healing it does not instantly refill that reserve. Boss support is species-specific, not an unlimited Nether Star substitute machine.
+- **Does:** A containment/service assembly for a living specimen. Its berth admits and holds one permitted target; a detachable Sampling Proboscis performs sampling. An Extractor and DNA Bank can be shared by several cradles downstream.
+- **Input → output:** Permitted occupant + functioning restraint/access services → one occupied ready berth. The sampler produces labeled samples and disclosed target damage; the cradle does not also extract stock or sequence DNA.
+- **Create:** Berth frame: 2 Rib Frames + 2 Membrane Windows + 1 Sensor Polyp. Install Restraining Tissue, a Sphincter Door and a Sampling Proboscis with separate sample output. No consumed Extractor or Ion Separator is hidden inside the berth.
+- **Assembly:** T0-11, T0-12, T1-14, T2-19, T1-29, T4-21.
+- **Growth:** No processing XP for standing in a berth. Extra berths cost physical containment and share population limits. Sampler mutations improve actual sample quality/damage; a restorative pad helps injuries but cannot refill the target's sampling reserve instantly.
 
 ### T4-07 — Precision Sequencer
 - **Does:** An extractor attachment for resolving difficult genomes from fewer valuable specimens. It makes saving a rare sample for a better laboratory worthwhile.
@@ -643,10 +763,10 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Growth:** Choose processing speed or electricity economy. End-grown parts later permit more complex combinations. Nether resistance, ocean pressure adaptation and burrowing endurance still compete for the target's finite capacity.
 
 ### T4-10 — Scheduler Ganglion
-- **Does:** Sends a short configured sequence to attached organs: reserve materials, run a batch, wait for output, then start the next batch.
-- **Input → output:** Player-set steps + sensor conditions + electricity → commands to named connected organs. It does not manufacture missing inputs.
+- **Does:** Runs a bounded recipe sequence across named organs, using their ready/result-held acknowledgments. Draft limit: eight steps and one active sequence; parallel lines use actual additional controllers, beds and supplies. No general scripting or recursive job expansion.
+- **Input → output:** Player-set conditions + electricity → reserved, acknowledged work steps. Optional delay/budget steps stagger starts; they never substitute for treatment completion. Power loss holds uncommitted work; committed jobs remain owned and visible.
 - **Create:** 1 Synaptic Console + 1 clock + 1 comparator + 1 Organ Bud.
-- **Growth:** Survey Gel treatment supports more conditions; additional ganglia divide a workshop into independently scheduled lines. A failed step displays its blocked dependency instead of silently skipping it.
+- **Growth:** Survey Gel treatment improves diagnostics and allows the declared step limit, not unlimited queues. Earlier Reflex Knots, selectors and vanilla circuits remain valid. Failed steps display their dependency; a restarted controller reconciles held work instead of replaying every start command.
 
 ### T4-11 — Display Membrane
 - **Does:** A readable wall display for one machine or configured district: stock, flow, reserve, pressure or an alarm. Adjacent panels form a larger display.
@@ -661,16 +781,18 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Growth:** Add Archive Lobes for more recipe/order slots and Item Capsules for pending inputs. A furnace order still needs fuel, output space and the right physical furnace upgrades; the cortex cannot simulate the machine away.
 
 ### T4-13 — Strata Maw
-- **Does:** Cuts a **one-block-wide long strip** from the surface toward a chosen depth. Starts at a Climbing Tendon and preserves lit resting/access points as it descends.
-- **Input → output:** Real marked terrain + biomass + steam/electric drive + tendon/light supplies → recovered blocks and an accessible deep trench.
-- **Create:** Core: 1 Descending Rootstock + 2 Thermal Linings + 1 Ion Separator. Install beside a ground-level Surveyed Tissue line, a spoil store and the starting tendon.
-- **Growth:** Choose cutting speed or energy economy. Extend the surveyed surface line to authorize another finite strip section. It does not turn into an unlimited chunk quarry when its first plan finishes.
+- **Does:** A Rootstock controller specialized for a **one-block-wide long strip** descending from a surface line. Starts at a Climbing Tendon; orders separate cutting, clearing and access work. It does not include an ore separator just because precision tier is reached.
+- **Input → output:** Finite surveyed strip + supplied working organs → successive accepted cuts and maintained lit resting/access points. Actual cutter products go through a Work Bed and collection line; treatment/refining is a separate choice.
+- **Create:** Upgrade the Rootstock controller with 2 Thermal Linings + 1 Precision Probe + 1 Survey Imprint, retaining its section history. Install a Boring Jaw/Steam Muscle, Work Bed, Collection Cilia and Structure Grower beside a Surveyed Tissue line, spoil store and starting luminous tendon.
+- **Assembly:** T3-12, T3-10, T1-32, T1-33, T2-20, T2-22, T1-23, T0-13.
+- **Growth:** Choose section-handling speed or controller energy economy; jaw throughput is independent. Existing upgraded access/collection parts can be reused. Another surface segment needs explicit approval; end-of-plan never becomes an unlimited chunk quarry.
 
 ### T4-14 — Spoil Sorter
-- **Does:** Keeps large mines from blocking their ore output with common stone. Separates ore, useful building rock and selected surplus before transport.
-- **Input → output:** A miner's mixed output + electricity → filtered item routes and retained excess. Destructive disposal is a separate explicit destination.
-- **Create:** 1 Item Capsule + 2 Output Mouths + 1 Filter Valve + 1 comparator.
-- **Growth:** Choose sort speed or electrical economy. Add capsules for stock reserves. An overflow line can send surplus stone to construction or residue processing without dropping it around the miner.
+- **Does:** A named sorting layout, **not another processing core**. Filtered mouths separate ore, useful rock and selected surplus; capsules buffer each destination. Basic sorting is available at T1; T4 teaches a high-throughput mine layout.
+- **Input → output:** Held mixed items → unchanged items through permitted outlets, or retained blocked contents. Sorting costs only its actual transport/control services; no fictitious recipe XP.
+- **Create:** Place one input Item Capsule, at least two Output Mouths with Filter Valves and separate receiving capsules. The worked shared-trunk layout includes one Selector Ganglion; independent outlets can omit it. Electrical monitoring is optional.
+- **Assembly:** T1-09, T1-11, T1-12.
+- **Growth:** Add parallel output lanes or larger packets; reserve building stone before allowing explicit disposal. No aggregate sorter level exists. Taking it apart returns its component blocks, not a second boxed all-in-one sorter.
 
 ### T4-15 — Recovery Sump
 - **Does:** Collects spilled biomass or escaped process liquid inside a player-built catchment. Gives hazardous-fluid installations a recoverable low point.
@@ -707,6 +829,12 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Input → output:** Experience deliberately deposited by a player → stored experience points → deliberate withdrawal or an attached permitted enchanting process.
 - **Create:** 1 Organ Bud + 1 enchanting table + 1 amethyst shard + 2 Membrane Sheets.
 - **Growth:** Join Mnemonic Vessels for capacity. Survey Gel treatment improves transfer rate. It cannot turn furnace maturity into player XP; bio-armor enchantment support remains a separate choice, not a consequence of owning this block.
+
+### T4-21 — Sampling Proboscis
+- **Does:** Takes one controlled tissue sample from a permitted creature in its facing reserved berth. Works in a Live Sampling Cradle, compatible husbandry station or later Foreign Specimen Cocoon; it does not also process the sample into stock or knowledge.
+- **Input → output:** Eligible target with recovered sampling reserve + empty Sample Vial + biomass/electricity → one Labeled Specimen and disclosed damage to the target. The specimen keeps its source; recovery waits on the actual creature, not a replaceable berth timer.
+- **Create:** 1 Organ Bud + 1 Field Lancet + 1 Precision Probe + 1 Filter Membrane + 1 Membrane Sheet.
+- **Growth:** Choose sampling rate or biomass economy. A source-specific graft favors sample quality or lower damage, within the target's recovery budget. A shared movable service arrangement requires explicit adjacent berth selection; no remotely sampling every animal in a pen. No output space, invalid consent/ownership or insufficient target reserve means no puncture.
 
 ## T5 — End colony: spatial materials and a defended settlement
 
@@ -815,7 +943,7 @@ Connect established workshops rather than replacing them. Transit consumes local
 ### T6-05 — Storage Cortex
 - **Does:** Presents connected Item Capsules and tanks as one searchable local store, while the physical cells still hold the contents.
 - **Input → output:** Player queries, deposits and withdrawals + electricity → indexed access and routed items through connected mouths/veins.
-- **Create:** 1 Synaptic Console + 1 Request Cortex + 1 precision-conditioned Spatial Membrane.
+- **Create:** 1 Synaptic Console + 1 Archive Lobe + 1 precision-conditioned Spatial Membrane. A Request Cortex is a separate optional client; storage indexing alone does not require automated recipe planning.
 - **Growth:** Attach Archive Lobes for more connected storage groups. Remote stock is shown separately with availability and freight cost; it cannot be withdrawn instantly from an unloaded dimension.
 
 ### T6-06 — Workshop Interface
@@ -837,10 +965,11 @@ Connect established workshops rather than replacing them. Transit consumes local
 - **Growth:** Choose placement speed or biomass economy. Add compartments for a larger deployment, or include a Folded Shelter. It does not instantly produce mature native beds in the wrong dimension.
 
 ### T6-09 — Service Pedestal
-- **Does:** A shared docking point at a station, mine entrance or workshop. Gives priority to an explicitly selected service: suit fuel, repair, cargo unloading or tool exchange.
-- **Input → output:** A docked wearer/set + attached reserves and service organs → the selected refuel, repair or inventory transfer.
-- **Create:** 1 Repair Dock + 1 Item Capsule + 1 Filter Valve + 1 Nerve Tissue segment.
-- **Growth:** Add another service face for a second user or machine. The pedestal delegates repairs to its actual dock and stock to its capsules; it is not a new all-purpose machine generating services from nothing.
+- **Does:** A named shared service-berth layout, **not another all-purpose block**. Its selected attached service handles fuel, repair or authorized cargo transfer. These individual services are available earlier; T6 introduces coordinated station layouts.
+- **Input → output:** One admitted wearer/set → acknowledged service requests in a chosen order. Each service pays its own costs and operates only on permitted targets/slots; stepping on a berth never authorizes emptying the player's whole inventory.
+- **Create:** Mark a standing berth with Living Skin and Rib Frames. The worked fuel-and-repair layout has a Fuel Papilla, Repair Dock, Item Capsule, Filter Valve and Reflex Knot. Add mouths or a Scheduler Ganglion for explicitly approved cargo/tool service.
+- **Assembly:** T0-10, T0-11, T1-36, T2-08, T1-09, T1-12, T1-34.
+- **Growth:** More separate berths support concurrent visitors; more service heads increase actual capacity. No pedestal counter or boxed core duplicates attached organs. A shared repair head is economical but queues visitors; dedicated heads cost space and supplies.
 
 ### T6-10 — Reclamation Mouth
 - **Does:** Recovers a selected biological assembly for relocation. Removes it in a visible order after draining resources into reserved containers.
@@ -856,7 +985,7 @@ The player designs assemblies with separate working, supply and control parts. M
 - **Does:** Builds large, compound organ cores from several compatible mature organs. Keeps each contributing organ's useful specialization visible in the resulting assembly.
 - **Input → output:** Listed donor organs + Genetic Stock + thermal/spatial materials + biomass/electricity → one recipe-defined compound core, with donor histories assigned rather than copied.
 - **Create:** 1 Mutation Chamber core + 1 Trait Regulator + 2 precision-conditioned Spatial Membranes. Build a 5×5 ribbed treatment body with separate donor, reagent and recovery bays.
-- **Growth:** Choose assembly speed or energy economy. Add Anatomy Sockets for larger donor sets. Combining incompatible organs shows the conflict before consuming anything; it never means “put any machines together and gain all outputs.”
+- **Growth:** Choose assembly speed or energy economy. Add Anatomy Sockets for larger donor sets. A compound core specializes a declared reaction/support role; extraction, transport, treatment and storage do not collapse into its GUI. Shared bodies can shorten transfers or share cooling, but installed working organs still occupy sockets and retain separate supplies, outputs, counters and limits. A specific fusion recipe may consume donor cores once; it never leaves reusable donors plus a second copy of their histories.
 
 ### T7-02 — Anatomy Socket
 - **Does:** A load-bearing, isolatable graft position in a compound organ. Separates one attachment's feed, output and control from neighboring attachments.
@@ -941,16 +1070,17 @@ Long-term dimension branch. Its local growth alternates between two environmenta
 - **Growth:** Choose growth speed or nutrient economy. Feeding and hardening bays can alternate for output or run separately for reliability. The chosen two conditions remain incompatible with unrelated third specialties.
 
 ### T8-06 — Phase Accumulator
-- **Does:** Stores work captured from a changing local phase for later organ operation. Smooths an intermittent native supply; it does not generate energy from an unchanging room.
-- **Input → output:** A real local phase transition + maintained collector tissue → stored phase charge, later spent by Fold machinery.
-- **Create:** 1 Charge Sac + 1 Chorus Resonator + Adaptive Gel + 2 Anchor Roots.
-- **Growth:** Choose capture rate or retention. Join Phase Accumulator cells to store a longer reserve. Forcing a transition electrically costs more than the charge recovered, preventing a self-powering loop.
+- **Does:** Stores phase work supplied by a separate Phase Collector. It is a specialized energy buffer, not simultaneously a generator or phase controller.
+- **Input → output:** Supplied phase charge → finite retained charge → discharge to an attached Fold service. No charge is earned merely from standing inside a changing room.
+- **Create:** Mutate 1 Charge Sac with 1 Adaptive Gel + 1 Spatial Membrane; brace it with 2 Anchor Roots. It can be built empty before the first collection cycle.
+- **Growth:** No processing XP for charging/discharging. Prepared membrane treatments favor discharge rate or retention; joined cells add bounded capacity. More storage bridges longer quiet periods, while extra collectors increase admitted capture area, not capacity by themselves.
 
 ### T8-07 — Foreign Specimen Cocoon
-- **Does:** Holds a dangerous local specimen in the conditions needed to study it. Lets the player research before choosing which native organisms to cultivate.
-- **Input → output:** A captured permissible specimen + habitat supplies + precision sampling → source-labeled samples while maintaining containment.
-- **Create:** 1 Live Sampling Cradle + 2 adaptive membranes + 1 Habitat Lung; enclose a clear berth in Phase Shelter Skin.
-- **Growth:** Choose sampling speed or lower specimen stress/damage. A larger cocoon accepts larger supported creatures; escape-resistant construction is still required, and the campaign boss is not an ordinary farm specimen.
+- **Does:** A native containment assembly around an existing sampling berth. Habitat Lung maintains its conditions; Sampling Proboscis takes samples; a separate laboratory processes them. The enclosure does none of those operations itself.
+- **Input → output:** A permitted captured specimen + supplied habitat/containment services → a maintained ready berth for actual sampling. Output remains the sampler's source-labeled specimen, not extra automatic stock or research.
+- **Create:** Enclose one installed Live Sampling Cradle and a Habitat Lung in Phase Shelter Skin with two adaptive membranes reinforcing the access hatch. Keep its sampler, sample outlet and emergency service face accessible.
+- **Assembly:** T4-06, T8-04, T8-03.
+- **Growth:** No enclosure processing XP. More volume accommodates specifically supported specimens; better sampler and lung mutations improve their own work. The campaign boss is not an ordinary farm specimen; no enclosure bypasses its species restrictions.
 
 ### T8-08 — Retuning Root
 - **Does:** Changes a small assigned chamber's biological phase on demand. Lets the player pay for steady production instead of waiting for the environment.
@@ -960,9 +1090,10 @@ Long-term dimension branch. Its local growth alternates between two environmenta
 
 ### T8-09 — Quarantine Gate
 - **Does:** A controlled station between the native habitat and the return route. Keeps incompatible cargo, active specimens and contaminated containers from entering an ordinary workshop by mistake.
-- **Input → output:** Declared cargo + inspection power → permitted packed cargo, or a clearly held batch awaiting treatment.
-- **Create:** 1 Cargo Lock + 1 Selective Membrane + 1 Ion Separator + Adaptive Gel.
-- **Growth:** Add specimen, fluid and equipment lanes with their own treatment recipes. It does not erase unknown cargo to declare it clean; the player can recover or redirect a refused batch.
+- **Input → output:** Declared cargo + inspection power → admitted packed cargo or a held/refused batch. It classifies declared supported cargo states; it does not secretly separate minerals, neutralize fluid or heal a specimen.
+- **Create:** Controller: 1 Reflex Knot + 1 Precision Probe + 1 Adaptive Gel. Install a Cargo Lock and Selective Membrane with separate return and admitted routes; attach a Sensor Polyp for local lock status.
+- **Assembly:** T6-04, T5-10, T1-14.
+- **Growth:** Add separate lanes for specimens, liquids and equipment. Route a treatable refusal through actual suitable processing organs, then reinspect its new state. An unknown item stays recoverable; clean cargo must not be blocked forever behind a contaminated batch sharing its only buffer.
 
 ### T8-10 — Foldroot
 - **Does:** A native branching ground plant. Its fleshy roots store the starting material for Adaptive Gel and remain useful after the settlement grows.
@@ -981,6 +1112,12 @@ Long-term dimension branch. Its local growth alternates between two environmenta
 - **Input → output:** Fed mature bloom + hardening-phase harvest → clear petals usable as glass in Membrane Window recipes, plus a planting seed. Harvesting the soft phase yields specimens instead of building petals.
 - **Create:** Found on exposed native ridges; cultivate a seed on Adaptive Substrate with suitable light and nutrients.
 - **Growth:** Grafting Bench variants favor structural petals or genetic sample recovery. Retuning a controlled room can schedule the harvest, but every batch still regrows from supplied material.
+
+### T8-13 — Phase Collector
+- **Does:** Captures work during a natural local phase transition across its assigned exposed tissue surface. Shares no storage or phase-changing function with an accumulator or Retuning Root.
+- **Input → output:** One natural transition + maintained native collector tissue + an accepting Phase Accumulator → a capped amount of phase charge. One surface participates in one collector; overlapping assignments do not multiply capture.
+- **Create:** 1 Chorus Resonator + 1 Adaptive Gel + 2 Anchor Roots; expose its supported collector surface in the Fold and attach a Phase Accumulator.
+- **Growth:** Choose capture rate or biomass maintenance economy. More real surface permits more admitted work within the station limit; it also uses land exposed to local hazards. Full storage declines excess capture. Artificially retuned transitions yield no charge in this proposal, so a powered room cannot farm its own retuning energy. No offline transition replay or dimension-wide collector scan.
 
 ## T9 — The Manyfold encounter and post-boss specialization
 

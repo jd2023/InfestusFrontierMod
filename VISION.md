@@ -58,6 +58,7 @@ and the player's equipment becomes another living part of that system.
   Its original identity, costs, endpoint rules and failure behavior remain to design.
 - Construction is compositional: reusable organs, tissues, structures and networks
   should combine into many solutions. Depth is not a large list of fixed recipes.
+- Separate useful operations: extracting, treating, fracturing, collecting and processing need not live in one block. A named large installation can be an arrangement of shared parts. Reliable ready/completed states permit several control designs; timing optimizes throughput rather than deciding whether the basic recipe works. Compact, parallel, high-recovery and economical builds should remain meaningful alternatives.
 - Mutated substrate carries resources as biological conduits. Useful paths must
   work across natural terrain and in 3D. Joins, splits and crossings matter.
 - Visuals should look living: muscle, cuticle, membrane, sacs, pores and circulation.

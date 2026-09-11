@@ -204,6 +204,13 @@ Two viable economies:
 A vanilla farm, hopper arrangement or compatible mod can supply either economy.
 No requirement to build a mob grinder; helpers are optional and not prerequisites.
 
+In a biological annual-crop plot, Cultivation Tissue grows the crop, a Harvest
+Corolla cuts it onto a Work Bed, Collection Cilia exports it, and a separate
+Planting Proboscis draws real seed from a reserved pouch. A perennial bush lane
+can omit replanting. Share one collection line to save organs, or split food and
+digestion lanes so a full food cabinet cannot stall all colony feed. These are
+arrangements of parts, not two recipes for different all-in-one farm blocks.
+
 **Puzzle:** reserve enough feedstock for the colony's useful services while feeding
 construction. One large tank is easy, but separate reserves and priorities prevent
 a construction order from starving the workshop. Long paths and uphill runs must
@@ -248,6 +255,16 @@ cycle or specific armor set is an additional rank gate.
 **Continuing value:** the atlas, chamber and workshop become the place for suit
 forward evolution and growing additional specialists. Early movement, utility and
 ecological traits participate in late designs.
+
+An optional mineral workshop makes the construction choices tangible: a Grasping
+Root presents one real block on a Work Bed; a Reaction Polyp conditions it; a
+Fracture Jaw releases fragments; cilia or a courier collects them for a shared
+gizzard/furnace. Direct mining skips the treatment for ordinary recovery. A
+serial bed minimizes equipment, while several beds overlap long reactions at
+the cost of space and greater supply per minute. Held completion/readiness states
+coordinate the line; optimization concerns bottlenecks and BU per useful product,
+not guessing how many redstone ticks a treatment might take. Exact constituents,
+recipes and alternative layouts live in the [block catalog](BLOCK_CATALOG.md#building-with-operations).
 
 **Review:** a mandatory perfect suit before any trait becomes useful is too steep.
 
@@ -659,6 +676,13 @@ Stable multiblocks express a clear core anatomy; modular attachments allow sever
 valid capacities and profiles. Arrays combine these structures. There should be
 valid compact, elongated, terraced and vertically separated arrangements within
 explicit size/connection limits. Structure-validation errors explain the problem.
+
+The controller must not absorb its installed organs' jobs. A mine planner chooses
+the next cut, a jaw cuts, a grower supplies access, and a collector exports actual
+products. Fuel Papilla and Repair Dock independently serve equipment; phase
+collectors and accumulators independently generate and store native work. Shared
+parts retain their own counters and upgrades. Larger buildings add physical work
+positions and services, not hidden universal functions in one core.
 
 Example: a chamber has limited exchange surface. Adding a protective membrane can
 improve product grade but reduce flow. A second exchange organ restores flow at

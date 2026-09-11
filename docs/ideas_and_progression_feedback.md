@@ -1079,6 +1079,16 @@ review rather than copying the prototype's depth presets.
 
 **Owner direction:** ore processing should connect to real mining and automation.
 
+**Construction rule:** split reusable operations rather than enclosing the whole
+line in one ore machine. The [block catalog](BLOCK_CATALOG.md#the-first-mineral-workshop)
+defines an intact-block extraction head, visible Work Bed, reagent applicator,
+fracture head and optional stationary/worker collection, feeding the existing
+grinding, washing and smelting organs. Several beds can share an expensive
+processor; a direct mining/smelting route can skip treatment and accept lower
+recovery. Treatment state persists until the next actor accepts it, so reliable
+operation does not depend on a guessed redstone delay. Optional timing, reserve
+priorities and parallelism optimize the line rather than make it barely function.
+
 **Proposal:** begin with useful biological sorting/preparation compatible with
 ordinary smelting. Later processing separates material more efficiently using
 heat, water and precise membranes. A concentrated ore sample remains materially
@@ -1101,9 +1111,10 @@ re-enter as fresh ore at a profit. Tags describe compatible materials; they do n
 automatically make every recipe cycle safe. If byproducts add only disposal chores,
 remove them or give them a useful bounded sink available at the same tier.
 
-**Open:** initial metals, raw-ore versus block processing, yield/support tradeoffs,
-smelting integration and whether one specialized mineral binder is enough to support
-several armor/organ reinforcement recipes.
+**Open:** initial metals, exact recovery differences between ordinary raw ore and
+intact treated blocks, support costs and external smelting integration. The item
+catalog's distinct prepared mineral media remain the proposed armor/organ carriers;
+this section does not replace them with a universal binder.
 
 ## 20. Tissue logistics: convenient connections, interesting allocation
 
@@ -1828,7 +1839,7 @@ Earliest eras are provisional; native foundations still apply where specified.
 | Reservoir | SR1 | Passive storage | B or compatible fluid in → same fluid out | Shape, reserve and access; no transmutation |
 | Vascular junction/stalk | SR1 | Small active B cost if justified | Routed material → selected destinations | Direction, split, priority, reservoir mounting |
 | Item capsule/access organ | SR1 | Passive local storage; powered remote requests later | Items in → identical data-bearing items out | Bulk/mixed policy, filters, growth, access |
-| Rooted tender | SR1 | B; real water/feed where required | Mature permitted crops → harvest/replanted plot | Work area and seed reserve; drone alternative |
+| Farm assembly | SR1 | B; real water/feed | Tissue grows; Corolla harvests; Proboscis replants; Cilia exports | Separate reusable organs; shared seed reserve; optional worker collection |
 | Husbandry station | SR1–SR2 | B + feed | Managed animals → byproducts/controlled harvest | Population, young/adult policy, output reserve |
 | Aquaculture nursery | SR2 optional | B + real feed/water habitat | Stock/bait → fish or declared specimens | Food versus specimen profile; no free treasure |
 | Kitchen/conditioning chamber | SR2 optional | B and optional T | Actual food ingredients → meals/provisions | Batch versus flexible orders; chemistry attachment later |
@@ -1837,7 +1848,7 @@ Earliest eras are provisional; native foundations still apply where specified.
 | DNA bank/archive | SR2 | Passive retained knowledge; powered active work | Specimens/templates in; authorized queries/transfers out | Finite queue, atlas, ownership; not a resource generator |
 | Mutation chamber | SR2 | B; T/E for demanding expressions | Target + prepared graft/medium + fuel → modified target | Anatomy, exchange/support attachments, previews |
 | Memory transfer attachment | SR2 | B; E optional advanced handling | Typed learning in source → compatible archive/target | Atomic transfer, retained identity; no progress cloning |
-| Repair/refill station | SR0 Cradle refueling; SR2 Repair Dock | B | Stored feed → repaired/refuelled eligible equipment | Reserve/priority and access; shares chamber anatomy |
+| Equipment service assembly | SR0 manual fill; SR1 Fuel Papilla; SR2 Repair Dock | B | Papilla transfers fuel; Dock independently mends | Fuel-only stops or shared repair rooms; no automatic extra service |
 | Exploration borer | SR2 | B | Real selected terrain → loot + traversable descent | Extent, depth, route, spoil and safe access |
 | Industrial excavator | SR3–SR4 | B + T; E optional precision | Real terrain + supplied access parts → galleries/shaft access | Profile, lining, branches and sustained hauling |
 | Mineral separation chamber | SR2–SR4 | B; T then E by profile | Actual ore → recipe-accounted outputs | Speed, recovery, byproduct choice and support |

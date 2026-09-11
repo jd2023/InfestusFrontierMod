@@ -201,3 +201,22 @@ The owner requested cross-document consistency, a review PR, and inclusion of th
 item catalog and updated ingredient chains in that PR. Publish the documentation
 feature branch against V3_1.21.1; do not merge, change main or implement gameplay.
 This approval does not authorize unrelated future remote actions.
+
+## D025 — reusable operations and construction puzzles (user direction, 2026-09-10)
+
+Critically decompose catalog organs where their operations can become reusable
+parts. Extraction, treatment, fracture, collection and further processing are a
+construction example, not a mandatory single route. Keep alternatives with real
+throughput, recovery, biomass, space and coordination tradeoffs. Do not fragment
+an operation merely to inflate the required block count.
+
+Basic operation must be reliable without tick-perfect redstone. Players can use
+held readiness/completion states, local interlocks, priorities, buffers, parallel
+lines or later scheduling; timing is an optimization tool. Helpers stay optional
+and visible outputs need not be loose item entities. Scalable simulation remains
+bounded and pauses at unavailable destinations.
+
+The revised Block Catalog owns proposed component names and assemblies; Item
+Catalog owns workpiece/reagent states; the guide teaches their construction. The
+new specific recipes, limits, yield accounting and tier placements are proposals
+for review, not authorization to implement gameplay or publish this change.

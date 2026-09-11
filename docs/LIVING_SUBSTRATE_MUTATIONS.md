@@ -36,7 +36,8 @@ Each cell has **one primary function**. Mutating it does not remove its ability 
 | **Nerve Tissue** | Synaptic Gel. | Carries control signals, separate from resources and power. | Input signal; no biomass upkeep. |
 | **Steam Vein** | Mutate a Fluid Vein with Thermal Lining + Bone Plate. | Carries steam; uses the heat lining slot and needs a condensate outlet. | Supplied steam; pressure falls as work and heat are lost. |
 | **Conductive Tissue** | Conductive Myelin; SR4. | Carries electricity through a separate circuit. | Actual electrical input. |
-| **Cultivation Tissue** | Hoe the mature cell, then apply Rooting Gel and the selected seed. The hoe is not consumed. | Grows crops with separate seed and harvest reserves. | Water; optional biomass-assisted growth. |
+| **Cultivation Tissue** | Hoe the mature cell, then apply Rooting Gel and the selected seed. The hoe is not consumed. | Maintains crop growth. Planting, harvest and seed/output reserves belong to separate organs or player actions. | Water; optional biomass-assisted growth. |
+| **Work Bed** | Membrane Sheet + Sealing Resin on exposed mature tissue. | Holds one visible specimen or finite item batch for attached working organs; no processing or automatic collection of its own. | No idle upkeep; each operation pays its own supplies. |
 | **Aquaculture Bed** | Aquaculture Graft, while submerged. | Supports the selected aquatic planting or husbandry recipe. | Water habitat, stock and nutrients. |
 | **Chorus Orchard Tissue** | Chorus Orchard Graft on mature Anchored Substrate in the End. | Supports a tended, harvestable chorus garden. | Planting stock and nutrients. |
 | **Digestive Tissue** | Digestive Enzyme. | Damages susceptible occupants without the required full bio suit; collects biomass from actual damage. | No continuous feed in the basic form; export its finite collected reserve. Full storage stops collection, not the damage. |
@@ -47,6 +48,8 @@ Each cell has **one primary function**. Mutating it does not remove its ability 
 | **Worker Waypoint** — optional | Waymark Secretion; link to a nursery. | Marks a route or separate waiting berth without a raised trail block. | No independent upkeep; the worker uses its own supply. |
 
 **Further mutations refine that function.** Examples: a rabbit-genome graft improves a Travel Tissue route's acceleration; a slime graft improves Item Vein packet handling; a spider graft changes Digestive Tissue's damage/slow balance. These are not additional simultaneous primary functions.
+
+Work Bed belongs to the diagram's service branch, not a new maturity stage. Its sealed surface cannot simultaneously be a crop bed or vein. Place supply tissue beside/below it and attach working organs to its service faces. Bed containment and process state follow the [block catalog](BLOCK_CATALOG.md#building-with-operations); held-workpiece recovery follows the [item catalog](ITEM_CATALOG.md#workpieces-are-not-another-ore-loot-roll).
 
 **Crossings and steps are route modifications.** A Membrane Sheet + Bone Plate creates a Septum Crossing with two isolated passages of the same carrier type. Contractile Fiber + Membrane Sheet creates a Vascular Stitch over a visible terrain step. A crossing does not join its routes. A junction does. Floor, wall and ceiling placement use the same functional forms.
 

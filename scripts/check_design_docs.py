@@ -94,6 +94,24 @@ def check_tables(content, label):
             raise ValueError(f"Unequal table columns in {label}: {rows[0][:80]}")
 
 
+def check_assemblies(content):
+    """Named assemblies may contain catalog parts, never themselves or unknown parts."""
+    sections = re.split(r'^### (T\d+-\d+) —[^\n]*\n', content, flags=re.M)
+    graph = {}
+    for node, body in zip(sections[1::2], sections[2::2]):
+        fields = re.findall(r'^- \*\*Assembly:\*\* (.+)$', body, re.M)
+        if len(fields) > 1:
+            raise ValueError(f'Duplicate assembly definition: {node}')
+        components = []
+        if fields:
+            if not re.fullmatch(r'T\d+-\d+(?:, T\d+-\d+)*\.', fields[0]):
+                raise ValueError(f'Invalid assembly parts at {node}: {fields[0]}')
+            components = re.findall(r'T\d+-\d+', fields[0])
+            unique(components, f'assembly component at {node}')
+        graph[node] = components
+    check_graph(graph)
+
+
 def check(root):
     docs = root / 'docs'
     guide = (docs / 'GUIDE_PROGRESSION_TREE.md').read_text()
@@ -107,8 +125,10 @@ def check(root):
             graph[node + '.III'] = [node + '.II']
     check_graph(graph)
 
-    blocks = re.findall(r'^### (T\d+-\d+) —', (docs / 'BLOCK_CATALOG.md').read_text(), re.M)
+    block_content = (docs / 'BLOCK_CATALOG.md').read_text()
+    blocks = re.findall(r'^### (T\d+-\d+) —', block_content, re.M)
     unique(blocks, 'block ID')
+    check_assemblies(block_content)
     guide_blocks = {node for node in graph if re.fullmatch(r'T\d+-\d+', node)}
     if set(blocks) != guide_blocks:
         raise ValueError(f"Block/guide coverage mismatch: {set(blocks) ^ guide_blocks}")
@@ -151,10 +171,21 @@ def check(root):
                 slugs = [re.sub(r'[^\w\- ]', '', heading.lower()).replace(' ', '-') for heading in headings]
                 if fragment not in slugs:
                     raise ValueError(f"Broken heading link: {document.name}: {target}")
-    return f'{len(blocks)} blocks; {len(items)} item rows/families; {len(mutations)} armor families; {len(rows)} guide nodes; local links valid'
+    return f'{len(blocks)} block/assembly entries; {len(items)} item rows/families; {len(mutations)} armor families; {len(rows)} guide nodes; assembly references and local links valid'
 
 
 class CheckerTests(unittest.TestCase):
+    def test_assembly_components_are_known_and_acyclic(self):
+        check_assemblies('### T0-01 — Bed\n### T1-01 — Line\n- **Assembly:** T0-01.\n')
+        for content in (
+            '### T1-01 — Line\n- **Assembly:** T0-99.\n',
+            '### T1-01 — Line\n- **Assembly:** T1-01.\n',
+            '### T1-01 — A\n- **Assembly:** T1-02.\n### T1-02 — B\n- **Assembly:** T1-01.\n',
+            '### T1-01 — Line\n- **Assembly:** unspecified parts\n',
+        ):
+            with self.assertRaises(ValueError):
+                check_assemblies(content)
+
     def test_table_breakage_rejected(self):
         check_tables('| A | B |\n|---|---|\n| x | y |', 'valid')
         for content in ('| x | y |', '| A | B |\n|---|---|\n| x |'):
