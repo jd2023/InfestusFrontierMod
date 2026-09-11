@@ -78,7 +78,7 @@
   <rect x="1130" y="310" width="240" height="220" rx="20" class="box" fill="#e3e2ef"/>
   <text x="1150" y="346" class="heading">SERVICES</text>
   <text x="1150" y="381" class="body">Light / travel</text>
-  <text x="1150" y="414" class="body">Healing</text>
+  <text x="1150" y="414" class="body">Healing / refueling</text>
   <text x="1150" y="447" class="body">Mining boundaries</text>
   <text x="1150" y="480" class="body">Worker waypoints</text>
   <text x="1150" y="510" class="small">One selected service</text>

@@ -78,11 +78,11 @@ One BU equals one mB biomass. A dose/portion is an item, not an unspecified tank
 | ID | Item | Obtain / batch recipe | Consumed by or used for |
 |---|---|---|---|
 | I020 | Resin | Sap Tap: one supplied tree's allocated growth harvest → one resin portion | Seals and adhesive culture. Exact tree growth budget belongs to the ecology specification; tapping is not free wood plus free biomass plus free resin. |
-| I021 | Capillary Gel | Cyst: 1 Elastic Gel + 1 Binder + 50 BU → 2 | Biomass Vein graft; Nutrient Intake; organic pumping upgrades. |
+| I021 | Capillary Gel | Cyst: 1 Elastic Gel + 1 Binder + 50 BU → 2 | Biomass Vein and Fuel Papilla tissue grafts; Nutrient Intake; organic pumping upgrades. |
 | I022 | Filter Membrane | Cyst: 1 sand + 1 Sheet + 50 mB water + 25 BU → 1 | Washing/filtration attachments and Fluid Vein treatment. Sand becomes embedded filter material. |
 | I023 | Contractile Fiber | Cyst: 1 string + 1 leather + 1 Binder + 50 BU → 2 | Item Veins, terrain stitches, transport-organ upgrades. |
 | I024 | Synaptic Gel | Cyst: 1 redstone dust + 1 string + 1 Binder + 50 BU → 2 | Nerve Tissue and control treatments. Not electrical fuel. |
-| I026 | Digestive Enzyme | Cyst: 1 fermented spider eye + 1 Elastic Gel + 1 Binder + 50 BU → 2 | Digestive Tissue; digestive-organ processing upgrades. No DNA required for first simple floor. |
+| I026 | Digestive Enzyme | Cyst: 1 fermented spider eye + 1 Elastic Gel + 1 Binder + 50 BU → 2 | Digestive Tissue; digestive-organ upgrades; C13 Digestive Crop graft preparation with zombie stock. No DNA required for the simple defensive floor; armor has its own genome gate. |
 | I027 | Locomotor Gel | Cyst: 1 sugar + 1 rabbit hide + 1 Binder + 50 BU → 2 | Travel Tissue; later DNA-specific acceleration treatments. |
 | I028 | Sealing Resin | Cyst: 1 resin or Elastic Gel + 1 Sheet + 25 BU → 2 | Chemical lining; sealed containers. Does not provide thermal/spatial protection. |
 | I029 | Char Gland Feed | Bowl/Cyst: 1 charcoal + 1 Binder + 25 BU → 1 | Unlock solid-fuel feeding on a sufficiently practiced Bio-Furnace; operating charcoal is still consumed separately. |
@@ -90,7 +90,7 @@ One BU equals one mB biomass. A dose/portion is an item, not an unspecified tank
 | I033 | Rooting Gel | Bowl/Cyst: 1 wheat seed + 1 Culture + 50 mB water → 2 | Selected crop-bed preparation, bush/tree graft attachment. Planting still needs real seed/sapling/cutting. |
 | I034 | Sapping Bush Cutting | One reserved cutting from deliberate bush conversion or a mature propagation harvest | Replant T1-25; conversion yields at most one retained starter, not repeated berry drops. |
 | I035 | Canopy Pod | Arbor/Canopy Cyst fills one pod from an assigned harvest allocation | Holds one declared resin, fiber or fruit batch. Open once; no second harvest from breaking its empty shell. |
-| I036 | Sealed Biomass Ampoule | Empty: 1 Sheet + 1 Sealing Resin → 1; fill from storage up to 250 mB | Portable armor refueling. Partial contents remain on the same unstackable item; no automatic drinking or spilling. |
+| I036 | Sealed Biomass Ampoule | Empty: 1 Sheet + 1 Sealing Resin → 1; fill from storage up to 250 mB | Hold use to refuel selected worn pieces, or assign to C12 automatic intake. Retain partial contents on the same unstackable item. T0 armor can instead use the Bladder's manual Fill slot. |
 | I037 | Route Imprint | Probe copies a bounded configuration onto 1 paper + 1 Synaptic Gel | Applies port/route settings to compatible owned tissue; never contains items, power, research or chunk-loading permission. |
 
 Early Lumen treatment is made in the Bowl; all T1 transport treatments use the Cyst. Its own construction requires only a Bud, Sheets and a Plate, so a first Cyst needs no transport graft. A player can hand-feed it before automating it.
@@ -137,7 +137,9 @@ Early Lumen treatment is made in the Bowl; all T1 transport treatments use the C
 
 ### Mutation grafts
 
-I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M4, H1–H10, C1–C12, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the DNA, prepared signatures, amounts and access gates in [Armor Evolution §6–10](ARMOR_EVOLUTION.md#6-installing-mutations). A tooltip names the exact outcome, not “mutation essence.”
+I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M4, H1–H10, C1–C13, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the DNA, prepared signatures, amounts and access gates in [Armor Evolution §6–10](ARMOR_EVOLUTION.md#6-installing-mutations). A tooltip names the exact outcome, not “mutation essence.”
+
+C13's operating feed is not a new item family: explicitly supported ordinary biological materials are consumed as fuel, not applied as upgrades. Armor Evolution owns its proposed conversion rates and per-material acceptance rules. Samples, grafts and other valuable biological items are not implicitly edible. C12 accepts measured biomass containers instead; C9 consumes food for player hunger. One item cannot fund two of these operations.
 
 The same family rule does not invent tool/weapon effects: their grafts require separately approved recipes. A treatment to advance an already committed branch is not a removable upgrade module. Item catalogs may list prepared grafts; there is deliberately **no Recovered Armor Graft** item.
 

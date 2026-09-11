@@ -44,6 +44,7 @@ Each cell has **one primary function**. Mutating it does not remove its ability 
 | **Restraining Tissue** | Restraining Graft; spider genome. | Slows or holds a susceptible target instead of harvesting it. | Biomass while restraining. |
 | **Travel Tissue** | Locomotor Gel. | Speeds an eligible full bio suit with a locomotion mutation. | The wearer's suit biomass. It does not give unaided flight. |
 | **Restorative Tissue** | Restorative Serum. | Gradually heals an authorized injured occupant. | Biomass per actual healing. |
+| **Fuel Papilla** | Capillary Gel + Membrane Sheet on an exposed mature cell. | A flush refueling surface transfers biomass into an authorized wearer's selected armor pieces; works without a full suit. No repair or digestion. | Real biomass from adjacent configured logistics; deliberate start and a free reserve in the target. |
 | **Surveyed Tissue** | Survey Gel; configure its boundary with the tool. | Defines a finite mining footprint flush with the ground. | No idle upkeep; the mining organ supplies the work. |
 | **Worker Waypoint** — optional | Waymark Secretion; link to a nursery. | Marks a route or separate waiting berth without a raised trail block. | No independent upkeep; the worker uses its own supply. |
 

@@ -85,7 +85,7 @@ The initial book is offered once on first join, retained as a pending claim if i
 | T0-02 — Culture Bowl | T0-01 | Run one rooted culture batch. | Renewable construction cultures and the slow early Fusion Binder recipe. |
 | T0-16 — Organ Bud | ST-01 | Craft or grow one bud. | Craft an organ as an item or grow it from a planted bud with the same ingredients. |
 | T0-03 — Digestive Sac | ALL(T0-01,T0-16) | Digest one organic batch into retained biomass. | First fuel; woody-feed limits; an output-full pause rather than spills. |
-| T0-04 — Biomass Bladder | ALL(T0-03,T0-16) | Store biomass and deliver a measured amount to a starter organ. | Buckets/direct connections, visible fill and the smaller leather construction option. |
+| T0-04 — Biomass Bladder | ALL(T0-03,T0-16) | Store biomass and deliver a measured amount to a starter organ. | Buckets/direct connections; its manual Fill slot fuels the first awakened piece without a later mutation. |
 | T0-05 — Membrane Rack | T0-01 | Produce a Membrane Sheet from supplied organic material, string and water. | Flexible building skins, equipment and organ walls. |
 | T0-06 — Bone Loom | ALL(T0-03,T0-16) | Grow a Bone Plate from real calcium feed. | Structural parts; biomass binds mineral rather than creating it. |
 | T0-07 — Bio-Furnace | ALL(T0-03,T0-05,T0-16) | Complete a normal smelting recipe. | A weak hand-fed furnace that can retain its history through later growth and multiblock expansion. |
@@ -146,7 +146,7 @@ For T1 and later, the chapter rank licenses commissioning; the listed parent nod
 | T1-33 — Collection Cilia | ALL(T1-32,T1-09) | Export a released batch into an accepting capsule; retain it when that capsule is full. | Stationary collection without loose entities or mandatory drones. |
 | T1-34 — Reflex Knot | ALL(SR1,T1-30) | Combine two held conditions to permit one operation, then block it by removing one condition. | Early condition-based control without quartz, electricity or a tick-perfect clock. |
 | T1-35 — Selector Ganglion | ALL(T1-34,T1-12) | Let two ready sources take turns using one destination; show only one owns the current grant. | Priority versus fair sharing; no extra transported material. |
-| T1-36 — Fuel Papilla | ALL(SR1,T0-04,T1-30) | Transfer a measured biomass amount into an authorized piece without changing its durability. | Fuel-only stops; repair and automatic food are distinct services. |
+| T1-36 — Fuel Papilla | ALL(SR1,ST-03,T0-04,T1-04,T1-30) | Mutate a mature substrate cell, connect its biomass supply and deliberately refuel worn armor while standing on it. | A flush fuel-only surface; partial suits work; no separate organ or repair function. |
 | CI-06 — Harvest Is Not Planting | ALL(T1-18,T1-31,T1-33) | Run a supplied annual crop cycle with separate planting, harvesting and collection. | Compare shared seed reserves with dedicated crop lanes; perennial harvest can omit replanting. |
 | CI-01 — One Line, No Hand Feeding | ALL(SR1,ST-02) | Run three consecutive batches in one organ with automatically replenished inputs and retained/exported output. Native mouths/veins, hoppers or compatible transports qualify. | First autonomous processing line; show the actual inputs, fuel and output path. |
 | CI-02 — Feed Tomorrow's Colony | CI-01 | Supply that line from a replenishable organic source while retaining its seed/breeding/growth reserve. Complete three source-to-consumer batches. | SR2 route. Crops, tended trees, bushes, ordinary farms or husbandry can solve it; no prescribed farm shape. |
@@ -540,6 +540,7 @@ For the dependency tables, a bare family ID such as `AM-H8` means its rank-I mil
 | AM-C9 — Feeding Lobe | ALL(AR-02,AR-04) | Chest; B schedule, C-M. Configure allowed food slots and feed from a real item. | Feeding Lobe supplies player hunger, not armor fuel; it creates no food. |
 | AM-C10 — Service Tendril | ALL(AR-02,GE-28,T2-06) | Chest; B schedule, C-M. | Feed one selected nearby compatible helper/tool; transfer is not free fuel or practice. |
 | AM-C12 — Nutrient Intake | ALL(AR-02,AR-04,T1-30) | Chest; B schedule, C-M; load a permitted sealed biomass container. | Automatic actual fuel transfer, distinct from food and healing; no transfer practice. |
+| AM-C13 — Digestive Crop | ALL(AR-02,GE-24,T1-30,T2-31,T2-06) | Chest; B schedule, C-M. Install a zombie-derived Digestive Enzyme graft, select permitted feed slots and convert one real item into stored biomass. | A separate branch from C12, not its upgrade; consumes biological materials, never health, samples or nearby terrain. Digestion gives no practice by itself. |
 | AM-C11 — Elytral Wings | ALL(AR-02,GE-27,EN-06,ANY(AR-12,AR-13),AR-30,T2-31) | Prepare Wings I with an actual Elytra and install on flexible G4 chest; advance I/II/III. | Glide → powered flight/climb → takeoff/hover; permanent exclusion of Burrow Mantle. |
 | AM-L1 — Running Tendons | ALL(AR-02,GE-08,T2-06) | Leggings; B schedule, L-E. | General grounded sprint improvement; excludes Fast-Lane Tendons. |
 | AM-L2 — Endurance Mesh | ALL(AR-02,AR-04) | Leggings; B schedule, L-T. | Reduce sprint hunger at a biomass cost. |

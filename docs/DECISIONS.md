@@ -220,3 +220,22 @@ The revised Block Catalog owns proposed component names and assemblies; Item
 Catalog owns workpiece/reagent states; the guide teaches their construction. The
 new specific recipes, limits, yield accounting and tier placements are proposals
 for review, not authorization to implement gameplay or publish this change.
+
+## D026 — refueling tissue and digestive armor (user direction, 2026-09-10)
+
+Fuel Papilla is a mutated form of Living Substrate, not a separately crafted
+free-standing organ. It supplies real biomass to armor. Automatic withdrawal from
+carried containers remains valid. Add a separate armor-evolution branch that
+automatically consumes selected biological materials and converts them into biomass;
+this is distinct from eating food to restore player hunger.
+
+The proposed C13 Digestive Crop uses the existing chest Metabolic Work counter,
+prepared Digestive Enzyme and zombie research. It does not require C12 and has no
+new assumed mutual exclusion with it. Rates, yields, feed list and exact ancestry
+are draft balance choices. A bounded selected-slot check and one saved batch are
+required; no world harvesting, recursive inventory scan or health conversion.
+
+The draft starter interaction is a manual equipment Fill slot in the Biomass
+Bladder; ampoules remain T1. This replaces the obsolete armor-text claim that a
+Repair Dock refuels equipment. These UI details remain proposals, not implemented
+behavior. No gameplay or remote publication is authorized by this documentation update.

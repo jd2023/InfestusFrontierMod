@@ -250,7 +250,7 @@ mutation should not silently wipe cosmetic identity.
 
 **Owner direction:** empty biomass reserves hurt the wearer until full mutual symbiosis. Afterwards, armor no longer causes hunger pain; unpaid biological features stop. This is not an opt-in health converter. Warn before reserves run out; teach refueling and removal without promising safety when already inside rock or lava.
 
-Each armor piece has permanent material and trait branches, its own counters and finite anatomy. Start another piece for an incompatible specialization. Auto-feeding consumes real food, auto-healing spends biomass, and Nutrient Intake transfers real stored biomass. Elytral flight incorporates an actual Elytra. [Armor Evolution](ARMOR_EVOLUTION.md) owns the complete proposed counters, material tree and ability costs; its wearer-versus-piece adaptation representation remains an open proposal.
+Each armor piece has permanent material and trait branches, its own counters and finite anatomy. Start another piece for an incompatible specialization. Auto-feeding consumes food for the player; Nutrient Intake transfers prepared biomass from carried containers; a separate Digestive Crop branch converts selected carried biological materials into armor fuel. Fuel Papilla is a mutated substrate refueling surface, not a free-standing organ. Auto-healing spends biomass, and Elytral flight incorporates an actual Elytra. [Armor Evolution](ARMOR_EVOLUTION.md) owns the counters, material tree, refueling interactions and proposed costs; its wearer-versus-piece adaptation representation remains open.
 
 An archive capsule should transfer typed learning in a chamber. The source loses
 the transferred amount in the same operation that the destination gains it.

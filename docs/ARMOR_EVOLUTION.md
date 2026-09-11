@@ -35,7 +35,7 @@ At G1:
 - Four anatomy slots permit a useful introductory combination, not a complete specialist.
 - Each helmet, leggings or boots holds 10 biomass units; the chest holds 40. **One biomass unit, BU, equals one mB of the mod's biomass fluid.**
 - Repair is a mutation, not free regeneration. An unfed, not-yet-symbiotic piece hurts its wearer and cannot power hungry features.
-- A chamber, Repair Dock or compatible biomass service connection fills the internal reserve without spilling fluid into the world.
+- Manual filling from a Biomass Bladder is available immediately. Later, ampoules, Fuel Papilla tissue and fuel mutations provide other routes. A Repair Dock mends equipment; it does not refill reserves.
 - A small lamp, better footing, a modest reserve or slow self-repair gives early value before material fusion.
 
 The cradle previews starvation risk before awakening. Hunger pain is automatic before full symbiosis, not an optional graft. Section 11 defines recovery and the later pain-free state.
@@ -349,18 +349,31 @@ The chest develops **fuel storage, metabolic throughput, repair, impact defense,
 | C10 Service Tendril | B; C-M | 1 / 2 / 3 | Bee; Membrane Sheet | Transfer stored biomass at 2 / 4 / 6 BU/s to one explicitly selected compatible tool or helper within 2 blocks. Stops when its tank is full. | Actual transferred BU; load 2; transfers give no Metabolic Work credit |
 | C11 Elytral Wings | S; C-M; auric-derived G4 frame | 3 / 4 / 5 | Phantom; precision-conditioned Spatial Membrane; actual Elytra at I only | I: controlled descending glide. II: powered forward flight and climbing. III: controlled takeoff and hover. Driven speed ceiling 6 / 8 / 10 m/s. | 2 / 6 / 10 BU/s; load 5 / 8 / 12 |
 | C12 Nutrient Intake | B; C-M | 1 / 2 / 3 | Host; Capillary Gel | Refill from 1 / 2 / 3 selected sealed biomass containers at up to 2 / 5 / 10 BU/s, stopping at capacity and retaining partial containers. | Transfers actual biomass; no output increase or practice credit. |
+| C13 Digestive Crop | B; C-M | 2 / 3 / 4 | Zombie; Digestive Enzyme | Automatically digest permitted biological materials from 1 / 2 / 3 selected inventory slots into chest biomass. Proposed net yield: 60% / 70% / 80% of the material's declared basic stationary digestion reference; delivery capped at 1 / 2 / 4 BU/s. | Load 1 / 2 / 2 while digesting; no starting biomass required. Consumes real feed, not player health or hunger. Conversion itself grants no practice. |
 
 C4 and C7 are alternative uses of the same inflatable defensive cavity and cannot be installed together. C8 and C11 are incompatible body plans and cannot be installed together. A soft chest can still install reserve, pump and a mobility plan, but rarely their maximum ranks plus regeneration and a full habitat lining.
 
 C4/C7 apply after ordinary armor calculations. The sum of additional physical/explosion reduction from living-armor mutations is capped at 20% of the residual damage, before the row's per-hit limit. Potion and enchantment stacking requires the separate compatibility decision in section 15; it is not silently another multiplicative defense layer.
 
-C3 is **auto-healing**; M1 is armor self-mending; C9 **feeds the player**; C12 **refuels armor**. No health-to-biomass conversion exists. Healing hunger injury awards no Guarding, repair or Metabolic Work credit. Food filters default empty: the player chooses supplies rather than losing rare food silently.
+C3 is **auto-healing**; M1 is armor self-mending; C9 **feeds the player**; C12 **transfers prepared biomass**; C13 **digests carried biological materials into biomass**. C13 is a separate permanent branch, not a C12 upgrade or a requirement for container intake. Coexistence follows the current anatomy/load rules; no new mutual exclusion is assumed. No health-to-biomass conversion exists. Healing hunger injury awards no Guarding, repair or Metabolic Work credit. Food/feed filters default empty: the player chooses supplies rather than losing valuable items silently.
 
 C6 stores its expanded air allowance on the worn piece and draws from it while submerged. Removing the piece removes access to that allowance, without refilling it. Ordinary water-breathing effects are respected: the suit does not spend fuel while one is already supplying breath.
 
 C11 requires a complete suit and permanently excludes C8. The actual Elytra is incorporated and cannot be recovered while retaining wings. It does not duplicate the Elytra's durability or enchantment effects; enchantment migration remains part of the open enchantment decision.
 
 Without fuel, powered flight stops. An intact incorporated wing retains an ordinary descending glide, never hover or climb. Collapsed wings provide no promised fall rescue. Warnings show landing reserves; flight never force-loads chunks.
+
+### Digestive Crop: a field supply, not a pocket factory
+
+The player configures permitted feed slots and a minimum retained count for each material. Proposed first feeds are rotten flesh, wheat and kelp. Each needs an explicit armor-digestion recipe with a net BU yield; an “organic” tag alone cannot authorize consuming DNA samples, grafts, organs, equipment, containers or arbitrary modded items. Potion effects and the food's player-nutrition value are not also awarded when it becomes armor fuel.
+
+When C9 and C13 share a selected slot, a due player-feeding action and its food reserve take priority. Digestion may consume only the permitted remainder after rechecking that slot; the same item is never eaten and digested twice. The player can instead keep separate meal and armor-feed slots.
+
+Ranks use the existing B schedule and C-M counter, not a sixth counter: I at G1/R0, II at G2/R2, III at G3/R3, with the previous rank installed. Zombie research and a prepared Digestive Enzyme graft make rank I a T2 option, not a prerequisite for first armor. Subsequent productive use of the generated fuel can earn C-M normally; digesting, filling and exporting it cannot.
+
+One chest processes at most one item at a time. Before consuming it, reserve room for the entire recipe yield in the chest; a recipe larger than available capacity waits. Deliver that reserved amount gradually at the rank's rate. Existing transfers must respect this reservation. Pausing, unequipping, death or reload retains only the remaining current batch on the same piece; it never returns both feed and produced fuel. No offline digestion, extra hidden tank or queued stack of meals. The HUD distinguishes available fuel from digestion still in progress.
+
+Container intake trades expedition packing for predictable transfer with no conversion loss. Digestion uses found/farmed feed but takes more anatomy and time, returns less biomass per material than base processing, and may compete for metabolic output. It cannot sustain high-demand Burrowing merely because the player carries a stack of flesh. Manual and tissue refueling remain available on either specialization. Exact feed yields and the proposed rates require balance tests before implementation.
 
 ## 10. Leggings and boots branches
 
@@ -409,6 +422,20 @@ Movement bonuses add within their category; they do not multiply one another ind
 Heavy-frame land penalties apply after the armor's positive movement bonus. A movement mutation failing or switching off restores ordinary movement, not a player-wide permanent disabled state.
 
 ## 11. Fuel, output and complete-suit abilities
+
+### How the player refuels
+
+Proposed interactions; transferring prepared biomass and digesting feed are distinct:
+
+| Route | Player action | Source and result |
+|---|---|---|
+| T0 manual station | Open a Biomass Bladder, place one awakened piece in its service slot, press **Fill**, then retrieve it. | Transfer only the needed stored biomass into that same piece. No mutation, full suit or repair service required; awakening itself still returns empty armor. |
+| T1 portable supply | Fill a Sealed Biomass Ampoule from storage; hold use while wearing bio armor. | Transfer its real contents to worn pieces, retaining the unused amount. One action serves the selected worn pieces; no need to remove each one. |
+| T1 Fuel Papilla tissue | Mutate a mature substrate cell, supply it through adjacent biomass logistics, stand on it and deliberately start filling. | Transfer from the colony reserve into authorized worn pieces. The tissue does not digest feed or repair armor. It also works with a partial suit. |
+| **C12 Nutrient Intake** | Install the mutation and select carried sealed-container slots. | Automatically transfer already-produced biomass, within C12's rate. |
+| **C13 Digestive Crop** | Install the separate mutation and select permitted feed slots/reserves. | Automatically convert real biological material over time, within C13's yield, capacity and output limits. |
+
+For multi-piece filling, use one configured order (default chest, helmet, leggings, boots), skip full/ineligible pieces and show each reserve. Allocation is a transfer into those actual items, not an extra suit tank. Filling uses no armor biomass and grants no counters. Empty sources or full targets stop transfer without spills. The early Bladder action closes the T0 gap without moving the later ampoule recipe to T0; no later Service Pedestal layout is required.
 
 ### Two operating limits, not two fuels
 
@@ -640,5 +667,6 @@ Burrowing, dynamic illumination and wall-adjacent sensing are the material perfo
 - The lamp is a bounded visual light effect, maximum 12-block reach. It must not repeatedly place/remove light blocks or cause chunk-light recalculation storms as the player runs.
 - Colony Reader requests the selected organ's existing status snapshot. It does not traverse an entire logistics network to draw one helmet label.
 - Refueling and forward evolution use bounded tanks/inventories with back-pressure. No armor operation vents excess fluid or throws items into the world as its automatic overflow behavior.
+- Automatic container intake, player feeding and armor digestion share one bounded inventory-access pass per wearer, proposed at most once per second over only their configured slots (at most three per function). No nested-inventory search or dropped-item collection. C13 keeps one current batch with a fixed recipe/yield/progress record on the chest; outputs and returned items cannot duplicate across save, transfer or death. Recipe lookup, consumption and reserved-capacity changes need shared admission limits and multiplayer stress tests before implementation.
 
 These bounds apply per equipped player in multiplayer. If they cannot deliver a readable effect, redesign the effect within a measured budget.

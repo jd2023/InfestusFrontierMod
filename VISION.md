@@ -44,6 +44,7 @@ and the player's equipment becomes another living part of that system.
   removal is not decided. Potion integration is a promising design direction.
 - Each armor piece evolves independently through permanent material and trait branches. No branch exchange or respec; grow and keep different specialized pieces. Fusion raises protection, durability and learning caps without granting earned counters. Rigid versus flexible anatomy is a lasting tradeoff.
 - Armor uses biomass for self-mending and active features. Tiny early reserves can run empty; hungry armor hurts its wearer until full mutual symbiosis. Afterwards hungry features stop without armor hunger pain. Auto-feeding uses real food, auto-healing spends biomass, and flight requires fusing an actual Elytra. Exact adaptation ownership and tuning remain open.
+- Fuel Papilla is a refueling mutation of Living Substrate. Armor can evolve container intake for prepared biomass or a separate digestive branch that consumes carried biological materials and converts them into fuel. Player feeding and armor digestion are different functions; neither converts player health into biomass.
 - Raw materials can craft basic bodies. Functional mutations consume biologically activated or fused ingredients prepared in organs; advanced reinforcement cannot consume raw ingots or diamonds directly.
 - Some colony functions require a complete bio suit with appropriate maturity or mutations.
 - Environmental specialists must remain meaningfully stronger at their jobs than

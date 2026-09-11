@@ -94,7 +94,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 
 ### T0-04 — Biomass Bladder
 - **Does:** A one-block, translucent feed tank for a first workshop. The contents visibly rise inside its fleshy shell.
-- **Input → output:** Biomass from buckets or an attached organ → stored biomass, then bucket or organ output. Other fluids are refused.
+- **Input → output:** Biomass from buckets or an attached organ → stored biomass, then bucket or organ output. A manual UI service slot accepts one bio-equipment piece; **Fill** transfers only its missing fuel from the tank, without repair or mutation. This is the T0 refueling route. Other fluids are refused.
 - **Create:** 1 Organ Bud + 2 glass + 1 slime ball; an early leather replacement for the slime ball makes a smaller bladder.
 - **Growth:** Skeletal Graft treatment reinforces its capacity. It can later become a Biomass Reservoir Cell without discarding its stored feed.
 
@@ -385,10 +385,10 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** No processing XP. Add another selector for a separate work group, not an unbounded central queue. Round-robin prevents a busy common-ore line starving a rare-ore bed; fixed priority deliberately favors emergency feed. A stale grant is revalidated after reload, never awarded twice.
 
 ### T1-36 — Fuel Papilla
-- **Does:** Fills one authorized worn or stored bio-equipment target from an actual connected biomass reserve. A cheap refueling stop with no repair, food supply or inventory sorting.
-- **Input → output:** Stored biomass + a selected target with room → equal biomass transferred into that target's reserve. Source reserve and maximum fill are configurable separately from production priorities.
-- **Create:** 1 Organ Bud + 1 Capillary Gel + 1 Membrane Sheet; root beside a marked standing berth or equipment holder.
-- **Growth:** Capillary treatment increases transfer rate, not transferred volume. No XP from refilling or circulating fuel. Later attach it to a repair bay or service station. T0 manual container refueling remains available without building this organ.
+- **Does:** A refueling mutation of Living Substrate, flush with the ground. Green pores open around an authorized wearer's feet while filling; otherwise it remains a walkable surface. No separate free-standing organ, repair head or digestive function.
+- **Input → output:** Biomass supplied from an adjacent configured vein/junction + a consenting occupant → equal biomass transferred into the selected worn pieces. Works with a partial suit; full pieces are skipped. Source reserve and maximum fill are configurable; this cell is not also a through-vein or a hidden reservoir.
+- **Create:** Apply 1 Capillary Gel + 1 Membrane Sheet to an exposed mature Living Substrate cell. Keep its existing maturity and compatible reinforcement; one primary function means replacing/draining any previous function first.
+- **Growth:** A further capillary treatment increases transfer rate, not supplied volume. No XP from refilling or circulating fuel. Use this tissue as a repair-bay/service-station floor; a Repair Dock remains a separate attachment. Deliberate use/probe control starts filling without intercepting ordinary block placement. T0 manual Bladder filling remains available before this mutation.
 
 ## T2 — Directed mutation: genomes, specialized organs and planned excavation
 
@@ -967,7 +967,7 @@ Connect established workshops rather than replacing them. Transit consumes local
 ### T6-09 — Service Pedestal
 - **Does:** A named shared service-berth layout, **not another all-purpose block**. Its selected attached service handles fuel, repair or authorized cargo transfer. These individual services are available earlier; T6 introduces coordinated station layouts.
 - **Input → output:** One admitted wearer/set → acknowledged service requests in a chosen order. Each service pays its own costs and operates only on permitted targets/slots; stepping on a berth never authorizes emptying the player's whole inventory.
-- **Create:** Mark a standing berth with Living Skin and Rib Frames. The worked fuel-and-repair layout has a Fuel Papilla, Repair Dock, Item Capsule, Filter Valve and Reflex Knot. Add mouths or a Scheduler Ganglion for explicitly approved cargo/tool service.
+- **Create:** Frame a Fuel Papilla substrate floor cell with Living Skin and Rib Frames. The worked fuel-and-repair layout adds a Repair Dock, Item Capsule, Filter Valve and Reflex Knot. Add mouths or a Scheduler Ganglion for explicitly approved cargo/tool service.
 - **Assembly:** T0-10, T0-11, T1-36, T2-08, T1-09, T1-12, T1-34.
 - **Growth:** More separate berths support concurrent visitors; more service heads increase actual capacity. No pedestal counter or boxed core duplicates attached organs. A shared repair head is economical but queues visitors; dedicated heads cost space and supplies.
 
