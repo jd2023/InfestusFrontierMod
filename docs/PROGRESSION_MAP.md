@@ -62,7 +62,7 @@ raising its stalk to retain a walkway.
 
 **Storage:** mutate Bladders into Reservoir Cells and extend by complete rows/layers.
 Invalid additions wait outside the valid body without erasing its contents.
-Fuel Papilla fills worn pieces from stored supply; extension anatomy is Q-019.
+Fuel Papilla fills worn pieces from stored supply.
 
 **Control:** protect seed/restart reserves, then distribute surplus. Full destinations
 pause suppliers. Reflex Knot and Selector Ganglion use ready/held/blocked states;
@@ -70,7 +70,6 @@ one-tick timing is unnecessary for correctness.
 
 **Result:** the farm replenishes biomass after its own operating costs. Add demand
 and choose more growing area, better recovery, another line or scheduled consumers.
-Net-positive source recipes and growing conditions: Q-013/Q-016.
 
 ## 3. SR2 — Research a selected specialization
 
@@ -95,7 +94,7 @@ production; Ration Kitchen for meals before surplus is allocated to digestion.
 
 **Mining:** mark a Descending Rootstock job with flush Surveyed Tissue. Supply
 access steps, light and output storage. Walk the result to explore a cavern or
-address a refused face. Job geometry, fluids and extension policy are Q-021.
+address a refused face.
 
 **Mineral workshop:** Grasping Root moves one intact specimen to Work Bed;
 Reaction Polyp treats it; Fracture Jaw creates held fragments; Collection Cilia
@@ -181,7 +180,7 @@ The dragon encounter does not substitute for this workshop.
 
 Transit Maw/Arrival Chamber move passengers. Freight Gullet/Cargo Locks move
 reserved real item/fluid batches. They may share one settlement gateway layout;
-shared-body anatomy and solo destination loading are Q-026.
+unattended operation is Q-026.
 
 **Choose:** centralized biomass exports, local fuel autonomy, or local essential
 reserves plus industrial imports. Storage Cortex indexes local physical stores;
@@ -204,8 +203,7 @@ Expression Switch selects supported organ process profiles, never armor branches
 
 A reservoir district contains several finite bodies, isolation valves, production
 buffers, export buffers and a protected reserve. Capacity and throughput are
-separate. Display reserve endurance at current net drain. Thermal/spatial capacity
-reinforcement and every giga-capacity value remain Q-014.
+separate. Display reserve endurance at current net drain.
 
 **Completion projects:** a traversable deep mine feeding a selected ore route;
 an expedition/refueling network; a supplied specialist equipment workshop; or
@@ -229,4 +227,4 @@ presets change settings within installed anatomy, not a hidden second loadout.
 Manyfold is player-initiated at a prepared site: observe its state → supply a
 countercondition → attack during the opening. Solo preparation must work.
 Failure cannot destroy the three-world colony. A first reward supplies a template
-maintained by culturing rather than routine boss slaughter. Encounter parameters: Q-031.
+maintained by culturing rather than routine boss slaughter.

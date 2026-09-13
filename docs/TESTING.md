@@ -13,6 +13,10 @@ Current layers:
   Both run in the authoritative gate. These are structural documentation
   checks, not proof of recipe balance, gameplay implementation or artistic quality.
 
+- `python3 scripts/check_armor_balance.py --self-test` and normal invocation:
+  fixed-point learning allocation, shared capacity and the armor specification's
+  threshold/cost arithmetic. Calculation checks only, not measured gameplay pacing.
+
 - `./gradlew :core:test`: three pure tests covering quota exhaustion, repeated
   refusal, invalid limits, next tick, clock rewind and long timestamp extremes.
 - `:core:verifyBoundary`: rejects production dependencies in the Java-only module.

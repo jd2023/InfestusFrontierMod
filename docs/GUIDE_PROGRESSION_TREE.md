@@ -156,7 +156,7 @@ T1 and later page order follows the listed parents. Whether commissioning has an
 
 | Node | Open after | Complete by | Teaches / unlocks |
 |---|---|---|---|
-| T1-37 — Temporary Membrane | SR1 | Held under Q-022: place supplied temporary support with the handheld organ and observe its defined expiration. | Uses armor biomass; fall-arrest/midair behavior is not approved. |
+| T1-37 — Temporary Membrane | SR1 | Place supplied temporary support with the handheld organ and observe its defined expiration. | Uses armor biomass; fall-arrest/midair behavior is not approved. |
 
 ## 5. Genetics, food, husbandry and field construction
 
@@ -461,26 +461,26 @@ The book has helmet, chest, leggings and boots tabs for the selected item's fusi
 |---|---|---|---|
 | AR-01 — A Dormant Skin | ST-01 | Craft or obtain one dormant armor piece from its familiar rotten-flesh silhouette recipe. | A weak starting body; awakening is not diamond protection. |
 | AR-02 — Your First Living Piece | ALL(AR-01,T0-08) | Awaken a piece and inspect its zeroed counters, shared capacity, frame, anatomy and empty fuel. | Independent history for each equipment slot; feed before wearing. |
-| AR-03 — It Learns by Being Used | AR-02 | Cross one approved activity-buff threshold on a worn piece (threshold pending Q-002). | Automatic activity learning within a shared cap; no free point allocation. |
+| AR-03 — It Learns by Being Used | AR-02 | Cross the first activity-buff threshold on a worn piece. | Automatic activity learning within a shared cap; no free point allocation. |
 | AR-04 — A Living Binder | ALL(T0-02,T0-03,T0-05) | Make Fusion Binder through the starter bowl recipe. | Host-grown introductory grafts before a DNA laboratory. |
 | AR-05 — Metal That Can Join Tissue | ALL(SR2,T2-06,T2-23,T2-24) | Use the culture-vat material mode to make Ferrocyte Paste or Auric Myelin from prepared real mineral. | Biological activation is mandatory; no raw ingot applied directly to armor. This recipe does not require a completed creature genome. |
-| AR-06 — Iron Ribs | ALL(AR-03,AR-05) | Fuse a G1 piece to Iron Ribs using prepared Ferrocyte Paste; installation parameters Q-005. | Permanent rigid child; shared capacity and statistics belong to Armor. |
-| AR-07 — Auric Lattice | ALL(AR-03,AR-05) | Fuse a G1 piece to Auric Lattice using prepared Auric Myelin; Q-005. | Permanent flexible alternative, not a step after iron. |
-| AR-08 — Diamond Carapace | ALL(AR-06,T3-09,T3-02) | Fuse Iron Ribs to Diamond Carapace using Faceted Chitin; Q-005. | Permanent plated child; no auric-to-carapace conversion. |
-| AR-09 — Obsidian Scutes | ALL(AR-06,T3-09,T3-02) | Fuse Iron Ribs to Obsidian Scutes using Vitreous Scute; Q-005. | Permanent heavy child with its own terminal path. |
-| AR-10 — Diamond Tendon | ALL(AR-07,T3-09,T4-05) | Fuse Auric Lattice to Diamond Tendon using Diamond-Fiber Matrix; Q-005. | Permanent flexible child. |
-| AR-11 — Netherite Lamellae | ALL(AR-08,T4-05,T3-09) | Fuse Diamond Carapace to Netherite Lamellae using its named medium; Q-005. | Permanent plated terminal candidate. |
-| AR-12 — Netherite Mesh | ALL(AR-10,T4-05,T3-09) | Fuse Diamond Tendon to Netherite Mesh using its named medium; Q-005. | Permanent flexible terminal candidate. |
-| AR-13 — Spatial Weave | ALL(AR-10,EN-06) | Fuse Diamond Tendon to Spatial Weave using Phase-Woven Matrix; Q-005. | Permanent spatial terminal candidate. |
+| AR-06 — Iron Ribs | ALL(AR-03,AR-05) | Fuse a G1 piece to Iron Ribs using prepared Ferrocyte Paste; use the fusion installation recipe in Armor. | Permanent rigid child; shared capacity and statistics belong to Armor. |
+| AR-07 — Auric Lattice | ALL(AR-03,AR-05) | Fuse a G1 piece to Auric Lattice using prepared Auric Myelin. | Permanent flexible alternative, not a step after iron. |
+| AR-08 — Diamond Carapace | ALL(AR-06,T3-09,T3-02) | Fuse Iron Ribs to Diamond Carapace using Faceted Chitin. | Permanent plated child; no auric-to-carapace conversion. |
+| AR-09 — Obsidian Scutes | ALL(AR-06,T3-09,T3-02) | Fuse Iron Ribs to Obsidian Scutes using Vitreous Scute. | Permanent heavy child with its own terminal path. |
+| AR-10 — Diamond Tendon | ALL(AR-07,T3-09,T4-05) | Fuse Auric Lattice to Diamond Tendon using Diamond-Fiber Matrix. | Permanent flexible child. |
+| AR-11 — Netherite Lamellae | ALL(AR-08,T4-05,T3-09) | Fuse Diamond Carapace to Netherite Lamellae using its named medium. | Permanent plated terminal candidate. |
+| AR-12 — Netherite Mesh | ALL(AR-10,T4-05,T3-09) | Fuse Diamond Tendon to Netherite Mesh using its named medium. | Permanent flexible terminal candidate. |
+| AR-13 — Spatial Weave | ALL(AR-10,EN-06) | Fuse Diamond Tendon to Spatial Weave using Phase-Woven Matrix. | Permanent spatial terminal candidate. |
 | AR-14 — Four Pieces, One Metabolism | AR-02 | Equip four functional awakened pieces, fill real reserves and inspect combined load/output. | Shared fuel and coordinated abilities; materials may differ across pieces. |
 | AR-15 — Commit to a Lineage | ALL(ANY(AR-06,AR-07),T2-06) | Inspect a committed piece's valid forward children and permanently excluded sibling. | Plan another independently grown piece for the other lineage; no branch exchange. |
-| AR-16 — Reshape Learned Practice [held] | AR-02 | Held: select the counter ritual and its exact operation under Q-003. | Paid fixed-amount partial reduction frees capacity without changing branches; storage/transfer is not approved. |
+| AR-16 — Reshape Learned Practice | ALL(AR-02,T2-06) | Complete one paid partial counter reduction and inspect the new capacity usage and buffs. | Counter reduction frees capacity without changing branches or creating a Memory Sample. |
 | AR-17 — A Supporting Organ [optional Curios] | AR-14 | Equip and use one supported control/reserve/chemical accessory through the suit's normal resource rules. | Accessories supplement a suit; they do not supply a missing armor piece or unlimited anatomy. |
 | AR-18 — Adaptive Interface [long-term] | ALL(ANY(AR-11,AR-12,AR-13,AR-27),T8-02,EN-06,T6-09) | Install Adaptive Interface and select two control presets for the same compatible installed anatomy. | All installed grafts plus interface must fit together; presets change settings, never branches. |
 | AR-19 — Reciprocal Controls | ALL(AR-18,T9-04) | Install Reciprocal Control Graft and perform its permitted settings-only field change. | Same anatomy and exclusions; interruption and cooldown still apply. |
-| AR-27 — Netherite-Bonded Scutes | ALL(AR-09,T4-05,T3-09) | Fuse Obsidian Scutes to Netherite-Bonded Scutes using its named medium; Q-005. | Permanent heavy terminal candidate. |
+| AR-27 — Netherite-Bonded Scutes | ALL(AR-09,T4-05,T3-09) | Fuse Obsidian Scutes to Netherite-Bonded Scutes using its named medium. | Permanent heavy terminal candidate. |
 | AR-28 — Learn to Live Together | AR-02 | Perform ordinary fed work while wearing an awakened piece; inspect adaptation and hunger warnings. | Tiny early reserves; no deliberate injury required for adaptation. |
-| AR-29 — Full Symbiosis | AR-28 | Reach the adaptation condition selected under Q-007; no completed trigger is specified yet. | Empty fuel stops causing armor hunger pain; unfunded abilities still stop. |
+| AR-29 — Full Symbiosis | AR-28 | Complete the symbiosis condition; adaptation identity is Q-007. | Empty fuel stops causing armor hunger pain; unfunded abilities still stop. |
 | AR-30 — A Real Pair of Wings | SR5 | Obtain an actual Elytra. | A physical ingredient for Wings I, not an ability fabricated solely from phantom DNA. |
 
 The AR material nodes are **first-achievement cards**, not permission to cross an individual item's lineage. AR-28/29 teach automatic early hunger pain and later full symbiosis; they never demand deliberate starvation. Repeat their operation independently for any helmet, chest, leggings or boots. A completed AR-11 cannot supply another item's fusion level, capacity or learned buffs.
@@ -491,7 +491,7 @@ Each piece tab displays [its activity counters](ARMOR_EVOLUTION.md#3-activity-ow
 next buff thresholds and combined capacity usage. Ritual previews show points
 removed, affected buffs and cost.
 
-Q-002 supplies exact credit and threshold cards. Q-004 supplies the optional
+Armor defines credit and threshold cards. Q-004 determines the optional
 death-learning/rescue/reset card; it is not a compulsory die-to-progress gate.
 
 ### All armor mutation families
@@ -511,7 +511,7 @@ Family's listed parents completed
                        → upgrade/use rank III on that piece → family.III complete
 ```
 
-Mutation access prerequisites: Q-006. Effects, slots and fuel costs are defined in Armor.
+Mutation prerequisites, effects, slots and fuel costs are defined in Armor.
 
 For the dependency tables, a bare family ID such as `AM-H8` means its rank-I milestone; `.II` or `.III` explicitly requires that higher-rank milestone. The family table's **Open after** applies to its first card. Advancements acknowledge a valid first installation/use; later operation always checks the worn item's own state.
 
@@ -579,7 +579,7 @@ Completing a suit demonstration acknowledges its first working rank. Its II and 
 
 ## 17. Handheld tools and weapons
 
-Tool/weapon forms and preparation candidates belong to Item Catalog I015–I018/I038. Q-030 owns exact activities, damage/harvest values and branch policy; Q-008 owns enchantment interactions. They are optional instructional leaves, not assumed personal-rank requirements.
+Tool/weapon forms and preparation candidates belong to Item Catalog I015–I018/I038. Enchantment/XP policy: Q-008. They are optional instructional leaves, not assumed personal-rank requirements.
 
 | Node | Open after | Complete by | Teaches / unlocks |
 |---|---|---|---|

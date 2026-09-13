@@ -26,7 +26,8 @@ and wearer adaptation require Q-007.
 **Invariant:** `sum(counters) <= learning_capacity`, independently on each piece.
 Fusion raises capacity without changing earned counter values.
 Counters are nonnegative. At capacity none can increase. A credit that would cross
-capacity can contribute only the remaining room; fractional credit policy is Q-002.
+capacity contributes only the remaining room. Store counters in units of 1/600 point;
+fractional units count toward the same capacity.
 Activity counters **cannot be paused** by a player setting. No points accumulate
 in a hidden reserve while capped or while the piece is not worn.
 
@@ -37,39 +38,72 @@ in a hidden reserve while capped or while the piece is not worn.
 - Free exactly the removed amount of shared capacity; never make a counter negative.
 - Repeat and pay again to remove more. Do not pause other counters or exchange branches.
 - Fusion level, material ancestry and installed branch identities are retained.
-- Reduction cost, minimum-count handling, buff consequences and point storage: Q-003.
+- At a Mutation Chamber, consume 2 Synaptic Gel, 1 Restorative Serum, 1 Fusion Binder
+  and `2000 × 2^(G−1)` BU over 60 seconds to remove 25 points from one counter.
+  With fewer than 25 points, remove the remainder for the same price; reject zero.
+- Recompute buffs immediately. Grafts remain installed; learning is not an installation gate.
+- Whether removed points can become a Memory Sample is Q-003; this recipe produces none.
 
 ## 3. Activity ownership and buffs
 
-Proposed activity mapping. One event credits only its assigned piece;
-burning and hot-floor damage must be classified separately. Rates and buffs: Q-002.
+First-playtest baseline. Thresholds are **25 / 100 / 300 / 800 / 1800 points**;
+each unlocks the corresponding value below, replacing the previous value.
 
-| ID | Piece | Eligible activity to specify | Buff to quantify in Q-002 |
+| ID | Piece | Eligible activity per raw point | Buff at the five thresholds |
 |---|---|---|---|
-| H-F | Helmet | Examine/sample a living target | Examination time or fuel cost |
-| H-D | Helmet | Active travel in darkness | Low-light visibility |
-| H-W | Helmet | Consume breathing reserve with head submerged | Breath endurance |
-| H-C | Helmet | Survive an externally caused harmful chemical effect | Supported effect duration |
-| H-S | Helmet | Survive loss of air, classified as drowning or solid suffocation | Suffocation tolerance |
-| C-G | Chest | Receive a direct hostile hit | Physical hit mitigation |
-| C-T | Chest | Burn, excluding classified hot-floor contact | Burning tolerance |
-| C-R | Chest | Heal actual wear on the chestpiece | Chest tissue-healing economy |
-| C-D | Chest | Actual death or lethal event, pending Q-004 | Single-use rescue |
-| L-E | Leggings | Self-propelled grounded sprint | Sprint speed |
-| L-W | Leggings | Self-propelled swimming | Swim speed |
-| L-B | Leggings | Travel through eligible solid terrain while Burrowing | Burrowing fuel economy |
-| L-S | Leggings | Complete manual tool work | Manual working speed |
-| L-C | Leggings | Move while crouched | Crouched speed |
-| L-F | Leggings | Glide/fly with incorporated wings | Flight steering or fuel economy |
-| B-F | Boots | Traverse uneven ground without a jump/climb event | Step handling |
-| B-A | Boots | Climb a contacted ladder, vine or supported wall | Climbing speed |
-| B-L | Boots | Land after a fall | Fall-impact reduction |
-| B-J | Boots | Jump during traversal | Jump height |
-| B-H | Boots | Stand/walk on a damaging hot surface | Contact-heat tolerance |
-| B-P | Boots | Complete an eligible short displacement | Blink cost or cooldown |
+| H-F | Helmet | 4 completed examinations or actual sample collections; consecutive examinations of an unchanged target at least 60 s apart | H1 focus time −5 / 10 / 15 / 20 / 25% |
+| H-D | Helmet | 30 s moving at least 1 m/s with eye-position light ≤7 | H2/H3 operating fuel −5 / 10 / 15 / 20 / 25% |
+| H-W | Helmet | 30 s consuming air while head-submerged | Air capacity +1 / 2 / 4 / 6 / 8 s |
+| H-C | Helmet | 30 s under externally applied Poison or Wither | Subsequent Poison/Wither duration −2 / 4 / 6 / 8 / 10% |
+| H-S | Helmet | 4 health points of actual drowning or solid-suffocation damage | Those damage types −2 / 4 / 6 / 8 / 10% |
+| C-G | Chest | 4 health points of actual hostile melee/projectile damage | Residual physical damage −2 / 4 / 6 / 8 / 10% |
+| C-T | Chest | 4 health points of actual fire/lava damage, excluding hot-floor contact | Residual fire/lava damage −3 / 6 / 9 / 12 / 15% |
+| C-R | Chest | 8 durability self-healed by M1 on the worn chestpiece; external healing services excluded | Chest tissue-healing fuel −5 / 10 / 15 / 20 / 25% |
+| C-D | Chest | Actual survival death: 25 points, once per death | One-use rescue; reset policy Q-004; higher thresholds add no charges |
+| L-E | Leggings | 150 m self-propelled grounded sprint | Sprint speed +3 / 6 / 10 / 15 / 20% |
+| L-W | Leggings | 45 m self-propelled swimming | Swim speed +3 / 6 / 10 / 15 / 20% |
+| L-B | Leggings | 24 m supported Burrowing | C8 operating fuel −3 / 6 / 10 / 15 / 20% |
+| L-S | Leggings | 32 successful manual block harvests with hardness ≥0.5 | Manual working speed +2 / 4 / 6 / 8 / 10% |
+| L-C | Leggings | 30 m self-propelled crouched travel | Crouched speed +4 / 8 / 12 / 16 / 20% |
+| L-F | Leggings | 180 m controlled wing travel | C11 operating fuel −3 / 6 / 10 / 15 / 20% |
+| B-F | Boots | 30 s grounded travel at least 1 m/s without jumping, climbing or sprinting | B1 assisted-step fuel −5 / 10 / 15 / 20 / 25% |
+| B-A | Boots | 24 m climbing a contacted ladder, vine or wall | Climb speed +3 / 6 / 10 / 15 / 20% |
+| B-L | Boots | 12 cumulative blocks of landing distance beyond each fall's first 3 m | Additional fall allowance +0.5 / 1 / 1.5 / 2 / 3 m |
+| B-J | Boots | 20 ground jumps, each landing ≥2 m horizontally from takeoff | Ordinary jump height +0.05 / 0.10 / 0.15 / 0.20 / 0.25 m |
+| B-H | Boots | 4 health points of actual magma-block/campfire contact damage | Residual contact damage −3 / 6 / 9 / 12 / 15% |
+| B-P | Boots | 4 successful fueled blinks | B6 activation fuel −3 / 6 / 10 / 15 / 20% |
 
-Practice improves use of anatomy; it does not create gills or wings.
-Mutation learning prerequisites: Q-006.
+Only worn, functional awakened pieces learn in Survival. Creative, spectator,
+teleports, vehicles and externally pushed movement earn no travel points.
+A physical activity credits one piece only: sprinting does not also credit B-F;
+a hot-floor hit does not also credit C-T. Swimming and air consumption are distinct.
+
+Every 600 loaded server ticks, each piece distributes at most **one point total**
+among its eligible non-death activities in proportion to their raw credits.
+Round down to 1/600-point units; assign remaining units by largest fractional
+remainder, breaking ties by counter ID. Clip the total to remaining capacity.
+Clear raw credits after settlement; discard them on unequip, death or unload.
+There is no offline gain, queued overflow or player-controlled pause.
+C-D is a separate once-per-death grant clipped by remaining shared capacity.
+
+For each window keep one raw-credit accumulator per activity, capped at one raw
+point, and fixed-size measurement remainders smaller than one event's divisor.
+No visited-position or attacker history. H-F stores only its last target and time;
+cycling targets is allowed. Movement and event inputs are server-validated.
+
+Practice never creates missing anatomy. Bonuses naming a graft require that graft.
+Learned movement bonuses cost 0.1 BU/s per active movement category; B-J costs
+0.2 BU per assisted jump and B-L costs 1 BU per extra fall metre absorbed.
+These costs use local reserves and load 1; repeated triggers refresh, not stack,
+that category's load. Fuel-economy buffs add no load. Air-capacity and damage/duration
+buffs are passive; they never grant immunity. Combine movement with mutation bonuses
+under the existing movement ceilings. Combined learned/grafted residual-damage
+reduction is capped at 20%; combined fuel discounts at 50%.
+
+At the maximum ordinary learning rate, the five thresholds take **12.5 min /
+50 min / 2.5 h / 6 h 40 min / 15 h** of qualifying activity focused on one counter.
+These are calculated lower bounds, not elapsed-playtime promises. Splitting activity
+divides the same budget. Test routine expeditions, not only deliberate training.
 
 ### Death rescue
 
@@ -115,14 +149,59 @@ by 10% and grounded movement speed by 2% per piece (set limits 40% and 8%).
 Netherite Lamellae reduce hostile knockback by 5% per piece (20% per set).
 Neither effect grants lava or fire immunity.
 
-Shared capacities: Q-001. Fusion recipes and amethyst placement: Q-005.
+### Learning capacity
+
+| Frame | Shared points |
+|---|---|
+| Dormant flesh | 0 |
+| Living frame | 100 |
+| Iron ribs | 300 |
+| Auric lattice | 400 |
+| Diamond carapace | 700 |
+| Obsidian scutes | 500 |
+| Diamond tendon | 1000 |
+| Netherite lamellae | 1400 |
+| Netherite-bonded scutes | 1100 |
+| Netherite mesh | 2000 |
+| Spatial weave | 2400 |
+
+A Living frame can hold one 100-point specialization or four 25-point beginnings.
+The 1800-point buff is reachable only on terminal flexible frames; a Spatial Weave
+piece reaching it has 600 points left for other activities. Counter values can
+exceed the last buff threshold and still occupy capacity.
+
+### Fusion installation
+
+Amounts are per piece, additional to making the named medium in Items.
+The medium is the child's material: Ferrocyte Paste, Auric Myelin, Faceted Chitin,
+Vitreous Scute, Diamond-Fiber Matrix, Living Netherite Lamella,
+Netherite-Bonded Scute, Netherite Tendon Mesh or Phase-Woven Matrix.
+
+| Destination level | Medium doses | Fusion Binder | Installation BU | Chamber seconds |
+|---|---|---|---|---|
+| G2 | 4 | 2 | 4000 | 120 |
+| G3 | 16 | 8 | 32000 | 480 |
+| G4 | 64 | 32 | 256000 | 1920 |
+
+G2 uses the Mutation Chamber. G3 adds a Thermal Mantle service; G4 adds a
+Precision Sequencer service bay and electrical supply. Spatial Weave additionally
+consumes End-native Phase-Woven Matrix. Higher throughput requires parallel
+prepared-material production and supplied chambers; it does not waive ingredients.
+No filled learning-capacity prerequisite: deliberate activity grinding is not a fusion gate.
+
+For a supply scenario of **10 / 40 / 160 BU/s** at G2/G3/G4, installation fuel alone
+takes **6 min 40 s / 13 min 20 s / 26 min 40 s** to produce per piece.
+This assumes fourfold productivity gains; eightfold fuel costs still double the
+production requirement. It excludes material preparation and is not a measured
+factory rate. Test optimized same-stage factories; raise costs or process dependencies
+if technological gains make the next fusion cheaper in actual preparation time.
 
 ### Turning minerals into living fusion materials
 
 Mineral Gizzard → Washing Kidney → culture/thermal/precision preparation →
 bioactive fusion medium. Raw ingots and gems cannot fuse directly.
 Fusion consumes prepared media and biomass; cost increases exponentially with
-level. Recipes: Q-005. Minecraft XP: Q-008.
+level. Minecraft XP participation: Q-008.
 
 ## 5. Mutation installation
 
@@ -132,7 +211,10 @@ I, II and III. Forward descendants and the explicit exclusions below are permane
 Disabled anatomy still occupies slots. Settings may turn an ability off, **not pause
 an activity counter** or replace a branch.
 
-Access prerequisites: Q-006.
+Expression I requires G1 for host grafts and G2 for creature grafts; II requires G3;
+III requires G4. C9 starts at G3. C11 starts at G3 plus an actual Elytra and its
+End-native medium. Recipes and slot limits still apply. No activity threshold
+is required to install a mutation.
 
 Prepare a target/expression-specific Mutation Graft, then install it on the existing
 piece. [Item Catalog](ITEM_CATALOG.md#mutation-grafts) owns the recipe quantities.
@@ -202,13 +284,15 @@ In the fuel column, `0.2 / 1` means 0.2 BU per second and load 1 while active. W
 | H9 Wither Sieve | 2 / 3 / 4 | Wither skeleton; Thermal Lining | Remove up to 4 / 8 / 12 s of Wither, cooldown 20 s. Does not prevent the attack, cancel boss damage or permanently immunize the wearer. | 10 / 15 / 20 BU per activation; load 5 for 1 s |
 | H10 Colony Reader | 1 / 2 / 3 | Bee; Auric Myelin | Show selected organ status and recent flow, and issue an already-authorized helper order, within 12 / 20 / 28 blocks. Higher rank improves reach, not drone population. | 1 BU per query/order; load 1 for 1 s |
 
-H2 and H3 can coexist. H3, H4 and H6 are installed anatomy, not exchangeable branches; only one visual display mode is active at a time. H7 uses a directional cue. H10 cannot read unloaded chunks or bypass ownership. Counter-buff interactions and reach ceilings are Q-002/Q-009.
+H2 and H3 can coexist. H3, H4 and H6 are installed anatomy, not exchangeable branches; only one visual display mode is active at a time. H7 uses a directional cue. H10 cannot read unloaded chunks or bypass ownership. Learned bonuses use the shared stacking ceilings.
 
 Stone Sense alone is useful for examining an adjacent underground cavity, but does not allow passage. Its coordinated Burrowing function requires the other three adaptations below.
 
 ## 8. Chest branches
 
 The chest develops **fuel storage, metabolic throughput, healing, impact defense, environmental exchange and whole-body transport**. This is where apparently compatible abilities compete for operating capacity.
+
+Berserk is a planned chest ability; its graft recipe and effects are not yet specified.
 
 | ID; branch | Slots I / II / III | DNA; signature ingredient | Effect I / II / III | Fuel and load |
 |---|---|---|---|---|
@@ -244,11 +328,11 @@ The player configures permitted feed slots and a minimum retained count for each
 
 When C9 and C13 share a selected slot, a due player-feeding action and its food reserve take priority. Digestion may consume only the permitted remainder after rechecking that slot; the same item is never eaten and digested twice. The player can instead keep separate meal and armor-feed slots.
 
-C13 has no generic Metabolic Work counter. Its fusion-level and any learning requirements are Q-006; its input yields are Q-010. Filling, digestion and fuel export do not themselves award activity points.
+C13 uses the creature-graft fusion requirements. Per-material digestion yields belong in Items. Filling, digestion and fuel export do not themselves award activity points.
 
 One chest processes at most one item at a time. Before consuming it, reserve room for the entire recipe yield in the chest; a recipe larger than available capacity waits. Deliver that reserved amount gradually at the rank's rate. Existing transfers must respect this reservation. Pausing, unequipping, death or reload retains only the remaining current batch on the same piece; it never returns both feed and produced fuel. No offline digestion, extra hidden tank or queued stack of meals. The HUD distinguishes available fuel from digestion still in progress.
 
-Container intake trades expedition packing for predictable transfer with no conversion loss. Digestion uses found/farmed feed but takes more anatomy and time, returns less biomass per material than base processing, and may compete for metabolic output. At these rates, C13's maximum 4 BU/s is below C8's minimum 18 BU/s; carried feed alone cannot sustain Burrowing indefinitely. Manual and tissue refueling remain available on either specialization. Feed yields: Q-010.
+Container intake trades expedition packing for predictable transfer with no conversion loss. Digestion uses found/farmed feed but takes more anatomy and time, returns less biomass per material than base processing, and may compete for metabolic output. At these rates, C13's maximum 4 BU/s is below C8's minimum 18 BU/s; carried feed alone cannot sustain Burrowing indefinitely. Manual and tissue refueling remain available on either specialization.
 
 ## 9. Leggings and boots branches
 
@@ -306,7 +390,7 @@ Proposed interactions; transferring prepared biomass and digesting feed are dist
 |---|---|---|
 | T0 manual station | Open a Biomass Bladder, place one awakened piece in its service slot, press **Fill**, then retrieve it. | Transfer only the needed stored biomass into that same piece. No mutation, full suit or healing service required; awakening itself still returns empty armor. |
 | T1 portable supply | Fill a Sealed Biomass Ampoule from storage; hold use while wearing bio armor. | Transfer its real contents to worn pieces, retaining the unused amount. One action serves the selected worn pieces; no need to remove each one. |
-| T1 Fuel Papilla tissue | Mutate a mature substrate cell, supply it through adjacent biomass logistics, stand on it and deliberately start filling. | Transfer from colony supply into authorized worn pieces. Rate, operating loss and multiblock improvement belong to T1-36/Q-019. No digestion or armor healing; partial suits work. |
+| T1 Fuel Papilla tissue | Mutate a mature substrate cell, supply it through adjacent biomass logistics, stand on it and deliberately start filling. | Transfer from colony supply into authorized worn pieces. Rate, operating loss and multiblock improvement belong to T1-36. No digestion or armor healing; partial suits work. |
 | **C12 Nutrient Intake** | Install the mutation and select carried sealed-container slots. | Automatically transfer already-produced biomass, within C12's rate. |
 | **C13 Digestive Crop** | Install the separate mutation and select permitted feed slots/reserves. | Automatically convert real biological material over time, within C13's yield, capacity and output limits. |
 
@@ -318,7 +402,7 @@ For multi-piece filling, use one configured order (default chest, helmet, leggin
 
 Starting reserves: 10 BU each for helmet, leggings and boots;
 40 BU for chest, before a Reservoir graft. Capacity contains no free fuel.
-Reserve progression: Q-009.
+Base reserves remain fixed across frames; C1 supplies additional capacity.
 
 The chest establishes complete-suit output: **G1 = 6, G2 = 10, G3 = 14, G4 = 18 load units**. Pump Heart adds its listed output. A G4 chest with Pump III supports 28 load, not unlimited simultaneous abilities. The other pieces do not contribute another three chest outputs.
 
@@ -334,7 +418,7 @@ A worn awakened piece without available biomass hurts its wearer until full mutu
 symbiosis. Afterwards, unpaid biological abilities and armor healing pause without
 armor hunger pain. Ordinary protection and unpowered movement remain.
 
-Symbiosis tracking and hunger damage: Q-007.
+Symbiosis identity and whether starvation can be fatal: Q-007.
 
 Refuel or remove hungry equipment to stop that armor condition. Doing so inside
 rock or underwater does not remove environmental danger. Q-004 separately defines
@@ -411,17 +495,17 @@ secretly upgrades the material frame.
 
 Curios control/reserve/potion accessories use the same resource accounting and
 cooldowns, never supply a missing armor piece or extra learning capacity.
-Exact accessory limits and enchantment/potion interactions are Q-008/Q-009.
+Enchantments and XP: Q-008. Accessory limits follow their item entries.
 
 Adaptive Interface and Reciprocal Control Graft are later settings-only proposals:
 they never exchange armor branches or hold a second invisible set of anatomy.
-Preparation: Items. Access and cost: Q-006/Q-031.
+Preparation and costs: Items.
 
 ## 12. Safety and implementation boundaries
 
 Learning uses a finite authored counter set and fixed-size event suppression,
-not a log of visited coordinates or lifetime attackers. Q-002 must set event
-bounds; Q-036 must set shared budgets. Charge, ritual and fusion transactions
+not a log of visited coordinates or lifetime attackers. Profile shared budgets
+under [Performance](PERFORMANCE.md). Charge, ritual and fusion transactions
 must be tested across full outputs, simultaneous users, interruption and reload.
 
 Visual work limits: Burrowing checks a 3×3×3 body
@@ -434,3 +518,16 @@ C9/C12/C13 use selected slots only, at most three per function, with one shared
 inventory pass per wearer per second. Digestion saves one
 current batch, not a queue or nested inventory. Apply server-wide admission as
 well as per-wearer limits before implementation.
+
+### Balance basis
+
+Activity-linked learning follows the useful-work principle of
+[Tinkers' Tool Leveling](https://github.com/SlimeKnights/TinkersToolLeveling);
+learning here does not award extra mutation slots. Bounded anatomical slots parallel
+[Tinkers' modifier slots](https://slimeknights.github.io/docs/json/tool-definitions/#modifier-slots),
+while fuel-consuming specialized abilities are informed by
+[Mekanism's powered armor](https://wiki.aidancbrady.com/wiki/Mekasuit).
+The numbers above are this mod's first-playtest baseline, not copied balance or
+validated gameplay. Calculation checks cover capacity, allocation and cost scaling;
+playtesting must measure time to first useful buff, incidental-counter crowding,
+optimized fusion supply time and full-suit fuel endurance.

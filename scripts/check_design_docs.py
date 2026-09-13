@@ -119,7 +119,7 @@ def check_questions(register, documents):
         if not line.strip() or re.fullmatch(r'#{1,2} [^?]+', line):
             continue
         match = re.fullmatch(
-            r'- (Q-\d{3}): (?:What|Which|How|Who|When|Where|Why|Should|Can|Does|Do|Is|Are|Will) [^?]+\?',
+            r'- (Q-\d{3}): (?:What|Which|How|Who|When|Where|Why|Should|Can|Does|Do|Is|Are|Will|Must) [^?]+\?',
             line,
         )
         if not match:
@@ -235,14 +235,14 @@ class CheckerTests(unittest.TestCase):
                 check_activity_owners(content)
 
     def test_question_register_rejects_drift(self):
-        valid = '# Open questions\n\n## Armor\n\n- Q-001: What capacity does each frame provide?\n'
-        check_questions(valid, {'armor': 'See Q-001.'})
+        valid = '# Open questions\n\n- Q-035: Must core gameplay work without other content mods?\n'
+        check_questions(valid, {'dependencies': 'See Q-035.'})
         for register, documents in (
             ('', {}), (valid + valid, {}),
             (valid + 'The capacity is 100.\n', {}),
             (valid + '- **Resolve in:** Armor.\n', {}),
-            (valid.replace('What capacity does each frame provide?', 'Capacity is 100?'), {}),
-            (valid.replace('provide?', 'provide.'), {}),
+            (valid.replace('Must core gameplay work without other content mods?', 'Compatibility is required?'), {}),
+            (valid.replace('mods?', 'mods.'), {}),
             (valid, {'armor': 'See Q-099.'}),
         ):
             with self.assertRaises(ValueError):

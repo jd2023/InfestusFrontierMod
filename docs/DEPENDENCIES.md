@@ -18,7 +18,7 @@ still need lock/verification metadata before release-grade reproducibility is cl
 
 ## Feature integrations: not installed in this empty foundation
 
-Production integration policy: Q-035.
+Core-mod independence: Q-035. Version selection and adapter design are engineering work.
 
 | Integration | Direction | Decision before implementation |
 |---|---|---|

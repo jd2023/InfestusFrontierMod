@@ -387,14 +387,14 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 
 ### T1-36 — Fuel Papilla
 - **Does:** Mutated Living Substrate, flush with the ground, that feeds worn armor. No separate free-standing feeder, healing head or digestive function.
-- **Input → output:** Colony biomass → biomass delivered to authorized selected worn pieces plus declared operating consumption. Single-cell rate/overhead are Q-019. Works with partial suits; full pieces are skipped. Source reserve and maximum fill are configurable; it is not a hidden reservoir or a through-vein.
+- **Input → output:** Colony biomass → biomass delivered to authorized selected worn pieces plus declared operating consumption. Single-cell rate and overhead are not yet specified. Works with partial suits; full pieces are skipped. Source reserve and maximum fill are configurable; it is not a hidden reservoir or a through-vein.
 - **Create:** Apply 1 Capillary Gel + 1 Membrane Sheet to exposed mature substrate. Keep maturity and compatible reinforcement; drain/replace any previous primary function first.
-- **Growth:** Extend with a supplied multiblock to improve rate and efficiency. Parts, shape and formula: Q-019. No learning from filling/circulating biomass. Probe/UI starts filling without intercepting block placement. Healing Dock remains a separate service.
+- **Growth:** Extend with a supplied multiblock to improve rate and efficiency. Extension dimensions and rates are not yet specified. No learning from filling/circulating biomass. Probe/UI starts filling without intercepting block placement. Healing Dock remains a separate service.
 
 ### T1-37 — Temporary Membrane
-- **Does:** Weak translucent temporary support grown by the handheld Membrane Projector. Placement, fall-arrest and collision options are Q-022.
+- **Does:** Weak translucent temporary support grown by the handheld Membrane Projector.
 - **Input → output:** Armor biomass paid by the projector → one temporary support block → expiration with no renewable item output.
-- **Create:** Projector placement only; recipe, range, cost, support condition and lifetime held under Q-022.
+- **Create:** Projector placement only; recipe, range, cost, support condition and lifetime not yet specified.
 - **Growth:** No processing level or permanent reinforcement. Active-block cap, unload/reload expiry and optional placement under a falling player must be selected before implementation.
 
 ## T2 — Directed mutation: genomes, specialized organs and planned excavation
@@ -439,21 +439,21 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 
 ### T2-07 — Memory Gland [held candidate]
 - **Does:** Candidate typed learning storage/transfer attachment. Armor point transfer is undecided under Q-003; this entry does not authorize it.
-- **Input → output:** If selected, source learning → accounted Memory Sample → compatible recipient, with donor reduction and no copying. Exact accepted targets/counters, loss, capacity and lineage rules are Q-003.
+- **Input → output:** If selected, source learning → accounted Memory Sample → compatible recipient, with donor reduction and no copying. Transfer recipes depend on whether point transfer is included (Q-003).
 - **Create:** 1 Organ Bud + 1 amethyst shard + 1 book + 1 Membrane Sheet. Operation recipe/cost is unresolved; the body alone grants no transfer.
-- **Growth:** No transfer-rate or category upgrade is specified before Q-003. The paid partial-reduction ritual may use different anatomy and must not be assumed to produce stored points.
+- **Growth:** Point transfer depends on Q-003. Counter reduction is a separate Mutation Chamber recipe and produces no Memory Sample.
 
 ### T2-08 — Healing Dock
 - **Does:** Heals one authorized worn piece or stored bio-equipment target using colony supplies. It neither refuels the target nor moves inventory. A mine can have a fuel berth without installing this separate healing operation.
-- **Input → output:** Damaged bio equipment + biomass + the healing recipe's materials → restored tissue durability on that same piece. Healing feed is spent on recovery, not also deposited into its reserve. Material list, rate and per-durability cost are Q-007/Q-009.
+- **Input → output:** Damaged bio equipment + biomass + the healing recipe's materials → restored tissue durability on that same piece. Healing feed is spent on recovery, not also deposited into its reserve.
 - **Create:** Mutate an Awakening Cradle with 2 Restorative Serum + 2 Membrane Sheets.
-- **Growth:** Choose healing speed or biomass economy. Hanger-like frames hold a set serviced one piece at a time; more healing heads enable independent work. Add a Fuel Papilla for a separate fill operation and mouths for materials. Any C-R learning follows the activity definition awaiting Q-002; only the chest owns this proposed counter; service grants no unrelated movement/combat counters.
+- **Growth:** Choose healing speed or biomass economy. Hanger-like frames hold a set serviced one piece at a time; more healing heads enable independent work. Add a Fuel Papilla for a separate fill operation and mouths for materials. C-R credits healing of the worn chestpiece only; dock service grants no armor-learning points.
 
 ### T2-09 — Grafting Bench
 - **Does:** Joins a known plant trait to compatible planting stock, so crop and tree selection affects the farm layout and its products.
 - **Input → output:** Seed/sapling + matching Genetic Stock + biomass + bank access → grafted planting stock with its stated nutrient, light and water requirements.
 - **Create:** 1 Bone Loom + 1 iron hoe + 1 Sequencing Lens.
-- **Growth:** Choose graft speed or biomass economy. Add two Seed Pouches to keep parent lines separate. New combinations need their species research and preparation recipes (Q-016/Q-023), not an assumed player-tier increase.
+- **Growth:** Choose graft speed or biomass economy. Add two Seed Pouches to keep parent lines separate. New combinations need their species research and preparation recipes, not an assumed player-tier increase.
 
 ### T2-10 — Ration Kitchen
 - **Does:** Turns a varied farm's products into useful expedition meals. A meal can emphasize saturation, travel endurance or suit feeding, with one selected recipe per batch.
@@ -1015,7 +1015,7 @@ The player designs assemblies with separate working, supply and control parts. M
 ### T7-05 — Organ Transplanter
 - **Does:** Moves one matured core from a temporary body into a prepared permanent assembly. Lets an early organ become the heart of a late workshop without destroying its accumulated value.
 - **Input → output:** Recovered donor core + a compatible prepared receiver + biomass → the same living core installed with its counters and choices intact.
-- **Create:** 1 Reclamation Mouth + 1 Memory Gland + 1 Levitation Chamber attachment. The Memory Gland requirement is held under Q-003/Q-020; moving an intact core is not extraction/transfer of its counters.
+- **Create:** 1 Reclamation Mouth + 1 Memory Gland + 1 Levitation Chamber attachment. The Memory Gland requirement is held under Q-003; moving an intact core is not extraction/transfer of its counters.
 - **Growth:** Choose transplant speed or biomass economy. Extra Anatomy Sockets handle larger cores. Transplanting is not a chance-based reroll and does not duplicate donor organs.
 
 ### T7-06 — Genome Vault

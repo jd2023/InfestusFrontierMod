@@ -10,19 +10,26 @@ Design ownership: `PROGRESSION_MAP.md` owns end-to-end player projects;
 `ITEM_CATALOG.md` owns items/preparation; `BLOCK_CATALOG.md` owns organs/construction;
 `LIVING_SUBSTRATE_MUTATIONS.md` owns cell anatomy; `ARMOR_EVOLUTION.md` owns equipment;
 `GUIDE_PROGRESSION_TREE.md` owns teaching dependencies. `OPEN_QUESTIONS.md` is the
-only unresolved-decision register. Questions contain only unanswered questions.
+product-decision register. It contains only questions about intended gameplay,
+scope or policy that require product direction—not balancing or implementation work.
 
 Before adding a document, identify a responsibility not already owned. Prefer a
 section in the existing owner. No parallel notebooks, reviews or prerequisite
 checklists that repeat gameplay. Keep technical contracts separate from gameplay.
 
-Use defined terms, exact conditions and observable results. If a value, recipe,
-scope or behavior is missing, reference the question ID that blocks it; do not
-substitute vague adjectives or invent precision. Label numeric candidates as drafts.
-When a question is resolved, put the rule in its specification, update dependent
-references and remove the question. State rules directly, without attribution,
-change history or repeated explanations.
-Draft numbers are not implementation authorization.
+Use defined terms, exact conditions and observable results. Research comparable
+systems, propose initial recipes, numbers and progression, and validate them with
+calculations, experiments and playtesting. This is design/development work; do not
+ask the player to supply tuning values or technical solutions. Keep baseline values
+in the feature specification, with brief supporting evidence and tuning targets.
+Distinguish calculated results from measured gameplay. An unfinished calculation
+does not become a product question.
+
+Ask only when alternatives change intended experience, scope or policy. Include
+a recommendation and its tradeoff when discussing that choice; keep the question
+register itself questions-only. Put resolved rules in their specifications and
+remove the questions. State rules directly, without attribution or change history.
+Design proposals do not authorize gameplay implementation or external actions.
 
 The bootstrap establishes build/test infrastructure only. It does not begin the
 content roadmap. Do not promote prototype implementations wholesale.

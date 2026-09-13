@@ -58,8 +58,7 @@ Work Bed belongs to the diagram's service branch, not a new maturity stage. Its 
 
 Dye changes the substrate's tissue pigment, not its function, maturity,
 reinforcement, ownership or stored resource. Preserve readable functional cues:
-a dyed biomass vein still shows green contents and port state. Palette, interaction
-and color persistence on conversion/recovery are Q-018.
+a dyed biomass vein still shows green contents and port state.
 
 ## 3. Reinforce it without changing its job
 

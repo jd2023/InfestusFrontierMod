@@ -99,7 +99,7 @@ Early Lumen treatment is made in the Bowl; all T1 transport treatments use the C
 
 | ID | Item | Obtain / recipe | Consumer / constraints |
 |---|---|---|---|
-| I124 | Membrane Projector [held candidate] | Handheld construction organ; body recipe and access Q-022 | Spends armor biomass to place Temporary Membrane T1-37 at a permitted target. Range, lifespan, attachment and fall-arrest behavior unresolved. T1 grouping is provisional. |
+| I124 | Membrane Projector [held candidate] | Handheld construction organ; body recipe and access not yet specified | Spends armor biomass to place Temporary Membrane T1-37 at a permitted target. Range, lifespan, attachment and fall-arrest behavior unresolved. T1 grouping is provisional. |
 
 ## 4. T2 — genetics, prepared grafts, food and helpers
 
@@ -145,9 +145,8 @@ Early Lumen treatment is made in the Bowl; all T1 transport treatments use the C
 
 Recovery produces 4→5→6→7→8 dust per defined ore input; smelting
 uses 4→3→2→1 dust per ingot. These are independent upgrades, not paired stages.
-The maximum combination is eight ingots per defined input unit. Q-011 selects
-that unit separately for each ore block/raw material and assigns each step to
-an actual process. Do not multiply an ordinary block's mining drops and intact
+The maximum combination is eight ingots per defined input unit. Each ore recipe
+must identify that unit and its processing steps. Do not multiply an ordinary block's mining drops and intact
 treatment recovery together.
 
 **Stockpiling is intended:** compatible dust produced earlier can feed a more
@@ -161,12 +160,12 @@ with a later batch. Recipe outputs reserve all residues and containers.
 
 Granulating an ingot for biological fusion produces Washed Portions, not
 yield-eligible ore dust. Unsupported imported materials are refused until their
-source and recycling paths are declared. Q-012 specifies energy type, quantity,
-duration and demand per improvement; no zero-cost improvement is implied.
+source and recycling paths are declared. Each processing recipe requires explicit energy, duration and demand;
+missing costs are not zero-cost operations.
 
 | ID | Item or family | Obtain / recipe | Consumer / constraints |
 |---|---|---|---|
-| I125 | Ore Dust [metal-specific family] | Actual eligible ore/raw material through recovery recipes selected in Q-011 | Stored for any compatible current/later smelting recipe. Metal identity retained; material list and treatment compatibility Q-011. Never obtained as multiply-smeltable dust from ingots. |
+| I125 | Ore Dust [metal-specific family] | Actual eligible ore/raw material through metal-specific recovery recipes | Stored for any compatible current/later smelting recipe. Metal identity retained; eligible materials and treatment compatibility not yet specified. Never obtained as multiply-smeltable dust from ingots. |
 
 ### Mutation grafts
 
@@ -175,9 +174,8 @@ matching Genetic Stock from each required species; 1 / 2 / 4 of each listed
 prepared signature; 1 / 2 / 3 Fusion Binder; 60 / 150 / 360 BU; 12 / 24 / 48 s.
 Installation uses the same target piece, one graft and 40 / 100 / 240 BU over
 8 / 16 / 32 s. Host I uses Spore Culture instead of Genetic Stock in the Bowl.
-Mutation access and DNA combinations: Q-006.
 
-I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M4, H1–H10, C1–C13, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the proposed DNA/signatures and access decision Q-006 in [Armor evolution](ARMOR_EVOLUTION.md#5-mutation-installation). A tooltip names the exact outcome, not “mutation essence.”
+I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M4, H1–H10, C1–C13, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the DNA/signatures and fusion-level requirements in [Armor evolution](ARMOR_EVOLUTION.md#5-mutation-installation). A tooltip names the exact outcome, not “mutation essence.”
 
 C13's operating feed is not a new item family: explicitly supported ordinary biological materials are consumed as fuel, not applied as upgrades. Armor Evolution owns its proposed conversion rates and per-material acceptance rules. Samples, grafts and other valuable biological items are not implicitly edible. C12 accepts measured biomass containers instead; C9 consumes food for player hunger. One item cannot fund two of these operations.
 

@@ -10,7 +10,7 @@ and interconnected production—not repetitive harvesting.
 - Evolve each armor piece independently along permanent branches. Specialized equipment outperforms universal equipment in its chosen role.
 - Mine real terrain. Excavations remain traversable; Burrowing crosses ground without extracting resources.
 - Maintain productive bases in every dimension. Connections carry both players and materials.
-- Keep early machinery useful through alternative production routes. Maximum recovery costs more infrastructure and operating energy.
+- Keep early machinery useful through alternative production routes. Later advancement must remain harder even with better technology; it requires automation, coordinated supply chains and increasing resources, not repeated manual grinding.
 - Preserve vanilla relevance, advancements and an in-game guide. FTB Quests remains a modpack responsibility.
 - Use original biological names and art: muscle, bone, membranes, visible fluids and living ground cover.
 - Bound simulation, storage and output. No unbounded drops or implicit chunk loading.
