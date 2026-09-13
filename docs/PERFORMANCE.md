@@ -14,8 +14,11 @@ stress/soak acceptance criteria. Distinguish tested bounds from measured TPS/FPS
   defense or refused insertion. Insert into bounded storage, retain a capped
   buffer and pause. Explicit player harvesting may return bounded stacks.
 - No implicit chunk loading for spread, routes, drones or dimension lookups.
-  Cross-dimensional endpoints and any explicit chunk loader need separate approval,
-  ownership, hard limits, upkeep, expiry and restart/removal tests.
+  Explicit Sail Roost loading follows the Block Catalog's paid-loading contract;
+  implement ownership, shared quotas, upkeep, expiry and restart/removal tests.
+  Cross-dimensional lookups do not inherit permission to create tickets. Measure
+  engine-loaded neighboring chunks as well as the requested ticking chunk; include
+  their memory/work costs in loader admission and soak tests.
 - No recursive flood fills, whole-world scans, position-keyed unbounded caches,
   ever-growing queues, unlimited inventories or attacker-sized NBT allocations.
 - Use shared admission budgets with bounded per-operation work. Rate limiting
@@ -32,7 +35,13 @@ stress/soak acceptance criteria. Distinguish tested bounds from measured TPS/FPS
 ## Required adversarial cases
 
 Counter reduction, fusion and rescue must not duplicate points, items or charges
-across interruption, swapping, concurrent users or reload.
+across interruption, swapping, concurrent users or reload. Sleep may recharge
+rescue but must not erase learning; reducing counters must not undo symbiosis.
+
+Spill budgets include neighbor updates, organ destruction and secondary fluid
+release, not just the first fluid placement. Test multiple ruptures at admission
+limits, full catchments, seal removal, chunk boundaries and reload. No recursive
+failure cascade, item storm or offline damage catch-up.
 Automatic feeding/refueling checks only configured slots on a bounded cadence.
 Hunger damage needs one wearer cadence, not four independent damage timers.
 No item-wide decay ticker,

@@ -15,11 +15,13 @@ Preparation recipes: [Items](ITEM_CATALOG.md). Service structures: [Blocks](BLOC
 | Anatomy slots | Space occupied by installed mutations, independent of fuel and learning capacity. |
 | Biomass reserve | Actual stored fuel belonging to this piece. |
 | Tissue durability | Condition healed with fuel/services; zero means collapsed equipment. |
+| Symbiosis | Permanent attribute of this piece; survives removal, trading, fusion and counter reduction. |
+| Rescue charge | Chest-owned single use, separate from its death counter; restored by sleeping. |
 
 No suit-wide learning budget, general equipment XP bar or freely allocated growth
 points. A full suit can share fuel/metabolic service, not counters or fusion levels.
-Each item preserves its state when removed, moved or traded; death-item recovery
-and wearer adaptation require Q-007.
+Each item preserves its state when removed, moved or traded. Dropped equipment
+remains subject to ordinary item loss; no automatic soulbinding.
 
 ## 2. Shared capacity and partial counter reduction
 
@@ -42,7 +44,8 @@ in a hidden reserve while capped or while the piece is not worn.
   and `2000 × 2^(G−1)` BU over 60 seconds to remove 25 points from one counter.
   With fewer than 25 points, remove the remainder for the same price; reject zero.
 - Recompute buffs immediately. Grafts remain installed; learning is not an installation gate.
-- Whether removed points can become a Memory Sample is Q-003; this recipe produces none.
+- Removed points are destroyed. No point storage, transfer or ritual byproduct.
+- Only this designated reduction process decreases counters; sleep, death and fusion do not.
 
 ## 3. Activity ownership and buffs
 
@@ -59,7 +62,7 @@ each unlocks the corresponding value below, replacing the previous value.
 | C-G | Chest | 4 health points of actual hostile melee/projectile damage | Residual physical damage −2 / 4 / 6 / 8 / 10% |
 | C-T | Chest | 4 health points of actual fire/lava damage, excluding hot-floor contact | Residual fire/lava damage −3 / 6 / 9 / 12 / 15% |
 | C-R | Chest | 8 durability self-healed by M1 on the worn chestpiece; external healing services excluded | Chest tissue-healing fuel −5 / 10 / 15 / 20 / 25% |
-| C-D | Chest | Actual survival death: 25 points, once per death | One-use rescue; reset policy Q-004; higher thresholds add no charges |
+| C-D | Chest | Actual survival death: 25 points, once per death | One rescue charge; sleep restores it; higher thresholds add no charges |
 | L-E | Leggings | 150 m self-propelled grounded sprint | Sprint speed +3 / 6 / 10 / 15 / 20% |
 | L-W | Leggings | 45 m self-propelled swimming | Swim speed +3 / 6 / 10 / 15 / 20% |
 | L-B | Leggings | 24 m supported Burrowing | C8 operating fuel −3 / 6 / 10 / 15 / 20% |
@@ -107,8 +110,17 @@ divides the same budget. Test routine expeditions, not only deliberate training.
 
 ### Death rescue
 
-Death learning grants a single-use totem-like rescue. Trigger, cost and sleep/reset
-behavior: Q-004.
+At C-D ≥25, the chest gains one rescue charge. On otherwise lethal damage that
+a vanilla Totem of Undying could prevent, a worn functional charged chest performs
+the vanilla totem rescue and consumes its charge. A held vanilla totem takes
+priority; never consume both. Rescue costs no biomass, allowing a depleted suit's
+wearer to survive once. A prevented death earns no C-D points.
+
+Completing a night's sleep while wearing that chest restores its single charge.
+Entering and immediately leaving a bed does not count. Sleeping changes neither
+C-D nor any other counter. Unequipping, trading, fusion and reload do not recharge.
+Ritual reduction below 25 suppresses rescue without refilling it; returning to the
+threshold cannot mint a new charge. First acquisition grants the charge only once.
 
 ## 4. Fusion tree
 
@@ -312,13 +324,13 @@ Berserk is a planned chest ability; its graft recipe and effects are not yet spe
 
 C4 and C7 are alternative uses of the same inflatable defensive cavity and cannot be installed together. C8 and C11 are incompatible body plans and cannot be installed together. Installed anatomy must fit the selected frame. A large fuel tank never removes slot or metabolic limits.
 
-C4/C7 apply after ordinary armor calculations. The sum of additional physical/explosion reduction from living-armor mutations is capped at 20% of the residual damage, before the row's per-hit limit. Potion and enchantment stacking: Q-008.
+C4/C7 apply after ordinary armor calculations. The sum of additional physical/explosion reduction from living-armor mutations is capped at 20% of the residual damage, before the row's per-hit limit. Vanilla effects apply normally; the 20% limit covers the additional learned/grafted reduction, not a replacement for vanilla protection.
 
 C3 is **auto-healing**; M1 is armor self-healing; C9 **feeds the player**; C12 **transfers prepared biomass**; C13 **digests carried biological materials into biomass**. C13 is a separate permanent branch, not a C12 upgrade or a requirement for container intake. Coexistence follows the current anatomy/load rules; no new mutual exclusion is assumed. No health-to-biomass conversion exists. Healing hunger injury grants no activity points. Food/feed filters default empty: the player chooses supplies rather than losing valuable items silently.
 
 C6 stores its expanded air allowance on the worn piece and draws from it while submerged. Removing the piece removes access to that allowance, without refilling it. Ordinary water-breathing effects are respected: the suit does not spend fuel while one is already supplying breath.
 
-C11 requires a complete suit and permanently excludes C8. The actual Elytra is incorporated and cannot be recovered while retaining wings. It does not duplicate the Elytra's durability or enchantment effects; enchantment migration remains part of the open enchantment decision.
+C11 requires a complete suit and permanently excludes C8. The actual Elytra is incorporated and cannot be recovered while retaining wings. It adds no second durability pool. Compatible Elytra enchantments move onto the chest at fusion, retaining the higher existing level rather than adding levels; incompatible enchantments must be removed before fusion. No enchanted Elytra is returned.
 
 Without fuel, powered flight stops. An intact incorporated wing retains an ordinary descending glide, never hover or climb. Collapsed wings provide no promised fall rescue. Warnings show landing reserves; flight never force-loads chunks.
 
@@ -361,7 +373,7 @@ L1 and L8 are alternative tendon architectures and cannot be installed together.
 | B4 Propulsive Fins | 2 / 3 / 4 | Squid; Membrane Sheet | +20% / 35% / 50% swimming speed. | 0.3 / 0.6 / 1 BU/s while swimming; load 2 / 3 / 4 |
 | B5 Spring Heel | 2 / 3 / 4 | Rabbit; Bone Plate | Charged ground jump reaching 1.5 / 2.5 / 3.5 blocks above takeoff. Requires surface contact; not a midair second jump. | 3 / 6 / 10 BU; load 3 for 1 s; cooldown 6 s |
 | B6 Blink Tendon | 3 / 4 / 5 | Enderman; precision-conditioned Spatial Membrane | Relocate up to 4 / 7 / 10 blocks to a visible clear supported destination. Does not pass through opaque terrain. | 20 / 30 / 45 BU; load 6 for 1 s; cooldown 12 / 10 / 8 s |
-| B7 Surface Key | 1 / 2 / 3 | Host; Spore Culture | Store 1 / 2 / 4 consented colony tissue signatures. I identifies wearer to compatible defensive tissue; II also enables Fast-Lane Tendons; III adds capacity for multiple colonies, not immunity to every hostile biomass fluid. | No operating cost/load |
+| B7 Surface Key | 1 / 2 / 3 | Host; Spore Culture | Store 1 / 2 / 4 consented colony tissue signatures. I identifies wearer to compatible service tissue without repeated enrollment; II also enables Fast-Lane Tendons; III stores additional signatures. No spill immunity or storage access. | No operating cost/load |
 | B8 Ground Anchor | 3 / 4 / 5 | Enderman; Diamond-Fiber Matrix | Coordinate body contact for Burrowing in all directions. Effective rank limits the complete burrowing system. Does not supply air or light. | Included in C8 cost/load |
 
 B2 and B4 cannot occupy the same foot anatomy: hooks and full fins are alternatives. Contour Sole, Landing Bladders and either one can coexist if they fit. B7 grants biological recognition only; it does not grant chest access, block-breaking permission or ownership of another player's colony.
@@ -418,11 +430,14 @@ A worn awakened piece without available biomass hurts its wearer until full mutu
 symbiosis. Afterwards, unpaid biological abilities and armor healing pause without
 armor hunger pain. Ordinary protection and unpowered movement remain.
 
-Symbiosis identity and whether starvation can be fatal: Q-007.
+Symbiosis belongs to the piece, not a player profile or a suit-wide bond. Initial
+threshold: 100 total learned points on the piece latches symbiosis permanently;
+subsequent counter reduction cannot undo it. Hunger injury and healing that injury
+award no points. Whether hunger damage can be fatal is Q-007.
 
 Refuel or remove hungry equipment to stop that armor condition. Doing so inside
-rock or underwater does not remove environmental danger. Q-004 separately defines
-death rescue; no guaranteed rescue is implied.
+rock or underwater does not remove environmental danger. Death rescue needs its
+own eligible charged chest; feeding is not a guaranteed escape.
 
 ### Priority and starvation
 
@@ -461,7 +476,6 @@ Stone Sense shows nearby cavities; it is not a headlamp. Bring Lantern Gland, No
 | Capability | Required armor combination | What mixed equipment loses |
 |---|---|---|
 | Shared reserves/output | Any four functional awakened pieces | Shared metabolism; each remaining piece works within its local limit |
-| Defensive tissue recognition | Complete living suit + B7 + a consented matching tissue signature | Tissue does not treat a partial suit as fully protected |
 | Fast lane | Complete living suit + L8 + B7 II or III + compatible lane | Lane boost, not ordinary walking |
 | Thermal Mode | Complete suit, all four M2 | Biological fire/lava protection; independent potions still work |
 | Pelagic Mode | Complete suit, all four M3 | Coordinated handling/efficiency, not ordinary swimming |
@@ -473,8 +487,8 @@ Stone Sense shows nearby cavities; it is not a headlamp. Bring Lantern Gland, No
 
 The item preserves frame, activity values, installed anatomy, actual biomass,
 tissue condition, pigment and trims. Cooldowns survive quick swaps, dimension
-changes and reconnects. Symbiosis representation and death-item loss are Q-007;
-counter transfer is Q-003. No operation may duplicate the item or stored learning.
+changes and reconnects. Symbiosis, rescue charge and whether the first charge was
+already granted stay on the same item. No operation duplicates stored learning.
 
 Forward fusion is transactional: validate target/parent, inputs, output and capacity
 before committing. Refusal leaves the item unchanged. Cancellation cannot return
@@ -495,7 +509,14 @@ secretly upgrades the material frame.
 
 Curios control/reserve/potion accessories use the same resource accounting and
 cooldowns, never supply a missing armor piece or extra learning capacity.
-Enchantments and XP: Q-008. Accessory limits follow their item entries.
+Bio equipment accepts applicable vanilla enchantments. Initial enchanting-table
+enchantability is **5** across armor frames; this lowers table rolls, not anvil/book
+limits. Fusion preserves enchantments. Unbreaking affects tissue durability loss;
+Mending spends ordinary XP to heal tissue, never to refill biomass or add learning.
+Protection and potion effects retain vanilla compatibility rules. Test combined
+protection and Mending alongside mutations; low enchantability alone is not a cap
+on a fully enchanted suit. Evolution/ritual XP costs remain Q-008.
+Accessory limits follow their item entries.
 
 Adaptive Interface and Reciprocal Control Graft are later settings-only proposals:
 they never exchange armor branches or hold a second invisible set of anatomy.

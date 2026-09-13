@@ -43,7 +43,24 @@ pure core, but not the development test mod or archived Forge content.
 - [Testing](docs/TESTING.md): current evidence and gates still to build.
 - [ktask](docs/KTASK.md): task automation and human gates.
 
-## Release constraint
+## Licensing
 
-`LICENSE.txt` specifies CC BY 4.0; legacy mod metadata specifies All Rights Reserved.
-Source and asset licensing must be resolved before publication (Q-037).
+Source and original assets should allow contributions, redistribution and continued
+development by forks, with attribution preserved.
+
+Recommendation: **LGPL-3.0-only for source** and **CC BY-SA 4.0 for original assets**.
+[AE2 uses LGPL v3](https://github.com/AppliedEnergistics/Applied-Energistics-2/blob/main/LICENSE):
+distributed modifications to covered source remain open, while independent linked
+code can use other licenses under LGPL's conditions.
+[Mekanism uses MIT](https://github.com/mekanism/Mekanism/blob/1.21.x/LICENSE), which
+requires retaining its notice but also permits closed-source derivatives.
+LGPL better matches keeping distributed improvements to this mod available to forks.
+
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) requires attribution
+and sharing adapted assets under compatible terms. Both proposed licenses permit
+commercial redistribution; they do not prohibit reuse or automatically enforce
+compliance. Third-party material retains its own terms.
+
+Final approval is Q-037. `LICENSE.txt` currently specifies CC BY 4.0 while legacy
+metadata says All Rights Reserved. Review contributor/asset provenance and resolve
+those declarations before publication; this recommendation does not relicense files.

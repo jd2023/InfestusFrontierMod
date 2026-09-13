@@ -1,6 +1,7 @@
 # End-to-end gameplay progression
 
-Proposed player projects. SR0–SR9 identify chapters; progression gates are Q-025.
+Proposed player projects. SR0–SR9 are guide chapters, not player/base ranks.
+Progress depends on actual materials, working organs and dimension-native production.
 
 ## 1. SR0 — Start beside a vanilla home
 
@@ -51,9 +52,10 @@ cannot produce its full compost and digestion yields. Collection exports held
 output; drones and loose item drops are not prerequisites.
 
 **Source choices:** crop beds, managed tree growth and later aquatic habitats.
-Arbor Root allocates a selected tree's growth among wood, pods and sap; harvesting
-and replanting stay separate. Wild vegetation conversion is Q-017, not automatic
-canopy clearance.
+Manually graft a log into Living Wood to build the first Arbor Root. Convert a
+selected tree into mod-native wood and pod-bearing canopy; allocate its growth
+among construction wood, pods and sap. Harvest and replant separately. Keep trees
+for renewable products or send harvested wood through veins to digestion.
 
 **Circulation:** configure Vascular Junction ports and recessed green veins.
 Vascular Stitch crosses exposed terrain steps; a junction joins routes; Septum
@@ -85,6 +87,10 @@ stock + prepared ingredients → Fusion Chrysalis → target-specific graft
 graft + existing target → Mutation Chamber → same target, forward mutation
 ```
 
+Store coverage in DNA Banks and attached Archive Lobes, not a player research bar.
+A grafting workshop needs access to its physical bank. Later complex DNA needs a
+Precision Sequencer service; boss/Fold genomes need a Genome Vault.
+
 **Armor project:** prepare mineral fusion media and select a permanent branch.
 Use the [armor tree](ARMOR_EVOLUTION.md#4-fusion-tree) to plan the piece's specialization.
 
@@ -101,8 +107,12 @@ Reaction Polyp treats it; Fracture Jaw creates held fragments; Collection Cilia
 exports to Mineral Gizzard, Washing Kidney and Bio-Furnace. Hand mining can bypass
 treatment. Multiple beds may share an applicator or fracture head.
 
+**Optional courier:** assign a nursery worker to collect held Work Bed results and
+deliver them to a capsule along waypoints. One courier can share several separated
+beds; fixed cilia/veins offer predictable throughput without pathfinding.
+
 **Result:** a chosen specialization and repeatable preparation, not every genome
-or every armor mutation. Optional helpers do not gate stationary logistics.
+or every armor mutation. Helpers do not gate stationary logistics.
 
 ## 4. SR3 — Establish the Nether thermal workshop
 
@@ -144,8 +154,10 @@ other measures rather than dominate every route.
 
 Sensors and Scheduler Ganglion control finite jobs. Display Membrane reports
 full stores, protected reserves and blocked work. Byproducts have held outputs
-and an available same-stage disposal route. Hazardous residual production is
-Q-015; ordinary full outputs still pause.
+and an available same-stage disposal route. Pressure/heat faults can rupture a
+vessel: leaked biomass kills unsealed substrate and can destroy organs. Build a
+sealed catchment, recovery path and cutoff around hazardous processes. Ordinary
+full outputs still pause; failure handling belongs in the factory layout.
 
 **Result:** a chosen refinery, a supplied power source and a demonstrated
 input-interruption recovery path.
@@ -179,8 +191,10 @@ The dragon encounter does not substitute for this workshop.
 | End spatial district | Spatial Nursery and Spatial Conditioner | Purpose-conditioned Spatial Membranes | Thermal Lining, membranes, biomass and electricity support |
 
 Transit Maw/Arrival Chamber move passengers. Freight Gullet/Cargo Locks move
-reserved real item/fluid batches. They may share one settlement gateway layout;
-unattended operation is Q-026.
+reserved real item/fluid batches. They may share one settlement gateway layout.
+A spatially upgraded Sail Roost can keep a selected chunk ticking, consuming
+biomass continuously. Fit critical organs inside its previewed boundary and retain
+local restart fuel; remote travel and freight never enable loading automatically.
 
 **Choose:** centralized biomass exports, local fuel autonomy, or local essential
 reserves plus industrial imports. Storage Cortex indexes local physical stores;
@@ -207,8 +221,8 @@ separate. Display reserve endurance at current net drain.
 
 **Completion projects:** a traversable deep mine feeding a selected ore route;
 an expedition/refueling network; a supplied specialist equipment workshop; or
-production meeting a specified energy/space/output target. Q-034 sets release
-targets. Completing every optional catalog entry is not assumed.
+production meeting a specified energy/space/output target. Completing every
+optional catalog entry is not assumed.
 
 ## 9. SR8–SR9 — Fold and Manyfold horizon
 

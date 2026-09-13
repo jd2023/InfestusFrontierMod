@@ -1,28 +1,5 @@
 # Open questions
 
-- Q-003: Can removed armor-learning points be stored and transferred to another piece, or are they destroyed?
-  - A very good question. Storing would be great, but also add a lot of complexity. We may consider it as some higher tier ritual or process, but for now let's just do removal. 
-- Q-004: Does sleeping erase death learning or restore its single-use rescue charge?
-  - Only the designated process (ritual) erases or reduces counters. Nothing else. Sleep restores single-use rescue charge. (may be top tier will be 2 charges, but super hard to achieve) 
-- Q-007: Is symbiosis a bond with each armor piece or a permanent player adaptation, and can hungry armor kill before that bond forms?
-  - The symbiosis is an attribute of an armor piece. It is permanent for that armor piece. 
-- Q-008: Should bio equipment accept vanilla enchantments, and should Minecraft XP participate in its evolution?
-  - Yes, if it is not too complicated. I know that enchantments could be overpowering. May be we can reduce enchantobility, but I would not remove it completely. Again if it complicates things by a lot, we can skip it for now. 
-- Q-015: Can biomass failures damage an established base, or should failures stop at lost production and recoverable spills?
-  - I would damage the base. Contamination, died living substrate, broken (completely destroyed organs). 
-- Q-017: Should affected trees remain productive living trees, become harvestable altered wood, or be consumed for biomass?
-  - My original idea was to consume them. But for that you need to have veins that transfer the biomass. Keeping trees the same behind the infection is an interesting idea but feels weird in practice. I would convert it into Infestus Frontier specific wood type with some useful for the mod properties. To make it an important resource for the mod. 
-- Q-024: Is research personal, shared by a colony, or freely tradable between players?
-  - WHat research? If you are talking about DNA, it should be stored in a specialized set of organs. With different capacity and tier for complex DNAs. 
-- Q-025: Should progression require personal advancement, an upgraded colony structure, or only the necessary materials and working infrastructure?
-  - Upgraded "colony structure" sounds interesting, but I have no idea what you mean. It is one of these cases when you are being vague, and just put some meaningless words without any substance. So unless you have a concrete definition what the heck it means, then the answer is No. 
-- Q-026: Should the mod provide chunk loading for unattended colonies?
-  - Yes. but it should not be default, it should cost biomass. So it should be hard to build and maintain. 
-- Q-029: Should colony defenses target other players, or only hostile creatures?
-  - Multiplayer options will be considered later. For now, let's not target other players.
-- Q-034: Should the first release include helper mobs, or focus on organs, logistics and equipment?
-  - If we see a good place for helper mobs, then yes. I like the mobs we prototypes. Let's discuss their use, keep it very concrete and consistent. 
-- Q-035: Must all core gameplay work without other content mods installed?
-  - I don't understand the question. Mod should be playable. And we will be testing, playing, evolving it constantly. 
-- Q-037: What licenses apply to the source code and assets?
-  - Check other popular mods. I don't care for keeping it proprietary. I would love folks to contribute. Reasonably want to protect myself from this code being stolen. But if someone pick it up and start moving forward then I'm fine with that. 
+- Q-007: Can hungry armor kill its wearer before that piece reaches symbiosis?
+- Q-008: Should Minecraft XP be consumed by equipment fusion or counter-reduction rituals?
+- Q-037: Should source code use LGPL-3.0-only and original assets use CC BY-SA 4.0?

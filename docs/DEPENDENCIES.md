@@ -18,7 +18,10 @@ still need lock/verification metadata before release-grade reproducibility is cl
 
 ## Feature integrations: not installed in this empty foundation
 
-Core-mod independence: Q-035. Version selection and adapter design are engineering work.
+The playable test profile is Minecraft, NeoForge, this mod and its declared required
+libraries. Content-mod integrations use separate presence/absence profiles; none
+substitutes for an unimplemented core gameplay loop. Version selection and adapter
+design are engineering work.
 
 | Integration | Direction | Decision before implementation |
 |---|---|---|

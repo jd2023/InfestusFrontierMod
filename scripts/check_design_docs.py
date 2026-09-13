@@ -145,6 +145,15 @@ def check_current_armor(content):
             raise ValueError(f'Missing armor contract: {required}')
 
 
+def check_catalog_references(documents, blocks, items):
+    """Deleted catalog entries must not survive as recipe or prose references."""
+    known = set(blocks) | set(items)
+    for name, content in documents.items():
+        unknown = set(re.findall(r'\b(?:T\d+-\d+|I\d{3})\b', content)) - known
+        if unknown:
+            raise ValueError(f'Unknown catalog references in {name}: {sorted(unknown)}')
+
+
 def check_activity_owners(content):
     rows = re.findall(r'^\| ([HCLB]-[A-Z]) \| (Helmet|Chest|Leggings|Boots) \|', content, re.M)
     unique([counter for counter, _ in rows], 'activity counter')
@@ -206,6 +215,7 @@ def check(root):
     question_path = docs / 'OPEN_QUESTIONS.md'
     if not question_path.exists():
         raise ValueError('Missing OPEN_QUESTIONS.md')
+    check_catalog_references({str(document): document.read_text() for document in documents}, blocks, items)
     check_questions(question_path.read_text(), {
         str(document): document.read_text() for document in documents
     })
@@ -227,6 +237,12 @@ def check(root):
 
 
 class CheckerTests(unittest.TestCase):
+    def test_removed_catalog_references_rejected(self):
+        check_catalog_references({'recipe': 'T2-03 and I044'}, ['T2-03'], ['I044'])
+        for reference in ('T2-07', 'I043'):
+            with self.assertRaises(ValueError):
+                check_catalog_references({'recipe': reference}, ['T2-03'], ['I044'])
+
     def test_activity_ownership(self):
         valid = '| H-D | Helmet | Darkness | Visibility |\n| L-W | Leggings | Swimming | Speed |\n'
         check_activity_owners(valid)

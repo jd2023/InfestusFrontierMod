@@ -18,7 +18,8 @@ Proposed cell anatomy. Maturity, function, framework and lining are separate pro
 
 Bone meal accelerates **maturity**, not expansion into unspecified neighboring land. The player selects the cells to grow. A later Foundation Cyst can treat a marked area using its packed stock and biomass; it stops at that boundary or when supplies run out.
 
-Maturity does not decay when the player leaves. An unfed active function pauses; the foundation does not disappear or turn into a barren dead carpet. Older-looking patterns are visual variants of mature tissue, not another mandatory progression level.
+Maturity does not decay when the player leaves. An unfed active function pauses.
+Destructive contamination can kill tissue under [containment rules](BLOCK_CATALOG.md#containment-failures); ordinary lack of fuel cannot. Older-looking patterns are visual variants of mature tissue, not another mandatory progression level.
 
 ## 2. Give mature tissue a function
 
@@ -35,12 +36,12 @@ Each cell has **one primary function**. Mutating it does not remove its ability 
 | **Item Vein** | Contractile Fiber. | Carries item packets along configured faces. | Connected transfer organs and free destination space. |
 | **Nerve Tissue** | Synaptic Gel. | Carries control signals, separate from resources and power. | Input signal; no biomass upkeep. |
 | **Steam Vein** | Mutate a Fluid Vein with Thermal Lining + Bone Plate. | Carries steam; uses the heat lining slot and needs a condensate outlet. | Supplied steam; pressure falls as work and heat are lost. |
-| **Conductive Tissue** | Conductive Myelin; chapter SR4 (Q-025). | Carries electricity through a separate circuit. | Actual electrical input. |
+| **Conductive Tissue** | Conductive Myelin. | Carries electricity through a separate circuit. | Actual electrical input. |
 | **Cultivation Tissue** | Hoe the mature cell, then apply Rooting Gel and the selected seed. The hoe is not consumed. | Maintains crop growth. Planting, harvest and seed/output reserves belong to separate organs or player actions. | Water; optional biomass-assisted growth. |
 | **Work Bed** | Membrane Sheet + Sealing Resin on exposed mature tissue. | Holds one visible specimen or finite item batch for attached working organs; no processing or automatic collection of its own. | No idle upkeep; each operation pays its own supplies. |
 | **Aquaculture Bed** | Aquaculture Graft, while submerged. | Supports the selected aquatic planting or husbandry recipe. | Water habitat, stock and nutrients. |
 | **Chorus Orchard Tissue** | Chorus Orchard Graft on mature Anchored Substrate in the End. | Supports a tended, harvestable chorus garden. | Planting stock and nutrients. |
-| **Digestive Tissue** | Digestive Enzyme. | Damages susceptible occupants without the required full bio suit; collects biomass from actual damage. | No continuous feed in the basic form; export its finite collected reserve. Full storage stops collection, not the damage. |
+| **Digestive Tissue** | Digestive Enzyme. | Damages hostile creatures; collects biomass from actual damage. Never targets players or tamed pets. | No continuous feed in the basic form; export its finite collected reserve. Full storage stops collection, not the damage. |
 | **Restraining Tissue** | Restraining Graft; spider genome. | Slows or holds a susceptible target instead of harvesting it. | Biomass while restraining. |
 | **Travel Tissue** | Locomotor Gel. | Speeds an eligible full bio suit with a locomotion mutation. | The wearer's suit biomass. It does not give unaided flight. |
 | **Restorative Tissue** | Restorative Serum. | Heals an authorized injured occupant. | Biomass per actual healing. |
@@ -105,7 +106,7 @@ Reconfiguration applies to substrate cells only.
 
 - **Change function:** Isolate the cell, drain fluid or return held items to storage, then remove the functional graft with the configuration tool and apply the new recipe. Keep maturity and compatible reinforcement. Used graft ingredients are not refunded, preventing free repeated recipe changes.
 - **Change lining:** Keep the old lining until a compatible replacement is confirmed. Refuse the change if it would expose a hot/chemical route, break an occupied structure or require somewhere to put material that has no available container.
-- **Break and move:** The recovered substrate retains its mature/native form, reinforcement, functional graft and configuration. Any earned functional progress, if that function has counters, belongs to the same recovered cell—not a duplicate left at the old position. Route links are revalidated at the new location.
+- **Normal dismantling:** The recovered substrate retains its mature/native form, reinforcement, functional graft and configuration. Any earned functional progress, if that function has counters, belongs to the same recovered cell—not a duplicate left at the old position. Route links are revalidated at the new location.
 - **Expand a multiblock:** Upgrade the additional required footing cells first, then add the body's ribs, chambers or service attachments. Unsupported extra blocks wait outside the valid body; they do not erase the old organ's history or inventory.
 - **Keep living detail:** Ribs follow edges, veins remain recessed, and unoccupied surfaces retain varied pores, soft growth and space for vegetation. Reinforcement should not turn the colony into a uniform armored pavement.
 

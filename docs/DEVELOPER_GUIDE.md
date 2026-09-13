@@ -96,8 +96,9 @@ Names and IDs come from an approved catalog. Recipes, tags, translations,
 advancements and the guide must explain how players discover and use the feature.
 Use original biological art with provenance, deliberate UVs and readable silhouettes.
 Items for blocks should render their block models. Preserve vanilla relevance;
-bio-armor enchantment support is unresolved (Q-008), not permission
-to remove enchantments or change ordinary vanilla equipment. Cross-mod behavior
+bio-equipment enchantments follow Armor Evolution. If supporting them introduces
+material complexity, bring evidence before deferring support. Do not change
+ordinary vanilla equipment. Cross-mod behavior
 belongs in optional adapters.
 
 FTB Quests is outside the mod's responsibility. Advancements remain required.
