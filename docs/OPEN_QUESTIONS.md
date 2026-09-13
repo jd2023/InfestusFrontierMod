@@ -3,7 +3,9 @@
 ## Armor
 
 - Q-001: How much shared learning capacity does each fusion level provide?
+  - We will need to determine that by playing the actual game. Think and come up with a progression that makes sense. Keep in mind, that with advance in technology it should NOT become easier to achieve the next level. It should be HARDER, but not impossible. Some automation and cleaver tricks should be necessary to achieve higher levels. Top levels should require a lot of resources and dedication. 
 - Q-002: Which activities teach each piece, at what rate, and which counter thresholds grant which buffs?
+  - Go figure it out. Check other mods. Come up with something that makes sense. 
 - Q-003: What ritual removes how many counter points, at what cost and loss of buffs, and can removed points be stored?
 - Q-004: Does sleeping erase death learning or restore the single-use rescue charge, and what triggers and powers that rescue?
 - Q-005: Which material branches, frame statistics and exponentially increasing fusion costs should each armor piece have?
