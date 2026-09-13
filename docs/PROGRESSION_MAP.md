@@ -1,32 +1,6 @@
 # End-to-end gameplay progression
 
-This document owns the sequence of player projects. [Blocks](BLOCK_CATALOG.md)
-owns operations, [Items](ITEM_CATALOG.md) recipes, [Substrate](LIVING_SUBSTRATE_MUTATIONS.md)
-ground anatomy, [Armor](ARMOR_EVOLUTION.md) equipment and [Guide](GUIDE_PROGRESSION_TREE.md)
-page/advancement dependencies. Do not copy their numeric rules here.
-
-**Status:** proposed campaign under [Vision](../VISION.md).
-SR0–SR9 are chapter coordinates; T0–T9 are catalog groupings. Whether a player rank,
-colony capability or upgraded structure gates operations is [Q-025](OPEN_QUESTIONS.md),
-not an established permission system. [Open questions](OPEN_QUESTIONS.md) is the
-only unresolved-decision register. References below identify blocked specifications.
-
-## Vocabulary
-
-| Term | Meaning |
-|---|---|
-| Biomass / BU | Processed biological fuel; draft unit 1 BU = 1 mB. |
-| Specimen | Source-attributed physical material consumed during analysis. |
-| Genome coverage | Retained species knowledge, not consumed by making a graft. |
-| Genetic Stock | Physical species-matched material consumed by culture/graft recipes. |
-| Bioactive medium | Prepared ingredient used in fusion or functional mutation. |
-| Fusion level | Level of one equipment piece's material frame, not a player level. |
-| Activity counter | Points from one eligible activity, owned by one armor piece. |
-| Learning capacity | Limit on the sum of that piece's activity counters. |
-| Mutation branch | Permanent anatomy with forward children, not a settings preset. |
-| Organ level | Development from completed organ work, separate from armor learning. |
-| Native bed | Substrate requiring its home dimension for named production. |
-| Production line | Connected reusable operations with actual inputs and held outputs. |
+Proposed player projects. SR0–SR9 identify chapters; progression gates are Q-025.
 
 ## 1. SR0 — Start beside a vanilla home
 
@@ -39,8 +13,7 @@ biomass; spend it on selected ground growth, preparation or equipment. Keep food
 and planting stock instead of digesting the whole inventory.
 
 Craft one dormant piece, awaken it in the Cradle, fill it at the Bladder and wear
-it during ordinary activity. Its counters share capacity; activity alone does not
-fuse a new frame. A first host-grown graft can provide light or armor healing
+it during ordinary activity. A first host-grown graft can provide light or armor healing
 without a completed creature genome.
 
 **Alternative project:** use Leaching Gland to weaken selected non-ore rock.
@@ -52,7 +25,6 @@ Remove/feed hungry armor to address its pre-symbiosis pain; this does not rescue
 a player from an unrelated environmental hazard.
 
 **Result:** one fed useful piece and a workshop preparing its own starter inputs.
-Onboarding: Q-032/Q-034; equipment parameters: Q-001–Q-010.
 
 ## 2. SR1 — Automate replenishment
 
@@ -114,13 +86,8 @@ stock + prepared ingredients → Fusion Chrysalis → target-specific graft
 graft + existing target → Mutation Chamber → same target, forward mutation
 ```
 
-Sample amount, genome coverage and extraction precision are separate; Q-023 sets
-their exact relationship. Cultured stock never manufactures mineral or boss loot.
-
 **Armor project:** prepare mineral fusion media and select a permanent branch.
-Fusion raises shared capacity without awarding practice. Activities cannot be
-paused. Paid partial counter reduction frees selected capacity without branch
-exchange; its recipe and below-threshold behavior are Q-003.
+Use the [armor tree](ARMOR_EVOLUTION.md#4-fusion-tree) to plan the piece's specialization.
 
 **Other projects:** Grafting Bench for plant traits; Feeding Trough plus
 Incubation Basket for bounded husbandry; Aquaculture Bed/Fishing Polyp for aquatic
@@ -159,10 +126,6 @@ supplied water with defined recovery, not an assumed exposed Nether water farm.
 creates a traversable route; Digestion Crucible processes a contained volume of
 host rock. These are different jobs, not merely different drill sizes.
 
-**Biomass route under review:** thermal pretreatment of fibrous feed → cooling →
-specialized digestion. Native catalyst/lining consumption and actual yield/cost
-are Q-012/Q-013; no industrial digestion recipe is approved by this description.
-
 **Result:** repeated Nether manufacturing for ongoing colony work. Keep local
 storage and manual restart supplies rather than making each visit an ingredient raid.
 
@@ -172,14 +135,8 @@ Electrocyte Stack converts defined feed to electricity; Charge Sac buffers it.
 Conductive Tissue carries it. Precision Sequencer and Ion Separator perform their
 listed preparation tasks, not every earlier operation.
 
-| Independent improvement | Owner's proposed steps | Choice |
-|---|---|---|
-| Dust recovery | 4, 5, 6, 7, 8 dust per defined ore input | Additional processing versus lower-cost recovery |
-| Smelting recovery | 4, 3, 2, 1 dust per ingot | More processing energy versus current smelting |
-
-Save compatible dust for a later efficient smelter. Maximum combination yields
-eight ingots per defined input unit; Q-011 must define that unit per ore source
-and prevent Fortune/recycling multiplication. Exact energy recipes are Q-012.
+Improve [ore recovery and smelting](ITEM_CATALOG.md#ore-dust-and-recovery)
+independently; stockpile compatible dust for a later smelter.
 
 **Layouts:** direct smelting, partial treatment plus stockpiling, parallel specialist
 lines or shared treatment equipment. Compare energy per ingot, ingots per time,
@@ -222,9 +179,6 @@ The dragon encounter does not substitute for this workshop.
 | Nether thermal district | Thermal Nursery and native Thermal Mantle | Thermal Lining and Tempered Bone Plates | Membranes, biological supplies, local or imported fuel |
 | End spatial district | Spatial Nursery and Spatial Conditioner | Purpose-conditioned Spatial Membranes | Thermal Lining, membranes, biomass and electricity support |
 
-No Overworld-exclusive culture recipe is defined; Q-025 tracks whether one is
-required. Ordinary cultivation is not claimed to be dimension-locked.
-
 Transit Maw/Arrival Chamber move passengers. Freight Gullet/Cargo Locks move
 reserved real item/fluid batches. They may share one settlement gateway layout;
 shared-body anatomy and solo destination loading are Q-026.
@@ -234,8 +188,7 @@ reserves plus industrial imports. Storage Cortex indexes local physical stores;
 remote availability and freight remain separate, not an instantly spendable global tank.
 
 **Unloading:** ordinary freight waits with accounted cargo until both endpoints
-are available. Remote farms do not run invisibly. No implicit chunk loader is
-authorized; the passenger-loading decision cannot be hidden in an arrival check.
+are available. Remote farms do not run invisibly. Freight does not load chunks.
 
 **Result:** make a useful product from all three sites' contributions. Preserve
 restart reserves so staged visits and shipments work without permanently loaded worlds.
@@ -276,28 +229,4 @@ presets change settings within installed anatomy, not a hidden second loadout.
 Manyfold is player-initiated at a prepared site: observe its state → supply a
 countercondition → attack during the opening. Solo preparation must work.
 Failure cannot destroy the three-world colony. A first reward supplies a template
-maintained by culturing rather than routine boss slaughter. Exact phases,
-counterconditions, costs and rewards are Q-031, not a finished encounter.
-
-## Other connected projects
-
-- **Burrowing:** move inside ground without mining, supply light/air separately and respect stopping stability; no open-air thrust. Terrain and budgets: Q-009/Q-021.
-- **Temporary scaffolding:** a handheld organ spends armor biomass on weak translucent support that expires. Attachment, fall arrest and midair placement: Q-022.
-- **Defense:** supplied ground/air organs and deliberately armed digestive tissue protect approaches; target policy, damage recovery and boss behavior: Q-029.
-- **Helpers:** bounded station jobs, separate idle berths, recall and cargo recovery; Sail loading is independent: Q-028.
-- **Building:** copy a layout, not cargo or earned counters. Reserve real parts for a selected region; preserve finished construction and unused supplies on interruption: Q-027.
-- **Tools, weapons, meals and potions:** retain manual field work and prepared expedition options alongside automation; exact trees/compatibility: Q-008/Q-016/Q-030.
-
-## Success and interruption
-
-Operations reserve inputs, target and outputs before committing. Full output,
-missing input or an unavailable chunk pauses without voiding material.
-Ready/held states let other operations take over without redstone timing races.
-Dangerous processes need an approved failure contract before overriding this baseline.
-
-A diagnostic names the blocked organ, missing condition and current reservation.
-The configuration tool exposes it without empty-hand actions obstructing placement.
-Safety information is available before the player encounters the hazard.
-
-Settling Q-025 determines whether guide milestones also authorize operations.
-Until then, no hidden global tier or chapter license is implementation-ready.
+maintained by culturing rather than routine boss slaughter. Encounter parameters: Q-031.

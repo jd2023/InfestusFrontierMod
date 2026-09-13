@@ -1,6 +1,6 @@
 # Task: <one concrete outcome>
 
-Status: proposed / owner-approved. Owning specification: <path/decision>.
+Status: proposed / approved. Owning specification: <path/decision>.
 
 - Outcome:
 - Owning module and public contract:

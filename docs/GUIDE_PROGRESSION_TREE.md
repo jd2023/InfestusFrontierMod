@@ -1,14 +1,14 @@
 # The Waking Genome — progression and advancement tree
 
-Draft of the complete proposed guide, from the first culture through the three-dimension campaign and the long-term Fold chapter. This specifies **what opens a page, what completes its advancement, and what becomes possible next**. It is not the current contents of the in-game book.
-
-Block IDs and names refer to [Block Catalog](BLOCK_CATALOG.md). Tissue rules follow [Living Substrate](LIVING_SUBSTRATE_MUTATIONS.md); equipment requirements follow the newer [Armor Evolution](ARMOR_EVOLUTION.md), including its per-piece counters and bioactive fusion materials. The tree does not replace those recipes or numerical tables. [Item Catalog](ITEM_CATALOG.md) owns prepared reagents and graft production. Exact milestone recipes and numeric gates remain proposals; confirmed owner constraints are not optional alternatives.
+Proposed page prerequisites, advancement triggers and teaching content.
+Recipes: [Items](ITEM_CATALOG.md). Structures: [Blocks](BLOCK_CATALOG.md).
+Equipment: [Armor](ARMOR_EVOLUTION.md). Cell anatomy: [Substrate](LIVING_SUBSTRATE_MUTATIONS.md).
 
 ## 1. How the tree works
 
 The book is a branching map, not a list of mandatory quests. Completing a parent opens its children. Some children have several parents; some accept alternative parents. An unlocked page explains the task **before** the player must perform it, including its recipe, minimum structure, supplies, controls and failure conditions.
 
-Every table below uses the same four columns:
+Tables use these columns; mutation-family rows share the installation trigger described in their section:
 
 - **Node:** stable ID and the title shown in the book. `T2-06`, for example, is also the Mutation Chamber's catalog ID.
 - **Open after:** completed prerequisite nodes. `ALL(A,B)` requires both; `ANY(A,B)` accepts either. A single ID requires that one parent. `START` has no prerequisite.
@@ -17,9 +17,7 @@ Every table below uses the same four columns:
 
 ### Book visibility is not operation permission
 
-Page dependencies below order teaching. They do not approve a player-rank license.
-Q-025 in [Open questions](OPEN_QUESTIONS.md) owns whether a milestone also gates
-commissioning; until answered, SR0–SR9 are chapter identifiers only.
+Page dependencies order teaching. Operation gates: Q-025.
 
 A process needs its actual materials, body, native bed, supply and genome.
 Equipment also needs its own fusion level and installed anatomy. A journal
@@ -27,15 +25,11 @@ completion does not supply these. Acquiring a valid item reveals its safety/use
 instructions even if earlier pages are incomplete; possession and operation
 completions remain distinct.
 
-The map is a proposed dependency graph, not installed game content. Armor access
-rows affected by the learning redesign are explicitly held at Q-001–Q-006.
-Cooperative credit and first-book delivery are Q-024/Q-032.
-
 ### Completion and cooperation
 
 - Use successful recipe, mutation, transfer and commissioning events. Obtaining ingredients reveals a recipe; it does not pretend that the player already ran it.
 - Qualifying work done before its page opens is retained as bounded evidence and reconciled when the prerequisites complete. The player should not rebuild a working organ because they opened the book late.
-- A shared workshop can credit its consenting participants. Each participant deliberately binds to the commissioned installation; standing elsewhere on the server is not participation. This is a proposed opt-in colony journal, not a dependency on FTB Teams or FTB Quests.
+- A shared workshop can credit its consenting participants. Each participant deliberately binds to the commissioned installation; standing elsewhere on the server is not participation. Cooperative credit: Q-024.
 - Completing a genome unlocks that genome's recipes in the connected research context; a journal badge does not create consumable Genetic Stock or remote DNA Bank access.
 - Advancements recognize first achievements. Repeating a recipe produces its normal output, not repeatable quest rewards.
 - No required node demands injury, a deliberate spill, a mob flood, every genome, every suit, every miner, drones or a chunk loader.
@@ -158,7 +152,7 @@ T1 and later page order follows the listed parents. Whether commissioning has an
 | CI-02 — Feed Tomorrow's Colony | CI-01 | Supply that line from a replenishable organic source while retaining its seed/breeding/growth reserve. Complete three source-to-consumer batches. | SR2 route. Crops, tended trees, bushes, ordinary farms or husbandry can solve it; no prescribed farm shape. |
 | CI-05 — The Store Is Full | CI-01 | Let a small destination become full; show clean refusal, free space, then resume one batch without material loss. | Back-pressure as normal operation. Optional readiness lesson, not a demand for destructive overflow. |
 
-### Temporary construction support — held design
+### Temporary construction support
 
 | Node | Open after | Complete by | Teaches / unlocks |
 |---|---|---|---|
@@ -493,11 +487,9 @@ The AR material nodes are **first-achievement cards**, not permission to cross a
 
 ### Counter branches shown inside each piece tab
 
-Use the single activity ownership table in [Armor](ARMOR_EVOLUTION.md#4-activity-ownership-and-buffs).
-Do not duplicate counter lists or thresholds in the guide. Each tab displays the
-selected counter's value and next buff, plus the piece's combined usage/capacity.
-Learning cannot be paused. Counter reduction previews lost points/buffs and costs;
-fusion/branch identity stays unchanged.
+Each piece tab displays [its activity counters](ARMOR_EVOLUTION.md#3-activity-ownership-and-buffs),
+next buff thresholds and combined capacity usage. Ritual previews show points
+removed, affected buffs and cost.
 
 Q-002 supplies exact credit and threshold cards. Q-004 supplies the optional
 death-learning/rescue/reset card; it is not a compulsory die-to-progress gate.
@@ -519,55 +511,55 @@ Family's listed parents completed
                        → upgrade/use rank III on that piece → family.III complete
 ```
 
-Armor's previous activity-rank schedules are withdrawn. Q-006 must supply exact fusion-level and any activity prerequisites for each I/II/III card. Retained slot, effect and fuel proposals belong to Armor; no card may invent missing gates.
+Mutation access prerequisites: Q-006. Effects, slots and fuel costs are defined in Armor.
 
 For the dependency tables, a bare family ID such as `AM-H8` means its rank-I milestone; `.II` or `.III` explicitly requires that higher-rank milestone. The family table's **Open after** applies to its first card. Advancements acknowledge a valid first installation/use; later operation always checks the worn item's own state.
 
-| Node | Open after | Complete by | Teaches / unlocks |
-|---|---|---|---|
-| AM-M1 — Healing Membrane | ALL(AR-02,AR-04) | Install and use M1 I, then its forward II/III expressions; access held under Q-006. | Self-healing spends biomass and restores tissue durability. |
-| AM-M2 — Thermal Lining | ALL(AR-02,GE-14,T3-02,ANY(AR-08,AR-09,AR-10)) | Install and use M2 I, then its forward II/III expressions; access held under Q-006. | All four linings are required for Thermal Mode. |
-| AM-M3 — Pelagic Lining | ALL(AR-02,GE-16,ANY(AR-06,AR-07)) | Install and use M3 I, then its forward II/III expressions; access held under Q-006. | Aquatic coordination excludes Thermal Lining on the same piece. |
-| AM-M4 — Potion Capillary | ALL(AR-02,GE-32,T4-08) | Install and use M4 I, then its forward II/III expressions; access held under Q-006. | Limited chemical charges, actual potion ingredients and shared dispensing cooldown. |
-| AM-H1 — Field Lens | ALL(AR-02,GE-07,T2-06) | Install and use H1 I, then its forward II/III expressions; access held under Q-006. | Directed examination and source information. |
-| AM-H2 — Lantern Gland | ALL(AR-02,AR-04) | Install and use H2 I, then its forward II/III expressions; access held under Q-006. | Fueled biological light; an early host-grown graft. |
-| AM-H3 — Nocturnal Membrane | ALL(AR-02,GE-13,T2-06) | Install and use H3 I, then its forward II/III expressions; access held under Q-006. | Low-light vision, distinct from illuminating the world. |
-| AM-H4 — Aquatic Eyes | ALL(AR-02,GE-10,T2-06) | Install and use H4 I, then its forward II/III expressions; access held under Q-006. | Underwater clarity, not wall-through ore vision. |
-| AM-H5 — Toxin Filter | ALL(AR-02,GE-12,T2-06) | Install and use H5 I, then its forward II/III expressions; access held under Q-006. | Limited removal of Poison; higher rank improves the response. |
-| AM-H6 — Thermal Sight | ALL(AR-02,GE-19,T3-02,T2-06) | Install and use H6 I, then its forward II/III expressions; access held under Q-006. | Read exposed hot targets and surfaces through distracting fire/smoke overlays. |
-| AM-H7 — Scent Pits | ALL(AR-02,GE-24,T2-06) | Install and use H7 I, then its forward II/III expressions; access held under Q-006. | Sparse nearby creature direction cues, not unrestricted enemy vision. |
-| AM-H8 — Stone Sense | ALL(AR-02,GE-15,T4-05,T2-06) | Install and use H8 I, then its forward II/III expressions; access held under Q-006. | Local cavity/navigation information for Burrowing; no ore identity reveal. |
-| AM-H9 — Wither Sieve | ALL(AR-02,GE-31,T3-02,T2-06) | Install and use H9 I, then its forward II/III expressions; access held under Q-006. | Limited Wither removal, not boss immunity. |
-| AM-H10 — Colony Reader | ALL(AR-02,GE-28,AR-05,T2-06) | Install and use H10 I, then its forward II/III expressions; access held under Q-006. | Selected organ status and already-authorized helper orders. |
-| AM-C1 — Reservoir | ALL(AR-02,AR-04) | Install and use C1 I, then its forward II/III expressions; access held under Q-006. | More stored fuel, not more instantaneous metabolic output. |
-| AM-C2 — Pump Heart | ALL(AR-02,AR-05) | Install and use C2 I, then its forward II/III expressions; access held under Q-006. | Higher whole-suit output with its actual operating overhead. |
-| AM-C3 — Regrowth Lobe | ALL(AR-02,GE-25,T2-06) | Install and use C3 I, then its forward II/III expressions; access held under Q-006. | Delayed player healing, distinct from armor healing. |
-| AM-C4 — Impact Bladder | ALL(AR-02,GE-09,T2-06) | Install and use C4 I, then its forward II/III expressions; access held under Q-006. | Conditional physical-hit reduction; excludes Blast Baffles. |
-| AM-C5 — Thermal Exchange | ALL(AR-02,GE-14,T3-02,T2-06) | Install and use C5 I, then its forward II/III expressions; access held under Q-006. | Better thermal fuel endurance, not limitless lava time at lower lining ranks. |
-| AM-C6 — Gill Bellows | ALL(AR-02,GE-16,T2-06) | Install and use C6 I, then its forward II/III expressions; access held under Q-006. | Fueled air supply; ordinary water-breathing potions remain valid. |
-| AM-C7 — Blast Baffles | ALL(AR-02,GE-26,T3-02,T2-06) | Install and use C7 I, then its forward II/III expressions; access held under Q-006. | Explosion specialist; excludes Impact Bladder. |
-| AM-C8 — Burrow Mantle | ALL(AR-02,GE-15,T4-05,T2-06) | Install and use C8 I, then its forward II/III expressions; access held under Q-006. | Owns coordinated passage fuel/load and its stopping window. |
-| AM-C9 — Feeding Lobe | ALL(AR-02,AR-04) | Held at Q-006 for late-game access; install Feeding Lobe, select real food and feed the player. | Feeding Lobe supplies player hunger, not armor fuel; it creates no food. |
-| AM-C10 — Service Tendril | ALL(AR-02,GE-28,T2-06) | Install and use C10 I, then its forward II/III expressions; access held under Q-006. | Feed one selected nearby compatible helper/tool; transfer is not free fuel or practice. |
-| AM-C12 — Nutrient Intake | ALL(AR-02,AR-04,T1-30) | Install and use C12 I, then its forward II/III expressions; access held under Q-006. | Automatic actual fuel transfer, distinct from food and healing; no transfer practice. |
-| AM-C13 — Digestive Crop | ALL(AR-02,GE-24,T1-30,T2-31,T2-06) | Install and use C13 I, then its forward II/III expressions; access held under Q-006. | A separate branch from C12, not its upgrade; consumes biological materials, never health, samples or nearby terrain. Digestion gives no practice by itself. |
-| AM-C11 — Elytral Wings | ALL(AR-02,GE-27,EN-06,ANY(AR-12,AR-13),AR-30,T2-31) | Install and use C11 I, then its forward II/III expressions; access held under Q-006. | Glide → powered flight/climb → takeoff/hover; permanent exclusion of Burrow Mantle. |
-| AM-L1 — Running Tendons | ALL(AR-02,GE-08,T2-06) | Install and use L1 I, then its forward II/III expressions; access held under Q-006. | General grounded sprint improvement; excludes Fast-Lane Tendons. |
-| AM-L2 — Endurance Mesh | ALL(AR-02,AR-04) | Install and use L2 I, then its forward II/III expressions; access held under Q-006. | Reduce sprint hunger at a biomass cost. |
-| AM-L3 — Swimming Muscles | ALL(AR-02,GE-30,T2-06) | Install and use L3 I, then its forward II/III expressions; access held under Q-006. | Powered swimming within the suit's limits. |
-| AM-L4 — Bracing Tendons | ALL(AR-02,GE-16,T2-06) | Install and use L4 I, then its forward II/III expressions; access held under Q-006. | Stable deliberate tool work; movement releases the brace. |
-| AM-L5 — Working Tendons | ALL(AR-02,GE-24,T2-06) | Install and use L5 I, then its forward II/III expressions; access held under Q-006. | Faster manual work without changing harvest tier or loot. |
-| AM-L6 — Stalking Fibers | ALL(AR-02,GE-29,T2-06) | Install and use L6 I, then its forward II/III expressions; access held under Q-006. | Better crouched movement, not invisibility. |
-| AM-L7 — Burrowing Muscles | ALL(AR-02,GE-15,T4-05,T2-06) | Install and use L7 I, then its forward II/III expressions; access held under Q-006. | Supported travel through eligible ground in all directions. |
-| AM-L8 — Fast-Lane Tendons | ALL(AR-02,AR-05,T1-22) | Install and use L8 I, then its forward II/III expressions; access held under Q-006. | A colony commuter's alternative to Running Tendons. Actual use needs Surface Key II and a full suit. |
-| AM-B1 — Contour Sole | ALL(AR-02,AR-04) | Install and use B1 I, then its forward II/III expressions; access held under Q-006. | Step over terrain edges with real headroom. |
-| AM-B2 — Climbing Hooks | ALL(AR-02,GE-11,T2-06) | Install and use B2 I, then its forward II/III expressions; access held under Q-006. | Contact-based wall climbing; excludes Propulsive Fins. |
-| AM-B3 — Landing Bladders | ALL(AR-02,GE-09,T2-06) | Install and use B3 I, then its forward II/III expressions; access held under Q-006. | A finite fall allowance, not immunity to arbitrary falls. |
-| AM-B4 — Propulsive Fins | ALL(AR-02,GE-10,T2-06) | Install and use B4 I, then its forward II/III expressions; access held under Q-006. | Aquatic propulsion; excludes Climbing Hooks. |
-| AM-B5 — Spring Heel | ALL(AR-02,GE-08,T2-06) | Install and use B5 I, then its forward II/III expressions; access held under Q-006. | A deliberate powered ground jump, not a second midair jump. |
-| AM-B6 — Blink Tendon | ALL(AR-02,GE-15,EN-06,T2-06) | Install and use B6 I, then its forward II/III expressions; access held under Q-006. | Short travel to a clear visible supported destination, with real cooldown and fuel. |
-| AM-B7 — Surface Key | ALL(AR-02,AR-04) | Install and use B7 I, then its forward II/III expressions; access held under Q-006. | Consented tissue recognition; rank II enables compatible fast-lane operation. |
-| AM-B8 — Ground Anchor | ALL(AR-02,GE-15,T4-05,T2-06) | Install and use B8 I, then its forward II/III expressions; access held under Q-006. | Ground contact coordination for the complete Burrowing anatomy. |
+| Node | Open after | Teaches / unlocks |
+|---|---|---|
+| AM-M1 — Healing Membrane | ALL(AR-02,AR-04) | Self-healing spends biomass and restores tissue durability. |
+| AM-M2 — Thermal Lining | ALL(AR-02,GE-14,T3-02,ANY(AR-08,AR-09,AR-10)) | All four linings are required for Thermal Mode. |
+| AM-M3 — Pelagic Lining | ALL(AR-02,GE-16,ANY(AR-06,AR-07)) | Aquatic coordination excludes Thermal Lining on the same piece. |
+| AM-M4 — Potion Capillary | ALL(AR-02,GE-32,T4-08) | Limited chemical charges, actual potion ingredients and shared dispensing cooldown. |
+| AM-H1 — Field Lens | ALL(AR-02,GE-07,T2-06) | Directed examination and source information. |
+| AM-H2 — Lantern Gland | ALL(AR-02,AR-04) | Fueled biological light; an early host-grown graft. |
+| AM-H3 — Nocturnal Membrane | ALL(AR-02,GE-13,T2-06) | Low-light vision, distinct from illuminating the world. |
+| AM-H4 — Aquatic Eyes | ALL(AR-02,GE-10,T2-06) | Underwater clarity, not wall-through ore vision. |
+| AM-H5 — Toxin Filter | ALL(AR-02,GE-12,T2-06) | Limited removal of Poison; higher rank improves the response. |
+| AM-H6 — Thermal Sight | ALL(AR-02,GE-19,T3-02,T2-06) | Read exposed hot targets and surfaces through distracting fire/smoke overlays. |
+| AM-H7 — Scent Pits | ALL(AR-02,GE-24,T2-06) | Sparse nearby creature direction cues, not unrestricted enemy vision. |
+| AM-H8 — Stone Sense | ALL(AR-02,GE-15,T4-05,T2-06) | Local cavity/navigation information for Burrowing; no ore identity reveal. |
+| AM-H9 — Wither Sieve | ALL(AR-02,GE-31,T3-02,T2-06) | Limited Wither removal, not boss immunity. |
+| AM-H10 — Colony Reader | ALL(AR-02,GE-28,AR-05,T2-06) | Selected organ status and already-authorized helper orders. |
+| AM-C1 — Reservoir | ALL(AR-02,AR-04) | More stored fuel, not more instantaneous metabolic output. |
+| AM-C2 — Pump Heart | ALL(AR-02,AR-05) | Higher whole-suit output with its actual operating overhead. |
+| AM-C3 — Regrowth Lobe | ALL(AR-02,GE-25,T2-06) | Delayed player healing, distinct from armor healing. |
+| AM-C4 — Impact Bladder | ALL(AR-02,GE-09,T2-06) | Conditional physical-hit reduction; excludes Blast Baffles. |
+| AM-C5 — Thermal Exchange | ALL(AR-02,GE-14,T3-02,T2-06) | Better thermal fuel endurance, not limitless lava time at lower lining ranks. |
+| AM-C6 — Gill Bellows | ALL(AR-02,GE-16,T2-06) | Fueled air supply; ordinary water-breathing potions remain valid. |
+| AM-C7 — Blast Baffles | ALL(AR-02,GE-26,T3-02,T2-06) | Explosion specialist; excludes Impact Bladder. |
+| AM-C8 — Burrow Mantle | ALL(AR-02,GE-15,T4-05,T2-06) | Owns coordinated passage fuel/load and its stopping window. |
+| AM-C9 — Feeding Lobe | ALL(AR-02,AR-04) | Feeding Lobe supplies player hunger, not armor fuel; it creates no food. |
+| AM-C10 — Service Tendril | ALL(AR-02,GE-28,T2-06) | Feed one selected nearby compatible helper/tool; transfer is not free fuel or practice. |
+| AM-C12 — Nutrient Intake | ALL(AR-02,AR-04,T1-30) | Automatic actual fuel transfer, distinct from food and healing; no transfer practice. |
+| AM-C13 — Digestive Crop | ALL(AR-02,GE-24,T1-30,T2-31,T2-06) | A separate branch from C12, not its upgrade; consumes biological materials, never health, samples or nearby terrain. Digestion gives no practice by itself. |
+| AM-C11 — Elytral Wings | ALL(AR-02,GE-27,EN-06,ANY(AR-12,AR-13),AR-30,T2-31) | Glide → powered flight/climb → takeoff/hover; permanent exclusion of Burrow Mantle. |
+| AM-L1 — Running Tendons | ALL(AR-02,GE-08,T2-06) | General grounded sprint improvement; excludes Fast-Lane Tendons. |
+| AM-L2 — Endurance Mesh | ALL(AR-02,AR-04) | Reduce sprint hunger at a biomass cost. |
+| AM-L3 — Swimming Muscles | ALL(AR-02,GE-30,T2-06) | Powered swimming within the suit's limits. |
+| AM-L4 — Bracing Tendons | ALL(AR-02,GE-16,T2-06) | Stable deliberate tool work; movement releases the brace. |
+| AM-L5 — Working Tendons | ALL(AR-02,GE-24,T2-06) | Faster manual work without changing harvest tier or loot. |
+| AM-L6 — Stalking Fibers | ALL(AR-02,GE-29,T2-06) | Better crouched movement, not invisibility. |
+| AM-L7 — Burrowing Muscles | ALL(AR-02,GE-15,T4-05,T2-06) | Supported travel through eligible ground in all directions. |
+| AM-L8 — Fast-Lane Tendons | ALL(AR-02,AR-05,T1-22) | A colony commuter's alternative to Running Tendons. Actual use needs Surface Key II and a full suit. |
+| AM-B1 — Contour Sole | ALL(AR-02,AR-04) | Step over terrain edges with real headroom. |
+| AM-B2 — Climbing Hooks | ALL(AR-02,GE-11,T2-06) | Contact-based wall climbing; excludes Propulsive Fins. |
+| AM-B3 — Landing Bladders | ALL(AR-02,GE-09,T2-06) | A finite fall allowance, not immunity to arbitrary falls. |
+| AM-B4 — Propulsive Fins | ALL(AR-02,GE-10,T2-06) | Aquatic propulsion; excludes Climbing Hooks. |
+| AM-B5 — Spring Heel | ALL(AR-02,GE-08,T2-06) | A deliberate powered ground jump, not a second midair jump. |
+| AM-B6 — Blink Tendon | ALL(AR-02,GE-15,EN-06,T2-06) | Short travel to a clear visible supported destination, with real cooldown and fuel. |
+| AM-B7 — Surface Key | ALL(AR-02,AR-04) | Consented tissue recognition; rank II enables compatible fast-lane operation. |
+| AM-B8 — Ground Anchor | ALL(AR-02,GE-15,T4-05,T2-06) | Ground contact coordination for the complete Burrowing anatomy. |
 
 All non-host armor graft cards also require the actual Fusion Chrysalis recipe and prepared I051 consumable. The recipes, not just the family parents, decide material availability: an AR-05 badge earned with iron does not create Auric Myelin for a gold-dependent graft. A page may be visible before the selected piece satisfies its approved installation requirements.
 

@@ -1,6 +1,6 @@
 # Living Substrate: growth, mutations and reinforcement
 
-Draft cell-anatomy rules. [Open questions](OPEN_QUESTIONS.md) owns missing values: Q-017 vegetation, Q-018 maturity/reinforcement/pigment, Q-019 Fuel Papilla extension, Q-020 transport/body limits. Numeric or qualitative upgrade claims below are not approved default values. A reinforced vein retains its transport function.
+Proposed cell anatomy. Maturity, function, framework and lining are separate properties.
 
 ## Mutation diagram
 
@@ -54,17 +54,12 @@ Work Bed belongs to the diagram's service branch, not a new maturity stage. Its 
 
 **Crossings and steps are route modifications.** A Membrane Sheet + Bone Plate creates a Septum Crossing with two isolated passages of the same carrier type. Contractile Fiber + Membrane Sheet creates a Vascular Stitch over a visible terrain step. A crossing does not join its routes. A junction does. Floor, wall and ceiling placement use the same functional forms.
 
-### Pigment and feeding surfaces
+### Pigment
 
 Dye changes the substrate's tissue pigment, not its function, maturity,
 reinforcement, ownership or stored resource. Preserve readable functional cues:
 a dyed biomass vein still shows green contents and port state. Palette, interaction
 and color persistence on conversion/recovery are Q-018.
-
-Fuel Papilla begins as one refueling cell. A supplied multiblock improves its
-transfer rate and biomass efficiency; [T1-36](BLOCK_CATALOG.md#t1-36--fuel-papilla)
-owns that operation and Q-019 its missing parts/formula. The extra anatomy does not
-turn each cell into a vein, digester and healer simultaneously.
 
 ## 3. Reinforce it without changing its job
 
@@ -107,7 +102,7 @@ Ordinary veins and service surfaces may use a native bed where their recipe and 
 
 ## 5. Rework and preserve the base
 
-These are **tissue reconfiguration** rules. Armor branches are permanent; a tissue tool cannot remove or exchange an armor graft.
+Reconfiguration applies to substrate cells only.
 
 - **Change function:** Isolate the cell, drain fluid or return held items to storage, then remove the functional graft with the configuration tool and apply the new recipe. Keep maturity and compatible reinforcement. Used graft ingredients are not refunded, preventing free repeated recipe changes.
 - **Change lining:** Keep the old lining until a compatible replacement is confirmed. Refuse the change if it would expose a hot/chemical route, break an occupied structure or require somewhere to put material that has no available container.

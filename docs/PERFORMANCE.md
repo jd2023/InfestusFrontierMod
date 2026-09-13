@@ -1,8 +1,7 @@
 # Performance and server safety
 
-Performance is correctness. Before scalable work is implemented, discuss its
-cost and worst-case failure with the owner. No production budget is inherited
-automatically from a successful small prototype.
+Performance is correctness. Discuss scalable systems' costs and worst-case
+failures before implementation.
 
 Every system must declare its work unit, admission scope (dimension/team/network),
 hard per-tick bound, loaded-block probes, maximum entities/geometry, persistent
@@ -32,12 +31,6 @@ stress/soak acceptance criteria. Distinguish tested bounds from measured TPS/FPS
 
 ## Required adversarial cases
 
-Prepared ingredients and armor add specific future costs: recipe transactions,
-bounded inventory queries, per-wearer ability accounting and adaptation storage.
-Discuss/prove their budgets before implementation (Q-002, Q-007, Q-009, Q-036 in
-[Open questions](OPEN_QUESTIONS.md)). Use a fixed authored activity set and one
-shared capacity per piece, not a wearer/item-pair history. Adaptation state and
-death-rescue reset ownership are unresolved; do not assume another uncapped counter.
 Counter reduction, fusion and rescue must not duplicate points, items or charges
 across interruption, swapping, concurrent users or reload.
 Automatic feeding/refueling checks only configured slots on a bounded cadence.

@@ -3,9 +3,8 @@
 Production foundation for a biological progression and construction mod.
 **No production gameplay content is implemented yet.** Start with [VISION.md](VISION.md).
 
-This branch rebuilds the foundation on the tested Minecraft **1.21.1**, NeoForge
-**21.1.249**, Java **21**, Gradle **9.2.1**, ModDevGradle **2.0.146** toolchain.
-These are deliberate inherited pins, not a claim to use the newest releases.
+Toolchain: Minecraft **1.21.1**, NeoForge **21.1.249**, Java **21**,
+Gradle **9.2.1**, ModDevGradle **2.0.146**.
 
 ## Development
 
@@ -29,7 +28,7 @@ pure core, but not the development test mod or archived Forge content.
 
 ## Project map
 
-- [Vision](VISION.md): current commitments and document ownership.
+- [Vision](VISION.md): gameplay principles.
 - **Start reading gameplay:** [Progression](docs/PROGRESSION_MAP.md), from hand-fed organs through dimensional production and storage.
 - [Open questions](docs/OPEN_QUESTIONS.md): the single register of unresolved decisions.
 - [Block catalog](docs/BLOCK_CATALOG.md): organs, structures and construction.
@@ -40,34 +39,11 @@ pure core, but not the development test mod or archived Forge content.
 - [Developer guide](docs/DEVELOPER_GUIDE.md): mandatory deep modularity and workflow.
 - [Performance](docs/PERFORMANCE.md): bounds, back-pressure and adversarial cases.
 - [Architecture](docs/ARCHITECTURE.md): module ownership and test-mod isolation.
-- [Decisions](docs/DECISIONS.md): historical decisions and supersessions.
 - [Dependencies](docs/DEPENDENCIES.md): active pins and feature-library candidates.
 - [Testing](docs/TESTING.md): current evidence and gates still to build.
-- [ktask](docs/KTASK.md): staged task automation; no workers have been launched.
+- [ktask](docs/KTASK.md): task automation and human gates.
 
-## Provenance and history
+## Release constraint
 
-Repository: `https://github.com/jd2023/InfestusFrontierMod`.
-Foundation branch: `feature/production-foundation-vision`, based on main commit
-`772c5cbfb304b54e75e1eea180711a3bea0c71b9`.
-The old Forge 1.19.2 project is preserved under `legacy/forge-1.19.2`, excluded
-from the active Gradle build. Its files and original Git history remain available.
-The sibling `InfestusFrontierModV3` is an experimental reference, not production.
-
-`LICENSE.txt` and `CREDITS.txt` are preserved from the repository. The old license
-file and metadata disagree; resolving source/asset licensing is a release gate.
-
-## Documentation consolidation
-
-The former ideas notebook, ideas review, project prerequisites and planning checklist
-were retired in favor of the progression map, owning catalogs and open-question register.
-Their complete pre-consolidation versions are recoverable from commit `01440a8`;
-the original owner-submitted ideas are preserved at `5b536bc`. No replacement archive
-copies are maintained as active design. For example:
-
-```bash
-git show 01440a8:docs/ideas_and_progression_feedback.md
-```
-
-Release scope/pacing is Q-034; dependency decisions Q-035; verification/automation
-readiness Q-036; licensing Q-037. No separate interview or prerequisite backlog.
+`LICENSE.txt` specifies CC BY 4.0; legacy mod metadata specifies All Rights Reserved.
+Source and asset licensing must be resolved before publication (Q-037).

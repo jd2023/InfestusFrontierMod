@@ -1,31 +1,13 @@
-# Stable project context
+# Project context
 
-Infestus Frontier: a distributed biological colony, mutation and original living
-construction across Overworld, Nether and End. Read `VISION.md` and respect its
-distinction between commitments, proposals and unresolved decisions.
+Read `AGENTS.md`, `docs/DEVELOPER_GUIDE.md` and `docs/PERFORMANCE.md`.
+Read `VISION.md` and `docs/PROGRESSION_MAP.md`, then the task's specific catalog.
+`docs/OPEN_QUESTIONS.md` contains unresolved questions; do not invent answers.
 
-Read `AGENTS.md`, `docs/DEVELOPER_GUIDE.md`, `docs/PERFORMANCE.md` and the owning
-specification. Deep modules, acyclic boundaries, server authority, conservation,
-hard bounds and a demonstrable feedback loop are mandatory. Low-level UI and
-world infrastructure must not be mixed with feature logic.
+The production mod has no gameplay content. `:core` is Java-only;
+`testMod` is development-only. Toolchain and commands are in `README.md`.
+The sibling V3 prototype and `legacy/forge-1.19.2` are excluded from production.
+Do not edit the prototype or copy its gameplay, assets or saves.
 
-Minecraft 1.21.1 / NeoForge 21.1.249 / Java 21. The root mod is a clean foundation;
-`:core` is Java-only, and `testMod` is development-only. `legacy/forge-1.19.2` is
-archived reference, not an active subproject. The sibling V3 experiment is not a
-production specification. Do not edit it or copy its gameplay/assets/saves.
-
-Advancements and an in-game guide stay. JEI and Curios are priorities. FTB Quests
-is for pack authors. Dependency additions and gameplay scope need approval.
-
-Authoritative local gate: `./.ktask/verify.sh`. Its log is in build/verification.
-No automatic publication, merging to main, remote writes, license changes or
-golden replacement. HUMAN gates are owner-only. This queue has no approved
-implementation tasks yet.
-
-
-Design ownership and reading order are defined in VISION.md and docs/DEVELOPER_GUIDE.md.
-Start gameplay context at docs/PROGRESSION_MAP.md, then read only the relevant owning
-catalogs. docs/OPEN_QUESTIONS.md is the single unresolved-decision register; blocked
-parameters cannot be guessed by a worker. Armor has permanent branches and one summed
-learning cap per piece; no learning pause, free respec or assumed point transfer.
-Paid partial counter reduction frees capacity without exchanging branches.
+Gate: `./.ktask/verify.sh`; logs: `build/verification`.
+HUMAN gates require human approval. No approved implementation tasks are queued.

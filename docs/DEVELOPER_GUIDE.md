@@ -2,8 +2,7 @@
 
 ## Authority and scope
 
-The owner defines product direction. Explicit commitments in `VISION.md` and
-accepted entries in `DECISIONS.md` constrain every implementation. A draft idea,
+Explicit requirements and `VISION.md` constrain every implementation. A draft idea,
 prototype behavior, or unchecked backlog item is not a ratified requirement.
 Ask when a decision changes scope, progression, player risk, dependencies or saves.
 
@@ -11,7 +10,7 @@ Design ownership: `PROGRESSION_MAP.md` owns end-to-end player projects;
 `ITEM_CATALOG.md` owns items/preparation; `BLOCK_CATALOG.md` owns organs/construction;
 `LIVING_SUBSTRATE_MUTATIONS.md` owns cell anatomy; `ARMOR_EVOLUTION.md` owns equipment;
 `GUIDE_PROGRESSION_TREE.md` owns teaching dependencies. `OPEN_QUESTIONS.md` is the
-only unresolved-decision register. The decision log is history, not a competing spec.
+only unresolved-decision register. Questions contain only unanswered questions.
 
 Before adding a document, identify a responsibility not already owned. Prefer a
 section in the existing owner. No parallel notebooks, reviews or prerequisite
@@ -20,9 +19,9 @@ checklists that repeat gameplay. Keep technical contracts separate from gameplay
 Use defined terms, exact conditions and observable results. If a value, recipe,
 scope or behavior is missing, reference the question ID that blocks it; do not
 substitute vague adjectives or invent precision. Label numeric candidates as drafts.
-When the owner resolves a question, update its owning specification, dependent
-references and the question's resolution together. Record supersession in
-`DECISIONS.md`; historical entries do not reactivate rejected rules.
+When a question is resolved, put the rule in its specification, update dependent
+references and remove the question. State rules directly, without attribution,
+change history or repeated explanations.
 Draft numbers are not implementation authorization.
 
 The bootstrap establishes build/test infrastructure only. It does not begin the
@@ -81,7 +80,7 @@ Automated comparison is regression evidence, not proof of artistic quality.
 
 Test mods and fixtures are development-only and must not enter the shipped JAR.
 Use isolated disposable worlds; no copying, deleting or rebuilding ordinary saves.
-No gameplay feature is done without automation or an explicit owner-approved
+No gameplay feature is done without automation or an explicitly approved
 human-only exception with a documented partial automated check.
 
 ## Content and integration
@@ -90,7 +89,7 @@ Names and IDs come from an approved catalog. Recipes, tags, translations,
 advancements and the guide must explain how players discover and use the feature.
 Use original biological art with provenance, deliberate UVs and readable silhouettes.
 Items for blocks should render their block models. Preserve vanilla relevance;
-bio-armor enchantment support is an open owner decision (see D012), not permission
+bio-armor enchantment support is unresolved (Q-008), not permission
 to remove enchantments or change ordinary vanilla equipment. Cross-mod behavior
 belongs in optional adapters.
 

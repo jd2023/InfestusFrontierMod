@@ -9,7 +9,7 @@ Current layers:
 - `python3 scripts/check_design_docs.py --self-test` and its normal invocation:
   prerequisite grammar, unknown references/cycles, block and armor-family guide
   coverage, permanent material parents, unique catalog IDs, intact Markdown tables,
-  local links, actionable question IDs and rejection of superseded armor contracts.
+  local links, questions-only entries and shared-capacity armor contracts.
   Both run in the authoritative gate. These are structural documentation
   checks, not proof of recipe balance, gameplay implementation or artistic quality.
 
@@ -23,10 +23,6 @@ Current layers:
 - `runClient` / `runServer`: isolated normal development launch configurations.
   They do not silently copy saves, accept EULAs or alter the prototype.
 
-The test fixture's empty NBT template was copied from the V3 test infrastructure;
-no gameplay, artwork or saved world was imported. Pure quota tests were added
-before the implementation and first failed because the implementation was absent.
-
 ## Not established yet
 
 No production gameplay, recipes, persistence, UI or assets means no claims of
@@ -39,4 +35,4 @@ for the complete mod. GameTests alone do not replace visual or gameplay review.
 Run graphical and headless gates as separate invocations. Bound each fixture and
 keep it in development sources. Capture readiness must verify the actual server
 and client state, including quota-delayed work—not merely wait an arbitrary time.
-Only the owner may approve a golden or replace its intended appearance.
+Golden approval and appearance changes require human review.

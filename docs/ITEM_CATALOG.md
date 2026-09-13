@@ -1,18 +1,8 @@
 # Item catalog and biological ingredient preparation
 
-Catalog of the proposed mod-owned items, grouped by first availability. This covers the current block, tissue, armor and progression designs, including long-term candidates; it is not a claim that these items are implemented or all belong in the first release. Names and recipe quantities are proposals. Existing vanilla items remain vanilla items.
-
-**This document owns item identity, preparation recipes and consumable forms.** [Block Catalog](BLOCK_CATALOG.md) owns organs and their construction; [Armor Evolution](ARMOR_EVOLUTION.md) owns equipment counters, permanent branches and effects; [Substrate Mutations](LIVING_SUBSTRATE_MUTATIONS.md) owns tissue anatomy. [Guide Tree](GUIDE_PROGRESSION_TREE.md) gives discovery order. T0–T9 mean availability, not an item's earned level.
-
-## Unresolved recipe fields
-
-Use [Open questions](OPEN_QUESTIONS.md), not implied defaults: Q-003 for Memory
-Sample; Q-005/Q-006 for fusion and graft access; Q-010/Q-013/Q-016 for fuel/feed
-and food; Q-011/Q-012 for mineral recovery and energy; Q-021/Q-022 for mining
-and temporary construction; Q-023 for DNA; Q-030/Q-031 for weapons and Fold.
-All existing numeric recipes remain **draft candidates**. Missing costs, times,
-source lists or access gates must be resolved in those entries before coding.
-T/SR prefixes order the catalog/guide, not approved personal rank locks (Q-025).
+Proposed items and recipes, grouped by first availability. T0–T9 are catalog
+stages, not item levels. Raw materials construct bodies; prepared treatments
+change their function.
 
 ## 1. What goes into an upgrade
 
@@ -105,7 +95,7 @@ One BU equals one mB biomass. A dose/portion is an item, not an unspecified tank
 
 Early Lumen treatment is made in the Bowl; all T1 transport treatments use the Cyst. Its own construction requires only a Bud, Sheets and a Plate, so a first Cyst needs no transport graft. A player can hand-feed it before automating it.
 
-### Temporary construction tool — held design
+### Temporary construction tool
 
 | ID | Item | Obtain / recipe | Consumer / constraints |
 |---|---|---|---|
@@ -153,7 +143,7 @@ Early Lumen treatment is made in the Bowl; all T1 transport treatments use the C
 
 ### Ore dust and recovery
 
-Owner direction: recovery produces 4→5→6→7→8 dust per defined ore input; smelting
+Recovery produces 4→5→6→7→8 dust per defined ore input; smelting
 uses 4→3→2→1 dust per ingot. These are independent upgrades, not paired stages.
 The maximum combination is eight ingots per defined input unit. Q-011 selects
 that unit separately for each ore block/raw material and assigns each step to
@@ -180,14 +170,14 @@ duration and demand per improvement; no zero-cost improvement is implied.
 
 ### Mutation grafts
 
-Retained numeric candidate for I / II / III graft preparation: 2 / 4 / 8
+I / II / III graft preparation: 2 / 4 / 8
 matching Genetic Stock from each required species; 1 / 2 / 4 of each listed
 prepared signature; 1 / 2 / 3 Fusion Binder; 60 / 150 / 360 BU; 12 / 24 / 48 s.
 Installation uses the same target piece, one graft and 40 / 100 / 240 BU over
 8 / 16 / 32 s. Host I uses Spore Culture instead of Genetic Stock in the Bowl.
-Q-006 must ratify these quantities and access, especially multi-genome variants.
+Mutation access and DNA combinations: Q-006.
 
-I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M4, H1–H10, C1–C13, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the proposed DNA/signatures and access decision Q-006 in [Armor Evolution §6–10](ARMOR_EVOLUTION.md#6-mutation-installation-and-reading-the-candidate-tables). A tooltip names the exact outcome, not “mutation essence.”
+I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M4, H1–H10, C1–C13, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the proposed DNA/signatures and access decision Q-006 in [Armor evolution](ARMOR_EVOLUTION.md#5-mutation-installation). A tooltip names the exact outcome, not “mutation essence.”
 
 C13's operating feed is not a new item family: explicitly supported ordinary biological materials are consumed as fuel, not applied as upgrades. Armor Evolution owns its proposed conversion rates and per-material acceptance rules. Samples, grafts and other valuable biological items are not implicitly edible. C12 accepts measured biomass containers instead; C9 consumes food for player hunger. One item cannot fund two of these operations.
 
@@ -294,30 +284,10 @@ Fusion level, activity-counter value, learning capacity, a genome's coverage, wo
 
 Bucket forms for non-biomass custom fluids are deferred until their finite world-spill semantics are approved. A tank transfer does not require a world-placeable fluid block. Source-specific reagents, concentrates, fragments and grafts use a finite registered recipe/schema set, not unrestricted user-created variants.
 
-## 9. How existing upgrade recipes read
-
-| Old shorthand | Actual consumable now | Preparation / placement rule |
-|---|---|---|
-| Glow ink / glow berries / glowstone for light | Lumen Secretion | Bowl/Cyst; apply to mature tissue, or use as H2 graft signature. Cosmetic glow-ink markings may still use ink directly. |
-| Slime ball for elasticity / transport | Elastic Gel / Capillary Gel | Elastic Gel for mechanical flexibility; Capillary Gel specifically for biomass transport. |
-| String + leather for Item Vein | Contractile Fiber | One dose per mature cell. |
-| Glass bottle + Sheet for Fluid Vein | Filter Membrane + Sealing Resin | One each per mature cell; no empty bottle installed as a functional organ. |
-| Redstone + string for nerve | Synaptic Gel | One dose per mature cell. |
-| Copper + redstone for conduction | Conductive Myelin | SR4 treatment; one dose per mature cell. |
-| Fermented eye + slime for digestive floor | Digestive Enzyme | One dose per mature cell. |
-| Sugar + rabbit hide for travel floor | Locomotor Gel | One dose per mature cell; suit eligibility remains independent. |
-| Golden apple + honey for restoration | Restorative Serum | One dose per cell; two doses for Healing Dock conversion. |
-| Bone / iron / diamond reinforcement | Skeletal Graft / Ferrocyte Paste / declared diamond medium | Use the target's listed dose; no direct raw mineral mutation. |
-| Magma cream + netherrack / End ingredients | Thermal Seed / Anchor Seed | Grow the selected native bed in its own dimension. |
-| Generic creature ingredient for better behavior | Named Organ Trait Graft | Complete matching DNA, physical stock and the behavior's prepared signature; not every dropped mob item carries complete DNA. |
-
-Construction recipes still list physical components, not these replacements unless explicitly marked **mutate**, **graft** or **upgrade**. Operating food, fuel, potion ingredients and cosmetic dyes remain valid direct supplies. This distinction avoids requiring an advanced activation machine merely to build its own basic body.
-
-## 10. Recipe and inventory acceptance checks
+## 9. Recipe and inventory acceptance checks
 
 - Every prepared item has a producer and at least one named consumer; recipes display both in JEI and the guide.
 - Refused/incompatible targets consume nothing. Preparing a graft does not promise that the selected piece meets its permanent lineage, level, genome and anatomy requirements.
 - Reserve all solid/fluid outputs, returned containers and the target before a batch starts. Full outputs pause without loose item drops; cancellation/restart cannot produce both result and ingredients.
 - No ore/ingot reprocessing multiplier, stock-to-mineral-loot recipe, potion bottle duplication, copied Memory Sample or removable Elytra-plus-wings output.
 - Inventory metadata has fixed fields and hard size limits. No per-tick decay across every stored item, unbounded recipe expansion or nested portable factory/world snapshots.
-- Before implementation, publish exact yields for each ore, ecology source, target mutation and tool branch still marked proposed here. Catalog coverage is not evidence that these balances are already complete.

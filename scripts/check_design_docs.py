@@ -113,16 +113,21 @@ def check_assemblies(content):
 
 
 def check_questions(register, documents):
-    """Every active question reference resolves to one actionable owning entry."""
-    sections = re.split(r'^### (Q-\d{3}) —[^\n]*\n', register, flags=re.M)
-    ids = sections[1::2]
+    """The register contains questions only; references resolve to unique IDs."""
+    ids = []
+    for line in register.splitlines():
+        if not line.strip() or re.fullmatch(r'#{1,2} [^?]+', line):
+            continue
+        match = re.fullmatch(
+            r'- (Q-\d{3}): (?:What|Which|How|Who|When|Where|Why|Should|Can|Does|Do|Is|Are|Will) [^?]+\?',
+            line,
+        )
+        if not match:
+            raise ValueError(f'Expected a question, not prose or an answer: {line}')
+        ids.append(match[1])
     unique(ids, 'open question ID')
     if not ids:
         raise ValueError('Empty open-question register')
-    for question, body in zip(ids, sections[2::2]):
-        for field in ('Decision', 'Resolve in'):
-            if not re.search(rf'^- \*\*{field}:\*\* \S', body, re.M):
-                raise ValueError(f'{question} lacks {field}')
     for name, content in documents.items():
         unknown = set(re.findall(r'\bQ-\d{3}\b', content)) - set(ids)
         if unknown:
@@ -230,11 +235,14 @@ class CheckerTests(unittest.TestCase):
                 check_activity_owners(content)
 
     def test_question_register_rejects_drift(self):
-        valid = '### Q-001 — Cap\n- **Decision:** Set capacity.\n- **Resolve in:** Armor.\n'
+        valid = '# Open questions\n\n## Armor\n\n- Q-001: What capacity does each frame provide?\n'
         check_questions(valid, {'armor': 'See Q-001.'})
         for register, documents in (
             ('', {}), (valid + valid, {}),
-            (valid.replace('- **Decision:** Set capacity.\n', ''), {}),
+            (valid + 'The capacity is 100.\n', {}),
+            (valid + '- **Resolve in:** Armor.\n', {}),
+            (valid.replace('What capacity does each frame provide?', 'Capacity is 100?'), {}),
+            (valid.replace('provide?', 'provide.'), {}),
             (valid, {'armor': 'See Q-099.'}),
         ):
             with self.assertRaises(ValueError):
