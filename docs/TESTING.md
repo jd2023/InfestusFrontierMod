@@ -8,8 +8,9 @@ Current layers:
 
 - `python3 scripts/check_design_docs.py --self-test` and its normal invocation:
   prerequisite grammar, unknown references/cycles, block and armor-family guide
-  coverage, permanent material parents, unique catalog IDs, intact Markdown tables
-  and local links. Both run in the authoritative gate. These are structural documentation
+  coverage, permanent material parents, unique catalog IDs, intact Markdown tables,
+  local links, actionable question IDs and rejection of superseded armor contracts.
+  Both run in the authoritative gate. These are structural documentation
   checks, not proof of recipe balance, gameplay implementation or artistic quality.
 
 - `./gradlew :core:test`: three pure tests covering quota exhaustion, repeated

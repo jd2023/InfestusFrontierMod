@@ -1,8 +1,8 @@
 # Block and organ catalog
 
-Draft recipes and tier assignments for discussion. Entries describe proposed gameplay, not implementation status. Quantities in **Create** are crafting ingredients; a multiblock's additional parts are stated separately. Process yields and operating costs still need recipe-by-recipe balancing. [Item Catalog](ITEM_CATALOG.md) owns consumable names and preparation. Construction may use raw structural components; functional mutations use prepared treatments. Growth shorthand such as “rabbit-genome mutation” means a target-specific Organ Trait Graft, not applying a raw mob drop. Armor follows its separate irreversible tree: no regulator, transplanter, adaptive material or profile switch may exchange committed branches, refund choices or transfer incompatible-lineage learning. Armor presets change only settings of installed compatible anatomy.
+Draft recipes and tier assignments for discussion. Entries describe proposed gameplay, not implementation status. Quantities in **Create** are crafting ingredients; a multiblock's additional parts are stated separately. Process yields and operating costs still need recipe-by-recipe balancing. [Item Catalog](ITEM_CATALOG.md) owns consumable names and preparation. Construction may use raw structural components; functional mutations use prepared treatments. Growth shorthand such as “rabbit-genome mutation” means a target-specific Organ Trait Graft, not applying a raw mob drop. Armor follows its separate irreversible tree: no regulator, transplanter, adaptive material or profile switch may exchange committed branches, refund choices or authorize counter transfer before Q-003 is decided. Armor presets change only settings of installed compatible anatomy.
 
-**Tier** is when a block first becomes available. **Organ level** is earned by using that particular organ; it does not reset when the colony reaches another tier. Unless an entry says otherwise, an active organ gains one count per completed batch, not per tick or failed attempt. At 32, 128 and 512 counts, choose one improvement from that organ's **Growth** options. Each choice gives +10% to the selected property, at most three choices total. New functions require the listed mutation or physical addition; levels alone do not add every function.
+**T0–T9 are catalog groupings**, not approved player/base permission gates (Q-025). **Organ level** is earned by using that particular organ; it does not reset when the colony reaches another tier. Unless an entry says otherwise, an active organ gains one count per completed batch, not per tick or failed attempt. At 32, 128 and 512 counts, choose one improvement from that organ's **Growth** options. Each choice gives +10% to the selected property, at most three choices total. New functions require the listed mutation or physical addition; levels alone do not add every function.
 
 Breaking an organ preserves its counts, level, chosen improvements and mutations in the dropped block. In a multiblock, the core carries this history; breaking a wall does not copy it. Upgrading an existing core preserves its history. Passive walls, floors and conduits do not earn processing levels. Storage contents must be retained in the recovered storage or its remaining cells, never sprayed into the world on invalidation.
 
@@ -10,11 +10,30 @@ Free-standing organs root into Living Substrate or a named specialized bed. Atta
 
 One starting ingredient is an item, not a block: **Spore Culture = 1 rotten flesh + 1 red mushroom + 1 wheat seed**. Biomass is the colony's consumable feed, measured as fluid; one bucket holds 1,000 mB. Other new construction materials are introduced by the blocks that produce them below. Colored membranes and skin can use vanilla dyes; color does not change routing or function.
 
+## Unresolved specification fields
+
+[Open questions](OPEN_QUESTIONS.md) is the only decision register. Entries below
+retain exact draft construction recipes and component jobs, not approved balance.
+An omitted operating rate, dose, duration, eligibility list or maximum shape is
+**unspecified**, never a free/default value.
+
+| Entry family | Owning unresolved decisions |
+|---|---|
+| Organ learning, functional upgrades, attachment formulas and body limits | Q-020 |
+| Digestion, farming, trees, food and aquatic production | Q-013, Q-016, Q-017 |
+| Reservoirs, fluid handling and overflow | Q-014, Q-015 |
+| Substrate, transport and Fuel Papilla | Q-018, Q-019, Q-020 |
+| Equipment healing, fusion, ritual and memory candidates | Q-003, Q-005, Q-006, Q-007, Q-009 |
+| Ore processing, energy and excavation | Q-011, Q-012, Q-021 |
+| DNA, ownership, configuration and transit | Q-023, Q-024, Q-026, Q-027 |
+| Helpers, defense, Fold and boss | Q-028, Q-029, Q-031 |
+| Temporary construction support | Q-022 |
+
 ## Building with operations
 
 A working organ owns one operation; a named installation combines organs. Split an operation out when the player could share it, place it differently, bypass it or specialize it independently. Do not require a separate block just to move between two internal steps of the same recipe. A furnace still smelts; a kidney still washes; neither becomes a mandatory chain of six tiny organs.
 
-**Assembly** lists the required component types of a worked installation, not a shapeless crafting recipe. **Create** states quantities, placement and whether there is a distinct controller. Installed components remain physical and recoverable, with their own counters and mutations; an assembly never copies their histories into its controller. Only the organ doing the conversion earns processing counts. A planning core earns at most one count per completed finite section; transferring, waiting or circulating the same output earns none. Passive service/holding parts have no processing levels. Automatic input, output, planting, repair and fueling are separate jobs, not free side effects of gaining a level.
+**Assembly** lists the required component types of a worked installation, not a shapeless crafting recipe. **Create** states quantities, placement and whether there is a distinct controller. Installed components remain physical and recoverable, with their own counters and mutations; an assembly never copies their histories into its controller. Only the organ doing the conversion earns processing counts. A planning core earns at most one count per completed finite section; transferring, waiting or circulating the same output earns none. Passive service/holding parts have no processing levels. Automatic input, output, planting, healing and fueling are separate jobs, not free side effects of gaining a level.
 
 ### Reliable sequencing, with room to optimize
 
@@ -57,12 +76,21 @@ The root presents **one existing block and stops**. It does not identify an ore 
 
 Tune these against an explicit recipe sheet, not a hidden universal yield multiplier. For example, **if** extraction and fracture each take 10 s and treatment takes 40 s, a single exclusive bed takes at least 60 s per block before collection. Four parallel beds can overlap that work, but cannot outrun a shared collector or furnace. These times illustrate the scheduling problem, not committed balance. Faster mutations spend their stated extra feed/work; an economical mutation and more parallel space offer a different build. Measure useful products/minute, recovery per ore block, BU/product, water/power use and footprint separately. Server cost is a constraint on every route, not a reward for forcing more updates.
 
+### Ore recovery and smelting are independent
+
+[Item Catalog](ITEM_CATALOG.md#ore-dust-and-recovery) owns the dust/input accounting.
+Recovery steps and furnace efficiency must be assigned to specific treatment and
+smelting arrangements under Q-011/Q-012. Compatible dust remains storable for a
+later smelter; the old processor is not required to have made it at that efficiency.
+Players may bypass, combine or defer operations. Each additional improvement needs
+an explicit operating-energy recipe and an observable throughput/space tradeoff.
+
 ### Reuse beyond mining
 
 | Workshop | Independent jobs | A different viable arrangement |
 |---|---|---|
 | Farm/orchard | Cultivation Tissue or Arbor Root grows; Planting Proboscis plants; Harvest Corolla cuts; Work Bed holds; Collection Cilia exports | Retain perennial bushes/trees and collect only mature pods; or replant annual beds from a shared reserved Seed Pouch. Manual harvest and optional workers remain valid. |
-| Equipment service | Fuel Papilla transfers real biomass; Repair Dock mends; Item Capsule holds gear; mouths move it | A cheap fuel stop near a mine, a shared repair room, or a later Service Pedestal with both attached. Paying for repair need not also authorize filling every reserve. |
+| Equipment service | Fuel Papilla transfers real biomass; Healing Dock mends; Item Capsule holds gear; mouths move it | A cheap fuel stop near a mine, a shared healing room, or a later Service Pedestal with both attached. Paying for healing need not also authorize filling every reserve. |
 | Sampling | A berth contains the target; Sampling Proboscis takes a sample; Extractor separates it; lens resolves knowledge; bank stores knowledge | Share a sampler between compatible service berths or dedicate it to one rare specimen; do not make an entire laboratory for each species. |
 | Heat and refining | Furnace performs the recipe; lung supplies airflow; muscle supplies pressure/work; gill exchanges heat; condenser recovers water | Passive cooling with more exposed area, compact supplied cooling, or deliberate safe venting where water is cheap. |
 | Spatial/Fold work | Nursery grows material; resonator supplies a condition; conditioner commits a product; collector captures phase work; accumulator stores it | Batch one shared tuned room, isolate parallel rooms, or buffer native phase output instead of powering continuous retuning. |
@@ -94,7 +122,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 
 ### T0-04 — Biomass Bladder
 - **Does:** A one-block, translucent feed tank for a first workshop. The contents visibly rise inside its fleshy shell.
-- **Input → output:** Biomass from buckets or an attached organ → stored biomass, then bucket or organ output. A manual UI service slot accepts one bio-equipment piece; **Fill** transfers only its missing fuel from the tank, without repair or mutation. This is the T0 refueling route. Other fluids are refused.
+- **Input → output:** Biomass from buckets or an attached organ → stored biomass, then bucket or organ output. A manual UI service slot accepts one bio-equipment piece; **Fill** transfers only its missing fuel from the tank, without healing or mutation. This is the T0 refueling route. Other fluids are refused.
 - **Create:** 1 Organ Bud + 2 glass + 1 slime ball; an early leather replacement for the slime ball makes a smaller bladder.
 - **Growth:** Skeletal Graft treatment reinforces its capacity. It can later become a Biomass Reservoir Cell without discarding its stored feed.
 
@@ -118,9 +146,9 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 
 ### T0-08 — Awakening Cradle
 - **Does:** Turns crafted dormant bio equipment into living equipment. Holds one armor piece, tool or weapon at a time; the body of the cradle folds around it.
-- **Input → output:** Dormant equipment + Spore Culture + biomass → awakened equipment with the same identity. It does not supply free repair or an infinite personal fuel reserve.
+- **Input → output:** Dormant equipment + Spore Culture + biomass → awakened equipment with the same identity. It does not supply free healing or an infinite personal fuel reserve.
 - **Create:** 1 Organ Bud + 2 Bone Plates + 2 Membrane Sheets.
-- **Growth:** Choose shorter awakening or lower biomass cost. Honey Culture treatment reduces awakening's processing biomass cost, not the wearer's starvation pain. Later mutation converts the cradle into a Repair Dock, preserving its history.
+- **Growth:** Choose shorter awakening or lower biomass cost. Honey Culture treatment reduces awakening's processing biomass cost, not the wearer's starvation pain. Later mutation converts the cradle into a Healing Dock, preserving its history.
 
 ### T0-09 — Seed Pouch
 - **Does:** A rooted, accessible store for seeds and planting stock; reserves a chosen amount for replanting before offering surplus to automation.
@@ -385,10 +413,16 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** No processing XP. Add another selector for a separate work group, not an unbounded central queue. Round-robin prevents a busy common-ore line starving a rare-ore bed; fixed priority deliberately favors emergency feed. A stale grant is revalidated after reload, never awarded twice.
 
 ### T1-36 — Fuel Papilla
-- **Does:** A refueling mutation of Living Substrate, flush with the ground. Green pores open around an authorized wearer's feet while filling; otherwise it remains a walkable surface. No separate free-standing organ, repair head or digestive function.
-- **Input → output:** Biomass supplied from an adjacent configured vein/junction + a consenting occupant → equal biomass transferred into the selected worn pieces. Works with a partial suit; full pieces are skipped. Source reserve and maximum fill are configurable; this cell is not also a through-vein or a hidden reservoir.
-- **Create:** Apply 1 Capillary Gel + 1 Membrane Sheet to an exposed mature Living Substrate cell. Keep its existing maturity and compatible reinforcement; one primary function means replacing/draining any previous function first.
-- **Growth:** A further capillary treatment increases transfer rate, not supplied volume. No XP from refilling or circulating fuel. Use this tissue as a repair-bay/service-station floor; a Repair Dock remains a separate attachment. Deliberate use/probe control starts filling without intercepting ordinary block placement. T0 manual Bladder filling remains available before this mutation.
+- **Does:** Mutated Living Substrate, flush with the ground, that feeds worn armor. No separate free-standing feeder, healing head or digestive function.
+- **Input → output:** Colony biomass → biomass delivered to authorized selected worn pieces plus declared operating consumption. Single-cell rate/overhead are Q-019. Works with partial suits; full pieces are skipped. Source reserve and maximum fill are configurable; it is not a hidden reservoir or a through-vein.
+- **Create:** Retained draft: apply 1 Capillary Gel + 1 Membrane Sheet to exposed mature substrate. Keep maturity and compatible reinforcement; drain/replace any previous primary function first.
+- **Growth:** Extend with a supplied multiblock to improve rate and efficiency. Exact parts, shape and formula are Q-019, not a guessed capillary recipe. No learning from filling/circulating biomass. Probe/UI starts filling without intercepting block placement. Healing Dock remains a separate service.
+
+### T1-37 — Temporary Membrane
+- **Does:** Weak translucent temporary support grown by the handheld Membrane Projector. Placement, fall-arrest and collision options are Q-022.
+- **Input → output:** Armor biomass paid by the projector → one temporary support block → expiration with no renewable item output in the proposed baseline.
+- **Create:** Projector placement only; recipe, range, cost, support condition and lifetime held under Q-022. T1 grouping is provisional.
+- **Growth:** No processing level or permanent reinforcement. Active-block cap, unload/reload expiry and optional placement under a falling player must be selected before implementation. Not an approved early-flight mechanism.
 
 ## T2 — Directed mutation: genomes, specialized organs and planned excavation
 
@@ -428,25 +462,25 @@ Build sample processing and a DNA bank. Individual genomes unlock particular gra
 - **Does:** Applies chosen genetic and material changes to one equipment item or recoverable organ core. Shows the resulting properties and incompatible mutations before starting.
 - **Input → output:** Target + prepared target-specific Mutation Graft or fusion medium + biomass + genome access → the same target with the chosen mutation; its counters and identity remain.
 - **Create:** Core recipe: 1 Awakening Cradle + 1 Sequencing Lens + 2 Bone Plates. Form a 3×3 floor, corner Rib Frames and a two-block-high Membrane Window enclosure around the central treatment space.
-- **Growth:** Choose treatment speed or biomass economy. Burrowing armor uses enderman-derived prepared grafts and Diamond-Fiber Matrix under Armor Evolution. Further burrowing mutations extend the safe stopping window and reduce biomass use, competing with other suit improvements. Add a Memory Gland or later a potion-infusion bay; a larger body accepts larger organ cores. Precision Chamber means this core/body with a T4-07 Precision Sequencer service bay, electrical supply and access to T4-05 prepared outputs; it is not an unlisted new block.
+- **Growth:** Choose treatment speed or biomass economy. Burrowing armor uses enderman-derived prepared grafts and Diamond-Fiber Matrix under Armor Evolution. Further burrowing mutations extend the safe stopping window and reduce biomass use, competing with other suit improvements. A Memory Gland attachment is held under Q-003; a potion-infusion bay is a separate addition; a larger body accepts larger organ cores. Precision Chamber means this core/body with a T4-07 Precision Sequencer service bay, electrical supply and access to T4-05 prepared outputs; it is not an unlisted new block.
 
-### T2-07 — Memory Gland
-- **Does:** An attachment that transfers earned equipment or organ experience into a reusable physical memory sample. It is a way to retain invested play, not a universal XP converter.
-- **Input → output:** Source + empty glass bottle + biomass → a typed Memory Sample; the extracted counts are removed from the source. Compatible sample + target → transferred counts, consuming that amount from the sample; capped remainders stay in the sample. Armor additionally requires matching permanent lineage and slot, with no transfer of symbiosis or grafts.
-- **Create:** 1 Organ Bud + 1 amethyst shard + 1 book + 1 Membrane Sheet.
-- **Growth:** Choose transfer speed or biomass economy. Enderman-genome mutation preserves more specialized categories. Furnace processing history cannot be installed as running history in boots.
+### T2-07 — Memory Gland [held candidate]
+- **Does:** Candidate typed learning storage/transfer attachment. Armor point transfer is undecided under Q-003; this entry does not authorize it.
+- **Input → output:** If selected, source learning → accounted Memory Sample → compatible recipient, with donor reduction and no copying. Exact accepted targets/counters, loss, capacity and lineage rules are Q-003.
+- **Create:** Retained construction candidate: 1 Organ Bud + 1 amethyst shard + 1 book + 1 Membrane Sheet. Operation recipe/cost is unresolved; the body alone grants no transfer.
+- **Growth:** No transfer-rate or category upgrade is specified before Q-003. The paid partial-reduction ritual may use different anatomy and must not be assumed to produce stored points.
 
-### T2-08 — Repair Dock
-- **Does:** Mends one authorized worn piece or stored bio-equipment target using colony supplies. It neither refuels the target nor moves inventory. A mine can have a cheap fuel berth without paying for a full repair installation.
-- **Input → output:** Damaged bio equipment + biomass + any recipe-specific repair material → restored durability on that same piece. Repair feed is spent on mending, not also deposited into its reserve.
+### T2-08 — Healing Dock
+- **Does:** Heals one authorized worn piece or stored bio-equipment target using colony supplies. It neither refuels the target nor moves inventory. A mine can have a fuel berth without installing this separate healing operation.
+- **Input → output:** Damaged bio equipment + biomass + the healing recipe's materials → restored tissue durability on that same piece. Healing feed is spent on recovery, not also deposited into its reserve. Material list, rate and per-durability cost are Q-007/Q-009.
 - **Create:** Mutate an Awakening Cradle with 2 Restorative Serum + 2 Membrane Sheets.
-- **Growth:** Choose repair speed or biomass economy. Hanger-like frames hold a set serviced one piece at a time; more repair heads enable independent work. Add a Fuel Papilla for a separate fill operation and mouths for materials. Only eligible chest wear can grant bounded C-R repair practice under Armor Evolution; service grants no unrelated movement/combat counters.
+- **Growth:** Choose healing speed or biomass economy. Hanger-like frames hold a set serviced one piece at a time; more healing heads enable independent work. Add a Fuel Papilla for a separate fill operation and mouths for materials. Any C-R learning follows the activity definition awaiting Q-002; only the chest owns this proposed counter; service grants no unrelated movement/combat counters.
 
 ### T2-09 — Grafting Bench
 - **Does:** Joins a known plant trait to compatible planting stock, so crop and tree selection affects the farm layout and its products.
 - **Input → output:** Seed/sapling + matching Genetic Stock + biomass + bank access → grafted planting stock with its stated nutrient, light and water requirements.
 - **Create:** 1 Bone Loom + 1 iron hoe + 1 Sequencing Lens.
-- **Growth:** Choose graft speed or biomass economy. Add two Seed Pouches to keep parent lines separate; advancing to a new tier unlocks combinations, not a seed that grows every resource.
+- **Growth:** Choose graft speed or biomass economy. Add two Seed Pouches to keep parent lines separate. New combinations need their species research and preparation recipes (Q-016/Q-023), not an assumed player-tier increase.
 
 ### T2-10 — Ration Kitchen
 - **Does:** Turns a varied farm's products into useful expedition meals. A meal can emphasize saturation, travel endurance or suit feeding, with one selected recipe per batch.
@@ -816,7 +850,7 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Does:** A transportable biological building kit for a dangerous outpost. It unfolds into a small ribbed shelter with an entrance, service face and floor, using material packed into it beforehand.
 - **Input → output:** Stored skin/frames + biomass + a clear selected footprint → those same parts assembled as a shelter. It provides ordinary cover, not dragon-proof invulnerability.
 - **Create:** 1 Structure Grower + 2 Membrane Sheets + 1 piston; pack the desired building parts into its UI.
-- **Growth:** Choose deployment speed or biomass economy. Add compartments for a Repair Dock and spare feed. A larger shelter consumes more packed parts and requires more clear ground; no End material is needed for the first End expedition.
+- **Growth:** Choose deployment speed or biomass economy. Add compartments for a Healing Dock and spare feed. A larger shelter consumes more packed parts and requires more clear ground; no End material is needed for the first End expedition.
 
 ### T4-19 — Cold Lobe
 - **Does:** Refrigerates an attached specimen, food or culture store. Preserves a vulnerable batch while the player improves the laboratory, rather than forcing immediate processing.
@@ -926,7 +960,7 @@ Connect established workshops rather than replacing them. Transit consumes local
 - **Does:** Defines a protected, inspectable landing volume for a Transit Maw. Keeps the arrival reserve separate from the workshop's production budget.
 - **Input → output:** Arrival reservation + local biomass/electrical reserve → a clear landing and admission acknowledgment.
 - **Create:** 1 Void Tether + 1 Biomass Bladder + 2 passenger-conditioned Spatial Membranes; assemble a 3×3 floor with at least three clear blocks above it.
-- **Growth:** Add separate berths for higher traffic or mounts. A Repair Dock can serve the exit, but a full repair queue must not block arrivals. Departure is refused when every berth is occupied.
+- **Growth:** Add separate berths for higher traffic or mounts. A Healing Dock can serve the exit, but a full healing queue must not block arrivals. Departure is refused when every berth is occupied.
 
 ### T6-03 — Freight Gullet
 - **Does:** Transfers reserved cargo between two built freight endpoints. Passenger throughput is not an unlimited bulk-storage connection.
@@ -965,11 +999,11 @@ Connect established workshops rather than replacing them. Transit consumes local
 - **Growth:** Choose placement speed or biomass economy. Add compartments for a larger deployment, or include a Folded Shelter. It does not instantly produce mature native beds in the wrong dimension.
 
 ### T6-09 — Service Pedestal
-- **Does:** A named shared service-berth layout, **not another all-purpose block**. Its selected attached service handles fuel, repair or authorized cargo transfer. These individual services are available earlier; T6 introduces coordinated station layouts.
+- **Does:** A named shared service-berth layout, **not another all-purpose block**. Its selected attached service handles fuel, healing or authorized cargo transfer. These individual services are available earlier; T6 introduces coordinated station layouts.
 - **Input → output:** One admitted wearer/set → acknowledged service requests in a chosen order. Each service pays its own costs and operates only on permitted targets/slots; stepping on a berth never authorizes emptying the player's whole inventory.
-- **Create:** Frame a Fuel Papilla substrate floor cell with Living Skin and Rib Frames. The worked fuel-and-repair layout adds a Repair Dock, Item Capsule, Filter Valve and Reflex Knot. Add mouths or a Scheduler Ganglion for explicitly approved cargo/tool service.
+- **Create:** Frame a Fuel Papilla substrate floor cell with Living Skin and Rib Frames. The worked fuel-and-healing layout adds a Healing Dock, Item Capsule, Filter Valve and Reflex Knot. Add mouths or a Scheduler Ganglion for explicitly approved cargo/tool service.
 - **Assembly:** T0-10, T0-11, T1-36, T2-08, T1-09, T1-12, T1-34.
-- **Growth:** More separate berths support concurrent visitors; more service heads increase actual capacity. No pedestal counter or boxed core duplicates attached organs. A shared repair head is economical but queues visitors; dedicated heads cost space and supplies.
+- **Growth:** More separate berths support concurrent visitors; more service heads increase actual capacity. No pedestal counter or boxed core duplicates attached organs. A shared healing head is economical but queues visitors; dedicated heads cost space and supplies.
 
 ### T6-10 — Reclamation Mouth
 - **Does:** Recovers a selected biological assembly for relocation. Removes it in a visible order after draining resources into reserved containers.
@@ -1008,12 +1042,12 @@ The player designs assemblies with separate working, supply and control parts. M
 ### T7-05 — Organ Transplanter
 - **Does:** Moves one matured core from a temporary body into a prepared permanent assembly. Lets an early organ become the heart of a late workshop without destroying its accumulated value.
 - **Input → output:** Recovered donor core + a compatible prepared receiver + biomass → the same living core installed with its counters and choices intact.
-- **Create:** 1 Reclamation Mouth + 1 Memory Gland + 1 Levitation Chamber attachment.
+- **Create:** Retained candidate: 1 Reclamation Mouth + 1 Memory Gland + 1 Levitation Chamber attachment. The Memory Gland requirement is held under Q-003/Q-020; moving an intact core is not extraction/transfer of its counters.
 - **Growth:** Choose transplant speed or biomass economy. Extra Anatomy Sockets handle larger cores. Transplanting is not a chance-based reroll and does not duplicate donor organs.
 
 ### T7-06 — Genome Vault
-- **Does:** Stores an explicit backup of discovered genome knowledge and holds separate physical Memory Samples for replacement equipment. Valuable before risky expeditions and large refits.
-- **Input → output:** Authorized bank records → a knowledge backup; deposited Memory Samples → retained typed learning samples. Knowledge copies do not create Genetic Stock or duplicate stored experience samples.
+- **Does:** Stores an explicit backup of discovered genome knowledge under Q-024's ownership/recovery policy. Memory Sample support is separately held under Q-003.
+- **Input → output:** Authorized bank records → a knowledge backup. If Memory Samples are approved, a separate physical compartment retains those actual items; it does not extract or duplicate learning. Knowledge copies never create Genetic Stock.
 - **Create:** 1 DNA Bank + 4 Archive Lobes + 2 obsidian + 1 precision-conditioned Spatial Membrane.
 - **Growth:** Add Archive Lobes for capacity. A Relay Ganglion synchronizes selected knowledge with another owned vault; physical samples still require actual transport.
 

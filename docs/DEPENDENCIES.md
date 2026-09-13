@@ -19,6 +19,9 @@ still need lock/verification metadata before release-grade reproducibility is cl
 
 ## Feature integrations: not installed in this empty foundation
 
+Artifact/side/absence and adapter decisions are tracked only in [Q-035](OPEN_QUESTIONS.md).
+The table retains candidate roles and known prototype pins, not a second decision list.
+
 | Integration | Direction | Decision before implementation |
 |---|---|---|
 | JEI | Essential recipe/process discovery | Pin 1.21.1 API/runtime; client adapter and process tests |

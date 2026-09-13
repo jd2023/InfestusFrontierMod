@@ -4,6 +4,16 @@ Catalog of the proposed mod-owned items, grouped by first availability. This cov
 
 **This document owns item identity, preparation recipes and consumable forms.** [Block Catalog](BLOCK_CATALOG.md) owns organs and their construction; [Armor Evolution](ARMOR_EVOLUTION.md) owns equipment counters, permanent branches and effects; [Substrate Mutations](LIVING_SUBSTRATE_MUTATIONS.md) owns tissue anatomy. [Guide Tree](GUIDE_PROGRESSION_TREE.md) gives discovery order. T0–T9 mean availability, not an item's earned level.
 
+## Unresolved recipe fields
+
+Use [Open questions](OPEN_QUESTIONS.md), not implied defaults: Q-003 for Memory
+Sample; Q-005/Q-006 for fusion and graft access; Q-010/Q-013/Q-016 for fuel/feed
+and food; Q-011/Q-012 for mineral recovery and energy; Q-021/Q-022 for mining
+and temporary construction; Q-023 for DNA; Q-030/Q-031 for weapons and Fold.
+All existing numeric recipes remain **draft candidates**. Missing costs, times,
+source lists or access gates must be resolved in those entries before coding.
+T/SR prefixes order the catalog/guide, not approved personal rank locks (Q-025).
+
 ## 1. What goes into an upgrade
 
 ```text
@@ -95,6 +105,12 @@ One BU equals one mB biomass. A dose/portion is an item, not an unspecified tank
 
 Early Lumen treatment is made in the Bowl; all T1 transport treatments use the Cyst. Its own construction requires only a Bud, Sheets and a Plate, so a first Cyst needs no transport graft. A player can hand-feed it before automating it.
 
+### Temporary construction tool — held design
+
+| ID | Item | Obtain / recipe | Consumer / constraints |
+|---|---|---|---|
+| I124 | Membrane Projector [held candidate] | Handheld construction organ; body recipe and access Q-022 | Spends armor biomass to place Temporary Membrane T1-37 at a permitted target. Range, lifespan, attachment and fall-arrest behavior unresolved. T1 grouping is provisional. |
+
 ## 4. T2 — genetics, prepared grafts, food and helpers
 
 | ID | Item or bounded family | Obtain / recipe | Consumer / constraints |
@@ -104,11 +120,11 @@ Early Lumen treatment is made in the Bowl; all T1 transport treatments use the C
 | I040 | Labeled Specimen | Field Lancet, T4 Sampling Proboscis or approved harvest puts one real source sample in I011 | Extractor; immutable species/source category, bounded quality fields. A generic rotten flesh item is not automatically a high-quality enderman sample. |
 | I041 | Genome Fragment | Extractor consumes specimen + 50 mB water + 25 BU → one fragment and one matching stock seed | DNA Bank records actual coverage; repeated covered region gives no invented new region. Quality/coverage tables remain source-specific. |
 | I042 | Genetic Stock | Extraction above; culture: 1 stock seed + 2 source-compatible feed portions + 100 BU → 3 stock, with complete matching genome | Two net new stocks; species retained. Does not produce pearls, stars, bones or minerals. Plant feed uses actual planting/produce; animal culture uses compatible protein feed. |
-| I043 | Memory Sample | Memory Gland removes a selected typed amount into a vial, consuming 50 BU | One compatible organ/item learns that amount at donor's expense. Armor slot, counter and permanent lineage restrictions survive transfer. |
+| I043 | Memory Sample [held candidate] | No approved preparation/use recipe; Q-003 decides whether learning can be stored/transferred at all | If approved, source loses recorded points; never a free ritual byproduct or duplicated progress. |
 | I044 | Genome Record | Export a known source record to 1 paper + 1 Synaptic Gel at DNA Bank | Knowledge sharing under permission rules; neither physical stock nor transferable practice. |
 | I045 | Antitoxin Serum | Cyst: 250 mB milk + 1 Filter Membrane + 50 BU → 1 | H5 graft preparation; process 1 milk bucket as four batches, returning one bucket, never four buckets. |
 | I046 | Scent Concentrate | Cyst: 1 rotten flesh + 1 Binder + 25 BU → 2 | H7 grafts; source-specific repellent/lure recipes additionally require their declared scent/food. |
-| I047 | Restorative Serum | Cyst: 1 golden apple + 1 honey bottle + 1 Binder + 100 BU → 2, returning bottle | Repair Dock mutation and Restorative Tissue, not directly drunk as a universal cure. |
+| I047 | Restorative Serum | Cyst: 1 golden apple + 1 honey bottle + 1 Binder + 100 BU → 2, returning bottle | Healing Dock mutation and Restorative Tissue, not directly drunk as a universal cure. |
 | I048 | Restraining Graft | Chrysalis: 2 spider stock + 1 cobweb + 1 Elastic Gel + 1 Binder + 100 BU → 1 | One mature Restraining Tissue cell; spider genome required. |
 | I049 | Aquaculture Graft | Cyst: 1 kelp + 1 prismarine shard + 1 Binder + 50 BU → 1 | One submerged mature tissue cell. Creature production still requires brood stock. |
 | I052 | Plant Graft | Grafting Bench: 1 seed/sapling + 2 matching stock + 1 Rooting Gel + 100 BU → 1 modified planting item | Retains species and chosen trait. No conversion of wheat into an unrelated tree species. |
@@ -135,9 +151,43 @@ Early Lumen treatment is made in the Bowl; all T1 transport treatments use the C
 | I038 | Piercing Fang / Grasping Limb / Spitter [proposed weapon forms] | Chrysalis prepares a named weapon graft from 2 relevant stock (skeleton / spider / slime), Bone Plate / Contractile Fiber / Digestive Enzyme respectively, Binder and 100 BU; Chamber applies it to one Living Fang for 100 BU | Three different resulting weapon bodies, not three simultaneous modes. Spitter consumes real Grown Spines plus fuel. Exact damage, counter gates and future branch policy require the tool/weapon specification; these are optional guide leaves. |
 | I069 | Growth Template | Structure Grower records a player-selected bounded layout onto paper + Route Imprint | Placement still consumes real blocks; no copied organ contents/counters. |
 
+### Ore dust and recovery
+
+Owner direction: recovery produces 4→5→6→7→8 dust per defined ore input; smelting
+uses 4→3→2→1 dust per ingot. These are independent upgrades, not paired stages.
+The maximum combination is eight ingots per defined input unit. Q-011 selects
+that unit separately for each ore block/raw material and assigns each step to
+an actual process. Do not multiply an ordinary block's mining drops and intact
+treatment recovery together.
+
+**Stockpiling is intended:** compatible dust produced earlier can feed a more
+efficient smelter later. Its stored identity does not restrict it to the machine
+that created it. Additional conditioning may be an alternative route, but must
+not retroactively invalidate already compatible dust.
+
+A recipe requiring four dust waits for four actual units; no fractional ingot or
+rounding up. A 5-dust output can leave one dust after a four-dust smelt, to combine
+with a later batch. Recipe outputs reserve all residues and containers.
+
+Granulating an ingot for biological fusion produces Washed Portions, not
+yield-eligible ore dust. Unsupported imported materials are refused until their
+source and recycling paths are declared. Q-012 specifies energy type, quantity,
+duration and demand per improvement; no zero-cost improvement is implied.
+
+| ID | Item or family | Obtain / recipe | Consumer / constraints |
+|---|---|---|---|
+| I125 | Ore Dust [metal-specific family] | Actual eligible ore/raw material through recovery recipes selected in Q-011 | Stored for any compatible current/later smelting recipe. Metal identity retained; material list and treatment compatibility Q-011. Never obtained as multiply-smeltable dust from ingots. |
+
 ### Mutation grafts
 
-I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M4, H1–H10, C1–C13, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the DNA, prepared signatures, amounts and access gates in [Armor Evolution §6–10](ARMOR_EVOLUTION.md#6-installing-mutations). A tooltip names the exact outcome, not “mutation essence.”
+Retained numeric candidate for I / II / III graft preparation: 2 / 4 / 8
+matching Genetic Stock from each required species; 1 / 2 / 4 of each listed
+prepared signature; 1 / 2 / 3 Fusion Binder; 60 / 150 / 360 BU; 12 / 24 / 48 s.
+Installation uses the same target piece, one graft and 40 / 100 / 240 BU over
+8 / 16 / 32 s. Host I uses Spore Culture instead of Genetic Stock in the Bowl.
+Q-006 must ratify these quantities and access, especially multi-genome variants.
+
+I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M4, H1–H10, C1–C13, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the proposed DNA/signatures and access decision Q-006 in [Armor Evolution §6–10](ARMOR_EVOLUTION.md#6-mutation-installation-and-reading-the-candidate-tables). A tooltip names the exact outcome, not “mutation essence.”
 
 C13's operating feed is not a new item family: explicitly supported ordinary biological materials are consumed as fuel, not applied as upgrades. Armor Evolution owns its proposed conversion rates and per-material acceptance rules. Samples, grafts and other valuable biological items are not implicitly edible. C12 accepts measured biomass containers instead; C9 consumes food for player hunger. One item cannot fund two of these operations.
 
@@ -232,7 +282,7 @@ One source block has one owner throughout extraction, treatment and fracture. Be
 
 An untreated hand-placed ore item may be recovered unchanged. Field extraction deliberately introduces intact handling at T2; whether it may export ordinary Silk-Touch ore items is **not** implicitly approved. The proposed baseline keeps field-extracted specimens in beds or Mineral Workpieces until fracture; ordinary logistics can move the wrapped workpiece between workshops without erasing its state. A tool-breaking fallback for a conditioned specimen returns the same accounted fragments, never Fortune loot plus chemical recovery. Every ore recipe must compare direct mining, Fortune, Silk Touch and supported external processing before its yields are approved. If a modded source lacks a safe state/loot mapping, refuse it rather than guess.
 
-Frame grade, counter rank, a genome's coverage, world phase, pressure, electricity, steam and network packets are not inventory items. The green Aerocyte projectile is an entity/effect made by spending biomass; it is not free collectible ammunition.
+Fusion level, activity-counter value, learning capacity, a genome's coverage, world phase, pressure, electricity, steam and network packets are not inventory items. The green Aerocyte projectile is an entity/effect made by spending biomass; it is not free collectible ammunition.
 
 | Process fluid | Producer | Consumer / accounting |
 |---|---|---|
@@ -256,7 +306,7 @@ Bucket forms for non-biomass custom fluids are deferred until their finite world
 | Copper + redstone for conduction | Conductive Myelin | SR4 treatment; one dose per mature cell. |
 | Fermented eye + slime for digestive floor | Digestive Enzyme | One dose per mature cell. |
 | Sugar + rabbit hide for travel floor | Locomotor Gel | One dose per mature cell; suit eligibility remains independent. |
-| Golden apple + honey for restoration | Restorative Serum | One dose per cell; two doses for Repair Dock conversion. |
+| Golden apple + honey for restoration | Restorative Serum | One dose per cell; two doses for Healing Dock conversion. |
 | Bone / iron / diamond reinforcement | Skeletal Graft / Ferrocyte Paste / declared diamond medium | Use the target's listed dose; no direct raw mineral mutation. |
 | Magma cream + netherrack / End ingredients | Thermal Seed / Anchor Seed | Grow the selected native bed in its own dimension. |
 | Generic creature ingredient for better behavior | Named Organ Trait Graft | Complete matching DNA, physical stock and the behavior's prepared signature; not every dropped mob item carries complete DNA. |

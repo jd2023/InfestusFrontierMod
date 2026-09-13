@@ -1,6 +1,6 @@
 # Living Substrate: growth, mutations and reinforcement
 
-Proposed rules and graft ingredients for discussion. **Yes: substrate should be reinforceable without losing its function.** A reinforced vein remains a vein; it does not become an inert armor block.
+Draft cell-anatomy rules. [Open questions](OPEN_QUESTIONS.md) owns missing values: Q-017 vegetation, Q-018 maturity/reinforcement/pigment, Q-019 Fuel Papilla extension, Q-020 transport/body limits. Numeric or qualitative upgrade claims below are not approved default values. A reinforced vein retains its transport function.
 
 ## Mutation diagram
 
@@ -35,7 +35,7 @@ Each cell has **one primary function**. Mutating it does not remove its ability 
 | **Item Vein** | Contractile Fiber. | Carries item packets along configured faces. | Connected transfer organs and free destination space. |
 | **Nerve Tissue** | Synaptic Gel. | Carries control signals, separate from resources and power. | Input signal; no biomass upkeep. |
 | **Steam Vein** | Mutate a Fluid Vein with Thermal Lining + Bone Plate. | Carries steam; uses the heat lining slot and needs a condensate outlet. | Supplied steam; pressure falls as work and heat are lost. |
-| **Conductive Tissue** | Conductive Myelin; SR4. | Carries electricity through a separate circuit. | Actual electrical input. |
+| **Conductive Tissue** | Conductive Myelin; chapter SR4 (Q-025). | Carries electricity through a separate circuit. | Actual electrical input. |
 | **Cultivation Tissue** | Hoe the mature cell, then apply Rooting Gel and the selected seed. The hoe is not consumed. | Maintains crop growth. Planting, harvest and seed/output reserves belong to separate organs or player actions. | Water; optional biomass-assisted growth. |
 | **Work Bed** | Membrane Sheet + Sealing Resin on exposed mature tissue. | Holds one visible specimen or finite item batch for attached working organs; no processing or automatic collection of its own. | No idle upkeep; each operation pays its own supplies. |
 | **Aquaculture Bed** | Aquaculture Graft, while submerged. | Supports the selected aquatic planting or husbandry recipe. | Water habitat, stock and nutrients. |
@@ -43,8 +43,8 @@ Each cell has **one primary function**. Mutating it does not remove its ability 
 | **Digestive Tissue** | Digestive Enzyme. | Damages susceptible occupants without the required full bio suit; collects biomass from actual damage. | No continuous feed in the basic form; export its finite collected reserve. Full storage stops collection, not the damage. |
 | **Restraining Tissue** | Restraining Graft; spider genome. | Slows or holds a susceptible target instead of harvesting it. | Biomass while restraining. |
 | **Travel Tissue** | Locomotor Gel. | Speeds an eligible full bio suit with a locomotion mutation. | The wearer's suit biomass. It does not give unaided flight. |
-| **Restorative Tissue** | Restorative Serum. | Gradually heals an authorized injured occupant. | Biomass per actual healing. |
-| **Fuel Papilla** | Capillary Gel + Membrane Sheet on an exposed mature cell. | A flush refueling surface transfers biomass into an authorized wearer's selected armor pieces; works without a full suit. No repair or digestion. | Real biomass from adjacent configured logistics; deliberate start and a free reserve in the target. |
+| **Restorative Tissue** | Restorative Serum. | Heals an authorized injured occupant. | Biomass per actual healing. |
+| **Fuel Papilla** | Capillary Gel + Membrane Sheet on an exposed mature cell. | A flush refueling surface transfers biomass into an authorized wearer's selected armor pieces; works without a full suit. No armor healing or digestion. | Real biomass from adjacent configured logistics; deliberate start and a free reserve in the target. |
 | **Surveyed Tissue** | Survey Gel; configure its boundary with the tool. | Defines a finite mining footprint flush with the ground. | No idle upkeep; the mining organ supplies the work. |
 | **Worker Waypoint** — optional | Waymark Secretion; link to a nursery. | Marks a route or separate waiting berth without a raised trail block. | No independent upkeep; the worker uses its own supply. |
 
@@ -53,6 +53,18 @@ Each cell has **one primary function**. Mutating it does not remove its ability 
 Work Bed belongs to the diagram's service branch, not a new maturity stage. Its sealed surface cannot simultaneously be a crop bed or vein. Place supply tissue beside/below it and attach working organs to its service faces. Bed containment and process state follow the [block catalog](BLOCK_CATALOG.md#building-with-operations); held-workpiece recovery follows the [item catalog](ITEM_CATALOG.md#workpieces-are-not-another-ore-loot-roll).
 
 **Crossings and steps are route modifications.** A Membrane Sheet + Bone Plate creates a Septum Crossing with two isolated passages of the same carrier type. Contractile Fiber + Membrane Sheet creates a Vascular Stitch over a visible terrain step. A crossing does not join its routes. A junction does. Floor, wall and ceiling placement use the same functional forms.
+
+### Pigment and feeding surfaces
+
+Dye changes the substrate's tissue pigment, not its function, maturity,
+reinforcement, ownership or stored resource. Preserve readable functional cues:
+a dyed biomass vein still shows green contents and port state. Palette, interaction
+and color persistence on conversion/recovery are Q-018.
+
+Fuel Papilla begins as one refueling cell. A supplied multiblock improves its
+transfer rate and biomass efficiency; [T1-36](BLOCK_CATALOG.md#t1-36--fuel-papilla)
+owns that operation and Q-019 its missing parts/formula. The extra anatomy does not
+turn each cell into a vein, digester and healer simultaneously.
 
 ## 3. Reinforce it without changing its job
 

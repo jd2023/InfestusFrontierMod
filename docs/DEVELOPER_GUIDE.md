@@ -7,13 +7,23 @@ accepted entries in `DECISIONS.md` constrain every implementation. A draft idea,
 prototype behavior, or unchecked backlog item is not a ratified requirement.
 Ask when a decision changes scope, progression, player risk, dependencies or saves.
 
-Design ownership: `ITEM_CATALOG.md` defines items and preparation recipes;
-`BLOCK_CATALOG.md` defines organs and construction; `LIVING_SUBSTRATE_MUTATIONS.md`
-defines tissue anatomy; `ARMOR_EVOLUTION.md` defines equipment;
-`GUIDE_PROGRESSION_TREE.md` defines proposed instructional dependencies. The vision,
-progression narrative and ideas notebook must not introduce conflicting copies of
-those rules. Historical decisions stay recorded; a newer decision explicitly
-supersedes an older one. Draft numbers are not implementation authorization.
+Design ownership: `PROGRESSION_MAP.md` owns end-to-end player projects;
+`ITEM_CATALOG.md` owns items/preparation; `BLOCK_CATALOG.md` owns organs/construction;
+`LIVING_SUBSTRATE_MUTATIONS.md` owns cell anatomy; `ARMOR_EVOLUTION.md` owns equipment;
+`GUIDE_PROGRESSION_TREE.md` owns teaching dependencies. `OPEN_QUESTIONS.md` is the
+only unresolved-decision register. The decision log is history, not a competing spec.
+
+Before adding a document, identify a responsibility not already owned. Prefer a
+section in the existing owner. No parallel notebooks, reviews or prerequisite
+checklists that repeat gameplay. Keep technical contracts separate from gameplay.
+
+Use defined terms, exact conditions and observable results. If a value, recipe,
+scope or behavior is missing, reference the question ID that blocks it; do not
+substitute vague adjectives or invent precision. Label numeric candidates as drafts.
+When the owner resolves a question, update its owning specification, dependent
+references and the question's resolution together. Record supersession in
+`DECISIONS.md`; historical entries do not reactivate rejected rules.
+Draft numbers are not implementation authorization.
 
 The bootstrap establishes build/test infrastructure only. It does not begin the
 content roadmap. Do not promote prototype implementations wholesale.

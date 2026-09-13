@@ -22,4 +22,10 @@ No automatic publication, merging to main, remote writes, license changes or
 golden replacement. HUMAN gates are owner-only. This queue has no approved
 implementation tasks yet.
 
-Design ownership: docs/ITEM_CATALOG.md owns prepared items; BLOCK_CATALOG.md owns organs; LIVING_SUBSTRATE_MUTATIONS.md owns tissue; ARMOR_EVOLUTION.md owns equipment; GUIDE_PROGRESSION_TREE.md owns proposed chapter prerequisites. Armor branches are permanent per piece. Hungry armor hurts until full symbiosis; afterwards unpaid features stop. Auto-feeding, auto-healing and actual Elytra fusion are requested. Exact symbiosis ownership and balance remain proposals. Raw functional upgrade ingredients require biological preparation; basic construction and ordinary food/fuel remain distinct.
+
+Design ownership and reading order are defined in VISION.md and docs/DEVELOPER_GUIDE.md.
+Start gameplay context at docs/PROGRESSION_MAP.md, then read only the relevant owning
+catalogs. docs/OPEN_QUESTIONS.md is the single unresolved-decision register; blocked
+parameters cannot be guessed by a worker. Armor has permanent branches and one summed
+learning cap per piece; no learning pause, free respec or assumed point transfer.
+Paid partial counter reduction frees capacity without exchanging branches.

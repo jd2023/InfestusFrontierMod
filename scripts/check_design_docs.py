@@ -112,6 +112,45 @@ def check_assemblies(content):
     check_graph(graph)
 
 
+def check_questions(register, documents):
+    """Every active question reference resolves to one actionable owning entry."""
+    sections = re.split(r'^### (Q-\d{3}) —[^\n]*\n', register, flags=re.M)
+    ids = sections[1::2]
+    unique(ids, 'open question ID')
+    if not ids:
+        raise ValueError('Empty open-question register')
+    for question, body in zip(ids, sections[2::2]):
+        for field in ('Decision', 'Resolve in'):
+            if not re.search(rf'^- \*\*{field}:\*\* \S', body, re.M):
+                raise ValueError(f'{question} lacks {field}')
+    for name, content in documents.items():
+        unknown = set(re.findall(r'\bQ-\d{3}\b', content)) - set(ids)
+        if unknown:
+            raise ValueError(f'Unknown open questions in {name}: {unknown}')
+
+
+def check_current_armor(content):
+    for obsolete in ('L0–L25', 'allocated growth points', 'Each counter\'s cap',
+                     'five practice counters', 'five active counter ranks'):
+        if obsolete in content:
+            raise ValueError(f'Superseded armor rule: {obsolete}')
+    for required in ('sum(counters) <= learning_capacity', 'cannot be paused',
+                     'partial counter reduction'):
+        if required not in content:
+            raise ValueError(f'Missing armor contract: {required}')
+
+
+def check_activity_owners(content):
+    rows = re.findall(r'^\| ([HCLB]-[A-Z]) \| (Helmet|Chest|Leggings|Boots) \|', content, re.M)
+    unique([counter for counter, _ in rows], 'activity counter')
+    owners = {'H': 'Helmet', 'C': 'Chest', 'L': 'Leggings', 'B': 'Boots'}
+    if not rows:
+        raise ValueError('Missing activity ownership table')
+    for counter, owner in rows:
+        if owners[counter[0]] != owner:
+            raise ValueError(f'Wrong activity owner: {counter}: {owner}')
+
+
 def check(root):
     docs = root / 'docs'
     guide = (docs / 'GUIDE_PROGRESSION_TREE.md').read_text()
@@ -134,6 +173,8 @@ def check(root):
         raise ValueError(f"Block/guide coverage mismatch: {set(blocks) ^ guide_blocks}")
 
     armor = (docs / 'ARMOR_EVOLUTION.md').read_text()
+    check_current_armor(armor)
+    check_activity_owners(armor)
     mutations = re.findall(r'^\| ([MHCLB]\d+) [^|]+\|', armor, re.M)
     unique(mutations, 'armor mutation ID')
     guide_mutations = {node[3:] for node in graph if node.startswith('AM-') and '.' not in node}
@@ -157,6 +198,12 @@ def check(root):
     # Check tracked-document locations, not external websites or prototype paths.
     documents = [root / 'README.md', root / 'VISION.md', root / 'AGENTS.md']
     documents += list(docs.glob('*.md')) + list((root / '.ktask').glob('*.md'))
+    question_path = docs / 'OPEN_QUESTIONS.md'
+    if not question_path.exists():
+        raise ValueError('Missing OPEN_QUESTIONS.md')
+    check_questions(question_path.read_text(), {
+        str(document): document.read_text() for document in documents
+    })
     for document in documents:
         check_tables(document.read_text(), document.name)
         for target in re.findall(r'\[[^\]\n]+\]\(([^)\s]+)\)', document.read_text()):
@@ -175,6 +222,31 @@ def check(root):
 
 
 class CheckerTests(unittest.TestCase):
+    def test_activity_ownership(self):
+        valid = '| H-D | Helmet | Darkness | Visibility |\n| L-W | Leggings | Swimming | Speed |\n'
+        check_activity_owners(valid)
+        for content in ('', valid + valid, valid.replace('H-D | Helmet', 'H-D | Boots')):
+            with self.assertRaises(ValueError):
+                check_activity_owners(content)
+
+    def test_question_register_rejects_drift(self):
+        valid = '### Q-001 — Cap\n- **Decision:** Set capacity.\n- **Resolve in:** Armor.\n'
+        check_questions(valid, {'armor': 'See Q-001.'})
+        for register, documents in (
+            ('', {}), (valid + valid, {}),
+            (valid.replace('- **Decision:** Set capacity.\n', ''), {}),
+            (valid, {'armor': 'See Q-099.'}),
+        ):
+            with self.assertRaises(ValueError):
+                check_questions(register, documents)
+
+    def test_superseded_armor_rules_rejected(self):
+        valid = 'sum(counters) <= learning_capacity; cannot be paused; partial counter reduction'
+        check_current_armor(valid)
+        for content in (valid + ' L0–L25', valid + " Each counter's cap", ''):
+            with self.assertRaises(ValueError):
+                check_current_armor(content)
+
     def test_assembly_components_are_known_and_acyclic(self):
         check_assemblies('### T0-01 — Bed\n### T1-01 — Line\n- **Assembly:** T0-01.\n')
         for content in (

@@ -1,5 +1,10 @@
 # Decisions
 
+Historical record: read [Vision](../VISION.md), the owning catalogs and
+[Open questions](OPEN_QUESTIONS.md) for current rules. Older entries retain their
+original rationale; later entries supersede them. Historical open statements are
+not a second active backlog.
+
 Use explicit status: **user requirement**, **bootstrap choice**, **proposal** or
 **open**. Only the owner can ratify product decisions. Include reason and impact;
 do not silently rewrite an accepted entry when changing direction.
@@ -239,3 +244,33 @@ The draft starter interaction is a manual equipment Fill slot in the Biomass
 Bladder; ampoules remain T1. This replaces the obsolete armor-text claim that a
 Repair Dock refuels equipment. These UI details remain proposals, not implemented
 behavior. No gameplay or remote publication is authorized by this documentation update.
+
+## D027 — armor counters, processing choices and documentation (user direction, 2026-09-12)
+
+Supersedes the old armor rank-sum/growth-allocation design and the C-M/point-transfer
+assumptions recorded with D026. Each piece owns its fusion level, permanent branches,
+activity counters and one cap on their sum. Activities have a single piece owner.
+Learning cannot be paused. A paid ritual removes a fixed amount from a selected
+counter, freeing shared capacity without exchanging branches. Amount, cost,
+below-threshold effects and optional point storage/transfer remain Q-001–Q-003.
+
+Death can develop a single-use totem-like rescue. Learning versus charge and
+bed/reset behavior remain Q-004; excluding death learning is not the owner's rule.
+Fusion uses prepared precious-material media and biomass, increases capacity and
+requires an explicit exponential difficulty/cost schedule (Q-005). Do not infer
+that ordinary Minecraft XP is required. Feed/heal terminology replaces armor repair.
+
+Ore recovery and smelting efficiency improve independently. Compatible dust may
+be saved for later smelting. Combining maximum improvements requires extensive
+infrastructure and operating energy; exact input units/energy recipes are
+Q-011/Q-012. No imposed dust-aging or mandatory same-machine processing.
+
+Temporary translucent support, extended Fuel Papilla anatomy and substrate pigment
+are tracked in Q-022/Q-019/Q-018. Passenger and material exchange connect colonies;
+the exact tier owner is unresolved at Q-025, not a chapter license.
+
+The owner requested one open-question document and removal of redundant planning
+documents. End-to-end progression replaces the competing narrative notebook.
+Retired review/prerequisite/planning originals remain in Git at 01440a8; original
+owner notes remain at 5b536bc. Recipes and feature rules stay in their owning catalogs.
+No gameplay or remote publication is authorized by this documentation consolidation.
