@@ -22,8 +22,8 @@ See ore through the translucent host, then mine with tools. Leaching does not
 pay the ore output or grant Burrowing.
 
 **Recovery:** retain ordinary gear, planting stock and manual feed access.
-Remove/feed hungry armor to address its pre-symbiosis pain; this does not rescue
-a player from an unrelated environmental hazard.
+Remove/feed hungry armor to stop its pre-symbiosis pain. Armor hunger stops at
+one heart; enemies, drowning and other environmental damage can still kill.
 
 **Result:** one fed useful piece and a workshop preparing its own starter inputs.
 
@@ -93,6 +93,8 @@ Precision Sequencer service; boss/Fold genomes need a Genome Vault.
 
 **Armor project:** prepare mineral fusion media and select a permanent branch.
 Use the [armor tree](ARMOR_EVOLUTION.md#4-fusion-tree) to plan the piece's specialization.
+If unwanted activities fill its shared capacity, pay materials, biomass and your
+Minecraft XP at the chamber to remove part of one counter. Branches stay permanent.
 
 **Other projects:** Grafting Bench for plant traits; Feeding Trough plus
 Incubation Basket for bounded husbandry; Aquaculture Bed/Fishing Polyp for aquatic
@@ -158,6 +160,9 @@ and an available same-stage disposal route. Pressure/heat faults can rupture a
 vessel: leaked biomass kills unsealed substrate and can destroy organs. Build a
 sealed catchment, recovery path and cutoff around hazardous processes. Ordinary
 full outputs still pause; failure handling belongs in the factory layout.
+
+Bank player XP in a Mnemonic Vessel and supply counter-reduction chambers from it.
+Keep a reserve for vanilla enchanting instead of consuming every point in rituals.
 
 **Result:** a chosen refinery, a supplied power source and a demonstrated
 input-interruption recovery path.

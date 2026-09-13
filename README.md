@@ -45,22 +45,21 @@ pure core, but not the development test mod or archived Forge content.
 
 ## Licensing
 
-Source and original assets should allow contributions, redistribution and continued
-development by forks, with attribution preserved.
+Recommendation, not yet approved: **LGPL-3.0-only for code; CC BY-SA 4.0 for original
+art and other assets**. In practice:
 
-Recommendation: **LGPL-3.0-only for source** and **CC BY-SA 4.0 for original assets**.
-[AE2 uses LGPL v3](https://github.com/AppliedEnergistics/Applied-Energistics-2/blob/main/LICENSE):
-distributed modifications to covered source remain open, while independent linked
-code can use other licenses under LGPL's conditions.
-[Mekanism uses MIT](https://github.com/mekanism/Mekanism/blob/1.21.x/LICENSE), which
-requires retaining its notice but also permits closed-source derivatives.
-LGPL better matches keeping distributed improvements to this mod available to forks.
+- Others can contribute, distribute the mod and continue it as a fork, including
+  commercially. A distributed modified version must retain notices and provide
+  the covered source under the license's terms. Independent code using its
+  interfaces can retain another license subject to LGPL's linking conditions.
+  [LGPL v3](https://opensource.org/license/lgpl-3-0)
+- Others can reuse or modify the art, including commercially, but must credit it,
+  identify changes and share distributed adaptations under compatible terms.
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+- For releases, include license texts, copyright/credit notices, corresponding
+  source access and asset provenance. Keep third-party material under its own terms.
+  These licenses allow reuse; they do not prevent copying or enforce themselves.
 
-[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) requires attribution
-and sharing adapted assets under compatible terms. Both proposed licenses permit
-commercial redistribution; they do not prohibit reuse or automatically enforce
-compliance. Third-party material retains its own terms.
-
-Final approval is Q-037. `LICENSE.txt` currently specifies CC BY 4.0 while legacy
-metadata says All Rights Reserved. Review contributor/asset provenance and resolve
-those declarations before publication; this recommendation does not relicense files.
+The choice remains unapproved pending the interview. `LICENSE.txt` currently says
+CC BY 4.0; legacy metadata says All Rights Reserved. Their scope and contributor
+permissions must be reconciled before publication. License files remain unchanged.

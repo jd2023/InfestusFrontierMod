@@ -280,7 +280,7 @@ First electrical production can be metabolic or steam-assisted. A complete steam
 | T4-17 — Pressure Regulator | ALL(SR4,T1-14,T1-13,T4-03) | Control a selected vessel and complete a safe stop while preserving shutdown reserve. | Automate limits; an undersized or obstructed relief route is still invalid. |
 | T4-18 — Folded Shelter | ALL(SR4,T2-20) | Pack and deploy a small shelter from actual parts into a clear footprint. | First End/Fold expeditions use imported building stock, not materials from their destination. |
 | T4-19 — Cold Lobe | ALL(SR4,T3-14,T4-03) | Maintain one valid cold compartment through a processing interval. | Preserve a valuable specimen/food batch; cooling does not reverse existing spoilage. |
-| T4-20 — Mnemonic Vessel | SR4 | Deposit and withdraw the same ordinary Minecraft XP amount. | XP storage is separate from genomes, organ counters and armor counters. |
+| T4-20 — Mnemonic Vessel | SR4 | Extract and withdraw a measured amount of player XP without loss. | Capacity, explicit payment source and chamber supply for counter-reduction rituals; no conversion of armor learning into XP. |
 | EL-01 — Precision With a Purpose | ANY(T4-05,T4-06,T4-07) | Deliver one useful precision output into storage or its next legitimate process. | SR5 prerequisite; mineral recovery, sample recovery and live sampling are alternatives. |
 | EL-02 — Stop Without Losing the Batch | EL-01 | In a small supported job, close its output or pause its supply, observe safe refusal, then restore service and finish with materials retained. | SR5 prerequisite. Native controls, simple redstone or a scheduler can solve it; no mandatory accident. |
 
@@ -475,12 +475,12 @@ The book has helmet, chest, leggings and boots tabs for the selected item's fusi
 | AR-13 — Spatial Weave | ALL(AR-10,EN-06) | Fuse Diamond Tendon to Spatial Weave using Phase-Woven Matrix. | Permanent spatial terminal candidate. |
 | AR-14 — Four Pieces, One Metabolism | AR-02 | Equip four functional awakened pieces, fill real reserves and inspect combined load/output. | Shared fuel and coordinated abilities; materials may differ across pieces. |
 | AR-15 — Commit to a Lineage | ALL(ANY(AR-06,AR-07),T2-06) | Inspect a committed piece's valid forward children and permanently excluded sibling. | Plan another independently grown piece for the other lineage; no branch exchange. |
-| AR-16 — Reshape Learned Practice | ALL(AR-02,T2-06) | Complete one paid partial counter reduction and inspect the new capacity usage and buffs. | Counter reduction destroys points without changing branches. |
+| AR-16 — Reshape Learned Practice | ALL(AR-02,T2-06) | Pay materials, biomass and Minecraft XP for one partial counter reduction; inspect capacity and buffs. | Counter reduction destroys points without changing branches. |
 | AR-17 — A Supporting Organ [optional Curios] | AR-14 | Equip and use one supported control/reserve/chemical accessory through the suit's normal resource rules. | Accessories supplement a suit; they do not supply a missing armor piece or unlimited anatomy. |
 | AR-18 — Adaptive Interface [long-term] | ALL(ANY(AR-11,AR-12,AR-13,AR-27),T8-02,EN-06,T6-09) | Install Adaptive Interface and select two control presets for the same compatible installed anatomy. | All installed grafts plus interface must fit together; presets change settings, never branches. |
 | AR-19 — Reciprocal Controls | ALL(AR-18,T9-04) | Install Reciprocal Control Graft and perform its permitted settings-only field change. | Same anatomy and exclusions; interruption and cooldown still apply. |
 | AR-27 — Netherite-Bonded Scutes | ALL(AR-09,T4-05,T3-09) | Fuse Obsidian Scutes to Netherite-Bonded Scutes using its named medium. | Permanent heavy terminal candidate. |
-| AR-28 — Learn to Live Together | AR-02 | Perform ordinary fed work while wearing an awakened piece; inspect adaptation and hunger warnings. | Tiny early reserves; no deliberate injury required for adaptation. |
+| AR-28 — Learn to Live Together | AR-02 | Perform ordinary fed work while wearing an awakened piece; inspect adaptation and hunger warnings. | Tiny early reserves and the nonlethal hunger floor; no deliberate injury required for adaptation. |
 | AR-29 — Full Symbiosis | AR-28 | Reach the piece's permanent symbiosis threshold. | Empty fuel stops causing armor hunger pain; unfunded abilities still stop. |
 | AR-30 — A Real Pair of Wings | SR5 | Obtain an actual Elytra. | A physical ingredient for Wings I, not an ability fabricated solely from phantom DNA. |
 
@@ -580,7 +580,7 @@ Completing a suit demonstration acknowledges its first working rank. Its II and 
 
 ## 17. Handheld tools and weapons
 
-Tool/weapon forms and preparation candidates belong to Item Catalog I015–I018/I038. Enchantments follow Armor Evolution; evolution XP costs remain Q-008. They are optional instructional leaves, not assumed personal-rank requirements.
+Tool/weapon forms and preparation candidates belong to Item Catalog I015–I018/I038. Enchantments and armor ritual costs follow Armor Evolution. They are optional instructional leaves, not assumed personal-rank requirements.
 
 | Node | Open after | Complete by | Teaches / unlocks |
 |---|---|---|---|
@@ -606,9 +606,9 @@ Each unlocked page includes a small working example, the required cells/parts an
 | A route is blocked | “East outlet closed” or “Destination full,” with the selected endpoint. Link to T1-04/T1-12 or CI-05, not a generic “network invalid.” |
 | A raw ingot is placed in an armor treatment | “Needs Ferrocyte Paste, not an iron ingot.” Link to AR-05 and its preparation recipe. |
 | Raw ingredients are offered as a tissue upgrade | “Prepare Capillary Gel in Activation Cyst.” Link to T1-30 and the exact Item Catalog recipe, without consuming the rejected ingredient. |
-| Hungry armor injures its wearer | “Fuel empty; symbiosis incomplete.” Show the affected pieces, refueling route and adaptation status. After full symbiosis the same warning says hungry abilities are paused, without armor pain. |
+| Hungry armor injures its wearer | “Fuel empty; symbiosis incomplete.” Show the affected pieces, refueling route and adaptation status. At the one-heart floor, say hunger damage has stopped but unfueled abilities remain off. After symbiosis, fuel shortage causes no armor pain. |
 | A mutation's DNA is incomplete | “Turtle genome: missing coverage shown in this bank.” Link to GE-16 and its supported specimen routes. Do not ask for unrelated samples. |
-| The piece's learning is capped | “Current frame permits R2. More activity will not count until a permitted forward fusion.” Link to its valid material alternatives. |
+| The piece's learning is capped | “Learning capacity full: {used}/{capacity}.” Show paid counter reduction (AR-16) and valid forward fusions; neither exchanges branches. |
 | Four pieces are equipped but Burrowing will not start | List the absent/wrong-rank H8/C8/L7/B8 graft, collapsed item, insufficient fuel or load conflict. Link to AR-22 and the specific piece tab. |
 | Native production is moved to the wrong dimension | “Thermal Nursery requires a mature Nether-native bed in the Nether.” Link to T3-01/T3-02; importing finished lining remains valid. |
 | A remote destination is unavailable | “Destination not ready; cargo retained here.” Link to T6-03 and the current endpoint state. Never report fabricated remote production. |

@@ -897,10 +897,10 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Growth:** Choose cooling rate or electrical economy. Add insulated Membrane Windows for a larger cold room. Cooling does not restore already-spoiled specimens or manufacture new genome information.
 
 ### T4-20 — Mnemonic Vessel
-- **Does:** Stores ordinary Minecraft experience separately from typed organ/equipment counters. Gives an enchanting corner a place to bank experience without loose XP orbs.
-- **Input → output:** Experience deliberately deposited by a player → stored experience points → deliberate withdrawal or an attached permitted enchanting process.
+- **Does:** Extracts and stores real Minecraft XP from a consenting player, separate from organ counters, armor learning and DNA. Supplies counter-reduction rituals or returns XP to the player for vanilla enchanting.
+- **Input → output:** UI-controlled deposit/withdrawal transfers raw XP points, not levels, at up to 20 points/s while the player is within 4 blocks with the UI open. One vessel serves one player transfer at a time. Full storage or insufficient player XP stops transfer; closing the UI stops extraction. A connected Mutation Chamber can reserve the ritual's stated XP payment directly.
 - **Create:** 1 Organ Bud + 1 enchanting table + 1 amethyst shard + 2 Membrane Sheets.
-- **Growth:** Join Mnemonic Vessels for capacity. Survey Gel treatment improves transfer rate. It cannot turn furnace maturity into player XP; armor enchantments follow Armor Evolution; storing XP does not raise activity counters or fusion level.
+- **Growth:** Initial capacity 10,000 XP per vessel; join at most four cells for 40,000 XP, with each cell retaining its own contents. Survey Gel doubles player transfer rate to 40 XP/s, not capacity or yield. Normal dismantling preserves stored XP in that cell. No loose-orb output, ambient entity search, counter-to-XP conversion or free XP generation. Player and ritual withdrawals reserve against the same available balance.
 
 ### T4-21 — Sampling Proboscis
 - **Does:** Takes one controlled tissue sample from a permitted creature in its facing reserved berth. Works in a Live Sampling Cradle, compatible husbandry station or later Foreign Specimen Cocoon; it does not also process the sample into stock or knowledge.

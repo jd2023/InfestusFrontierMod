@@ -40,9 +40,13 @@ in a hidden reserve while capped or while the piece is not worn.
 - Free exactly the removed amount of shared capacity; never make a counter negative.
 - Repeat and pay again to remove more. Do not pause other counters or exchange branches.
 - Fusion level, material ancestry and installed branch identities are retained.
-- At a Mutation Chamber, consume 2 Synaptic Gel, 1 Restorative Serum, 1 Fusion Binder
-  and `2000 × 2^(G−1)` BU over 60 seconds to remove 25 points from one counter.
+- At a Mutation Chamber, consume 2 Synaptic Gel, 1 Restorative Serum, 1 Fusion Binder,
+  `2000 × 2^(G−1)` BU and `100 × 2^(G−1)` Minecraft XP points over 60 seconds
+  to remove 25 learning points from one counter. XP uses raw points, not levels.
   With fewer than 25 points, remove the remainder for the same price; reject zero.
+- Pay XP from the consenting operator, or one connected Mnemonic Vessel selected
+  in the chamber UI. Reserve payment before starting; interruption retains one
+  accounted payment in the chamber, never both a refund and a completed reduction.
 - Recompute buffs immediately. Grafts remain installed; learning is not an installation gate.
 - Removed points are destroyed. No point storage, transfer or ritual byproduct.
 - Only this designated reduction process decreases counters; sleep, death and fusion do not.
@@ -213,7 +217,8 @@ if technological gains make the next fusion cheaper in actual preparation time.
 Mineral Gizzard → Washing Kidney → culture/thermal/precision preparation →
 bioactive fusion medium. Raw ingots and gems cannot fuse directly.
 Fusion consumes prepared media and biomass; cost increases exponentially with
-level. Minecraft XP participation: Q-008.
+level. The initial XP sink is counter reduction, not fusion; XP cannot buy
+activity points, genome coverage or a different armor branch.
 
 ## 5. Mutation installation
 
@@ -426,14 +431,21 @@ Continuous load lasts while an ability is active. A triggered ability reserves i
 
 ### Mutual symbiosis and hunger pain
 
-A worn awakened piece without available biomass hurts its wearer until full mutual
-symbiosis. Afterwards, unpaid biological abilities and armor healing pause without
-armor hunger pain. Ordinary protection and unpowered movement remain.
+Before symbiosis, a worn awakened piece without available biomass causes hunger
+pain, but armor hunger **cannot reduce health below 1 heart (2 health points)**.
+Clamp each hunger hit to the health remaining above that floor; at or below it,
+apply no hunger damage and do not restore health. Four hungry pieces share one
+wearer damage cadence, not four independent hits.
+
+Unfunded biomass-dependent abilities and self-healing stop at any health level;
+reaching one heart grants no free operation. Refueling permits them to resume.
+Ordinary protection, unpowered movement and non-biomass refueling remain available.
+After symbiosis, fuel shortage causes no armor hunger pain.
 
 Symbiosis belongs to the piece, not a player profile or a suit-wide bond. Initial
 threshold: 100 total learned points on the piece latches symbiosis permanently;
 subsequent counter reduction cannot undo it. Hunger injury and healing that injury
-award no points. Whether hunger damage can be fatal is Q-007.
+award no points.
 
 Refuel or remove hungry equipment to stop that armor condition. Doing so inside
 rock or underwater does not remove environmental danger. Death rescue needs its
@@ -515,7 +527,7 @@ limits. Fusion preserves enchantments. Unbreaking affects tissue durability loss
 Mending spends ordinary XP to heal tissue, never to refill biomass or add learning.
 Protection and potion effects retain vanilla compatibility rules. Test combined
 protection and Mending alongside mutations; low enchantability alone is not a cap
-on a fully enchanted suit. Evolution/ritual XP costs remain Q-008.
+on a fully enchanted suit.
 Accessory limits follow their item entries.
 
 Adaptive Interface and Reciprocal Control Graft are later settings-only proposals:

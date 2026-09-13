@@ -44,6 +44,11 @@ limits, full catchments, seal removal, chunk boundaries and reload. No recursive
 failure cascade, item storm or offline damage catch-up.
 Automatic feeding/refueling checks only configured slots on a bounded cadence.
 Hunger damage needs one wearer cadence, not four independent damage timers.
+Test the one-heart floor with four hungry pieces, fractional health and simultaneous
+external damage; armor hunger cannot kill or heal, but external damage remains lethal.
+XP deposits and ritual withdrawals share one reserved balance. Test concurrent use,
+full stores, cancellation, player disconnect and cell removal without XP duplication.
+Mnemonic Vessels process explicit transfers only, with no ambient orb scans or drops.
 No item-wide decay ticker,
 recursive portable inventory, or flight-induced chunk loading is authorized.
 

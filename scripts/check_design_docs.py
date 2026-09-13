@@ -114,6 +114,8 @@ def check_assemblies(content):
 
 def check_questions(register, documents):
     """The register contains questions only; references resolve to unique IDs."""
+    if not register.startswith('# Open questions\n'):
+        raise ValueError('Missing open-question register heading')
     ids = []
     for line in register.splitlines():
         if not line.strip() or re.fullmatch(r'#{1,2} [^?]+', line):
@@ -126,8 +128,6 @@ def check_questions(register, documents):
             raise ValueError(f'Expected a question, not prose or an answer: {line}')
         ids.append(match[1])
     unique(ids, 'open question ID')
-    if not ids:
-        raise ValueError('Empty open-question register')
     for name, content in documents.items():
         unknown = set(re.findall(r'\bQ-\d{3}\b', content)) - set(ids)
         if unknown:
@@ -263,6 +263,12 @@ class CheckerTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 check_questions(register, documents)
+
+    def test_question_register_can_be_cleared(self):
+        cleared = '# Open questions\n'
+        check_questions(cleared, {'armor': 'Current rules, no unresolved references.'})
+        with self.assertRaises(ValueError):
+            check_questions(cleared, {'armor': 'See Q-007.'})
 
     def test_superseded_armor_rules_rejected(self):
         valid = 'sum(counters) <= learning_capacity; cannot be paused; partial counter reduction'

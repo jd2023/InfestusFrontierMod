@@ -1,7 +1,8 @@
 # Production readiness gates — no autonomous implementation approved yet
 HUMAN: Review VISION.md and the end-to-end docs/PROGRESSION_MAP.md.
-Resolve only product questions affecting the selected slice through
-docs/OPEN_QUESTIONS.md. Q-037 blocks release. Do not treat prototype tuning or draft concepts as approval. Only a human may acknowledge this gate.
+Clarify product gaps in the design interview. Publication requires the licensing
+approval described in README.md. Draft concepts are not implementation approval.
+Only a human may acknowledge this gate.
 
 ---
 
