@@ -628,6 +628,46 @@ Costs are gameplay tuning; ticket counts still require a loaded-factory soak tes
 - **Create:** Mutate mature substrate with 1 Restraining Graft and spider-genome access.
 - **Growth:** Slime-genome graft improves restraint strength; spider-genome graft improves duration. Stronger mobs resist more; players and bosses require explicit targeting rules, not automatic indefinite immobilization.
 
+#### Initial defense recipes and effects
+
+These baselines target hostile mobs only; players and tamed animals are excluded.
+Crown, Lure and Restraining Tissue also exclude bosses. Attack organs respect
+the target's ordinary defenses. Distances are blocks; damage is health points.
+
+| Organ | Range | Paid operation | Initial effect |
+|---|---|---|---|
+| Aerocyte Bloom | 24 | 5 BU, one shot per 40 ticks | One green projectile; 4 damage to an eligible flying hostile |
+| Spine Sentry | 16 | 2 BU + 1 Grown Spine, one shot per 40 ticks | One projectile; 4 damage to an eligible ground hostile |
+| Repellent Crown | 8 | 5 BU + 1 Scent Concentrate per 40-tick pulse | Susceptible hostiles request a reachable local escape path; influence expires after 40 ticks |
+| Lure Polyp | 8 | 5 BU + 1 Scent Concentrate per 40-tick pulse | One idle hostile approaches a reachable adjacent cell for at most 40 ticks; an existing attack target wins |
+| Restraining Tissue | Contact | 2 BU per target per 20 ticks | 20% movement reduction for 20 ticks; overlapping cells do not stack or double-charge |
+
+Refuse before spending if the operation has no eligible target, supply or shared
+admission. No teleport, spawning, chunk loading or profitable projectile drops.
+Lure selects nearest, then entity ID. Conflicting scent requests in one tick use
+block-position order; keep one transient influence per target, not a request log.
+Share at most 64 defense queries/tick, 16 returned candidates/query, 4 local
+defense path requests/tick and 128 active colony projectiles/server.
+
+Husbandry treatments replace the hostile Lure mode; they do not run alongside it.
+At the Chrysalis, prepare one I053 Organ Trait Graft from 2 matching Genetic Stock
++ 1 matching feed + 1 Fusion Binder + 100 BU with complete genome access. Install
+it on a Lure Polyp at L1 or higher. Supported treatments are rabbit,
+cod, cow, pig, sheep and chicken. Each pulse costs 5 BU plus one matching feed:
+carrot, raw cod, wheat, carrot, wheat or wheat seeds, respectively. Keep the same
+8-block range and 40-tick pulse; one animal follows at a time. A disabled Nerve
+input or full assigned pen refuses attraction. Existing player luring and attack
+intent wins; tamed animals and players are excluded. Food is consumed as scent,
+not as a simultaneous breeding or feeding action.
+
+Restraining Tissue accepts one irreversible I053 treatment prepared in Chrysalis:
+2 spider stock + cobweb + Binder + 100 BU gives 40-tick duration at the base 20%
+reduction; 2 slime stock + slime ball + Binder + 100 BU gives 40% reduction for
+20 ticks. Both require the matching complete genome; passive tissue has no counter
+gate. Retain the 2 BU/target/20-tick cost. The selected mode targets either
+hostiles or the six husbandry species, never players, pets or bosses. Overlapping
+cells use the strongest funded effect, not summed strength or double charging.
+
 ### T2-20 — Structure Grower
 - **Does:** Builds a selected small biological wall, room or repeated pattern from supplied parts. Useful for enclosing organs without hand-placing every decorative rib.
 - **Input → output:** A player-marked template + actual blocks or declared prepared tissue grafts + biomass → construction at clear authorized positions, or mutation of eligible exposed support cells. This lets a mine grow flush light/access tissue without raised floor markers. Obstructions are reported, not consumed; grafting does not also award the replaced terrain's loot.
@@ -833,6 +873,7 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 - **Does:** A short-range vertical launcher for prepared landings, mine entrances or glider takeoff. It is not a free-flight field or a revived acid-filled lift.
 - **Input → output:** A charged steam reserve + an occupant's deliberate activation → one directed launch, then recharge.
 - **Create:** 1 Steam Muscle + 2 Rib Frames + 1 slime block; install on a clearly marked launch pad.
+- **Initial operation:** Deliberate activation costs 250 mB steam, sets upward velocity to at most 1.0 block/tick and starts a 40-tick cooldown. Refuse if the next eight overhead cells are obstructed; one occupant per activation. These are initial tuning values, not measured flight-range guarantees.
 - **Growth:** Choose recharge speed or steam economy. Contractile Fiber treatment softens takeoff; the destination still needs a safe landing surface. Covering the launch path prevents activation.
 
 ### T3-17 — Thermal Root

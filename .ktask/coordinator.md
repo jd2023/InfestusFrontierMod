@@ -8,6 +8,10 @@ retained. Inspect it with git show/diff, not by applying it during planning.
 Correct only the supplied planning paths. Resolve dependencies, interface contracts,
 initial numbers, test commands and exact edit scopes. Split oversized pending work
 using new unique task IDs. Preserve accepted packets and the blocked task's ID.
+Update content-plan.json ownership and producer edges with each split. Preserve
+accepted obligations and explicit exclusions; a task cannot silently drop a rank
+or substitute an unavailable ingredient. Qualification profiles follow a tested
+harness and must fit the configured execution budgets.
 Do not remove gameplay obligations, weaken assertions, change models/permissions,
 edit acceptance machinery, implement gameplay, commit, push or discard a stash.
 

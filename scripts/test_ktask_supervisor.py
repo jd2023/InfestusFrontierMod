@@ -22,7 +22,8 @@ class SupervisorTests(unittest.TestCase):
         (self.root / '.ktask').mkdir()
         (self.root / 'docs').mkdir()
         for name in ('config.toml', 'context.md', 'prompt.md', 'autoresolve.md'):
-            (self.root / '.ktask' / name).write_text('project_dir = "."\n' if name == 'config.toml' else 'prompt\n')
+            (self.root / '.ktask' / name).write_text(
+                'project_dir = "."\nlimit_max_wait_seconds = 3600\n' if name == 'config.toml' else 'prompt\n')
         (self.root / '.gitignore').write_text('.ktask/session/\n')
         (self.root / 'code.txt').write_text('baseline\n')
         self.git('add', '.')

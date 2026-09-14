@@ -107,3 +107,9 @@ verifyAll; the adapter allows 30 minutes. Client/multiplayer/soak qualification 
 separate recorded commands, up to two hours for soak. Any candidate edit invalidates
 qualification. Acceptance requires both classes; long soaks do not run inside
 every fast-gate invocation. No model is invoked recursively from a test.
+Normal workers have 7200 seconds; IF-107 qualification has 10800 seconds after
+IF-092 supplies its tested harness. The outer worker timeout reserves shutdown
+margin; enclosing runner time is calculated from worker, verification, retry and
+provider-wait budgets. Invalid or contradictory budgets fail before dispatch.
+Content ownership and declared producer edges are checked before dispatch; IF-108
+introduces incremental executable content coverage before the first gameplay task.

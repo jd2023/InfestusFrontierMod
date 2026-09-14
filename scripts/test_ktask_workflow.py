@@ -356,6 +356,8 @@ class DeliveryTests(unittest.TestCase):
 
     def test_executor_uses_supplied_packet_and_removes_sandbox_bypass(self):
         self.task["body"] = "IF-001 Change owned behavior"
+        (self.root / '.ktask/config.toml').write_text('timeout = 10860\nlimit_max_wait_seconds = 3600\n')
+        self.policy['task_timeouts'] = {'IF-001':10800}
         flow.save(self.session / "active.json", self.state)
         prompt = "[Orchestrator context] Task 1 of 1 (attempt 1).\n" + self.task["body"]
         with patch.object(flow, "require_session"), patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
@@ -368,6 +370,7 @@ class DeliveryTests(unittest.TestCase):
         self.assertIn('sandbox_workspace_write.network_access=true', argv)
         self.assertNotIn('--dangerously-bypass-approvals-and-sandbox', argv)
         self.assertIn(self.base, execute.call_args.args[3])
+        self.assertEqual(10800, execute.call_args.args[2])
 
     def test_dependency_receipt_required_before_worker_starts(self):
         self.task.update(body="IF-002 Consumer", id="IF-002", dependencies=["IF-001"])

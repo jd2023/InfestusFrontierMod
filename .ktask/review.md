@@ -30,6 +30,9 @@ Check:
 
 Compare costs/outputs/prerequisites against owning tables. Registration is not an
 implemented operation. A build is not a gameplay test. Quotas do not establish TPS.
+Check every owned item/rank in content-plan.json against its incremental coverage
+contributor. Multi-organ work needs independent observable tests per organ, not
+one successful demonstration standing in for all implementations.
 Check artifact freshness and that commands exercise changed code. Missing evidence
 is rejection, not a request for the user to test every feature. A design gap goes
 back to the coordinator with an exact correction, not a numerical question to the

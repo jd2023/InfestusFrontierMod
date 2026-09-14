@@ -15,6 +15,8 @@ from ktask_process import run, codex_args
 from ktask_evidence import record, validate_runs
 from ktask_guardian import invoke as run_model
 import ktask_delivery as delivery
+from ktask_timeouts import budgets
+from ktask_plan import validate_plan, bind_contracts
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -224,6 +226,7 @@ def accept(root, task, state, policy):
 
 def load_project(root):
     tasks = parse_tasks((root / ".ktask/tasks.md").read_text())
+    tasks = bind_contracts(tasks, json.loads((root / '.ktask/content-plan.json').read_text()))
     policy = tomllib.loads((root / ".ktask/policy.toml").read_text())
     if policy["branch"] in ("main", "master", "V3_1.21.1"):
         raise ValueError("Delivery must target the explicit feature branch")
@@ -233,7 +236,7 @@ def load_project(root):
 def plan_digest(root):
     paths = [".ktask/" + name for name in
              ("config.toml", "policy.toml", "context.md", "prompt.md", "tasks.md",
-              "review.md", "autoresolve.md", "readiness.md", "coordinator.md")]
+              "review.md", "autoresolve.md", "readiness.md", "coordinator.md", "content-plan.json")]
     paths += [str(path.relative_to(root)) for path in sorted((root / 'scripts').glob('ktask_*.py'))]
     paths += ["AGENTS.md", "VISION.md", ".ktask/verify.sh"]
     paths += [str(path.relative_to(root)) for path in sorted((root / "docs").glob("*.md"))]
@@ -284,7 +287,8 @@ def executor(root, tasks, policy, argv):
     diagnosis = root / '.ktask/session/planning' / task['id'] / 'reason.txt'
     if diagnosis.exists():
         prompt += '\nCoordinator diagnosis:\n' + diagnosis.read_text()
-    run_model(argv, root, 7200, prompt, check=True)
+    config = tomllib.loads((root / '.ktask/config.toml').read_text())
+    run_model(argv, root, budgets(task['id'], config, policy)[0], prompt, check=True)
 
 
 def validate(root, tasks):
@@ -299,6 +303,15 @@ def validate(root, tasks):
     if len(assigned) != len(set(assigned)) or set(assigned) != blocks:
         raise ValueError(f"Block ownership mismatch: missing={blocks - set(assigned)}, "
                          f"extra={set(assigned) - blocks}")
+    items = set(re.findall(r'^\| (I\d+) \|', (root / 'docs/ITEM_CATALOG.md').read_text(), re.M))
+    families = set(re.findall(r'^\| ([MHLBC]\d+) ', (root / 'docs/ARMOR_EVOLUTION.md').read_text(), re.M))
+    validate_plan(tasks, json.loads((root / '.ktask/content-plan.json').read_text()), items, families)
+    config = tomllib.loads((root / '.ktask/config.toml').read_text())
+    policy = tomllib.loads((root / '.ktask/policy.toml').read_text())
+    if set(policy.get('task_timeouts', {})) - {task['id'] for task in tasks}:
+        raise ValueError('Task timeout references unknown task')
+    for task in tasks:
+        budgets(task['id'], config, policy)
     print(f"{len(tasks)} ordered tasks; {len(blocks)} in-scope block entries owned once.", flush=True)
 
 

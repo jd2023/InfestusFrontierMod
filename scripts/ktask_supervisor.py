@@ -13,11 +13,12 @@ import tomllib
 
 import ktask_workflow as flow
 import ktask_delivery as delivery
+from ktask_timeouts import budgets
 from ktask_contracts import check_review
 from ktask_process import codex_args
 from ktask_guardian import invoke as run_runner
 
-PLAN_FILES = ('.ktask/tasks.md', 'docs/ARCHITECTURE.md', 'docs/TASK_TEMPLATE.md',
+PLAN_FILES = ('.ktask/tasks.md', '.ktask/content-plan.json', 'docs/ARCHITECTURE.md', 'docs/TASK_TEMPLATE.md',
               'docs/BLOCK_CATALOG.md', 'docs/ITEM_CATALOG.md', 'docs/ARMOR_EVOLUTION.md',
               'docs/LIVING_SUBSTRATE_MUTATIONS.md', 'docs/GUIDE_PROGRESSION_TREE.md',
               'docs/PROGRESSION_MAP.md')
@@ -293,7 +294,9 @@ def supervise(root, policy, through=None):
             flow.save(active, flow.begin(root, task, policy))
         assessment = decision(root, task, policy, 'readiness')
         if assessment['status'] == 'ready':
-            code = run_runner([policy['runner'], 'run', '--retry-failed'], root / '.ktask/session', 40000)
+            config = tomllib.loads((root / '.ktask/config.toml').read_text())
+            code = run_runner([policy['runner'], 'run', '--retry-failed'], root / '.ktask/session',
+                              budgets(task['id'], config, policy)[1])
             if code == 0:
                 if accepted_prefix(root, tasks) <= count:
                     raise ValueError('Runner exited without an accepted receipt')

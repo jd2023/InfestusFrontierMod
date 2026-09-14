@@ -1,5 +1,5 @@
 project_dir = "."
-timeout = 7200
+timeout = 10860
 idle_timeout = 1200
 max_retries = 1
 max_remediation_attempts = 0

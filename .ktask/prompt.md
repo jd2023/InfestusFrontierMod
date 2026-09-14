@@ -17,6 +17,9 @@
 3. Implement the supplied contract in its owning module. Keep public APIs small,
    dependencies inward and acyclic; do not duplicate UI, transport or persistence
    infrastructure. Test shared limits, refusal, concurrent use and reload.
+   Update only your owner's content-coverage contributor for the packet's
+   catalog obligations. Use canonical recipe IDs; do not introduce future
+   ingredients, alternate names or excluded branches to satisfy a fixture.
 4. Run focused tests, adjacent regressions, bash .ktask/verify.sh and every packet
    Evidence kind. Game means actual Minecraft assertions; visual means client
    captures inspected from relevant angles/states; soak means measured data.
