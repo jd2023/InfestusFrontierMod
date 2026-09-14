@@ -133,6 +133,16 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(accepted, self.git("rev-parse", "HEAD"))
         self.assertTrue((self.session / "accepted/IF-001.json").exists())
 
+    def test_configured_github_credentials_are_scoped_to_push_command(self):
+        self.evidence()
+        self.policy["github_cli_credentials"] = True
+        with patch.object(flow, "git", wraps=flow.git) as commands:
+            self.accept()
+        push = next(call.args[1:] for call in commands.call_args_list if "push" in call.args)
+        self.assertEqual(("-c", "credential.helper=", "-c",
+                          "credential.helper=!gh auth git-credential"), push[:4])
+        self.assertNotIn("credential.helper", self.git("config", "--local", "--list"))
+
     def test_preexisting_untracked_user_file_is_preserved(self):
         self.git("restore", "owned.txt")
         user_file = self.root / "notes.pdf"

@@ -52,6 +52,11 @@ A push failure retains the accepted local commit and retries its delivery withou
 reimplementing the task. A crash between commit and receipt write stops for
 coordinator recovery; it never guesses and duplicates work.
 
+Delivery uses the existing authenticated GitHub CLI as a per-command credential
+helper when enabled in policy.toml. It does not change global/local Git settings,
+switch accounts or initiate login. Missing repository access remains an external
+authentication failure; the accepted local commit is retained.
+
 The external runner owns retries, locks, provider waits and queue state. The project
 adapter does not fork or patch ktask. Its Codex wrapper removes the runner's
 sandbox-bypass flag and uses workspace-write; review uses read-only, ephemeral

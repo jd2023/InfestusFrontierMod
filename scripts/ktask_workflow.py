@@ -166,7 +166,9 @@ def push_receipt(root, task, state, policy):
         raise ValueError("Pending delivery changed; coordinator recovery required")
     if candidate_state(root, task, state, policy, committed=True)[1] != state["candidate"]:
         raise ValueError("Committed content differs from the reviewed candidate")
-    git(root, "push", policy["remote"], f"HEAD:refs/heads/{policy['branch']}")
+    credentials = (["-c", "credential.helper=", "-c", "credential.helper=!gh auth git-credential"]
+                   if policy.get("github_cli_credentials", False) else [])
+    git(root, *credentials, "push", policy["remote"], f"HEAD:refs/heads/{policy['branch']}")
     remote = git(root, "ls-remote", policy["remote"], f"refs/heads/{policy['branch']}")
     if not remote or remote.split()[0] != commit:
         raise ValueError("Remote branch does not contain the accepted commit")
