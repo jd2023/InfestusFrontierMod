@@ -10,6 +10,10 @@
 2. Write the narrowest meaningful test FIRST; preserve the failing assertion and
    command output. Missing imports alone are insufficient: once scaffolding
    exists, prove the behavioral assertion detects the missing implementation.
+   Exercise required red cases independently: one failure must not skip another.
+   Boundary fixtures must otherwise be valid; keep malformed-input/admission-order
+   tests separate. Inspect failures: incidental exceptions do not prove a missing
+   limit or rule.
 3. Implement the supplied contract in its owning module. Keep public APIs small,
    dependencies inward and acyclic; do not duplicate UI, transport or persistence
    infrastructure. Test shared limits, refusal, concurrent use and reload.
@@ -21,7 +25,8 @@
    test quality and performance. Refactor and repeat tests. Remove narration,
    obsolete notes and comments compensating for confusing structure. Useful API
    documentation remains. Never remove assertions or bless goldens to get green.
-6. Write evidence and report. DO NOT commit or push. DONE means a candidate ready
+6. Write evidence, run python3 scripts/ktask_workflow.py check-evidence, and correct
+   any rejection before writing the report. DO NOT commit or push. DONE means a candidate ready
    for independent acceptance, not final delivery.
 
 Routine API debugging, test failures, refactoring and tuning are engineering work.
@@ -47,6 +52,12 @@ create these files inside the task evidence directory during that run. Visual
 receipts require captures. Describe inspection in the report; do not replace the
 capture receipt with a notes-only run. The reviewer also inspects the images.
 Manifest paths must be captured logs or declared artifacts, not unbound files.
+Each phase has ONE current receipt (red.json, green.json, etc.). Recording it again
+archives the previous receipt. Only logs/artifacts named by current required-phase
+receipts can appear in evidence.json; prior captures remain diagnostic history,
+not valid manifest entries. Use one command for all checks in a phase, or reference
+only its final capture. The pre-check validates bindings and manifest references;
+it does not run tests, invoke models, approve code, commit or push.
 
 Then write .ktask/session/evidence/<task-id>/evidence.json:
 {

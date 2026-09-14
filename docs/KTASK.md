@@ -7,6 +7,7 @@ Do not duplicate these contracts in issue descriptions or another roadmap.
 ```bash
 python3 scripts/ktask_workflow.py validate
 python3 scripts/ktask_workflow.py status
+python3 scripts/ktask_workflow.py check-evidence
 python3 scripts/ktask_workflow.py run
 python3 scripts/ktask_workflow.py resume
 python3 scripts/ktask_workflow.py retry
@@ -15,6 +16,8 @@ python3 scripts/ktask_workflow.py run --through IF-094
 ```
 
 Only run/resume/retry invoke models. --through stops after the named accepted task.
+check-evidence validates an active candidate's receipts without tests, review or
+delivery. Workers run it before submitting DONE; it is not acceptance.
 Use this launcher, not bare ktask: it creates ignored `.ktask/session/.ktask`
 runtime files, pins the plan/prompts, and leaves tracked packets free of status
 markers. Reconciliation preserves accepted receipts, verifies their unchanged

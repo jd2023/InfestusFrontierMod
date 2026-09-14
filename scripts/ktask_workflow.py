@@ -289,11 +289,16 @@ def main():
         print(json.dumps(task["scope"], indent=2))
     elif command == "executor":
         executor(ROOT, tasks, policy, arguments)
-    elif command == "accept":
+    elif command in ("accept", "check-evidence"):
         require_session(ROOT)
         state = json.loads((ROOT / ".ktask/session/active.json").read_text())
         task = next(task for task in tasks if task["id"] == state["task"])
-        print(accept(ROOT, task, state, policy))
+        if command == 'check-evidence':
+            candidate = candidate_state(ROOT, task, state, policy)[1]
+            evidence(ROOT, task, state, candidate)
+            print(f'{task["id"]}: current candidate evidence is valid')
+        else:
+            print(accept(ROOT, task, state, policy))
     elif command == 'record':
         require_session(ROOT)
         state = json.loads((ROOT / '.ktask/session/active.json').read_text())
@@ -311,7 +316,7 @@ def main():
         record(ROOT / '.ktask/session/evidence' / task['id'], evidence_binding(state),
                candidate, phase, argv, ROOT, 7200 if phase == 'soak' else 1800, options.artifact)
     else:
-        raise ValueError("Use validate, status, run, resume or retry")
+        raise ValueError("Use validate, status, run, resume, retry or check-evidence")
 
 
 if __name__ == "__main__":

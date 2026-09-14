@@ -68,6 +68,46 @@ class DeliveryTests(unittest.TestCase):
             gate.assert_called_once()
             return result
 
+    def preflight(self):
+        flow.save(self.session / 'active.json', self.state)
+        with patch.object(flow, 'ROOT', self.root), \
+                patch.object(flow, 'load_project', return_value=([self.task], self.policy)), \
+                patch.object(flow, 'require_session'), \
+                patch.object(flow.sys, 'argv', ['ktask_workflow.py', 'check-evidence']), \
+                patch.object(flow, 'accept') as deliver, patch.object(flow, 'run_gate') as gate, \
+                patch.object(flow, 'review_candidate') as review:
+            try:
+                flow.main()
+            finally:
+                deliver.assert_not_called()
+                gate.assert_not_called()
+                review.assert_not_called()
+
+    def test_evidence_preflight_does_not_deliver_or_change_candidate(self):
+        self.evidence()
+        status = self.git('status', '--porcelain')
+        candidate = flow.candidate_state(self.root, self.task, self.state, self.policy)[1]
+        self.preflight()
+        self.assertEqual(status, self.git('status', '--porcelain'))
+        self.assertEqual(self.base, self.git('rev-parse', 'HEAD'))
+        self.assertEqual(candidate, flow.candidate_state(self.root, self.task, self.state, self.policy)[1])
+        self.assertFalse((self.session / 'accepted/IF-001.json').exists())
+
+    def test_evidence_preflight_identifies_superseded_capture_before_handoff(self):
+        self.evidence()
+        folder = self.session / 'evidence/IF-001'
+        candidate = flow.candidate_state(self.root, self.task, self.state, self.policy)[1]
+        current = flow.record(folder, flow.evidence_binding(self.state), candidate, 'green',
+                              [sys.executable, '-c', 'print("current assertion")'], self.root, 10)
+        with self.assertRaisesRegex(ValueError, 'Artifact lacks a producing run'):
+            self.preflight()
+        manifest = json.loads((folder / 'evidence.json').read_text())
+        manifest['artifacts']['rules'] = [current['log']]
+        flow.save(folder / 'evidence.json', manifest)
+        self.preflight()
+        self.assertEqual(self.base, self.git('rev-parse', 'HEAD'))
+        self.assertFalse((self.session / 'accepted/IF-001.json').exists())
+
     def test_accepted_change_committed_and_pushed(self):
         self.evidence()
         self.accept()
