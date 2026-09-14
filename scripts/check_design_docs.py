@@ -165,6 +165,50 @@ def check_activity_owners(content):
             raise ValueError(f'Wrong activity owner: {counter}: {owner}')
 
 
+def check_milestones(content):
+    rows = re.findall(r'^\| (M\d+) — [^|]+\| ([^|]+) \|', content, re.M)
+    if not rows:
+        raise ValueError('Missing implementation milestones')
+    unique([node for node, _ in rows], 'implementation milestone')
+    graph = {}
+    for node, dependency in rows:
+        if dependency != 'Bootstrap' and not re.fullmatch(r'M\d+', dependency):
+            raise ValueError(f'Invalid milestone dependency: {dependency}')
+        graph[node] = [] if dependency == 'Bootstrap' else [dependency]
+    check_graph(graph)
+    acceptance = re.findall(r'^\| (M\d+) \| [^|]+\|$', content, re.M)
+    unique(acceptance, 'milestone acceptance row')
+    if set(acceptance) != set(graph):
+        raise ValueError('Each milestone needs exactly one acceptance row')
+
+
+def check_sample_calculations(content):
+    rows = re.findall(r'^\| Wither \| (\d+) \| (\d+) \| (\d+) \| (\d+) \|$', content, re.M)
+    if not rows:
+        raise ValueError('Missing specimen coverage calculation')
+    for target, lab, quality, samples in (map(int, row) for row in rows):
+        if min(target, lab, quality, samples) <= 0:
+            raise ValueError('Coverage calculation requires positive values')
+        if samples != (target + lab * quality - 1) // (lab * quality):
+            raise ValueError('Specimen count must round up to complete coverage')
+
+
+def check_native_calculations(content):
+    rows = re.findall(
+        r'^\| (Overworld|Nether|End) \| ' + r'(-?\d+) \| ' * 6 + r'(-?\d+) \|$',
+        content, re.M,
+    )
+    if not rows:
+        raise ValueError('Missing native supply calculation')
+    unique([row[0] for row in rows], 'native supply dimension')
+    for dimension, *values in rows:
+        seconds, gross_bu, cost_bu, net_bu, gross_be, cost_be, net_be = map(int, values)
+        if min(seconds, gross_bu, cost_bu, net_bu, gross_be, cost_be, net_be) <= 0:
+            raise ValueError(f'Native reference module must sustain both supplies: {dimension}')
+        if gross_bu - cost_bu != net_bu or gross_be - cost_be != net_be:
+            raise ValueError(f'Native supply accounting mismatch: {dimension}')
+
+
 def check(root):
     docs = root / 'docs'
     guide = (docs / 'GUIDE_PROGRESSION_TREE.md').read_text()
@@ -205,6 +249,10 @@ def check(root):
             raise ValueError(f"Non-tree armor lineage at {node}: {actual}")
 
     items = re.findall(r'^\| (I\d+) \|', (docs / 'ITEM_CATALOG.md').read_text(), re.M)
+    item_content = (docs / 'ITEM_CATALOG.md').read_text()
+    check_sample_calculations(item_content)
+    check_native_calculations(item_content)
+    check_milestones((docs / 'PROGRESSION_MAP.md').read_text())
     unique(items, 'item ID')
     if not items:
         raise ValueError('Empty item catalog')
@@ -237,6 +285,29 @@ def check(root):
 
 
 class CheckerTests(unittest.TestCase):
+    def test_milestones_have_valid_dependencies_and_acceptance(self):
+        valid = '| M0 — Start | Bootstrap | Result | Owner |\n| M0 | Test evidence |\n'
+        check_milestones(valid)
+        for invalid in ('', valid.replace('Bootstrap', 'M9'),
+                        valid.replace('Bootstrap', 'M0'), valid.splitlines()[0]):
+            with self.assertRaises(ValueError):
+                check_milestones(invalid)
+
+    def test_sample_coverage_arithmetic(self):
+        valid = '| Wither | 1000 | 4 | 2 | 125 |\n| Wither | 1000 | 8 | 4 | 32 |'
+        check_sample_calculations(valid)
+        for invalid in ('', valid.replace('125', '124'), valid.replace('| 8 |', '| 0 |')):
+            with self.assertRaises(ValueError):
+                check_sample_calculations(invalid)
+
+    def test_native_supply_accounts_for_own_cost(self):
+        valid = '| Nether | 60 | 3000 | 1500 | 1500 | 24000 | 6000 | 18000 |'
+        check_native_calculations(valid)
+        for invalid in ('', valid.replace('| 1500 | 1500 |', '| 1600 | 1500 |'),
+                        valid.replace('| 6000 | 18000 |', '| 25000 | -1000 |')):
+            with self.assertRaises(ValueError):
+                check_native_calculations(invalid)
+
     def test_removed_catalog_references_rejected(self):
         check_catalog_references({'recipe': 'T2-03 and I044'}, ['T2-03'], ['I044'])
         for reference in ('T2-07', 'I043'):

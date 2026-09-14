@@ -3,7 +3,7 @@
 Proposed recipes and stage assignments. **Create** lists construction ingredients;
 **Assembly** lists component types. Consumable preparation: [Items](ITEM_CATALOG.md).
 
-**T0–T9 are catalog groupings**, not player or base ranks. Operation requires the entry's materials, physical structure, native bed and supplies; there is no additional colony-level permission gate. **Organ level** is earned by using that particular organ; upgrading other organs does not change it. Unless an entry says otherwise, an active organ gains one count per completed batch, not per tick or failed attempt. At 32, 128 and 512 counts, choose one improvement from that organ's **Growth** options. Each choice gives +10% to the selected property, at most three choices total. New functions require the listed mutation or physical addition; levels alone do not add every function.
+**T0–T9 are catalog groupings**, not player or base ranks. Operation requires the entry's materials, physical structure, native bed and supplies; there is no additional colony-level permission gate. **Organ level** is earned by using that particular organ; upgrading other organs does not change it. Unless an entry says otherwise, an active organ gains one count per completed batch, not per tick or failed attempt. L0 starts at zero counts; L1, L2 and L3 start at 32, 128 and 512 counts respectively. At those thresholds, choose one improvement from that organ's **Growth** options. Each choice gives +10% to the selected property, at most three choices total. New functions require the listed mutation or physical addition; levels alone do not add every function.
 
 Normal dismantling of an organ preserves its counts, level, chosen improvements and mutations in the dropped block. In a multiblock, the core carries this history; breaking a wall does not copy it. Upgrading an existing core preserves its history. Passive walls, floors and conduits do not earn processing levels. Normal dismantling and invalid additions retain contents in recovered storage or remaining cells. Destructive failures follow the separate containment rules below.
 
@@ -29,8 +29,8 @@ The puzzle is where work waits, which equipment is shared, what gets priority, a
 ### Defense targets
 
 Colony weapons, Digestive Tissue and defensive restraints target hostile creatures,
-never players or tamed pets. Sampling restraint requires an explicitly assigned
-specimen. Environmental hazards, including spilled biomass, can still hurt players.
+never players or tamed pets. Husbandry restraint requires an explicitly assigned
+animal. Environmental hazards, including spilled biomass, can still hurt players.
 
 ### Containment failures
 
@@ -96,7 +96,7 @@ Compare throughput, recovery, energy per product and footprint independently.
 |---|---|---|
 | Farm/orchard | Cultivation Tissue or Arbor Root grows; Planting Proboscis plants; Harvest Corolla cuts; Work Bed holds; Collection Cilia exports | Retain perennial bushes/trees and collect only mature pods; or replant annual beds from a shared reserved Seed Pouch. Manual harvest and optional workers remain valid. |
 | Equipment service | Fuel Papilla transfers real biomass; Healing Dock mends; Item Capsule holds gear; mouths move it | A cheap fuel stop near a mine, a shared healing room, or a later Service Pedestal with both attached. Paying for healing need not also authorize filling every reserve. |
-| Sampling | A berth contains the target; Sampling Proboscis takes a sample; Extractor separates it; lens resolves knowledge; bank stores knowledge | Share a sampler between compatible service berths or dedicate it to one rare specimen; do not make an entire laboratory for each species. |
+| DNA processing | A pouch/collector captures death loot; an archive holds samples; Extractor consumes them; lens/sequencer improves coverage; bank stores knowledge | Share a lab across species, reserve pristine samples for precision work, or maintain native laboratories near local production. |
 | Heat and refining | Furnace performs the recipe; lung supplies airflow; muscle supplies pressure/work; gill exchanges heat; condenser recovers water | Passive cooling with more exposed area, compact supplied cooling, or deliberate safe venting where water is cheap. |
 | Spatial/Fold work | Nursery grows material; resonator supplies a condition; conditioner commits a product; collector captures phase work; accumulator stores it | Batch one shared tuned room, isolate parallel rooms, or buffer native phase output instead of powering continuous retuning. |
 | Large structures | Controller selects finite work; installed organs do it; mouths/veins carry results; sockets isolate services | A bigger body adds actual bays or support capacity, not a hidden copy of every function in the core. |
@@ -429,15 +429,27 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Create:** Projector placement only; recipe, range, cost, support condition and lifetime not yet specified.
 - **Growth:** No processing level or permanent reinforcement. Active-block cap, unload/reload expiry and optional placement under a falling player must be selected before implementation.
 
+### T1-38 — Sample Dock
+- **Does:** Unloads one inserted Sample Pouch to explicitly connected Specimen Archives.
+- **Input → output:** Actual pouch samples + accepted destination → the same samples transferred; no extraction or global storage access.
+- **Create:** 1 Organ Bud + 1 Filter Membrane + 1 Item Capsule.
+- **Growth:** Passive service, no processing counts. Transfers at most 16 samples per second; all/selected/surplus modes preserve configured reserves.
+
+### T1-39 — Dew Gland
+- **Does:** Squeezes clean process water from allocated fresh harvest; no creature DNA or biomass production.
+- **Input → output:** The native supply recipes in Items consume exactly two harvested items into 1000 mB water; retain water or pause.
+- **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 Filter Membrane; root on ordinary or the required native bed.
+- **Growth:** Choose speed or biomass economy. Thermal Lining treatment permits Nether fruit; Spatial Membrane treatment permits chorus. No electricity required for first operation.
+
 ## T2 — Directed mutation: genomes, specialized organs and planned excavation
 
 Build sample processing and a physical DNA bank. A genome is available only through a connected loaded compatible bank; no personal research level grants remote access. Collecting unrelated samples is not a substitute.
 
 ### T2-01 — Specimen Extractor
 - **Does:** Separates usable genetic material from source-labeled mob drops, plants and tissue samples. The basic organ wastes more of a rare specimen than an upgraded laboratory would.
-- **Input → output:** Identified specimen + water + biomass → source-specific Genetic Stock and a readable genome fragment. Remaining organic material goes to a byproduct slot.
+- **Input → output:** Identified specimen + water + biomass → source-specific Genetic Stock and a readable genome fragment. The batch also retains 50 mB spent process water; reserve this fluid output and any returned vial before consumption.
 - **Create:** 1 Organ Bud + 2 glass bottles + 1 iron ingot + 2 Membrane Sheets.
-- **Growth:** Choose recovery or speed. Add a Sequencing Lens for more informative fragments; electrical separation later improves rare-sample recovery. Display expected coverage before consuming a valuable specimen.
+- **Growth:** Choose biomass economy or speed. A Sequencing Lens previews remaining coverage; R2/R3 service configurations increase information recovery. Display expected coverage before consuming a valuable specimen.
 
 ### T2-02 — DNA Bank
 - **Does:** Stores accumulated genome knowledge, shows missing coverage and makes completed genomes available to connected mutation organs. Knowledge is distinct from consumable Genetic Stock.
@@ -465,6 +477,42 @@ but cannot supply them to processes. Removing a lobe moves its records with it;
 records beyond reduced capacity remain stored but inactive until capacity is
 restored; insertion cannot displace them. One physical lobe holds at most 16 records.
 
+#### Laboratory and native process requirements
+
+All columns are simultaneous conditions checked before committing a batch.
+R1/R2/R3 are laboratory configurations, not player ranks. The multiplier applies
+only to coverage, not stock, ordinary loot or mineral recovery.
+
+| Configuration | Coverage multiplier | Extractor level | Installed services | Extra cost per sample |
+|---|---|---|---|---|
+| R1 | 1 | L0 | Extractor and compatible DNA Bank | None beyond Item Catalog extraction recipe |
+| R2 | 4 | L2 | Sequencing Lens and Precision Sequencer on separate service faces; Charge Sac supplying them | 100 BU and 2000 BE |
+| R3 | 8 | L3 | R2 plus Ion Separator, Levitation Chamber and Cold Lobe in a sealed body | 400 BU, 16000 BE, 1 shulker stock and 100 mB cooling water per batch; retain 100 mB warmed water |
+
+R3 consumes shulker stock; it never extracts shulker coverage from that stock.
+The first shulker genome is resolved at R1/R2, before this service exists.
+Precision Sequencer may provide a bank's complex-storage grade even when the
+attached Extractor has not yet earned R2. A Genome Vault admits bosses at any
+eligible extraction configuration; it needs no boss genome to construct.
+
+| Source's native class | Species | Extraction and matching stock-culture conditions |
+|---|---|---|
+| Ordinary | Overworld creatures/plants, including enderman | Any dimension; ordinary supported bed and compatible storage grade |
+| Nether | Blaze, ghast, magma cube, wither skeleton, Wither; crimson/warped fungus | Actual Nether; 3×3 Thermal Substrate bed; Extractor/Vat L1; thermal mutation made with 2 Thermal Linings + 200 BU per core |
+| End | Shulker, Ender Dragon, chorus | Actual End; 3×3 Anchored Substrate bed and four corner Anchor Roots; Extractor/Vat L2; spatial mutation made with 2 Spatial Membranes + 400 BU per core |
+| Fold | Native plants/creatures and Manyfold | Actual Fold; Adaptive Substrate bed, supplied Habitat Lung, Extractor/Vat L3; 1 Native Specimen Seal per extraction |
+
+Class follows registered species, not the location of death. Moving a blaze into
+the Overworld cannot change its processing requirements. Samples and completed
+records travel; stocked material and finished grafts may be used elsewhere.
+Continuing native stock culture maintains the need for each laboratory.
+An imported native substrate block does not satisfy the dimension predicate.
+
+A generic organ trait is not automatically a native mutation. The above thermal
+and spatial installations consume their listed prepared materials at a Mutation
+Chamber and preserve the core's earned levels; they supply process tolerance,
+not a different species class. A Fold habitat supplies its external containment.
+
 ### T2-03 — Archive Lobe
 - **Does:** A physical memory extension to a DNA Bank, showing stored species on its membrane. Later control organs use the same lobe for recipe or index records instead of needing a second memory-block family.
 - **Input → output:** Bank records, or a controller's recipe/index records, assigned to its slots → retained records accessible through that host.
@@ -472,10 +520,10 @@ restored; insertion cannot displace them. One physical lobe holds at most 16 rec
 - **Growth:** Attach more lobes to valid faces. Removing one preserves its assigned records in that lobe; the same records cannot remain as a second physical archive copy by accident.
 
 ### T2-04 — Sequencing Lens
-- **Does:** A precision eye attached to an extractor. It selects which missing portion of a specimen's genome the next batch should resolve.
-- **Input → output:** A specimen being processed by the host + bank's missing-coverage selection → better-targeted fragments, not extra mob loot.
+- **Does:** A precision eye attached to an extractor. It reads the bank's remaining coverage and previews the next batch's information gain.
+- **Input → output:** A selected specimen and accessible bank record → coverage/cost preview; installed precision services set the multiplier, not extra mob loot.
 - **Create:** 2 glass + 1 amethyst shard + 1 spider eye + 1 Membrane Sheet.
-- **Growth:** Lumen Secretion treatment improves weak-sample visibility; electrical drive supports finer rare-genome work. Multiple lenses cover different sample channels, not unlimited yield multipliers on one specimen.
+- **Growth:** Lumen Secretion improves the visible readout; precision electrical service enables R2/R3 work. Multiple lenses cover different sample channels, not unlimited yield multipliers on one specimen.
 
 ### T2-05 — Genetic Culture Vat
 - **Does:** Maintains consumable genetic cultures after the source genome is understood. Avoids requiring another boss kill for every routine use of an already-developed mutation.
@@ -487,7 +535,7 @@ restored; insertion cannot displace them. One physical lobe holds at most 16 rec
 - **Does:** Applies chosen genetic and material changes to one equipment item or recoverable organ core. Shows the resulting properties and incompatible mutations before starting.
 - **Input → output:** Target + prepared target-specific Mutation Graft or fusion medium + biomass + genome access → the same target with the chosen mutation; its counters and identity remain.
 - **Create:** Core recipe: 1 Awakening Cradle + 1 Sequencing Lens + 2 Bone Plates. Form a 3×3 floor, corner Rib Frames and a two-block-high Membrane Window enclosure around the central treatment space.
-- **Growth:** Choose treatment speed or biomass economy. Burrowing armor uses enderman-derived prepared grafts and Diamond-Fiber Matrix under Armor Evolution. Further burrowing mutations extend the safe stopping window and reduce biomass use, competing with other suit improvements. A potion-infusion bay is a separate addition; a larger body accepts larger organ cores. Precision Chamber means this core/body with a T4-07 Precision Sequencer service bay, electrical supply and access to T4-05 prepared outputs; it is not an unlisted new block.
+- **Growth:** Choose treatment speed or biomass economy. Burrowing armor uses combined silverfish/enderman prepared grafts and Diamond-Fiber Matrix under Armor Evolution. Further burrowing mutations extend the safe stopping window and reduce biomass use, competing with other suit improvements. A potion-infusion bay is a separate addition; a larger body accepts larger organ cores. Precision Chamber means this core/body with a T4-07 Precision Sequencer service bay, electrical supply and access to T4-05 prepared outputs; it is not an unlisted new block.
 
 ### T2-08 — Healing Dock
 - **Does:** Heals one authorized worn piece or stored bio-equipment target using colony supplies. It neither refuels the target nor moves inventory. A mine can have a fuel berth without installing this separate healing operation.
@@ -569,13 +617,13 @@ Costs are gameplay tuning; ticket counts still require a loaded-factory soak tes
 - **Growth:** Choose scent duration or biomass economy. Cat-genome mutation supports phantom deterrence; target-specific recipes do not grant universal boss or player repulsion.
 
 ### T2-18 — Lure Polyp
-- **Does:** Draws susceptible nearby creatures toward a marked feeding or sampling location. The creature still needs a navigable path.
+- **Does:** Draws susceptible nearby creatures toward a marked feeding or defensive location. The creature still needs a navigable path.
 - **Input → output:** Target-specific food/scent + biomass → attraction toward the polyp, not spawned mobs.
 - **Create:** 1 Organ Bud + 1 honey bottle + 1 spider eye.
 - **Growth:** Choose scent duration or nutrient economy. Rabbit, fish and livestock genomes unlock appropriate lures; a Nerve Tissue signal disables attraction when the destination pen is full.
 
 ### T2-19 — Restraining Tissue
-- **Does:** Holds or heavily slows susceptible creatures on a small sampling/defense floor. It is separate from lethal Digestive Tissue.
+- **Does:** Holds or heavily slows susceptible creatures on a small husbandry/defense floor. It is separate from lethal Digestive Tissue.
 - **Input → output:** Supplied biomass + contact with a permitted target → restraint until duration or fuel runs out.
 - **Create:** Mutate mature substrate with 1 Restraining Graft and spider-genome access.
 - **Growth:** Slime-genome graft improves restraint strength; spider-genome graft improves duration. Stronger mobs resist more; players and bosses require explicit targeting rules, not automatic indefinite immobilization.
@@ -607,12 +655,12 @@ Costs are gameplay tuning; ticket counts still require a loaded-factory soak tes
 
 ### T2-24 — Washing Kidney
 - **Does:** Washes crushed ore before smelting. The player chooses a simple dry furnace route or more recovery with a water supply and waste handling.
-- **Input → output:** Mineral concentrate + water → washed concentrate + tailings containing the unrecovered mineral fraction. Wash water goes to a separate dirty-fluid output.
+- **Input → output:** Mineral concentrate + water → washed concentrate + tailings containing the unrecovered mineral fraction. Wash water goes to a separate dirty-fluid output. Its starter filtration mode also cleans generator process water at the Item Catalog rate; that mode needs no ore or genome.
 - **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 sand + 1 glass bottle.
 - **Growth:** Choose washing speed or water economy. Elastic Gel treatment improves fine-particle capture; a later Ion Separator recovers selected tailings. Full waste output stops new batches.
 
 ### T2-25 — Feeding Trough
-- **Does:** Supplies an assigned livestock pen from stored food, with a target population and a breeding reserve. The player chooses food production, sampling or animal growth as the pen's priority.
+- **Does:** Supplies an assigned livestock pen from stored food, with a target population and a breeding reserve. The player chooses food production or animal growth as the pen's priority.
 - **Input → output:** Actual breeding food + eligible animals → fed/breeding animals under the pen's population setting. Food is consumed normally.
 - **Create:** 1 Seed Pouch + 1 cauldron + 1 Organ Bud.
 - **Growth:** Choose feeding rate or lower biomass operating cost, not free breeding food. Species DNA unlocks better husbandry scheduling; no food is spent on a full pen.
@@ -639,7 +687,7 @@ Costs are gameplay tuning; ticket counts still require a loaded-factory soak tes
 - **Does:** A safe recovery patch for an authorized wearer or husbandry berth. Useful near hazardous workshops, but not a free regeneration effect over the whole base.
 - **Input → output:** Biomass + contact with an eligible injured target → gradual healing, consuming feed only when healing is delivered.
 - **Create:** Mutate mature substrate with 1 Restorative Serum.
-- **Growth:** Rabbit-genome graft favors recovery after movement; livestock genomes permit controlled pen care. It cannot instantly refill a live specimen's depleted sampling reserve.
+- **Growth:** Rabbit-genome graft favors recovery after movement; livestock genomes permit controlled pen care. It heals injuries; it neither produces samples nor awards genome coverage.
 
 ### T2-30 — Spine Sentry
 - **Does:** A short-range ground-defense organ. It guards an approach with aimed physical spines rather than serving as another flying-target bloom.
@@ -671,6 +719,18 @@ Costs are gameplay tuning; ticket counts still require a loaded-factory soak tes
 - **Create:** 1 Organ Bud + 1 iron pickaxe + 2 flint + 2 Bone Plates.
 - **Growth:** Choose break rate or biomass economy. Prepared reinforcement increases cutting grade. A thermal upgrade becomes a Boring Jaw and retains this jaw's counters. For a bed job, start requires the bed's declared treatment-complete state; direct breaking uses a separately selected mode. Occupied/protected targets, unsafe falling terrain and insufficient output room cause refusal.
 
+### T2-35 — Specimen Archive
+- **Does:** Stores grouped raw samples, separate from reconstructed knowledge and Genetic Stock.
+- **Input → output:** Species/quality sample counts → exactly those counts available to docks, collectors and extractors.
+- **Create:** 1 Item Capsule + 2 Filter Membranes + 1 Auric Myelin.
+- **Growth:** No processing levels. The per-body capacity table in Items applies. Connect more bodies through actual routes, not an unbounded merged inventory. Full stores refuse new samples.
+
+### T2-36 — Sample Collector
+- **Does:** Routes sample loot from one explicitly linked owned killing organ into one adjacent archive.
+- **Input → output:** That killer's qualifying death event → one accepted sample, with quality from its installed Dissector if present.
+- **Create:** 1 Organ Bud + 1 Sample Pouch + 1 Synaptic Gel + 1 Filter Membrane.
+- **Growth:** No creature searches or ground-loot collection. A Dissector service socket accepts one real weapon; the sampling rule is owned by the weapon, not duplicated here. Full output suppresses the additional sample, never ordinary loot.
+
 ## T3 — Thermal colony: a working Nether base and larger mines
 
 The Nether grows Thermal Lining continuously. It is needed for hot-fluid service, high-temperature organ bodies and steam-driven attachments. Heat alone in another dimension does not replace the native growing bed.
@@ -683,7 +743,7 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 
 ### T3-02 — Thermal Nursery
 - **Does:** Grows Thermal Lining on a Nether-native bed. This is the continuing local supply for industrial organs, not a one-time dimension-unlock item.
-- **Input → output:** Membrane Sheets + magma cream + biomass + controlled local heat → Thermal Lining sheets.
+- **Input → output:** Membrane Sheets + magma cream + biomass + controlled local heat → Thermal Lining; a locally grown Thermal Fruiting Body may replace the magma cream at 2 bodies per batch.
 - **Create:** 1 Culture Bowl + 2 Bone Plates + 1 magma block; place on a 3×3 Thermal Substrate bed. Its first batches use a neighboring magma block, without requiring steam equipment.
 - **Growth:** Choose growth speed or biomass economy. Add a hot-fluid jacket and condenser-fed water cooling for faster batches. Maintain its membrane and nutrient inputs from farms or imports.
 
@@ -775,14 +835,26 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 - **Create:** 1 Steam Muscle + 2 Rib Frames + 1 slime block; install on a clearly marked launch pad.
 - **Growth:** Choose recharge speed or steam economy. Contractile Fiber treatment softens takeoff; the destination still needs a safe landing surface. Covering the launch path prevents activation.
 
+### T3-17 — Thermal Root
+- **Does:** Supplies a fixed heat condition to one adjacent thermal cultivation/nursery body from actual Nether terrain.
+- **Input → output:** Loaded Nether position rooted on a magma block → local heat condition; no lava, items, electricity or consumed magma.
+- **Create:** 1 Organ Bud + 1 magma block + 2 Bone Plates; mature Thermal Substrate support.
+- **Growth:** Passive heat interface, no processing levels. One supported host face; its operation consumes its own biomass. No heat flood-fill or heating an entire chunk.
+
+### T3-18 — Thermal Cultivation Tissue
+- **Does:** Mutates mature Thermal Substrate into a Nether fungus bed producing Thermal Fruiting Bodies.
+- **Input → output:** Reserved crimson/warped fungus planting + water + biomass + Thermal Root heat → the finite native harvest specified in Items.
+- **Create:** Apply 1 Rooting Gel + 1 crimson or warped fungus to exposed mature Thermal Substrate. Keep the fungus as the planted parent; the graft consumes Rooting Gel.
+- **Growth:** Separate Harvest Corolla and Collection Cilia automate collection; the basal planting remains. Bone ribs support a 3×3 bed. No mob farm, End product or native genome is needed to start.
+
 ## T4 — Electrical precision: better recovery and controlled automation
 
 Bioelectric organs make exact sampling, coordinated production and larger excavation practical. Electricity supplements biomass and physical materials; it does not replace genomes or native beds.
 
 ### T4-01 — Electrocyte Stack
 - **Does:** Produces electricity through a living stack of charged membranes. A slow metabolic build and a steam-assisted build use the same core.
-- **Input → output:** Biomass + water and optional steam assistance → electrical power, spent water and heat. Its output is below the energy needed to recreate its consumed supplies.
-- **Create:** 1 Organ Bud + 2 copper ingots + 2 Membrane Sheets + 2 Tempered Bone Plates + 1 redstone block; its first operation requires no electricity.
+- **Input → output:** Biomass + water and optional steam assistance → electrical power, spent water and heat. Item Catalog's native supply recipes define conversion costs; no reverse electricity-to-biomass recipe.
+- **Create:** 1 Organ Bud + 2 copper ingots + 2 Membrane Sheets + 2 Bone Plates + 1 redstone block; its starter metabolic form is available with T1 preparation and requires no electricity. Tempered plates and Thermal Lining unlock industrial conversion on the same core.
 - **Growth:** Choose electrical output or biomass economy. Add membrane cells for capacity; Steam Muscles improve sustained output while adding steam demand. Physical cooling limits the largest stack.
 
 ### T4-02 — Conductive Tissue
@@ -809,18 +881,11 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Create:** 1 Washing Kidney + 1 Sequencing Lens + 2 copper ingots + 1 gold ingot.
 - **Growth:** Choose separation speed or electrical economy. Gold mutation unlocks finer separation. Retreatment recovers only remaining material; repeatedly cycling clean output cannot create more mineral or genome coverage.
 
-### T4-06 — Live Sampling Cradle
-- **Does:** A containment/service assembly for a living specimen. Its berth admits and holds one permitted target; a detachable Sampling Proboscis performs sampling. An Extractor and DNA Bank can be shared by several cradles downstream.
-- **Input → output:** Permitted occupant + functioning restraint/access services → one occupied ready berth. The sampler produces labeled samples and disclosed target damage; the cradle does not also extract stock or sequence DNA.
-- **Create:** Berth frame: 2 Rib Frames + 2 Membrane Windows + 1 Sensor Polyp. Install Restraining Tissue, a Sphincter Door and a Sampling Proboscis with separate sample output. No consumed Extractor or Ion Separator is hidden inside the berth.
-- **Assembly:** T0-11, T0-12, T1-14, T2-19, T1-29, T4-21.
-- **Growth:** No processing XP for standing in a berth. Extra berths cost physical containment and share population limits. Sampler mutations improve actual sample quality/damage; a restorative pad helps injuries but cannot refill the target's sampling reserve instantly.
-
 ### T4-07 — Precision Sequencer
 - **Does:** An extractor attachment for resolving difficult genomes from fewer valuable specimens. It makes saving a rare sample for a better laboratory worthwhile.
 - **Input → output:** Host's rare specimen + electricity + completed related research where specified → high-quality genome fragments; actual sample material is still consumed.
 - **Create:** 1 Sequencing Lens + 1 Ion Separator + 1 amethyst cluster + 1 gold ingot.
-- **Growth:** Choose sequencing speed or electricity economy. Additional lenses let one laboratory handle several source families. It reveals expected coverage gain before consuming a Nether Star or other scarce input.
+- **Growth:** Choose sequencing speed or electricity economy. Additional lenses let one laboratory handle several source families. It reveals expected coverage gain before consuming a scarce species-specific death sample.
 
 ### T4-08 — Potion Infuser
 - **Does:** A mutation-chamber attachment that installs a limited temporary chemical load into eligible bio equipment, or applies a supported potion-based organ treatment.
@@ -891,22 +956,16 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Growth:** Choose deployment speed or biomass economy. Add compartments for a Healing Dock and spare feed. A larger shelter consumes more packed parts and requires more clear ground; no End material is needed for the first End expedition.
 
 ### T4-19 — Cold Lobe
-- **Does:** Refrigerates an attached specimen, food or culture store. Preserves a vulnerable batch while the player improves the laboratory, rather than forcing immediate processing.
-- **Input → output:** Electricity + cooling fluid → a cold host compartment and warmed fluid. Stopping cooling preserves the items but resumes their disclosed spoilage clock.
+- **Does:** Refrigerates an attached specimen, food or culture store. Supplies a cold condition for recipes that require it; raw DNA samples have no passive spoilage.
+- **Input → output:** Electricity + cooling fluid → a cold host compartment and warmed fluid. Stopping cooling pauses cold-dependent work and retains its contents; it starts no inventory decay timer.
 - **Create:** 1 Heat-Exchange Gill + 1 packed ice + 1 Charge Sac.
-- **Growth:** Choose cooling rate or electrical economy. Add insulated Membrane Windows for a larger cold room. Cooling does not restore already-spoiled specimens or manufacture new genome information.
+- **Growth:** Choose cooling rate or electrical economy. Add insulated Membrane Windows for a larger cold room. Cooling produces no new genome information or additional stock.
 
 ### T4-20 — Mnemonic Vessel
 - **Does:** Extracts and stores real Minecraft XP from a consenting player, separate from organ counters, armor learning and DNA. Supplies counter-reduction rituals or returns XP to the player for vanilla enchanting.
 - **Input → output:** UI-controlled deposit/withdrawal transfers raw XP points, not levels, at up to 20 points/s while the player is within 4 blocks with the UI open. One vessel serves one player transfer at a time. Full storage or insufficient player XP stops transfer; closing the UI stops extraction. A connected Mutation Chamber can reserve the ritual's stated XP payment directly.
 - **Create:** 1 Organ Bud + 1 enchanting table + 1 amethyst shard + 2 Membrane Sheets.
 - **Growth:** Initial capacity 10,000 XP per vessel; join at most four cells for 40,000 XP, with each cell retaining its own contents. Survey Gel doubles player transfer rate to 40 XP/s, not capacity or yield. Normal dismantling preserves stored XP in that cell. No loose-orb output, ambient entity search, counter-to-XP conversion or free XP generation. Player and ritual withdrawals reserve against the same available balance.
-
-### T4-21 — Sampling Proboscis
-- **Does:** Takes one controlled tissue sample from a permitted creature in its facing reserved berth. Works in a Live Sampling Cradle, compatible husbandry station or later Foreign Specimen Cocoon; it does not also process the sample into stock or knowledge.
-- **Input → output:** Eligible target with recovered sampling reserve + empty Sample Vial + biomass/electricity → one Labeled Specimen and disclosed damage to the target. The specimen keeps its source; recovery waits on the actual creature, not a replaceable berth timer.
-- **Create:** 1 Organ Bud + 1 Field Lancet + 1 Precision Probe + 1 Filter Membrane + 1 Membrane Sheet.
-- **Growth:** Choose sampling rate or biomass economy. A source-specific graft favors sample quality or lower damage, within the target's recovery budget. A shared movable service arrangement requires explicit adjacent berth selection; no remotely sampling every animal in a pen. No output space, invalid consent/ownership or insufficient target reserve means no puncture.
 
 ## T5 — End colony: spatial materials and a defended settlement
 
@@ -1049,6 +1108,12 @@ Connect established workshops rather than replacing them. Transit consumes local
 - **Create:** 1 Structure Grower + 1 Output Mouth + 1 Cargo Lock.
 - **Growth:** Choose recovery speed or energy economy. Add a larger cargo bay for complete rooms. A missing container, occupied chamber or unknown inventory stops removal; it does not erase the difficult part to finish the job.
 
+### T6-11 — Recall Nest
+- **Does:** Binds, charges and receives individual armor pieces with preservation anatomy.
+- **Input → output:** One inserted eligible piece + Preservation Dose + the armor branch's commissioning biomass → one armed piece; a successful Recall transfers that same piece to its reserved berth.
+- **Create:** 1 Item Capsule + 2 Cargo Membranes + 2 Sealing Resin + 1 Station Imprint; root on a 3×3 bone-ribbed substrate bed.
+- **Growth:** Four equipment berths, one binding per berth. No processing counts or global item search. Owner authorization and an empty loaded berth are required at transfer time; no automatic chunk tickets. Death Bond charging uses the same service without reserving a receiving berth.
+
 ## T7 — Compound organs: configurable large structures and specialized power
 
 The player designs assemblies with separate working, supply and control parts. More sockets allow more combinations, but their feed, cooling and trait limits still have to be met.
@@ -1146,13 +1211,6 @@ Long-term dimension branch. Its local growth alternates between two environmenta
 - **Input → output:** Supplied phase charge → finite retained charge → discharge to an attached Fold service. No charge is earned merely from standing inside a changing room.
 - **Create:** Mutate 1 Charge Sac with 1 Adaptive Gel + 1 Spatial Membrane; brace it with 2 Anchor Roots. It can be built empty before the first collection cycle.
 - **Growth:** No processing XP for charging/discharging. Prepared membrane treatments favor discharge rate or retention; joined cells add bounded capacity. More storage bridges longer quiet periods, while extra collectors increase admitted capture area, not capacity by themselves.
-
-### T8-07 — Foreign Specimen Cocoon
-- **Does:** A native containment assembly around an existing sampling berth. Habitat Lung maintains its conditions; Sampling Proboscis takes samples; a separate laboratory processes them. The enclosure does none of those operations itself.
-- **Input → output:** A permitted captured specimen + supplied habitat/containment services → a maintained ready berth for actual sampling. Output remains the sampler's source-labeled specimen, not extra automatic stock or research.
-- **Create:** Enclose one installed Live Sampling Cradle and a Habitat Lung in Phase Shelter Skin with two adaptive membranes reinforcing the access hatch. Keep its sampler, sample outlet and emergency service face accessible.
-- **Assembly:** T4-06, T8-04, T8-03.
-- **Growth:** No enclosure processing XP. More volume accommodates specifically supported specimens; better sampler and lung mutations improve their own work. The campaign boss is not an ordinary farm specimen; no enclosure bypasses its species restrictions.
 
 ### T8-08 — Retuning Root
 - **Does:** Changes a small assigned chamber's biological phase on demand. Lets the player pay for steady production instead of waiting for the environment.

@@ -229,7 +229,7 @@ Disabled anatomy still occupies slots. Settings may turn an ability off, **not p
 an activity counter** or replace a branch.
 
 Expression I requires G1 for host grafts and G2 for creature grafts; II requires G3;
-III requires G4. C9 starts at G3. C11 starts at G3 plus an actual Elytra and its
+III requires G4. M6 and M7 start at G4 after M5 III. C9 starts at G3. C11 starts at G3 plus an actual Elytra and its
 End-native medium. Recipes and slot limits still apply. No activity threshold
 is required to install a mutation.
 
@@ -249,10 +249,48 @@ These occupy anatomy on **each piece that receives them**. Installing a lining o
 | M2 Thermal Lining | 2 / 3 / 4 | Magma cube; Thermal Lining | One quarter of a sealed thermal suit. Full-set effects are below; individual incomplete linings confer no player fire immunity. |
 | M3 Pelagic Lining | 2 / 3 / 4 | Turtle; Membrane Sheet | One quarter of a coordinated aquatic suit. Enables the underwater handling and efficiency benefits below, not free breathing by itself. |
 | M4 Potion Capillary | 1 / 2 / 3 | Witch; Potion Vesicle | Hold 1 / 2 / 3 prepared potion doses on this piece. Dispense manually or against one configured trigger. One actual dose is consumed per activation; 5 BU and load 3 for 1 s. |
+| M5 Protective Cocoon | 2 / 3 / 4 | Spider + turtle; Sealing Resin | On death, consume one loaded Preservation Dose to protect this dropped piece from fire/lava and extend its loaded-time despawn limit to 10 / 20 / 30 min. No teleport, owner immunity or protection for other inventory. |
+| M6 Recall | 4 / 5 / 6 | Spider + turtle + enderman + shulker; Cargo Membrane | Descendant of M5 III. Move this piece to its bound Recall Nest on death for a prepaid 20000 / 15000 / 10000 BU charge. If unavailable, use the retained cocoon fallback. |
+| M7 Death Bond | 6 / 7 / 8 | Spider + turtle + enderman + Wither; Precision Membrane | Alternative descendant of M5 III. Retain this piece through one death/respawn for a prepaid 50000 / 35000 / 25000 BU charge; no transfer of backpack or other equipment. |
 
 M2 and M3 are mutually exclusive on the same piece. A two-thermal/two-pelagic suit completes neither system. Mixing their ranks is allowed, but a complete system works at its **lowest installed rank**. Higher-rank parts are investments toward the next complete set, not an excuse to count four bonuses on one chest.
 
 M4 stores normal-duration, normal-strength doses supplied by the Potion Infuser. It neither extends their duration nor permits normally incompatible effects to stack. Changing armor cannot reset a dose already consumed. Across all worn pieces and Curios, automatic dispensing has one shared 10-second cooldown. Removing an effect with milk does not refund its dose.
+
+### Preservation is a permanent branch
+
+M5 I → II → III then choose M6 I → II → III **or** M7 I → II → III.
+The descendant replaces M5's slot cost and retains its III cocoon fallback;
+M6 and M7 never coexist or exchange. Each piece needs its own grafts, dose and
+charge. Completion of every required species genome and consumption of stock
+from each species are mandatory. The general rank formula in Items applies to
+grafts; the following commissioning costs are additional.
+
+Load a dose into M5 through the Cradle's equipment service slot.
+At Recall Nest, load one Preservation Dose and pay that piece's rank-specific
+BU cost to arm one Recall/Death Bond charge. This is an indivisible single-use
+charge, not extra spendable armor fuel. No refund to a biomass tank and no
+automatic field recharging. The charge persists across unequip/reload.
+Cocoon alone needs only its dose. A successful Recall or Death Bond consumes both
+dose and charge; a failed Recall consumes the dose for cocoon protection but
+retains the unused charge. An uncharged descendant can still use a loaded dose.
+
+Recall requires a bound, owned, loaded nest with a reserved empty berth. A broken,
+unloaded, full or revoked destination means a normal drop with available cocoon
+protection; no ticket creation, retries or later item scanning. Death Bond places
+the same item into its original slot on respawn, or ordinary inventory if that
+slot is occupied. If neither has room, retain it in one bounded pending return
+slot for that equipment position until claimed. Maximum four pending pieces per
+player; an occupied pending position refuses another retention unchanged, leaving
+the new piece to its available cocoon fallback or ordinary drop.
+
+Vanilla keepInventory and an actual prevented death consume no preservation
+charge. C-D rescue and vanilla totems run before a final-death preservation event.
+An external grave system must have an explicit ownership adapter before combined
+support is claimed: one death outcome owns each item. No dropped copy plus recalled
+copy, no copied counters, and no second Elytra returned from a winged chest.
+A cocoon item can still be destroyed by explosions or the void and despawns when
+its limit expires. Normal unfunded armor is an ordinary dropped item.
 
 ### Thermal suit operation
 
@@ -297,7 +335,7 @@ In the fuel column, `0.2 / 1` means 0.2 BU per second and load 1 while active. W
 | H5 Toxin Filter | 1 / 2 / 3 | Cave spider; Antitoxin Serum | Remove up to 4 / 8 / 12 s of Poison per activation, with a 20 / 15 / 10 s cooldown. Excess Poison remains. Milk containers return during serum preparation. | 4 / 6 / 8 BU per activation; load 3 for 1 s |
 | H6 Thermal Sight | 2 / 3 / 4 | Blaze; Thermal Lining | Distinguish exposed hot targets and hot surfaces through smoke/fire overlays within 12 / 20 / 28 blocks. Cannot look through opaque rock. | 0.2 / 0.3 / 0.5 BU/s; load 2 |
 | H7 Scent Pits | 2 / 3 / 4 | Zombie; Scent Concentrate | Indicate direction and rough distance band of nearby living creatures within 6 / 10 / 14 blocks. Works around thin obstacles, but gives no exact wall-through model or species-perfect ore-like outline. | 1 / 2 / 3 BU per pulse, every 4 s; load 2 |
-| H8 Stone Sense | 3 / 4 / 5 | Enderman; Diamond-Fiber Matrix | Burrowing adaptation: distinguish passable rock and nearby air pockets within 3 / 5 / 7 blocks while inside ground. Reveals cavities, not ore identities or block inventories. | Included in the coordinated Burrowing cost; alone, 1 BU per deliberate pulse, load 2 |
+| H8 Stone Sense | 3 / 4 / 5 | Silverfish + enderman; Diamond-Fiber Matrix | Burrowing adaptation: distinguish passable rock and nearby air pockets within 3 / 5 / 7 blocks while inside ground. Reveals cavities, not ore identities or block inventories. | Included in the coordinated Burrowing cost; alone, 1 BU per deliberate pulse, load 2 |
 | H9 Wither Sieve | 2 / 3 / 4 | Wither skeleton; Thermal Lining | Remove up to 4 / 8 / 12 s of Wither, cooldown 20 s. Does not prevent the attack, cancel boss damage or permanently immunize the wearer. | 10 / 15 / 20 BU per activation; load 5 for 1 s |
 | H10 Colony Reader | 1 / 2 / 3 | Bee; Auric Myelin | Show selected organ status and recent flow, and issue an already-authorized helper order, within 12 / 20 / 28 blocks. Higher rank improves reach, not drone population. | 1 BU per query/order; load 1 for 1 s |
 
@@ -320,7 +358,7 @@ Berserk is a planned chest ability; its graft recipe and effects are not yet spe
 | C5 Thermal Exchange | 2 / 3 / 4 | Magma cube; Thermal Lining | Reduce Thermal Mode biomass cost by 10% / 20% / 30%. No conversion of environmental heat into free suit biomass. | No additional BU cost; load 2 / 3 / 4 while exchanging |
 | C6 Gill Bellows | 2 / 3 / 4 | Turtle; Membrane Sheet | Supply up to 10 / 30 / 60 s of breathing per pulse. Refills only missing air; unused supply is not banked beyond the current air capacity. | Full pulse costs 3 / 6 / 10 BU, prorated for missing air; load 2 / 3 / 4 while operating |
 | C7 Blast Baffles | 2 / 3 / 4 | Creeper; Vitreous Scute | Reduce residual explosion damage by 10% / 15% / 20%, at most 3 / 5 / 7 health points per explosion. | 3 BU per health point prevented; load 4 / 6 / 8 while armed |
-| C8 Burrow Mantle | 3 / 4 / 5 | Enderman; Diamond-Fiber Matrix | Whole-body passage support. Together with H8/L7/B8 gives a 10 / 20 / 35 s safe stopping window. | Whole Burrowing mode: 24 / 20 / 18 BU/s; load 12 / 10 / 8 |
+| C8 Burrow Mantle | 3 / 4 / 5 | Silverfish + enderman; Diamond-Fiber Matrix | Whole-body passage support. Together with H8/L7/B8 gives a 10 / 20 / 35 s safe stopping window. | Whole Burrowing mode: 24 / 20 / 18 BU/s; load 12 / 10 / 8 |
 | C9 Feeding Lobe | 1 / 2 / 3 | Host; Nutrient Mash | Automatically consume permitted real food from 1 / 2 / 3 selected inventory slots when hunger is at or below 14 / 16 / 18 points. At most one food per 10 s; normal food effects apply. | 1 BU per food; load 1 for 1 s. No biomass-to-food conversion. |
 | C10 Service Tendril | 1 / 2 / 3 | Bee; Membrane Sheet | Transfer stored biomass at 2 / 4 / 6 BU/s to one explicitly selected compatible tool or helper within 2 blocks. Stops when its tank is full. | Actual transferred BU; load 2; transfers give no activity credit |
 | C11 Elytral Wings | 3 / 4 / 5 | Phantom; precision-conditioned Spatial Membrane; actual Elytra at I only | I: controlled descending glide. II: powered forward flight and climbing. III: controlled takeoff and hover. Driven speed ceiling 6 / 8 / 10 m/s. | 2 / 6 / 10 BU/s; load 5 / 8 / 12 |
@@ -363,7 +401,7 @@ Container intake trades expedition packing for predictable transfer with no conv
 | L4 Bracing Tendons | 1 / 2 / 3 | Turtle; Bone Plate | While deliberately braced on a surface and using a tool, reduce hostile knockback by 20% / 40% / 60%. Walking releases the brace. | 0.2 / 0.4 / 0.6 BU/s while braced; load 1 / 2 / 3 |
 | L5 Working Tendons | 2 / 3 / 4 | Zombie; Bone Plate | +10% / 20% / 30% manual tool working speed. Does not change harvest tier, loot, ore identity, durability cost per action or machine speed. | 0.3 / 0.6 / 1 BU/s during actual tool work; load 2 / 3 / 4 |
 | L6 Stalking Fibers | 1 / 2 / 3 | Fox; Membrane Sheet | +20% / 40% / 60% crouched movement speed. Does not make the wearer invisible or silence every action. | 0.1 / 0.2 / 0.3 BU/s while moving crouched; load 1 |
-| L7 Burrowing Muscles | 3 / 4 / 5 | Enderman; Diamond-Fiber Matrix | Coordinated Burrowing travel speed 0.8 / 1.2 / 1.6 m/s through eligible terrain, including deliberate upward/downward movement. | Included in C8 cost/load |
+| L7 Burrowing Muscles | 3 / 4 / 5 | Silverfish + enderman; Diamond-Fiber Matrix | Coordinated Burrowing travel speed 0.8 / 1.2 / 1.6 m/s through eligible terrain, including deliberate upward/downward movement. | Included in C8 cost/load |
 | L8 Fast-Lane Tendons | 2 / 3 / 4 | Host; Auric Myelin | +40% / 70% / 100% grounded travel speed on a compatible mutated fast-lane tissue. Needs a complete living suit and Surface Key II or III. | 0.5 / 1 / 2 BU/s on the active lane; load 2 / 3 / 4 |
 
 L1 and L8 are alternative tendon architectures and cannot be installed together. L8 does nothing on ordinary stone, so a colony commuter and a wilderness explorer prefer different leggings. L4 and L5 can cooperate, but neither lets the player mine protected blocks or harvest an ore their tool cannot harvest.
@@ -379,7 +417,7 @@ L1 and L8 are alternative tendon architectures and cannot be installed together.
 | B5 Spring Heel | 2 / 3 / 4 | Rabbit; Bone Plate | Charged ground jump reaching 1.5 / 2.5 / 3.5 blocks above takeoff. Requires surface contact; not a midair second jump. | 3 / 6 / 10 BU; load 3 for 1 s; cooldown 6 s |
 | B6 Blink Tendon | 3 / 4 / 5 | Enderman; precision-conditioned Spatial Membrane | Relocate up to 4 / 7 / 10 blocks to a visible clear supported destination. Does not pass through opaque terrain. | 20 / 30 / 45 BU; load 6 for 1 s; cooldown 12 / 10 / 8 s |
 | B7 Surface Key | 1 / 2 / 3 | Host; Spore Culture | Store 1 / 2 / 4 consented colony tissue signatures. I identifies wearer to compatible service tissue without repeated enrollment; II also enables Fast-Lane Tendons; III stores additional signatures. No spill immunity or storage access. | No operating cost/load |
-| B8 Ground Anchor | 3 / 4 / 5 | Enderman; Diamond-Fiber Matrix | Coordinate body contact for Burrowing in all directions. Effective rank limits the complete burrowing system. Does not supply air or light. | Included in C8 cost/load |
+| B8 Ground Anchor | 3 / 4 / 5 | Silverfish + enderman; Diamond-Fiber Matrix | Coordinate body contact for Burrowing in all directions. Effective rank limits the complete burrowing system. Does not supply air or light. | Included in C8 cost/load |
 
 B2 and B4 cannot occupy the same foot anatomy: hooks and full fins are alternatives. Contour Sole, Landing Bladders and either one can coexist if they fit. B7 grants biological recognition only; it does not grant chest access, block-breaking permission or ownership of another player's colony.
 
@@ -500,7 +538,7 @@ Stone Sense shows nearby cavities; it is not a headlamp. Bring Lantern Gland, No
 The item preserves frame, activity values, installed anatomy, actual biomass,
 tissue condition, pigment and trims. Cooldowns survive quick swaps, dimension
 changes and reconnects. Symbiosis, rescue charge and whether the first charge was
-already granted stay on the same item. No operation duplicates stored learning.
+already granted stay on the same item. Preservation dose, charge and nest binding remain on the same piece. No operation duplicates stored learning.
 
 Forward fusion is transactional: validate target/parent, inputs, output and capacity
 before committing. Refusal leaves the item unchanged. Cancellation cannot return

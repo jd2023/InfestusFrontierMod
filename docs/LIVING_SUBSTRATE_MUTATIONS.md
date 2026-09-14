@@ -40,6 +40,7 @@ Each cell has **one primary function**. Mutating it does not remove its ability 
 | **Cultivation Tissue** | Hoe the mature cell, then apply Rooting Gel and the selected seed. The hoe is not consumed. | Maintains crop growth. Planting, harvest and seed/output reserves belong to separate organs or player actions. | Water; optional biomass-assisted growth. |
 | **Work Bed** | Membrane Sheet + Sealing Resin on exposed mature tissue. | Holds one visible specimen or finite item batch for attached working organs; no processing or automatic collection of its own. | No idle upkeep; each operation pays its own supplies. |
 | **Aquaculture Bed** | Aquaculture Graft, while submerged. | Supports the selected aquatic planting or husbandry recipe. | Water habitat, stock and nutrients. |
+| **Thermal Cultivation Tissue** | Rooting Gel and planted crimson/warped fungus on mature Thermal Substrate in the Nether. | Grows Thermal Fruiting Bodies with a local Thermal Root; separate organs harvest and allocate fruit to biomass, water or construction. | Water, biomass and native heat. |
 | **Chorus Orchard Tissue** | Chorus Orchard Graft on mature Anchored Substrate in the End. | Supports a tended, harvestable chorus garden. | Planting stock and nutrients. |
 | **Digestive Tissue** | Digestive Enzyme. | Damages hostile creatures; collects biomass from actual damage. Never targets players or tamed pets. | No continuous feed in the basic form; export its finite collected reserve. Full storage stops collection, not the damage. |
 | **Restraining Tissue** | Restraining Graft; spider genome. | Slows or holds a susceptible target instead of harvesting it. | Biomass while restraining. |
@@ -92,8 +93,8 @@ Native mutation changes the **kind of living bed**, not its reinforcement grade.
 
 | Native bed | Treatment and place | What it enables |
 |---|---|---|
-| **Thermal Substrate** | Thermal Seed, followed by local feeding in the Nether. | Thermal Nursery and Nether-native Thermal Mantle foundations. |
-| **Anchored Substrate** | Anchor Seed, followed by local conditioning in the End. | Spatial Nursery, Spatial Conditioner and Chorus Orchard foundations. |
+| **Thermal Substrate** | Thermal Seed, followed by local feeding in the Nether. | Thermal Nursery, native Thermal Mantle, thermal crops and Nether DNA-processing foundations. |
+| **Anchored Substrate** | Anchor Seed, followed by local conditioning in the End. | Spatial Nursery, Spatial Conditioner, Chorus Orchard and End DNA-processing foundations. |
 | **Adaptive Substrate** — long-term | Adaptive Seed grafted into local root-bearing ground in the Fold, followed by local phase exposure. | Founder Nursery and phase-dependent native habitats. This branch starts from the local ground, not from an imported ordinary bed. |
 
 Changing family preserves installed reinforcement only if compatible; the preview identifies any lining that must be replaced. The new native bed needs local maturation before native production starts. Removing and placing it elsewhere preserves the block, but cannot transplant the dimension's growing conditions.

@@ -32,6 +32,34 @@ stress/soak acceptance criteria. Distinguish tested bounds from measured TPS/FPS
 - Keep authoritative gameplay on the server. Clients cannot mint resources,
   select arbitrary targets, bypass ownership or supply trusted mutation results.
 
+## Sample collection and equipment recovery
+
+Sample collection is a death-event hook, not an ambient mob/item scan. Each death
+can offer one sample to one selected destination. At most 64 collection attempts
+per server tick; excess offers are discarded without extra drops. Containers use
+the finite species/quality counters in Items; never store a persistent kill log.
+Collector links are one explicit killer and one destination; revalidate loaded
+endpoints without discovering neighbors or requesting tickets. Core normal loot
+processing is unchanged. Deduplication is part of the one-death transaction, not
+an ever-growing UUID cache.
+
+Sample UI pages contain at most 16 species rows and 48 quality counts; send at
+most two changed pages per second per open viewer. Server validates filters and
+counts. At most four portable-supply transactions per wearer per second, subject
+to a server-wide 64-transaction/tick budget; defer excess, preserve source contents.
+Container schema/entry limits are validated before allocation, including malformed
+saves and client requests.
+
+Preservation examines at most four worn pieces on final death. Recall performs
+one loaded-endpoint lookup per piece, never a retry queue or chunk ticket.
+Death Bond retains at most one pending piece per equipment position per player.
+No counterpart remains in drops, a grave, equipped armor or a recall berth.
+Concurrent logout/respawn/server-stop paths must commit one authoritative outcome.
+
+Native factory calculations are resource budgets only. Implement shared loaded-
+cell/recipe admission and measure dense multi-dimension bases before claiming
+their production rates are attainable at server limits.
+
 ## Required adversarial cases
 
 Counter reduction, fusion and rescue must not duplicate points, items or charges
