@@ -73,6 +73,54 @@ class DeliveryTests(unittest.TestCase):
                          self.git("ls-remote", "origin", "refs/heads/feature/test").split()[0])
         self.assertEqual("", self.git("status", "--porcelain"))
 
+    def test_new_file_accepts_without_a_retry(self):
+        self.task['scope'].append('new.txt')
+        (self.root / 'new.txt').write_text('new behavior\n')
+        self.evidence()
+        self.accept()
+        self.assertEqual('new behavior', self.git('show', 'HEAD:new.txt'))
+
+    def test_rename_delete_and_staging_preserve_candidate_identity(self):
+        self.task['scope'].append('renamed.txt')
+        (self.root / 'owned.txt').rename(self.root / 'renamed.txt')
+        before = flow.candidate_state(self.root, self.task, self.state, self.policy)
+        self.git('add', '-A')
+        self.assertEqual(before, flow.candidate_state(self.root, self.task, self.state, self.policy))
+        self.evidence()
+        self.accept()
+        self.assertEqual('after', self.git('show', 'HEAD:renamed.txt'))
+
+    def test_identical_content_rename_accepts(self):
+        self.task['scope'].append('renamed.txt')
+        (self.root / 'owned.txt').write_text('before\n')
+        (self.root / 'owned.txt').rename(self.root / 'renamed.txt')
+        before = flow.candidate_state(self.root, self.task, self.state, self.policy)
+        self.git('add', '-A')
+        self.assertEqual(before, flow.candidate_state(self.root, self.task, self.state, self.policy))
+        self.evidence()
+        self.accept()
+
+    def test_git_owner_execute_bit_is_not_group_execute_bit(self):
+        path = self.root / 'owned.txt'
+        path.chmod(0o755)
+        before = flow.candidate_state(self.root, self.task, self.state, self.policy)
+        path.chmod(0o655)
+        self.assertNotEqual(before, flow.candidate_state(self.root, self.task, self.state, self.policy))
+
+    def test_executable_bit_changes_candidate_identity(self):
+        before = flow.candidate_state(self.root, self.task, self.state, self.policy)
+        (self.root / 'owned.txt').chmod(0o755)
+        self.assertNotEqual(before, flow.candidate_state(self.root, self.task, self.state, self.policy))
+
+    def test_symlink_retarget_changes_candidate_identity(self):
+        self.task['scope'].append('link')
+        link = self.root / 'link'
+        link.symlink_to('owned.txt')
+        before = flow.candidate_state(self.root, self.task, self.state, self.policy)
+        link.unlink()
+        link.symlink_to('missing.txt')
+        self.assertNotEqual(before, flow.candidate_state(self.root, self.task, self.state, self.policy))
+
     def test_failed_gate_cannot_commit_or_push(self):
         self.evidence()
         with patch.object(flow, "run_gate", side_effect=ValueError("gate failed")):

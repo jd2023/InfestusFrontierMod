@@ -87,14 +87,15 @@ def candidate_state(root, task, state, policy, committed=False):
         raise ValueError("Task, branch or checkpoint changed outside delivery")
     if file_digest(root, state["protected"]) != state["protected"]:
         raise ValueError("Pre-existing untracked user files changed")
-    paths = set(git(root, "diff", "--name-only", "-z", state["baseline"]).split("\0")) - {""}
+    paths = set(git(root, "diff", "--no-renames", "--name-only", "-z", state["baseline"]).split("\0")) - {""}
     paths |= untracked(root) - state["protected"].keys()
     check_scope(task, paths)
     if not paths:
         raise ValueError("No implementation change to accept")
-    fingerprint = hashlib.sha256()
-    fingerprint.update(git(root, "diff", "--binary", state["baseline"]).encode())
-    fingerprint.update(json.dumps(file_digest(root, paths), sort_keys=True).encode())
+    contents = file_digest(root, paths)
+    modes = {name: bool((root / name).lstat().st_mode & 0o100)
+             for name in paths if (root / name).exists() and not (root / name).is_symlink()}
+    fingerprint = hashlib.sha256(json.dumps([contents, modes], sort_keys=True).encode())
     return sorted(paths), fingerprint.hexdigest()
 
 
@@ -193,7 +194,10 @@ def accept(root, task, state, policy):
         raise ValueError("Candidate changed during review")
     if evidence(root, task, state) != evidence_digest:
         raise ValueError("Test evidence changed during review")
-    git(root, "add", "--", *paths)
+    indexed = set(git(root, "ls-files", "-z").split("\0"))
+    to_stage = [name for name in paths if name in indexed or os.path.lexists(root / name)]
+    if to_stage:
+        git(root, "add", "--", *to_stage)
     if candidate_state(root, task, state, policy)[1] != candidate:
         raise ValueError("Candidate changed while staging")
     git(root, "commit", "-m", f"{task['id']}: {task['title']}\n\n"
