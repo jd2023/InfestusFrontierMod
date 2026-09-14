@@ -39,9 +39,9 @@ pure core, but not the development test mod or archived Forge content.
 - [Developer guide](docs/DEVELOPER_GUIDE.md): mandatory deep modularity and workflow.
 - [Performance](docs/PERFORMANCE.md): bounds, back-pressure and adversarial cases.
 - [Architecture](docs/ARCHITECTURE.md): module ownership and test-mod isolation.
-- [Dependencies](docs/DEPENDENCIES.md): active pins and feature-library candidates.
+- [Dependencies](docs/DEPENDENCIES.md): active toolchain and selected feature libraries.
 - [Testing](docs/TESTING.md): current evidence and gates still to build.
-- [ktask](docs/KTASK.md): task automation and human gates.
+- [ktask](docs/KTASK.md): implementation queue, independent review and gated delivery.
 
 ## Licensing
 

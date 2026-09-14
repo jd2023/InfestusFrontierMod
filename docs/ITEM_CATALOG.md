@@ -99,7 +99,14 @@ Early Lumen treatment is made in the Bowl; all T1 transport treatments use the C
 
 | ID | Item | Obtain / recipe | Consumer / constraints |
 |---|---|---|---|
-| I124 | Membrane Projector [held candidate] | Handheld construction organ; body recipe and access not yet specified | Spends armor biomass to place Temporary Membrane T1-37 at a permitted target. Range, lifespan, attachment and fall-arrest behavior unresolved. T1 grouping is provisional. |
+| I124 | Membrane Projector | Cyst: 1 Organ Bud + 2 Membrane Sheets + 1 Contractile Fiber + 1 Elastic Gel + 100 BU → 1 | Manual support placement within 5 blocks at a visible replaceable target adjacent to a solid support; costs 5 BU from worn armor. No automatic fall-arrest or placement into empty unsupported air. |
+
+Temporary Membrane lasts 200 loaded server ticks, hardness 0.1, no item drop.
+It cannot support another Temporary Membrane; placement reserves one of 32 active
+cells per player and 256 per server before spending fuel. Unload pauses remaining
+lifetime; reload resumes it without resetting. Persistent admitted-cell records
+are capped at the same limit; cleanup never loads their chunks.
+The projector refuses when no slot, valid support or armor fuel is available.
 
 ## 4. T2 — genetics, prepared grafts, food and helpers
 

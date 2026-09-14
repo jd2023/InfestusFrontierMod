@@ -29,10 +29,9 @@ Ask only when alternatives change intended experience, scope or policy. Include
 a recommendation and its tradeoff when discussing that choice; keep the question
 register itself questions-only. Put resolved rules in their specifications and
 remove the questions. State rules directly, without attribution or change history.
-Design proposals do not authorize gameplay implementation or external actions.
-
-The bootstrap establishes build/test infrastructure only. It does not begin the
-content roadmap. Do not promote prototype implementations wholesale.
+Implementation follows the scoped M0–M10 task queue. The planning coordinator
+owns research, design, numerical baselines and module interfaces; implementation
+workers receive defined contracts. Do not promote prototype implementations wholesale.
 
 ## Deep modularity: mandatory
 
@@ -69,8 +68,12 @@ failure diagnostics, performance bounds and tests. Follow `ARCHITECTURE.md`.
 5. Implement behind the module boundary; do not expand scope opportunistically.
 6. Run focused tests, then adjacent regressions and `./.ktask/verify.sh`.
 7. Run the required client/visual/integration/performance checks for affected features.
-8. Review the entire staged diff, including generated outputs and assets.
-9. Commit the coherent scope and report evidence, omissions and remaining risk.
+8. Review the entire diff, including generated outputs and assets: correctness,
+   placement, simplicity, scope, abstractions, isolation, test quality, comments
+   and performance. Refactor and repeat tests until no acceptance defects remain.
+9. Obtain fresh independent smart-model review; its author must not be the worker
+   or repair session. Every required check must pass. Delivery then commits the
+   coherent scope, pushes the authorized feature branch and confirms the remote.
 
 Dirty unrelated work belongs to the user; preserve it. A failed or flaky test is
 evidence to investigate, not a reason to delete assertions, skip a check or retry
@@ -82,8 +85,10 @@ exercise contention. Do not expand a module boundary just to make a test conveni
 Pure tests cover rules and limits. Contract tests cover commands and invariants.
 Platform tests cover registry/data/save/network boundaries. GameTests exercise real
 Minecraft state. Client fixtures verify resource loading and visible behavior.
-Human review judges appearance, readability, feel and approved screenshot goldens.
-Automated comparison is regression evidence, not proof of artistic quality.
+The smart reviewer inspects actual client captures for appearance, readability,
+geometry and state transitions. Human feedback is an exception for product/feel
+decisions or genuinely unavailable observation, not the normal completion gate.
+Automated pixel comparison is regression evidence, not proof of artistic quality.
 
 Test mods and fixtures are development-only and must not enter the shipped JAR.
 Use isolated disposable worlds; no copying, deleting or rebuilding ordinary saves.
@@ -107,6 +112,14 @@ an explicit required/optional decision. See `DEPENDENCIES.md`.
 
 ## Delivery
 
-No automatic remote creation, pushes, releases, license grants or migration promises.
-The local authoritative gate is the same entry point future CI/ktask must call.
-Workers may not acknowledge human gates or turn proposals into approved decisions.
+Accepted task changes are committed and pushed to the configured feature branch;
+the delivery adapter owns those actions, not the worker. No force pushes, merges
+to main, remote creation, public releases, license grants or migration promises.
+The authoritative gate is the same entry point CI/ktask call. Routine failures
+receive bounded strong-model repair and fresh review; exhausted engineering work
+returns to the planning coordinator for re-scoping, not a numerical assignment
+to the user. Only new product choices or external authority require human input.
+
+Low-value comments are defects. Keep useful API/function/type contracts; remove
+narration, obsolete discussion and comments compensating for confusing code.
+Make the structure self-evident. Unrelated cleanup remains outside a task's scope.

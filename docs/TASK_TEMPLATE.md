@@ -1,20 +1,50 @@
-# Task: <one concrete outcome>
+# Implementation packet contract
 
-Status: proposed / approved. Owning specification: <path/decision>.
+One packet is one reviewable behavior at one committed dependency checkpoint.
+Tasks are ordered; Depends lists accepted prerequisite IDs, not permission to
+reach into their internals. No research, architecture selection or human interview
+is an implementation task.
 
-- Outcome:
-- Owning module and public contract:
-- Allowed files/subsystems:
-- Explicit non-goals:
-- Dependencies and decisions required before starting:
-- Red-first test and expected failure:
-- Acceptance criteria observable in-game or through the public API:
-- Adjacent behavior and regression checks:
-- Work, memory, entity, packet, geometry and unloaded-chunk bounds:
-- Save/reload, interruption, full-output and malformed-input cases:
-- Required client captures / human approval:
-- Completion gate: `./.ktask/verify.sh` plus <task-specific checks>.
-- Branch/commit expectations and authorized remote actions:
+Required fields in `.ktask/tasks.md`:
 
-Stop conditions: missing scope, missing product decision, boundary violation,
-unavailable required verification or a need for broader authority. Do not guess.
+| Field | Meaning |
+|---|---|
+| IF-nnn title | One observable implementation outcome |
+| Milestone | Playable checkpoint M0–M10, not a player tier |
+| Owner | Architecture module responsible for policy and state |
+| Depends | Earlier accepted packets; none only for the first task |
+| Spec | Existing authoritative files; Contract identifies the relevant entries |
+| Blocks | Primary ownership of catalog blocks; each in-scope entry occurs once |
+| Scope | Exact paths/globs; shared-file edits only for this feature's wiring/data |
+| Contract | Commands, state transitions, inputs/outputs and refusal behavior |
+| Red | Behavioral assertion that fails before implementation |
+| Accept | Observable success and adjacent regression outcomes |
+| Bounds | Hard work/state limits and overload behavior |
+| Evidence | Required kinds: rules, game, visual, integration, soak |
+
+Scope profile `@module:name` expands the path convention once, in
+`scripts/ktask_contracts.py`: that module's core, platform, client, tests,
+namespaced data/assets and composition bridge. Shared translation/vanilla-tag
+files permit only its own entries. Campaign scope excludes production sources.
+Additional paths explicitly grant task-specific cross-module integration work.
+Inspect exact expanded paths with
+`python3 scripts/ktask_workflow.py scope IF-003`; process-control paths are always
+forbidden to workers. Do not duplicate the expansion in every packet.
+
+For each content packet, include its recipes/tags/translations, original readable
+assets, guide/advancement entries and discovery tests for the content actually
+introduced. Never register an empty placeholder to satisfy catalog coverage.
+Common requirements are inherited, not repeated as identical paragraphs per task:
+versioned save/reload, break/replacement, ownership/concurrency, full outputs,
+unloaded endpoints and invalid network input must preserve stated invariants.
+
+Tests cover public behavior and one meaningful negative case, then adjacent
+regressions. The authoritative gate is always `bash .ktask/verify.sh`; a task may
+add checks, not replace it. Client-visible changes require inspected captures;
+resource/process changes require conservation assertions; scalable work requires
+shared-budget contention and measured performance.
+
+Coordinator owns packet readiness, numerical baselines and design corrections.
+Worker implements the supplied contract; reviewer cannot waive missing behavior.
+If a packet proves too large, coordinator splits it before another attempt, keeping
+one primary owner per catalog entry and preserving accepted predecessor receipts.

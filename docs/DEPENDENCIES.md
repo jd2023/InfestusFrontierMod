@@ -16,23 +16,41 @@ Change versions as an isolated task with cache-cold build, server and client che
 No dynamic Maven versions or automatic upgrades. Build-tool/transitive dependencies
 still need lock/verification metadata before release-grade reproducibility is claimed.
 
-## Feature integrations: not installed in this empty foundation
+## Selected feature integrations
 
-The playable test profile is Minecraft, NeoForge, this mod and its declared required
-libraries. Content-mod integrations use separate presence/absence profiles; none
-substitutes for an unimplemented core gameplay loop. Version selection and adapter
-design are engineering work.
+Selected for IF-001; not installed or production-validated by this planning change.
+The required profile is Minecraft/NeoForge/this mod/Modonomicon/GeckoLib.
+JEI is essential in the development/playtest pack but optional for server operation.
+Curios is optional: armor and manual sample collection work without it.
 
-| Integration | Direction | Decision before implementation |
+| Integration | Exact artifact | Boundary |
 |---|---|---|
-| JEI | Essential recipe/process discovery | Pin 1.21.1 API/runtime; client adapter and process tests |
-| Curios | Equipment integration | Version and required/optional status |
-| Modonomicon | Guide candidate | Guide requirements, version and API boundary |
-| GeckoLib | Animation candidate | Renderer requirements, version and API boundary |
-| Jade | Candidate diagnostics integration | Approve scope and optional adapter |
-| UI/multiblock libraries | Open | Evaluate against a concrete feature; internal module regardless of implementation |
-| FTB Quests | Excluded | Pack maintainers own quest chains; advancements stay |
+| Modonomicon | com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4 | Required guide adapter; discovery owns prerequisites |
+| GeckoLib | software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.2 | Required model library; client renderer owns animation, never server policy |
+| JEI | mezz.jei:jei-1.21.1-neoforge:19.56.0.438 | Optional runtime; compileOnly common/neoforge API artifacts at same version |
+| Curios | top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1 | compileOnly api classifier; optional runtime; separate accessory adapter |
+| UI | Internal module over NeoForge/vanilla menus and widgets | Reusable layout/intents/snapshot framework; no external UI dependency |
+| Multiblocks | Internal loaded-only bounded validator | Structure rules/data separate from controller and rendering |
+| Jade | Deferred | Probe/console provide required diagnostics |
+| FTB Quests | Excluded | Pack maintainers own quests; advancements remain |
 
-Before adding a library record its source/license, exact artifact, side,
-required/optional status, replacement cost, API boundary and test profiles. Popular
-mod compatibility needs explicit targets and tests, not a blanket promise.
+IF-001 verifies dependency resolution, transitive requirements, packaged server,
+client resource loading and optional presence/absence. Missing dependencies or
+incompatible pins are engineering failures; do not silently select another version.
+Add dependency verification metadata and retain it in review. No library swapping
+inside a gameplay task.
+
+Repositories: [JEI Maven](https://maven.blamejared.com/mezz/jei/jei-1.21.1-neoforge/19.56.0.438/jei-1.21.1-neoforge-19.56.0.438.pom),
+[Curios setup](https://docs.illusivesoulworks.com/curios/getting-started),
+[Modonomicon setup](https://klikli-dev.github.io/modonomicon/docs/getting-started/maven-dependencies),
+[GeckoLib 4 setup](https://github.com/bernie-g/geckolib/wiki/Installation-%28Geckolib4%29).
+
+Before distributing, inspect the exact resolved artifacts' license notices and
+transitive notices; do not copy upstream art into our assets. Expected upstream
+licenses: JEI/GeckoLib code MIT; Curios LGPL-3.0-or-later; Modonomicon code MIT with
+separately licensed assets. Upstream notices, not this summary, control distribution.
+
+Replacement costs stay local: guide adapter/data conversion; animation renderer
+conversion; JEI category adapter; Curios accessory adapter. None may own genome,
+armor, recipe or resource state. Compatibility claims name the tested profile;
+third-party content mods/backpacks are not required for the core loop.

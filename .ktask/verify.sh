@@ -2,6 +2,8 @@
 set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 mkdir -p build/verification
+python3 -m unittest discover -s scripts -p 'test_ktask_*.py'
+python3 scripts/ktask_workflow.py validate
 python3 scripts/check_design_docs.py --self-test
 python3 scripts/check_design_docs.py
 python3 scripts/check_armor_balance.py --self-test

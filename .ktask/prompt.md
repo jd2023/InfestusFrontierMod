@@ -1,38 +1,54 @@
-# Scoped implementation contract
-
-Read the repository instructions and the task's owning specification first.
-The task is the scope, not permission to resolve open product decisions. Stop
-with NEEDS_INPUT if required choices, authority or external prerequisites are missing.
-
-## Task
+# Scoped implementation
 
 {{TASK}}
 
-## Required process
+## Process
 
-Start at a clean committed checkpoint on the authorized task branch. State the
-owning module, outcome, allowed files, non-goals and adjacent risks. Add the
-narrowest meaningful failing test before implementing. Keep rules inward, hide
-internals and explain any public API growth. Discuss material performance costs
-and enforce hard limits; test overload and safe refusal rather than dropping work.
+1. Read required instructions and owning sections. Use the adapter's baseline;
+   preserve unrelated files. Check owner, scope and dependencies. Contract gaps
+   are FAILED for coordinator correction, not automatic human questions.
+2. Write the narrowest meaningful test FIRST; preserve the failing assertion and
+   command output. Missing imports alone are insufficient: once scaffolding
+   exists, prove the behavioral assertion detects the missing implementation.
+3. Implement the supplied contract in its owning module. Keep public APIs small,
+   dependencies inward and acyclic; do not duplicate UI, transport or persistence
+   infrastructure. Test shared limits, refusal, concurrent use and reload.
+4. Run focused tests, adjacent regressions, bash .ktask/verify.sh and every packet
+   Evidence kind. Game means actual Minecraft assertions; visual means client
+   captures inspected from relevant angles/states; soak means measured data.
+   A build, registration test or uninspected screenshot cannot substitute.
+5. Review the entire diff: correctness, placement, simplicity, scope, isolation,
+   test quality and performance. Refactor and repeat tests. Remove narration,
+   obsolete notes and comments compensating for confusing structure. Useful API
+   documentation remains. Never remove assertions or bless goldens to get green.
+6. Write evidence and report. DO NOT commit or push. DONE means a candidate ready
+   for independent acceptance, not final delivery.
 
-Run focused checks, the interaction/adjacent regression sweep, then
-`./.ktask/verify.sh` and any required client, compatibility or performance gates.
-Do not treat logs without assertions, a screenshot alone or a successful build as
-proof of gameplay. Never weaken verification, rerun until lucky, acknowledge a
-HUMAN gate or replace goldens. Review the complete staged diff; commit one coherent
-scope only after required gates pass. No push/merge/release without authorization.
+Routine API debugging, test failures, refactoring and tuning are engineering work.
+Only a new product choice or external authority can require human input. Do not
+silently change progression, scope, model/provider, host software or acceptance
+machinery. Do not expand a task because adjacent code could be improved.
 
-## Final structured report
+## Evidence
 
-Start with exactly one result line:
+Write .ktask/session/evidence/<task-id>/evidence.json:
+{
+  "task": "<task-id>",
+  "baseline": "<adapter baseline commit>",
+  "red": {"command": ["<executable>", "<arg>"], "exit": 1, "log": "red.log"},
+  "green": {"command": ["<executable>", "<arg>"], "exit": 0, "log": "green.log"},
+  "artifacts": {"rules": ["green.log"], "game": ["gametest.log"]}
+}
 
-KTASK_RESULT: DONE
-KTASK_RESULT: FAILED
-KTASK_RESULT: NEEDS_INPUT
+Paths are relative to this evidence directory and must be nonempty files.
+Include every Evidence kind in the packet: visual (captures and inspection notes),
+integration (named profiles/results), soak (hardware/duration/measurements).
+Preserve focused and adjacent output, not only the full-gate log. Explain why the
+red assertion detects the behavior. Schema validity is not substantive proof.
 
-Choose one, not all three. Follow it with outcome, scope, API/boundary changes,
-red/green evidence, full-gate result, adjacent checks, performance bounds, visual
-evidence/human approvals where relevant, commit and branch, skipped checks and
-remaining risk. NEEDS_INPUT includes one focused question and why it blocks work.
-DONE is not allowed if required verification or approval is missing.
+## Report
+
+First nonempty line: KTASK_RESULT: DONE, FAILED or NEEDS_INPUT (choose one).
+Then at most five short lines: outcome, evidence path, checks, defect or exact
+external blocker. Write at the path supplied by the orchestrator. Detailed evidence
+belongs in artifacts, not a verbose completion report.

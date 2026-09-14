@@ -1,0 +1,6 @@
+runner = "/home/etf/Projects/ktask/ktask"
+branch = "docs/progression-tree-armor-symbiosis"
+remote = "origin"
+reviewer_model = "gpt-6-astra"
+reviewer_effort = "high"
+review_timeout = 1500

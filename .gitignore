@@ -24,6 +24,8 @@ runs/
 .ktask/logs/
 .ktask/queue/
 .ktask/*.lock
+.ktask/session/
+__pycache__/
 .env
 .env.*
 !.env.example

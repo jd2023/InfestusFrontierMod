@@ -426,8 +426,8 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 ### T1-37 — Temporary Membrane
 - **Does:** Weak translucent temporary support grown by the handheld Membrane Projector.
 - **Input → output:** Armor biomass paid by the projector → one temporary support block → expiration with no renewable item output.
-- **Create:** Projector placement only; recipe, range, cost, support condition and lifetime not yet specified.
-- **Growth:** No processing level or permanent reinforcement. Active-block cap, unload/reload expiry and optional placement under a falling player must be selected before implementation.
+- **Create:** Membrane Projector placement only; recipe, fuel, support, lifetime and admission limits are defined with I124 in Items.
+- **Growth:** No processing level, drops or permanent reinforcement. It cannot support another Temporary Membrane or provide automatic fall-arrest.
 
 ### T1-38 — Sample Dock
 - **Does:** Unloads one inserted Sample Pouch to explicitly connected Specimen Archives.

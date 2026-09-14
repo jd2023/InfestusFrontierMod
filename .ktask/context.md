@@ -1,13 +1,21 @@
-# Project context
+# Implementation context
 
-Read `AGENTS.md`, `docs/DEVELOPER_GUIDE.md` and `docs/PERFORMANCE.md`.
-Read `VISION.md` and `docs/PROGRESSION_MAP.md`, then the task's specific catalog.
-`docs/OPEN_QUESTIONS.md` contains unresolved questions; do not invent answers.
+Production: InfestusFrontierModV3_dev. Sibling InfestusFrontierModV3 is read-only
+prototype evidence. Never copy its code/assets/saves or edit it.
 
-The production mod has no gameplay content. `:core` is Java-only;
-`testMod` is development-only. Toolchain and commands are in `README.md`.
-The sibling V3 prototype and `legacy/forge-1.19.2` are excluded from production.
-Do not edit the prototype or copy its gameplay, assets or saves.
+Read AGENTS.md, docs/DEVELOPER_GUIDE.md, docs/PERFORMANCE.md, VISION.md,
+docs/ARCHITECTURE.md, then the task's named specification sections.
+Rules have one owner; do not duplicate gameplay prose across documents.
+This queue implements M0–M10, not Fold Gateway/T8/T9/Fold grafts, attack waves
+or village transformation.
 
-Gate: `./.ktask/verify.sh`; logs: `build/verification`.
-HUMAN gates require human approval. No approved implementation tasks are queued.
+Coordinator owns design, task contracts and boundaries. Worker implements the
+packet. Independent reviewer checks the whole candidate. Adapter runs acceptance,
+commits and pushes to the authorized feature branch.
+Workers never commit/push, edit queue markers, change gates or widen scope.
+Routine engineering failures return to the stronger resolver, not the user.
+
+Gate: bash .ktask/verify.sh.
+Evidence: .ktask/session/evidence/<task-id>/.
+Report: exact path in the orchestrator header, not a guessed queue path.
+Status: python3 scripts/ktask_workflow.py status.

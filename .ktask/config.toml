@@ -1,14 +1,21 @@
 project_dir = "."
-timeout = 3600
-idle_timeout = 900
-max_retries = 2
-max_remediation_attempts = 1
-# Runner default only; choose executor/model with the owner before enabling work.
+timeout = 7200
+idle_timeout = 1200
+max_retries = 1
+max_remediation_attempts = 0
 executor = "codex"
-# No model or pricing assumption is established by this bootstrap.
+codex_cmd = "python3 scripts/ktask_workflow.py executor"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
+autoresolve_attempts = 2
+autoresolve_model = "gpt-6-astra"
+autoresolve_reasoning_effort = "high"
+verification_command = ["python3", "scripts/ktask_workflow.py", "accept"]
+verification_timeout = 3600
 verify_task_report = true
 verify_issue_closed = false
 verify_remote_mainline = false
 mainline_remote = "origin"
-mainline_branch = "main"
-limit_auto_wait = false
+mainline_branch = "docs/progression-tree-armor-symbiosis"
+limit_auto_wait = true
+limit_max_wait_seconds = 3600

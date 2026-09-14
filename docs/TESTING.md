@@ -6,6 +6,14 @@ GameTests and rejects severe output. There is no skip flag. Use Bash and ripgrep
 
 Current layers:
 
+- `python3 -m unittest discover -s scripts -p 'test_ktask_*.py'`:
+  packet dependencies/scopes, review binding, changed code/evidence refusal,
+  actual temporary Git commit/push, rejected delivery, push-only retry, protected
+  user files, worker argv and process-group ownership. No model calls.
+- `python3 scripts/ktask_workflow.py validate`: ordered task contracts and exactly
+  one implementation owner for every in-scope block. This is planning coverage,
+  not evidence that those blocks exist in the mod.
+
 - `python3 scripts/check_design_docs.py --self-test` and its normal invocation:
   prerequisite grammar, unknown references/cycles, block and armor-family guide
   coverage, permanent material parents, unique catalog IDs, specimen-count rounding,
@@ -41,4 +49,7 @@ for the complete mod. GameTests alone do not replace visual or gameplay review.
 Run graphical and headless gates as separate invocations. Bound each fixture and
 keep it in development sources. Capture readiness must verify the actual server
 and client state, including quota-delayed work—not merely wait an arbitrary time.
-Golden approval and appearance changes require human review.
+Independent smart review inspects actual client captures before acceptance.
+Pixel goldens cannot be replaced merely to suppress a regression; changes need
+an explained intentional visual difference and fresh inspection. Human review is
+reserved for product/feel decisions, not routine implementation verification.

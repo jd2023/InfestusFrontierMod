@@ -316,9 +316,9 @@ M0–M10 regardless of their catalog grouping.
 | M9 — Complete production choices | M8 | Remaining SR0–SR7 catalog branches: aquatic/husbandry/food/potion routes, helper professions, defensive organs, paid Sail loading, synthesis and finite reservoir districts | Existing feature owners; no catch-all endgame module |
 | M10 — Complete campaign gate | M9 | Fresh-world Survival route reaches three-world synthesis; alternate layouts and equipment lineages remain viable; remaining supported armor ranks and catalog recipes are verified | Integration and balance across existing modules |
 
-M0 evaluates UI/guide/animation libraries against the actual first screen and
-asset; it does not create unused frameworks. Exact artifacts, required/optional
-status and absence/presence tests are fixed before their feature is built.
+M0 integrates the selected libraries in DEPENDENCIES.md against the actual first
+screen and asset; it does not create unused frameworks. Required/optional profiles
+and exact artifact pins are validated before their feature is built.
 JEI discovery is essential, advancements remain, FTB Quests is not shipped.
 Separate content mods and backpacks cannot be required for the core loop.
 
