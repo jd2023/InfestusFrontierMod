@@ -1,0 +1,635 @@
+# The Waking Genome — progression and advancement tree
+
+Proposed page prerequisites, advancement triggers and teaching content.
+Recipes: [Items](ITEM_CATALOG.md). Structures: [Blocks](BLOCK_CATALOG.md).
+Equipment: [Armor](ARMOR_EVOLUTION.md). Cell anatomy: [Substrate](LIVING_SUBSTRATE_MUTATIONS.md).
+
+## 1. How the tree works
+
+The book is a branching map, not a list of mandatory quests. Completing a parent opens its children. Some children have several parents; some accept alternative parents. An unlocked page explains the task **before** the player must perform it, including its recipe, minimum structure, supplies, controls and failure conditions.
+
+Tables use these columns; mutation-family rows share the installation trigger described in their section:
+
+- **Node:** stable ID and the title shown in the book. `T2-06`, for example, is also the Mutation Chamber's catalog ID.
+- **Open after:** completed prerequisite nodes. `ALL(A,B)` requires both; `ANY(A,B)` accepts either. A single ID requires that one parent. `START` has no prerequisite.
+- **Complete by:** the observable action that earns the advancement. Merely reading a page is never evidence of building, operating or understanding a machine.
+- **Teaches / unlocks:** the new construction, behavior or choice explained by that node. Its child pages open when it completes; their precise dependencies are in their own rows.
+
+### Book visibility is not operation permission
+
+Page dependencies order teaching; they impose no player/base operation rank.
+
+A process needs its actual materials, organ level, installed mutations, body, native bed, dimension, supply and genome where its recipe specifies them.
+Equipment also needs its own fusion level and installed anatomy. A journal
+completion does not supply these. Acquiring a valid item reveals its safety/use
+instructions even if earlier pages are incomplete; possession and operation
+completions remain distinct.
+
+### Completion and cooperation
+
+- Use successful recipe, mutation, transfer and commissioning events. Obtaining ingredients reveals a recipe; it does not pretend that the player already ran it.
+- Qualifying work done before its page opens is retained as bounded evidence and reconciled when the prerequisites complete. The player should not rebuild a working organ because they opened the book late.
+- Credit the player performing the observed action; multiplayer sharing policies are outside the current scope.
+- A completed genome in a loaded compatible bank satisfies that source's recipe requirement; a journal badge does not create consumable Genetic Stock or remote DNA Bank access.
+- Advancements recognize first achievements. Repeating a recipe produces its normal output, not repeatable quest rewards.
+- No required node demands injury, a deliberate spill, a mob flood, every genome, every suit, every miner, drones or a chunk loader.
+
+## 2. Main path
+
+```text
+SR0 Contact
+ ├─ first biomass + membrane + bone + storage → SR1 Circulation
+ │   ├─ autonomous processing + replenishable feed → SR2 Directed Mutation
+ │   │   ├─ one complete genome + one useful expression → SR3 Thermal Colony
+ │   │   │   ├─ native Nether production + tempered plates → SR4 Precision
+ │   │   │   │   ├─ precision process + controlled shutdown → SR5 End Colony
+ │   │   │   │   │   ├─ native End production + conditioning → SR6 Distributed Colony
+ │   │   │   │   │   │   ├─ three working sites + combined production → SR7 Synthesis
+ │   │   │   │   │   │   │   ├─ compound organs and optimization [three-world capstone]
+ │   │   │   │   │   │   │   └─ prepared Fold expedition → SR8 Foreign Symbiosis
+ │   │   │   │   │   │   │       └─ local native production + adaptation → SR9 Manyfold
+ │   │   │   │   │   │   │           └─ deliberate encounter → maintained boss culture
+ │   │   │   │   │   │   │               └─ reciprocal designs; no SR10 god tier
+ │   │   ├─ genetics: agriculture / husbandry / equipment / defense
+ │   │   └─ mining: manual treatment / descending roots / later shafts and strips
+ │   └─ circulation: farms / trees / storage / routing / local controls
+ └─ living equipment, construction and manual leaching remain useful throughout
+```
+
+The arrows describe dependencies, not one required base layout. Optional branches can be pursued in parallel and revisited after later discoveries. The SR7 capstone stands on its own if the Fold expansion is not installed or not yet released.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| SR0 — Contact | START | Begin a world; initialize the personal guide journal. | T0 starter recipes and the first pages. |
+| SR1 — Circulation | ALL(T0-03,T0-04,T0-05,T0-06) | Automatic badge after first biomass production, usable storage, a Membrane Sheet and a Bone Plate are recorded. | T1 circulation, farm and expandable-body commissioning. |
+| SR2 — Directed Mutation | ALL(CI-01,CI-02) | Commission one supplied processing line and its replenishable organic feed. | T2 laboratory, directed genetics, planned excavation and optional helpers. |
+| SR3 — Thermal Colony | ALL(GE-02,GE-04) | Complete one genome and use a researched trait in a useful plant, organ or equipment expression. | T3 native thermal and steam construction. No requirement to evolve a whole armor set first. |
+| SR4 — Precision | ALL(T3-09,TH-01) | Produce tempered plates and commission continuing Nether-native lining production. | T4 electrical and precision commissioning. Steam transport is useful but not a compulsory parallel factory. |
+| SR5 — End Colony | ALL(EL-01,EL-02) | Run one real precision process and demonstrate its controlled stop/resume with supplies retained. | T5 native End installations and spatial growth. Vanilla End entry remains independent. |
+| SR6 — Distributed Colony | ALL(T5-06,EN-03) | Condition a spatial batch and commission recurring production in the End. | T6 stations, freight, district storage and services. |
+| SR7 — Synthesis | ALL(TR-01,TR-02) | Connect the output of three working dimensional sites and finish a product using their contributions. | T7 compound organs; three-dimension capstone; optional Fold preparation. |
+| SR8 — Foreign Symbiosis | ALL(T7-09,FO-01) | Establish a supplied first Fold foothold with its prepared return route. | T8 native Fold construction; no boss material required. |
+| SR9 — The Manyfold | ALL(FO-02,FO-03) | Sustain local nursery production and make a useful native adaptive material. | T9 encounter preparations. The boss is not summoned automatically. |
+
+## 3. Contact: the first working patch
+
+The initial book is offered once on first join, retained as a pending claim if inventory is full. Its first page is also reachable through a rebindable guide action, so losing the item does not block discovery. A replacement physical book is crafted from **one ordinary book + one Spore Culture**. No claim creates loose items on the ground.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| ST-00 — The Waking Genome | SR0 | Open the guide or receive its first copy. | Starting ingredients, controlled growth and how to read prerequisites. No gameplay capability depends on reading this page. |
+| ST-01 — A Culture in Your Hand | SR0 | Obtain Spore Culture; its recipe is rotten flesh + red mushroom + wheat seed. | Apply culture to exposed ground; replacement-book recipe. |
+| ST-02 — Speak to an Organ | ST-01 | Craft a Synaptic Probe (bone + slime ball + Spore Culture) and use it on a valid target. | Deliberate configuration; input/output/closed faces; status and safe pause. Empty hands remain available for building. |
+| T0-01 — Living Substrate | ST-01 | Convert one exposed eligible ground cell. | Basic → young → mature; selected cells only, no endless autonomous expansion. |
+| ST-03 — A Mature Foundation | T0-01 | Deliberately mature one selected cell through its two growth treatments. | Functional tissue grafts; variety does not require destroying its vegetation. |
+| T0-02 — Culture Bowl | T0-01 | Run one rooted culture batch. | Renewable construction cultures and the slow early Fusion Binder recipe. |
+| T0-16 — Organ Bud | ST-01 | Craft or grow one bud. | Craft an organ as an item or grow it from a planted bud with the same ingredients. |
+| T0-03 — Digestive Sac | ALL(T0-01,T0-16) | Digest one organic batch into retained biomass. | First fuel; woody-feed limits; an output-full pause rather than spills. |
+| T0-04 — Biomass Bladder | ALL(T0-03,T0-16) | Store biomass and deliver a measured amount to a starter organ. | Buckets/direct connections; its manual Fill slot fuels the first awakened piece without a later mutation. |
+| T0-05 — Membrane Rack | T0-01 | Produce a Membrane Sheet from supplied organic material, string and water. | Flexible building skins, equipment and organ walls. |
+| T0-06 — Bone Loom | ALL(T0-03,T0-16) | Grow a Bone Plate from real calcium feed. | Structural parts; biomass binds mineral rather than creating it. |
+| T0-07 — Bio-Furnace | ALL(T0-03,T0-05,T0-16) | Complete a normal smelting recipe. | A weak hand-fed furnace that can retain its history through later growth and multiblock expansion. |
+| T0-08 — Awakening Cradle | ALL(T0-05,T0-06,T0-16) | Form the cradle and awaken one dormant equipment piece. | Early living armor/tools and host-grown rank-I grafts without a genetics laboratory. |
+| T0-09 — Seed Pouch | T0-05 | Deposit planting stock and set a reserve. | Keep replanting material separate from food and digestion. |
+| T0-10 — Living Skin | T0-05 | Place a small enclosure using at least two compatible shapes. | Biological walls, stairs and rounded corners; ordinary building remains unrestricted. |
+| T0-11 — Rib Frame | ALL(T0-05,T0-06) | Construct one supported arch or a valid organ-frame corner. | Shared structural vocabulary for later multiblocks. |
+| T0-12 — Membrane Window | T0-05 | Join two windows into one readable membrane surface. | Connected transparent walls, tinting and later lining variants. |
+| T0-13 — Lumen Tissue | ST-03 | Graft one selected floor, wall or ceiling cell with light. | Flush illumination; grow Lumen Secretion in the Bowl from glow ink, glow berries or glowstone. |
+| T0-14 — Leaching Gland | ALL(T0-03,T0-05,T0-16) | Produce a Leaching Nodule from a real batch. | Manual mining treatment before powered excavators. |
+| T0-15 — Leached Rock | T0-14 | Treat exposed host rock and mine one treated block with a suitable tool. | Nearby ore remains ordinary ore; treatment neither extracts it nor grants passage through solid rock. |
+| ST-04 — Grow, Then Reinforce | ALL(ST-03,T0-06) | Reinforce one mature cell while preserving its current function. | Bone ribs are independent of maturity and functional grafts; later tempered ribs replace their grade. |
+
+ST-02 uses Item Catalog I010's Synaptic Probe recipe; no amethyst console is needed to configure the first organ. Sample Pouch and vial recipes appear with early collection instructions. Looking identifies a source; creature DNA requires actual death loot, and plant DNA requires consumed harvested material.
+
+Each producer's page lists its Item Catalog recipes, required ingredients and downstream consumers. Gels, fusion media and prepared grafts are recipe subpages of their owning organs, not extra rank badges. JEI links the same preparation chain in both directions.
+
+## 4. Circulation, storage and a living landscape
+
+T1 and later page order follows the listed parents, not an additional commissioning rank.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| T1-30 — Activation Cyst | ALL(SR1,T0-02,T0-05,T0-06) | Activate one ingredient into a named consumable gel or secretion. | Raw feed → biological treatment; construction and mutation have different inputs. |
+| T1-01 — Biomass Vein | ALL(ALL(SR1,ST-02,ST-03),T1-30) | Graft and configure one recessed biomass route cell. | Green fuel circulation; directional pulses; source and destination remain separate things. |
+| T1-02 — Fluid Vein | ALL(ALL(SR1,ST-02,ST-03),T1-30) | Graft a fluid route and select its liquid. | Water service; no automatic conversion between fluid and biomass. |
+| T1-03 — Item Vein | ALL(ALL(SR1,ST-02,ST-03),T1-30) | Graft an item route and set its destination face. | Inventory transport without helper mobs. |
+| T1-04 — Vascular Junction | T1-01 | Transfer biomass through an explicitly configured intake and outlet. | Join/split flow; a shared bidirectional store port; closed mouths remain visibly closed. |
+| CI-03 — A Reservoir You Can Walk Under | T1-04 | Grow an unobstructed junction stalk to two blocks before mounting storage. | Optional tall support; growth does not move an occupied reservoir. |
+| T1-05 — Septum Crossing | ANY(T1-01,T1-02,T1-03) | Route two distinguishable same-carrier streams through one crossing without mixing. | Crossing is not a junction; isolation is deliberate. |
+| T1-06 — Vascular Stitch | ANY(T1-01,T1-02,T1-03) | Transfer across a visible terrain step using its two selected endpoints. | Natural hills, turns, rising and descending paths; no buried-block targeting. |
+| T1-07 — Biomass Reservoir | ALL(T1-04,T0-04) | Upgrade a bladder into reservoir cells and form one valid connected store. | Grow a rectangular shared volume without interior walls or duplicated contents. |
+| CI-04 — Expand Without Losing the Colony | T1-07 | Add a complete reservoir row/layer and confirm the previous contents remain. | An incomplete addition waits outside the valid body; it does not erase the old tank. |
+| T1-08 — Fluid Cyst | ALL(SR1,T0-12) | Store and withdraw the same compatible fluid. | Separate water/process tanks; future hot-fluid lining. |
+| T1-09 — Item Capsule | SR1 | Store two distinct item types and retrieve them unchanged. | Physical storage, legible contents and expansion without merging equipment histories. |
+| T1-10 — Intake Mouth | ALL(SR1,T0-05) | Pull a permitted ingredient from a facing inventory into an organ input. | Hoppers, ordinary chests and compatible external storage are valid partners. |
+| T1-11 — Output Mouth | ALL(SR1,T0-06) | Export a completed product without extracting reserved ingredients. | Output separation and full-inventory back-pressure. |
+| T1-12 — Filter Valve | ANY(T1-01,T1-02,T1-03) | Admit a permitted stream while retaining a configured minimum reserve. | Filters, priority and reserve floors. |
+| T1-13 — Overflow Valve | ALL(T1-12,T1-08) | Send a measured excess batch to an assigned spare tank. | Both destinations full means stop, not disappear or burst. |
+| T1-14 — Sensor Polyp | SR1 | Measure a selected target and change an output signal at its configured threshold. | Local alarms; comparator ingredients may require trade or Nether resources. Not an early mandatory gate. |
+| T1-15 — Nerve Tissue | ALL(ALL(SR1,ST-03),T1-30) | Deliver an on/off signal to one assigned organ. | Control is separate from transport and electricity. |
+| T1-16 — Synaptic Console | ALL(T1-04,T1-14) | Inspect an actual blocked route, identify its reason and change a valid rule. | A local overview; the handheld tool still works without a console. |
+| T1-17 — Cultivation Tissue | ALL(SR1,T0-09,ST-03) | Grow and harvest a planted crop while retaining replanting stock. | Food and colony feed compete for a real harvest. |
+| T1-18 — Harvest Corolla | ALL(T1-17,T1-32) | Cut one mature crop into a reserved bed or capsule, leaving planting to a player or separate organ. | Harvest is one operation; no ground-item shower or free replant. |
+| T1-19 — Compost Gland | SR1 | Recover fertilizer from an organic scrap batch. | Choose compost or digestion for the same material, not full yield from both. |
+| T1-20 — Arbor Root | ALL(SR1,T0-16,T1-26) | Bind and feed one selected tree, assigning its growth between wood, pods or resin. | Growth and cutting are separate; authorize finite salvage only when desired. |
+| T1-25 — Sapping Bush | ALL(SR1,T0-01) | Establish a bush and collect its selected product while retaining the plant. | Fiber, berries or feedstock; an inhabited ground layer rather than a bare carpet. |
+| T1-26 — Living Wood | ALL(SR1,T1-30) | Graft and harvest one exposed log as Living Wood. | First Arbor Root ingredient; mod-native construction wood and later sap production. |
+| T1-27 — Canopy Cyst | ALL(T1-20,T0-05) | Harvest one supplied canopy pod with the tree still viable. | Food, resin or planting-stock specialization; luminous canopy variant. |
+| T1-28 — Sap Tap | ALL(T1-26,T1-20) | Collect resin into a container without removing the trunk. | An alternative biological binder; multiple taps share the tree's production. |
+| T1-21 — Digestive Tissue | ALL(ALL(SR1,ST-03,ST-02),T1-30) | Configure a small isolated patch, its export and safe bypass. Live damage is not required for the teaching advancement. | Armed defense is a separate surface function; explain actual-damage biomass and exclusion of players/tamed pets. |
+| T1-22 — Travel Tissue | ALL(ALL(SR1,ST-03),T1-30) | Mark a route and inspect its exact suit prerequisites. | A prepared fast lane; functional use is completed separately under equipment. |
+| T1-23 — Climbing Tendon | SR1 | Build and climb a short supported vertical route. | A reusable escape path needing no suit fuel; luminous variant for mines. |
+| T1-24 — Hearth Lung | ALL(SR1,T0-07) | Attach an unobstructed lung and complete a host furnace batch. | Upgrade the existing furnace's body; a blocked lung removes its benefit, not the furnace. |
+| T1-29 — Sphincter Door | ALL(SR1,T0-11) | Open and close a living doorway with a clear occupied-space check. | Ordinary access, nerve control and later process hatches. |
+| T1-31 — Planting Proboscis | ALL(SR1,T0-09,T1-17) | Plant one supplied seed into a valid empty cell, retaining the stock reserve. | Share a seed supply across separate harvest/planting stations. |
+| T1-32 — Work Bed | ALL(SR1,ST-03,T1-30) | Hold a real workpiece and inspect ready versus result-held states. | A flush visible workspace, finite contents and exclusive work ownership. |
+| T1-33 — Collection Cilia | ALL(T1-32,T1-09) | Export a released batch into an accepting capsule; retain it when that capsule is full. | Stationary collection without loose entities or mandatory drones. |
+| T1-34 — Reflex Knot | ALL(SR1,T1-30) | Combine two held conditions to permit one operation, then block it by removing one condition. | Early condition-based control without quartz, electricity or a tick-perfect clock. |
+| T1-35 — Selector Ganglion | ALL(T1-34,T1-12) | Let two ready sources take turns using one destination; show only one owns the current grant. | Priority versus fair sharing; no extra transported material. |
+| T1-36 — Fuel Papilla | ALL(SR1,ST-03,T0-04,T1-04,T1-30) | Mutate a mature substrate cell, connect its biomass supply and deliberately refuel worn armor while standing on it. | A flush fuel-only surface; partial suits work; no separate organ or healing function. |
+| CI-06 — Harvest Is Not Planting | ALL(T1-18,T1-31,T1-33) | Run a supplied annual crop cycle with separate planting, harvesting and collection. | Compare shared seed reserves with dedicated crop lanes; perennial harvest can omit replanting. |
+| CI-01 — One Line, No Hand Feeding | ALL(SR1,ST-02) | Run three consecutive batches in one organ with automatically replenished inputs and retained/exported output. Native mouths/veins, hoppers or compatible transports qualify. | First autonomous processing line; show the actual inputs, fuel and output path. |
+| CI-02 — Feed Tomorrow's Colony | CI-01 | Supply that line from a replenishable organic source while retaining its seed/breeding/growth reserve. Complete three source-to-consumer batches. | SR2 route. Crops, tended trees, bushes, ordinary farms or husbandry can solve it; no prescribed farm shape. |
+| CI-05 — The Store Is Full | CI-01 | Let a small destination become full; show clean refusal, free space, then resume one batch without material loss. | Back-pressure as normal operation. Optional readiness lesson, not a demand for destructive overflow. |
+
+### Temporary construction support
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| T1-37 — Temporary Membrane | SR1 | Place supplied temporary support with the handheld organ and observe its defined expiration. | Uses armor biomass; fall-arrest/midair behavior is not approved. |
+
+## 5. Genetics, food, husbandry and field construction
+
+Genetics has two outputs: **knowledge** in the DNA Bank and **consumable stock** in a container. Neither substitutes for the other. An incomplete genome card shows missing coverage and the relevant specimen sources before the player spends a rare sample.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| T2-31 — Fusion Chrysalis | ALL(SR2,T1-30,T2-04) | Prepare one target-specific graft from active ingredients and Binder. | Host preparation needs no creature genome; genetic grafts consume researched stock. |
+| SC-01 — Collect Without Clutter | ST-02 | Equip one Sample Pouch, collect a supported death sample and inspect its species/quality row. | No armor requirement; full/filtered collection does not spill extra items. |
+| BP-01 — Carry Sac | ALL(SR1,T1-30) | Craft the separate pack and move an existing pouch into its sample socket. | Storage only; no armor abilities or nested packs. |
+| T1-38 — Sample Dock | ALL(SC-01,T1-07) | Unload selected samples into an accepting archive without changing their quality/count. | Real transfer; retained field reserve. |
+| T1-39 — Dew Gland | ALL(SR1,T1-30) | Recover water from an allocated fresh harvest batch. | Crops divided among fuel, water, food and construction. |
+| T2-35 — Specimen Archive | ALL(SR2,SC-01) | Store samples from two sources and request one selected species. | Raw samples are separate from DNA Bank coverage and Genetic Stock. |
+| T2-36 — Sample Collector | ALL(SR2,T2-35) | Link one owned killing organ and accept one qualifying sample. | Event-based collection; no surrounding-creature scan. |
+| T2-01 — Specimen Extractor | SR2 | Process one labeled specimen into a fragment and matching stock. | Basic extraction and disclosed recovery; ordinary plant and mob sources both qualify. |
+| T2-02 — DNA Bank | SR2 | Deposit one real fragment and inspect its source-specific coverage. | Physical storage grade/capacity, missing coverage and connected access. |
+| GE-01 — Follow the Missing Sequence | ALL(T2-01,T2-02) | Select a source and show a new fragment increasing previously missing coverage. | A fragment is consumed once; repeatedly reinserting the same evidence gives nothing. |
+| GE-02 — One Complete Genome | GE-01 | Reach 100% coverage of any supported ordinary source. | That source's trait recipes; qualifies a route toward SR3. No requirement to complete every species. |
+| T2-03 — Archive Lobe | T2-02 | Attach a lobe and assign one real research record. | Expand memory; moving a lobe retains its assigned records. |
+| T2-04 — Sequencing Lens | ALL(T2-01,T2-02) | Inspect remaining coverage and predicted gain, then process the selected sample. | Preview before consumption; precision services determine the multiplier. |
+| T2-05 — Genetic Culture Vat | ALL(SR2,T1-08,T2-04) | Grow one batch of matching Genetic Stock using a completed genome and retained seed stock. | Maintain discovered cultures; recipes cannot grow pearls, stars or metals. Bioactive mineral-carrier recipes do not themselves need a creature genome. |
+| T2-06 — Mutation Chamber | ALL(SR2,T0-08,T2-04,T0-11,T0-12) | Form the valid chamber and inspect a target's mutation preview. No completed mutation is needed to reveal its instructions. | Reagents, anatomy, incompatible grafts and preserved target identity. |
+| T2-08 — Healing Dock | ALL(SR2,T0-08) | Mend eligible damage using real supplies without also refilling the reserve. | Healing and fuel stops can be separate; armor healing credit follows Armor Evolution. |
+| T2-09 — Grafting Bench | ALL(SR2,T0-06,T2-04) | Form a valid bench and inspect a compatible plant graft. | Plant specialization, separate parent stock and habitat needs. |
+| GE-04 — A Trait Put to Work | ALL(GE-02,ANY(T2-06,T2-09)) | Install one researched genome-derived trait and demonstrate its stated function on a plant, organ or equipment piece. Host-only grafts do not satisfy this particular genome lesson. | SR3 route; player chooses the research specialty. |
+| T2-10 — Ration Kitchen | ALL(SR2,T0-07) | Cook one chosen expedition ration from actual food. | Food production has value beyond digestion; travel and work meals are alternatives. |
+| T2-11 — Brewing Gland | SR2 | Brew one valid potion batch from its normal ingredients. | Actual brewing-stand ingredients still matter; drinking remains useful alongside future infusion. |
+| T2-12 — Aquaculture Bed | ALL(ALL(SR2,T1-17),T1-30) | Raise one selected aquatic crop or stock batch in its valid water habitat. | A parallel ocean economy, not mandatory Nether preparation. |
+| T2-25 — Feeding Trough | ALL(SR2,T0-09) | Feed an assigned pen while respecting its target population and breeding reserve. | Controlled husbandry using real food. |
+| T2-26 — Milking Lobe | T2-25 | Collect a permitted nonlethal animal product into its required container. | Service berths, animal recovery and later shearing grafts. |
+| T2-27 — Incubation Basket | T2-25 | Hatch into one reserved valid berth; retain stock if no berth is available. | Populate a pen without flooding it with entities. |
+| T2-28 — Fishing Polyp | SR2 | Catch a permitted fish from a marked valid water area into storage. | A shore-based alternative to cultivated aquaculture, with bait and rod wear. |
+| T2-29 — Restorative Tissue | ALL(ALL(SR2,ST-03),T1-30) | Supply and configure a recovery cell for an authorized target. Healing an already injured target may complete it, but deliberate injury is not required. | Recovery spends biomass; it produces neither specimens nor DNA. |
+| T2-20 — Structure Grower | ALL(SR2,T0-10,T0-11) | Assemble a small marked pattern entirely from supplied parts. | Templates, obstruction refusal and physical construction costs. |
+| GE-05 — A Deliberate Plant Line | ALL(GE-04,T2-09) | Grow and harvest one grafted plant with its stated conditions met. | A useful crop/tree expression; optional ecological specialization, not a mandatory combat genome. |
+| GE-06 — A Research Supply Line | ALL(T2-05,CI-01) | Automatically replenish one culture's feed and export usable stock while retaining its seed reserve. | Reduce repeated specimen collection after discovery; rare cultures still need their own feed. |
+
+## 6. Mining: choose the excavation, not just a bigger head
+
+Manual Leaching remains available throughout. Automated methods remove real terrain. Every plan is finite and must leave a usable entrance, light and access. Completing one method never requires completing all the others.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| T2-22 — Surveyed Tissue | ALL(ALL(SR2,ST-02,ST-03),T1-30) | Mark a finite footprint/depth entirely on exposed ground-level tissue and confirm its preview. | Selected borders, access and an explicit stopping depth. |
+| T2-21 — Descending Rootstock | ALL(T2-22,T2-34,T2-20,T1-32,T1-33,T1-34,T1-23,T0-13) | Assemble the working organs, finish one supplied staircase section and walk to its landing. | Planner, cutter, collector and access grower remain separate; the next section needs authorization. |
+| MI-01 — Another Section, Not Forever | T2-21 | Prepare the next landing/collar and approve one additional bounded branch or section. | A completed section does not automatically acquire another mine's worth of targets. |
+| T2-23 — Mineral Gizzard | ALL(SR2,T0-06) | Process actual raw ore into its accounted mineral concentrate and residue. | Dry smelting versus a longer recovery chain. Armor-carrier preparation is a separate no-bonus recipe mode. |
+| T2-24 — Washing Kidney | T2-23 | Wash a batch into separate useful and waste outputs. | Water logistics, retained mineral fractions and full-waste back-pressure. |
+| T2-32 — Grasping Root | ALL(SR2,T1-32) | Present one real adjacent eligible block on an empty bed and stop while it is occupied. | Intact extraction is not treatment, a loot roll or automatic delivery of ingots. |
+| T2-33 — Reaction Polyp | ALL(SR2,T1-32,T1-30) | Apply a supported reagent to a locked workpiece and hold its treated state. | The Cyst prepares reagents; the polyp applies them; another organ fractures/collects. |
+| T2-34 — Fracture Jaw | ALL(SR2,T1-32,T0-06) | Break a permitted workpiece into retained products, respecting its cutting grade and process state. | One accounted harvest; no second loot roll for treated ore. |
+| MI-03 — One Block, Several Jobs | ALL(T2-32,T2-33,T2-34,T1-33,T2-23) | Extract, condition and fracture one ore block, then collect and grind its fragments. | Reusable parts form a refinery; direct ordinary mining remains a cheaper alternative. |
+| MI-04 — Share or Duplicate | ALL(MI-03,T1-35) | Compare a serial bed with two beds sharing one downstream organ; record output, feed and the blocking stage for a finite run. | Optional early optimization, not an arbitrary production quota or required second factory. |
+| MI-02 — A Mine That Stops Cleanly | ANY(T2-21,T3-11,T3-13,T4-13) | Pause a real job for a full output, absent access supplies or an unapproved boundary; resolve the cause and resume without losing its cargo. | Servicing a mine, not outrunning an uncontrollable quarry. |
+
+Later mining pages are listed in their thermal and precision chapters: Descending Cradle, Boring Jaw, Digestion Crucible and the one-block-wide Strata Maw. Rootstock stairs, a moving shaft platform, a drained treatment pit and a surface trench solve different jobs; none is the mandatory replacement for Manual Leaching.
+
+## 7. Defense and optional helpers
+
+The ordinary campaign can be completed with stationary organs, normal equipment and other players. Helper pages are a side branch. A demonstration can use safe target observation or an authorized training target; progression never asks for an uncontrolled mob farm.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| T2-16 — Aerocyte Bloom | SR2 | Connect fuel, configure permitted targets and demonstrate a valid unobstructed target solution. | Single green shots, limited ammunition and sight lines; not automatic immunity to a dragon or Wither. |
+| T2-30 — Spine Sentry | SR2 | Supply real ammunition, configure its ground approach and validate its firing lane. | Ground defense differs from aerial interception. |
+| T2-17 — Repellent Crown | SR2 | Apply an appropriate scent to deter a susceptible ordinary target. | A nonlethal way to protect a work area; not universal boss/player repulsion. |
+| T2-18 — Lure Polyp | SR2 | Bring a susceptible existing creature to a marked accessible destination. | Attraction needs a path, a real target and the appropriate scent. |
+| T2-19 — Restraining Tissue | ALL(SR2,GE-11,ST-03) | Form a supplied husbandry restraint and safely release its permitted occupant. | Spider-informed restraint; release on timeout or supply loss. |
+| DF-01 — A Fed Defensive Position | ALL(T1-04,ANY(T1-21,T2-16,T2-30)) | Supply a defense while preserving a separate workshop/emergency reserve; demonstrate its safe stand-down. | Allocation between production and defense; damage-derived feed is optional. |
+| T2-13 — Brood Nursery [optional] | SR2 | Hatch one larva into a clear reserved berth, within the station's population limit. | Individual berths, idle positions and the Courier Graft for held-output delivery. |
+| T2-14 — Worker Waypoint [optional] | ALL(T2-13,T1-30) | Assign a short route with separate waiting/delivery positions and complete one safe delivery. | Reliable stairs/terrain routes; work stays local and loaded. |
+| T2-15 — Sail Roost [optional] | T2-13 | House and feed one sail assigned to named nurseries. | Population/support monitoring; no automatic chunk loading. |
+| CL-01 — Keep an Outpost Awake [optional] | ALL(T2-15,EN-06,T4-05) | Install the spatial roost upgrade, enable its chunk and verify fuel cutoff. | Preview ticking boundary, recurring biomass cost and quota; supply local restart fuel. |
+| DF-02 — Recall the Worker [optional] | T2-14 | Recall or relocate a worker with cargo preserved and its old berth released. | Ownership, full destination behavior and recovery after a worker dies. |
+
+No chapter badge has T2-13, T2-14, T2-15 or DF-02 as a compulsory ancestor. The parked hostile-fluid lift has no progression node.
+
+## 8. Thermal colony: build in the Nether
+
+Nether scouting and ordinary brewing are not locked behind SR3. This chapter teaches how to make the Nether a working production site. Its initial nursery uses carried biomass and a neighboring magma block; it does not need a Steam Heart to manufacture the first Thermal Lining.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| TH-00 — Pack for a Thermal Outpost | GE-02 | Establish a vanilla Nether route and stage membranes, feed, tools, shelter parts and a return supply. | Build the first outpost without already owning thermal bio armor. Ordinary fire-resistance preparations remain valid. |
+| T3-01 — Thermal Substrate | SR3 | Grow a local thermal bed in the Nether from the listed treatment and carried feed. | Native family differs from merely putting heat lining on an Overworld cell. |
+| T3-17 — Thermal Root | T3-01 | Root one heat interface on loaded Nether magma beside its host. | Local heat condition, not electrical generation or free lava. |
+| T3-18 — Thermal Cultivation Tissue | ALL(T3-01,T1-17,T3-17) | Produce a native fruit harvest with its fungus parent retained. | Feed local digestion, water recovery and membrane preparation through separate organs. |
+| T3-02 — Thermal Nursery | T3-01 | Produce the first Thermal Lining on the required native bed using bootstrap heat. | Nether-native membrane production; keep imported feed and local conditions distinct. |
+| T3-03 — Lava Siphon | ALL(T3-02,T1-02,T1-08) | Withdraw a measured amount from an actual marked lava source into a lined tank. | Finite hot-fluid extraction, receding source and shutoff. |
+| T3-07 — Relief Chimney | ALL(T3-02,T1-12) | Install an unobstructed relief destination and validate its route before pressure operation. | Safe discharge is constructed before a boiler is started. |
+| T3-04 — Steam Heart | ALL(T3-02,T3-07,T1-08) | Produce a controlled steam batch with water, real heat input and a working relief path. | The first pressure body; no first-batch electricity requirement. |
+| T3-05 — Steam Vein | T3-04 | Deliver a steam batch through a heat-lined route with a designated condensate outlet. | Steam, fluid and signal paths are separate services. |
+| T3-06 — Pressure Vesicle | T3-04 | Charge and discharge a finite steam reserve within its permitted pressure. | Burst work and reserve capacity, not a cold-fluid tank. |
+| T3-08 — Condenser | T3-04 | Recover water from spent steam and supply make-up for the unrecovered fraction. | Cooling surface versus compact active cooling; no lossless self-powering loop. |
+| T3-09 — Thermal Mantle | ALL(T3-02,T0-07,T0-11) | Enclose an existing Bio-Furnace on the native footing and make Tempered Bone Plates. | Same furnace history, new body and hotter recipes; SR4 prerequisite. |
+| TH-02 — A Stronger Foundation | ALL(T3-09,ST-04) | Upgrade an existing ribbed functional cell to tempered ribs without losing its function. | Structural reinforcement is not an automatic upgrade to every organ above it. |
+| T3-10 — Steam Muscle | ALL(T3-04,T3-02) | Drive one supported host operation and account for spent steam. | A powered attachment that cannot mine or process by itself. |
+| T3-12 — Boring Jaw | ALL(T3-09,T3-10,T2-34) | Reinforce a Fracture Jaw and use its powered cutting face with a reserved output. | Retain the jaw's history; it can serve a fixed workshop or mining assembly. |
+| T3-11 — Descending Cradle | ALL(T3-12,T1-23,T2-22,T2-20,T1-33,T0-13) | Assemble the deck's working parts, descend one planned shaft section and return through retained access. | A moving supported platform, separate cutter/grower/collection, not arbitrary building relocation. |
+| T3-13 — Digestion Crucible | ALL(T3-02,T0-14,T2-22,T2-33,T1-02,T1-08,T1-23,T0-13) | Dose a sealed finite pit, drain its process medium and enter the recovery space safely. | A separate polyp treats; untouched ores still need recovery; waste destinations are required. |
+| T3-14 — Heat-Exchange Gill | ALL(T3-04,T1-02) | Transfer heat between separated streams without mixing their contents. | Heat reuse and cooling layout. |
+| T3-15 — Distillation Crown | ALL(T3-14,T2-11) | Concentrate one valid potion batch with its dose count conserved. | Compact chemistry for later infusion; not more effects from the same bottle. |
+| T3-16 — Launch Bellows | ALL(T3-10,T3-06) | Charge a clear launch pad and validate its landing plan; a safe short launch can demonstrate it. | Prepared vertical movement and later glider takeoff; not free flight. |
+| TH-01 — Nether Industrial Independence | ALL(T3-02,T3-18,T1-39,T4-01) | Run three complete local harvest/water/biomass/power cycles, then make a lining batch without withdrawing startup reserves. | Native industry exports surplus; imported fuel is for startup or emergencies. |
+
+## 9. Electrical precision and controlled production
+
+First electrical production can be metabolic or steam-assisted. A complete steam power network is not compulsory. An external energy source can power compatible consumers, but cannot provide a missing native material or replace proof of the supported process.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| T4-01 — Electrocyte Stack | ALL(SR1,T1-30) | Generate electricity using the starter metabolic recipe and retain its waste. | First power requires no power; thermal/spatial upgrades on this same core supply larger industry. |
+| T4-02 — Conductive Tissue | ALL(SR1,ST-03,T1-30) | Deliver power through a bounded route. | Actual supply, circuit separation and transfer limits. |
+| T4-03 — Charge Sac | T4-01 | Charge a reserve and discharge it into a supported load. | Finite energy storage; protected shutdown supply. |
+| T4-04 — Electrical Exchange Organ | ALL(SR4,T4-01) | Exchange energy with an available compatible external system in the selected direction. | Optional integration branch; absent external mods never block a badge. |
+| T4-05 — Ion Separator | ALL(SR4,T2-24,T2-04) | Run one mineral or genetic separation recipe with power, water and retained waste. | Separate recipe cartridges; recover only the remaining mineral/sample value. |
+| T4-07 — Precision Sequencer | ALL(T4-05,T2-04) | Process a supported valuable sample with its expected recovery preview. | Fewer wasted specimens; attach a sequencer service to a DNA Bank to enable complex records. |
+| T4-08 — Potion Infuser | ALL(SR4,T3-15,T2-06) | Install a supported chemical interface and load one real potion dose into eligible equipment. | Limited charged effects; returned empty bottles; ordinary drinking remains useful. |
+| T4-09 — Trait Regulator | ALL(T4-07,T2-03) | Process a compatible specialist plan and retain its stated anatomy/metabolic exclusions. | Regulation does not erase the protection-versus-flexibility tradeoff. |
+| T4-10 — Scheduler Ganglion | ALL(SR4,T1-16,T4-03) | Complete a short sequence: reserve inputs, run a real organ, wait, then export. | Explicit dependencies and a visible blocked step. |
+| T4-11 — Display Membrane | ALL(SR4,T1-14) | Display one actual machine value with a readable threshold/alarm state. | Optional wall monitoring; labels and shape cues as well as color. |
+| T4-12 — Request Cortex | T4-10 | Request one item whose recipe uses at least two real operations and deliver the result. | Physical machines execute the order; shortages remain visible. |
+| T4-13 — Strata Maw | ALL(SR4,T2-21,T3-12,T2-31,T1-23) | Upgrade the planner and complete a finite **one-block-wide** strip from the surface down, using its actual working organs. | Reuse cutting/collection/access parts; no built-in ore separator or compulsory Cradle/Crucible. |
+| T4-14 — Spoil Sorter | ALL(SR4,T1-09,T1-11,T1-12,T1-35) | Build filtered capsule/mouth lanes and route a mixed batch into ore, useful rock and retained surplus. | A layout recipe, not a new sorter block; simple versions work at T1. |
+| T4-15 — Recovery Sump | ALL(SR4,T1-08,T1-04,T3-02) | Recover a small measured test volume inside an isolated catchment. | Local fluid recovery; no need to rupture a live storage tank. |
+| T4-16 — Neutralization Gland | ALL(SR4,T0-03,T2-24,T3-02) | Neutralize a supplied waste batch with accounted residue and dirty water. | Destructive disposal is explicit, costs reagents and cannot close a profitable digestion loop. |
+| T4-17 — Pressure Regulator | ALL(SR4,T1-14,T1-13,T4-03) | Control a selected vessel and complete a safe stop while preserving shutdown reserve. | Automate limits; an undersized or obstructed relief route is still invalid. |
+| T4-18 — Folded Shelter | ALL(SR4,T2-20) | Pack and deploy a small shelter from actual parts into a clear footprint. | First End/Fold expeditions use imported building stock, not materials from their destination. |
+| T4-19 — Cold Lobe | ALL(SR4,T3-14,T4-03) | Maintain one valid cold compartment through a processing interval. | Cold condition for R3 sequencing; raw samples have no passive decay. |
+| T4-20 — Mnemonic Vessel | SR4 | Extract and withdraw a measured amount of player XP without loss. | Capacity, explicit payment source and chamber supply for counter-reduction rituals; no conversion of armor learning into XP. |
+| EL-01 — Precision With a Purpose | ANY(T4-05,T4-07) | Deliver one useful precision output into storage or its next legitimate process. | SR5 prerequisite; mineral recovery and sample sequencing are alternatives. |
+| EL-02 — Stop Without Losing the Batch | EL-01 | In a small supported job, close its output or pause its supply, observe safe refusal, then restore service and finish with materials retained. | SR5 prerequisite. Native controls, simple redstone or a scheduler can solve it; no mandatory accident. |
+
+Recovery and neutralization pages teach containment of destructive biomass spills.
+Demonstrate safe handling with a supplied catchment, not a mandatory organ-destruction task.
+
+## 10. End settlement and spatial production
+
+The book shows the expedition plan before departure. It does not invent a free pre-dragon return portal or assume a shelter is dragon-proof. A world where another team already defeated the dragon remains fully playable; the dragon egg is never required.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| EN-00 — Plan the First End Expedition | SR4 | Stage an equipment, building, fuel and ordinary return/recovery plan in an expedition inventory. | Vanilla preparation or a packed supported outpost. No End-grown gear required. |
+| EN-01 — Beyond the Portal | EN-00 | Reach the End alive. | Survey a build site and locate local materials; rank does not restrict ordinary portal use. |
+| EN-02 — The Dragon Is Not the Ending [optional] | EN-01 | Participate in a dragon defeat, or inspect an already opened exit in a world where it is defeated. | Post-encounter settlement and recovery; no exclusive egg ownership or repeated kill demand. |
+| T5-01 — Anchored Substrate | SR5 | Mature a local anchored bed in the End using imported supplies and local ingredients. | A native spatial foundation, not an Overworld floor with a special appearance. |
+| T5-03 — Anchor Root | SR5 | Construct and supply the physical corner restraints of a proposed spatial body. | First anchors use thermal products and End materials, not Spatial Membrane. |
+| T5-02 — Spatial Nursery | ALL(T5-01,T5-03,T2-05) | Grow the first Spatial Membrane with real feed and electricity on its End bed. | A continuing three-material chain: ordinary membrane, Nether lining, End growth. |
+| T5-04 — Void Tether | ALL(T5-02,T3-16) | Register a clear local rescue berth, charge it and validate its bounded work area. No fall into the void is required. | A later local rescue service; never assumed available for the first arrival. |
+| T5-05 — Chorus Resonator | ALL(SR5,T5-01) | Establish one selected local conditioning pulse. | Purpose-specific rooms; incompatible tuning must be separated or scheduled. |
+| T5-06 — Spatial Conditioner | ALL(T5-02,T5-05,T2-06) | Finish one purpose-conditioned membrane batch in the End. | Passenger, cargo and precision branches. Reconditioning consumes work, not another original membrane. |
+| EN-04 — Passenger Conditioning | T5-06 | Produce a passenger-conditioned batch. | Transit mouths and arrival anatomy. |
+| EN-05 — Cargo Conditioning | T5-06 | Produce a cargo-conditioned batch. | Freight gullets and staging locks. |
+| EN-06 — Precision Conditioning | T5-06 | Produce a precision-conditioned batch. | Spatial armor, district control and compound-organ treatment. |
+| T5-07 — Levitation Chamber | ALL(SR5,T4-09,T5-02,GE-18) | Run one supported delicate treatment in a properly supplied suspension bay. | Shulker-informed sample handling, not a free-flight chamber. |
+| T5-08 — Chorus Orchard Tissue | ALL(T5-01,T1-18) | Harvest an End-grown chorus crop with planting stock retained. | Local nursery feed and an accessible cultivated canopy. |
+| T5-09 — Targeting Eye | ALL(T5-02,T1-14,ANY(T2-16,T2-30)) | Assign a valid observed target to an authorized defense without bypassing its range or sight line. | Coordinated defense rather than another independent weapon. |
+| T5-10 — Selective Membrane | ALL(T5-02,T1-29) | Admit an authorized entrant and demonstrate the configured safe emergency opening. | Controlled rooms without trapping their occupants. |
+| T5-11 — Catching Membrane | T5-02 | Catch a deliberately dropped low-value item over a safe test floor and retain it in connected storage. | Physical collection net; not universal player rescue. |
+| T5-12 — Phase Isolator | ALL(T5-02,T5-05) | Run two nearby differently tuned rooms with their boundaries separating the processes. | Compact spatial districts; a complete enclosure has a job. |
+| EN-03 — End Industrial Independence | ALL(T5-02,T5-08,T1-39,T4-01) | Run three local chorus/water/biomass/power cycles and grow another membrane without fuel imports or reserve depletion. | End cultivation needs powered native conditions and larger cycle buffers. |
+
+## 11. Three worlds, one production system
+
+Local automation is required; perpetual remote ticking is not. An unloaded workshop pauses. Each arrival station needs a clear actual destination, and each cargo transfer needs real receiver capacity.
+
+**Solo route:** the player can carry accounted batches through ordinary available portals between already automated local sites. This can satisfy TR-01/TR-02. Freight Gullets and Transit Maws offer another route when their endpoints can legitimately operate. No badge forces both distant sites to remain loaded, requires a Nutrient Sail, or silently authorizes chunk tickets. An explicitly enabled spatial Sail Roost upgrade can maintain an endpoint chunk under the catalog's paid loading limits; it is not included in a gate's ordinary operation.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| T6-02 — Arrival Chamber | ALL(SR6,EN-04,T5-04) | Reserve and validate a supplied clear arrival berth. | Arrival before departure; production cannot consume its protected reserve. |
+| T6-01 — Transit Maw | T6-02 | Complete one authorized trip between ready valid stations. | Original living passenger transit; unavailable destination refuses departure. |
+| T6-04 — Cargo Lock | ALL(SR6,EN-05,T1-09) | Pack and cancel one real staged batch without losing or duplicating cargo. | Requested, reserved, packed and received are different states. |
+| T6-03 — Freight Gullet | ALL(T6-04,T1-04,T1-08) | Deliver one acknowledged cargo batch between ready endpoints. | Freight capacity and passenger capacity are independent. Offline receivers leave cargo safely local. |
+| T6-05 — Storage Cortex | ALL(SR6,EN-06,T1-16,T2-03,T1-09) | Find and withdraw a real item from connected physical storage through its routed interface. | Storage indexing does not require a recipe planner; offline stock is not instantly withdrawable. |
+| T6-06 — Workshop Interface [optional integration] | ALL(SR6,T4-12,T1-10,T1-11) | Complete a compatible external process request using delivered ingredients and a real organ. | Adapter branch; no external mod is required for the native progression. |
+| T6-07 — Relay Ganglion | ALL(SR6,EN-06,T4-10) | Query or command an authorized connected district and show an honest unavailable state when it is offline. | Local autonomy plus selective remote oversight. |
+| T6-08 — Foundation Cyst | ALL(SR6,EN-05,T2-20,T0-04) | Deploy a packed finite marked patch and retain unused supplies. | Controlled outpost expansion; no limitless spreading or instantly mature native beds. |
+| T6-09 — Service Pedestal | ALL(SR6,T2-08,T1-36,T1-09,T1-12,T1-34) | Build a berth with separate fuel/healing services and complete only the authorized requests. | A reusable station layout, not a new block that grants every service. |
+| T6-11 — Recall Nest | ALL(SR6,EN-05,T1-07) | Form the supplied nest and inspect its empty reservable berths. | Individual-piece recall; loaded receiver required; charging also supports Death Bond. |
+| T6-10 — Reclamation Mouth | ALL(SR6,T2-20,T1-11,T6-04) | Recover a selected unoccupied small assembly into reserved containers. | Safe relocation with core history, fluid and contents accounted for. |
+| TR-01 — Three Useful Addresses | ALL(SR6,TH-01,EN-03,CI-01) | Deliver one real Nether-native batch and one real End-native batch to an owned working Overworld workshop. Record the producing sites; hand carriage through available vanilla portals or acknowledged compatible freight qualifies. | Three-dimensional supply network without mandatory remote chunk loading. |
+| TR-02 — A Product No Single World Could Make | TR-01 | Finish one supported product whose actual chain used Overworld construction membrane, Nether Thermal Lining and End-grown/conditioned Spatial Membrane. Local production steps run automatically; transport may use the chosen route. | SR7. A Transit Maw, spatial armor medium or another declared pre-SR7 recipe can demonstrate the chain. |
+| TR-03 — Two Routes, One Colony [optional] | ALL(T6-03,T6-07) | Redirect one bounded shipment after an endpoint becomes unavailable, retaining the original reservation correctly. | Redundant districts and rerouting; no off-screen production claim. |
+
+## 12. Synthesis and the three-dimension capstone
+
+This chapter rewards design choices: which organs are combined, which services are shared, and which processes should remain separate. A large assembly is not automatically a better version of every smaller one.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| T7-02 — Anatomy Socket | ALL(SR7,EN-06,T1-04,T0-11) | Install and isolate one supported attachment in a prepared compound body. | Physical attachment space with separate supply, output and control. |
+| T7-01 — Synthesis Heart | ALL(SR7,T4-09,T2-06,EN-06) | Form its body and grow one supported compound core from actual donor organs. | Donor histories are assigned, not copied; the resulting recipe defines its capabilities. |
+| T7-03 — Catalyst Lobe | ALL(SR7,T2-05,T4-07,T5-02) | Maintain one matching catalyst culture through a host recipe. | Advanced culture feed and real catalyst consumption. |
+| T7-04 — Expression Switch | ALL(SR7,T4-09,T4-10,EN-06) | Complete one legal drained/idle changeover between two installed organ profiles. | Alternate roles, not both at full strength simultaneously. |
+| T7-05 — Organ Transplanter | ALL(SR7,T6-10,T7-02,T5-07) | Move one seasoned core into a prepared compatible body with its history unchanged. | A starter organ can remain valuable inside a late installation. |
+| T7-06 — Genome Vault | ALL(SR7,T2-02,T2-03,EN-06) | Store an exotic source record in the supplied vault. | Exotic DNA storage and physical backups; knowledge is not consumable stock. |
+| T7-07 — Interceptor Nursery [optional] | ALL(SR7,T2-13,T7-03,ANY(T2-16,T2-30)) | Deploy and recall one bounded defender group with accounted growth stock. | Temporary combat organisms; no requirement for ordinary freight or boss access. |
+| T7-08 — Siege Blossom | ALL(SR7,T2-30,T5-09,T3-10,T4-03) | Commission a supported, cooled firing position and deliver one valid supplied shot. | Strong stationary defense that needs a clear target and a working base. |
+| SY-01 — One Body, Two Jobs | ALL(T7-01,T7-02) | Complete two supported operations through a compound assembly using its actual installed working parts. | A practical compound design, not an arbitrary organ collection. |
+| SY-02 — Choose the Better Design | ALL(SY-01,T4-11) | Record two finite production runs for the same useful output and compare throughput, feed and occupied footprint. Keep the chosen design. | Optional optimization page; no universal leaderboard formula or forced “best” layout. |
+| SY-03 — A Colony With a Future | ALL(SR7,SY-01) | Finish one useful commissioned order while retaining supply for the next and a protected service/return reserve. | Three-dimension capstone advancement. Research, alternative builds and new outposts remain open; the Fold is not required. |
+| T7-09 — Fold Gateway [long-term] | ALL(SR7,T5-06,T6-02,T7-03,GE-17,GE-19,GE-15) | Prepare the End-native gateway, its two catalyst services, imported landing stock and return reserve; create a destination seed from silverfish, blaze and enderman stock using their complete genomes. | First deliberate Fold expedition. No Fold plant, Adaptive Gel or boss material is needed to open the first route. |
+
+## 13. The Fold: a fourth settlement, not a loot room
+
+The first shelter and return mechanism use imported parts. Natural feeding and hardening phases can be waited for; later regulation is an alternative that costs infrastructure and power. Nothing here makes harvested ore regenerate.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| FO-01 — A Foothold, Not a Trap | T7-09 | Arrive at the prepared Fold landing, establish the packed shelter and validate its still-supplied return mechanism. | SR8. Basic survival does not depend on obtaining the first native output under an invisible deadline. |
+| T8-10 — Foldroot | SR8 | Gather a local cutting and reserve one for planting. | Starting nursery feed and a regenerating ground plant. |
+| T8-11 — Pulse Reed | SR8 | Harvest a reed segment while retaining its base or planting stock. | Fiber and a visible local phase indicator. |
+| T8-12 — Glassbloom | SR8 | Obtain soft-phase specimen material or hardened petals, with planting stock retained. | Different useful harvests from different natural phases. |
+| T8-01 — Adaptive Substrate | ALL(SR8,T8-10) | Culture local root-bearing ground and mature it under native conditions. | Imported ordinary tissue cannot replace the native growing environment. |
+| T8-02 — Founder Nursery | ALL(T8-01,T8-10,T3-02) | Produce the first Adaptive Gel using imported water/feed and native cuttings. | Native supply before any boss or closed environmental room exists. |
+| T8-03 — Phase Shelter Skin | ALL(T8-02,T0-10) | Enclose a small room and show its supported buffering behavior through a natural phase change. | Biological room boundaries and maintenance, not a universal hazard shield. |
+| T8-04 — Habitat Lung | ALL(T8-02,T8-03,T3-14,T1-14) | Maintain a selected room condition while accounting for water, feed, power and waste. | Local habitat control; separate rooms can serve different organisms. |
+| T8-05 — Adaptive Culture Loom | ALL(T8-04,T5-07,ANY(GE-20,GE-21,GE-22)) | Grow an adaptive membrane for two specified operating conditions. | Local plant knowledge plus thermal/spatial materials; no requirement to capture an advanced local creature first. |
+| T8-06 — Phase Accumulator | ALL(T8-02,T4-03,T5-03) | Build a finite empty phase reserve and inspect its input/output limits. | Storage alone captures nothing; its first commissioning can precede the collector. |
+| T8-13 — Phase Collector | ALL(T8-06,T5-05) | Capture one natural transition into an actual accepting accumulator. | Exposed capture area and sheltered reserve can be built separately; retuned transitions give no charge. |
+| T8-08 — Retuning Root | ALL(T8-13,T7-04) | Pay for a local feeding/hardening interval in an assigned enclosure. | Scheduled native production; a separate collector supplies charge, never from artificial retuning. |
+| T8-09 — Quarantine Gate | ALL(T8-02,T6-04,T5-10,T1-34) | Inspect one declared cargo batch, admit a compatible load and retain/return a refused one. | Inspection is separate from any required treatment; no hidden universal decontamination machine. |
+| FO-02 — The Foothold Feeds Itself | ALL(T8-02,CI-01) | Run three nursery batches with reserved/replanted local cuttings and replenished water/biomass. Imported biomass is permitted; local Gel production is mandatory. | SR9 prerequisite; an ongoing settlement, not a single plucked plant. |
+| FO-03 — Work With the New Biology | T8-05 | Use a native adaptive membrane in a supported functional part or equipment interface. | SR9 prerequisite; a material must become useful, not merely sit in a trophy chest. |
+| FO-04 — Separate the Seasons [optional] | ALL(T8-08,T8-05) | Run feeding and hardening recipes in separately supplied rooms or a deliberately scheduled shared room. | Two viable architectures for native production. |
+
+## 14. The Manyfold and what follows
+
+The boss is summoned deliberately at a prepared site, away from the return station. Its chapter is about opening a vulnerability and exploiting it, not a prerequisite to maintain the settlement that makes the attempt possible.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| T9-01 — Calling Corolla | ALL(SR9,GE-20,GE-21,GE-22) | Build the corolla with its required native stock and inspect its ready-to-call state without activating it. | Encounter site, supplies and deliberate summon control. |
+| T9-02 — Resonance Sink | ALL(SR9,T8-06,T3-14,T5-12) | Handle a supplied noncombat calibration pulse with cooling and correct tuning. | Open a future vulnerability window; no need to summon the boss before learning the mechanism. |
+| T9-03 — Severing Root [optional] | ALL(SR9,T7-08,T8-08) | Prepare an aligned, charged severing organ and validate its target lane. | Infrastructure-heavy damage route. Personal weapons and allies remain a complete alternative. |
+| BS-01 — Ready to Call | ALL(T9-01,T9-02) | Validate return/service reserves, cooling, a clear encounter boundary and either a prepared personal combat loadout or supplied offensive organs. | Enables the deliberate summon action; no prescribed armor branch or compulsory Siege Blossom. |
+| BS-02 — Make It Vulnerable | BS-01 | During a deliberately started encounter, route the correct pulse through a supplied sink and open a vulnerability window. | The encounter's central puzzle; raw damage alone does not replace it. |
+| BS-03 — Sever the Manyfold | BS-02 | Defeat the encounter through personal attacks, a supplied Severing Root or their combination. | Species-specific death sample subject to collection capacity; no armor invulnerability reward. |
+| GE-23 — Understand the Manyfold | ALL(BS-03,T4-07,T7-06) | Resolve the boss genome with precision processing, retaining the stock needed to seed its culture. | Collect boss death samples and improve quality/extraction before spending them; complete coverage is not guaranteed by one victory. |
+| T9-04 — Pattern Incubator | ALL(GE-23,T7-03,T8-04) | Grow a first maintained batch of Manyfold Genetic Stock. | Repeatable post-boss graft materials from real feed and native habitat, not repeatable unique boss loot. |
+| T9-05 — Reciprocal Graft | ALL(T9-04,T7-04,T7-02,T7-01) | Install a shared adaptation budget and operate each legal allocation separately. | More capacity for one role means less for the other; no simultaneous maximums. |
+| BS-04 — A New Relationship | T9-05 | Complete a useful production/defense cycle using the chosen reciprocal arrangement, with both donors' histories retained. | Final journal capstone; alternate anatomy, colonies and efficient designs remain the long game. |
+
+Summoning again never awards another chapter milestone. Losing a battle does not remove SR9, destroy learned recipes or make the existing Founder Nursery require boss stock. A new attempt still pays its material preparation cost.
+
+## 15. The genetic atlas: species lead to actual choices
+
+All ordinary source cards are searchable after GE-01, with habitat and collection instructions. They do not need to be hunted in this table's order. Each completion below means **100% of that named genome in an accessible compatible DNA Bank or Genome Vault**, from valid source-labeled evidence, not simply holding its familiar drop.
+
+Every supported creature has species-specific death loot, including bats and silverfish. Pouch/collector instructions show filters, capacity and sample quality. Native extraction and stock culture require the actual dimension and laboratory configuration in Blocks; species origin does not change when a mob is relocated.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| GE-03 — Know What You Collected | T2-01 | Inspect a supported specimen's source label and the extractor's predicted outputs. | Source identity, ambiguous drops, material stock versus genome coverage. |
+| GE-07 — Cow | GE-01 | Complete cow DNA from identified livestock specimens. | Field Lens; compatible husbandry expressions. |
+| GE-08 — Rabbit | GE-01 | Complete rabbit DNA. | Running Tendons, Spring Heel and travel-tissue acceleration. |
+| GE-09 — Slime | GE-01 | Complete slime DNA. | Impact Bladder, Landing Bladders, route handling and restraint variants. |
+| GE-10 — Squid | GE-01 | Complete squid DNA. | Aquatic Eyes and Propulsive Fins. |
+| GE-11 — Spider | GE-01 | Complete spider DNA; cave-spider coverage is separate. | Climbing Hooks, Restraining Tissue and specialized digestive-floor control. |
+| GE-12 — Cave Spider | GE-01 | Complete cave-spider DNA. | Toxin Filter; controlled chemical-defense branch. |
+| GE-13 — Bat | GE-01 | Complete bat DNA through its supported sampling route. | Nocturnal Membrane; ordinary darkness traversal remains possible without it. |
+| GE-14 — Magma Cube | GE-01 | Complete magma-cube DNA. | Thermal suit lining and Thermal Exchange once native materials and frame requirements are available. |
+| GE-15 — Enderman | GE-01 | Complete enderman DNA. | Burrowing anatomy, later Blink and tracking; finding endermen in the Overworld is a legitimate early research route. |
+| GE-16 — Turtle | GE-01 | Complete turtle DNA through permitted specimens. | Gill Bellows, Pelagic Lining, Bracing Tendons and aquatic incubation. |
+| GE-17 — Silverfish | GE-01 | Complete silverfish DNA through identified specimens. | One Fold destination-seed component; it combines with enderman DNA for Burrowing. |
+| GE-18 — Shulker | GE-01 | Complete shulker DNA after reaching a valid source. | Levitation Chamber; the first End nursery does not need this genome. |
+| GE-19 — Blaze | GE-01 | Complete blaze DNA. | Thermal Sight, thermal ammunition expressions and Fold destination-seed stock. |
+| GE-20 — Foldroot | ALL(GE-01,T8-10) | Complete Foldroot DNA from ordinary extracted native plant specimens. | Adaptive growth, cutting/feed variants and one Calling Corolla culture. |
+| GE-21 — Pulse Reed | ALL(GE-01,T8-11) | Complete Pulse Reed DNA. | Fiber/phase-sensitivity variants and one Calling Corolla culture. |
+| GE-22 — Glassbloom | ALL(GE-01,T8-12) | Complete Glassbloom DNA. | Structural/sample variants and one Calling Corolla culture. |
+| GE-24 — Zombie | GE-01 | Complete zombie DNA. | Scent Pits and Working Tendons. |
+| GE-25 — Axolotl | GE-01 | Complete axolotl DNA through permitted specimens. | Regrowth Lobe, with fuel and combat-recovery limits. |
+| GE-26 — Creeper | GE-01 | Complete creeper DNA. | Blast Baffles; choosing them excludes the chest's Impact Bladder cavity. |
+| GE-27 — Phantom | GE-01 | Complete phantom DNA. | Later Elytral Wings; genome possession supplies neither a real Elytra nor End-conditioned materials. |
+| GE-28 — Bee | GE-01 | Complete bee DNA through permitted specimens. | Colony Reader and Service Tendril. Helpers are not needed to use the organ-status reader. |
+| GE-29 — Fox | GE-01 | Complete fox DNA. | Stalking Fibers; not invisibility. |
+| GE-30 — Dolphin | GE-01 | Complete dolphin DNA through permitted specimens. | Swimming Muscles. |
+| GE-31 — Wither Skeleton | GE-01 | Complete wither-skeleton DNA. | Wither Sieve; the skull is not assumed to be the only usable specimen. |
+| GE-32 — Witch | GE-01 | Complete witch DNA. | Potion Capillary after the actual infuser is available. |
+| GE-33 — Wheat | GE-01 | Complete wheat DNA from plant specimens. | Ordinary cultivated-crop grafts; a noncombat first-genome route. |
+| GE-34 — Oak | GE-01 | Complete oak DNA from identified tree specimens. | Oak-specific root/canopy expressions; no need to destroy every tree to sample it. |
+| GE-35 — Cod | GE-01 | Complete cod DNA from identified aquatic specimens. | Fish husbandry and targeted food-fishing expressions. |
+| GE-36 — Sheep | GE-01 | Complete sheep DNA. | Supported shearing/husbandry branch using actual animals and tools. |
+| GE-37 — Cat | GE-01 | Complete cat DNA through permitted specimens. | Targeted Repellent Crown expressions, including the proposed phantom-deterrence route. |
+| GE-38 — Kelp | GE-01 | Complete kelp DNA. | Aquaculture plant-production variants. |
+| GE-41 — Wither | ALL(GE-01,T7-06) | Complete Wither DNA from death loot processed in the Nether. | Long-term sample efficiency and the Death Bond lineage. |
+| GE-42 — Ender Dragon | ALL(GE-01,T7-06) | Complete dragon DNA from death loot processed in the End. | Exotic research requires local industry, not possession of the dragon egg. |
+| GE-39 — Birch | GE-01 | Complete birch DNA. | Birch-specific arbor choices; it does not substitute for oak coverage. |
+| GE-40 — Sweet Berry Bush | GE-01 | Complete the original bush genome from identified specimens. | Compatible berry/fiber husbandry choices; a planted bush is still useful before DNA completion. |
+
+GE-23, the Manyfold genome, is defined in the boss chapter. For every additional supported animal, plant, tree or modded organism, the atlas adds the same finite card family:
+
+```text
+Supported source discovered / inspected
+  → identified specimens → accumulated coverage → complete source genome
+       ├─ matching consumable-stock culture
+       ├─ its listed compatible organ/plant expressions
+       └─ its listed compatible equipment mutations
+```
+
+The card is generated from that source's declared recipes, not an assumption that every creature grants every behavior associated with its name. A completed genome with no implemented expression must say so. Missing optional mods remove their own source cards; they do not remove a main-path prerequisite. Boss and Fold sources stay inside their own revealed chapter instead of spoiling the final encounter at first contact.
+
+## 16. Equipment path: four independent living pieces
+
+The book has helmet, chest, leggings and boots tabs for the selected item's fusion level, shared learning capacity, activity counters, installed branches and fuel. A badge never upgrades another piece. Armor owns their definitions.
+
+### Material and service branches
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| AR-01 — A Dormant Skin | ST-01 | Craft or obtain one dormant armor piece from its familiar rotten-flesh silhouette recipe. | A weak starting body; awakening is not diamond protection. |
+| AR-02 — Your First Living Piece | ALL(AR-01,T0-08) | Awaken a piece and inspect its zeroed counters, shared capacity, frame, anatomy and empty fuel. | Independent history for each equipment slot; feed before wearing. |
+| AR-03 — It Learns by Being Used | AR-02 | Cross the first activity-buff threshold on a worn piece. | Automatic activity learning within a shared cap; no free point allocation. |
+| AR-04 — A Living Binder | ALL(T0-02,T0-03,T0-05) | Make Fusion Binder through the starter bowl recipe. | Host-grown introductory grafts before a DNA laboratory. |
+| AR-05 — Metal That Can Join Tissue | ALL(SR2,T2-06,T2-23,T2-24) | Use the culture-vat material mode to make Ferrocyte Paste or Auric Myelin from prepared real mineral. | Biological activation is mandatory; no raw ingot applied directly to armor. This recipe does not require a completed creature genome. |
+| AR-06 — Iron Ribs | ALL(AR-03,AR-05) | Fuse a G1 piece to Iron Ribs using prepared Ferrocyte Paste; use the fusion installation recipe in Armor. | Permanent rigid child; shared capacity and statistics belong to Armor. |
+| AR-07 — Auric Lattice | ALL(AR-03,AR-05) | Fuse a G1 piece to Auric Lattice using prepared Auric Myelin. | Permanent flexible alternative, not a step after iron. |
+| AR-08 — Diamond Carapace | ALL(AR-06,T3-09,T3-02) | Fuse Iron Ribs to Diamond Carapace using Faceted Chitin. | Permanent plated child; no auric-to-carapace conversion. |
+| AR-09 — Obsidian Scutes | ALL(AR-06,T3-09,T3-02) | Fuse Iron Ribs to Obsidian Scutes using Vitreous Scute. | Permanent heavy child with its own terminal path. |
+| AR-10 — Diamond Tendon | ALL(AR-07,T3-09,T4-05) | Fuse Auric Lattice to Diamond Tendon using Diamond-Fiber Matrix. | Permanent flexible child. |
+| AR-11 — Netherite Lamellae | ALL(AR-08,T4-05,T3-09) | Fuse Diamond Carapace to Netherite Lamellae using its named medium. | Permanent plated terminal candidate. |
+| AR-12 — Netherite Mesh | ALL(AR-10,T4-05,T3-09) | Fuse Diamond Tendon to Netherite Mesh using its named medium. | Permanent flexible terminal candidate. |
+| AR-13 — Spatial Weave | ALL(AR-10,EN-06) | Fuse Diamond Tendon to Spatial Weave using Phase-Woven Matrix. | Permanent spatial terminal candidate. |
+| AR-14 — Four Pieces, One Metabolism | AR-02 | Equip four functional awakened pieces, fill real reserves and inspect combined load/output. | Shared fuel and coordinated abilities; materials may differ across pieces. |
+| AR-15 — Commit to a Lineage | ALL(ANY(AR-06,AR-07),T2-06) | Inspect a committed piece's valid forward children and permanently excluded sibling. | Plan another independently grown piece for the other lineage; no branch exchange. |
+| AR-16 — Reshape Learned Practice | ALL(AR-02,T2-06) | Pay materials, biomass and Minecraft XP for one partial counter reduction; inspect capacity and buffs. | Counter reduction destroys points without changing branches. |
+| AR-17 — A Supporting Organ [optional Curios] | AR-14 | Equip and use one supported control/reserve/chemical accessory through the suit's normal resource rules. | Accessories supplement a suit; they do not supply a missing armor piece or unlimited anatomy. |
+| AR-18 — Adaptive Interface [long-term] | ALL(ANY(AR-11,AR-12,AR-13,AR-27),T8-02,EN-06,T6-09) | Install Adaptive Interface and select two control presets for the same compatible installed anatomy. | All installed grafts plus interface must fit together; presets change settings, never branches. |
+| AR-19 — Reciprocal Controls | ALL(AR-18,T9-04) | Install Reciprocal Control Graft and perform its permitted settings-only field change. | Same anatomy and exclusions; interruption and cooldown still apply. |
+| AR-27 — Netherite-Bonded Scutes | ALL(AR-09,T4-05,T3-09) | Fuse Obsidian Scutes to Netherite-Bonded Scutes using its named medium. | Permanent heavy terminal candidate. |
+| AR-28 — Learn to Live Together | AR-02 | Perform ordinary fed work while wearing an awakened piece; inspect adaptation and hunger warnings. | Tiny early reserves and the nonlethal hunger floor; no deliberate injury required for adaptation. |
+| AR-29 — Full Symbiosis | AR-28 | Reach the piece's permanent symbiosis threshold. | Empty fuel stops causing armor hunger pain; unfunded abilities still stop. |
+| AR-30 — A Real Pair of Wings | SR5 | Obtain an actual Elytra. | A physical ingredient for Wings I, not an ability fabricated solely from phantom DNA. |
+
+The AR material nodes are **first-achievement cards**, not permission to cross an individual item's lineage. AR-28/29 teach automatic early hunger pain and later full symbiosis; they never demand deliberate starvation. Repeat their operation independently for any helmet, chest, leggings or boots. A completed AR-11 cannot supply another item's fusion level, capacity or learned buffs.
+
+### Counter branches shown inside each piece tab
+
+Each piece tab displays [its activity counters](ARMOR_EVOLUTION.md#3-activity-ownership-and-buffs),
+next buff thresholds and combined capacity usage. Ritual previews show points
+removed, affected buffs and cost.
+
+Armor defines credit, thresholds and the optional death-rescue card. It teaches
+sleeping to restore a charge, not erase learning. Dying is not a progression gate.
+
+### All armor mutation families
+
+The rows below are the branch roots. Each family produces three connected book cards **`.I → .II → .III`**; all current families have all three ranks. For common M-family grafts, the cards appear independently in all four equipment tabs.
+
+The exact expansion is:
+
+```text
+Family's listed parents completed
+  + a valid selected piece
+  → family.I instructions
+       → install/use rank I on that piece → family.I complete
+           → family.II instructions, with its approved fusion/learning requirements visible
+               → upgrade/use rank II on that piece → family.II complete
+                   → family.III instructions
+                       → upgrade/use rank III on that piece → family.III complete
+```
+
+Mutation prerequisites, effects, slots and fuel costs are defined in Armor.
+
+For the dependency tables, a bare family ID such as `AM-H8` means its rank-I milestone; `.II` or `.III` explicitly requires that higher-rank milestone. The family table's **Open after** applies to its first card. M6/M7 additionally descend from M5 III as shown; the two descendants are mutually exclusive on one piece. Advancements acknowledge a valid first installation/use; later operation always checks the worn item's own state.
+
+| Node | Open after | Teaches / unlocks |
+|---|---|---|
+| AM-M1 — Healing Membrane | ALL(AR-02,AR-04) | Self-healing spends biomass and restores tissue durability. |
+| AM-M2 — Thermal Lining | ALL(AR-02,GE-14,T3-02,ANY(AR-08,AR-09,AR-10)) | All four linings are required for Thermal Mode. |
+| AM-M3 — Pelagic Lining | ALL(AR-02,GE-16,ANY(AR-06,AR-07)) | Aquatic coordination excludes Thermal Lining on the same piece. |
+| AM-M4 — Potion Capillary | ALL(AR-02,GE-32,T4-08) | Limited chemical charges, actual potion ingredients and shared dispensing cooldown. |
+| AM-M5 — Protective Cocoon | ALL(AR-02,GE-11,GE-16,T2-06) | Spend anatomy and a loaded dose to protect this dropped piece; normal destruction/despawn remain without it. |
+| AM-M6 — Recall | ALL(AM-M5.III,GE-15,GE-18,T6-11) | Permanent alternative descendant; prepaid one-use transfer to a loaded reserved nest. |
+| AM-M7 — Death Bond | ALL(AM-M5.III,GE-15,GE-41,T6-11) | Permanent alternative descendant; costly per-piece survival through actual death/respawn. |
+| AM-H1 — Field Lens | ALL(AR-02,GE-07,T2-06) | Directed examination and source information. |
+| AM-H2 — Lantern Gland | ALL(AR-02,AR-04) | Fueled biological light; an early host-grown graft. |
+| AM-H3 — Nocturnal Membrane | ALL(AR-02,GE-13,T2-06) | Low-light vision, distinct from illuminating the world. |
+| AM-H4 — Aquatic Eyes | ALL(AR-02,GE-10,T2-06) | Underwater clarity, not wall-through ore vision. |
+| AM-H5 — Toxin Filter | ALL(AR-02,GE-12,T2-06) | Limited removal of Poison; higher rank improves the response. |
+| AM-H6 — Thermal Sight | ALL(AR-02,GE-19,T3-02,T2-06) | Read exposed hot targets and surfaces through distracting fire/smoke overlays. |
+| AM-H7 — Scent Pits | ALL(AR-02,GE-24,T2-06) | Sparse nearby creature direction cues, not unrestricted enemy vision. |
+| AM-H8 — Stone Sense | ALL(AR-02,GE-15,GE-17,T4-05,T2-06) | Local cavity/navigation information for Burrowing; no ore identity reveal. |
+| AM-H9 — Wither Sieve | ALL(AR-02,GE-31,T3-02,T2-06) | Limited Wither removal, not boss immunity. |
+| AM-H10 — Colony Reader | ALL(AR-02,GE-28,AR-05,T2-06) | Selected organ status and already-authorized helper orders. |
+| AM-C1 — Reservoir | ALL(AR-02,AR-04) | More stored fuel, not more instantaneous metabolic output. |
+| AM-C2 — Pump Heart | ALL(AR-02,AR-05) | Higher whole-suit output with its actual operating overhead. |
+| AM-C3 — Regrowth Lobe | ALL(AR-02,GE-25,T2-06) | Delayed player healing, distinct from armor healing. |
+| AM-C4 — Impact Bladder | ALL(AR-02,GE-09,T2-06) | Conditional physical-hit reduction; excludes Blast Baffles. |
+| AM-C5 — Thermal Exchange | ALL(AR-02,GE-14,T3-02,T2-06) | Better thermal fuel endurance, not limitless lava time at lower lining ranks. |
+| AM-C6 — Gill Bellows | ALL(AR-02,GE-16,T2-06) | Fueled air supply; ordinary water-breathing potions remain valid. |
+| AM-C7 — Blast Baffles | ALL(AR-02,GE-26,T3-02,T2-06) | Explosion specialist; excludes Impact Bladder. |
+| AM-C8 — Burrow Mantle | ALL(AR-02,GE-15,GE-17,T4-05,T2-06) | Owns coordinated passage fuel/load and its stopping window. |
+| AM-C9 — Feeding Lobe | ALL(AR-02,AR-04) | Feeding Lobe supplies player hunger, not armor fuel; it creates no food. |
+| AM-C10 — Service Tendril | ALL(AR-02,GE-28,T2-06) | Feed one selected nearby compatible helper/tool; transfer is not free fuel or practice. |
+| AM-C12 — Nutrient Intake | ALL(AR-02,AR-04,T1-30) | Automatic actual fuel transfer, distinct from food and healing; no transfer practice. |
+| AM-C13 — Digestive Crop | ALL(AR-02,GE-24,T1-30,T2-31,T2-06) | A separate branch from C12, not its upgrade; consumes biological materials, never health, samples or nearby terrain. Digestion gives no practice by itself. |
+| AM-C11 — Elytral Wings | ALL(AR-02,GE-27,EN-06,ANY(AR-12,AR-13),AR-30,T2-31) | Glide → powered flight/climb → takeoff/hover; permanent exclusion of Burrow Mantle. |
+| AM-C14 — Berserk Gland | ALL(AR-02,GE-11,GE-24,T2-06) | Paid melee burst with increased incoming damage, paused Regrowth and a persistent cooldown. |
+| AM-L1 — Running Tendons | ALL(AR-02,GE-08,T2-06) | General grounded sprint improvement; excludes Fast-Lane Tendons. |
+| AM-L2 — Endurance Mesh | ALL(AR-02,AR-04) | Reduce sprint hunger at a biomass cost. |
+| AM-L3 — Swimming Muscles | ALL(AR-02,GE-30,T2-06) | Powered swimming within the suit's limits. |
+| AM-L4 — Bracing Tendons | ALL(AR-02,GE-16,T2-06) | Stable deliberate tool work; movement releases the brace. |
+| AM-L5 — Working Tendons | ALL(AR-02,GE-24,T2-06) | Faster manual work without changing harvest tier or loot. |
+| AM-L6 — Stalking Fibers | ALL(AR-02,GE-29,T2-06) | Better crouched movement, not invisibility. |
+| AM-L7 — Burrowing Muscles | ALL(AR-02,GE-15,GE-17,T4-05,T2-06) | Supported travel through eligible ground in all directions. |
+| AM-L8 — Fast-Lane Tendons | ALL(AR-02,AR-05,T1-22) | A colony commuter's alternative to Running Tendons. Actual use needs Surface Key II and a full suit. |
+| AM-B1 — Contour Sole | ALL(AR-02,AR-04) | Step over terrain edges with real headroom. |
+| AM-B2 — Climbing Hooks | ALL(AR-02,GE-11,T2-06) | Contact-based wall climbing; excludes Propulsive Fins. |
+| AM-B3 — Landing Bladders | ALL(AR-02,GE-09,T2-06) | A finite fall allowance, not immunity to arbitrary falls. |
+| AM-B4 — Propulsive Fins | ALL(AR-02,GE-10,T2-06) | Aquatic propulsion; excludes Climbing Hooks. |
+| AM-B5 — Spring Heel | ALL(AR-02,GE-08,T2-06) | A deliberate powered ground jump, not a second midair jump. |
+| AM-B6 — Blink Tendon | ALL(AR-02,GE-15,EN-06,T2-06) | Short travel to a clear visible supported destination, with real cooldown and fuel. |
+| AM-B7 — Surface Key | ALL(AR-02,AR-04) | Consented tissue recognition; rank II enables compatible fast-lane operation. |
+| AM-B8 — Ground Anchor | ALL(AR-02,GE-15,GE-17,T4-05,T2-06) | Ground contact coordination for the complete Burrowing anatomy. |
+
+All non-host armor graft cards also require the actual Fusion Chrysalis recipe and prepared I051 consumable. The recipes, not just the family parents, decide material availability: an AR-05 badge earned with iron does not create Auric Myelin for a gold-dependent graft. A page may be visible before the selected piece satisfies its approved installation requirements.
+
+### Whole-suit demonstrations
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| AR-20 — Ready for Heat | ALL(AR-14,AM-M2) | Equip four valid thermal linings and show an adequately fueled Thermal Mode readiness result. | Lowest lining rank governs the set; the guide displays actual fire/lava limits before exposure. |
+| AR-21 — An Ocean Is a Worksite | ALL(AR-14,AM-M3,AM-C6,AM-H4) | Perform a short planned underwater job with breathing, visibility and the selected aquatic mode operating. | Build an ocean specialist without requiring the Nether specialist first. |
+| AR-22 — Through the Ground | ALL(AR-14,AM-H8,AM-C8,AM-L7,AM-B8) | Burrow through a short prepared eligible rock volume into a known adjacent clear exit. | Ground-only movement, fuel and the 10-second rank-I stopping window; no deliberate entombment required. |
+| AR-23 — Use the Colony's Roads | ALL(AR-14,T1-22,AM-L8,AM-B7.II) | Traverse a compatible fast lane with the actual required full suit and mutations. | The floor alone does not grant speed to every player. |
+| AR-24 — A Flight With a Landing | ALL(AR-14,AM-C11) | Glide to a prepared landing; II/III follow-ups demonstrate powered climbing and hovering with actual fuel. | Landing reserves, intact wing fallback and no flight chunk loading. |
+| AR-25 — A Safe Short Blink | ALL(AR-14,AM-B6) | Perform a valid charged Blink without bypassing terrain or destination checks. | Failed attempts consume no travel charge and do not train displacement. |
+| AR-26 — Two Jobs, Two Builds | AR-14 | Compare two separately grown owned pieces with different permanent branches. | Owning multiple specialists; preview their anatomy, fuel and protection tradeoffs. |
+
+Completing a suit demonstration acknowledges its first working rank. Its II and III follow-up checks require the actually equipped coordinated adaptations at that rank; a better chest alone does not upgrade Burrowing. No whole-suit experience pool is created.
+
+## 17. Handheld tools and weapons
+
+Tool/weapon forms and preparation candidates belong to Item Catalog I015–I018/I038. Enchantments and armor ritual costs follow Armor Evolution. They are optional instructional leaves, not assumed personal-rank requirements.
+
+| Node | Open after | Complete by | Teaches / unlocks |
+|---|---|---|---|
+| EQ-01 — A Living Working Tool | T0-08 | Awaken a supported dormant tool and complete one eligible manual operation. | The same lifecycle as armor, with a tool's own history. |
+| EQ-02 — A Careful Cutting Tool | ALL(EQ-01,T2-06,T2-09) | Install a supported cutting/plant-preservation graft and perform one deliberate harvest with planting material retained. | A garden/wood specialist rather than a universal mining tool. |
+| EQ-03 — A Mineral Working Tool | ALL(EQ-01,AR-05,T2-23) | Fuse a supported bioactive mineral form and harvest a block within the resulting tool tier. | Real harvest tier, useful manual work beside automated mines. |
+| EQ-04 — Dissector | ALL(EQ-06,GE-11,GE-17,T2-31) | Commit a Living Fang to Dissector I and collect an Intact sample with a qualifying killing hit. | Permanent sample-quality specialization; II adds enderman stock and prepared diamond fibers for Pristine samples. |
+| EQ-05 — Clear a Small Worksite | ALL(EQ-03,T4-05) | Execute one previewed bounded area cut with space for every recovered output. | Small room/service excavation; no recursive whole-forest or whole-vein deletion. |
+| EQ-06 — A Living Weapon | T0-08 | Awaken a supported weapon and complete an eligible attack. | Portable offense has its own counters and material limits. |
+| EQ-07 — Piercing Limb | ALL(EQ-06,T2-06) | Install a supported piercing expression and use a deliberate single-target attack. | Timing and penetration, not the strongest attack against every target. |
+| EQ-08 — Grasping Weapon | ALL(EQ-06,T2-06,GE-11) | Apply a permitted control effect to a susceptible target and release it safely. | Space control trades damage; no permanent boss/player immobilization. |
+| EQ-09 — Ranged Gland | ALL(EQ-06,T2-06,T1-09) | Fire supplied ammunition at a valid visible target with its operating cost paid. | A portable ranged branch, weaker in sustained output than a supplied emplacement. |
+| EQ-10 — One Weapon Is Not Every Weapon | ANY(EQ-07,EQ-08,EQ-09) | Inspect a valid alternate expression and its incompatible allocation. | Compare separate weapon forms, not a mandate to craft all three. Tool/weapon branch policy remains a separate decision. |
+
+## 18. What the player sees when progress stops
+
+Each unlocked page includes a small working example, the required cells/parts and a checklist tied to the selected machine or item. Failed conditions report their actual cause:
+
+| Situation | Message and next link |
+|---|---|
+| A blueprint is outside the current colony chapter | “Commissioning requires SR4. Complete **The Nether Makes Something** and **Thermal Mantle**.” Link to the unmet parent; still show supplies needed for planning. |
+| A young cell cannot become a vein | “Mature this selected cell first.” Link to ST-03; show the next growth treatment. |
+| A route is blocked | “East outlet closed” or “Destination full,” with the selected endpoint. Link to T1-04/T1-12 or CI-05, not a generic “network invalid.” |
+| A raw ingot is placed in an armor treatment | “Needs Ferrocyte Paste, not an iron ingot.” Link to AR-05 and its preparation recipe. |
+| Raw ingredients are offered as a tissue upgrade | “Prepare Capillary Gel in Activation Cyst.” Link to T1-30 and the exact Item Catalog recipe, without consuming the rejected ingredient. |
+| Hungry armor injures its wearer | “Fuel empty; symbiosis incomplete.” Show the affected pieces, refueling route and adaptation status. At the one-heart floor, say hunger damage has stopped but unfueled abilities remain off. After symbiosis, fuel shortage causes no armor pain. |
+| A mutation's DNA is incomplete | “Turtle genome: missing coverage shown in this bank.” Link to GE-16 and its supported specimen routes. Do not ask for unrelated samples. |
+| The piece's learning is capped | “Learning capacity full: {used}/{capacity}.” Show paid counter reduction (AR-16) and valid forward fusions; neither exchanges branches. |
+| Four pieces are equipped but Burrowing will not start | List the absent/wrong-rank H8/C8/L7/B8 graft, collapsed item, insufficient fuel or load conflict. Link to AR-22 and the specific piece tab. |
+| Native production is moved to the wrong dimension | “Thermal Nursery requires a mature Nether-native bed in the Nether.” Link to T3-01/T3-02; importing finished lining remains valid. |
+| A remote destination is unavailable | “Destination not ready; cargo retained here.” Link to T6-03 and the current endpoint state. Never report fabricated remote production. |
+| An optional dependency is absent | Hide only its adapter-specific action and suggest the native route. Never leave an unfinishable mandatory card. |
+
+### Recovery and completion rules
+
+Losing the book, dying, evolving equipment, unloading an outpost or breaking a multiblock does not remove earned journal completion. Operational permissions still follow the real remaining structure and supplies. A completed page can reopen its tutorial and diagnostics without resetting the world or crafting a duplicate machine.
+
+For commissioning evidence, retain only the named milestone and its small capped demonstration state: the three required batch receipts, the selected sites or the current bounded trial. Do not keep a lifetime log of every transfer, mined block, participant position or visited chunk. The guide observes server-confirmed events; it must not scan whole worlds to decide which boxes to tick.
+
+The tree supplies native guidance and advancements. Pack authors can wrap it in their own quests, recipes and extra challenges, but FTB Quests is not part of this mod's required progression.

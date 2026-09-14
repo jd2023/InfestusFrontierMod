@@ -6,6 +6,27 @@ GameTests and rejects severe output. There is no skip flag. Use Bash and ripgrep
 
 Current layers:
 
+- `python3 -m unittest discover -s scripts -p 'test_ktask_*.py'`:
+  packet dependencies/scopes, review binding, changed code/evidence refusal,
+  actual temporary Git commit/push, rejected delivery, push-only retry, protected
+  user files, worker argv and process-group ownership. No model calls.
+- `python3 scripts/ktask_workflow.py validate`: ordered task contracts and exactly
+  one implementation owner for every in-scope block. This is planning coverage,
+  not evidence that those blocks exist in the mod.
+
+- `python3 scripts/check_design_docs.py --self-test` and its normal invocation:
+  prerequisite grammar, unknown references/cycles, block and armor-family guide
+  coverage, permanent material parents, unique catalog IDs, specimen-count rounding,
+  native supply surplus arithmetic, milestone dependency/acceptance coverage,
+  intact Markdown tables,
+  local links, questions-only entries and shared-capacity armor contracts.
+  Both run in the authoritative gate. These are structural documentation
+  checks, not proof of recipe balance, gameplay implementation or artistic quality.
+
+- `python3 scripts/check_armor_balance.py --self-test` and normal invocation:
+  fixed-point learning allocation, shared capacity and the armor specification's
+  threshold/cost arithmetic. Calculation checks only, not measured gameplay pacing.
+
 - `./gradlew :core:test`: three pure tests covering quota exhaustion, repeated
   refusal, invalid limits, next tick, clock rewind and long timestamp extremes.
 - `:core:verifyBoundary`: rejects production dependencies in the Java-only module.
@@ -15,10 +36,6 @@ Current layers:
   mod; checks the core contract across actual server ticks. Requires one test.
 - `runClient` / `runServer`: isolated normal development launch configurations.
   They do not silently copy saves, accept EULAs or alter the prototype.
-
-The test fixture's empty NBT template was copied from the V3 test infrastructure;
-no gameplay, artwork or saved world was imported. Pure quota tests were added
-before the implementation and first failed because the implementation was absent.
 
 ## Not established yet
 
@@ -32,4 +49,7 @@ for the complete mod. GameTests alone do not replace visual or gameplay review.
 Run graphical and headless gates as separate invocations. Bound each fixture and
 keep it in development sources. Capture readiness must verify the actual server
 and client state, including quota-delayed work—not merely wait an arbitrary time.
-Only the owner may approve a golden or replace its intended appearance.
+Independent smart review inspects actual client captures before acceptance.
+Pixel goldens cannot be replaced merely to suppress a regression; changes need
+an explained intentional visual difference and fresh inspection. Human review is
+reserved for product/feel decisions, not routine implementation verification.

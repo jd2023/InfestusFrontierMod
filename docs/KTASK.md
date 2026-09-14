@@ -1,33 +1,115 @@
-# ktask setup
+# Task execution
 
-Stable context, task prompt, configuration and HUMAN gates live in `.ktask/` and
-are version-controlled. Logs, queue artifacts and locks are ignored. The scaffold
-uses the local framework at `/home/etf/Projects/ktask`; it is not vendored or modified.
-Examples in axiotask/axiomd informed the workflow; their project-specific mandates
-(such as automatic pushes or licensing choices) are not imported here.
-
-Read-only inspection:
+Canonical packets: `.ktask/tasks.md`. Module interfaces: `ARCHITECTURE.md`.
+Worker/context/reviewer/repair prompts and exact model roles are in `.ktask/`.
+Do not duplicate these contracts in issue descriptions or another roadmap.
 
 ```bash
-/home/etf/Projects/ktask/ktask status
+python3 scripts/ktask_workflow.py validate
+python3 scripts/ktask_workflow.py status
+python3 scripts/ktask_workflow.py check-evidence
+python3 scripts/ktask_workflow.py run
+python3 scripts/ktask_workflow.py resume
+python3 scripts/ktask_workflow.py retry
+python3 scripts/ktask_workflow.py reconcile
+python3 scripts/ktask_workflow.py restore-receipts
+python3 scripts/ktask_workflow.py run --through IF-094
 ```
 
-No workers have been launched and no gate has been acknowledged. The queue starts
-with design review and then automation/first-slice approval. The configured executor
-is the runner's default, not an approved model choice or a cost recommendation.
-After approval, choose models according to risk and demonstrated gate strength.
+Only run/resume/retry invoke models. --through stops after the named accepted task.
+check-evidence validates an active candidate's receipts without tests, review or
+delivery. Workers run it before submitting DONE; it is not acceptance.
+Use this launcher, not bare ktask: it creates ignored `.ktask/session/.ktask`
+runtime files, pins the plan/prompts, and leaves tracked packets free of status
+markers. Reconciliation preserves accepted receipts, verifies their unchanged
+contracts and commit ancestry, and regenerates the accepted prefix plus one task.
+Accepted work cannot be removed, reordered or silently marked pending.
+Never clear statuses or delete a session to repeat accepted gameplay work.
+After a fresh clone or loss of receipt files, restore-receipts verifies the
+published branch's task packets, changed-file scopes and candidate content hashes,
+then rebuilds its accepted prefix. It never accepts unpublished commits. The clone
+must contain the published branch tip; fetch that branch first if necessary.
+Logs/captures remain local artifacts; restored receipts do not recreate them.
 
-Important limitation: the inspected ktask runner can require structured reports,
-issue closure and remote mainline agreement; its report verification alone does
-**not independently execute our project test script**. The prompt mandates the
-gate, but that is not a hard execution guarantee. Before unattended implementation,
-add and test a project completion adapter that runs `.ktask/verify.sh` independently
-and checks required evidence/branch state. Do not call this bootstrap a hardened
-autonomous pipeline. Remote-mainline verification is off because feature-branch
-work must not silently push to main.
+## Roles and acceptance
 
-Only queue tasks with approved outcomes, module/file boundaries, regression risks,
-explicit tests, performance budgets and human approvals. Use `TASK_TEMPLATE.md`.
-Product questions belong in a HUMAN gate or NEEDS_INPUT report, not remediation.
-Keep bounded remediation project-local; never install host tools, troubleshoot
-providers, weaken checks or invent policy to force a completion result.
+| Role | Initial configuration | Responsibility |
+|---|---|---|
+| Implementation | gpt-5.6-sol, high | Supplied contract, red-first tests, narrow implementation |
+| Repair | gpt-6-astra, high; at most two attempts | Resolve engineering failure and revise candidate |
+| Independent review | Fresh gpt-6-astra, high; read-only | Inspect whole diff, boundaries, tests, performance and actual evidence |
+| Planning coordinator | Fresh gpt-6-astra, high | Readiness before dispatch; scoped plan correction after exhausted repairs |
+| Delivery adapter | No model | Run full gate, validate evidence/verdict, commit and push feature branch |
+
+Model selections are not cost guarantees. Offline tests never launch models.
+
+```text
+readiness -> worker -> captured evidence -> authoritative gate -> independent review
+                                                  ├─ reject -> bounded smart repair -> repeat
+                                                  └─ accept -> commit -> push/confirm -> next task
+```
+
+ktask itself executes the configured verification command after a DONE report.
+The project adapter supplies semantic review for every successful candidate,
+including stronger-model repairs. Acceptance binds task packet, baseline, branch
+and content digest. It rejects out-of-scope files, changed checkpoints, missing
+evidence, stale verdicts, incomplete review checks and changes during testing/review.
+Workers cannot edit process-control files inside ordinary task scopes.
+
+Commit/push happen only after acceptance. No force push, merge to main, remote
+creation or public release. Remote confirmation is required before advancement.
+A push failure retains the accepted local commit and retries its delivery without
+reimplementing the task. Before committing, delivery durably records the reviewed
+tree, parent and exact message. Restart recognizes only that exact child commit,
+or finishes the prepared commit if HEAD has not moved. An unrelated commit or
+changed worktree refuses recovery. Planning delivery uses the same protocol.
+
+Delivery uses the existing authenticated GitHub CLI as a per-command credential
+helper when enabled in policy.toml. It does not change global/local Git settings,
+switch accounts or initiate login. Missing repository access remains an external
+authentication failure; the accepted local commit is retained.
+
+The external runner owns worker retries and provider waits. The supervisor admits
+one pending packet at a time under a project lock. No fork or patch of ktask.
+Workers use workspace-write, explicit network access and the named Gradle cache;
+reviews use read-only. Both ignore user config, retain existing authentication and
+disable interactive approvals. User/project execpolicy rules still apply. Settings follow
+[Codex non-interactive documentation](https://learn.chatgpt.com/docs/non-interactive-mode).
+
+## Failure ownership and evidence limits
+
+The supervisor calls the coordinator when readiness fails or worker/repair attempts
+are exhausted. It parks only the failed candidate in a retained Git stash, leaving
+unrelated files untouched. Planning edits are limited to existing contracts and
+gameplay specifications, pass the full gate and fresh independent review, then
+commit/push. A diagnosis can also restart repair without changing the plan.
+The candidate is restored when its task is next; intervening prerequisites can run.
+Two coordinator cycles/task bound costs. Provider/access failures preserve progress.
+Interrupted stash application stops with the recovery receipt and stash intact;
+never delete a session or stash to bypass recovery checks.
+Interrupted planning resumes before parsing its unfinished task edits. Provider and
+access pauses do not consume engineering retries. On Linux, a process guardian
+forwards cancellation and reaps detached workers before releasing the project lock.
+
+The record command captures actual exit codes, logs and generated artifact hashes.
+Green and qualification receipts bind to exact candidate content; red binds to
+task/baseline. A failed rerun invalidates the prior phase receipt. Logs are limited
+to 16 MiB and 64 captures/task. Review checks require supporting evidence.
+These bindings establish provenance, not honesty or artistic quality.
+The independent reviewer must inspect red assertions, actual captures, negative
+cases and measurements. Same-user local processes are not a security boundary
+against a malicious agent rewriting ignored files. Offline tests validate delivery
+control with disposable Git remotes and fake review outcomes; they do not certify
+real-model review quality, visual judgment, account access or campaign gameplay.
+
+The full gate stays offline with respect to AI. Fast regression checks join Gradle
+verifyAll; the adapter allows 30 minutes. Client/multiplayer/soak qualification uses
+separate recorded commands, up to two hours for soak. Any candidate edit invalidates
+qualification. Acceptance requires both classes; long soaks do not run inside
+every fast-gate invocation. No model is invoked recursively from a test.
+Normal workers have 7200 seconds; IF-107 qualification has 10800 seconds after
+IF-092 supplies its tested harness. The outer worker timeout reserves shutdown
+margin; enclosing runner time is calculated from worker, verification, retry and
+provider-wait budgets. Invalid or contradictory budgets fail before dispatch.
+Content ownership and declared producer edges are checked before dispatch; IF-108
+introduces incremental executable content coverage before the first gameplay task.

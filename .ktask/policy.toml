@@ -1,0 +1,15 @@
+runner = "/home/etf/Projects/ktask/ktask"
+branch = "docs/progression-tree-armor-symbiosis"
+remote = "origin"
+github_cli_credentials = true
+reviewer_model = "gpt-6-astra"
+reviewer_effort = "high"
+review_timeout = 1500
+gradle_cache = "/home/etf/.gradle"
+coordinator_model = "gpt-6-astra"
+coordinator_effort = "high"
+coordinator_attempts = 2
+worker_timeout = 7200
+
+[task_timeouts]
+IF-107 = 10800
