@@ -84,9 +84,51 @@ condition and leaves uncommitted resources unchanged.
 - Optional adapters load only when their library is present. Core retains an empty
   external dependency classpath. testMod/campaign code never enters release JARs.
 
+## Freight persistence protocol
+
+The durability boundary is Cargo Lock to Cargo Lock, not arbitrary external
+inventories. External deposit/withdrawal follows the source mod's save semantics;
+do not promise crash-atomic transfers into a foreign inventory.
+
+Storage owns one world-level freight ledger: admitted Cargo Lock balances,
+reserved receiver capacity, payloads and monotonically increasing transfer IDs.
+Chunk data stores lock identity, not another authoritative cargo copy. Transit
+submits commands through storage's freight port and never writes ledger files.
+
+| Transition | Durable result | Retry/restart behavior |
+|---|---|---|
+| request | Reserve existing source cargo and receiver capacity; cargo remains source-owned and unavailable to other requests | Repeated request ID returns the same reservation; cancel releases both holds |
+| pack | Atomically debit source and move the same payload into escrow | Before durable commit: request remains; after commit: only escrow owns the cargo |
+| receive | Atomically move escrow into the reserved destination balance and mark the transfer received | Repeated transfer ID returns its existing result without adding cargo again |
+| acknowledge | Advance the link's contiguous acknowledged sequence and retire received records | IDs at or below the watermark cannot be replayed; out-of-order acknowledgments stay within the admitted transfer slots |
+
+After packing, cancellation cannot refund the source. It must finish delivery or
+perform a separately reserved return transfer. Unloaded endpoints pause; they do
+not load chunks or run offline production. Removing a lock with reservations or
+cargo refuses normal dismantling; unexpected removal retains the same ledger
+identity for explicit recovery, never spills a second copy. Stale/cloned block
+identities cannot claim an occupied lock. Rebinding requires owner authorization
+and the original location to be loaded and absent.
+
+The ledger admits at most 512 locks, 256 links and 256 in-flight transfers, with
+at most 8 transfers/link. One lock has 9 item slots; separate installed fluid/BE
+compartments hold at most 16000 mB/100000 BE. Item data is limited to 16 KiB/stack.
+Refuse excess before reserving or spending anything. Retired lock/link identities
+use a monotonic allocation counter; do not retain an ever-growing tombstone map.
+
+Persistence uses a versioned, checksummed snapshot plus bounded write-ahead log.
+One writer serializes commits; at most 64 pending records, 1 MiB/record and a
+64 MiB journal. Compact into a new snapshot before admitting beyond that bound;
+atomically replace only after flushing it, keeping the previous valid snapshot.
+Disk I/O runs off the server thread. Commands remain pending until the durable
+completion is applied on the server thread; at most 16 completions/tick. I/O
+failure stops freight admission with cargo retained. No timeout invents success.
+Test process termination at every commit boundary, truncated final records,
+duplicate acknowledgments, slow-disk back-pressure and snapshot replacement.
+
 ## Enforcement and growth
 
-The first implementation task adds import/package checks, including a deliberately
+The first production task adds import/package checks, including a deliberately
 invalid fixture proving rejection. Additional Gradle projects are justified by
 compile-time isolation, not one project per noun. Check API references and cycles
 in the full gate; package naming alone is not enforcement.

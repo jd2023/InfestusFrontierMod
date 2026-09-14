@@ -347,8 +347,6 @@ Stone Sense alone is useful for examining an adjacent underground cavity, but do
 
 The chest develops **fuel storage, metabolic throughput, healing, impact defense, environmental exchange and whole-body transport**. This is where apparently compatible abilities compete for operating capacity.
 
-Berserk is a planned chest ability; its graft recipe and effects are not yet specified.
-
 | ID; branch | Slots I / II / III | DNA; signature ingredient | Effect I / II / III | Fuel and load |
 |---|---|---|---|---|
 | C1 Reservoir | 1 / 2 / 3 | Host; Membrane Sheet | Add 100 / 600 / 1,500 BU capacity to the chest's base 40. Capacity is not fuel generation. | No operating cost/load |
@@ -364,8 +362,19 @@ Berserk is a planned chest ability; its graft recipe and effects are not yet spe
 | C11 Elytral Wings | 3 / 4 / 5 | Phantom; precision-conditioned Spatial Membrane; actual Elytra at I only | I: controlled descending glide. II: powered forward flight and climbing. III: controlled takeoff and hover. Driven speed ceiling 6 / 8 / 10 m/s. | 2 / 6 / 10 BU/s; load 5 / 8 / 12 |
 | C12 Nutrient Intake | 1 / 2 / 3 | Host; Capillary Gel | Refill from 1 / 2 / 3 selected sealed biomass containers at up to 2 / 5 / 10 BU/s, stopping at capacity and retaining partial containers. | Transfers actual biomass; no output increase or practice credit. |
 | C13 Digestive Crop | 2 / 3 / 4 | Zombie; Digestive Enzyme | Automatically digest permitted biological materials from 1 / 2 / 3 selected inventory slots into chest biomass. Proposed net yield: 60% / 70% / 80% of the material's declared basic stationary digestion reference; delivery capped at 1 / 2 / 4 BU/s. | Load 1 / 2 / 2 while digesting; no starting biomass required. Consumes real feed, not player health or hunger. Conversion itself grants no practice. |
+| C14 Berserk Gland | 2 / 3 / 4 | Zombie + spider; Contractile Fiber | Manual burst lasting 8 / 10 / 12 s: add 1 / 2 / 3 health points to fully charged primary-target melee hits. Incoming damage after ordinary defenses increases by 25%; C3 player healing pauses during the burst. No projectile, sweep or attack-speed bonus. | Activation 20 / 40 / 60 BU, then 1 / 2 / 3 BU per enhanced hit; load 4 / 6 / 8 during burst; 90 s cooldown from activation |
 
 C4 and C7 are alternative uses of the same inflatable defensive cavity and cannot be installed together. C8 and C11 are incompatible body plans and cannot be installed together. Installed anatomy must fit the selected frame. A large fuel tank never removes slot or metabolic limits.
+
+C14 uses the normal creature-graft frame/rank gates and preparation recipe.
+Activation requires its full load and activation fuel. The burst ends on unequip,
+death, insufficient hit fuel or insufficient load; it never refunds activation.
+Its cooldown remains on the piece across swaps and saves. Fully charged means
+attack strength at least 0.9 before that attack resets it. Only a successful paid
+primary hit receives the bonus. The burst multiplies positive incoming damage by
+1.25; it cannot amplify a refused hit or bypass existing invulnerability frames.
+These initial values trade short melee output for exposure and a long cooldown;
+compare paid damage and survival against Strength potions during combat testing.
 
 C4/C7 apply after ordinary armor calculations. The sum of additional physical/explosion reduction from living-armor mutations is capped at 20% of the residual damage, before the row's per-hit limit. Vanilla effects apply normally; the 20% limit covers the additional learned/grafted reduction, not a replacement for vanilla protection.
 

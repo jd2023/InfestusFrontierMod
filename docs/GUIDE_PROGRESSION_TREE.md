@@ -556,6 +556,7 @@ For the dependency tables, a bare family ID such as `AM-H8` means its rank-I mil
 | AM-C12 — Nutrient Intake | ALL(AR-02,AR-04,T1-30) | Automatic actual fuel transfer, distinct from food and healing; no transfer practice. |
 | AM-C13 — Digestive Crop | ALL(AR-02,GE-24,T1-30,T2-31,T2-06) | A separate branch from C12, not its upgrade; consumes biological materials, never health, samples or nearby terrain. Digestion gives no practice by itself. |
 | AM-C11 — Elytral Wings | ALL(AR-02,GE-27,EN-06,ANY(AR-12,AR-13),AR-30,T2-31) | Glide → powered flight/climb → takeoff/hover; permanent exclusion of Burrow Mantle. |
+| AM-C14 — Berserk Gland | ALL(AR-02,GE-11,GE-24,T2-06) | Paid melee burst with increased incoming damage, paused Regrowth and a persistent cooldown. |
 | AM-L1 — Running Tendons | ALL(AR-02,GE-08,T2-06) | General grounded sprint improvement; excludes Fast-Lane Tendons. |
 | AM-L2 — Endurance Mesh | ALL(AR-02,AR-04) | Reduce sprint hunger at a biomass cost. |
 | AM-L3 — Swimming Muscles | ALL(AR-02,GE-30,T2-06) | Powered swimming within the suit's limits. |

@@ -287,7 +287,7 @@ prepared signature; 1 / 2 / 3 Fusion Binder; 60 / 150 / 360 BU; 12 / 24 / 48 s.
 Installation uses the same target piece, one graft and 40 / 100 / 240 BU over
 8 / 16 / 32 s. Host I uses Spore Culture instead of Genetic Stock in the Bowl.
 
-I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M7, H1–H10, C1–C13, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the DNA/signatures and fusion-level requirements in [Armor evolution](ARMOR_EVOLUTION.md#5-mutation-installation). A tooltip names the exact outcome, not “mutation essence.”
+I051 is a **closed family**, not arbitrary NBT-programmable effects. Its allowed members are exactly the armor rows **M1–M7, H1–H10, C1–C14, L1–L8 and B1–B8**, ranks I–III. Common M grafts specify their destination slot; other letters already identify the slot. Each member uses the DNA/signatures and fusion-level requirements in [Armor evolution](ARMOR_EVOLUTION.md#5-mutation-installation). A tooltip names the exact outcome, not “mutation essence.”
 
 C13's operating feed is not a new item family: explicitly supported ordinary biological materials are consumed as fuel, not applied as upgrades. Armor Evolution owns its proposed conversion rates and per-material acceptance rules. Samples, grafts and other valuable biological items are not implicitly edible. C12 accepts measured biomass containers instead; C9 consumes food for player hunger. One item cannot fund two of these operations.
 

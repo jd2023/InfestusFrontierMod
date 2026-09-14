@@ -11,7 +11,7 @@ python3 scripts/ktask_workflow.py run
 python3 scripts/ktask_workflow.py resume
 python3 scripts/ktask_workflow.py retry
 python3 scripts/ktask_workflow.py reconcile
-python3 scripts/ktask_workflow.py run --through IF-001
+python3 scripts/ktask_workflow.py run --through IF-094
 ```
 
 Only run/resume/retry invoke models. --through stops after the named accepted task.
