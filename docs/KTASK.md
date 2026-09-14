@@ -12,6 +12,7 @@ python3 scripts/ktask_workflow.py run
 python3 scripts/ktask_workflow.py resume
 python3 scripts/ktask_workflow.py retry
 python3 scripts/ktask_workflow.py reconcile
+python3 scripts/ktask_workflow.py restore-receipts
 python3 scripts/ktask_workflow.py run --through IF-094
 ```
 
@@ -24,6 +25,11 @@ markers. Reconciliation preserves accepted receipts, verifies their unchanged
 contracts and commit ancestry, and regenerates the accepted prefix plus one task.
 Accepted work cannot be removed, reordered or silently marked pending.
 Never clear statuses or delete a session to repeat accepted gameplay work.
+After a fresh clone or loss of receipt files, restore-receipts verifies the
+published branch's task packets, changed-file scopes and candidate content hashes,
+then rebuilds its accepted prefix. It never accepts unpublished commits. The clone
+must contain the published branch tip; fetch that branch first if necessary.
+Logs/captures remain local artifacts; restored receipts do not recreate them.
 
 ## Roles and acceptance
 
@@ -53,8 +59,10 @@ Workers cannot edit process-control files inside ordinary task scopes.
 Commit/push happen only after acceptance. No force push, merge to main, remote
 creation or public release. Remote confirmation is required before advancement.
 A push failure retains the accepted local commit and retries its delivery without
-reimplementing the task. A crash between commit and receipt write stops for
-coordinator recovery; it never guesses and duplicates work.
+reimplementing the task. Before committing, delivery durably records the reviewed
+tree, parent and exact message. Restart recognizes only that exact child commit,
+or finishes the prepared commit if HEAD has not moved. An unrelated commit or
+changed worktree refuses recovery. Planning delivery uses the same protocol.
 
 Delivery uses the existing authenticated GitHub CLI as a per-command credential
 helper when enabled in policy.toml. It does not change global/local Git settings,

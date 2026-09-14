@@ -14,6 +14,7 @@ from ktask_contracts import parse_tasks, check_scope, check_review, review_schem
 from ktask_process import run, codex_args
 from ktask_evidence import record, validate_runs
 from ktask_guardian import invoke as run_model
+import ktask_delivery as delivery
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -30,8 +31,16 @@ def git(root, *args):
 def save(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(".tmp")
-    temporary.write_text(json.dumps(value, indent=2) + "\n")
+    with temporary.open('w') as handle:
+        handle.write(json.dumps(value, indent=2) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
     temporary.replace(path)
+    descriptor = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
 
 
 def tracked_clean(root):
@@ -77,8 +86,7 @@ def candidate_state(root, task, state, policy, committed=False, allowed_controls
     contents = file_digest(root, paths)
     modes = {name: bool((root / name).lstat().st_mode & 0o100)
              for name in paths if (root / name).exists() and not (root / name).is_symlink()}
-    fingerprint = hashlib.sha256(json.dumps([contents, modes], sort_keys=True).encode())
-    return sorted(paths), fingerprint.hexdigest()
+    return sorted(paths), delivery.fingerprint(contents, modes)
 
 
 def evidence_binding(state):
@@ -167,6 +175,19 @@ def publish(root, policy, commit):
 
 
 def accept(root, task, state, policy):
+    pending = root / '.ktask/session/delivery-intent.json'
+    if pending.exists():
+        intent = json.loads(pending.read_text())
+        saved = intent['state']
+        head = git(root, 'rev-parse', 'HEAD')
+        committed = head != saved['baseline']
+        if candidate_state(root, task, dict(saved, commit=head), policy, committed=committed)[1] != saved['candidate']:
+            raise ValueError('Pending delivery differs from reviewed content')
+        state = delivery.finish(root, intent, git)
+        save(root / '.ktask/session/active.json', state)
+        result = push_receipt(root, task, state, policy)
+        pending.unlink()
+        return result
     if "commit" in state:
         return push_receipt(root, task, state, policy)
     paths, candidate = candidate_state(root, task, state, policy)
@@ -189,12 +210,16 @@ def accept(root, task, state, policy):
         git(root, "add", "--", *to_stage)
     if candidate_state(root, task, state, policy)[1] != candidate:
         raise ValueError("Candidate changed while staging")
-    git(root, "commit", "-m", f"{task['id']}: {task['title']}\n\n"
+    message = (f"{task['id']}: {task['title']}\n\n"
         f"Task-packet: {task['digest']}\nReviewed-candidate: {candidate}\n"
+        f"Git-candidate: {delivery.committed_candidate(root, task, state['baseline'], git(root, 'write-tree'), git)}\n"
         "Validation: red/green evidence, authoritative gate, independent review.")
-    state.update(commit=git(root, "rev-parse", "HEAD"), candidate=candidate)
+    intent = delivery.prepare(root, pending, dict(state, candidate=candidate), message, git, save)
+    state.update(delivery.finish(root, intent, git))
     save(root / ".ktask/session/active.json", state)
-    return push_receipt(root, task, state, policy)
+    result = push_receipt(root, task, state, policy)
+    pending.unlink()
+    return result
 
 
 def load_project(root):
@@ -279,7 +304,7 @@ def validate(root, tasks):
 
 def main():
     command, *arguments = sys.argv[1:]
-    if command in ("run", "resume", "retry", "status", "reconcile"):
+    if command in ("run", "resume", "retry", "status", "reconcile", "restore-receipts"):
         os.execv(sys.executable, [sys.executable, str(ROOT / 'scripts/ktask_supervisor.py'), command, *arguments])
     tasks, policy = load_project(ROOT)
     if command == "validate":

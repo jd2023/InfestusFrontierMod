@@ -116,6 +116,97 @@ class DeliveryTests(unittest.TestCase):
                          self.git("ls-remote", "origin", "refs/heads/feature/test").split()[0])
         self.assertEqual("", self.git("status", "--porcelain"))
 
+    def test_commit_interruption_resumes_without_review_or_second_commit(self):
+        self.evidence()
+        flow.save(self.session / 'active.json', self.state)
+        original = flow.git
+        def interrupt(root, *args):
+            result = original(root, *args)
+            if args[0] == 'commit':
+                raise OSError('interrupted after commit')
+            return result
+        with patch.object(flow, 'git', side_effect=interrupt), \
+                patch.object(flow, 'review_candidate', side_effect=self.review), patch.object(flow, 'run_gate'):
+            with self.assertRaisesRegex(OSError, 'interrupted'):
+                flow.accept(self.root, self.task, self.state, self.policy)
+        committed = self.git('rev-parse', 'HEAD')
+        self.assertNotEqual(self.base, committed)
+        with patch.object(flow, 'review_candidate') as review, patch.object(flow, 'run_gate') as gate:
+            saved = json.loads((self.session / 'active.json').read_text())
+            self.assertEqual(committed, flow.accept(self.root, self.task, saved, self.policy))
+            review.assert_not_called()
+            gate.assert_not_called()
+        self.assertEqual('2', self.git('rev-list', '--count', 'HEAD'))
+        self.assertEqual(committed, self.git('ls-remote', 'origin', 'refs/heads/feature/test').split()[0])
+
+    def test_pending_delivery_rejects_unrelated_commit(self):
+        self.evidence()
+        original = flow.git
+        with patch.object(flow, 'review_candidate', side_effect=self.review), patch.object(flow, 'run_gate'), \
+                patch.object(flow, 'git', wraps=flow.git) as git:
+            def interrupt(root, *args):
+                if args[0] == 'commit':
+                    raise OSError('interrupted before commit')
+                return original(root, *args)
+            git.side_effect = interrupt
+            with self.assertRaises(OSError):
+                flow.accept(self.root, self.task, self.state, self.policy)
+        self.git('commit', '-m', 'unrelated commit')
+        with self.assertRaises(ValueError):
+            flow.accept(self.root, self.task, self.state, self.policy)
+
+    def test_published_receipts_reconstruct_in_fresh_clone(self):
+        self.evidence()
+        commit = self.accept()
+        clone = Path(self.temp.name) / 'clone'
+        subprocess.run(['git', 'clone', '-b', self.policy['branch'], str(self.remote), str(clone)],
+                       check=True, capture_output=True)
+        self.assertFalse((clone / '.ktask/session').exists())
+        receipts = flow.delivery.published_receipts(clone, [self.task], self.policy, flow.git)
+        self.assertEqual(commit, receipts['IF-001']['commit'])
+        self.assertEqual(self.base, receipts['IF-001']['baseline'])
+
+    def test_published_receipt_survives_line_ending_normalization(self):
+        self.git('config', 'core.autocrlf', 'true')
+        (self.root / 'owned.txt').write_bytes(b'after\r\n')
+        self.evidence()
+        commit = self.accept()
+        receipts = flow.delivery.published_receipts(self.root, [self.task], self.policy, flow.git)
+        self.assertEqual(commit, receipts['IF-001']['commit'])
+
+    def test_prepared_message_preserves_markdown_whitespace(self):
+        self.git('add', 'owned.txt')
+        message = 'Plan correction\n\nDefine one operation.  \nPreserve the boundary.'
+        intent = flow.delivery.prepare(self.root, self.session / 'intent.json', self.state, message, flow.git, flow.save)
+        state = flow.delivery.finish(self.root, intent, flow.git)
+        self.assertEqual(message, self.git('show', '-s', '--format=%B', state['commit']))
+        self.assertEqual(state, flow.delivery.finish(self.root, intent, flow.git))
+
+    def test_supervisor_resumes_pre_intent_push_failure(self):
+        import ktask_supervisor as supervisor
+        self.evidence()
+        with patch.object(flow, 'publish', side_effect=OSError('offline')):
+            with self.assertRaises(OSError):
+                self.accept()
+        (self.session / 'delivery-intent.json').unlink()
+        with patch.object(flow, 'load_project', return_value=([self.task], self.policy)), \
+                patch.object(flow, 'validate'), patch.object(supervisor, 'reconcile', side_effect=lambda *args: supervisor.accepted_prefix(self.root, [self.task])), \
+                patch.object(supervisor, 'decision') as model:
+            self.assertEqual(0, supervisor.supervise(self.root, self.policy))
+            model.assert_not_called()
+
+    def test_reconstruction_rejects_false_candidate_attestation(self):
+        self.git('add', 'owned.txt')
+        self.git('commit', '-m', 'IF-001: alleged delivery\n\nTask-packet: packet\nReviewed-candidate: ' + '0' * 64)
+        self.git('push', 'origin', 'HEAD')
+        with self.assertRaisesRegex(ValueError, 'candidate'):
+            flow.delivery.published_receipts(self.root, [self.task], self.policy, flow.git)
+
+    def test_unpublished_commit_is_not_reconstructed(self):
+        self.git('add', 'owned.txt')
+        self.git('commit', '-m', 'IF-001: unpublished\n\nTask-packet: packet\nReviewed-candidate: ' + '0' * 64)
+        self.assertEqual({}, flow.delivery.published_receipts(self.root, [self.task], self.policy, flow.git))
+
     def test_new_file_accepts_without_a_retry(self):
         self.task['scope'].append('new.txt')
         (self.root / 'new.txt').write_text('new behavior\n')

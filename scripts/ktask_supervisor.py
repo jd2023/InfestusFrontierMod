@@ -12,6 +12,7 @@ import time
 import tomllib
 
 import ktask_workflow as flow
+import ktask_delivery as delivery
 from ktask_contracts import check_review
 from ktask_process import codex_args
 from ktask_guardian import invoke as run_runner
@@ -52,6 +53,9 @@ def reconcile(root, tasks, policy):
     if flow.git(root, 'branch', '--show-current') != policy['branch']:
         raise ValueError('Wrong delivery branch')
     count = accepted_prefix(root, tasks)
+    if count < len(tasks) and flow.git(root, 'log', '-1', '--format=%H', '--fixed-strings',
+                                     '--grep=Task-packet: ' + tasks[count]['digest']):
+        raise ValueError('Task delivery exists without its receipt; run restore-receipts before dispatch')
     selected = tasks[:count + 1]
     runtime = root / '.ktask/session/.ktask'
     runtime.mkdir(parents=True, exist_ok=True)
@@ -144,7 +148,7 @@ def coordinate(root, task, policy, reason):
         state = saved['state']
     else:
         state = json.loads(state_path.read_text()) if state_path.exists() else flow.begin(root, task, policy)
-        if state.get('commit'):
+        if state.get('commit') or (root / '.ktask/session/delivery-intent.json').exists():
             flow.accept(root, task, state, policy)
             return
         park(root, task, state, policy)
@@ -189,16 +193,19 @@ def coordinate(root, task, policy, reason):
         if flow.candidate_state(root, plan_task, plan_state, policy, allowed_controls=PLAN_FILES)[1] != candidate:
             raise ValueError('Plan changed during review')
         flow.git(root, 'add', '--', *sorted(changed))
-        flow.git(root, 'commit', '-m', f'Clarify {task["id"]} implementation contract', '-m', result['reason'])
-        delivery = root / '.ktask/session/planning/pending-delivery.json'
-        commit = flow.git(root, 'rev-parse', 'HEAD')
-        flow.save(delivery, dict(commit=commit))
+        intent_path = root / '.ktask/session/planning/commit-intent.json'
+        intent = delivery.prepare(root, intent_path, dict(plan_state, candidate=candidate),
+                                  f'Clarify {task["id"]} implementation contract\n\n{result["reason"]}', flow.git, flow.save)
+        commit = delivery.finish(root, intent, flow.git)['commit']
+        pending_delivery = root / '.ktask/session/planning/pending-delivery.json'
+        flow.save(pending_delivery, dict(commit=commit))
         phase = root / '.ktask/session/planning/active.json'
         if phase.exists():
             saved = json.loads(phase.read_text())
             flow.save(phase, dict(saved, accepted_commit=commit))
-        flow.publish(root, policy, json.loads(delivery.read_text())['commit'])
-        delivery.replace(delivery.with_name('delivered-' + str(time.time_ns()) + '.json'))
+        flow.publish(root, policy, commit)
+        pending_delivery.replace(pending_delivery.with_name('delivered-' + str(time.time_ns()) + '.json'))
+        intent_path.unlink()
     folder = root / '.ktask/session/planning' / task['id']
     folder.mkdir(parents=True, exist_ok=True)
     (folder / 'reason.txt').write_text(result['reason'] + '\n')
@@ -238,12 +245,23 @@ def recover(root, task, policy, reason):
 
 
 def supervise(root, policy, through=None):
-    delivery = root / '.ktask/session/planning/pending-delivery.json'
-    if delivery.exists():
+    intent_path = root / '.ktask/session/planning/commit-intent.json'
+    if intent_path.exists():
+        intent = json.loads(intent_path.read_text())
+        if flow.file_digest(root, intent['state']['protected']) != intent['state']['protected']:
+            raise ValueError('Unrelated files changed during plan delivery')
+        commit = delivery.finish(root, intent, flow.git)['commit']
+        flow.publish(root, policy, commit)
+        phase = root / '.ktask/session/planning/active.json'
+        if phase.exists():
+            flow.save(phase, dict(json.loads(phase.read_text()), accepted_commit=commit))
+        intent_path.unlink()
+    pending_delivery = root / '.ktask/session/planning/pending-delivery.json'
+    if pending_delivery.exists():
         if not flow.tracked_clean(root):
             raise ValueError('Pending plan delivery has new edits')
-        flow.publish(root, policy, json.loads(delivery.read_text())['commit'])
-        delivery.replace(delivery.with_name('delivered-' + str(time.time_ns()) + '.json'))
+        flow.publish(root, policy, json.loads(pending_delivery.read_text())['commit'])
+        pending_delivery.replace(pending_delivery.with_name('delivered-' + str(time.time_ns()) + '.json'))
     phase = root / '.ktask/session/planning/active.json'
     if phase.exists():
         saved = json.loads(phase.read_text())
@@ -251,6 +269,17 @@ def supervise(root, policy, through=None):
     while True:
         tasks, policy = flow.load_project(root)
         flow.validate(root, tasks)
+        pending = root / '.ktask/session/delivery-intent.json'
+        if pending.exists():
+            saved = json.loads(pending.read_text())['state']
+            pending_task = next(task for task in tasks if task['id'] == saved['task'])
+            flow.accept(root, pending_task, saved, policy)
+        active_path = root / '.ktask/session/active.json'
+        if active_path.exists():
+            saved = json.loads(active_path.read_text())
+            if saved.get('commit') and not (root / '.ktask/session/accepted' / (saved['task'] + '.json')).exists():
+                pending_task = next(task for task in tasks if task['id'] == saved['task'])
+                flow.accept(root, pending_task, saved, policy)
         if through and through not in {task['id'] for task in tasks}:
             raise ValueError('Unknown --through task')
         count = reconcile(root, tasks, policy)
@@ -282,7 +311,7 @@ def supervise(root, policy, through=None):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', choices=['run', 'resume', 'retry', 'status', 'reconcile'])
+    parser.add_argument('command', choices=['run', 'resume', 'retry', 'status', 'reconcile', 'restore-receipts'])
     parser.add_argument('--through')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -293,6 +322,22 @@ def main():
         return 0
     with (root / '.ktask/supervisor.lock').open('a+') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if args.command == 'restore-receipts':
+            if not flow.tracked_clean(root) or flow.git(root, 'branch', '--show-current') != policy['branch']:
+                raise ValueError('Receipt restoration requires a clean tracked checkpoint')
+            tasks, _ = flow.load_project(root)
+            receipts = delivery.published_receipts(root, tasks, policy, flow.git)
+            folder = root / '.ktask/session/accepted'
+            for identity, receipt in receipts.items():
+                path = folder / (identity + '.json')
+                if path.exists():
+                    existing = json.loads(path.read_text())
+                    if any(existing.get(key) != receipt[key] for key in ('task', 'packet', 'commit')):
+                        raise ValueError('Existing receipt disagrees with published history')
+                else:
+                    flow.save(path, receipt)
+            print(f'{len(receipts)} published task receipts verified')
+            return 0
         if args.command == 'reconcile':
             if not flow.tracked_clean(root):
                 raise ValueError('Commit coordinator plan changes before explicit reconciliation')
