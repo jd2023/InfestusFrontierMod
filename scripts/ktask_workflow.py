@@ -5,7 +5,6 @@ import json
 import os
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import sys
 import tomllib
@@ -14,8 +13,13 @@ import uuid
 from ktask_contracts import parse_tasks, check_scope, check_review, review_schema
 from ktask_process import run, codex_args
 from ktask_evidence import record, validate_runs
+from ktask_guardian import invoke as run_model
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+class ReviewUnavailable(ValueError):
+    """Review execution failed without producing a semantic verdict."""
 
 
 def git(root, *args):
@@ -58,7 +62,7 @@ def begin(root, task, policy):
                 branch=policy["branch"], protected=file_digest(root, untracked(root)), token=uuid.uuid4().hex)
 
 
-def candidate_state(root, task, state, policy, committed=False):
+def candidate_state(root, task, state, policy, committed=False, allowed_controls=()):
     if (git(root, "branch", "--show-current") != state["branch"]
             or state["branch"] != policy["branch"] or task["digest"] != state["packet"]
             or git(root, "rev-parse", "HEAD") != state["commit" if committed else "baseline"]):
@@ -67,7 +71,7 @@ def candidate_state(root, task, state, policy, committed=False):
         raise ValueError("Pre-existing untracked user files changed")
     paths = set(git(root, "diff", "--no-renames", "--name-only", "-z", state["baseline"]).split("\0")) - {""}
     paths |= untracked(root) - state["protected"].keys()
-    check_scope(task, paths)
+    check_scope(task, paths, allowed_controls)
     if not paths:
         raise ValueError("No implementation change to accept")
     contents = file_digest(root, paths)
@@ -124,9 +128,12 @@ def review_candidate(root, task, state, candidate, policy):
     prompt = (root / ".ktask/review.md").read_text()
     prompt += f"\nTask: {task['id']}\nBaseline: {state['baseline']}\nCandidate: {candidate}\n"
     prompt += f"Evidence: .ktask/session/evidence/{task['id']}\n\n{task['body']}\n"
-    run([*codex_args(policy['reviewer_model'], policy['reviewer_effort']),
-         "--output-schema", str(schema), "-o", str(output), "-C", str(root), "-"],
-        root, policy["review_timeout"], prompt, log=folder / 'transcript.log')
+    try:
+        run_model([*codex_args(policy['reviewer_model'], policy['reviewer_effort']),
+             "--output-schema", str(schema), "-o", str(output), "-C", str(root), "-"],
+            root, policy["review_timeout"], prompt, log=folder / 'transcript.log', check=True)
+    except (ValueError, OSError, subprocess.SubprocessError) as error:
+        raise ReviewUnavailable(str(error)) from error
     try:
         return json.loads(output.read_text())
     except (OSError, json.JSONDecodeError) as error:
@@ -143,14 +150,20 @@ def push_receipt(root, task, state, policy):
         raise ValueError("Pending delivery changed; coordinator recovery required")
     if candidate_state(root, task, state, policy, committed=True)[1] != state["candidate"]:
         raise ValueError("Committed content differs from the reviewed candidate")
+    publish(root, policy, commit)
+    save(root / ".ktask/session/accepted" / (task["id"] + ".json"), state)
+    return commit
+
+
+def publish(root, policy, commit):
+    if git(root, 'rev-parse', 'HEAD') != commit or git(root, 'branch', '--show-current') != policy['branch']:
+        raise ValueError('Delivery checkpoint or branch changed')
     credentials = (["-c", "credential.helper=", "-c", "credential.helper=!gh auth git-credential"]
                    if policy.get("github_cli_credentials", False) else [])
     git(root, *credentials, "push", policy["remote"], f"HEAD:refs/heads/{policy['branch']}")
     remote = git(root, "ls-remote", policy["remote"], f"refs/heads/{policy['branch']}")
     if not remote or remote.split()[0] != commit:
         raise ValueError("Remote branch does not contain the accepted commit")
-    save(root / ".ktask/session/accepted" / (task["id"] + ".json"), state)
-    return commit
 
 
 def accept(root, task, state, policy):
@@ -195,7 +208,7 @@ def load_project(root):
 def plan_digest(root):
     paths = [".ktask/" + name for name in
              ("config.toml", "policy.toml", "context.md", "prompt.md", "tasks.md",
-              "review.md", "autoresolve.md")]
+              "review.md", "autoresolve.md", "readiness.md", "coordinator.md")]
     paths += [str(path.relative_to(root)) for path in sorted((root / 'scripts').glob('ktask_*.py'))]
     paths += ["AGENTS.md", "VISION.md", ".ktask/verify.sh"]
     paths += [str(path.relative_to(root)) for path in sorted((root / "docs").glob("*.md"))]
@@ -206,32 +219,15 @@ def require_session(root):
     expected = root / ".ktask/session/plan.json"
     if not expected.exists() or json.loads(expected.read_text())["digest"] != plan_digest(root):
         raise ValueError("No matching prepared session; use the project launcher")
-
-
-def prepare_session(root, policy):
-    session = root / ".ktask/session"
-    if session.exists():
-        require_session(root)
-        return session
-    if not tracked_clean(root) or git(root, "branch", "--show-current") != policy["branch"]:
-        raise ValueError("Commit the plan on the configured branch before launching")
-    runtime = session / ".ktask"
-    runtime.mkdir(parents=True)
-    for name in ("tasks.md", "context.md", "prompt.md", "autoresolve.md"):
-        shutil.copyfile(root / ".ktask" / name, runtime / name)
-    config = (root / ".ktask/config.toml").read_text()
-    config = re.sub(r'^project_dir = .*$', "project_dir = " + json.dumps(str(root)),
-                    config, count=1, flags=re.M)
-    (runtime / "config.toml").write_text(config)
-    save(session / "plan.json", dict(digest=plan_digest(root)))
-    return session
+    return json.loads(expected.read_text())
 
 
 def executor(root, tasks, policy, argv):
-    require_session(root)
+    plan = require_session(root)
     prompt = sys.stdin.read()
     header = re.search(r"\[Orchestrator context\] Task (\d+) of (\d+)", prompt)
-    if not header or int(header[2]) != len(tasks) or not 1 <= int(header[1]) <= len(tasks):
+    total = len(plan['task_ids']) if isinstance(plan, dict) else len(tasks)
+    if not header or int(header[2]) != total or not 1 <= int(header[1]) <= total:
         raise ValueError("Unrecognized ktask executor context")
     task = tasks[int(header[1]) - 1]
     if task["body"] not in prompt:
@@ -260,7 +256,10 @@ def executor(root, tasks, policy, argv):
     argv = codex_args(model, effort, writable=True, cache=policy.get('gradle_cache')) + ['-']
     prompt += "\nThe delivery adapter owns commits and pushes. Do not perform either.\n"
     prompt += f"Baseline: {state['baseline']}\nEvidence directory: .ktask/session/evidence/{task['id']}\n"
-    run(argv, root, 7200, prompt)
+    diagnosis = root / '.ktask/session/planning' / task['id'] / 'reason.txt'
+    if diagnosis.exists():
+        prompt += '\nCoordinator diagnosis:\n' + diagnosis.read_text()
+    run_model(argv, root, 7200, prompt, check=True)
 
 
 def validate(root, tasks):
@@ -279,8 +278,10 @@ def validate(root, tasks):
 
 
 def main():
-    tasks, policy = load_project(ROOT)
     command, *arguments = sys.argv[1:]
+    if command in ("run", "resume", "retry", "status", "reconcile"):
+        os.execv(sys.executable, [sys.executable, str(ROOT / 'scripts/ktask_supervisor.py'), command, *arguments])
+    tasks, policy = load_project(ROOT)
     if command == "validate":
         validate(ROOT, tasks)
     elif command == "scope":
@@ -309,11 +310,6 @@ def main():
         candidate = candidate_state(ROOT, task, state, policy)[1]
         record(ROOT / '.ktask/session/evidence' / task['id'], evidence_binding(state),
                candidate, phase, argv, ROOT, 7200 if phase == 'soak' else 1800, options.artifact)
-    elif command in ("run", "resume", "retry", "status"):
-        validate(ROOT, tasks)
-        session = ROOT if command == "status" and not (ROOT / ".ktask/session").exists() else prepare_session(ROOT, policy)
-        os.chdir(session)
-        os.execv(policy["runner"], [policy["runner"], command, *arguments])
     else:
         raise ValueError("Use validate, status, run, resume or retry")
 

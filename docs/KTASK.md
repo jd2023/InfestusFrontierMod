@@ -10,13 +10,16 @@ python3 scripts/ktask_workflow.py status
 python3 scripts/ktask_workflow.py run
 python3 scripts/ktask_workflow.py resume
 python3 scripts/ktask_workflow.py retry
+python3 scripts/ktask_workflow.py reconcile
+python3 scripts/ktask_workflow.py run --through IF-001
 ```
 
-Only run/resume/retry invoke workers. This planning change does not launch them.
+Only run/resume/retry invoke models. --through stops after the named accepted task.
 Use this launcher, not bare ktask: it creates ignored `.ktask/session/.ktask`
 runtime files, pins the plan/prompts, and leaves tracked packets free of status
-markers. Existing sessions refuse a changed plan; coordinator migration preserves
-accepted receipts and explicitly revalidates dependencies before restarting.
+markers. Reconciliation preserves accepted receipts, verifies their unchanged
+contracts and commit ancestry, and regenerates the accepted prefix plus one task.
+Accepted work cannot be removed, reordered or silently marked pending.
 Never clear statuses or delete a session to repeat accepted gameplay work.
 
 ## Roles and acceptance
@@ -26,15 +29,13 @@ Never clear statuses or delete a session to repeat accepted gameplay work.
 | Implementation | gpt-5.6-sol, high | Supplied contract, red-first tests, narrow implementation |
 | Repair | gpt-6-astra, high; at most two attempts | Resolve engineering failure and revise candidate |
 | Independent review | Fresh gpt-6-astra, high; read-only | Inspect whole diff, boundaries, tests, performance and actual evidence |
-| Planning coordinator | Smart model | Research/design, contracts, dependency ordering, re-scoping failures |
+| Planning coordinator | Fresh gpt-6-astra, high | Readiness before dispatch; scoped plan correction after exhausted repairs |
 | Delivery adapter | No model | Run full gate, validate evidence/verdict, commit and push feature branch |
 
-These are initial role selections, not measured cost or account-access claims.
-Actual account/model access must succeed at execution; no paid worker/reviewer run
-is part of the offline configuration tests.
+Model selections are not cost guarantees. Offline tests never launch models.
 
 ```text
-worker -> red/green evidence -> authoritative gate -> independent review
+readiness -> worker -> captured evidence -> authoritative gate -> independent review
                                                   ├─ reject -> bounded smart repair -> repeat
                                                   └─ accept -> commit -> push/confirm -> next task
 ```
@@ -57,25 +58,41 @@ helper when enabled in policy.toml. It does not change global/local Git settings
 switch accounts or initiate login. Missing repository access remains an external
 authentication failure; the accepted local commit is retained.
 
-The external runner owns retries, locks, provider waits and queue state. The project
-adapter does not fork or patch ktask. Its Codex wrapper removes the runner's
-sandbox-bypass flag and uses workspace-write; review uses read-only, ephemeral
-execution and a structured output schema. These CLI options were checked against
+The external runner owns worker retries and provider waits. The supervisor admits
+one pending packet at a time under a project lock. No fork or patch of ktask.
+Workers use workspace-write, explicit network access and the named Gradle cache;
+reviews use read-only. Both ignore user config, retain existing authentication and
+disable interactive approvals. User/project execpolicy rules still apply. Settings follow
 [Codex non-interactive documentation](https://learn.chatgpt.com/docs/non-interactive-mode).
 
 ## Failure ownership and evidence limits
 
-Normal failures and task ambiguities are engineering work. The resolver repairs
-within scope; an exhausted or invalid packet returns to the planning coordinator.
-The coordinator refines the contract/baseline and resumes. Only genuine product
-choices or new external authority reach the user. No automatic HUMAN placeholders.
+The supervisor calls the coordinator when readiness fails or worker/repair attempts
+are exhausted. It parks only the failed candidate in a retained Git stash, leaving
+unrelated files untouched. Planning edits are limited to existing contracts and
+gameplay specifications, pass the full gate and fresh independent review, then
+commit/push. A diagnosis can also restart repair without changing the plan.
+The candidate is restored when its task is next; intervening prerequisites can run.
+Two coordinator cycles/task bound costs. Provider/access failures preserve progress.
+Interrupted stash application stops with the recovery receipt and stash intact;
+never delete a session or stash to bypass recovery checks.
+Interrupted planning resumes before parsing its unfinished task edits. Provider and
+access pauses do not consume engineering retries. On Linux, a process guardian
+forwards cancellation and reaps detached workers before releasing the project lock.
 
-Evidence schema validates presence and binding, not honesty or artistic quality.
+The record command captures actual exit codes, logs and generated artifact hashes.
+Green and qualification receipts bind to exact candidate content; red binds to
+task/baseline. A failed rerun invalidates the prior phase receipt. Logs are limited
+to 16 MiB and 64 captures/task. Review checks require supporting evidence.
+These bindings establish provenance, not honesty or artistic quality.
 The independent reviewer must inspect red assertions, actual captures, negative
 cases and measurements. Same-user local processes are not a security boundary
 against a malicious agent rewriting ignored files. Offline tests validate delivery
 control with disposable Git remotes and fake review outcomes; they do not certify
 real-model review quality, visual judgment, account access or campaign gameplay.
 
-The full gate must stay offline with respect to AI: no reviewer recursively calls
-acceptance from tests. Feature checks join Gradle verifyAll and the existing script.
+The full gate stays offline with respect to AI. Fast regression checks join Gradle
+verifyAll; the adapter allows 30 minutes. Client/multiplayer/soak qualification uses
+separate recorded commands, up to two hours for soak. Any candidate edit invalidates
+qualification. Acceptance requires both classes; long soaks do not run inside
+every fast-gate invocation. No model is invoked recursively from a test.

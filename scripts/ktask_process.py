@@ -8,7 +8,7 @@ import subprocess
 import time
 
 
-def run(argv, root, timeout, prompt=None, *, log=None, check=True):
+def run(argv, root, timeout, prompt=None, *, log=None, check=True, graceful=False):
     """Keep descendants in the runner's kill group; cap each captured log at 16 MiB."""
     runner_group = os.getpgrp() == os.getpid() or bool(os.environ.get('INFESTUS_TASK_GROUP'))
     output = Path(log).open('wb', buffering=0) if log else None
@@ -16,10 +16,11 @@ def run(argv, root, timeout, prompt=None, *, log=None, check=True):
                              stdout=subprocess.PIPE if output else None,
                              stderr=subprocess.STDOUT if output else None,
                              env=dict(os.environ, INFESTUS_TASK_GROUP='1'),
-                             start_new_session=not runner_group)
-    group = os.getpgrp() if runner_group else child.pid
+                             start_new_session=graceful or not runner_group)
+    group = os.getpgrp() if runner_group and not graceful else child.pid
     def stop(signum, frame):
-        os.killpg(group, signal.SIGKILL)
+        if not graceful:
+            os.killpg(group, signal.SIGKILL)
         raise KeyboardInterrupt
     previous = {sig: signal.signal(sig, stop) for sig in (signal.SIGTERM, signal.SIGINT)}
     deadline, heartbeat = time.monotonic() + timeout, time.monotonic() + 30
@@ -62,6 +63,15 @@ def run(argv, root, timeout, prompt=None, *, log=None, check=True):
                 print('Task process still running within its deadline.', flush=True)
                 heartbeat = time.monotonic() + 30
     except (subprocess.TimeoutExpired, KeyboardInterrupt, ValueError):
+        if graceful:
+            for sig in previous:
+                signal.signal(sig, signal.SIG_IGN)
+        if graceful and child.poll() is None:
+            child.send_signal(signal.SIGTERM)
+            try:
+                child.wait(timeout=40)
+            except subprocess.TimeoutExpired:
+                pass
         try:
             os.killpg(group, signal.SIGKILL)
         except ProcessLookupError:

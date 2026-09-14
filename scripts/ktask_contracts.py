@@ -85,10 +85,10 @@ def parse_tasks(content):
     return tasks
 
 
-def check_scope(task, paths):
+def check_scope(task, paths, allowed_controls=()):
     """Every changed path must be explicitly allowed; workers cannot rewrite their gates."""
     for path in paths:
-        if (path.startswith(CONTROL) or ".." in PurePosixPath(path).parts
+        if ((path.startswith(CONTROL) and path not in allowed_controls) or ".." in PurePosixPath(path).parts
                 or not any(fnmatch.fnmatchcase(path, rule) for rule in task["scope"])):
             raise ValueError(f"{task['id']} out-of-scope change: {path}")
 

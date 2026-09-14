@@ -228,7 +228,7 @@ class DeliveryTests(unittest.TestCase):
         flow.save(self.session / "active.json", self.state)
         prompt = "[Orchestrator context] Task 1 of 1 (attempt 1).\n" + self.task["body"]
         with patch.object(flow, "require_session"), patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
-                patch.object(flow, "run") as execute:
+                patch.object(flow, "run_model") as execute:
             flow.executor(self.root, [self.task], self.policy,
                           ["exec", "--dangerously-bypass-approvals-and-sandbox", "-"])
         argv = execute.call_args.args[0]
@@ -242,7 +242,7 @@ class DeliveryTests(unittest.TestCase):
         self.task.update(body="IF-002 Consumer", id="IF-002", dependencies=["IF-001"])
         prompt = "[Orchestrator context] Task 1 of 1 (attempt 1).\n" + self.task["body"]
         with patch.object(flow, "require_session"), patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
-                patch.object(flow, "run") as execute:
+                patch.object(flow, "run_model") as execute:
             with self.assertRaisesRegex(ValueError, "Unaccepted dependency"):
                 flow.executor(self.root, [self.task], self.policy, ["exec", "-"])
         execute.assert_not_called()
@@ -252,7 +252,7 @@ class DeliveryTests(unittest.TestCase):
         flow.save(self.session / "active.json", self.state)
         prompt = "[Orchestrator context] Task 1 of 1 (attempt 1).\nIF-001 Wrong contract"
         with patch.object(flow, "require_session"), patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
-                patch.object(flow, "run") as execute:
+                patch.object(flow, "run_model") as execute:
             with self.assertRaisesRegex(ValueError, "packet"):
                 flow.executor(self.root, [self.task], self.policy, ["exec", "-"])
         execute.assert_not_called()
