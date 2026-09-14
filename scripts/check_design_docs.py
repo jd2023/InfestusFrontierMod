@@ -54,23 +54,56 @@ def parents(expression):
 
 
 def check_graph(graph):
-    visiting, finished = set(), set()
-
-    def visit(node):
-        if node not in graph:
-            raise ValueError(f"Unknown guide node: {node}")
-        if node in visiting:
-            raise ValueError(f"Guide cycle at {node}")
-        if node in finished:
-            return
-        visiting.add(node)
-        for parent in graph[node]:
-            visit(parent)
-        visiting.remove(node)
-        finished.add(node)
+    if not isinstance(graph, dict):
+        raise ValueError('Guide graph must be a dict')
+    if len(graph) > 4096:
+        raise ValueError('Guide graph exceeds 4096 nodes')
 
     for node in graph:
-        visit(node)
+        if not isinstance(node, str):
+            raise ValueError(f'Invalid guide node: {node!r}')
+
+    edge_count = 0
+    for node, dependencies in graph.items():
+        if not isinstance(dependencies, (list, tuple)):
+            raise ValueError(
+                f'Invalid guide dependencies at {node}: expected list or tuple'
+            )
+        edge_count += len(dependencies)
+        if edge_count > 16384:
+            raise ValueError('Guide graph exceeds 16384 edges')
+
+    for node, dependencies in graph.items():
+        for dependency in dependencies:
+            if not isinstance(dependency, str):
+                raise ValueError(f'Invalid guide reference at {node}: {dependency!r}')
+            if dependency not in graph:
+                raise ValueError(f'Unknown guide node referenced by {node}: {dependency}')
+            if dependency == node:
+                raise ValueError(f'Guide self-edge at {node}')
+
+    states = {}
+    for start in graph:
+        if states.get(start) == 2:
+            continue
+        states[start] = 1
+        stack = [(start, 0)]
+        while stack:
+            node, dependency_index = stack[-1]
+            dependencies = graph[node]
+            if dependency_index == len(dependencies):
+                states[node] = 2
+                stack.pop()
+                continue
+
+            dependency = dependencies[dependency_index]
+            stack[-1] = (node, dependency_index + 1)
+            state = states.get(dependency, 0)
+            if state == 1:
+                raise ValueError(f'Guide cycle at {dependency}')
+            if state == 0:
+                states[dependency] = 1
+                stack.append((dependency, 0))
 
 
 def unique(values, label):
@@ -378,6 +411,78 @@ class CheckerTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 check_graph(graph)
         check_graph({'root': [], 'child': ['root']})
+
+    def test_graph_accepts_bounded_dag_shapes_without_mutation(self):
+        graph = {
+            'root': [],
+            'left': ['root'],
+            'right': ('root',),
+            'shared': ['left', 'right', 'root', 'root'],
+            'disconnected': [],
+        }
+        snapshot = {
+            node: dependencies[:] if isinstance(dependencies, list) else dependencies
+            for node, dependencies in graph.items()
+        }
+        self.assertIsNone(check_graph(graph))
+        self.assertEqual(graph, snapshot)
+        self.assertIsNone(check_graph({}))
+
+        chain = {
+            f'node-{index}': [] if index == 0 else [f'node-{index - 1}']
+            for index in reversed(range(4096))
+        }
+        chain_snapshot = {node: dependencies[:] for node, dependencies in chain.items()}
+        self.assertIsNone(check_graph(chain))
+        self.assertEqual(chain, chain_snapshot)
+
+        exact_edge_limit = {'root': [], 'child': ['root'] * 16384}
+        self.assertIsNone(check_graph(exact_edge_limit))
+
+    def test_graph_rejects_4097_valid_nodes(self):
+        graph = {f'node-{index}': [] for index in range(4097)}
+        with self.assertRaisesRegex(ValueError, '4096'):
+            check_graph(graph)
+
+    def test_graph_rejects_16385_valid_edges(self):
+        graph = {'root': [], 'child': ['root'] * 16385}
+        with self.assertRaisesRegex(ValueError, '16384'):
+            check_graph(graph)
+
+    def test_graph_rejects_excess_nodes_before_adjacency_validation(self):
+        too_many_nodes = {f'node-{index}': None for index in range(4097)}
+        with self.assertRaisesRegex(ValueError, '4096'):
+            check_graph(too_many_nodes)
+
+    def test_graph_rejects_excess_edges_before_reference_validation(self):
+        too_many_edges = {'root': [], 'child': [object()] * 16385}
+        with self.assertRaisesRegex(ValueError, '16384'):
+            check_graph(too_many_edges)
+
+    def test_graph_rejects_long_cycle_with_node_identity_without_mutation(self):
+        graph = {
+            f'node-{index}': ([f'node-4095'] if index == 0 else [f'node-{index - 1}'])
+            for index in reversed(range(4096))
+        }
+        snapshot = {node: dependencies[:] for node, dependencies in graph.items()}
+        with self.assertRaisesRegex(ValueError, 'node-4095'):
+            check_graph(graph)
+        self.assertEqual(graph, snapshot)
+
+    def test_graph_rejects_malformed_inputs_and_names_bad_references(self):
+        for graph in ([], {1: []}, {'node': set()}, {'node': [1]}):
+            with self.subTest(graph=graph):
+                with self.assertRaises(ValueError):
+                    check_graph(graph)
+
+        for graph, offending in (
+            ({'node': ['missing']}, 'missing'),
+            ({'node': ['node']}, 'node'),
+        ):
+            snapshot = {node: dependencies[:] for node, dependencies in graph.items()}
+            with self.assertRaisesRegex(ValueError, offending):
+                check_graph(graph)
+            self.assertEqual(graph, snapshot)
 
 
 if __name__ == '__main__':
