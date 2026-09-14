@@ -53,7 +53,7 @@ Evidence: rules
 
     def test_review_requires_all_checks_and_current_candidate(self):
         good = {"task": "IF-001", "candidate": "abc", "verdict": "accept",
-                "checks": {name: "pass" for name in ["correctness", "placement", "simplicity",
+                "checks": {name: {"status": "pass", "evidence": "file.py:1 — verified boundary"} for name in ["correctness", "placement", "simplicity",
                     "scope", "boundaries", "tests", "comments", "performance", "evidence"]},
                 "findings": []}
         check_review(good, "IF-001", "abc")
@@ -61,6 +61,13 @@ Evidence: rules
                        dict(good, checks={}), dict(good, verdict="reject")]:
             with self.assertRaises(ValueError):
                 check_review(broken, "IF-001", "abc")
+
+    def test_review_without_supporting_evidence_is_rejected(self):
+        from ktask_contracts import CHECKS
+        verdict = dict(task='IF-001', candidate='abc', verdict='accept', findings=[],
+                       checks=dict.fromkeys(CHECKS, 'pass'))
+        with self.assertRaises(ValueError):
+            check_review(verdict, 'IF-001', 'abc')
 
 
 if __name__ == "__main__":

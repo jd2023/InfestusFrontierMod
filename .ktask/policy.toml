@@ -5,3 +5,7 @@ github_cli_credentials = true
 reviewer_model = "gpt-6-astra"
 reviewer_effort = "high"
 review_timeout = 1500
+gradle_cache = "/home/etf/.gradle"
+coordinator_model = "gpt-6-astra"
+coordinator_effort = "high"
+coordinator_attempts = 2

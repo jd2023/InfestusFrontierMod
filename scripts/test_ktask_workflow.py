@@ -4,6 +4,7 @@ import json
 import io
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch, Mock
@@ -46,17 +47,19 @@ class DeliveryTests(unittest.TestCase):
     def evidence(self):
         folder = self.session / "evidence/IF-001"
         folder.mkdir(parents=True)
-        (folder / "red.log").write_text("Expected before but was after: failing assertion\n")
-        (folder / "green.log").write_text("Assertion passed\n")
+        candidate = flow.candidate_state(self.root, self.task, self.state, self.policy)[1]
+        logs = []
+        for phase, status in [('red', 1), ('green', 0)]:
+            receipt = flow.record(folder, flow.evidence_binding(self.state), candidate, phase,
+                                 [sys.executable, '-c', f'print("assertion"); raise SystemExit({status})'], self.root, 10)
+            logs.append(receipt['log'])
         (folder / "evidence.json").write_text(json.dumps(dict(
-            task="IF-001", baseline=self.base,
-            red={"command": ["test"], "exit": 1, "log": "red.log"},
-            green={"command": ["test"], "exit": 0, "log": "green.log"},
-            artifacts={"rules": ["green.log"]})))
+            task="IF-001", baseline=self.base, artifacts={"rules": logs})))
 
     def review(self, root, task, state, candidate, policy):
         return dict(task=task["id"], candidate=candidate, verdict="accept",
-                    checks=dict.fromkeys(CHECKS, "pass"), findings=[])
+                    checks={key: dict(status="pass", evidence="owned.txt:1 and red/green assertions")
+                            for key in CHECKS}, findings=[])
 
     def accept(self):
         with patch.object(flow, "review_candidate", side_effect=self.review), \
@@ -155,10 +158,12 @@ class DeliveryTests(unittest.TestCase):
         self.evidence()
         def changed_evidence(*args):
             result = self.review(*args)
-            (self.session / "evidence/IF-001/red.log").write_text("different evidence\n")
+            folder = self.session / 'evidence/IF-001'
+            receipt = json.loads((folder / 'red.json').read_text())
+            (folder / receipt['log']).write_text("different evidence\n")
             return result
         with patch.object(flow, "run_gate"), patch.object(flow, "review_candidate", side_effect=changed_evidence):
-            with self.assertRaisesRegex(ValueError, "evidence changed"):
+            with self.assertRaisesRegex(ValueError, "Changed red log"):
                 flow.accept(self.root, self.task, self.state, self.policy)
         self.assertEqual(self.base, self.git("rev-parse", "HEAD"))
 
@@ -227,7 +232,10 @@ class DeliveryTests(unittest.TestCase):
             flow.executor(self.root, [self.task], self.policy,
                           ["exec", "--dangerously-bypass-approvals-and-sandbox", "-"])
         argv = execute.call_args.args[0]
-        self.assertEqual(["codex", "exec", "--sandbox", "workspace-write", "-"], argv)
+        self.assertIn('--ignore-user-config', argv)
+        self.assertIn('workspace-write', argv)
+        self.assertIn('sandbox_workspace_write.network_access=true', argv)
+        self.assertNotIn('--dangerously-bypass-approvals-and-sandbox', argv)
         self.assertIn(self.base, execute.call_args.args[3])
 
     def test_dependency_receipt_required_before_worker_starts(self):
@@ -250,7 +258,8 @@ class DeliveryTests(unittest.TestCase):
         execute.assert_not_called()
 
     def test_subprocess_stays_in_ktasks_kill_group(self):
-        child = Mock(returncode=0)
+        child = Mock(returncode=0, stdin=None, stdout=None)
+        child.poll.return_value = 0
         with patch.object(flow.os, "getpgrp", return_value=100), \
                 patch.object(flow.os, "getpid", return_value=100), \
                 patch.object(flow.subprocess, "Popen", return_value=child) as spawn:

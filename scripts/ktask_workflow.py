@@ -6,12 +6,14 @@ import os
 from pathlib import Path
 import re
 import shutil
-import signal
 import subprocess
 import sys
 import tomllib
+import uuid
 
 from ktask_contracts import parse_tasks, check_scope, check_review, review_schema
+from ktask_process import run, codex_args
+from ktask_evidence import record, validate_runs
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -26,30 +28,6 @@ def save(path, value):
     temporary = path.with_suffix(".tmp")
     temporary.write_text(json.dumps(value, indent=2) + "\n")
     temporary.replace(path)
-
-
-def run(argv, root, timeout, prompt=None):
-    """Terminate owned descendants on timeout or the runner's interruption."""
-    runner_group = os.getpgrp() == os.getpid()
-    child = subprocess.Popen(argv, cwd=root, stdin=subprocess.PIPE if prompt is not None else None,
-                             text=True, start_new_session=not runner_group)
-    group = os.getpgrp() if runner_group else child.pid
-    def stop(signum, frame):
-        os.killpg(group, signal.SIGKILL)
-        raise KeyboardInterrupt
-    previous = {sig: signal.signal(sig, stop) for sig in (signal.SIGTERM, signal.SIGINT)}
-    try:
-        child.communicate(prompt, timeout=timeout)
-        if child.returncode:
-            raise ValueError(f"Command failed ({child.returncode}): {argv}")
-    except (subprocess.TimeoutExpired, KeyboardInterrupt):
-        if child.poll() is None:
-            os.killpg(group, signal.SIGKILL)
-        child.wait()
-        raise
-    finally:
-        for sig, handler in previous.items():
-            signal.signal(sig, handler)
 
 
 def tracked_clean(root):
@@ -77,7 +55,7 @@ def begin(root, task, policy):
     if git(root, "branch", "--show-current") != policy["branch"] or not tracked_clean(root):
         raise ValueError("A clean checkpoint on the authorized feature branch is required")
     return dict(task=task["id"], packet=task["digest"], baseline=git(root, "rev-parse", "HEAD"),
-                branch=policy["branch"], protected=file_digest(root, untracked(root)))
+                branch=policy["branch"], protected=file_digest(root, untracked(root)), token=uuid.uuid4().hex)
 
 
 def candidate_state(root, task, state, policy, committed=False):
@@ -99,26 +77,26 @@ def candidate_state(root, task, state, policy, committed=False):
     return sorted(paths), fingerprint.hexdigest()
 
 
-def evidence(root, task, state):
+def evidence_binding(state):
+    return {key: state[key] for key in ('task', 'baseline', 'packet', 'token')}
+
+
+def evidence(root, task, state, candidate):
     folder = root / ".ktask/session/evidence" / task["id"]
     files = ["evidence.json"]
     try:
         value = json.loads((folder / "evidence.json").read_text())
         if value["task"] != task["id"] or value["baseline"] != state["baseline"]:
             raise ValueError("Stale test evidence")
-        for phase in ("red", "green"):
-            record = value[phase]
-            if (not isinstance(record["command"], list) or not record["command"]
-                    or type(record["exit"]) is not int
-                    or (record["exit"] == 0) != (phase == "green")):
-                raise ValueError("Invalid red/green evidence")
-            safe_artifact(folder, record["log"])
-            files.append(record["log"])
+        recorded = validate_runs(folder, evidence_binding(state), candidate, task['Evidence'].split(', '))
+        files += recorded
         for kind in task["Evidence"].split(", "):
             if not value["artifacts"][kind]:
                 raise ValueError(f"Missing {kind} evidence")
             for name in value["artifacts"][kind]:
                 safe_artifact(folder, name)
+                if name not in recorded:
+                    raise ValueError(f'Artifact lacks a producing run: {name}')
                 files.append(name)
     except (OSError, KeyError, TypeError, json.JSONDecodeError) as error:
         raise ValueError(f"Incomplete evidence at {folder}") from error
@@ -146,11 +124,9 @@ def review_candidate(root, task, state, candidate, policy):
     prompt = (root / ".ktask/review.md").read_text()
     prompt += f"\nTask: {task['id']}\nBaseline: {state['baseline']}\nCandidate: {candidate}\n"
     prompt += f"Evidence: .ktask/session/evidence/{task['id']}\n\n{task['body']}\n"
-    run(["codex", "exec", "--ephemeral", "--sandbox", "read-only",
-         "--model", policy["reviewer_model"], "-c",
-         f'model_reasoning_effort="{policy["reviewer_effort"]}"',
+    run([*codex_args(policy['reviewer_model'], policy['reviewer_effort']),
          "--output-schema", str(schema), "-o", str(output), "-C", str(root), "-"],
-        root, policy["review_timeout"], prompt)
+        root, policy["review_timeout"], prompt, log=folder / 'transcript.log')
     try:
         return json.loads(output.read_text())
     except (OSError, json.JSONDecodeError) as error:
@@ -181,18 +157,18 @@ def accept(root, task, state, policy):
     if "commit" in state:
         return push_receipt(root, task, state, policy)
     paths, candidate = candidate_state(root, task, state, policy)
-    evidence_digest = evidence(root, task, state)
+    evidence_digest = evidence(root, task, state, candidate)
     run_gate(root)
     if candidate_state(root, task, state, policy)[1] != candidate:
         raise ValueError("Candidate changed during tests")
-    if evidence(root, task, state) != evidence_digest:
+    if evidence(root, task, state, candidate) != evidence_digest:
         raise ValueError("Test evidence changed during acceptance")
     verdict = review_candidate(root, task, state, candidate, policy)
     save(root / ".ktask/session/last-review.json", verdict)
     check_review(verdict, task["id"], candidate)
     if candidate_state(root, task, state, policy)[1] != candidate:
         raise ValueError("Candidate changed during review")
-    if evidence(root, task, state) != evidence_digest:
+    if evidence(root, task, state, candidate) != evidence_digest:
         raise ValueError("Test evidence changed during review")
     indexed = set(git(root, "ls-files", "-z").split("\0"))
     to_stage = [name for name in paths if name in indexed or os.path.lexists(root / name)]
@@ -220,7 +196,7 @@ def plan_digest(root):
     paths = [".ktask/" + name for name in
              ("config.toml", "policy.toml", "context.md", "prompt.md", "tasks.md",
               "review.md", "autoresolve.md")]
-    paths += ["scripts/ktask_workflow.py", "scripts/ktask_contracts.py"]
+    paths += [str(path.relative_to(root)) for path in sorted((root / 'scripts').glob('ktask_*.py'))]
     paths += ["AGENTS.md", "VISION.md", ".ktask/verify.sh"]
     paths += [str(path.relative_to(root)) for path in sorted((root / "docs").glob("*.md"))]
     return hashlib.sha256(json.dumps(file_digest(root, paths), sort_keys=True).encode()).hexdigest()
@@ -278,11 +254,13 @@ def executor(root, tasks, policy, argv):
         return
     if git(root, "rev-parse", "HEAD") != state["baseline"]:
         raise ValueError("Worker checkpoint moved without acceptance")
-    argv = [arg for arg in argv if arg != "--dangerously-bypass-approvals-and-sandbox"]
-    argv[1:1] = ["--sandbox", "workspace-write"]
+    model = argv[argv.index('--model') + 1] if '--model' in argv else policy.get('worker_model', 'gpt-5.6-sol')
+    effort = next((arg.split('=', 1)[1].strip('"') for arg in argv
+                   if arg.startswith('model_reasoning_effort=')), 'high')
+    argv = codex_args(model, effort, writable=True, cache=policy.get('gradle_cache')) + ['-']
     prompt += "\nThe delivery adapter owns commits and pushes. Do not perform either.\n"
     prompt += f"Baseline: {state['baseline']}\nEvidence directory: .ktask/session/evidence/{task['id']}\n"
-    run(["codex", *argv], root, 7200, prompt)
+    run(argv, root, 7200, prompt)
 
 
 def validate(root, tasks):
@@ -315,6 +293,22 @@ def main():
         state = json.loads((ROOT / ".ktask/session/active.json").read_text())
         task = next(task for task in tasks if task["id"] == state["task"])
         print(accept(ROOT, task, state, policy))
+    elif command == 'record':
+        require_session(ROOT)
+        state = json.loads((ROOT / '.ktask/session/active.json').read_text())
+        task = next(task for task in tasks if task['id'] == state['task'])
+        import argparse
+        parser = argparse.ArgumentParser()
+        parser.add_argument('phase')
+        parser.add_argument('--artifact', action='append', default=[])
+        if '--' not in arguments:
+            raise ValueError('Use record PHASE -- COMMAND [ARGS]')
+        split = arguments.index('--')
+        options = parser.parse_args(arguments[:split])
+        phase, argv = options.phase, arguments[split + 1:]
+        candidate = candidate_state(ROOT, task, state, policy)[1]
+        record(ROOT / '.ktask/session/evidence' / task['id'], evidence_binding(state),
+               candidate, phase, argv, ROOT, 7200 if phase == 'soak' else 1800, options.artifact)
     elif command in ("run", "resume", "retry", "status"):
         validate(ROOT, tasks)
         session = ROOT if command == "status" and not (ROOT / ".ktask/session").exists() else prepare_session(ROOT, policy)

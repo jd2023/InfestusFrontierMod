@@ -8,13 +8,17 @@ surrounding callers, resources, tests and generated output. Read all task eviden
 Return the supplied JSON schema with exact task/candidate IDs. Accept only if
 every check passes and findings is empty. Reject with concrete file/symbol,
 violated contract and observable correction. No optional style wish list.
+Each check contains status and evidence: cite the inspected symbol/test/artifact
+and explain what it establishes. Bare pass labels are invalid. For a plan-only
+correction, review executable contract consistency; gameplay red/visual evidence
+is not applicable. Never waive implementation evidence for a gameplay candidate.
 Do not implement, edit, commit or push.
 
 Check:
 - correctness: all outcomes, negative cases and persistence invariants;
 - placement: one behavior owner, platform/UI adapters contain no gameplay policy;
 - simplicity: real callers justify each abstraction/API; one rule needs one change;
-- scope: every file/hunk necessary, no unrelated cleanup or changed gates;
+- scope: every file/hunk necessary, no unrelated cleanup or weakened gates;
 - boundaries: inward acyclic dependencies, hidden internals, small interfaces;
 - tests: actual behavioral red assertion, green and adjacent checks; no vacuous
   assertions, implementation-as-oracle, flakiness, suppressed errors or omissions;

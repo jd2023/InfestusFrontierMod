@@ -97,8 +97,12 @@ def check_review(review, task_id, candidate):
     """A fresh verdict must cover every review responsibility without unresolved findings."""
     if (not isinstance(review, dict) or review.get("task") != task_id or review.get("candidate") != candidate
             or review.get("verdict") != "accept" or review.get("findings") != []
-            or review.get("checks") != dict.fromkeys(CHECKS, "pass")):
+            or set(review.get("checks", {})) != set(CHECKS)):
         raise ValueError("Independent review rejected, incomplete, or stale")
+    for value in review['checks'].values():
+        if (not isinstance(value, dict) or value.get('status') != 'pass'
+                or not isinstance(value.get('evidence'), str) or not value['evidence'].strip()):
+            raise ValueError('Independent review needs supporting evidence for every check')
 
 
 def review_schema():
@@ -110,7 +114,11 @@ def review_schema():
             "verdict": {"type": "string", "enum": ["accept", "reject"]},
             "checks": {"type": "object", "additionalProperties": False,
                        "required": list(CHECKS),
-                       "properties": {key: {"type": "string", "enum": ["pass", "fail"]}
+                       "properties": {key: {"type": "object", "additionalProperties": False,
+                                             "required": ["status", "evidence"],
+                                             "properties": {
+                                                 "status": {"type": "string", "enum": ["pass", "fail"]},
+                                                 "evidence": {"type": "string"}}}
                                       for key in CHECKS}},
             "findings": {"type": "array", "items": {"type": "string"}},
         },

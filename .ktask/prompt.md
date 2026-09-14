@@ -31,17 +31,32 @@ machinery. Do not expand a task because adjacent code could be improved.
 
 ## Evidence
 
-Write .ktask/session/evidence/<task-id>/evidence.json:
+Capture actual commands with the launcher, never write execution receipts yourself:
+
+    python3 scripts/ktask_workflow.py record red -- <focused test command>
+    python3 scripts/ktask_workflow.py record green -- <focused test command>
+
+Red requires a behavioral failure. Record green after the final source/test edits.
+Record game/visual/integration/soak the same way for each required kind; each must run
+against the final candidate. Long qualification runs are separate from the fast
+full gate. Any source/resource edit invalidates green and qualification receipts.
+The original red receipt may survive a repair on the same task/baseline. New tests
+need their own demonstrated failure, preserved as additional evidence.
+For capture files, pass --artifact <relative-path> before --. The command must
+create these files inside the task evidence directory during that run. Visual
+receipts require captures. Describe inspection in the report; do not replace the
+capture receipt with a notes-only run. The reviewer also inspects the images.
+Manifest paths must be captured logs or declared artifacts, not unbound files.
+
+Then write .ktask/session/evidence/<task-id>/evidence.json:
 {
   "task": "<task-id>",
   "baseline": "<adapter baseline commit>",
-  "red": {"command": ["<executable>", "<arg>"], "exit": 1, "log": "red.log"},
-  "green": {"command": ["<executable>", "<arg>"], "exit": 0, "log": "green.log"},
-  "artifacts": {"rules": ["green.log"], "game": ["gametest.log"]}
+  "artifacts": {"rules": ["<recorded green log>"], "game": ["<recorded game log>"]}
 }
 
 Paths are relative to this evidence directory and must be nonempty files.
-Include every Evidence kind in the packet: visual (captures and inspection notes),
+Include every Evidence kind in the packet: visual (recorded captures),
 integration (named profiles/results), soak (hardware/duration/measurements).
 Preserve focused and adjacent output, not only the full-gate log. Explain why the
 red assertion detects the behavior. Schema validity is not substantive proof.
