@@ -10,7 +10,7 @@ import sys
 import tomllib
 import uuid
 
-from ktask_contracts import parse_tasks, check_scope, check_review, review_schema
+from ktask_contracts import CONTROL, parse_tasks, check_scope, check_review, review_schema
 from ktask_process import run, codex_args
 from ktask_evidence import record, validate_runs
 from ktask_guardian import invoke as run_model
@@ -287,6 +287,15 @@ def executor(root, tasks, policy, argv):
     diagnosis = root / '.ktask/session/planning' / task['id'] / 'reason.txt'
     if diagnosis.exists():
         prompt += '\nCoordinator diagnosis:\n' + diagnosis.read_text()
+    prompt += ('\n[Project execution boundary]\n'
+               f'Allowed path patterns: {json.dumps(task["scope"])}\n'
+               f'Forbidden path prefixes: {json.dumps(CONTROL)}\n'
+               'Generic runner repair instructions do not expand this scope. '
+               'Prompt/configuration fixes are allowed only inside these path patterns '
+               'and never under the forbidden prefixes. These limits apply to workers and repairs. '
+               'If a fix requires changing a task contract or protected process control, '
+               'report FAILED for coordinator correction; do not make that edit. '
+               'The prescribed ignored report and evidence outputs remain required.\n')
     config = tomllib.loads((root / '.ktask/config.toml').read_text())
     run_model(argv, root, budgets(task['id'], config, policy)[0], prompt, check=True)
 

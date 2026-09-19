@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 import ktask_workflow as flow
-from ktask_contracts import CHECKS
+from ktask_contracts import CHECKS, CONTROL, check_scope
 
 
 class DeliveryTests(unittest.TestCase):
@@ -380,6 +380,37 @@ class DeliveryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Unaccepted dependency"):
                 flow.executor(self.root, [self.task], self.policy, ["exec", "-"])
         execute.assert_not_called()
+
+    def test_worker_and_repair_receive_final_enforced_scope_boundary(self):
+        self.task['body'] = 'IF-001 Change owned behavior'
+        (self.root / '.ktask/config.toml').write_text('timeout = 10860\nlimit_max_wait_seconds = 3600\n')
+        flow.save(self.session / 'active.json', self.state)
+        diagnosis = self.session / 'planning/IF-001/reason.txt'
+        diagnosis.parent.mkdir(parents=True)
+        diagnosis.write_text('Keep the correction inside this packet.')
+        for repair in (False, True):
+            with self.subTest(repair=repair):
+                prompt = '[Orchestrator context] Task 1 of 1 (attempt 1).\n' + self.task['body']
+                if repair:
+                    prompt += '\n[Automatic resolution]\nCorrect contradictory project prompts/configuration.'
+                with patch.object(flow, 'require_session'), \
+                        patch.object(flow.sys, 'stdin', io.StringIO(prompt)), \
+                        patch.object(flow, 'run_model') as execute:
+                    flow.executor(self.root, [self.task], self.policy, ['exec', '-'])
+                submitted = execute.call_args.args[3]
+                self.assertTrue(submitted.startswith(prompt))
+                self.assertIn('[Project execution boundary]', submitted)
+                boundary = submitted.split('[Project execution boundary]', 1)[1]
+                self.assertGreater(submitted.index('[Project execution boundary]'),
+                                   submitted.index('Coordinator diagnosis:'))
+                lines = boundary.strip().splitlines()
+                self.assertEqual(self.task['scope'], json.loads(lines[0].removeprefix('Allowed path patterns: ')))
+                self.assertEqual(list(CONTROL), json.loads(lines[1].removeprefix('Forbidden path prefixes: ')))
+                self.assertIn('Generic runner repair instructions do not expand this scope.', boundary)
+                self.assertIn('report FAILED for coordinator correction', boundary)
+                check_scope(self.task, ['owned.txt'])
+                with self.assertRaises(ValueError):
+                    check_scope(self.task, ['.ktask/prompt.md'])
 
     def test_mismatched_runtime_packet_refused_before_worker(self):
         self.task["body"] = "IF-001 Change owned behavior"

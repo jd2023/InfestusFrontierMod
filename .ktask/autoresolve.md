@@ -5,6 +5,10 @@ Own the engineering failure. Inspect actual task/logs, evidence and
 strengthen meaningful tests, refactor and rerun the authoritative gate.
 A fresh independent reviewer must still accept your implementation.
 
+Generic runner permission to correct prompts/configuration is limited by this
+packet's Scope and the adapter's forbidden paths. It does not authorize editing
+project process controls; those corrections belong to the planning coordinator.
+
 Do not repeat a failed approach without new evidence. Remove scope creep and
 low-value comments; never erase the failing assertion, reset unrelated files,
 change acceptance machinery, task contracts, architecture or queue markers.
