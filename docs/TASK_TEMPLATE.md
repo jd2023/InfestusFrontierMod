@@ -45,9 +45,13 @@ forbidden to workers. Do not duplicate the expansion in every packet.
 For each content packet, include its recipes/tags/translations, original readable
 assets, guide/advancement entries and discovery tests for the content actually
 introduced. Never register an empty placeholder to satisfy catalog coverage.
+Advance the shared tracked content-checkpoint.json to this packet's ID whenever
+it introduces content; never lower it or remove existing obligations.
 Extend the incremental coverage contributor created by IF-108 for every introduced
 entry: actual registry representation, obtainable recipe, useful operation and
-guide assertion. Catalog aliases and transaction-state rows map to their existing
+guide assertion. Before IF-004, owner guide data and assertions are staged and
+schema-checked; IF-004 activates actual client checks for all prior content.
+Obtain/use assertions run immediately. Catalog aliases and transaction-state rows map to their existing
 representation; they must not become duplicate items. Pure future-rank rule tests
 do not prove Survival obtainability; the producer task must add its real recipe
 and exercise the assembled route when its materials become available.

@@ -24,9 +24,9 @@ Depends: IF-094
 Spec: docs/DEPENDENCIES.md, docs/ARCHITECTURE.md
 Blocks: none
 Scope: ["@module:integration","build.gradle","gradle.properties","settings.gradle","gradle/**","src/main/templates/**","scripts/check_boundaries.py"]
-Contract: Install the exact artifacts in DEPENDENCIES; add base/JEI/Curios presence and absence launch profiles, a client capture run and packaged dedicated-server smoke run. Keep testMod out of every release artifact.
+Contract: Install DEPENDENCIES pins and verification metadata. Add Gradle tasks checkBoundaries, profileSmoke, captureClient and packagedServerSmoke. -PmodProfile=required|jei|curios|combined selects required libraries only, +JEI, +Curios, or +both; all four retain Modonomicon/GeckoLib. -PomitRequired=modonomicon|geckolib is a negative loader fixture only. Capture uses -PcaptureDir and -Pscenario=bootstrap; packaged server runs the release JAR, never testMod. Boundary checker rejects core external imports and client references reachable from server bootstrap. verifyAll includes checker/unit fixtures and required-profile smoke; full four-profile captures/server runs are task evidence.
 Red: An intentionally imported client class in server code or third-party type in core fails the boundary check; missing required library gives the expected loader diagnostic.
-Accept: All four profiles launch on Java 21; game assertions execute, not merely compile; capture names the actual loaded profile. Add checks to Gradle verifyAll, not a second full-gate script.
+Accept: Run ./gradlew checkBoundaries and profileSmoke for each profile on Java21, captureClient for each profile with actual loaded-mod identities, and packagedServerSmoke for each profile. Assert server readiness, connect/disconnect and clean stop; development profile GameTests execute a real server assertion. Verify both missing-required-library diagnostics and release JAR exclusion of testMod. Add checks to verifyAll, not a second full gate.
 Bounds: One disposable world/process per profile; 120 s readiness and 30 s shutdown deadlines; no ordinary save access.
 Evidence: integration, visual
 
@@ -38,10 +38,10 @@ Owner: integration
 Depends: IF-001
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: none
-Scope: ["@module:integration","scripts/check_content_coverage.py","scripts/test_content_coverage.py","build.gradle"]
-Contract: Implement scripts/check_content_coverage.py and development-only content assertions before first gameplay content. Read .ktask/content-plan.json as ownership/dependency metadata, not balance data. Owner testMod contributors enumerate actual registry IDs, recipe obtain/use and guide checks for their introduced items/blocks/ranks. Cross-check contributions against accepted tasks plus the current candidate; pending-only content cannot satisfy coverage. No production registries or placeholder features.
+Scope: ["@module:integration","scripts/check_content_coverage.py","scripts/test_content_coverage.py","build.gradle","src/testMod/resources/content-checkpoint.json"]
+Contract: Implement scripts/check_content_coverage.py with --self-test and --through IF-nnn plus Gradle checkContentCoverage. Initialize tracked src/testMod/resources/content-checkpoint.json to IF-108. Each content packet advances it to its own ID with its contributor; default gate reads this file from the current working tree, including uncommitted candidate changes, never ignored receipts. Explicit --through/-PcontentThrough may require a later checkpoint, never lower it. Each owner supplies src/testMod/resources/<owner>/coverage.json mapping task/catalog IDs to actual registry IDs and named obtain/use/guide assertions in its testMod contributor. Discover these exact paths; require every obligation through the independent checkpoint and reject unknown/later contributions. No runtime scanning or production placeholders. Before IF-004, schema-check staged guide data/assertions for implemented content; obtain/use checks execute immediately. At IF-004 and later, execute all eligible guide assertions, including the staged predecessor entries.
 Red: With a synthetic owner contribution, remove an item, rank, recipe-use assertion or required producer: gate fails at exact identifier. An empty initial gameplay registry passes only while no content task is accepted.
-Accept: Add deterministic manifest validation to verifyAll. Each subsequent content task extends its own contributor; milestone fixtures execute its real assertions. Final IF-090 checks all approved content, not a separate competing manifest.
+Accept: Wire checkContentCoverage into verifyAll and execute named contributor assertions through actual GameTests/client scenarios. A clean clone uses the tracked checkpoint. Empty IF-108 coverage asserts no gameplay registrations. Tests delete the only/latest contributor under the default invocation, omit an assertion, remove a producer, lower the explicit checkpoint and add future content: each fails by ID. An uncommitted candidate checkpoint/contributor must be checked without launcher flags. Aliases map to one representation; no registration-only substitute.
 Bounds: Build-time bounded4096 identifiers and16384 edges; no world scans or AI in gate.
 Evidence: rules
 
@@ -114,7 +114,7 @@ Depends: IF-003
 Spec: docs/GUIDE_PROGRESSION_TREE.md, docs/ITEM_CATALOG.md
 Blocks: none
 Scope: ["@module:discovery","src/main/java/org/jd/infestusfrontier/integration/jei/**","src/main/java/org/jd/infestusfrontier/integration/modonomicon/**"]
-Contract: Implement I009 craft and once-only first-join claim; Modonomicon adapter teaches the implemented Bowl recipes and JEI displays their inputs, output, duration and BU. Advancement completion is server-owned; guide visibility follows GUIDE_PROGRESSION_TREE. Add only nodes whose content exists.
+Contract: Implement I009 craft and once-only first-join claim; Modonomicon adapter teaches the implemented Bowl recipes and JEI displays their inputs, output, duration and BU. Advancement completion is server-owned; guide visibility follows GUIDE_PROGRESSION_TREE. Add only nodes whose content exists. Activate staged owner guide entries/assertions from earlier content packets, using one discovery-owned integration fixture that iterates their existing contributors. Before this packet those assets are schema-checked only; afterward every eligible introduced entry must have executed client guide assertions.
 Red: Full inventory cannot lose or duplicate a claim; repeated join cannot grant a second book; creative give does not accidentally satisfy a completion-only node.
 Accept: Fresh Survival player can craft Culture, find Bowl and renew Culture from the guide alone. Lost book recrafts without resetting progress; JEI absent leaves the guide usable.
 Bounds: One pending claim boolean/player, no delivery queue or world item spawn.
@@ -249,7 +249,7 @@ Depends: IF-012
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T1-30
 Scope: ["@module:processing"]
-Contract: Implement Cyst construction from starter products and the exact Cyst recipes I021/I022/I023/I024/I026/I027/I028 plus existing Bowl/Cyst recipes. Prepare I031/I032/I045/I046/I047/I049/I054/I107 where Items assigns Cyst, with their existing input items. I020 Resin is harvested vegetation owned by IF-022; I025 Conductive Myelin belongs to IF-050. Spent Penetrant and its Cyst recovery recipe wait for IF-039. Reuse BatchWork; no second machine engine.
+Contract: Implement Cyst construction from starter products and the exact Cyst recipes I021/I022/I023/I024/I026/I027/I028 plus existing Bowl/Cyst recipes. Prepare I031/I032/I045/I046/I047/I049/I054/I107 where Items assigns Cyst, with their existing input items. I020 Resin is harvested vegetation owned by IF-022; I025 Conductive Myelin belongs to IF-121. Spent Penetrant and its Compost Gland recovery recipe wait for IF-039. Reuse BatchWork; no second machine engine.
 Red: A first Cyst constructs from starter products only; inactive minerals cannot substitute for prepared grafts; refused conversion retains containers.
 Accept: Each Cyst recipe has original item art, guide and JEI entry; hand-feeding works before Item Veins; resin's Elastic Gel alternative avoids a tree bootstrap cycle.
 Bounds: One batch/core, existing shared completion limit.
@@ -377,29 +377,14 @@ Evidence: rules, game, visual
 
 ---
 
-IF-021 Crop beds, planting and independent harvesting
+IF-022 Useful infected bushes and trees
 Milestone: M2
 Owner: cultivation
 Depends: IF-020
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
-Blocks: T1-17, T1-18, T1-19, T1-31
-Scope: ["@module:cultivation"]
-Contract: Implement Cultivation Tissue, Planting Proboscis, Harvest Corolla and Compost Gland as separate operations. Grower reserves water/feed and real seed; harvester holds its result; planter requires an empty eligible cell. Match Overworld reference wheat loop in Items.
-Red: Missing seed, unloaded crop, full seed/output reserve and same-tick harvest requests cannot delete crops or mint harvests; vanilla random tick never awards a second allocated harvest.
-Accept: Manual, serial and two-bed shared-harvester layouts work; reserve seed before selling output; crops visually change through actual growth.
-Bounds: <=64 assigned cells/organ, 4 loaded probes/organ/s under 256 cultivation probes/server tick; <=16 harvest commits/server tick.
-Evidence: rules, game, visual
-
----
-
-IF-022 Useful infected bushes and trees
-Milestone: M2
-Owner: cultivation
-Depends: IF-021
-Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T1-20, T1-25, T1-26, T1-27, T1-28
 Scope: ["@module:cultivation"]
-Contract: Implement deliberate bush/tree conversion and Arbor growth allocation. Choose one harvest allocation per cycle: resin, fiber, fruit or wood; tapping does not also award a full wood harvest. Retain one cutting from a qualifying conversion; canopy pods open once.
+Contract: Implement deliberate bush/tree conversion and the exact Managed vegetation allocation table in Items. Tree wood/resin/planting-stock and bush berry/fiber propagation are separate paid allocations; taps never also award the whole wood harvest. Manual harvest and capsule outputs work before automated harvesters. Retain one basal cutting; pods transfer their held product once.
 Red: Re-converting a living tree, breaking an emptied pod or loading a canopy twice cannot create extra cuttings/wood; protected trees and foreign block entities remain untouched.
 Accept: A cultivated grove visibly retains foliage, varied wood and luminous pods; choosing wood versus resin gives different useful supply chains. No barren automatic clearcut.
 Bounds: <=256 explicitly assigned loaded tree cells/Arbor, <=4 cell probes/s under cultivation quota; cap held harvest to 9 stacks.
@@ -407,17 +392,77 @@ Evidence: rules, game, visual
 
 ---
 
-IF-023 Native water and starter biological power
+IF-125 Reusable held batches and separate collection
+Milestone: M2
+Owner: mineral
+Depends: IF-022
+Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
+Blocks: T1-32, T1-33
+Scope: ["@module:mineral"]
+Contract: Implement Work Bed item mode with4 stacks and ready/working/released/blocked states; Collection Cilia exports only released contents of its facing Bed to one adjacent inventory or typed route. Expose a reservation-based batch deposit port; IF-021 wires Harvest Corolla to it without exposing cultivation internals. Cilia moves at most4 items/20ticks for1BU; Elastic Gel raises8 with the same cost. Native reference harvest cost includes that collection charge: reserve it from the listed harvest budget, not an unlisted extra debit. IF-038 adds exclusive block mode; no placeholder Workpiece items yet.
+Red: Unreleased target, full destination and simultaneous Cilia calls cannot lose or clone contents. No nearby loose-item pickup. Refused harvest cannot also retain a second Bed copy.
+Accept: Hand-place a real crop item batch, mark it released and collect through Cilia to adjacent storage, then feed existing digestion manually. Capture held/working/result states and stable comparator interlocks. IF-021 owns automated crop deposit.
+Bounds: 4 stacks/Bed,one facing target and one recipient/Cilia; shared64 transfer admissions/tick, no search/ticker on idle Bed.
+Evidence: rules, game, visual
+
+---
+
+IF-021 Crop beds, planting and independent harvesting
+Milestone: M2
+Owner: cultivation
+Depends: IF-125
+Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
+Blocks: T1-17, T1-18, T1-19, T1-31
+Scope: ["@module:cultivation"]
+Contract: Implement Cultivation Tissue, Planting Proboscis, Harvest Corolla and Compost Gland as separate operations. Grower reserves water/feed and real seed; harvester holds its result; planter requires an empty eligible cell. Match Overworld reference wheat loop in Items. Route harvest into the existing Work Bed through its deposit reservation port; Cilia owns subsequent export. Capsule output remains a direct alternative.
+Red: Missing seed, unloaded crop, full seed/output reserve and same-tick harvest requests cannot delete crops or mint harvests; vanilla random tick never awards a second allocated harvest.
+Accept: Manual, serial and two-bed shared-harvester layouts work; reserve seed before selling output; crops visually change through actual growth.
+Bounds: <=64 assigned cells/organ, 4 loaded probes/organ/s under 256 cultivation probes/server tick; <=16 harvest commits/server tick.
+Evidence: rules, game, visual
+
+---
+
+IF-023 Dew water recovery and furnace airflow
 Milestone: M2
 Owner: processing
-Depends: IF-022
+Depends: IF-021
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T1-24, T1-39
 Scope: ["@module:processing"]
-Contract: Implement Dew Gland and Hearth Lung recipes from renewable native production tables. Biological energy (BE) is a separate bounded store, never synonyms for BU or redstone. Add energy port only with Hearth's first consumer: filtration in the reference loop.
-Red: Generator lacking returned-water room cannot consume feed; simulated BE extraction has no side effects; a stopped pump cannot multiply water on restart.
-Accept: Three exact 60 s Overworld reference cycles match water/biomass/BE deltas; startup reserves are retained before overflow exports; record measured rates.
-Bounds: One batch/organ; BE stored as checked long with declared capacity 100000/Hearth; shared 16 completion budget, no per-tick neighbor search.
+Contract: Implement Dew Gland with ordinary wheat recovery from Items and Hearth Lung as an airflow attachment, not a generator. An unobstructed Lung reduces Rack/Bio-Furnace loaded batch duration to4/5, rounded up, without changing inputs/yields; maximum one benefit per host. Advanced native Dew modes attach in their native cultivation tasks.
+Red: Full water output preserves Dew feed; blocked Lung removes speed benefit; two lungs cannot stack speed; power extraction from Lung is unsupported.
+Accept: Hand-feed Dew's two-wheat recipe and measure1000mB output plus listed40BU/10s cost. Compare the same Rack/Furnace batch with open/blocked Lung and unchanged resource ledger. No autonomous power or full reference-loop claim here.
+Bounds: One batch/Dew, one attached Lung benefit/host; event-driven obstruction updates, existing shared16 batch completions/tick.
+Evidence: rules, game
+
+---
+
+IF-121 Starter electricity and finite charge routing
+Milestone: M2
+Owner: energy
+Depends: IF-023
+Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
+Blocks: T4-01, T4-02, T4-03
+Scope: ["@module:energy"]
+Contract: Implement starter Electrocyte Stack, Conductive Tissue, Charge Sac and I025 Cyst recipe through existing processing/route/storage ports. Starter Stack converts200BU+100mB water over60s into4000BE+100mB dirty water, retaining both outputs. Charge Sac holds1000000BE. Direct adjacent energy port and selected tissue routes have no idle drain; delivered transfers lose ceil(amount/100)BE once per route, capped at source amount; direct adjacency is lossless. Reference module uses direct adjacency. No FE adapter or industrial conversion yet.
+Red: Full charge/waste output refuses feed; simulate never spends; an unloaded receiver pauses. At one remaining unit transfer cannot round up energy or repeatedly round-trip into gain.
+Accept: Craft all three entries from existing starter products, produce charge, retain waste and supply a finite synthetic load through direct/tissue routes. Actual filtration consumer arrives next; no phantom Hearth electricity. Add BE balances through QuantityStore, not a second resource store.
+Bounds: 1000000BE/Sac,4000BE Stack output buffer,1000mB water/waste each; shared64 route commits/tick; one batch/core.
+Evidence: rules, game, visual
+
+---
+
+IF-122 Starter process-water filtration
+Milestone: M2
+Owner: mineral
+Depends: IF-121
+Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
+Blocks: T2-24
+Scope: ["@module:mineral"]
+Contract: Craft Washing Kidney and implement only the Items process-water filtration recipe through existing BatchWork and energy ports. Reserve clean-water output before spending dirty water/BE. No ore products or artificial mineral registry placeholders; IF-040 adds mineral washing to this same organ.
+Red: Insufficient1000BE, unavailable100mB output room and repeated start each leave inputs unchanged. Mid-batch reload completes one output.
+Accept: Use actual starter Stack dirty water/charge and recover100mB clean water; assert total reference charge delta3000BE with direct adjacency. Retain water and stock for the next cycle.
+Bounds: One batch/core,1000mB dirty/clean tanks,existing shared recipe/transfer budgets.
 Evidence: rules, game
 
 ---
@@ -425,7 +470,7 @@ Evidence: rules, game
 IF-024 Ground-based fueling and equipment service
 Milestone: M2
 Owner: equipment
-Depends: IF-023
+Depends: IF-122
 Spec: docs/ARMOR_EVOLUTION.md, docs/ITEM_CATALOG.md, docs/BLOCK_CATALOG.md
 Blocks: T1-36
 Scope: ["@module:equipment"]
@@ -459,7 +504,7 @@ Depends: IF-025
 Spec: docs/PROGRESSION_MAP.md, docs/GUIDE_PROGRESSION_TREE.md
 Blocks: none
 Scope: ["@module:campaign"]
-Contract: Automate the declared reference farm using separate planter/grower/harvester/collector/storage/control operations; validate positive reserves under full-output and chunk pause. Add route visuals and performance counters to reusable lab harness.
+Contract: Automate the declared reference farm using separate planter/grower/harvester/collector/storage/control operations; validate positive reserves under full-output and chunk pause. Add route visuals and performance counters to reusable lab harness. Use existing Bed/Cilia, starter Stack and filtration Kidney; direct adjacent electrical coupling makes the stated lossless reference ledger applicable. Tissue-route losses are measured separately.
 Red: Remove one planting reserve or reverse a port and named assertion fails before resource exhaustion; capture verifies pulse direction.
 Accept: Run three cycles then restart without external feed; compare serial and parallel layouts for throughput, footprint and BU/item; no economy tuning in this task.
 Bounds: <=256 organs fixture, 12000 loaded ticks/run, explicit seed/water reserves and exact conservation.
@@ -482,7 +527,7 @@ Evidence: rules, game
 
 ---
 
-IF-028 Sample docking, archive and collection links
+IF-028 Sample docking into explicit destinations
 Milestone: M3
 Owner: genetics
 Depends: IF-027
@@ -507,7 +552,7 @@ Scope: ["@module:genetics"]
 Contract: Implement R1 Extractor and DNA Bank/Archive Lobe. Coverage required16 plants/32 ordinary/128 complex/1000 bosses; sample quality1/2/4. Consumed sample yields one stock plus coverage; cloned records merge by maximum, not sum. Native species checks live in Genetics eligibility.
 Red: Copied records do not double research; a consumed sample cannot be recreated after restart; a wrong native dimension gives a named refusal without spending BU.
 Accept: Reconstruct an ordinary genome, inspect partial coverage, merge a copy safely and withdraw stock. Test boss arithmetic at1000 without spawning1000 mobs. Consume real samples delivered through the existing dock, not fixture-only extractor inventory.
-Bounds: Bounded scalar record/species; active extraction one batch, 128 species/bank baseline; existing UI page and recipe budgets.
+Bounds: 16 species/ordinary Bank,32 with precision service; each Archive Lobe adds8 within the catalog assembly limit. One extraction batch/core; existing UI and recipe budgets. Removing expansion never deletes records: excess records become inactive until capacity is restored.
 Evidence: rules, game, visual
 
 ---
@@ -542,7 +587,7 @@ Evidence: rules, game, visual
 
 ---
 
-IF-031 Living tools and permanent Dissector choice
+IF-031 Base living tools and Living Fang
 Milestone: M3
 Owner: equipment
 Depends: IF-030
@@ -581,7 +626,7 @@ Blocks: none
 Scope: ["@module:portable"]
 Contract: Implement I126 Carry Sac9-slot crafting and18-slot Chrysalis upgrade, one optional pouch socket and nesting prohibition from Items. Pure storage admission tests also cover27 slots; the27-slot Survival recipe belongs to IF-112 after tempered materials exist. Carry Sac never adds armor abilities or expands an installed pouch's capacity.
 Red: Nested Sac, shulker box or portable handler cannot create recursion; rapid swapping and disconnect during move conserve items; Curios absent retains manual pouch use.
-Accept: Use all grades while changing armor; pouch collection consumes no general slots; UI shows actual fixed capacity and disables refused insertion.
+Accept: Craft/use9- and18-slot grades while changing armor;27-slot admission is pure-rule coverage only here. Pouch collection consumes no general slots; UI shows actual fixed capacity and disables refused insertion.
 Bounds: At most27 general stacks plus one pouch; <=4KiB page, no recursive save walking.
 Evidence: rules, game, visual, integration
 
@@ -607,9 +652,9 @@ Milestone: M4
 Owner: mineral
 Depends: IF-033
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
-Blocks: T1-32, T2-32
+Blocks: T2-32
 Scope: ["@module:mineral"]
-Contract: Implement Work Bed as exclusive held workpiece plus stage, not a duplicate world ore. Grasping Root moves exactly one existing eligible block to one bed then stops. Block entities, protected blocks and unsupported modded ores refuse. Vanilla placing a real ore on a bed remains possible.
+Contract: Extend existing Work Bed with exclusive block mode and I103 wrapped workpiece plus stage, not a duplicate world ore; prohibit item/block modes occupying it simultaneously. Grasping Root moves exactly one existing eligible block to one bed then stops. Block entities, protected blocks and unsupported modded ores refuse. Vanilla placing a real ore on a bed remains possible.
 Red: Two roots cannot own one bed; interruption between removal/presentation leaves exactly one authoritative workpiece; full bed never deletes source.
 Accept: Manually place and root-present iron/gold/copper ore; comparator states distinguish ready/held/blocked; no conversion/smelting in Root.
 Bounds: One workpiece/bed, one loaded source lookup/start,16 world extraction commits/server tick.
@@ -622,9 +667,9 @@ Milestone: M4
 Owner: mineral
 Depends: IF-038
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
-Blocks: T2-33, T2-34, T1-33
-Scope: ["@module:mineral"]
-Contract: Reaction Polyp treats a held block once using I107 prepared penetrant, retaining I109 Spent Penetrant. Add its exact Cyst recovery recipe through the existing data-driven recipe port. Fracture Jaw consumes the final workpiece stage into retained I108 fragments; Collection Cilia alone moves retained output to storage. Honor stable interlocks; no loose automatic item spawning.
+Blocks: T2-33, T2-34
+Scope: ["@module:mineral","src/main/java/org/jd/infestusfrontier/platform/cultivation/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/cultivation/**"]
+Contract: Reaction Polyp treats a held block once using I107 prepared penetrant, retaining I109 Spent Penetrant. Add its exact Compost Gland recovery recipe through the existing data-driven recipe port. Fracture Jaw consumes the final workpiece stage into retained I108 fragments; Existing Collection Cilia alone moves retained output to storage. Honor stable interlocks; no loose automatic item spawning.
 Red: Jaw started before treatment-complete refuses; repeated treatment cannot multiply yield; a collected workpiece cannot be restored as a fresh ore block.
 Accept: Three independently controlled organs execute one bed cycle and pause safely at any blocked downstream stage; vanilla hopper/manual collection remains possible.
 Bounds: One reserved target/operation;16 extraction/fracture commits/server tick;9 retained stacks/organ.
@@ -637,9 +682,9 @@ Milestone: M4
 Owner: mineral
 Depends: IF-039
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
-Blocks: T2-23, T2-24
+Blocks: T2-23
 Scope: ["@module:mineral","src/main/java/org/jd/infestusfrontier/platform/genetics/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/genetics/**"]
-Contract: Implement Mineral Gizzard, Washing Kidney and retained tailings. Start iron/gold/copper at4 dust/raw ore and4 dust/ingot; define permitted higher paths in recipe tables from Items, never automatic multiply then apply vanilla Fortune. Dust fragments remain items/storage until a complete recipe fits. Include I061 washed iron/gold/diamond/obsidian portions, I062 Ferrocyte Paste and I063 Auric Myelin; use the existing Vat material mode, not a second genetic processor.
+Contract: Implement Mineral Gizzard and add mineral washing/retained tailings recipes to existing Washing Kidney. Start iron/gold/copper at4 dust/raw ore and4 dust/ingot; use the exact recovery/smelting table in Items; here enable base4-dust and Kidney5-dust recovery plus4-dust smelting only, never automatic multiply then apply vanilla Fortune. Dust fragments remain items/storage until a complete recipe fits. Include I061 washed iron/gold/diamond/obsidian portions, I062 Ferrocyte Paste and I063 Auric Myelin; use the existing Vat material mode, not a second genetic processor.
 Red: All routes reject reprocessing treated intermediates as pristine ore; incomplete dust batches are retained; swapping recipes cannot erase fractional progress.
 Accept: Compare raw ore/direct furnace, simple dust and washed chain using exact resource ledgers; guide/JEI expose total recovery and waste, not misleading per-stage multipliers.
 Bounds: One batch/processor; finite9-slot waste/output buffers; no floating-point production amounts.
@@ -654,7 +699,7 @@ Depends: IF-040
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T2-35, T2-36
 Scope: ["@module:genetics"]
-Contract: Craft Specimen Archive using actual Auric Myelin; implement Sample Collector binding one explicit killer and adjacent destination. Reuse Dock's sample port. Archive capacity128 species and16384/species; all quality categories are counted.
+Contract: Craft Specimen Archive using actual Auric Myelin; implement Sample Collector binding one explicit killer and adjacent destination. Reuse Dock's sample port. Archive capacity128 species and16384 total samples summed across species/quality counters; all quality categories are counted.
 Red: Last-slot competition, duplicate death callback, foreign killer and unloaded destination cannot clone samples or add fallback loose drops. Full archive refuses without deleting input.
 Accept: Manufacture materials, build archive, dock pouch, withdraw vials and feed existing Extractor. Linked Collector consumes one existing killer event; later defense organs use the same port.
 Bounds: 16 species/page,48 quality counters/page,2 changed pages/s; shared collection quota; no entity searches.
@@ -686,7 +731,7 @@ Blocks: none
 Scope: ["@module:equipment","src/main/java/org/jd/infestusfrontier/platform/genetics/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/genetics/**"]
 Contract: Extend the existing Chrysalis with fusion graft recipes and implement the equipment-owned permanent frame transition service used by Mutation Chamber installation. Implement/test all G1->G2->G3->G4 edges from Armor Evolution as pure rules; enable Survival installation recipes only for G2 Ferrocyte/Auric media from the existing Gizzard -> Kidney -> Vat chain. Later producer tasks enable their own G3/G4 recipes; do not register placeholder ingredients or waive native services. Consume prepared medium, Binder and BU with listed costs/times; reject raw ingots/diamonds. Preserve identity, wear ratio, counters and installed branches.
 Red: Backward/sibling transitions refuse; cap increase does not allocate learning points; full output/disconnect cannot clone a frame or charge twice.
-Accept: Iron/Auric paths and soft/rigid descendants have exact defense, durability, learning cap and mutation slots; UI previews permanent choice and required prepared inputs.
+Accept: Pure tests prove every frame's exact defense, durability, summed learning cap and mutation slots. Actual Survival fusion covers G2 iron/Auric only; UI previews permanent successors and unavailable prepared inputs without making G3/G4 obtainable.
 Bounds: One piece and one reserved fusion transaction/Chrysalis; checked integer BU arithmetic.
 Evidence: rules, game
 
@@ -697,9 +742,9 @@ Milestone: M4
 Owner: equipment
 Depends: IF-034
 Spec: docs/ARMOR_EVOLUTION.md, docs/ITEM_CATALOG.md, docs/BLOCK_CATALOG.md
-Blocks: T2-09
+Blocks: none
 Scope: ["@module:equipment"]
-Contract: Grafting Bench installs legal target/family/rank successors through equipment service. Implement M1.I, M3.I, H1.I, H3.I, H4.I and all H2 light-cone effects; introduce I052 Plant Graft with exact Items recipe. No M2 before native Nether tolerance; no graft extraction or branch swapping. Pure higher-rank H2 tests use existing frame definitions; enable crafting only with actual frame/material services.
+Contract: Apply Host I at the existing Cradle; all other legal armor grafts install through the existing Mutation Chamber equipment port. Implement obtainable M1.I, M3.I, H1.I, H2.I, H3.I and H4.I using Items graft recipes. Test higher-rank H2 cone rules without registering their later recipes. No plant grafting, M2 before Nether tolerance, extraction or branch swapping; IF-075/077 own later ranks.
 Red: Wrong slot, missing predecessor, mutually exclusive branch and insufficient slots refuse without consuming graft; repeated confirmation cannot install twice.
 Accept: Early self-healing, basic protection and lighting draw actual fuel; underwater vision does not supply air. UI shows exact cost/benefit and permanent exclusions; advanced ranks remain discoverable but unavailable.
 Bounds: At most catalog family/rank slots per piece; action query returns immutable capability snapshot.
@@ -707,14 +752,29 @@ Evidence: rules, game, visual
 
 ---
 
+IF-123 Permanent plant grafts with cultivation tradeoffs
+Milestone: M4
+Owner: cultivation
+Depends: IF-035
+Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
+Blocks: T2-09
+Scope: ["@module:cultivation"]
+Contract: Build Grafting Bench and prepare I052 using the exact Plant graft traits table. Require complete matching genome and real stock via genetics port; planting item retains exactly one permanent water-thrift or rapid-growth trait. Armor grafting remains Cradle/Chamber owned. Support wheat, oak, birch and berry here; kelp installation follows IF-072 aquatic production and chorus follows IF-100 native genetic service. Pure trait rules cover all declared source IDs without claiming those later recipes obtainable.
+Red: Wrong/partial genome, sibling trait replacement and cancelled batch cannot spend/clone planting stock. Apply a modifier once; grafted seed yield cannot duplicate basal stock.
+Accept: Graft and plant each supported source through actual managed cultivation. Compare plain/water-thrift/rapid-growth cost, duration and identical yield; harvest/replant/save/load retains species and chosen trait.
+Bounds: One batch/Bench,one trait per planting item; existing bounded cultivation plan and recipe budgets.
+Evidence: rules, game, visual
+
+---
+
 IF-036 Fuel priority, hunger, symbiosis and feeding branches
 Milestone: M4
 Owner: equipment
-Depends: IF-035
+Depends: IF-123
 Spec: docs/ARMOR_EVOLUTION.md, docs/ITEM_CATALOG.md, docs/BLOCK_CATALOG.md
 Blocks: T2-08
 Scope: ["@module:equipment"]
-Contract: Implement self-healing, Healing Dock and fuel priority/starvation from Armor Evolution; hunger has one wearer cadence and one-heart floor until that piece earns100 learning. C12 intake consumes configured containers; C13 Digestive Crop consumes only listed bio-materials using prepared grafts. Include C6 Gill Bellows air pulses before burrowing is enabled; H4 is underwater vision, not breathing.
+Contract: Implement self-healing, Healing Dock and fuel priority/starvation from Armor Evolution; hunger has one wearer cadence and one-heart floor until that piece earns100 learning. C12 intake consumes configured containers; C13 Digestive Crop consumes only listed bio-materials using prepared grafts. Include C6 Gill Bellows air pulses before burrowing is enabled; H4 is underwater vision, not breathing. Obtain/install only C6.I/C12.I/C13.I here; IF-076 owns their higher ranks and complete routes.
 Red: Four hungry pieces cannot bypass health floor; armor hunger neither kills nor heals; external damage remains lethal. Empty automatic source stops features rather than creating fuel.
 Accept: Manual feed, Papilla and Dock share Equipment service; internal tanks differ by frame/mutations; C13 field production matches capped table rather than a portable factory.
 Bounds: 4 supply transactions/player/s and64/server tick; inspect configured slots only; one hunger cadence/player.
@@ -759,7 +819,7 @@ Depends: IF-042
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T3-01, T3-02, T3-17, T3-18
 Scope: ["@module:cultivation"]
-Contract: Implement Thermal Substrate/Nursery/Root/Cultivation using native bed contracts. Root supplies the reference powered grower; thermal fruit needs real seed, feed and local water production. Specialized soil is created only in actual Nether; imported soil does not spoof dimension.
+Contract: Implement Thermal Substrate/Nursery/Root/Cultivation using native bed contracts. Root provides heat only; charged thermal controls use actual BE; thermal fruit needs real seed, feed and local water production. Own I071 Thermal Lining at Nursery; first lining uses actual imported magma cream, then install Dew/Sac thermal treatments and demonstrate local-fruit recipe. Reserve5000BE per reference cycle for heat-control/pump operation, not for a fictitious Root generator. Specialized soil is created only in actual Nether; imported soil does not spoof dimension.
 Red: Copied bed layout in Overworld refuses native recipe without consuming materials; first thermal feed does not require a Wither genome or advanced fusion it enables.
 Accept: Build the initial3x3 thermal bed and complete local fruit harvest; useful flora remains part of the base. Structure UI names missing bed cell versus missing energy.
 Bounds: Existing64-cell cultivation/4096 structure ceilings and shared probe budgets.
@@ -773,8 +833,8 @@ Owner: thermal
 Depends: IF-043
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T3-03, T3-04, T3-07, T3-09
-Scope: ["@module:thermal"]
-Contract: Implement Lava Siphon, Steam Heart and Thermal Mantle as separate intake/generation/application operations. Lava must be removed from a real loaded source or supplied by a real tank. Use Thermal Nursery's actual Thermal Lining to craft Relief Chimney; implement metered clear-vent relief before pressurized Steam Heart operation. Bind temperature/pressure to ThermalProcess state; recipes reserve water, steam and condensate capacity.
+Scope: ["@module:thermal","src/main/java/org/jd/infestusfrontier/platform/mineral/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/mineral/**"]
+Contract: Implement Lava Siphon, Steam Heart and Thermal Mantle as separate intake/generation/application operations. Lava must be removed from a real loaded source or supplied by a real tank. Use Thermal Nursery's actual Thermal Lining to craft Relief Chimney; implement metered clear-vent relief before pressurized Steam Heart operation. Bind temperature/pressure to ThermalProcess state; recipes reserve water, steam and condensate capacity. Add the Mantle3-dust/ingot row in Items through the mineral recipe port; powered2/1 rows wait for IF-051.
 Red: No water, full steam store or removed heat face stops start without disappearing lava; unloading pauses work rather than accumulating unlimited heat catch-up.
 Accept: Produce heat/steam and manufacture Tempered Bone Plate through its actual Mantle recipe; blocked/unloaded relief independently prevents safe operation; unsafe temperatures are visible before damage; no mineral output from empty space.
 Bounds: One source cell probe/start,16 thermal steps/server tick, one batch/core; max100000 checked pressure units/process baseline.
@@ -879,7 +939,7 @@ Depends: IF-047
 Spec: docs/ARMOR_EVOLUTION.md, docs/ITEM_CATALOG.md, docs/BLOCK_CATALOG.md
 Blocks: none
 Scope: ["@module:equipment"]
-Contract: Implement M2 thermal lining and C5 thermal exchange ranks plus Nether rigid frame recipes. Test pure higher-rank rules; enable each recipe only when its listed material/service exists. Prepare I073/I074 using actual Thermal Mantle service; G4 waits for IF-052. H6/H9 effects and complex-source grafts are IF-075 after IF-099. No immunity flag substitutes for paid thermal capabilities.
+Contract: Implement M2 thermal lining and C5 thermal exchange ranks plus Nether rigid frame recipes. Test pure higher-rank rules; enable each recipe only when its listed material/service exists. Prepare I073/I074 using actual Thermal Mantle service; G4 waits for IF-052. H6/H9 effects and complex-source grafts are IF-075 after IF-099. No immunity flag substitutes for paid thermal capabilities. M2/C5 rankIII remains IF-077.
 Red: Lava drains exact BU and kills an unfunded unprotected wearer normally; fire resistance does not imply underwater breathing or arbitrary damage immunity.
 Accept: A thermal-specialist suit completes a measured work window and refuels at Nether Papilla; mixed generalist pieces cannot equal every dedicated set.
 Bounds: Fixed4-piece evaluation and listed upkeep cadence; no chunk tickets or extra armor inventory ticker.
@@ -887,14 +947,29 @@ Evidence: rules, game, visual
 
 ---
 
+IF-050 Industrial conversion and external energy exchange
+Milestone: M5
+Owner: energy
+Depends: IF-048
+Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
+Blocks: T4-04
+Scope: ["@module:energy"]
+Contract: Extend existing Stack with the exact industrial upgrade from Items: L1 core,2 Tempered Bone Plates,2 Thermal Linings and actual Mantle/Gill cooling. Enable Nether1200BU->24000BE recipe only with native services. Implement Exchange Organ1:1 BE/FE at its own ports; existing route losses remain separate and cannot be refunded. No duplicated generator/storage/tissue implementation. Industrial upgrade expands the same Stack output buffer from4000 to40000BE; downgrade refuses while contents exceed target capacity. End conversion remains disabled until IF-126 supplies native services.
+Red: Round trip through two exchange organs cannot increase either balance; full Charge Sac and unsupported FE handler refuse; absent external mods leave native loop functional.
+Accept: Upgrade the actual starter Stack, provide thermal cooling/water and run a native industrial batch with all retained waste. Supply a real Kidney and standard FE test handler; reverse direction without gain. Industrial service removal falls back to starter mode only when idle, never reinterprets active inputs.
+Bounds: <=64 energy commits/server tick under shared transfer admission; checked capacity1000000BE/Sac.
+Evidence: rules, game, integration
+
+---
+
 IF-049 Nether base sustains itself and exports
 Milestone: M5
 Owner: campaign
-Depends: IF-048
+Depends: IF-050
 Spec: docs/PROGRESSION_MAP.md, docs/GUIDE_PROGRESSION_TREE.md
 Blocks: none
 Scope: ["@module:campaign"]
-Contract: Automate three native60s reference cycles starting from the finite Items kit. Use exact recipe-table durations and actual deltas, including6000BE filtration charge, planting/resin reserves and1500 netBU/declared cycle. Export only after local restart reserves.
+Contract: Automate three native60s reference cycles starting from the finite Items kit. Use exact recipe-table durations and actual deltas, including1000BE filtration plus5000BE heat-control/pump charge, planting/resin reserves and1500 netBU/declared cycle. Export only after local restart reserves.
 Red: Disconnect Overworld supply before start; remove local seed/water reserve and restart assertion fails. No creative refueling after initial kit.
 Accept: Nether manufactures Thermal Lining, DNA stock and surplus fuel locally, restarts after save/reload and outproduces declared Overworld reference at stated cost/footprint.
 Bounds: <=512 organ fixture, finite24000 tick deadline; measure shared-budget throttling separately from recipe arithmetic.
@@ -902,29 +977,14 @@ Evidence: rules, game, visual, soak
 
 ---
 
-IF-050 Electrical generation, conduction and exchange
-Milestone: M6
-Owner: energy
-Depends: IF-049
-Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
-Blocks: T4-01, T4-02, T4-03, T4-04
-Scope: ["@module:energy"]
-Contract: Electrocyte Stack generates recipe-defined BE; Conductive Tissue and Charge Sac move/store it using typed ports. Exchange Organ converts BE<->external FE only at explicit1:1 baseline with no loop gain; core has no NeoForge classes.
-Red: Round trip through two exchange organs cannot increase either balance; full Charge Sac and unsupported FE handler refuse; absent external mods leave native loop functional.
-Accept: Supply a real processor through tissue and through a standard FE test handler; charging requires actual fuel/cooling; UI distinguishes BE, BU and steam.
-Bounds: <=64 energy commits/server tick under shared transfer admission; checked capacity1000000BE/Sac.
-Evidence: rules, game, integration
-
----
-
 IF-051 Independent recovery and smelting efficiency paths
 Milestone: M6
 Owner: mineral
-Depends: IF-050
+Depends: IF-049
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T4-05
 Scope: ["@module:mineral","src/main/java/org/jd/infestusfrontier/platform/equipment/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/equipment/**"]
-Contract: Ion Separator recovers retained tailings through recipe-defined chemistry/BE. Complete4->5->6->7->8 dust recovery and4->3->2->1 dust/ingot branches from Items as separate installed services; every stronger recipe consumes its listed additional reagents/energy. Include I076 Diamond-Fiber Matrix preparation and enable G3 flexible fusion through the existing equipment service. G4 remains unavailable until precision service exists.
+Contract: Ion Separator recovers retained tailings through recipe-defined chemistry/BE. Complete4->5->6->7->8 dust recovery and4->3->2->1 dust/ingot branches from Items as separate installed services; add only the Separator6/7/8 recovery and powered2/1 smelting rows here, reusing earlier4/5 recovery and4/3 smelting; every stronger recipe consumes its listed additional reagents/energy. Include I076 Diamond-Fiber Matrix preparation and enable G3 flexible fusion through the existing equipment service. G4 remains unavailable until precision service exists.
 Red: Unsupported metal recipes cannot inherit iron multipliers; combining max paths pays both costs; raw ore/Fortune/workpiece routes cannot double-roll loot.
 Accept: Measured base and max-path ingot yields exactly match ledger; intermediate layouts can save dust without buying every improvement; JEI lists waste and all energy.
 Bounds: One batch/Separator, finite waste slots; same16 completion quota; integer ratios only.
@@ -957,7 +1017,7 @@ Scope: ["@module:equipment"]
 Contract: Implement Trait Regulator ritual removing25 points from one selected eligible counter for catalog BU/XP/ingredients, never negative; Mnemonic Vessel stores explicit raw XP transfers. C-D actual-death learning unlocks one rescue; sleeping recharges rescue without clearing learned counters.
 Red: Insufficient points/XP/output room, simultaneous deposit+ritual, logout and repeat confirmation cannot duplicate XP/charges; prevented death earns no actual-death count.
 Accept: Reduce unwanted points and let another activity fill freed capacity; rescue fires once and remains spent after reload until qualifying sleep.
-Bounds: One reservation per piece/Vessel, stored XP capped at1000000 raw points; no orb scans or spawned XP.
+Bounds: One reservation per piece/Vessel;10000 raw XP/cell, at most4 joined cells and40000 total;20 XP/s player transfer or40 with Survey Gel while authorized UI is open within4 blocks. No orb scans or spawned XP.
 Evidence: rules, game
 
 ---
@@ -972,7 +1032,7 @@ Scope: ["@module:genetics"]
 Contract: Enable bank complex-storage service and run ordinary enderman plus Nether blaze/ghast/wither-skeleton sample routes through actual R1/R2 and native Vat. Use Block Catalog storage/native tables unchanged. No Wither/dragon support without Vault.
 Red: Removing precision service retains complex records but makes them inactive; wrong native bed or full spent-water output refuses without consuming a sample.
 Accept: Complete one complex genome and culture its stock; compare identical quality samples at R1/R2 exact BU/BE costs. Preview why boss samples remain refused.
-Bounds: Existing128 species bound,16-record UI pages and one reserved batch/core.
+Bounds: Existing DNA storage grades:16 ordinary/32 precision species slots plus8 per attached Lobe;16-record UI pages and one reserved batch/core. No Vault-sized implicit capacity.
 Evidence: rules, game
 
 ---
@@ -1037,17 +1097,17 @@ Evidence: rules, game, visual
 
 ---
 
-IF-055 Descending walkable galleries and modular boring
+IF-055 Finite vertical shaft and descending platform
 Milestone: M6
 Owner: excavation
 Depends: IF-054
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T3-11, T3-12
-Scope: ["@module:excavation"]
-Contract: Descending Cradle plans 3-wide stairs dropping one block per forward step, with4-block headroom and16-step finite length; Boring Jaw removes only its assigned real face. Insert paid stair/light material rather than spawned surface posts; control shares existing Bed/Root operations.
-Red: A cavity below next stair, missing support or lava ahead stops safely; two cutters cannot claim same block; light/refill costs remain conserved.
-Accept: Walk down and back without jumping or suffocating; rotate a fresh section90 degrees from a landing; demonstrate manual pause/reload/continue.
-Bounds: <=256 planned cells/core;16 global excavation edits/tick includes stairs and lights; loaded targets only.
+Scope: ["@module:excavation","src/main/java/org/jd/infestusfrontier/platform/mineral/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/mineral/**"]
+Contract: Build the catalog Descending Cradle:3x3 Rib Frame deck, two Steam Muscles, Boring Jaw, Work Bed, Cilia and Grower. Select16 downward slices of a5x5 shaft:3x3 working deck plus side access/service clearance. Jaw performs individual real cuts through the mineral cutter port; Grower installs paid side Climbing Tendon and Lumen inserts every4 levels before deck descent. Move only the registered deck/payload identities, at most16 components; no arbitrary block entities. Platform moves one block only after next slice, cargo capacity, access and rider collision checks acknowledge. Retain a bottom landing and continuous climbable exit; use a fresh Cradle for another section.
+Red: Lava, protection, unloaded next slice, full Bed/output, absent tendon/light supply or obstructed rider headroom pauses before movement. Crash/reload at cut/access/move boundaries preserves one core, one payload and each paid block; two cutters cannot own one cell.
+Accept: Mine straight down16 levels, ride one admitted player safely with3 clear blocks above deck, climb out by tendon, and resume a paused slice after reload. Removal/shutdown leaves the shaft lit and climbable. This is a vertical shaft, not another staircase.
+Bounds: At most512 selected world cells and16 known payload components/core; one slice pending; one rider/deck. Each removal/placement/relocation destination consumes the shared16 world-edit admissions/tick; loaded cells only, no free block-moving bypass.
 Evidence: rules, game, visual
 
 ---
@@ -1074,7 +1134,7 @@ Depends: IF-056
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T4-15, T4-16, T4-17
 Scope: ["@module:containment"]
-Contract: Implement Recovery Sump, Neutralization Gland and Pressure Regulator with catalog containment rules. Enable intentional I019 placement only through finite spill admission. Ordinary full tanks refuse; only specified charged/damaged process ruptures. Excess volume remains in breached vessel.
+Contract: Implement Recovery Sump, Neutralization Gland and Pressure Regulator with catalog containment rules. Enable intentional I019 placement only through finite spill admission. Ordinary full tanks refuse; only specified charged/damaged process ruptures. Excess volume remains in breached vessel. Own I084 Neutralizing Salts Cyst recipe and I085 retained Inert Sludge; neutralize250mB spent biomass +1 Salt over5s into1 Sludge +250mB dirty water, never reusable BU. Spent Penetrant/Leach Cake use1 Salt per item ->1 Sludge over5s, no metal or BU.
 Red: At64 jobs/16 probes budget bucket refuses unchanged; secondary casualty cannot spawn another spill job or item storm; unload pauses10s damage without catch-up.
 Accept: Recover a dose before tissue death, isolate a blocked pressure process and neutralize retained waste. Warn before rupture; finite quantity never becomes a renewable source.
 Bounds: 64 cells/spill at250mB, one neighbor probe/job/tick under16/server tick,64 jobs; secondary fluids join same bounded spill.
@@ -1133,23 +1193,38 @@ Owner: cultivation
 Depends: IF-059
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T5-05, T5-08
-Scope: ["@module:cultivation"]
-Contract: Chorus Resonator and Orchard Tissue implement native reference cultivation: real planting stock, local Dew water, powered growth, separate harvest and generation. Outputs remain physical fruit/stock, not spontaneous biomass.
+Scope: ["@module:cultivation","src/main/java/org/jd/infestusfrontier/platform/processing/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/processing/**"]
+Contract: Chorus Resonator and Orchard Tissue implement native reference cultivation: real planting stock, local Dew water, powered growth, separate harvest and generation. Outputs remain physical fruit/stock, not spontaneous biomass. Install actual Spatial Membrane treatments into existing Dew/Sac recipes through their processing ports; preserve ordinary variants. Complete the powered orchard using supplied stored charge; the native Stack upgrade is IF-126.
 Red: No End feed without seed/water/BE; repeating harvest callback cannot award a second fruit allocation; Overworld dimension refuses native recipe.
-Accept: Complete three120s reference cycles, retaining planting/restart kit and matching2300 netBU and26000 netBE reference surplus per declared cycle before transport.
+Accept: Harvest one actual120s native cycle with finite supplied water/charge; route two fruit to Dew and ten to Sac with exact native costs/yields, retaining basal flower. Do not assert positive whole-loop BE before IF-126 supplies native generation.
 Bounds: Existing shared cultivation/recipe budgets; explicit fixed plot and finite reserve buffer.
 Evidence: rules, game, visual
+
+---
+
+IF-126 Native End electrical conversion
+Milestone: M7
+Owner: energy
+Depends: IF-060
+Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
+Blocks: none
+Scope: ["@module:energy"]
+Contract: Upgrade the existing industrial Stack with2 Spatial Membranes and actual Anchor Root service in the End. Use the Items2000BU/100mB water/120s ->40000BE/100mB dirty-water recipe within its40000BE buffer. Add no new power/storage organ or generic dimension bypass.
+Red: Remove dimension, membrane upgrade, native anchor or output reservation independently: refuse without fuel loss. First membranes must be obtainable with starter/imported charge, not this upgrade's own output.
+Accept: Install upgrade using actual Spatial Nursery products; run three120s cycles of the assembled End reference module with paid resonator/pump/filtration loads. Assert2300 netBU/26000 netBE per cycle, preserve restart kit, then disconnect external supply and reload safely.
+Bounds: One batch/Stack,40000BE output capacity,existing shared recipe and transfer quotas; no catch-up or chunk tickets.
+Evidence: rules, game
 
 ---
 
 IF-100 First End-native shulker research
 Milestone: M7
 Owner: genetics
-Depends: IF-060
+Depends: IF-126
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: none
-Scope: ["@module:genetics"]
-Contract: Install End native Extractor/Vat tolerance with exactly2 I091 Spatial Membranes +400BU per core at L2 on the End3x3 bed with4 Anchor Roots. No Conditioner output, levitation culture or R3 required. Species/native/storage conditions follow Block Catalog.
+Scope: ["@module:genetics","src/main/java/org/jd/infestusfrontier/platform/cultivation/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/cultivation/**"]
+Contract: Install End native Extractor/Vat tolerance with exactly2 I091 Spatial Membranes +400BU per core at L2 on the End3x3 bed with4 Anchor Roots. No Conditioner output, levitation culture or R3 required. Species/native/storage conditions follow Block Catalog. Also enable ordinary End-native chorus genome/stock from a consumed chorus fruit specimen and attach I052 chorus trait recipes to the existing Bench via cultivation adapter; complete16-coverage plant genome required.
 Red: Remove dimension, bed, anchor, organ level or spatial treatment independently: refuse unchanged; first-shulker route cannot require existing shulker stock.
 Accept: Reconstruct first Shulker with R1/R2 precision storage, then culture matching stock locally; I097 names that stock's levitation role, not an extra material.
 Bounds: Existing native genetics, one-batch and shared structure budgets.
@@ -1292,7 +1367,7 @@ Evidence: rules, game, visual
 
 ---
 
-IF-070 Cocoon, Recall and Death Bond preservation
+IF-070 Cocoon and Recall preservation
 Milestone: M8
 Owner: equipment
 Depends: IF-069
@@ -1328,8 +1403,8 @@ Owner: husbandry
 Depends: IF-071
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T2-12, T2-28
-Scope: ["@module:husbandry"]
-Contract: Aquaculture Bed grows allocated aquatic harvest from real starter/feed; Fishing Polyp performs a paid fishing operation only against valid loaded water. Use declared loot tables with explicit nonrenewable exclusions; no AFK loose-item stream.
+Scope: ["@module:husbandry","src/main/java/org/jd/infestusfrontier/platform/cultivation/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/cultivation/**"]
+Contract: Aquaculture Bed grows allocated aquatic harvest from real starter/feed; Fishing Polyp performs a paid fishing operation only against valid loaded water. Use declared loot tables with explicit nonrenewable exclusions; no AFK loose-item stream. Attach the existing I052 kelp traits to Grafting Bench via its cultivation port; test both modifiers on actual Aquaculture harvests, retaining source/seed identity.
 Red: Invalid water, no bait, full result or duplicate completion cannot produce loot; a sealed one-cell puddle cannot impersonate valid fishery.
 Accept: Compare crop and aquatic protein supply for DNA culture; harvest routes through ordinary Cilia/storage; water layout affects valid work area.
 Bounds: <=64 assigned water cells/bed,4 probes/organ/s under cultivation quota;9 retained stacks; one catch/30s baseline.
@@ -1449,8 +1524,8 @@ Depends: IF-079
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T2-13, T2-14
 Scope: ["@module:helpers"]
-Contract: Implement Brood Nursery with3 distinct collision-free larva berths and Worker Waypoint. Mutation consumes a larva and real graft to create one assigned helper. Population reservations release on death, expiry, unload and station removal; idle workers return to assigned berth.
-Red: Kill all workers then hatch again: slots free correctly. Occupied berth cannot spawn overlapping larvae; simultaneous hatch requests cannot exceed3.
+Contract: Implement Brood Nursery with3 distinct collision-free larva berths and Worker Waypoint. Mutation consumes a larva and real graft to create one assigned helper. Persistent population leases count loaded and unloaded workers. Death/expiry releases the matching ID exactly once; unload pauses lifetime and retains its lease. Normal station removal refuses while leases remain; explicit retirement ends loaded idle workers after cargo handoff, and pending unloaded workers retain their slots until loaded and retired. Idle workers return to assigned berth.
+Red: Kill all workers then hatch again: slots free exactly once. Unload workers then request new hatches: quotas remain occupied; reload cannot duplicate leases. Occupied berth cannot spawn overlapping larvae; simultaneous requests cannot exceed3.
 Accept: Original bug-shaped models walk/climb ordinary stairs; Probe reassigns a loaded compatible waypoint and home nursery; no teleport across unloaded ground.
 Bounds: <=3 workers/Nursery,24/team and96/server baseline; spawn only with free valid berth; one fixed home/task record/worker.
 Evidence: rules, game, visual
@@ -1599,10 +1674,10 @@ Depends: IF-113
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T5-09, T5-10, T5-11
 Scope: ["@module:defense"]
-Contract: Targeting Eye supplies bounded chosen target to an attached defense; Selective Membrane collision uses authorized full-suit capability; Catching Membrane arrests a paid bounded fall. Neither grants remote entity lookup or unlimited flight.
-Red: Unknown ownership or incomplete suit cannot bypass selective collision; catching without fuel does not reset fall indefinitely; all target queries remain loaded/local.
-Accept: Walk/collide through membrane with qualified/unqualified suit; demonstrate falling safety net with actual refill and output state; Eye improves targeting without new projectiles.
-Bounds: Existing defense/entity budgets; one catch/player/40ticks and64/server tick; no terrain or chunk lookup beyond local structure.
+Contract: Targeting Eye supplies one loaded local target to attached defense. Selective Membrane follows T5-10 authorization/power/emergency rules; no added armor prerequisite. Catching Membrane catches actual colliding item entities into an attached Capsule, retaining refused overflow in its own9-stack buffer. Remove only the count successfully reserved. At full net/capsule leave entity ownership unchanged. Elastic Gel treatment additionally cushions an ordinary living-entity fall by subtracting3 blocks from damage distance once per landing; no fuel-driven aerial reset, remote rescue or flight.
+Red: Unauthorized entry is blocked while powered; occupied doorway, emergency-open and power loss cannot trap an entrant; full Capsule/net and duplicate contact callbacks cannot delete/clone items. Breaking/reloading net retains one inventory. Repeated collision while airborne cannot reset fall distance.
+Accept: Authorized/unauthorized passage, power draw and fail-open behavior match T5-10 independent of armor. Drop actual items over net and collect through Capsule; repeat with full Capsule, overflow and dismantling. Compare ordinary and Gel-treated landings; Eye uses the existing target/projectile service.
+Bounds: 9 retained stacks/net section; shared64 contact/collection admissions/tick, at most16 candidates/query; passive collision callbacks, no dropped-item world scan or chunk loading.
 Evidence: rules, game, visual
 
 ---
@@ -1629,9 +1704,9 @@ Depends: IF-085
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T7-01, T7-02, T7-03
 Scope: ["@module:synthesis"]
-Contract: Synthesis Heart composes installed Anatomy Sockets and Catalyst Lobes through small recipe-service ports. Each lobe owns one culture/feed stream; installed components retain their own counters, not copied into controller. Build catalog synthesis recipes using three-world intermediates.
-Red: Missing lobe/feed/heat/space refuses; closing one socket isolates it without consuming neighbor stock; breaking host never duplicates donor histories.
-Accept: Build two valid layouts sharing versus separating lobes; measure productivity/footprint/feed tradeoffs and keep native input chains necessary.
+Contract: Implement the two exact Compound-organ commissioning recipes and I101 source-specific Catalyst Culture from Items; I100 aliases the primary donor item in its compound-body form. Attach separate physical Anatomy Sockets and Catalyst Lobes via service ports. Preserve both original donor identities/history; no donor copies or universal super-machine. Initial Economy profile belongs here; Throughput installation/switching is IF-087.
+Red: Wrong donor/level/native bed, missing actual culture/feed or reserved outputs each refuses before consumption. Repeated completion/dismantling cannot leave packed body plus donor copies; isolating one socket cannot debit another.
+Accept: Commission both catalog bodies from actual donors and three-world intermediates. Compare separate physical layouts, run Economy-profile batches and show independent supplies/results/history. Deplete the Lobe then refill to resume paid service without duplicating remaining service ticks.
 Bounds: <=16 sockets/Heart,one active recipe/core,4096-cell structure cap; recipe/route shared budgets.
 Evidence: rules, game, visual
 
@@ -1644,9 +1719,9 @@ Depends: IF-086
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: T7-04, T7-05
 Scope: ["@module:synthesis"]
-Contract: Expression Switch changes between2 installed compatible organ operating profiles only while drained/idle, after paid delay. Organ Transplanter moves one real leveled core into a compatible receiver. Armor mutation trees never gain profile switching.
+Contract: Install Throughput profile and switch Economy/Throughput on the two existing compound bodies using Items' exact costs, delays and rounding. Reject all unsupported profile pairs and armor targets. Organ Transplanter moves one real Bio-Furnace/Gizzard core into a matching empty socket using the listed transaction; construction owns placement, organ owns history, synthesis owns reservation.
 Red: Working/undrained organ refuses switch; rollback cannot refund spent waste; donor and recipient cannot both retain history after restart or interrupted move.
-Accept: Reconfigure shared batch refinery without rebuilding every part, then transplant mature Bio-Furnace preserving its identity/counts into larger assembly.
+Accept: Run identical actual input batches under each profile and compare exact unchanged yields, cost/time tradeoff, switching downtime and paid catalyst upkeep. Transplant both supported core types and verify same identity/counts, output reservations and compatible structure; no copying a packed compound donor.
 Bounds: <=2 installed profiles/host,one transfer/core; finite retained donor reservation; no copied counter banks.
 Evidence: rules, game, visual
 
@@ -1697,17 +1772,32 @@ Evidence: rules, game, integration
 
 ---
 
-IF-089 Limited interceptors and prepared siege fire
+IF-089 Temporary ground and air interceptors
 Milestone: M9
 Owner: defense
 Depends: IF-111
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
-Blocks: T7-07, T7-08
+Blocks: T7-07
+Scope: ["@module:defense","src/main/java/org/jd/infestusfrontier/platform/helpers/**","src/testMod/java/org/jd/infestusfrontier/testmod/platform/helpers/**"]
+Contract: Implement ground/air Interceptor Nursery specializations exactly under Block Catalog T7-07 deployment costs, movement, targets, damage and lifetime. Consume actual larvae and matching stock through Catalyst service. Reuse helpers population leases and path jobs; defense owns attack selection. Offspring cannot yield specimens, XP, ordinary loot or tissue biomass.
+Red: No feed/berth/support means no deployment. Death/expiry releases one lease; unload retains it. Exceeding path/population quota waits without spending. Players/pets/bosses never targeted; death cannot farm DNA or biomass.
+Accept: Produce zombie/phantom stock, commission each permanently specialized Nursery and deploy into distinct berths. Ground navigates stairs; air navigates collision-clear local routes. Measure shared contention with existing workers, expiry/support loss and re-hatching after death.
+Bounds: 3 defenders/Nursery within existing24/team and96/server total helper leases;2400 loaded ticks life; existing4 defense path requests/server tick,16 candidates/query and64 queries/tick. No chunk tickets.
+Evidence: rules, game, visual, soak
+
+---
+
+IF-124 Paid siege shots and permanent targeting grafts
+Milestone: M9
+Owner: defense
+Depends: IF-089
+Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
+Blocks: T7-08
 Scope: ["@module:defense"]
-Contract: Interceptor Nursery uses separately validated berths for temporary ground or air defenders; Siege Blossom fires paid ammunition only into local clear coverage with cooling available. Organic visuals, no profitable defender loot. Professions are permanent nursery specialization.
-Red: No feed/berth/support means no deployment; expiry/death frees slot; full projectile quota blocks fire before spending; player/pet immunity remains.
-Accept: Ground and air nursery variants have visibly distinct behavior; Siege shot connects to real steam/BE/cooling chain; compare with cheaper sentries.
-Bounds: <=3 defenders/Nursery under96-server helper cap,120s lifetime; shared128-projectile ceiling, siege1shot/100ticks baseline.
+Contract: Implement Siege Blossom's exact T7-08 shot, cooling and three permanent graft recipes. Reserve ammo, BU, BE, steam and cooling outputs before projectile admission. Reuse hostile targeting/projectile service; separate supplier organs remain necessary. Prepare grafts through existing Chrysalis/Chamber ports, not direct raw-item clicks.
+Red: Blocked muzzle, protected/nonhostile target, full spent-fluid output or projectile ceiling refuses before spending. Duplicate hit callback cannot damage twice; unsupported sibling graft cannot replace installed branch; secondary targets obey exclusions.
+Accept: Feed real Spine/charge/steam/water through separate routes, fire base and each specialization at controlled eligible targets and measure exact damage/range/reload/cost. Verify no terrain damage, projectile recovery or bypass of vanilla boss immunity; compare with cheap Sentry.
+Bounds: Shared128 projectiles/server,64 target queries/tick and16 returned candidates/query; suppression at most4 total hit entities;60-tick projectile lifetime.
 Evidence: rules, game, visual, soak
 
 ---
@@ -1715,7 +1805,7 @@ Evidence: rules, game, visual, soak
 IF-090 Catalog, guide and alternate-route completeness
 Milestone: M10
 Owner: campaign
-Depends: IF-089
+Depends: IF-124
 Spec: docs/PROGRESSION_MAP.md, docs/GUIDE_PROGRESSION_TREE.md
 Blocks: none
 Scope: ["@module:campaign","scripts/check_content_coverage.py","build.gradle"]
@@ -1734,7 +1824,7 @@ Depends: IF-090
 Spec: docs/DEPENDENCIES.md, docs/ARCHITECTURE.md
 Blocks: none
 Scope: ["@module:integration"]
-Contract: Run packaged base, required-library, JEI, Curios and combined profiles on dedicated server with two clients. Validate inventory capability simulation/commit against vanilla and synthetic hostile handlers; persist schema fixtures across each production schema version. No blanket claim for untested content mods.
+Contract: Extend IF-001 profileSmoke/captureClient/packagedServerSmoke for the same required/jei/curios/combined four-profile matrix, using a dedicated server and two disposable clients. Missing required libraries remain negative fixtures, never a supported fifth profile. Validate inventory capability simulation/commit against vanilla and synthetic hostile handlers; persist schema fixtures across each production schema version. No blanket claim for untested content mods.
 Red: Missing optional mod, malformed packet/NBT, stale menu, malicious count, version mismatch and client-only class on server each has explicit assertion.
 Accept: Original art loads without missing textures; joins, guide grants, transfers, armor and DNA work in all supported profiles; released JAR contains no test fixtures.
 Bounds: Packet and collection caps from Performance are asserted under concurrent clients; fixed process/readiness deadlines.
@@ -1748,8 +1838,8 @@ Owner: campaign
 Depends: IF-091
 Spec: docs/PROGRESSION_MAP.md, docs/PERFORMANCE.md
 Blocks: none
-Scope: ["@module:campaign"]
-Contract: Implement the dense three-world stress harness with maximum declared organs/entities/spills and a short deterministic stress regression in verifyAll. Add separate qualification command running three30-minute fixed-seed trials against an equivalent idle baseline. This packet implements the harness; IF-107 runs long qualification against the frozen candidate.
+Scope: ["@module:campaign","build.gradle"]
+Contract: Implement the dense three-world stress harness with maximum declared organs/entities/spills and a short deterministic stress regression in verifyAll. Add separate qualification command running three30-minute fixed-seed trials against an equivalent idle baseline. This packet implements the harness; IF-107 runs long qualification against the frozen candidate. Commands: ./gradlew stressRegression (verifyAll dependency) and ./gradlew qualifyColony -PtrialSeeds=11,29,47 -PidleSeconds=300 -PactiveSeconds=1800 -PoutputDir=<evidence>. Add only these harness hooks to build.gradle; never relax other gates.
 Red: At every configured ceiling, one excess operation refuses/defer safely; forced unload/restart does not grow queues, lose escrow or duplicate fuel.
 Accept: Short runs verify calibrated timing/percentile collection, resource ledgers, warm-up exclusion, retained-job/chunk/memory accounting and injected budget failures. Publish exact named command/options and hardware metadata schema for IF-107; do not claim90-minute qualification from short tests.
 Bounds: Hard budgets from owning services remain authoritative; no global cap silently raised to pass throughput; measured host-dependent target recorded separately.
@@ -1779,7 +1869,7 @@ Depends: IF-107
 Spec: docs/PROGRESSION_MAP.md, docs/GUIDE_PROGRESSION_TREE.md
 Blocks: none
 Scope: ["@module:campaign"]
-Contract: Execute fresh-world Survival route through Overworld workshop, Nether export base, End self-supply and three-world synthesis using real actions. Validate second layout and distinct armor lineage. Capture screens/structures/all model faces in actual client; smart reviewer judges visibility and clipping, not only pixel diffs.
+Contract: Implement reusable campaign action fixtures, then execute fresh-world Survival route through Overworld workshop, Nether export base, End self-supply and three-world synthesis using real actions. Validate second layout and distinct armor lineage. Capture screens/structures/all model faces in actual client; smart reviewer judges visibility and clipping, not only pixel diffs.
 Red: Break a native bootstrap link, hide a required recipe or invert a logistics face and playthrough must fail at named action. No direct grants after starting fixture.
 Accept: Both routes finish without administrative unlocks. Measured failures remain failing and return to the coordinator for a narrowly owned tuning/fix task; this campaign packet cannot change production recipes or balance. Required gameplay/features complete; no automatic public release/license grant.
 Bounds: Finite scripted checkpoints with per-action timeouts and conservation ledgers; no real user saves. Final gate includes multiplayer and dense-base results.

@@ -121,7 +121,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 
 ### T0-03 — Digestive Sac
 - **Does:** Converts unwanted organic matter into the first usable biomass. Food-rich inputs give more than woody scraps; mineral blocks are not food.
-- **Input → output:** Rotten flesh, surplus crops, leaves or fish + water → biomass. Bones are returned as mineral residue rather than silently converted into flesh.
+- **Input → output:** Item Catalog's starter/native feed recipes → biomass with their exact water costs. No mineral feed or unlisted fish/leaf recipe; future fibrous diets require explicit recipes.
 - **Create:** 1 Organ Bud + 2 rotten flesh + 1 bowl.
 - **Growth:** Choose processing speed or biomass recovery. Elastic Gel treatment accepts fibrous leaves; add Intake/Output Mouths for a continuous feed line. It stops accepting batches when output has no room.
 
@@ -419,9 +419,9 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 
 ### T1-36 — Fuel Papilla
 - **Does:** Mutated Living Substrate, flush with the ground, that feeds worn armor. No separate free-standing feeder, healing head or digestive function.
-- **Input → output:** Colony biomass → biomass delivered to authorized selected worn pieces plus declared operating consumption. Single-cell rate and overhead are not yet specified. Works with partial suits; full pieces are skipped. Source reserve and maximum fill are configurable; it is not a hidden reservoir or a through-vein.
+- **Input → output:** Colony biomass → biomass delivered to authorized selected worn pieces. Base rate10BU/s plus ceil(delivered/5)BU overhead per one-second batch. Works with partial suits; full pieces are skipped. Source reserve and maximum fill are configurable; it is not a hidden reservoir or a through-vein.
 - **Create:** Apply 1 Capillary Gel + 1 Membrane Sheet to exposed mature substrate. Keep maturity and compatible reinforcement; drain/replace any previous primary function first.
-- **Growth:** Extend with a supplied multiblock to improve rate and efficiency. Extension dimensions and rates are not yet specified. No learning from filling/circulating biomass. Probe/UI starts filling without intercepting block placement. Healing Dock remains a separate service.
+- **Growth:** Add four adjacent Biomass Vein cells and four corner Rib Frames in a3×3 flush service pad:40BU/s with ceil(delivered/20)BU overhead per batch. One pad serves one wearer; no multiplicative stacking. No learning from filling/circulating biomass. Probe/UI starts filling without intercepting block placement. Healing Dock remains a separate service.
 
 ### T1-37 — Temporary Membrane
 - **Does:** Weak translucent temporary support grown by the handheld Membrane Projector.
@@ -695,7 +695,7 @@ cells use the strongest funded effect, not summed strength or double charging.
 
 ### T2-24 — Washing Kidney
 - **Does:** Washes crushed ore before smelting. The player chooses a simple dry furnace route or more recovery with a water supply and waste handling.
-- **Input → output:** Mineral concentrate + water → washed concentrate + tailings containing the unrecovered mineral fraction. Wash water goes to a separate dirty-fluid output. Its starter filtration mode also cleans generator process water at the Item Catalog rate; that mode needs no ore or genome.
+- **Input → output:** A four-unit Mineral Tailings parcel + water → one Washed Concentrate plus a three-unit residual parcel, at the Item Catalog cost. Wash water goes to a separate dirty-fluid output. Its starter filtration mode also cleans generator process water at the Item Catalog rate; that mode needs no ore or genome. Non-ore granulation washes one real mineral portion without a recovery multiplier.
 - **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 sand + 1 glass bottle.
 - **Growth:** Choose washing speed or water economy. Elastic Gel treatment improves fine-particle capture; a later Ion Separator recovers selected tailings. Full waste output stops new batches.
 
@@ -826,7 +826,7 @@ The Nether grows Thermal Lining continuously. It is needed for hot-fluid service
 
 ### T3-09 — Thermal Mantle
 - **Does:** Encloses an existing Bio-Furnace in a larger heat-safe body on mature Nether-native substrate. Unlocks tempered biological construction materials while retaining the furnace's counters and chosen traits; an ordinary unmantled furnace still works elsewhere.
-- **Input → output:** 1 Bone Plate + 1 Thermal Lining + 100 BU + heat → 1 Tempered Bone Plate. Washed iron, copper or gold concentrate + heat → the corresponding ingots and retained residue, according to the concentrate's mineral content. Item Catalog owns these yields; thermal processing does not require an additional raw iron reinforcement recipe.
+- **Input → output:** 1 Bone Plate + 1 Thermal Lining + 100 BU + heat → 1 Tempered Bone Plate. Iron, copper or gold dust + the listed steam/biomass → corresponding ingots; release concentrate into accounted dust first. Item Catalog owns these yields; thermal processing does not require an additional raw iron reinforcement recipe.
 - **Create:** Surround the furnace with an eight-block 3×3 Thermal Substrate ring, four lined corner Rib Frames and four Thermal Linings on its chamber faces. Leave its service and output faces accessible.
 - **Assembly:** T0-07, T3-01, T0-11.
 - **Growth:** A Steam Muscle adds batch pressure; additional lungs trade space for rate. Tempered plates reinforce large mining heads and electrical organs. Ordinary ingots do not become extra metal merely by passing through the mantle.
@@ -1071,6 +1071,7 @@ Starter structures use T4 products plus local End materials. Mature spatial tiss
 - **Input → output:** Access decision + electricity → an open passage for an admitted entrant or a closed barrier. No damage by default.
 - **Create:** Mutate a Sphincter Door with 1 Spatial Membrane + 1 ender pearl.
 - **Growth:** Add a Nerve Tissue emergency-open control and a local reserve. It does not trap someone in a closing membrane or grant an entire base immunity to boss attacks.
+- **Initial operation:** Keep the closed barrier powered for20BE/s, with a200BE internal reserve. Owner/team authorization controls passage, not armor completeness. Authorized contact or emergency-open opens for40ticks; occupied doorway prevents closure. Loss of power opens it without damage.
 
 ### T5-11 — Catching Membrane
 - **Does:** A physical safety net beneath a work platform, catching falling items before they disappear into the void. It must actually occupy the catch area.
@@ -1093,6 +1094,7 @@ Connect established workshops rather than replacing them. Transit consumes local
 - **Input → output:** Authorized passenger + biomass at departure + a ready Arrival Chamber → that passenger at the linked station, with inventory unchanged.
 - **Create:** Core: 1 Vascular Junction + 2 passenger-conditioned Spatial Membranes + 2 ender pearls. Build a ribbed mouth with a two-block-clear opening and a linked Arrival Chamber at each end.
 - **Growth:** Choose transit recharge rate or biomass economy. Add a wider throat and landing to admit mounts; longer/cross-dimensional trips cost more. A destination that cannot be made ready refuses departure rather than dropping the traveler into rock or the void.
+- **Initial operation:** Player only; reject mounted/passenger entities. Departure costs100BU+10BU×ceil(distance/256) in one dimension, or500BU across dimensions. Arrival reserves50BU+1000BE per traveler;20-tick cooldown per station. Distance is Euclidean between endpoints, computed without chunk lookup.
 
 ### T6-02 — Arrival Chamber
 - **Does:** Defines a protected, inspectable landing volume for a Transit Maw. Keeps the arrival reserve separate from the workshop's production budget.
@@ -1105,6 +1107,7 @@ Connect established workshops rather than replacing them. Transit consumes local
 - **Input → output:** A committed item batch or sealed fluid batch + biomass/electricity → the same batch in the receiver's reserved buffer.
 - **Create:** 1 Vascular Junction + 2 cargo-conditioned Spatial Membranes + 1 Item Capsule + 1 Fluid Cyst.
 - **Growth:** Choose dispatch speed or energy economy. Additional Cargo Locks increase batch size. Both endpoints must be available; a sleeping destination leaves the cargo accounted for locally rather than continuing invisible remote production.
+- **Initial operation:** One bounded cargo-lock batch costs25BU+1000BE at source and10BU+500BE at destination, doubled for a cross-dimensional link;40-tick dispatch cadence/link. Reserve fuel separately from payload, including BE cargo. Pay once at durable pack; retries/acknowledgments never rebill or refund committed cargo. A return is a separately paid transfer.
 
 ### T6-04 — Cargo Lock
 - **Does:** A physical staging buffer attached to a Freight Gullet. Separates “requested,” “packed” and “received” cargo so another machine cannot consume a half-prepared delivery.
@@ -1201,11 +1204,43 @@ The player designs assemblies with separate working, supply and control parts. M
 - **Create:** 1 Brood Nursery + 1 Aerocyte Bloom or Spine Sentry + 2 Thermal Linings + 1 Catalyst Lobe; provide separate deployment berths.
 - **Growth:** Choose growth speed or feed economy. Extra valid berths increase the permitted squad within its station limit; support loss or lifespan expiry recalls/ends it rather than leaving permanent uncontrolled creatures.
 
+Initial deployment requires a complete matching genome and consumes one Larval
+Cyst, two matching stock and 200 BU over 20 s per defender: zombie for the
+ground build (Spine Sentry donor), phantom for the air build (Aerocyte donor).
+Each defender has 12 health, no armor/loot/XP/sample yield, and 2400 loaded ticks
+of life. Ground defenders move at most 0.22 blocks/tick on navigable terrain;
+air defenders move at most 0.25 blocks/tick through collision-clear cells.
+Both stay within 16 blocks of their nursery and hit for 3 damage at range 1.5,
+once per 30 ticks. Ground targets grounded hostiles; air targets airborne
+hostiles. No players, pets or bosses. Losing support ends aggression and returns
+to a berth; after 100 loaded ticks without support the defender expires without
+refund. Unload preserves lifetime and population lease, never frees a spawn slot.
+Reuse helper population/path admission and defense target queries. Three berths
+maximum; ground/air is a permanent nursery choice, not a switchable command.
+
 ### T7-08 — Siege Blossom
 - **Does:** A large stationary weapon for a prepared defensive position. Requires the enemy to enter its covered area; it cannot attack a boss anywhere in the dimension.
 - **Input → output:** Grown spine ammunition + biomass + charged electricity/steam → a slow, powerful visible shot and spent heat.
 - **Create:** 1 Spine Sentry + 1 Targeting Eye + 2 Steam Muscles + 1 Charge Sac; build a 5×5 rooted support body with a clear barrel-like corolla and cooling route.
 - **Growth:** Choose reload rate or energy economy. Different genetic grafts favor armor penetration, aerial tracking or crowd suppression; installing one sacrifices another. A blocked muzzle or empty cooling path prevents firing.
+
+Initial range is 32 blocks, nearest eligible hostile then entity ID; line of
+sight and a clear muzzle are required. One non-explosive projectile costs
+4 Grown Spines + 50 BU + 2000 BE + 250 mB steam. Reserve 250 mB cooling water and
+dirty-water output before firing; convert it to 250 mB dirty water. Steam is
+retained as spent steam for condensation. Reload is 100 ticks, projectile speed
+1.2 blocks/tick, maximum life 60 ticks; hit once for 16 damage through ordinary
+armor/encounter defenses. No terrain damage, piercing or recovered ammunition.
+
+Permanent Siege grafts are prepared at Chrysalis and installed at Chamber:
+4 each of the named stock, 2 Thermal Linings, 2 Binder and 1000 BU, 40 s;
+all genomes complete. Precision (skeleton + silverfish) changes damage to 20
+and reload to 140 ticks; it does not bypass boss immunity. Tracking (skeleton +
+phantom) permits initial interception aiming at airborne hostiles, range 40,
+damage 12, no homing. Suppression (skeleton + slime) deals 8 to the primary and
+at most three additional eligible hostiles within 2 blocks at impact, reload140.
+All grafts retain the base shot cost; exclusions and the global query/projectile
+budgets apply independently to secondary hits. Only one graft per Blossom.
 
 ### T7-09 — Fold Gateway
 - **Does:** Opens the route to a fourth dimension, provisionally called **the Fold**. It is a prepared expedition gate, not a random world rupture or an automatic end to the campaign.

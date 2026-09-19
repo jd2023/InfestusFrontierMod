@@ -26,6 +26,7 @@ def module_scope(owner):
              f"src/testMod/java/{package}testmod/{owner}/**",
              f"src/testMod/java/{package}testmod/platform/{owner}/**",
              f"src/testMod/resources/{owner}/**", f"assets/provenance/{owner}.md",
+             "src/testMod/resources/content-checkpoint.json",
              f"src/main/java/{package}InfestusFrontier.java",
              "src/main/resources/assets/infestusfrontier/lang/en_us.json",
              "src/main/resources/data/minecraft/tags/block/mineable/*.json",
@@ -33,8 +34,12 @@ def module_scope(owner):
     for kind in ("models/block", "models/item", "textures", "geo", "animations", "blockstates"):
         paths.append(f"src/main/resources/assets/infestusfrontier/{kind}/{owner}/**")
     for kind in ("recipe", "loot_table", "advancement", "tags/block", "tags/item",
-                 "tags/fluid", "tags/entity_type", "modonomicon/books/the_waking_genome"):
+                 "tags/fluid", "tags/entity_type"):
         paths.append(f"src/main/resources/data/infestusfrontier/{kind}/{owner}/**")
+    book = "src/main/resources/data/infestusfrontier/modonomicon/books/the_waking_genome/"
+    paths.extend([book + f"categories/{owner}.json", book + f"entries/{owner}/**"])
+    if owner == "discovery":
+        paths.append(book + "book.json")
     if owner == "campaign":
         return [path for path in paths if not path.startswith(("src/main/", "core/src/main/"))]
     return paths

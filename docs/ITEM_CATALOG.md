@@ -46,6 +46,58 @@ Short recipe labels Bowl, Cyst, Vat, Chrysalis, Mantle and Conditioner mean Cult
 
 One BU equals one mB biomass. A dose/portion is an item, not an unspecified tank volume. Unless stated otherwise, one batch produces one listed item; batch ingredients are consumed, tools explicitly described as tools are retained, and empty bottles/buckets are returned to a reserved output slot. Prepared solids do not decay just because a chunk is unloaded. No inventory ticker is needed.
 
+For listed preparation recipes without an explicit duration, use 20 loaded
+seconds, except the Bowl/Cyst timings above. Unlisted inputs are not silently
+added: a recipe listing no BU or BE costs none. This default does not authorize
+new recipes or substitute for an explicit operating recipe for a service.
+
+| Starter operation | Exact input → output | Loaded duration |
+|---|---|---|
+| Digestive Sac | 1 rotten flesh → 50 BU; no water | 8 s |
+| Digestive Sac | 1 wheat → 100 BU; no water | 2 s |
+| Digestive Sac | 1 harvested Living Wood → 100 BU; no water | 10 s |
+| Membrane Rack | I002 ingredients; no extra BU | 20 s flesh / 40 s leather |
+| Bone Loom | I003 ingredients; no extra water | 20 s |
+| Bio-Furnace | 1 vanilla smelting input + 40 BU → its normal result/XP | 16 s |
+| Compost Gland | 4 leaf blocks or 4 wheat seeds + 100 mB water → 1 bone meal | 20 s |
+
+Only these starter Sac feeds and the native harvest rows are accepted initially.
+Vanilla smelting result/XP follows the selected recipe once; dust uses the
+separate mineral table, not vanilla smelting plus a second recovery reward.
+
+### Managed vegetation allocation
+
+An assigned oak/birch tree reserves 500 mB water + 40 BU per 120 s growth cycle,
+requires light9 and retains its planted trunk/canopy. It earns four growth units
+held until harvest, not a timer-based item drop. Each unit is allocated once:
+one Living Wood grown into an empty declared branch cell, one Resin held by a
+Sap Tap, or one matching sapling in a Canopy Pod. Pod opening transfers that
+same item; ordinary converted logs do not also return vanilla logs. A tree holds
+at most one completed four-unit cycle. All taps/cysts share it; no second cycle
+until harvested. Initial manual log conversion costs one Rooting Gel per log;
+an Arbor Root spends5BU per selected log converted without growth rewards.
+
+Sapping Bush cycles take60s,100mB water and10BU at light9: select2 sweet berries
+or1 string, with one basal cutting retained and at most one pending harvest.
+Contractile Fiber treatment enables string; Honey Culture reduces berry-cycle
+time to50s without changing feed or yield.
+Propagating one extra cutting instead consumes the entire cycle allocation.
+Untreated starter bushes use berries. These outputs do not also create biomass;
+feed must pass through an explicitly supported digestion recipe.
+
+Aquaculture plant mode: one retained basal kelp/seagrass stock in a selected
+3×3×2 source-water habitat +20BU +500mB supplied process water →4 matching
+plant items over60s. Water in the world is habitat, not automatically drained
+into the process tank. A supplied aquatic Harvest Corolla transfers the allocated
+crop for10BU; Cilia collection is paid separately. No fish are created by this
+recipe. Kelp's I052 traits modify this growth row only.
+
+Fishing Polyp: one wheat seed +50BU +one fishing-rod durability over30s →one
+retained fish, cod with probability3/4 or salmon1/4. Require a selected loaded
+5×5×2 source-water area and clear air above; store the chosen result in the
+reserved batch so reload cannot reroll it. No treasure, junk, XP or luck bonus
+in this first recipe; it does not require or duplicate an actual fish entity.
+
 ## 2. T0 — starter items, reagents and hand equipment
 
 | ID | Item | Obtain / batch recipe | Consumed by or used for |
@@ -77,7 +129,7 @@ One BU equals one mB biomass. A dose/portion is an item, not an unspecified tank
 
 | ID | Item | Obtain / batch recipe | Consumed by or used for |
 |---|---|---|---|
-| I020 | Resin | Sap Tap: one supplied tree's allocated growth harvest → one resin portion | Seals and adhesive culture. Exact tree growth budget belongs to the ecology specification; tapping is not free wood plus free biomass plus free resin. |
+| I020 | Resin | Sap Tap: one unit from Managed vegetation allocation → one resin portion | Seals and adhesive culture; tapping shares the tree's finite growth budget. |
 | I021 | Capillary Gel | Cyst: 1 Elastic Gel + 1 Binder + 50 BU → 2 | Biomass Vein and Fuel Papilla tissue grafts; Nutrient Intake; organic pumping upgrades. |
 | I022 | Filter Membrane | Cyst: 1 sand + 1 Sheet + 50 mB water + 25 BU → 1 | Washing/filtration attachments and Fluid Vein treatment. Sand becomes embedded filter material. |
 | I023 | Contractile Fiber | Cyst: 1 string + 1 leather + 1 Binder + 50 BU → 2 | Item Veins, terrain stitches, transport-organ upgrades. |
@@ -129,9 +181,9 @@ The projector refuses when no slot, valid support or armor fuel is available.
 | I054 | Protein Culture Feed | Cyst: 1 raw fish or rotten flesh + 1 Nutrient Mash + 50 mB water → 2 | Animal-stock recipes, larvae. Not edible player food. |
 | I055 | Expedition Ration | Ration Kitchen: 1 cooked beef + 1 baked potato + 1 carrot → 1 ration | Proposed 10 hunger, 12 saturation; real food for player or Feeding Lobe. No extra potion effect. |
 | I056 | Travel Ration | Kitchen: 1 bread + 1 cooked fish + 1 honey bottle → 1, returning bottle | Proposed 8 hunger, 10 saturation; lighter farm recipe, not free speed mutation. |
-| I057 | Mineral Concentrate | Gizzard recipe for named raw ore OR treated Mineral Fragments → that input's accounted concentrate + rock residue | Kidney/smelting. A fragment recipe uses its own remaining recovery allowance, not a second raw-ore bonus. Source-specific yields remain to balance. |
-| I058 | Washed Concentrate | Kidney washes I057 with a declared water dose | Smelting/Separator; mineral removed into tailings is deducted from this output. |
-| I059 | Mineral Tailings | Washing byproduct with bounded source/grade | Separator may recover only its remaining mineral fraction. Spent tailings are inert; no repeat extraction. |
+| I057 | Mineral Concentrate | Gizzard's base four-unit recovered fraction | Release to four matching dust; no second ore-input processing. |
+| I058 | Washed Concentrate | Kidney/Separator's one-unit recovered fraction | Release to one matching dust; no residual recovery allowance. |
+| I059 | Mineral Tailings | Gizzard's four-unit residual parcel, reduced by Kidney/Separator | Recover only the remaining metal at its declared processing stage. |
 | I060 | Rock Residue | Gizzard's accounted non-mineral fraction | Building aggregate or deliberate disposal, not a second ore product or organic biomass feed. |
 | I061 | Washed Iron / Gold / Diamond / Obsidian Portion | Four distinct forms: corresponding ingot/gem/block → Gizzard granulation → Kidney with 100 mB water | One cleaned portion and 100 mB spent wash per source item. Fusion media below, no yield multiplier. |
 | I103 | Mineral Workpiece | Work Bed wraps one idle intact/conditioned mineral specimen with 1 Membrane Sheet → one unstackable workpiece | Another Work Bed unwraps the same target and returns that one Sheet into reserved space. Item Veins, capsules and couriers can carry it. Fixed source/state fields; not a placeable fresh ore item or an arbitrary block-entity container. Wrapping grants no processing counts. |
@@ -163,7 +215,7 @@ Unaccepted samples are not created as loose entities or diverted into ordinary
 inventory. The pouch warns when full or filtered. Players can deliberately
 withdraw samples into vials; those are ordinary droppable items. Samples have no
 idle decay. Plant extraction consumes identified harvested material: wheat,
-oak/birch saplings, kelp and sweet berries identify their corresponding sources.
+oak/birch saplings, kelp, sweet berries and chorus fruit identify their corresponding sources.
 Harvested plant specimens are Fragmented; Dissector does not improve them.
 Generic wood, leather or rotten flesh cannot identify an arbitrary creature.
 
@@ -190,7 +242,7 @@ or cycling an exported record cannot complete an unfinished genome.
 
 | Source class | Coverage target | Examples |
 |---|---|---|
-| Plant | 16 | Wheat, oak, birch, kelp, sweet berry bush |
+| Plant | 16 | Wheat, oak, birch, kelp, sweet berry bush, chorus (End-native) |
 | Ordinary creature | 32 | Cow, rabbit, bat, spider, silverfish, turtle |
 | Complex creature | 128 | Enderman, blaze, shulker, guardian, phantom |
 | Major boss | 1000 | Wither, Ender Dragon, Manyfold |
@@ -277,7 +329,65 @@ missing costs are not zero-cost operations.
 
 | ID | Item or family | Obtain / recipe | Consumer / constraints |
 |---|---|---|---|
-| I125 | Ore Dust [metal-specific family] | Actual eligible ore/raw material through metal-specific recovery recipes | Stored for any compatible current/later smelting recipe. Metal identity retained; eligible materials and treatment compatibility not yet specified. Never obtained as multiply-smeltable dust from ingots. |
+| I125 | Ore Dust [metal-specific family] | Iron, gold and copper through the recovery table below | Metal identity retained. Never obtained as multiply-smeltable dust from ingots. |
+
+Initial recovery recipes support iron, gold and copper only. One input unit is
+one raw item or one intact ordinary/deepslate ore block. An intact block never
+rolls vanilla mining loot: copper receives the same one-unit treatment. Vanilla
+mining remains an alternative source of raw items, including Fortune, not an
+additional roll within this chain. Nether gold ore, storage blocks, ingots and
+foreign ores are not admitted as recovery inputs.
+
+| Operation / required assembly | Input per operation | Output | Cost / loaded time |
+|---|---|---|---|
+| Gizzard, base | 1 input unit or its fractured I108 parcel | 1 I057 (4 recovered units) + 1 I059 tailings parcel (4 residual units) + 1 I060 residue | 20 BU / 8 s |
+| Kidney washing | 1 tailings parcel with 4 residual units + 250 mB water | 1 I058 + parcel with 3 residual units + 250 mB dirty water | 30 BU / 8 s |
+| Separator, base | Parcel with 3 residual units + 1 Leaching Nodule + 250 mB water | 1 I058 + parcel with 2 residual units + 250 mB dirty water | 60 BU + 2000 BE / 12 s |
+| Separator, Auric precision service | Parcel with 2 residual units + 2 Leaching Nodules + 500 mB water | 1 I058 + parcel with 1 residual unit + 500 mB dirty water | 120 BU + 8000 BE / 20 s |
+| Separator, precision and Mantle heat | Parcel with 1 residual unit + 4 Leaching Nodules + 1 Thermal Lining + 1000 mB water | 1 I058 + 1 mineral-depleted I060 residue + 1000 mB dirty water | 240 BU + 32000 BE / 40 s |
+| Gizzard, concentrate release | 1 I057 or 1 I058 | 4 or 1 matching dust respectively | No extra fuel / 1 s |
+
+Residual units and metal are immutable recipe-state fields on I059, not a second
+ore item or a freely editable counter. Each operation replaces its input parcel;
+reject insufficient/wrong residual state. I057/I058 contain only their recovered
+fraction; releasing it consumes the concentrate, never creates more tailings.
+Treating an intact Work Bed ore with I107 makes its fractured parcel eligible for
+Kidney washing; raw-input Gizzard parcels already permit washing. Treatment
+does not add dust by itself. Untreated intact parcels permit the base four dust
+but their residue is inert. All mineral waste remains in reserved outputs.
+
+| Smelting assembly | Dust / ingot | Additional cost per ingot | Loaded time |
+|---|---|---|---|
+| Bio-Furnace | 4 | 40 BU | 16 s |
+| Furnace + Nether Thermal Mantle | 3 | 80 BU + 250 mB steam | 20 s |
+| Mantle + Steam Muscle + supplied electrical port | 2 | 160 BU + 500 mB steam + 8000 BE | 30 s |
+| Previous assembly + isolated Separator precision service | 1 | 320 BU + 1000 mB steam + 32000 BE + 1 Thermal Lining | 45 s |
+
+All rows output one matching ingot and no recoverable metal dust. Steam is
+consumed into the host's reserved spent-steam output for the Condenser. The
+precision attachment consumes 2 Auric Myelin + 2 Filter Membranes once at the
+Chamber; its host must be L1. It grants access to the listed recipes, not passive
+yield. The Separator servicing a smelter cannot simultaneously process tailings.
+Kidney process-water filtration is a separate recipe: 100 mB dirty water +
+1000 BE, 5 s → 100 mB clean water, without consuming a mineral parcel or filter.
+
+### Plant graft traits
+
+I052 preparation takes 20 s with the row's unchanged ingredients and complete
+matching genome. Choose exactly one permanent trait on that planting item;
+grafting an already grafted item refuses. Saved/harvested replacement planting
+stock retains its trait without duplicating the basal stock.
+
+| Eligible planting stock | Trait | Change to its ordinary managed cultivation recipe |
+|---|---|---|
+| Wheat seed, oak/birch sapling, kelp, sweet berry bush | Water thrift | Water cost ×3/4, rounded up; duration ×5/4, rounded up |
+| Same five sources | Rapid growth | Duration ×4/5, rounded up; growth BU ×3/2, rounded up; same yield/water |
+
+Only managed Cultivation Tissue, Arbor Root, Sapping Bush, Aquaculture Bed and
+Chorus Orchard recipes apply these modifiers; vanilla random-tick growth does
+not run a second yield algorithm. Native chorus grafts require End orchard and
+native genetic services and use the same two traits. No Fold grafts in this
+implementation. Reference supply tables use ungrafted planting stock.
 
 ### Mutation grafts
 
@@ -326,6 +436,61 @@ Host rank I can be cultured in the Bowl and applied at the Cradle. Other ranks u
 | I106 | Spent Leach Cake | Crucible retains the spent I105 treatment separately from accounted recovered host residue | Neutralization/disposal. No second terrain harvest or full-charge regeneration; the internal treatment medium is not a world-placeable fluid. |
 
 These ingredients have useful non-armor consumers. Prepared iron reinforces load-bearing organs; gold supports pumps and signals; diamond supports cutting and precise fibers. Higher mineral yield, counter-cap changes and new processing recipes remain separate explicit organ mutations, not automatic consequences of feeding a better metal.
+
+### Thermal and spatial operating recipes
+
+Heat units (HU) are finite thermal-process state, not items or BE. One fuel batch
+charges a Steam Heart's10000HU store: one charcoal →1000HU over10s, or1000mB
+actual lava →8000HU over40s. Reserve heat space first; lava leaves no mineral
+product and a supplied bucket returns empty. No other starter heat fuels.
+
+| Service | Exact operation | Loaded duration |
+|---|---|---|
+| Steam Heart | 100HU +100mB water →100mB pressurized steam | 1 s |
+| Steam Muscle | Host requests steam; consumes the host recipe's stated amount into the same volume of spent steam | Host work duration |
+| Condenser | 100mB spent steam →75mB water; remaining25mB dissipates | 2 s |
+| Relief Chimney | Vent up to100mB steam, no returned product; two clear cells above required | 1 s |
+| Heat-Exchange Gill | Transfer up to100HU from a connected hotter store; receiver gets floor(4×input/5)HU, remainder dissipates | 1 s |
+| Cold Lobe | 100mB clean water +200BE →100mB warmed water and one host's cold-service grant; no extra water | 5 s |
+| Mantle, tempered plate | I072 ingredients +200HU →1 plate | 20 s |
+| Mantle, I073/I074 preconditioning | Listed mineral/binder/lining +100HU →one retained preconditioned portion | 30 s; following Vat stage30s |
+| Separator, I076 preparation | Listed diamond/binders/sheet +4000BE →one retained woven portion | 45 s; following Vat stage45s |
+| Spatial Nursery | I091 listed ingredients +4000BE →1 Spatial Membrane | 40 s |
+| Spatial Conditioner | I092/I093/I094 listed inputs +8000BE →1 selected membrane | 40 s |
+| Phase-Woven Matrix | I095 listed inputs +16000BE →1 matrix | 120 s |
+| Levitation Chamber | 1 shulker stock +200BU +4000BE →one admitted host batch's suspension service | 10 s preparation |
+
+Single-use preconditioned/woven portions are processing states of I073/I074/I076,
+not duplicate finished products. The listed total BU is reserved by the first
+stage; subsequent stages cannot bill it twice or bypass paid preparation.
+I077/I078/I079/I080 precision recipes additionally cost4000/8000/12000/8000BE
+respectively; their listed BU/time remains unchanged (I077 uses20s).
+Cold/suspension grants bind one batch ID for at most4000 loaded ticks, end on
+completion/cancellation and cannot be reused. R3's listed total includes these
+service payments: reserve/debit them once, not again per attached organ. Kidney
+filtration also accepts warmed water at its100mB/1000BE rate.
+
+Steam Vein moves at most100mB/s/route and loses1mB to retained condensate per
+whole100mB moved per route; carry the remainder across requests to prevent
+packet-size exploits. Condensate needs a low-point output before another transfer.
+Steam Heart has16000mB output; Pressure Vesicle holds16000mB. Pressure is
+ceil(100000×contained steam/capacity); warn at80000, Regulator stops new fuel at
+90000. With pressure100000, obstructed relief and retained heat, a200-loaded-tick
+countdown ends in a local vessel rupture; opening relief or removing heat cancels
+the countdown. Rupture spends retained heat/steam without item drops or chain
+explosions; actual biomass in the damaged body enters the bounded spill service.
+Empty ordinary biomass tanks never use these pressure rules.
+
+Each spatial recipe requires a loaded valid anchored body. Four Anchor Roots
+share1BU/s while actively servicing that body; Nursery/Conditioner recipe BU
+already includes it, and the listed cultivation BU includes orchard anchoring.
+Chorus Resonator assigned-process radius is8 blocks; one tuning per resonator.
+Spatial recipe BE includes its correct resonator/isolation service. Simultaneous
+incompatible tunings within that radius refuse, unless a powered Phase Isolator
+encloses the affected formed body. One Isolator admits one body, at most4096cells;
+upkeep is included in listed recipe BE, never a second hidden debit. Native
+generator heat-control/pump/cooling allowances remain exactly those in the
+reference-cycle table, not extra thermal consumption inferred from these rows.
 
 ### Renewable native biomass and power
 
@@ -427,6 +592,52 @@ continue a settled Fold habitat.
 | I100 | Compound Organ Core | Synthesis Heart consumes a listed donor-body recipe | Same placeable item as the resulting named organ, with one designated history owner. No universal core substituting for every recipe. |
 | I101 | Catalyst Culture | Catalyst Lobe's matching stock in a recipe-specific suspension | Recipe reagent service, not an immortal reusable catalyst. Stock and feed are consumed at declared rates. |
 | I102 | Attuned Destination Seed | End Conditioner: 1 ender pearl + 1 Passenger Membrane + 1 Precision Membrane + 2 each silverfish, blaze and enderman stock + 500 BU, with all three genomes complete and a surveyed Fold resonance | Prepared Fold Gateway destination; no Fold-native material or boss loot needed for first entry. |
+
+### Compound-organ commissioning
+
+These are Synthesis Heart recipes in the End on mature Anchored Substrate.
+Each needs two Anatomy Sockets and one supplied Catalyst Lobe. Donor cores must
+be idle, drained and unreserved. The primary donor must be L2; support donors
+need no level. All named genomes must be complete in a connected bank.
+
+| Result (I100 alias) | Actual donors consumed into the assembly | Prepared inputs | Cost / loaded time |
+|---|---|---|---|
+| Compound Bio-Furnace | 1 Bio-Furnace + 1 Hearth Lung | 2 Tempered Bone Plates + 2 precision-conditioned Spatial Membranes + 1 spider Catalyst Culture | 8000 BU + 80000 BE / 120 s |
+| Compound Mineral Gizzard | 1 Mineral Gizzard + 1 Washing Kidney | 2 Tempered Bone Plates + 2 precision-conditioned Spatial Membranes + 1 silverfish Catalyst Culture | 8000 BU + 80000 BE / 120 s |
+
+The resulting placeable item is the primary organ's item with a compound-body
+form, not a universal ingredient. It contains exactly the two original core
+identities/histories. Installation assigns each to a separate physical Anatomy
+Socket in a 5×5 ribbed body; supplies, outputs, reservations and work remain
+separate. Dismantling returns that same packed body only after both sockets are
+drained; it cannot also drop donor cores. No transport, treatment or storage
+operation is implicit. Both bodies accept the two expression profiles below.
+
+A Lobe consumes 2 matching Genetic Stock + 2 Protein Culture Feed + 250 mB water
++ 200 BU + 2000 BE over 20 s to retain one source-specific Catalyst Culture.
+Capacity is four cultures; output-full stops preparation. Each commissioning
+consumes one, never returns its stock. A running compound body consumes one
+matching culture per 600 loaded active ticks shared by its two sockets; pause
+when exhausted. Pausing/reload retains remaining paid service ticks.
+
+| Installed expression profile | Effect on each installed working organ | Install at idle Heart |
+|---|---|---|
+| Economy (initial) | Work duration ×5/4; recipe BU ×4/5; all other inputs/yields unchanged | Included in commissioning |
+| Throughput | Work duration ×3/4; recipe BU ×3/2; all other inputs/yields unchanged | 2 Contractile Fibers + 1 Auric Myelin + 1000 BU + 10000 BE, 30 s |
+
+Round time/cost upward; these modifiers apply once after the organ's own earned
+choices. Profiles change operation, never irreversible donor traits or armor.
+Switching requires both sockets idle/drained: 2000 BE, 100 loaded ticks, no work
+during changeover. Survey Gel treatment costs one gel and reduces changeover to
+60 ticks without reducing energy. Removal/reload cannot reset payment or refund
+a completed changeover. Only this Economy/Throughput pair is supported initially.
+
+Organ Transplanter accepts a single Bio-Furnace or Mineral Gizzard core into an
+empty matching ordinary/compound socket: 500 BU, 200 loaded ticks, both endpoints
+within 8 blocks and loaded. Move the same identity, history and traits; reject
+occupied, incompatible or reserved receivers. A packed compound body is not a
+single-core donor. Structure Grower performs paid placement through its existing
+interface; no free building materials or arbitrary block-entity relocation.
 
 ## 7. T8–T9 — Fold ecology and post-boss materials
 

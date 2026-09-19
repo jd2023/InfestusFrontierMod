@@ -51,6 +51,20 @@ class PlanTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'IF-999'):
             self.check()
 
+    def test_campaign_cannot_own_production_content(self):
+        for section in ('items', 'mutations', 'blocks'):
+            with self.subTest(section=section):
+                plan = copy.deepcopy(self.plan)
+                tasks = copy.deepcopy(self.tasks)
+                tasks[2]['Owner'] = 'campaign'
+                if section == 'blocks':
+                    tasks[2]['Blocks'] = 'T1-01'
+                else:
+                    symbol = next(iter(plan[section]))
+                    plan[section][symbol] = 'IF-003'
+                with self.assertRaisesRegex(ValueError, 'campaign.*production'):
+                    validate_plan(tasks, plan, {'I000', 'I001'}, {'M1'})
+
     def test_overlapping_exclusion_refused(self):
         self.plan['excluded_items'] = ['I000']
         with self.assertRaisesRegex(ValueError, 'I000'):

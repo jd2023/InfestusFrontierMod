@@ -39,6 +39,7 @@ def validate_plan(tasks, plan, items, families):
     if set(plan['mutations']) != ranks:
         raise ValueError(f'Mutation ownership mismatch: {ranks ^ set(plan["mutations"])}')
     providers, ancestors = {}, {}
+    campaign = {task['id'] for task in tasks if task.get('Owner') == 'campaign'}
     for task in tasks:
         identity = task['id']
         parents = task['dependencies']
@@ -46,6 +47,8 @@ def validate_plan(tasks, plan, items, families):
             raise ValueError(f'{identity}: dependency must precede task')
         ancestors[identity] = set(parents).union(*(ancestors[parent] for parent in parents))
         for block in [] if task['Blocks'] == 'none' else task['Blocks'].split(', '):
+            if identity in campaign:
+                raise ValueError(f'{identity}: campaign cannot own production content {block}')
             if block in providers:
                 raise ValueError(f'Duplicate block owner: {block}')
             providers[block] = identity
@@ -53,6 +56,8 @@ def validate_plan(tasks, plan, items, families):
         for symbol, owner in plan[section].items():
             if not isinstance(owner, str) or owner not in ancestors:
                 raise ValueError(f'Unknown owner {owner}: {symbol}')
+            if section != 'services' and owner in campaign:
+                raise ValueError(f'{owner}: campaign cannot own production content {symbol}')
             if symbol in providers:
                 raise ValueError(f'Duplicate content symbol: {symbol}')
             providers[symbol] = owner

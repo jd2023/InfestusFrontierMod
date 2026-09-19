@@ -62,6 +62,21 @@ Evidence: rules
             with self.assertRaises(ValueError):
                 check_review(broken, "IF-001", "abc")
 
+    def test_guide_scope_matches_resource_layout_without_neighbor_access(self):
+        root = 'src/main/resources/data/infestusfrontier/modonomicon/books/the_waking_genome/'
+        for owner in ('processing', 'discovery'):
+            task = parse_tasks(self.packet().replace('["src/processing/**"]',
+                               f'["@module:{owner}"]'))[0]
+            check_scope(task, [root + f'categories/{owner}.json',
+                               root + f'entries/{owner}/first_recipe.json'])
+            with self.assertRaises(ValueError):
+                check_scope(task, [root + 'entries/equipment/armor.json'])
+            if owner == 'discovery':
+                check_scope(task, [root + 'book.json'])
+            else:
+                with self.assertRaises(ValueError):
+                    check_scope(task, [root + 'book.json'])
+
     def test_review_without_supporting_evidence_is_rejected(self):
         from ktask_contracts import CHECKS
         verdict = dict(task='IF-001', candidate='abc', verdict='accept', findings=[],
