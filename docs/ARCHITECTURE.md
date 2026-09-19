@@ -126,6 +126,127 @@ failure stops freight admission with cargo retained. No timeout invents success.
 Test process termination at every commit boundary, truncated final records,
 duplicate acknowledgments, slow-disk back-pressure and snapshot replacement.
 
+## Integration bootstrap harness
+
+Integration owns library-profile selection, runtime identity checks, isolated
+process lifecycle and bootstrap evidence. IF-001 implements and tests this harness;
+IF-127 supplies the four-profile qualification manifest and runs it after acceptance.
+There are no recipe, item, armor-rank or gameplay registrations in either packet.
+
+`gradle/integration/bootstrap.gradle` wires the Gradle tasks;
+`gradle/integration/harness.py` owns launch/readiness/connection/capture/shutdown
+and result validation; `gradle/integration/test_harness.py` owns fast fixtures.
+Fixture child programs/data live under `gradle/integration/fixtures/**`.
+`scripts/check_boundaries.py` owns static boundary checks and its `--self-test`.
+Development Java hooks live only in
+`src/testMod/java/org/jd/infestusfrontier/testmod/integration/**`; shared fixture
+resources live in `src/testMod/resources/integration/**`. Client automation is
+packaged separately for disposable clients; neither it nor the existing testMod
+is installed on the packaged server or included in the release JAR. Any runtime
+identity diagnostic adapter lives in the production integration package, exposes
+only loaded IDs/versions and owns no gameplay state. Build-file changes only wire
+these tasks/source sets, pinned dependencies, verification metadata and fixtures;
+existing acceptance machinery and checks remain intact.
+
+The task inputs are `modProfile=required|jei|curios|combined` (default required),
+`scenario=bootstrap`, and an output directory (`captureDir` for captureClient;
+otherwise `build/integration/evidence/<profile>/<task>`). Invalid inputs fail before
+launch. `integrationProfileFile`, when supplied, is a JSON object with `schema: 1`,
+`scenario: "bootstrap"`, `profiles: ["required","jei","curios","combined"]`,
+`seed: 11`, and `deadlinesSeconds` containing `readiness: 120`, `join: 30`,
+`capture: 30`, `disconnect: 30`, `shutdown: 30`, `cleanup: 5`, `profileSmoke: 180`,
+`clientScenario: 420`. Validate these fields and CLI agreement before launch.
+Absence of this file uses the same built-in bootstrap defaults, allowing IF-001
+to test the harness before the IF-127 qualification file exists.
+
+Every command writes a fresh `result.json` with schema version, run ID, profile,
+scenario, Java version, candidate identity supplied by the evidence runner (or
+Git tree plus dirty-diff digest for local diagnosis), release JAR SHA-256 when
+used, runtime mod lists by process, assertion outcomes, child PIDs/exit codes,
+phase durations, artifact paths/digests and final success/failure. Logs are kept
+as `server.log` and/or `client.log`. Success requires the current run's evidence
+and reaped processes; stale files, empty/truncated evidence, timeout, missing
+assertion or nonzero ordinary child exit produce failure and a nonzero task exit.
+Expected negative loader exits are handled only by the explicit omission fixture.
+
+Runtime mod lists come from the running loader, never inferred from Maven
+resolution or copied from the selected profile. Assert `minecraft` 1.21.1,
+`neoforge` 21.1.249, `infestusfrontier` at the built `mod_version`, `modonomicon`
+1.120.4 and `geckolib` 4.9.2. Assert `jei` 19.56.0.438 exactly when selected and
+`curios` 9.5.1+1.21.1 exactly when selected; require their absence otherwise.
+Check client and server lists separately. Required transitive mod identities are
+recorded and matched to the pinned resolved artifacts/verification metadata;
+they are not forbidden by the name "required". Development fixture IDs are
+explicitly identified on development runs/automated clients and absent from the
+packaged server. Do not silently change pins or treat a missing optional selected
+mod as success.
+
+| Command | Observable result |
+|---|---|
+| `./gradlew checkBoundaries` | Check production core imports/classpath and transitive server-bootstrap references, then run checker fixtures. |
+| `./gradlew integrationHarnessTest` | Run the fast supervisor/evaluator fixtures without launching Minecraft. |
+| `./gradlew profileSmoke -PmodProfile=<p>` | Start an isolated development GameTest server in that profile, collect actual loader identities, execute at least one real world/server-state assertion (including the existing required GameTest), see the required-test success summary, then stop cleanly. Dependency resolution or a socket opening alone is insufficient. |
+| `./gradlew captureClient -PmodProfile=<p> -Pscenario=bootstrap -PcaptureDir=<dir>` | Launch a packaged server and disposable client; after resources load capture `bootstrap-title.png`, join the server and capture `bootstrap-world.png` with the HUD/world visible. Both are fresh readable 1280x720 PNGs; report their digests and loaded client/server identities in result.json. Missing-texture/resource-load errors fail; review inspects actual images. |
+| `./gradlew packagedServerSmoke -PmodProfile=<p>` | Install the release JAR and pinned profile libraries in a disposable dedicated server; await readiness, join using a real Minecraft client, disconnect, then stop both cleanly. Assert server-side player UUID/name join and subsequent removal plus client play-state entry/exit. Server-list ping, TCP connect or simulated player objects cannot replace this evidence. |
+| `./gradlew profileSmoke -PmodProfile=required -PomitRequired=<id>` | Only `modonomicon` or `geckolib` is allowed. Remove that actual runtime artifact, retain the release mod's required-dependency declaration, require loader refusal before world readiness and a diagnostic naming both the missing ID and dependent mod. Wrapper exits zero only for that expected refusal and cleanup; crash/timeout/generic failure is insufficient. |
+
+Bootstrap uses seed 11, a default superflat disposable Overworld and the fixture
+player's spawn camera at yaw 0, pitch 15 for the world image. Bind the server to loopback
+on an allocated port, allow only the fixture player, and disable online-account
+authentication solely in this owned disposable server. The client runs with an
+isolated game directory and deterministic fixture identity; no personal account,
+ordinary save or production-server access is required. Wait for rendered frames
+and observed player state, not arbitrary sleeps. A display helper is allowed when
+needed and shares the scenario's ownership and cleanup.
+
+Run scenarios serially: at most one dedicated server, one client, one world and
+one display helper at a time, with at most four owned helper descendants and no
+nested Gradle invocations. ProfileSmoke needs only its server. Readiness is bounded
+by 120 seconds per process, join/capture/disconnect by 30 seconds per phase,
+graceful shutdown by 30 seconds for all children together, then forced termination
+and reaping by 5 seconds. Every failure or interrupted launch cleans the entire
+owned process group, including grandchildren, and releases its port. Failure to
+clean up remains a failure. Entire profileSmoke is bounded by 180 seconds and each
+client scenario by 420 seconds, including cleanup; setup/downloads are separately
+bounded by 600 seconds per qualification matrix. No automatic retry. Each stream
+log is capped at 8 MiB, result JSON at 1 MiB, captures at 4 MiB each; overflow fails
+with cleanup rather than silently discarding evidence. Poll at most 10 times/second.
+Only owned run directories under `build/integration/runs` may be created/removed;
+keep result evidence outside them. At most one such world is retained at a time.
+
+Fast fixtures exercise the same supervisor and evaluator through injected clock,
+process and evidence interfaces. Require positive completion and individual
+readiness-timeout, failed-join (including ping without player login), absent/stale
+capture, wrong-runtime-version and shutdown-timeout assertions. Each failure names
+its phase, exits unsuccessfully, emits no success receipt, and proves no live
+owned child/grandchild or listening port remains. Include real fixture subprocesses
+for graceful stop and forced cleanup; fake-clock tests alone do not prove reaping.
+Use 1-second fixture readiness/shutdown limits and a 2-second cleanup limit;
+the entire fixture suite has a 60-second deadline. No Minecraft/downloads in it.
+`-PintegrationFixture=wrong-mod-version` runs a deliberately invalid synthetic
+result through the production evaluator and must fail nonzero at the mod ID;
+the ordinary fast suite asserts this rejection as a passing regression.
+
+Boundary fixtures include a pure core success case, a rejected core third-party
+type (including fully qualified references), direct and indirect server-to-client
+reference failures with the reference path in diagnostics, and a valid client-only
+adapter unreachable from server roots. Dist-scoped client registration is allowed;
+server bootstrap/common initialization must not resolve client implementations.
+Check all production server entry points and registration roots, not just imports
+in the entry-point file. Rejection of every client import is not a valid checker.
+
+`verifyAll` adds checker self-tests, integrationHarnessTest and required-profile
+smoke without removing its existing core, distribution or GameTest checks. Its
+smoke always uses required, independent of a caller's profile selection; reuse the
+existing required GameTest run where possible. Full profile captures and packaged
+server runs are recorded task evidence, not four extra copies of the full gate.
+IF-127 runs four times (180+420+420) seconds at most: 4080 seconds runtime, plus
+600 seconds preparation inside a 4800-second matrix deadline. Reserve 1200 seconds
+for the existing gate within the unchanged 7200-second worker budget. Qualification
+has no production-edit scope; changed code invalidates its evidence and requires
+a scoped repair before requalification. These are execution ceilings, not measured
+performance claims.
+
 ## Enforcement and growth
 
 The first production task adds import/package checks, including a deliberately

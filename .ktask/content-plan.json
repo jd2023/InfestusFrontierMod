@@ -253,6 +253,8 @@
     "B8.III": "IF-063"
   },
   "services": {
+    "bootstrap_profile_harness": "IF-001",
+    "qualified_bootstrap_profiles": "IF-127",
     "complex_dna": "IF-099",
     "end_stock": "IF-100",
     "boss_dna": "IF-102",
@@ -269,6 +271,12 @@
     "end_power": "IF-126"
   },
   "requires": {
+    "IF-127": [
+      "bootstrap_profile_harness"
+    ],
+    "IF-108": [
+      "qualified_bootstrap_profiles"
+    ],
     "IF-112": [
       "I072",
       "I063",

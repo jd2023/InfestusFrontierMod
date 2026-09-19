@@ -24,10 +24,25 @@ Depends: IF-094
 Spec: docs/DEPENDENCIES.md, docs/ARCHITECTURE.md
 Blocks: none
 Scope: ["@module:integration","build.gradle","gradle.properties","settings.gradle","gradle/**","src/main/templates/**","scripts/check_boundaries.py"]
-Contract: Install DEPENDENCIES pins and verification metadata. Add Gradle tasks checkBoundaries, profileSmoke, captureClient and packagedServerSmoke. -PmodProfile=required|jei|curios|combined selects required libraries only, +JEI, +Curios, or +both; all four retain Modonomicon/GeckoLib. -PomitRequired=modonomicon|geckolib is a negative loader fixture only. Capture uses -PcaptureDir and -Pscenario=bootstrap; packaged server runs the release JAR, never testMod. Boundary checker rejects core external imports and client references reachable from server bootstrap. verifyAll includes checker/unit fixtures and required-profile smoke; full four-profile captures/server runs are task evidence.
-Red: An intentionally imported client class in server code or third-party type in core fails the boundary check; missing required library gives the expected loader diagnostic.
-Accept: Run ./gradlew checkBoundaries and profileSmoke for each profile on Java21, captureClient for each profile with actual loaded-mod identities, and packagedServerSmoke for each profile. Assert server readiness, connect/disconnect and clean stop; development profile GameTests execute a real server assertion. Verify both missing-required-library diagnostics and release JAR exclusion of testMod. Add checks to verifyAll, not a second full gate.
-Bounds: One disposable world/process per profile; 120 s readiness and 30 s shutdown deadlines; no ordinary save access.
+Contract: Install DEPENDENCIES pins and verification metadata; implement the Integration bootstrap harness contract in ARCHITECTURE. Own its first-use process supervisor, evidence evaluator and fixtures under gradle/integration/**, runtime adapters under the integration module and boundary checker in scripts/check_boundaries.py. Add checkBoundaries, integrationHarnessTest, profileSmoke, captureClient and packagedServerSmoke. -PmodProfile=required|jei|curios|combined selects the required libraries, +JEI, +Curios or +both; default required, invalid values fail before launch. Both required libraries remain in all supported profiles. -PomitRequired=modonomicon|geckolib is only a negative profileSmoke loader fixture. Capture uses -PcaptureDir and -Pscenario=bootstrap. Packaged server uses the release JAR and an actual disposable Minecraft client join/disconnect, never testMod on the server. verifyAll includes fast boundary/harness fixtures and required-profile smoke; preserve all existing checks. IF-127 owns full matrix qualification after this harness is accepted.
+Red: Record failing boundary fixtures for core third-party imports, direct server client references and an indirect server-to-common-helper-to-client reference; a valid isolated client-only adapter must pass. Record supervisor/evaluator failures for readiness timeout, failed player connection, missing capture and shutdown timeout, each asserting child cleanup and no success receipt. Omit each required library in turn and require its named loader diagnostic rather than a generic launch failure.
+Accept: On Java21 run python3 scripts/check_boundaries.py --self-test, ./gradlew checkBoundaries integrationHarnessTest, ./gradlew profileSmoke -PmodProfile=required, ./gradlew captureClient -PmodProfile=required -Pscenario=bootstrap -PcaptureDir=build/integration/evidence/required/capture, and ./gradlew packagedServerSmoke -PmodProfile=required. Run ./gradlew profileSmoke -PmodProfile=required -PomitRequired=modonomicon and again with geckolib; the negative-fixture wrapper succeeds only after proving the expected loader failure and cleanup. Inspect fresh bootstrap PNGs and runtime ID/version evidence. Assert real GameTest server state, player join then disconnect, clean stop and release JAR exclusion of testMod/fixture classes. Run ./.ktask/verify.sh; no second full gate. Commands and artifact schema are specified in ARCHITECTURE and must exist before IF-127.
+Bounds: Serial scenarios; at most one disposable dedicated server, one disposable client and one owned world concurrently per profile, plus bounded launcher/display helpers. Readiness 120 s/process, join/capture/disconnect 30 s each, graceful shutdown 30 s then forced cleanup/reaping 5 s. Whole profileSmoke <=180 s; captureClient or packagedServerSmoke <=420 s including cleanup; fast fixtures <=60 s. No ordinary saves or background runtime processes. Required-profile evidence and both negative fixtures have <=1800 s runtime budget; build preparation and full gate remain within the unchanged 7200 s worker budget.
+Evidence: integration, visual
+
+---
+
+IF-127 Qualify the four bootstrap library profiles
+Milestone: M0
+Owner: integration
+Depends: IF-001
+Spec: docs/DEPENDENCIES.md, docs/ARCHITECTURE.md
+Blocks: none
+Scope: ["src/testMod/resources/integration/bootstrap-profiles.json"]
+Contract: Add the fixed qualification manifest consumed by the accepted IF-001 harness: schema 1, scenario bootstrap, ordered profiles required/jei/curios/combined, seed 11 and the ARCHITECTURE deadlines. Freeze the candidate before evidence. Run the existing harness and evaluators for all four profiles; no harness, pin, production or gate changes. This packet completes all four-profile smoke, capture and packaged-server obligations; missing-required-library fixtures remain negative tests, never extra supported profiles.
+Red: Run ./gradlew integrationHarnessTest -PintegrationFixture=wrong-mod-version; the production evaluator must exit nonzero for a synthetic runtime version differing from the pin, naming the mod ID. The ordinary fast suite asserts that rejection as a passing regression. Do not alter library pins or the final qualification profile to manufacture a failure.
+Accept: Run ./gradlew checkBoundaries integrationHarnessTest and, for each p in required, jei, curios, combined, ./gradlew profileSmoke -PmodProfile=<p>, ./gradlew captureClient -PmodProfile=<p> -Pscenario=bootstrap -PcaptureDir=build/integration/evidence/<p>/capture, and ./gradlew packagedServerSmoke -PmodProfile=<p>. Each command consumes -PintegrationProfileFile=src/testMod/resources/integration/bootstrap-profiles.json and rejects disagreement with the CLI. Inspect both captures for each profile; require exact selected loaded-mod IDs/versions, absent unselected optionals, real GameTests, actual player join/disconnect, readiness and clean stop. Re-run both IF-001 negative loader fixtures through fast regression coverage; retain IF-001 real loader evidence. Run ./.ktask/verify.sh and verifyDistribution. Artifacts identify the frozen candidate and release JAR digest; no success claim for a partial matrix or stale capture.
+Bounds: Same topology and per-command deadlines as IF-001. Four serial profiles cost at most 4*(180+420+420)=4080 s; allow 600 s preparation inside a 4800 s matrix deadline including cleanup. Reserve 1200 s for the existing full gate within the configured 7200 s worker budget; no retries or deadline increases. Engineering failures return for scoped repair, never reduced assertions or omitted profiles.
 Evidence: integration, visual
 
 ---
@@ -35,7 +50,7 @@ Evidence: integration, visual
 IF-108 Incremental content coverage harness
 Milestone: M0
 Owner: integration
-Depends: IF-001
+Depends: IF-127
 Spec: docs/BLOCK_CATALOG.md, docs/ITEM_CATALOG.md
 Blocks: none
 Scope: ["@module:integration","scripts/check_content_coverage.py","scripts/test_content_coverage.py","build.gradle","src/testMod/resources/content-checkpoint.json"]
