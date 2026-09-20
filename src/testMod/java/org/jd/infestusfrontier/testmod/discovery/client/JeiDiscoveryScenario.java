@@ -11,12 +11,12 @@ import net.minecraft.resources.ResourceLocation;
 @JeiPlugin
 public final class JeiDiscoveryScenario implements IModPlugin {
     private static IJeiRuntime runtime;
-    private static boolean opened;
+    private static String opened = "";
     private static boolean pointerMoved;
     @Override public ResourceLocation getPluginUid() { return ResourceLocation.parse("infestusfrontier_client:discovery"); }
     @Override public void onRuntimeAvailable(IJeiRuntime value) { runtime = value; }
 
-    static boolean prepare(Minecraft game) {
+    static boolean prepare(Minecraft game, String typePath) {
         if (runtime == null) return false;
         var type = runtime.getRecipeManager().getRecipeType(ResourceLocation.parse("infestusfrontier:culture_bowl")).orElseThrow();
         long expected = org.jd.infestusfrontier.processing.api.CultureBowlRecipes.all().values().stream()
@@ -26,7 +26,7 @@ public final class JeiDiscoveryScenario implements IModPlugin {
         verifyIngredients(type);
         verifyPreparation("membrane_rack", "I002");
         verifyPreparation("bone_loom", "I003");
-        if (opened) {
+        if (opened.equals(typePath)) {
             if (game.screen == null || !game.screen.getClass().getName().contains("RecipesGui"))
                 throw new IllegalStateException("JEI recipe browser did not open");
             if (!pointerMoved) {
@@ -40,8 +40,10 @@ public final class JeiDiscoveryScenario implements IModPlugin {
             }
             return game.mouseHandler.xpos() < 20 && game.mouseHandler.ypos() < 20;
         }
-        runtime.getRecipesGui().showTypes(List.of(type));
-        opened = true;
+        runtime.getRecipesGui().showTypes(List.of(runtime.getRecipeManager().getRecipeType(
+                ResourceLocation.parse("infestusfrontier:" + typePath)).orElseThrow()));
+        opened = typePath;
+        pointerMoved = false;
         return false;
     }
 
@@ -61,11 +63,34 @@ public final class JeiDiscoveryScenario implements IModPlugin {
             checkPreparationItems(ingredients.getIngredients(mezz.jei.api.recipe.RecipeIngredientRole.OUTPUT), recipe.outputs());
             int water = 0;
             for (var ingredient : ingredients.getIngredients(mezz.jei.api.recipe.RecipeIngredientRole.INPUT)) {
-                if (ingredient.getIngredient() instanceof net.neoforged.neoforge.fluids.FluidStack fluid) water += fluid.getAmount();
+                if (ingredient.getIngredient() instanceof net.neoforged.neoforge.fluids.FluidStack fluid) {
+                    if (!fluid.is(net.minecraft.world.level.material.Fluids.WATER)) throw new IllegalStateException("Wrong preparation fluid");
+                    water += fluid.getAmount();
+                }
             }
             if (water != recipe.fluidInputs().getOrDefault("water", 0)) {
                 throw new IllegalStateException("JEI preparation water differs for " + catalogId);
             }
+            var rendered = new RecordedLabels(net.minecraft.client.Minecraft.getInstance());
+            ((mezz.jei.api.recipe.category.IRecipeCategory) category).draw(displays.get(route), null, rendered, -1, -1);
+            String duration = net.minecraft.network.chat.Component.translatable("jei.infestusfrontier.duration",
+                    recipe.routes().get(route).workUnits()
+                            / org.jd.infestusfrontier.processing.api.PreparationRecipes.TICKS_PER_SECOND).getString();
+            String biomass = net.minecraft.network.chat.Component.translatable("jei.infestusfrontier.biomass",
+                    recipe.fluidInputs().getOrDefault("biomass", 0)).getString();
+            if (!rendered.labels.contains(duration) || !rendered.labels.contains(biomass)) {
+                throw new IllegalStateException("JEI drawn duration/biomass differ for " + catalogId + ": " + rendered.labels);
+            }
+        }
+    }
+
+    private static final class RecordedLabels extends net.minecraft.client.gui.GuiGraphics {
+        final java.util.List<String> labels = new java.util.ArrayList<>();
+        RecordedLabels(Minecraft game) { super(game, game.renderBuffers().bufferSource()); }
+        @Override public int drawString(net.minecraft.client.gui.Font font, net.minecraft.network.chat.Component text,
+                int x, int y, int color, boolean shadow) {
+            labels.add(text.getString());
+            return 0;
         }
     }
 

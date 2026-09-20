@@ -70,12 +70,32 @@ class VisualSetupTest(unittest.TestCase):
             self.assertEqual([], harness.visual_setup_captures(root, {"gameTest": []}))
             self.assertEqual(["ecology-underside.png"],
                              harness.visual_setup_captures(root, {"gameTest": ["substrate.use"]}))
+            fixture["captures"] = [f"view-{i}.png" for i in range(24)]
+            path.write_text(json.dumps(fixture))
+            self.assertEqual(fixture["captures"],
+                             harness.visual_setup_captures(root, {"gameTest": ["substrate.use"]}))
             for names in (["../escape.png"], ["bootstrap-world.png"], ["same.png"] * 2,
-                          [f"view-{i}.png" for i in range(17)]):
+                          [f"view-{i}.png" for i in range(25)]):
                 fixture["captures"] = names
                 path.write_text(json.dumps(fixture))
                 with self.assertRaisesRegex(harness.HarnessFailure, "visual setup"):
                     harness.visual_setup_captures(root, {"gameTest": ["substrate.use"]})
+
+    def test_capture_bound_is_shared_across_owners(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            for owner in ("ecology", "processing"):
+                path = root / f"src/testMod/resources/{owner}/visual-setup.json"
+                path.parent.mkdir(parents=True)
+                fixture = {"requires": f"{owner}.use", "commands": ["say fixture"],
+                           "captures": [f"{owner}-{i}.png" for i in range(12)]}
+                path.write_text(json.dumps(fixture))
+            requirements = {"gameTest": ["ecology.use", "processing.use"]}
+            self.assertEqual(24, len(harness.visual_setup_captures(root, requirements)))
+            fixture["captures"].append("processing-extra.png")
+            path.write_text(json.dumps(fixture))
+            with self.assertRaisesRegex(harness.HarnessFailure, "excessive.*captures"):
+                harness.visual_setup_captures(root, requirements)
 
     def test_rejects_excessive_or_multiline_commands(self):
         for commands in (["say one\nsay two"], ["say test"] * 17):

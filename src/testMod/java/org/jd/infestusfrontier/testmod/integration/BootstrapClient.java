@@ -73,7 +73,7 @@ public final class BootstrapClient {
                                 .map(view -> new UiCapture(scene, view))).toList();
                         var names = java.util.stream.Stream.concat(detailViews.stream().map(capture -> capture.view().filename()),
                                 uiCaptures.stream().map(capture -> capture.view().filename())).toList();
-                        if (names.size() > 16 || names.stream().distinct().count() != names.size()) {
+                        if (names.size() > 24 || names.stream().distinct().count() != names.size()) {
                             throw new IllegalStateException("Excessive or duplicate detail captures");
                         }
                         stage = Stage.WORLD_RENDER;

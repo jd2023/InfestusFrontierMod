@@ -141,12 +141,14 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Does:** Stretches cultivated skin over a bone rack to make the common flexible construction material.
 - **Input → output:** Rotten flesh + string + water → Membrane Sheets; leather can replace flesh for a slower, low-biomass recipe.
 - **Create:** 2 sticks + 2 bones + 1 Spore Culture.
+- **Hand controls:** Load ingredients and water by hand; empty-hand use starts a batch. Sneak-use with an empty hand collects one stack while idle, taking finished output first and otherwise returning unused inputs.
 - **Growth:** Choose batch speed or water economy. Add a Hearth Lung for faster drying; thermal membranes are a later, distinct Nether-grown material, not an automatic level reward.
 
 ### T0-06 — Bone Loom
 - **Does:** Grows curved plates and load-bearing ribs from existing calcium, rather than fabricating mineral mass from biomass.
 - **Input → output:** 1 bone + 50 BU → 1 Bone Plate. Bone blocks require a separately accounted calcium recipe, not an assumed unpacking into nine bones. A calcite recipe uses extra biomass to supply the organic binder.
 - **Create:** 1 Organ Bud + 2 bones + 2 sticks.
+- **Hand controls:** Load bones and biomass buckets by hand; empty-hand use starts a batch. Sneak-use with an empty hand collects one stack while idle, taking finished output first and otherwise returning unused inputs. Biomass buckets share the portable-transfer admission and successful-transfer discovery rules.
 - **Growth:** Choose speed or biomass economy. Ferrocyte Paste treatment produces reinforced plates using additional prepared iron; adding frame blocks increases batch size, not mineral yield.
 
 ### T0-07 — Bio-Furnace

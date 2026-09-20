@@ -17,7 +17,7 @@ import org.jd.infestusfrontier.processing.menu.BowlSnapshotPayload;
 import org.jd.infestusfrontier.processing.menu.CultureBowlMenu;
 import org.jd.infestusfrontier.discovery.api.DiscoveryObserver;
 
-/** Registers only the Bowl and products with implemented Bowl producers. */
+/** Registers implemented preparation organs and their products. */
 public final class ProcessingModule {
     private final DeferredRegister.Blocks blocks = DeferredRegister.createBlocks("infestusfrontier");
     private final DeferredRegister.Items items = DeferredRegister.createItems("infestusfrontier");
@@ -80,7 +80,7 @@ public final class ProcessingModule {
             java.util.function.Supplier<PreparationBlock> block, PreparationOrgan organ,
             java.util.function.Supplier<BlockEntityType<PreparationBlockEntity>> entityType) {
         return BlockEntityType.Builder.of(
-                (pos, state) -> new PreparationBlockEntity(pos, state, entityType, organ), block.get()).build(null);
+                (pos, state) -> new PreparationBlockEntity(pos, state, entityType, organ, discovery), block.get()).build(null);
     }
 
     public void register(IEventBus bus) {

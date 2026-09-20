@@ -141,6 +141,26 @@ hand loading/collection, tick completion, save/reload, recovery, corrupt saves a
 cross-dimension contention. The connected client fixture observes the Bowl models
 and all four collected material icons in a disposable server scene.
 
+## Membrane and skeletal preparation adapters
+
+Rack and Loom compose `BatchWork` with the processing-owned `PreparationRecipes`
+catalog. Their strict schema-1 codec bounds state to four item slots, one 1,000-unit
+tank, one reservation and three history choices. Active recovery must match a
+catalog route. Rejected payloads remain frozen through save and recovered placement.
+One stateful drop carries both the contents and history; placement consumes it.
+Idle collection returns one stack, prioritizing output; active reservations lock
+all hand transfers. Only loaded, rooted active organs advance through the existing
+16-completion server quota. There is no additional scheduler or offline work.
+Loom deposits invoke `BiomassBucketTransfer`, which owns the portable admission,
+hand exchange and discovery credit also used by Sac and Bladder. The destination
+callback performs one atomic BatchWork insertion without exposing its mutable store.
+
+Gameplay tests exercise all three routes across active reload, recovered placement,
+exact completion and completed recovery, plus malformed payload preservation,
+clog recovery and shared player/server transfer contention. Client evidence includes
+nearby block models, inventory icons, each guide route and the actual optional JEI
+categories. JEI checks inspect rendered duration/biomass labels as well as ingredients.
+
 ## Starter biomass adapter
 
 Storage extends `QuantityStore` reservations to finite fluid outputs; digestion and
@@ -391,7 +411,7 @@ join. Each names an active GameTest assertion and at most 16 single-line command
 of 256 characters; all active fixtures together admit at most 64 commands. The
 client's development-only `ContentVisualScenario` providers wait for the resulting
 world/inventory packets before rendering/capture, under the existing capture
-deadline. Owners may additionally declare up to 16 unique detail capture names
+deadline. Owners may additionally declare up to 24 unique detail capture names
 across all active fixtures. Client contributors supply matching bounded camera
 angles; the shared capture adapter renders and saves these after the unchanged
 overview, within the existing disconnect deadline. Each required image must be a

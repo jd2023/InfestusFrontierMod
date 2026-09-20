@@ -61,8 +61,8 @@ final class DigestiveSacEntity extends BlockEntity {
         }
         if (player instanceof ServerPlayer serverPlayer) reconcileDiscovery(serverPlayer);
         var held = player.getItemInHand(hand);
-        if (BiomassInteractions.transfer(sac.quantities(), player, hand, biomassBucket, discovery)
-                != BiomassInteractions.TransferResult.PASS) {
+        if (BiomassBucketTransfer.transfer(sac.quantities(), player, hand, biomassBucket, discovery)
+                != BiomassBucketTransfer.Result.PASS) {
             setChanged();
         } else {
             String feed = BiomassInteractions.feed(held);

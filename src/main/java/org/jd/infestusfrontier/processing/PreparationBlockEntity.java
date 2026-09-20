@@ -17,19 +17,24 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jd.infestusfrontier.discovery.api.DiscoveryObserver;
 import org.jd.infestusfrontier.processing.api.BatchWork;
 import org.jd.infestusfrontier.processing.api.PreparationRecipes;
+import org.jd.infestusfrontier.processing.digestion.BiomassBucketTransfer;
+import org.jd.infestusfrontier.storage.api.BiomassTransfer;
 import org.jd.infestusfrontier.storage.api.QuantityStore;
 
 final class PreparationBlockEntity extends BlockEntity {
     private final PreparationOrgan organ;
+    private final DiscoveryObserver discovery;
     private BatchWork work;
     private CompoundTag rejected;
 
     PreparationBlockEntity(BlockPos pos, BlockState state, Supplier<BlockEntityType<PreparationBlockEntity>> type,
-            PreparationOrgan organ) {
+            PreparationOrgan organ, DiscoveryObserver discovery) {
         super(type.get(), pos, state);
         this.organ = organ;
+        this.discovery = discovery;
         work = BatchWork.create(new QuantityStore(
                 Collections.nCopies(PreparationSave.ITEM_SLOTS, QuantityStore.ItemSlot.empty(64)),
                 List.of(QuantityStore.Tank.empty(PreparationSave.TANK_CAPACITY))),
@@ -59,8 +64,14 @@ final class PreparationBlockEntity extends BlockEntity {
                 else message(player, "started");
             }
         } else if (acceptFluid(stack)) {
-            if (work.insertFluid(organ.fluid, 1000, work.revision())) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
-            else message(player, "transfer_refused");
+            if (organ == PreparationOrgan.BONE_LOOM) {
+                BiomassBucketTransfer.empty(player, hand,
+                        PreparationResources.item("biomass_bucket"),
+                        () -> work.insertFluid(organ.fluid,
+                                BiomassTransfer.BUCKET_AMOUNT, work.revision()), discovery);
+            } else if (work.insertFluid(organ.fluid, 1000, work.revision())) {
+                player.setItemInHand(hand, new ItemStack(Items.BUCKET));
+            } else message(player, "transfer_refused");
         } else {
             String resource = PreparationResources.key(stack.getItem());
             if (!resource.isEmpty() && allowedInput(resource) && stack.getComponentsPatch().isEmpty()
@@ -85,11 +96,17 @@ final class PreparationBlockEntity extends BlockEntity {
 
     private void collect(Player player, InteractionHand hand) {
         var slots = work.state().quantities().itemSlots();
+        int selected = -1;
         for (int index = 0; index < slots.size(); index++) {
             var slot = slots.get(index);
-            if (!slot.resource().equals(organ.output)) continue;
+            if (slot.isEmpty()) continue;
+            if (selected < 0) selected = index;
+            if (slot.resource().equals(organ.output)) { selected = index; break; }
+        }
+        if (selected >= 0) {
+            var slot = slots.get(selected);
             var stack = new ItemStack(PreparationResources.item(slot.resource()), slot.count());
-            if (work.extractItemSlot(index, work.revision())) player.setItemInHand(hand, stack);
+            if (work.extractItemSlot(selected, work.revision())) player.setItemInHand(hand, stack);
             else message(player, "transfer_refused");
             return;
         }

@@ -43,17 +43,56 @@ public final class DiscoveryGuideScenario implements ContentGuideScenario, Conte
         return List.of(new UiView("waking-genome-guide.png", 3),
                 new UiView("bowl-guide-controls.png", 3), new UiView("bowl-guide-recipes-1.png", 3),
                 new UiView("bowl-guide-recipes-2.png", 3), new UiView("bowl-guide-recipes-3.png", 3),
-                new UiView("bowl-recipe-browser.png", 3));
+                new UiView("bowl-recipe-browser.png", 3), new UiView("preparation-items.png", 3),
+                new UiView("rack-guide-flesh.png", 3), new UiView("rack-guide-leather.png", 3),
+                new UiView("loom-guide.png", 3), new UiView("rack-recipe-browser.png", 3),
+                new UiView("loom-recipe-browser.png", 3));
     }
 
     @Override
     public boolean prepareUi(Minecraft minecraft, UiView view) {
-        if (view.filename().equals("bowl-recipe-browser.png")
-                && net.neoforged.fml.ModList.get().isLoaded("jei")) return JeiDiscoveryScenario.prepare(minecraft);
-        var entry = view.filename().equals("waking-genome-guide.png") ? FIRST_ENTRY
-                : ResourceLocation.parse("infestusfrontier:processing/culture_bowl");
+        if (view.filename().equals("preparation-items.png")) {
+            for (var slot : java.util.Map.of(10, "membrane_sheet", 12, "bone_plate").entrySet()) {
+                var stack = minecraft.player.getInventory().getItem(slot.getKey());
+                if (!stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(ResourceLocation.parse(
+                        "infestusfrontier:processing/" + slot.getValue())))) {
+                    throw new IllegalStateException("Missing server-supplied preparation inventory item " + slot.getValue());
+                }
+            }
+            if (minecraft.screen instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen screen) {
+                if (screen.isInventoryOpen()) return true;
+                var tab = screen.getCurrentPage().getVisibleTabs().stream()
+                        .filter(value -> value.getType() == net.minecraft.world.item.CreativeModeTab.Type.INVENTORY)
+                        .findFirst().orElseThrow();
+                int column = screen.getCurrentPage().getColumn(tab);
+                int x = screen.getGuiLeft() + 195 - 27 * (7 - column) + 14;
+                int y = screen.getGuiTop() + 148;
+                screen.mouseClicked(x, y, 0);
+                screen.mouseReleased(x, y, 0);
+                return false;
+            }
+            if (minecraft.screen instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen) return true;
+            minecraft.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(minecraft.player));
+            return false;
+        }
+        String browser = switch (view.filename()) {
+            case "bowl-recipe-browser.png" -> "culture_bowl";
+            case "rack-recipe-browser.png" -> "membrane_rack";
+            case "loom-recipe-browser.png" -> "bone_loom";
+            default -> "";
+        };
+        if (!browser.isEmpty() && net.neoforged.fml.ModList.get().isLoaded("jei")) {
+            return JeiDiscoveryScenario.prepare(minecraft, browser);
+        }
+        var entry = switch (view.filename()) {
+            case "waking-genome-guide.png" -> FIRST_ENTRY;
+            case "rack-guide-flesh.png", "rack-guide-leather.png", "rack-recipe-browser.png" ->
+                    ResourceLocation.parse("infestusfrontier:processing/membrane_rack");
+            case "loom-guide.png", "loom-recipe-browser.png" -> ResourceLocation.parse("infestusfrontier:processing/bone_loom");
+            default -> ResourceLocation.parse("infestusfrontier:processing/culture_bowl");
+        };
         int target = switch (view.filename()) {
-            case "bowl-guide-recipes-1.png", "bowl-recipe-browser.png" -> 2;
+            case "bowl-guide-recipes-1.png", "bowl-recipe-browser.png", "rack-guide-leather.png" -> 2;
             case "bowl-guide-recipes-2.png" -> 4;
             case "bowl-guide-recipes-3.png" -> 6;
             default -> 0;

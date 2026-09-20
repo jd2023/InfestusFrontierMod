@@ -10,16 +10,22 @@
     "data modify block -2 -60 3 bowl.selected set value \"I030\"",
     "data modify block -2 -60 3 bowl.items[0] set value {resource:\"honey_bottle\",count:1,capacity:16}",
     "data modify block -2 -60 3 bowl.items[1] set value {resource:\"spore_culture\",count:1,capacity:64}",
-    "fill -4 -61 8 -2 -61 8 infestusfrontier:ecology/living_substrate",
-    "setblock -4 -60 8 infestusfrontier:processing/membrane_rack",
-    "setblock -2 -60 8 infestusfrontier:processing/bone_loom",
-    "item replace entity @a inventory.0 with infestusfrontier:processing/membrane_rack",
+    "fill 1 -61 2 3 -61 2 infestusfrontier:ecology/living_substrate",
+    "setblock 1 -60 2 infestusfrontier:processing/membrane_rack",
+    "setblock 3 -60 2 infestusfrontier:processing/bone_loom",
+    "item replace entity @a inventory.4 with infestusfrontier:processing/membrane_rack",
     "item replace entity @a inventory.1 with infestusfrontier:processing/membrane_sheet",
     "item replace entity @a inventory.2 with infestusfrontier:processing/bone_loom",
     "item replace entity @a inventory.3 with infestusfrontier:processing/bone_plate"
   ],
   "captures": [
     "processing-bowls.png",
-    "processing-preparation.png"
+    "processing-preparation.png",
+    "preparation-items.png",
+    "rack-guide-flesh.png",
+    "rack-guide-leather.png",
+    "loom-guide.png",
+    "rack-recipe-browser.png",
+    "loom-recipe-browser.png"
   ]
 }

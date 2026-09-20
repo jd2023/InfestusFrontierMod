@@ -734,7 +734,7 @@ def _visual_setup(root, requirements, filename="visual-setup.json"):
                        or "\n" in line or "\r" in line for line in batch)):
             raise HarnessFailure(f"invalid visual setup: {path}")
         images = fixture.get("captures", [])
-        if (not isinstance(images, list) or len(images) > 16
+        if (not isinstance(images, list) or len(images) > 24
                 or any(not isinstance(name, str) or not re.fullmatch(r"[a-z][a-z0-9-]{0,63}\.png", name)
                        or name in CAPTURES for name in images)
                 or len(set(images)) != len(images)):
@@ -742,7 +742,7 @@ def _visual_setup(root, requirements, filename="visual-setup.json"):
         if fixture["requires"] in active:
             commands.extend(batch)
             captures.extend(images)
-        if len(captures) > 16 or len(set(captures)) != len(captures):
+        if len(captures) > 24 or len(set(captures)) != len(captures):
             raise HarnessFailure("excessive or duplicate visual setup captures")
         if len(commands) > 64:
             raise HarnessFailure("excessive visual setup commands")

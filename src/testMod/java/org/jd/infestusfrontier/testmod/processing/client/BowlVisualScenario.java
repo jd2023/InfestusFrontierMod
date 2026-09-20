@@ -33,8 +33,8 @@ public final class BowlVisualScenario implements ContentVisualScenario {
                     .getParticleIcon().contents().name().toString();
             if (texture.equals("minecraft:missingno")) throw new IllegalStateException("Missing preparation item model: " + name);
         }
-        var rackState = game.level.getBlockState(new BlockPos(-4, -60, 8));
-        var loomState = game.level.getBlockState(new BlockPos(-2, -60, 8));
+        var rackState = game.level.getBlockState(new BlockPos(1, -60, 2));
+        var loomState = game.level.getBlockState(new BlockPos(3, -60, 2));
         ready &= rackState.is(BuiltInRegistries.BLOCK.get(id("membrane_rack")))
                 && loomState.is(BuiltInRegistries.BLOCK.get(id("bone_loom")));
         ready &= game.player.getInventory().getItem(6).is(BuiltInRegistries.ITEM.get(
@@ -61,6 +61,14 @@ public final class BowlVisualScenario implements ContentVisualScenario {
         return settled == 8;
     }
     @Override public List<View> detailViews() { return List.of(new View("processing-bowls.png", 32, 24),
-            new View("processing-preparation.png", 25, 22)); }
+            new View("processing-preparation.png", -45, 24)); }
+    @Override public boolean prepareView(Minecraft game, View view) {
+        if (view.filename().equals("processing-preparation.png")) {
+            game.player.getInventory().selected = 6;
+            game.gui.getChat().clearMessages(false);
+            game.gui.setOverlayMessage(net.minecraft.network.chat.Component.empty(), false);
+        }
+        return true;
+    }
     private static ResourceLocation id(String name) { return ResourceLocation.parse("infestusfrontier:processing/" + name); }
 }

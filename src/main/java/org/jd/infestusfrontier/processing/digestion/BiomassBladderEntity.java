@@ -34,9 +34,9 @@ final class BiomassBladderEntity extends BlockEntity implements EquipmentFueling
 
     boolean interact(Player player, InteractionHand hand, Item biomassBucket) {
         if (rejected != null) return false;
-        var result = BiomassInteractions.transfer(store, player, hand, biomassBucket, discovery);
-        if (result != BiomassInteractions.TransferResult.PASS) {
-            if (result == BiomassInteractions.TransferResult.FILLED_BUCKET
+        var result = BiomassBucketTransfer.transfer(store, player, hand, biomassBucket, discovery);
+        if (result != BiomassBucketTransfer.Result.PASS) {
+            if (result == BiomassBucketTransfer.Result.FILLED_BUCKET
                     && player instanceof ServerPlayer serverPlayer) {
                 discovery.complete(serverPlayer,
                         DiscoveryObserver.Milestone.BIOMASS_BLADDER);
