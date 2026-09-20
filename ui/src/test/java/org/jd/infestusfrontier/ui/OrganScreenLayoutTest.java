@@ -2,7 +2,6 @@ package org.jd.infestusfrontier.ui;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashSet;
 import org.junit.jupiter.api.Test;
 
 final class OrganScreenLayoutTest {
@@ -12,11 +11,14 @@ final class OrganScreenLayoutTest {
             int width = (int) Math.ceil(1280.0 / scale);
             int height = (int) Math.ceil(720.0 / scale);
             var layout = OrganScreenLayout.centered(width, height);
-            var seen = new HashSet<OrganScreenLayout.Bounds>();
+            var seen = new java.util.ArrayList<OrganScreenLayout.Bounds>();
             for (var control : layout.focusOrder()) {
                 assertTrue(control.bounds().width() >= 16 && control.bounds().height() >= 16, "click target at scale " + scale);
                 assertTrue(layout.panel().contains(control.bounds()), "control outside panel at scale " + scale);
-                assertTrue(seen.add(control.bounds()), "overlapping controls at scale " + scale);
+                var b = control.bounds();
+                for (var a : seen) assertFalse(a.x() < b.x() + b.width() && b.x() < a.x() + a.width()
+                        && a.y() < b.y() + b.height() && b.y() < a.y() + a.height(), "overlap at scale " + scale);
+                seen.add(b);
                 assertTrue(control.bounds().contains(control.bounds().centerX(), control.bounds().centerY()));
             }
             assertEquals(17, layout.focusOrder().size(), "nine slots, six recipes, start and cancel");

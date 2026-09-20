@@ -29,6 +29,11 @@ public final class BootstrapClient {
     private static final Logger LOGGER = LogUtils.getLogger();
     private final Path captureDirectory = Path.of(environment("INFESTUS_CAPTURE_DIR", "build/integration/capture"));
     private final String address = environment("INFESTUS_SERVER", "127.0.0.1:25565");
+    private final String probeRole = environment("INFESTUS_PROBE_ROLE", "");
+    private final Path coordination = Path.of(environment("INFESTUS_COORDINATION", "."));
+    private final List<org.jd.infestusfrontier.testmod.integration.client.ContentMultiplayerScenario> multiplayer =
+            ServiceLoader.load(org.jd.infestusfrontier.testmod.integration.client.ContentMultiplayerScenario.class)
+                    .stream().map(ServiceLoader.Provider::get).toList();
     private Stage stage = Stage.TITLE_LOAD;
     private boolean worldRendered;
     private GuideScenarios guideScenarios;
@@ -59,7 +64,9 @@ public final class BootstrapClient {
                 case CONNECT -> connect(minecraft);
                 case WORLD -> captureWorld(minecraft);
                 case WORLD_SETUP -> {
-                    if (visuals.stream().allMatch(scene -> scene.ready(minecraft))) {
+                    boolean ready = true;
+                    for (var scene : visuals) ready &= scene.ready(minecraft);
+                    if (ready) {
                         detailViews = visuals.stream().flatMap(scene -> scene.detailViews().stream()).toList();
                         uiCaptures = visuals.stream().flatMap(scene -> scene.uiViews().stream()
                                 .map(view -> new UiCapture(scene, view))).toList();
@@ -83,6 +90,11 @@ public final class BootstrapClient {
                     }
                 }
                 case UI_SETUP -> prepareUi(minecraft);
+                case MULTIPLAYER -> {
+                    if (multiplayer.size() != 1) throw new IllegalStateException("Expected one multiplayer contributor");
+                    if (multiplayer.getFirst().tick(minecraft, probeRole, coordination))
+                        stage = probeRole.equals("observer") ? Stage.DISCONNECT : Stage.GUIDES;
+                }
                 case GUIDES -> {
                     if (guideScenarios == null) guideScenarios = new GuideScenarios();
                     if (guideScenarios.tick(minecraft)) stage = Stage.DISCONNECT;
@@ -135,7 +147,7 @@ public final class BootstrapClient {
         minecraft.player.xRotO = 15;
         minecraft.options.hideGui = false;
         LOGGER.info("INFESTUS_CLIENT_PLAY_ENTER name={} uuid={}", minecraft.player.getGameProfile().getName(), minecraft.player.getUUID());
-        stage = Stage.WORLD_SETUP;
+        stage = probeRole.equals("observer") ? Stage.MULTIPLAYER : Stage.WORLD_SETUP;
     }
 
     private void worldRendered(RenderLevelStageEvent event) {
@@ -208,7 +220,7 @@ public final class BootstrapClient {
         if (uiIndex == uiCaptures.size()) {
             if (minecraft.screen != null) minecraft.setScreen(null);
             minecraft.resizeDisplay();
-            stage = Stage.GUIDES;
+            stage = probeRole.isEmpty() ? Stage.GUIDES : Stage.MULTIPLAYER;
             return;
         }
         var capture = uiCaptures.get(uiIndex);
@@ -241,5 +253,5 @@ public final class BootstrapClient {
     }
 
     private record UiCapture(ContentVisualScenario scenario, ContentVisualScenario.UiView view) {}
-    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_SETUP, WORLD_RENDER, DETAILS, DETAIL_RENDER, UI_SETUP, UI_RENDER, GUIDES, DISCONNECT, STOP, DONE }
+    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_SETUP, WORLD_RENDER, DETAILS, DETAIL_RENDER, UI_SETUP, UI_RENDER, MULTIPLAYER, GUIDES, DISCONNECT, STOP, DONE }
 }

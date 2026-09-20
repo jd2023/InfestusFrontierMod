@@ -49,6 +49,19 @@ public final class ProbeVisualScenario implements ContentVisualScenario {
             preparedScale = view.guiScale();
             settled = 0;
             game.screen.keyPressed(GLFW.GLFW_KEY_TAB, 0, 0);
+            if (!(game.screen.getFocused() instanceof net.minecraft.client.gui.components.AbstractWidget focused)
+                    || !focused.isFocused() || focused.getMessage().getString().isBlank())
+                throw new IllegalStateException("Missing keyboard focus/narration label at scale " + preparedScale);
+            var widgets = game.screen.children().stream()
+                    .filter(child -> child instanceof net.minecraft.client.gui.components.AbstractWidget)
+                    .map(child -> (net.minecraft.client.gui.components.AbstractWidget) child).toList();
+            if (widgets.size() != 17) throw new IllegalStateException("Missing organ controls");
+            for (var widget : widgets) {
+                if (widget.getX() < 0 || widget.getY() < 0 || widget.getRight() > game.screen.width
+                        || widget.getBottom() > game.screen.height || !widget.isMouseOver(
+                        widget.getX() + widget.getWidth() / 2.0, widget.getY() + widget.getHeight() / 2.0))
+                    throw new IllegalStateException("Inaccessible control at scale " + preparedScale);
+            }
             var layout = OrganScreenLayout.centered(game.getWindow().getGuiScaledWidth(), game.getWindow().getGuiScaledHeight());
             var hover = layout.control("recipe-0").bounds();
             double x = hover.centerX() * (double) game.getWindow().getScreenWidth() / game.getWindow().getGuiScaledWidth();

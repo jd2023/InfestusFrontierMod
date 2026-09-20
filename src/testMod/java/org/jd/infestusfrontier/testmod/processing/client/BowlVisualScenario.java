@@ -11,6 +11,7 @@ import org.jd.infestusfrontier.testmod.integration.client.ContentVisualScenario;
 public final class BowlVisualScenario implements ContentVisualScenario {
     private int settled;
     private boolean started;
+    private boolean opening;
     @Override public boolean ready(Minecraft game) {
         if (game.level == null || game.player == null) return false;
         var bowl = BuiltInRegistries.BLOCK.get(id("culture_bowl"));
@@ -26,12 +27,19 @@ public final class BowlVisualScenario implements ContentVisualScenario {
             }
         }
         if (ready && !started) {
-            var pos = new BlockPos(-2, -60, 3);
-            game.player.getInventory().selected = 5;
-            game.gameMode.useItemOn(game.player, net.minecraft.world.InteractionHand.MAIN_HAND,
-                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos), net.minecraft.core.Direction.UP, pos, false));
-            game.player.getInventory().selected = 0;
-            started = true;
+            if (!opening) {
+                var pos = new BlockPos(-2, -60, 3);
+                game.player.getInventory().selected = 6;
+                game.gameMode.useItemOn(game.player, net.minecraft.world.InteractionHand.MAIN_HAND,
+                        new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos), net.minecraft.core.Direction.UP, pos, false));
+                opening = true;
+            }
+            if (game.player.containerMenu instanceof org.jd.infestusfrontier.processing.menu.CultureBowlMenu menu) {
+                menu.submit(org.jd.infestusfrontier.processing.menu.BowlIntentPayload.Intent.START, -1, "I030");
+                game.player.closeContainer();
+                game.player.getInventory().selected = 0;
+                started = true;
+            }
             return false;
         }
         ready &= started && game.level.getBlockState(new BlockPos(-2, -60, 3)).toString().contains("active=true");

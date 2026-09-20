@@ -131,16 +131,29 @@ examines only the selected loaded block entity. Unsupported held-item interactio
 through to normal item placement, so building beside an organ is not intercepted.
 
 Processing owns the Culture Bowl menu target and every recipe transition. The client
-screen composes the internal `ui` module's fixed logical layout, accessible palette and
-focus order. It observes an immutable snapshot and sends only start, cancel or slot-
+screen composes the internal UI owner: dependency-free `:ui` supplies layout, palette
+and snapshot cadence; `ui/client/OrganScreen` supplies Minecraft widgets, panel/bar
+drawing, keyboard focus/narration and themed tooltips. Processing binds values and
+intents only. Pure tests check geometry/cadence and the real client fixture checks
+widget bounds, focus, narrated labels and rendered tooltips at all three GUI scales.
+The screen observes an immutable snapshot and sends only start, cancel or slot-
 collection intents; it does not edit balances, recipes or progress. A snapshot contains
-the Bowl revision, exactly nine bounded slots, water amount/capacity, work state and
+a command revision, exactly nine bounded slots, water amount/capacity, work state and
 progress, completed count, selected recipe and latest refusal code. Its codec is bounded
 below 4 KiB before allocation.
 
-Vanilla permits one open menu per player. Each menu admits at most four intents in any
-20-tick window, and one server-identity quota admits at most 64 intents/tick across
-dimensions; refused excess is not queued. Every intent revalidates menu ID, exact target,
+Progress changes do not invalidate a command revision. Commands and batch completion
+advance it to the storage-backed work revision; restoring a core seeds it from that
+saved revision. Existing menus invalidate when their loaded entity disappears, so
+no separate persisted menu state or save-schema change is required.
+
+Vanilla permits one open menu per player. Each player admits at most four intents in any
+20-tick window across menus, targets, dimensions and reconnects. One server-identity
+quota admits at most 64 intents/tick across dimensions; refused excess is not queued. A server-local table holds at most 1024
+player windows (four timestamps each). Each request prunes at most 64 expired
+windows in last-admission order; a full table refuses new entries. Entries expire
+after 20 ticks without admission and the server table is weakly owned. Every intent
+revalidates menu ID, exact target,
 loaded state, dimension, reach, owner, revision and slot/recipe shape on the server.
 Open menus compare snapshots each player tick but send only changes, at most once per
 10 ticks per viewer. Idle menus send nothing. Reopening always receives one current
@@ -315,16 +328,29 @@ angles; the shared capture adapter renders and saves these after the unchanged
 overview, within the existing disconnect deadline. Each required image must be a
 fresh 1280x720 PNG under the same 4 MiB/digest checks; missing detail captures fail
 acceptance. The setup never modifies an ordinary world or fabricates client state.
-Bind the server to loopback on an allocated port, allow only the fixture player, and disable online-account
+Bind the server to loopback on an allocated port, allow only the fixture identities, and disable online-account
 authentication solely in this owned disposable server. The client runs with an
 isolated game directory and deterministic fixture identity; no personal account,
 ordinary save or production-server access is required. Wait for rendered frames
 and observed player state, not arbitrary sleeps. A display helper is allowed when
 needed and shares the scenario's ownership and cleanup.
 
-Run scenarios serially: at most one dedicated server, one client, one world and
-one display helper at a time, with at most four owned helper descendants and no
-nested Gradle invocations. ProfileSmoke needs only its server. Readiness is bounded
+When Probe coverage is active, captureClient also starts the allowlisted
+FixtureObserver. A bounded file carries phase names only; each client independently
+opens the real menu and records received snapshots. Actual screen clicks start and
+cancel work, the owner closes/reopens, and the observer checks ownership refusal.
+The evaluator compares revision, recipe work requirement, slots, water, state and
+progress within the 10-tick snapshot cadence. Missing/mismatched observations,
+identity, mod lists, clean disconnect or process cleanup fail acceptance. Each
+additional action phase is bounded by 30 seconds within the existing 420-second
+scenario ceiling. Shared admission and snapshot cadence/idle silence have focused
+rule tests, while the game fixtures cover reopening and offhand placement.
+
+Run scenarios serially: at most one dedicated server and one world. The Probe
+acceptance fixture uses exactly two disposable clients sharing one owned display helper to
+observe the same menu via actual packets; other scenarios use one client/display.
+At most four owned helper descendants and four root processes (including the
+already-reaped installer) are admitted, with no nested Gradle invocations. ProfileSmoke needs only its server. Readiness is bounded
 by 120 seconds per process, join/capture/disconnect by 30 seconds per phase,
 graceful shutdown by 30 seconds for all children together, then forced termination
 and reaping by 5 seconds. Every failure or interrupted launch cleans the entire

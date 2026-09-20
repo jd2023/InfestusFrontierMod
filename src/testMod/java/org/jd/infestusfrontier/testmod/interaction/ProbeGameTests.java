@@ -128,6 +128,116 @@ public final class ProbeGameTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void progressDoesNotInvalidateCancelButCommandsDo(GameTestHelper helper) {
+        var owner = player(helper, "CancelOwner");
+        var pos = placeOwned(helper, owner);
+        use(owner, pos, new ItemStack(Items.RED_MUSHROOM));
+        use(owner, pos, new ItemStack(Items.WHEAT_SEEDS));
+        use(owner, pos, new ItemStack(Items.WATER_BUCKET));
+        openForTest(helper, owner, pos);
+        var menu = (CultureBowlMenu) owner.containerMenu;
+        menu.handleIntent(owner, new BowlIntentPayload(menu.containerId, pos, menu.snapshot().revision(),
+                BowlIntentPayload.Intent.START, -1, "I000"));
+        long receivedRevision = menu.snapshot().revision();
+        tick(helper.getLevel().getBlockEntity(pos));
+        menu.handleIntent(owner, new BowlIntentPayload(menu.containerId, pos, receivedRevision,
+                BowlIntentPayload.Intent.CANCEL, -1, ""));
+        helper.assertTrue(!data(helper, pos).getCompound("bowl").contains("active")
+                && menu.snapshot().refusal() == BowlRefusal.NONE, "Cancel survives progress between snapshots");
+        var cancelled = data(helper, pos);
+        menu.handleIntent(owner, new BowlIntentPayload(menu.containerId, pos, receivedRevision,
+                BowlIntentPayload.Intent.START, -1, "I000"));
+        helper.assertTrue(cancelled.equals(data(helper, pos)) && menu.snapshot().refusal() == BowlRefusal.STALE_REVISION,
+                "A successful command still invalidates the old revision");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void reopenCannotResetPlayerAdmission(GameTestHelper helper) {
+        var owner = player(helper, "ReopenOwner");
+        var first = placeOwned(helper, owner);
+        var second = first.south(2);
+        helper.getLevel().setBlock(second.below(), BuiltInRegistries.BLOCK.get(id("ecology/living_substrate")).defaultBlockState(), 2);
+        helper.getLevel().setBlock(second, BuiltInRegistries.BLOCK.get(id("processing/culture_bowl")).defaultBlockState(), 2);
+        ((org.jd.infestusfrontier.interaction.api.ProbeTarget) helper.getLevel().getBlockEntity(second)).claimProbeOwner(owner.getUUID());
+        for (int i = 0; i < 5; i++) {
+            var pos = i % 2 == 0 ? first : second;
+            owner.setPos(Vec3.atCenterOf(pos).add(0, 0, -2));
+            openForTest(helper, owner, pos);
+            var menu = (CultureBowlMenu) owner.containerMenu;
+            menu.handleIntent(owner, new BowlIntentPayload(menu.containerId, pos, menu.snapshot().revision(),
+                    BowlIntentPayload.Intent.CANCEL, -1, ""));
+            helper.assertTrue(menu.snapshot().refusal() == (i == 4 ? BowlRefusal.RATE_LIMITED : BowlRefusal.IDLE),
+                    "Four intents per player survives replacing the menu, intent " + i);
+            owner.closeContainer();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void emptyMainHandAllowsOffhandPlacement(GameTestHelper helper) {
+        var owner = player(helper, "OffhandOwner");
+        var pos = placeOwned(helper, owner);
+        use(owner, pos, new ItemStack(Items.RED_MUSHROOM));
+        use(owner, pos, new ItemStack(Items.WHEAT_SEEDS));
+        use(owner, pos, new ItemStack(Items.WATER_BUCKET));
+        var before = data(helper, pos);
+        owner.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.DIRT));
+        var main = use(owner, pos, ItemStack.EMPTY, Direction.EAST);
+        helper.assertTrue(!main.consumesAction() && before.equals(data(helper, pos)),
+                "Empty main hand passes without starting the Bowl when offhand is occupied");
+        var hit = new BlockHitResult(Vec3.atCenterOf(pos).add(0.5, 0, 0), Direction.EAST, pos, false);
+        owner.gameMode.useItemOn(owner, helper.getLevel(), owner.getOffhandItem(), InteractionHand.OFF_HAND, hit);
+        helper.assertTrue(helper.getLevel().getBlockState(pos.east()).is(net.minecraft.world.level.block.Blocks.DIRT),
+                "Offhand places beside the Bowl");
+        helper.assertTrue(before.equals(data(helper, pos)), "Placement leaves the Bowl unchanged");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "probe_quota")
+    public static void allMenusShare64IntentsPerServerTick(GameTestHelper helper) {
+        var owner = player(helper, "QuotaOwner");
+        var pos = placeOwned(helper, owner);
+        var before = data(helper, pos);
+        for (int i = 0; i < 65; i++) {
+            var observer = player(helper, "QuotaViewer" + i);
+            observer.setPos(Vec3.atCenterOf(pos).add(0, 0, -2));
+            openForTest(helper, observer, pos);
+            var menu = (CultureBowlMenu) observer.containerMenu;
+            menu.handleIntent(observer, new BowlIntentPayload(menu.containerId, pos, menu.snapshot().revision(),
+                    BowlIntentPayload.Intent.CANCEL, -1, ""));
+            helper.assertTrue(menu.snapshot().refusal() == (i < 64 ? BowlRefusal.WRONG_OWNER : BowlRefusal.SERVER_BUSY),
+                    "Shared server limit at request " + i);
+            observer.closeContainer();
+        }
+        helper.assertTrue(before.equals(data(helper, pos)), "Refused traffic never mutates the Bowl");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void malformedRecipeAndSlotRefuseWithoutMutation(GameTestHelper helper) {
+        var owner = player(helper, "MalformedOwner");
+        var pos = placeOwned(helper, owner);
+        var before = data(helper, pos);
+        openForTest(helper, owner, pos);
+        var menu = (CultureBowlMenu) owner.containerMenu;
+        menu.handleIntent(owner, new BowlIntentPayload(menu.containerId, pos, menu.snapshot().revision(),
+                BowlIntentPayload.Intent.START, -1, ""));
+        helper.assertTrue(menu.snapshot().refusal() == BowlRefusal.UNKNOWN_RECIPE, "Blank recipe refuses without throwing");
+        menu.handleIntent(owner, new BowlIntentPayload(menu.containerId, pos, menu.snapshot().revision(),
+                BowlIntentPayload.Intent.EXTRACT_SLOT, 99, ""));
+        helper.assertTrue(menu.snapshot().refusal() == BowlRefusal.MALFORMED_SLOT, "Malformed slot has a clear refusal");
+        helper.assertTrue(before.equals(data(helper, pos)), "Malformed payloads leave the Bowl unchanged");
+        helper.succeed();
+    }
+
+    private static ServerPlayer player(GameTestHelper helper, String name) {
+        var player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.nameUUIDFromBytes(name.getBytes(java.nio.charset.StandardCharsets.UTF_8)), name));
+        player.setGameMode(GameType.SURVIVAL);
+        return player;
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void maximumSnapshotRoundTripsBelowFourKiB(GameTestHelper helper) {
         var slots = java.util.stream.IntStream.range(0, 9)
                 .mapToObj(i -> new CultureBowlMenuSnapshot.Slot("infestusfrontier:processing/nutrient_mash", 64)).toList();

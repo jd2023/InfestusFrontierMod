@@ -1,6 +1,6 @@
 package org.jd.infestusfrontier.interaction.api;
 
-/** Four-entry sliding window owned by one open player menu; rejected intents are never queued. */
+/** Four-entry sliding window owned by one player across menus; rejected intents are never queued. */
 public final class IntentAdmission {
     public static final int WINDOW_TICKS = 20;
     public static final int MAX_INTENTS = 4;

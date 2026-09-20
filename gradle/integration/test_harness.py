@@ -98,6 +98,19 @@ class EvaluatorTest(EvidenceCase):
         with self.assertRaisesRegex(harness.HarnessFailure, "invalid profile"):
             harness.validate_profile_file(None, "everything", "bootstrap")
 
+    def test_multiplayer_requires_observer_runtime_and_action_evidence(self):
+        result = self.result()
+        result["multiplayer"] = True
+        with self.assertRaisesRegex(harness.HarnessFailure, "process roles"):
+            harness.ResultEvaluator().evaluate(result)
+        result["runtimeMods"]["observer"] = copy.deepcopy(result["runtimeMods"]["client"])
+        result["runtimeMods"]["observer"]["geckolib"] = "4.9.1"
+        with self.assertRaisesRegex(harness.HarnessFailure, "observer mod geckolib"):
+            harness.ResultEvaluator().evaluate(result)
+        result["runtimeMods"]["observer"]["geckolib"] = "4.9.2"
+        with self.assertRaisesRegex(harness.HarnessFailure, "probeCancelledBoth"):
+            harness.ResultEvaluator().evaluate(result)
+
     def test_wrong_runtime_version_is_rejected_at_named_mod(self):
         result = self.result()
         result["runtimeMods"]["server"]["geckolib"] = "4.9.1"

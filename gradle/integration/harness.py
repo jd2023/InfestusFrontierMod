@@ -307,6 +307,8 @@ class ResultEvaluator:
         ):
             raise HarnessFailure("invalid omission fixture")
         roles = {"server"} if command == "profileSmoke" else {"server", "client"}
+        if result.get("multiplayer") is True:
+            roles.add("observer")
         runtime = result.get("runtimeMods", {})
         expected = REQUIRED_MODS.copy()
         expected["infestusfrontier"] = result.get(
@@ -335,7 +337,7 @@ class ResultEvaluator:
                     {"infestusfrontier_tests": "1.0.0"}
                     if command == "profileSmoke"
                     else (
-                        {"infestusfrontier_client": "1.0.0"} if role == "client" else {}
+                        {"infestusfrontier_client": "1.0.0"} if role in ("client", "observer") else {}
                     )
                 )
                 if mods != expected | fixtures:
@@ -351,6 +353,9 @@ class ResultEvaluator:
             if omission
             else (SMOKE_ASSERTIONS if command == "profileSmoke" else CLIENT_ASSERTIONS)
         )
+        if result.get("multiplayer") is True:
+            required = required | {"probeProgressConsistent", "probeReopened", "probeOwnerRefused", "probeCancelledBoth",
+                                   "observerJoined", "observerLeft", "observerResourcesClean", "probeIdleSilent"}
         assertions = result.get("assertions", {})
         if not required.issubset(assertions) or not all(
             value is True for value in assertions.values()
@@ -427,7 +432,12 @@ class ResultEvaluator:
             "total": 180 if command == "profileSmoke" else 420,
         }
         for name, seconds in durations.items():
-            if name in phase_bounds and seconds > phase_bounds[name]:
+            bound = phase_bounds.get(name)
+            if name.startswith("probe-") or name in ("observerJoin", "observerDisconnect"):
+                bound = 30
+            elif name in ("observerReadiness", "observerDisplay"):
+                bound = 120
+            if bound is not None and seconds > bound:
                 raise HarnessFailure(f"{name}: exceeded duration bound")
         if command != "profileSmoke" and not re.fullmatch(
             "[a-f0-9]{64}", result.get("releaseJarSha256", "")
@@ -634,7 +644,7 @@ def _release_clean(path):
         )
 
 
-def _prepare_server(s, staged, output):
+def _prepare_server(s, staged, output, multiplayer=False):
     server_dir, client_dir = s.run_dir / "server", s.run_dir / "client"
     server_dir.mkdir()
     client_dir.mkdir()
@@ -675,7 +685,7 @@ def _prepare_server(s, staged, output):
                 "level-name=world",
                 "level-seed=11",
                 "level-type=minecraft:flat",
-                "max-players=1",
+                f"max-players={2 if multiplayer else 1}",
                 "online-mode=false",
                 "server-ip=127.0.0.1",
                 f"server-port={port}",
@@ -689,7 +699,8 @@ def _prepare_server(s, staged, output):
         )
     )
     (server_dir / "whitelist.json").write_text(
-        json.dumps([{"uuid": _offline_uuid("FixturePlayer"), "name": "FixturePlayer"}])
+        json.dumps([{"uuid": _offline_uuid(name), "name": name}
+                    for name in (["FixturePlayer", "FixtureObserver"] if multiplayer else ["FixturePlayer"])])
     )
     (server_dir / "user_jvm_args.txt").write_text("-Xms512M\n-Xmx1536M\n")
     (client_dir / "options.txt").write_text(
@@ -740,7 +751,7 @@ def visual_setup_captures(root, requirements):
 
 
 def _client_lifecycle(
-    s, server_command, client_command, server_dir, client_dir, output, port, setup_commands=()
+    s, server_command, client_command, server_dir, client_dir, output, port, setup_commands=(), observer_command=None
 ):
     server = s.start("server", server_command, server_dir, output / "server.log")
     s.markers("readiness", s.limits["readiness"], [(server, "Done (")])
@@ -748,7 +759,23 @@ def _client_lifecycle(
         "INFESTUS_CAPTURE_DIR": str(output),
         "INFESTUS_SERVER": f"127.0.0.1:{port}",
     }
+    if observer_command:
+        env.update(INFESTUS_PROBE_ROLE="owner", INFESTUS_COORDINATION=str(output))
     client = s.start("client", client_command, client_dir, output / "client.log", env)
+    observer = None
+    if observer_command:
+        display_file = s.run_dir / "shared-display.json"
+        s.phase("observerDisplay", s.limits["readiness"], display_file.is_file)
+        if display_file.stat().st_size > 4096:
+            raise HarnessFailure("observer: oversized display configuration")
+        shared_display = json.loads(display_file.read_text())
+        if set(shared_display) != {"DISPLAY", "XAUTHORITY"}:
+            raise HarnessFailure("observer: invalid display configuration")
+        observer_dir = s.run_dir / "observer"
+        observer_dir.mkdir()
+        shutil.copy2(client_dir / "options.txt", observer_dir / "options.txt")
+        observer = s.start("observer", observer_command, observer_dir, output / "observer.log",
+                           env | shared_display | {"INFESTUS_PROBE_ROLE": "observer", "INFESTUS_CAPTURE_DIR": str(output / "observer")})
     s.markers(
         "clientReadiness",
         s.limits["readiness"],
@@ -768,13 +795,22 @@ def _client_lifecycle(
             (client, f"INFESTUS_CLIENT_PLAY_ENTER {identity}"),
         ],
     )
+    if observer:
+        s.markers("observerReadiness", s.limits["readiness"], [(observer, "INFESTUS_CLIENT_TITLE_READY")])
+        s.markers("observerJoin", s.limits["join"], [
+            (server, f"INFESTUS_INTEGRATION_PLAYER_JOIN name=FixtureObserver uuid={_offline_uuid('FixtureObserver')}"),
+            (observer, "INFESTUS_PROBE_READY role=observer")])
     for command in setup_commands:
         server.send(command)
+    if observer:
+        server.send("tp FixtureObserver -0.5 -60 0.5 0 15")
     s.markers(
         "capture",
         s.limits["capture"],
         [(client, "INFESTUS_CLIENT_CAPTURE name=bootstrap-world.png")],
     )
+    if observer:
+        _probe_actions(s, client, observer, output)
     s.markers(
         "disconnect",
         s.limits["disconnect"],
@@ -782,6 +818,79 @@ def _client_lifecycle(
             (client, "INFESTUS_CLIENT_PLAY_EXIT"),
             (server, f"INFESTUS_INTEGRATION_PLAYER_LEAVE {identity}"),
         ],
+    )
+
+
+def _observer_command(command, run_dir):
+    """Copy only the generated launch arguments into this owned run."""
+    result = list(command)
+    args = Path(result[-1].removeprefix("@"))
+    text = args.read_text()
+    if "FixturePlayer" not in text:
+        raise HarnessFailure("observer: generated client identity missing")
+    args_copy = run_dir / "observer-args.txt"
+    args_copy.write_text(text.replace("FixturePlayer", "FixtureObserver")
+                         .replace("11111111-1111-1111-1111-111111111111", _offline_uuid("FixtureObserver")))
+    result[-1] = "@" + str(args_copy)
+    return result
+
+
+def _probe_snapshots(log):
+    return re.findall(r"INFESTUS_PROBE_SNAPSHOT role=\w+ revision=(\d+) work=(\d+) required=(\d+) water=(\d+) state=(\w+) slots=(.+) refusal=\w+", log)
+
+
+def _probe_consistent(owner_log, observer_log, state):
+    owners = [row for row in _probe_snapshots(owner_log) if row[4] == state]
+    observers = [row for row in _probe_snapshots(observer_log) if row[4] == state]
+    if not owners or not observers:
+        return False
+    a, b = owners[-1], observers[-1]
+    return a[0] == b[0] and a[2:] == b[2:] and abs(int(a[1]) - int(b[1])) <= 10
+
+
+def _set_probe_phase(output, name):
+    temporary = output / "probe-stage.tmp"
+    temporary.write_text(name)
+    temporary.replace(output / "probe-stage")
+
+
+def _probe_actions(s, client, observer, output):
+    def phase(name, markers):
+        _set_probe_phase(output, name)
+        s.markers("probe-" + name, 30, markers)
+    s.markers("probe-ready", 30, [(client, "INFESTUS_PROBE_READY role=owner"),
+                                  (observer, "INFESTUS_PROBE_READY role=observer")])
+    phase("open", [(client, "INFESTUS_PROBE_OPEN role=owner"), (observer, "INFESTUS_PROBE_OPEN role=observer")])
+    phase("reset", [(client, "INFESTUS_PROBE_RESET role=owner"), (observer, "INFESTUS_PROBE_RESET role=observer")])
+    phase("start", [(client, "INFESTUS_PROBE_WORKING role=owner"), (observer, "INFESTUS_PROBE_WORKING role=observer")])
+    if not _probe_consistent(client.text(), observer.text(), "WORKING"):
+        raise HarnessFailure("probe: clients disagree on authoritative progress")
+    phase("close", [(client, "INFESTUS_PROBE_CLOSED role=owner")])
+    phase("reopen", [(client, "INFESTUS_PROBE_REOPENED role=owner")])
+    phase("wrong-owner", [(observer, "INFESTUS_PROBE_OWNER_REFUSAL")])
+    phase("cancel", [(client, "INFESTUS_PROBE_CANCELLED role=owner"), (observer, "INFESTUS_PROBE_CANCELLED role=observer")])
+    phase("idle", [(client, "INFESTUS_PROBE_IDLE_SILENT role=owner"), (observer, "INFESTUS_PROBE_IDLE_SILENT role=observer")])
+    _set_probe_phase(output, "done")
+    s.markers("observerDisconnect", 30, [(observer, "INFESTUS_CLIENT_PLAY_EXIT"),
+        (s.children["server"], f"INFESTUS_INTEGRATION_PLAYER_LEAVE name=FixtureObserver uuid={_offline_uuid('FixtureObserver')}")])
+
+
+def _probe_assertions(s):
+    owner = s.children.get("client")
+    observer = s.children.get("observer")
+    server = s.children.get("server")
+    a, b, log = owner.text() if owner else "", observer.text() if observer else "", server.text() if server else ""
+    identity = f"name=FixtureObserver uuid={_offline_uuid('FixtureObserver')}"
+    return dict(
+        probeProgressConsistent=_probe_consistent(a, b, "WORKING"),
+        probeReopened="INFESTUS_PROBE_REOPENED role=owner" in a,
+        probeIdleSilent="INFESTUS_PROBE_IDLE_SILENT role=owner" in a and "INFESTUS_PROBE_IDLE_SILENT role=observer" in b,
+        probeOwnerRefused="INFESTUS_PROBE_OWNER_REFUSAL" in b,
+        probeCancelledBoth="INFESTUS_PROBE_CANCELLED role=owner" in a and "INFESTUS_PROBE_CANCELLED role=observer" in b
+                           and _probe_consistent(a, b, "IDLE"),
+        observerJoined=f"INFESTUS_INTEGRATION_PLAYER_JOIN {identity}" in log and f"INFESTUS_CLIENT_PLAY_ENTER {identity}" in b,
+        observerLeft=f"INFESTUS_INTEGRATION_PLAYER_LEAVE {identity}" in log and "INFESTUS_CLIENT_PLAY_EXIT" in b,
+        observerResourcesClean=not re.search(r"missing.?texture|Unable to load model|FileNotFoundException|INFESTUS_CLIENT_FAILURE|/ERROR\]|\[ERROR\]", b, re.I),
     )
 
 
@@ -836,13 +945,14 @@ def run_client_scenario(
     content_requirements=None,
 ):
     validate_profile_file(None, profile, "bootstrap")
+    multiplayer = not fixture and "infestusfrontier_tests:interaction.synaptic_probe.use" in (content_requirements or {}).get("gameTest", [])
     if (root / "build/integration/runs").resolve() in output.resolve().parents:
         raise HarnessFailure("evidence output must be outside owned run directories")
     limits = limits or DEFAULT_DEADLINES
     command = "captureClient" if capture else "packagedServerSmoke"
     started, failure, release, port = time.time_ns(), None, None, None
     captures = []
-    s = Supervisor(root, f"{command}-{uuid.uuid4()}", limits, limits["clientScenario"])
+    s = Supervisor(root, f"{command}-{uuid.uuid4()}", limits, limits["clientScenario"], max_children=4 if multiplayer else 3)
 
     def finish(failure):
         result = _base_result(
@@ -858,6 +968,9 @@ def run_client_scenario(
             fixture=bool(fixture),
             captures=captures,
         )
+        if multiplayer:
+            result["multiplayer"] = True
+            result["assertions"].update(_probe_assertions(s))
         return publish_result(output, result)
 
     s.on_finished = finish
@@ -865,6 +978,7 @@ def run_client_scenario(
         with s:
             captures = [] if fixture else visual_setup_captures(root, content_requirements)
             _clear_output(output, captures)
+            observer_command = None
             if fixture:
                 server_dir = client_dir = s.run_dir
                 release = s.run_dir / "release.jar"
@@ -899,7 +1013,7 @@ def run_client_scenario(
                     raise HarnessFailure("setup: deliberate failure after launch")
             else:
                 server_dir, client_dir, release, port = _prepare_server(
-                    s, staged, output
+                    s, staged, output, multiplayer
                 )
                 server_command = _server_command(server_dir)
                 client_command = [
@@ -908,9 +1022,15 @@ def run_client_scenario(
                     "-s",
                     "-screen 0 1280x720x24",
                 ] + _read_spec(launch_spec)
+                if multiplayer:
+                    observer_command = _observer_command(_read_spec(launch_spec), s.run_dir)
+                    client_command = client_command[:4] + [sys.executable,
+                        str(Path(__file__).parent / "display_client.py"), str(s.run_dir / "shared-display.json")
+                    ] + client_command[4:]
+                    (output / "probe-stage").unlink(missing_ok=True)
             _client_lifecycle(
                 s, server_command, client_command, server_dir, client_dir, output, port,
-                () if fixture else visual_setup_commands(root, content_requirements),
+                () if fixture else visual_setup_commands(root, content_requirements), observer_command,
             )
     except Exception as exc:
         failure = str(exc)

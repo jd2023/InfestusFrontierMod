@@ -8,26 +8,24 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.jd.infestusfrontier.interaction.api.IntentAdmission;
+import org.jd.infestusfrontier.interaction.api.ServerIntentAdmission;
 import org.jd.infestusfrontier.interaction.api.ProbeAccess;
 import org.jd.infestusfrontier.processing.ProcessingModule;
+import org.jd.infestusfrontier.ui.ChangedSnapshot;
 
 /** One player's bounded view of one loaded Bowl. */
 public final class CultureBowlMenu extends AbstractContainerMenu {
     private final BlockPos targetPosition;
     private final ServerPlayer serverPlayer;
     private final BowlMenuTarget target;
-    private final IntentAdmission playerAdmission = new IntentAdmission();
     private CultureBowlMenuSnapshot snapshot;
-    private CultureBowlMenuSnapshot lastSent;
+    private ChangedSnapshot<CultureBowlMenuSnapshot> updates;
     private BowlRefusal pendingRefusal = BowlRefusal.NONE;
-    private long lastSnapshotTick = Long.MIN_VALUE;
 
     public CultureBowlMenu(int id, Inventory inventory, BlockPos position, CultureBowlMenuSnapshot initial) {
         super(ProcessingModule.BOWL_MENU.get(), id);
         this.targetPosition = position.immutable();
         this.snapshot = initial;
-        this.lastSent = initial;
         this.serverPlayer = null;
         this.target = null;
     }
@@ -38,8 +36,8 @@ public final class CultureBowlMenu extends AbstractContainerMenu {
         this.serverPlayer = (ServerPlayer) inventory.player;
         this.target = target;
         this.snapshot = target.menuSnapshot(BowlRefusal.NONE);
-        this.lastSent = snapshot;
-        this.lastSnapshotTick = Integer.toUnsignedLong(serverPlayer.server.getTickCount());
+        this.updates = new ChangedSnapshot<>(snapshot,
+                Integer.toUnsignedLong(serverPlayer.server.getTickCount()));
     }
 
     public BlockPos targetPosition() { return targetPosition; }
@@ -54,10 +52,10 @@ public final class CultureBowlMenu extends AbstractContainerMenu {
     }
 
     public void handleIntent(ServerPlayer player, BowlIntentPayload payload) {
-        long tick = Integer.toUnsignedLong(player.server.getTickCount());
-        if (!playerAdmission.take(tick)) {
+        var admission = BowlIntentTraffic.take(player);
+        if (admission == ServerIntentAdmission.Result.PLAYER_LIMIT) {
             pendingRefusal = BowlRefusal.RATE_LIMITED;
-        } else if (!BowlIntentTraffic.take(player.server)) {
+        } else if (admission == ServerIntentAdmission.Result.SERVER_LIMIT) {
             pendingRefusal = BowlRefusal.SERVER_BUSY;
         } else if (!payload.target().equals(targetPosition)) {
             pendingRefusal = BowlRefusal.REMOTE_TARGET;
@@ -110,12 +108,9 @@ public final class CultureBowlMenu extends AbstractContainerMenu {
         if (serverPlayer == null || target == null || !stillValid(serverPlayer)) return;
         var current = target.menuSnapshot(pendingRefusal);
         snapshot = current;
-        if (current.equals(lastSent)) return;
         long tick = Integer.toUnsignedLong(serverPlayer.server.getTickCount());
-        if (tick - lastSnapshotTick < 10) return;
+        if (!updates.take(current, tick)) return;
         PacketDistributor.sendToPlayer(serverPlayer, new BowlSnapshotPayload(containerId, current));
-        lastSent = current;
-        lastSnapshotTick = tick;
     }
 
     @Override public boolean stillValid(Player player) {

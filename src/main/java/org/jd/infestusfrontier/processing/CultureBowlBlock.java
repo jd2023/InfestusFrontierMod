@@ -60,7 +60,9 @@ final class CultureBowlBlock extends BaseEntityBlock {
     }
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
             Player player, InteractionHand hand, BlockHitResult hit) {
-        if (stack.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (stack.isEmpty()) return player.getOffhandItem().isEmpty()
+                ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                : ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         if (!directControl(stack)) return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
         if (level.getBlockEntity(pos) instanceof CultureBowlEntity bowl) bowl.interact(player, hand);
@@ -71,6 +73,7 @@ final class CultureBowlBlock extends BaseEntityBlock {
                 || stack.is(Items.WATER_BUCKET) || !BowlResources.key(stack.getItem()).isEmpty();
     }
     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.getOffhandItem().isEmpty()) return InteractionResult.PASS;
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof CultureBowlEntity bowl) {
             bowl.interact(player, InteractionHand.MAIN_HAND);
         }

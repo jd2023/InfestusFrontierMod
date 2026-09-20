@@ -128,10 +128,14 @@ class Supervisor:
         clock=time.monotonic,
         sleep=time.sleep,
         process_factory=CappedProcess,
+        max_children=3,
     ):
         self.root, self.run_id, self.limits = root, run_id, limits
         self.clock, self.sleep, self.process_factory = clock, sleep, process_factory
         self.total = total
+        if max_children not in (3, 4):
+            raise HarnessFailure("ownership: invalid child bound")
+        self.max_children = max_children
         self.children = {}
         self.durations = {}
         self.cleanup_ok = False
@@ -199,7 +203,7 @@ class Supervisor:
         )
 
     def start(self, role, command, cwd, log, env=None):
-        if role in self.children or len(self.children) >= 3:
+        if role in self.children or len(self.children) >= self.max_children:
             raise HarnessFailure("ownership: duplicate role or child limit")
         self.launching = True
         try:
