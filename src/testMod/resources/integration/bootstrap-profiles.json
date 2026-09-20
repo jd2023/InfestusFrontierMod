@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "scenario": "bootstrap",
+  "profiles": [
+    "required",
+    "jei",
+    "curios",
+    "combined"
+  ],
+  "seed": 11,
+  "deadlinesSeconds": {
+    "readiness": 120,
+    "join": 30,
+    "capture": 30,
+    "disconnect": 30,
+    "shutdown": 30,
+    "cleanup": 5,
+    "profileSmoke": 180,
+    "clientScenario": 420
+  }
+}

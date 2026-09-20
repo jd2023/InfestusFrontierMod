@@ -36,6 +36,17 @@ def alive(pid: int) -> bool:
 
 
 class EvaluatorTest(EvidenceCase):
+    def result_for_profile(self, profile):
+        result = self.result()
+        result["profile"] = profile
+        for mods in result["runtimeMods"].values():
+            if profile in ("jei", "combined"):
+                mods["jei"] = "19.56.0.438"
+                mods["mezz_config"] = "0.5.6"
+            if profile in ("curios", "combined"):
+                mods["curios"] = "9.5.1+1.21.1"
+        return result
+
     def test_profile_file_must_match_bootstrap_contract_exactly(self):
         with tempfile.TemporaryDirectory() as raw:
             profile = Path(raw) / "profiles.json"
@@ -52,6 +63,46 @@ class EvaluatorTest(EvidenceCase):
         result["runtimeMods"]["server"]["geckolib"] = "4.9.1"
         with self.assertRaisesRegex(harness.HarnessFailure, "geckolib.*4.9.2"):
             harness.ResultEvaluator().evaluate(result)
+
+    def test_pinned_jei_bundled_identity_is_required_for_both_processes(self):
+        for profile in ("jei", "combined"):
+            with self.subTest(profile=profile):
+                harness.ResultEvaluator().evaluate(self.result_for_profile(profile))
+
+    def test_pinned_jei_bundled_identity_rejects_missing_wrong_and_unknown(self):
+        cases = (
+            ("missing", "mezz_config"),
+            ("wrong", "mezz_config.*0.5.6"),
+            ("unknown", "identities do not match"),
+        )
+        for profile in ("jei", "combined"):
+            for role in ("server", "client"):
+                for mutation, diagnostic in cases:
+                    with self.subTest(
+                        profile=profile, role=role, mutation=mutation
+                    ):
+                        result = self.result_for_profile(profile)
+                        if mutation == "missing":
+                            del result["runtimeMods"][role]["mezz_config"]
+                        elif mutation == "wrong":
+                            result["runtimeMods"][role]["mezz_config"] = "0.5.5"
+                        else:
+                            result["runtimeMods"][role]["unknown_library"] = "1.0"
+                        with self.assertRaisesRegex(
+                            harness.HarnessFailure, diagnostic
+                        ):
+                            harness.ResultEvaluator().evaluate(result)
+
+    def test_jei_bundled_identity_is_rejected_when_jei_is_unselected(self):
+        for profile in ("required", "curios"):
+            for role in ("server", "client"):
+                with self.subTest(profile=profile, role=role):
+                    result = self.result_for_profile(profile)
+                    result["runtimeMods"][role]["mezz_config"] = "0.5.6"
+                    with self.assertRaisesRegex(
+                        harness.HarnessFailure, "identities do not match"
+                    ):
+                        harness.ResultEvaluator().evaluate(result)
 
     def test_stale_or_absent_capture_is_rejected(self):
         for mutation in ("missing", "stale"):

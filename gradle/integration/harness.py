@@ -48,6 +48,7 @@ REQUIRED_MODS = {
     "geckolib": "4.9.2",
 }
 OPTIONAL_MODS = {"jei": "19.56.0.438", "curios": "9.5.1+1.21.1"}
+PROFILE_TRANSITIVE_MODS = {"jei": {"mezz_config": "0.5.6"}}
 DEFAULT_DEADLINES = {
     "readiness": 120,
     "join": 30,
@@ -272,6 +273,9 @@ class ResultEvaluator:
                 if profile in (key, "combined")
             }
         )
+        for selected, transitive in PROFILE_TRANSITIVE_MODS.items():
+            if profile in (selected, "combined"):
+                expected.update(transitive)
         if not omission:
             if set(runtime) != roles:
                 raise HarnessFailure("runtime mod process roles missing or unexpected")
