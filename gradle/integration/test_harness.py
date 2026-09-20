@@ -121,6 +121,47 @@ class EvaluatorTest(EvidenceCase):
     def test_valid_evidence_is_accepted(self):
         harness.ResultEvaluator().evaluate(self.result())
 
+    def test_content_requirements_reject_missing_named_runtime_assertion(self):
+        requirements = {
+            "gameTest": ["infestusfrontier_tests:fixture.obtain"],
+            "client": [],
+        }
+        self.assertEqual(
+            harness._named_assertions(
+                "", requirements["gameTest"], harness.CONTENT_MARKER
+            ),
+            {"content:infestusfrontier_tests:fixture.obtain": False},
+        )
+        log = "INFESTUS_CONTENT_ASSERTION name=infestusfrontier_tests:fixture.obtain\n"
+        self.assertTrue(
+            harness._named_assertions(
+                log, requirements["gameTest"], harness.CONTENT_MARKER
+            )["content:infestusfrontier_tests:fixture.obtain"]
+        )
+
+    def test_content_requirements_file_is_bounded_and_typed(self):
+        with tempfile.TemporaryDirectory() as raw:
+            path = Path(raw) / "requirements.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "assertions": {
+                            "gameTest": ["infestusfrontier_tests:fixture.obtain"],
+                            "client": ["infestusfrontier_client:fixture.guide"],
+                        }
+                    }
+                )
+            )
+            self.assertEqual(
+                harness.load_content_requirements(path)["client"],
+                ["infestusfrontier_client:fixture.guide"],
+            )
+            path.write_text(
+                json.dumps({"assertions": {"gameTest": [], "client": [7]}})
+            )
+            with self.assertRaisesRegex(harness.HarnessFailure, "client"):
+                harness.load_content_requirements(path)
+
 
 class SupervisorFixtureTest(unittest.TestCase):
     def assert_failure_cleans_children(self, scenario: str, phase: str):

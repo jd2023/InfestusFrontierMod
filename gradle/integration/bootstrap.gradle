@@ -87,7 +87,9 @@ abstract class VerifyClientAutomation extends DefaultTask {
         new java.util.zip.ZipFile(artifact.get().asFile).withCloseable { jar ->
             def classes = jar.entries().findAll { it.name.endsWith('.class') }.collect { it.name }
             if (!classes.contains('org/jd/infestusfrontier/testmod/integration/BootstrapClient.class') ||
-                    classes.any { !it.startsWith('org/jd/infestusfrontier/testmod/integration/BootstrapClient') }) {
+                    !classes.contains('org/jd/infestusfrontier/testmod/integration/ContentAssertion.class') ||
+                    classes.any { !(it.startsWith('org/jd/infestusfrontier/testmod/integration/BootstrapClient') ||
+                            it == 'org/jd/infestusfrontier/testmod/integration/ContentAssertion.class') }) {
                 throw new GradleException("Client automation contains missing hooks or unrelated fixtures: ${classes}")
             }
             if (jar.getEntry('META-INF/neoforge.mods.toml') == null)
@@ -126,7 +128,7 @@ def packagedDestination = layout.buildDirectory.dir("integration/evidence/${inte
 tasks.register('captureClient', Exec) {
     group = 'verification'
     description = 'Captures the title and joined-world bootstrap states with a real disposable client.'
-    dependsOn stageIntegration, writeClientSpec, validateIntegrationInputs
+    dependsOn stageIntegration, writeClientSpec, validateIntegrationInputs, tasks.named('checkContentCoverage')
     inputs.property 'modProfile', integrationSelectedProfile
     inputs.property 'scenario', providers.gradleProperty('scenario').orElse('bootstrap')
     outputs.file captureDestination.map { new File(it, 'result.json') }
@@ -137,6 +139,7 @@ tasks.register('captureClient', Exec) {
             '--launch-spec', layout.buildDirectory.file('integration/client-launch.json').get().asFile.absolutePath,
             '--output', captureDestination.get().absolutePath,
             '--profile', integrationSelectedProfile,
+            '--content-requirements', layout.buildDirectory.file('content-coverage/requirements.json').get().asFile.absolutePath,
             '--capture'
 }
 
@@ -159,7 +162,7 @@ def profileSmokeDestination = integrationOutput('profileSmoke')
 tasks.register('profileSmoke', Exec) {
     group = 'verification'
     description = 'Runs the bounded real GameTest bootstrap for the selected integration profile.'
-    dependsOn writeGameTestSpec, validateIntegrationInputs
+    dependsOn writeGameTestSpec, validateIntegrationInputs, tasks.named('checkContentCoverage')
     inputs.property 'modProfile', integrationSelectedProfile
     inputs.property 'omitRequired', integrationOmittedRequired
     outputs.file new File(profileSmokeDestination, 'result.json')
@@ -168,7 +171,9 @@ tasks.register('profileSmoke', Exec) {
                  '--root', project.projectDir.absolutePath,
                  '--launch-spec', layout.buildDirectory.file('integration/gametest-launch.json').get().asFile.absolutePath,
                  '--output', profileSmokeDestination.absolutePath,
-                 '--profile', integrationSelectedProfile] + (integrationOmittedRequired ? ['--omit', integrationOmittedRequired] : []))
+                 '--profile', integrationSelectedProfile,
+                 '--content-requirements', layout.buildDirectory.file('content-coverage/requirements.json').get().asFile.absolutePath] +
+                (integrationOmittedRequired ? ['--omit', integrationOmittedRequired] : []))
 }
 
 tasks.named('verifyAll') {

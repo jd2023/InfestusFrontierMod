@@ -62,6 +62,8 @@ DEFAULT_DEADLINES = {
 MAX_RESULT = 1024 * 1024
 MAX_CAPTURE = 4 * 1024 * 1024
 IDENTITY = re.compile(r"INFESTUS_INTEGRATION_RUNTIME\s+([^\r\n]+)")
+CONTENT_MARKER = "INFESTUS_CONTENT_ASSERTION"
+GUIDE_MARKER = "INFESTUS_GUIDE_ASSERTION"
 
 
 def _sha256(path: Path) -> str:
@@ -137,6 +139,40 @@ def validate_profile_file(
             "CLI profile/scenario disagree with integration profile file"
         )
     return value
+
+
+def load_content_requirements(path: Path | None) -> dict[str, list[str]]:
+    empty = {"gameTest": [], "client": []}
+    if path is None:
+        return empty
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        assertions = value["assertions"]
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        raise HarnessFailure(f"invalid content requirements: {exc}") from exc
+    result = {}
+    for role in empty:
+        names = assertions.get(role)
+        if (
+            not isinstance(names, list)
+            or len(names) > 4096
+            or len(names) != len(set(names))
+            or any(
+                not isinstance(name, str)
+                or not re.fullmatch(r"[a-z0-9_.-]+:[a-z0-9_./-]+", name)
+                for name in names
+            )
+        ):
+            raise HarnessFailure(f"invalid {role} content assertion requirements")
+        result[role] = names
+    return result
+
+
+def _named_assertions(log: str, names: list[str], marker: str) -> dict[str, bool]:
+    observed = set(
+        re.findall(re.escape(marker) + r" name=([a-z0-9_.-]+:[a-z0-9_./-]+)", log)
+    )
+    return {f"content:{name}": name in observed for name in names}
 
 
 def _png_dimensions(path: Path) -> tuple[int, int]:
@@ -693,7 +729,7 @@ def _client_lifecycle(
     )
 
 
-def _client_assertions(s, port, release):
+def _client_assertions(s, port, release, content_requirements=None):
     server = s.children.get("server")
     client = s.children.get("client")
     slog, clog = server.text() if server else "", client.text() if client else ""
@@ -702,7 +738,7 @@ def _client_assertions(s, port, release):
         f"INFESTUS_INTEGRATION_PLAYER_JOIN {identity}",
         f"INFESTUS_INTEGRATION_PLAYER_LEAVE {identity}",
     )
-    return dict(
+    assertions = dict(
         serverReady="Done (" in slog,
         serverPlayerJoin=join in slog,
         serverPlayerDisconnect=leave in slog
@@ -723,10 +759,25 @@ def _client_assertions(s, port, release):
         cameraRendered="INFESTUS_CLIENT_CAMERA_RENDERED yaw=0.0 pitch=15.0" in clog,
         portReleased=port is not None and _port_released(port),
     )
+    assertions.update(
+        _named_assertions(
+            clog, (content_requirements or {}).get("client", []), GUIDE_MARKER
+        )
+    )
+    return assertions
 
 
 def run_client_scenario(
-    root, staged, launch_spec, output, profile, capture, *, fixture=None, limits=None
+    root,
+    staged,
+    launch_spec,
+    output,
+    profile,
+    capture,
+    *,
+    fixture=None,
+    limits=None,
+    content_requirements=None,
 ):
     validate_profile_file(None, profile, "bootstrap")
     if (root / "build/integration/runs").resolve() in output.resolve().parents:
@@ -745,7 +796,7 @@ def run_client_scenario(
             profile,
             started,
             failure,
-            _client_assertions(s, port, release),
+            _client_assertions(s, port, release, content_requirements),
             release=release,
             fixture=bool(fixture),
         )
@@ -819,7 +870,9 @@ def run_fixture_scenario(scenario, output):
     )
 
 
-def run_profile_smoke(root, launch_spec, output, profile, omission):
+def run_profile_smoke(
+    root, launch_spec, output, profile, omission, content_requirements=None
+):
     validate_profile_file(None, profile, "bootstrap")
     if omission and (
         omission not in ("modonomicon", "geckolib") or profile != "required"
@@ -850,6 +903,13 @@ def run_profile_smoke(root, launch_spec, output, profile, omission):
                 ),
                 cleanStop="Game test server shutting down" in log and s.cleanup_ok,
                 ordinaryExit=child is not None and child.process.returncode == 0,
+            )
+            assertions.update(
+                _named_assertions(
+                    log,
+                    (content_requirements or {}).get("gameTest", []),
+                    CONTENT_MARKER,
+                )
             )
         return publish_result(
             output,
@@ -922,6 +982,7 @@ def main():
         for flag in ("root", "launch-spec", "output"):
             p.add_argument("--" + flag, type=Path, required=True)
         p.add_argument("--profile", required=True)
+        p.add_argument("--content-requirements", type=Path)
         if name == "client-scenario":
             p.add_argument("--staged", type=Path, required=True)
             p.add_argument("--capture", action="store_true")
@@ -939,13 +1000,16 @@ def main():
         validate_profile_file(args.file, args.profile, args.scenario)
         return 0
     if args.command == "profile-smoke":
+        content_requirements = load_content_requirements(args.content_requirements)
         return run_profile_smoke(
             args.root.resolve(),
             args.launch_spec.resolve(),
             args.output.resolve(),
             args.profile,
             args.omit,
+            content_requirements,
         )
+    content_requirements = load_content_requirements(args.content_requirements)
     return run_client_scenario(
         args.root.resolve(),
         args.staged.resolve(),
@@ -953,6 +1017,7 @@ def main():
         args.output.resolve(),
         args.profile,
         args.capture,
+        content_requirements=content_requirements,
     )
 
 

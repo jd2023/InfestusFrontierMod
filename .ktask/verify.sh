@@ -6,4 +6,5 @@ python3 scripts/check_design_docs.py --self-test
 python3 scripts/check_design_docs.py
 python3 scripts/check_armor_balance.py --self-test
 python3 scripts/check_armor_balance.py
+python3 scripts/check_content_coverage.py --self-test
 ./gradlew verifyAll --max-workers=1 --console=plain 2>&1 | tee build/verification/full-gate.log

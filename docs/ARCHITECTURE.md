@@ -234,6 +234,53 @@ tests cover exercised paths; they do not prove every hypothetical class-load pat
 No custom Java source analyzer or static transitive-reachability checker is required.
 Client-only registrations remain valid; common initialization must not load them.
 
+## Incremental content coverage harness
+
+Integration owns the build-time catalog coverage gate. The tracked
+`src/testMod/resources/content-checkpoint.json` is schema 1 with one `through`
+task ID. The default gate reads that file and owner contributors directly from the
+current working tree. `--through`/`-PcontentThrough` may require a later queue task,
+but cannot lower the tracked checkpoint. Git state, ignored receipts, runtime
+registry discovery and production placeholders are never coverage inputs.
+
+An owner contributes only at
+`src/testMod/resources/<owner>/coverage.json`. Its schema-1 `owner` must match the
+directory and each contribution contains one queue `task` plus `entries`. An entry
+has exactly these fields:
+
+```json
+{
+  "catalog": ["I001", "T0-16"],
+  "registry": ["infestusfrontier:construction/organ_bud"],
+  "producer": "infestusfrontier:construction/organ_bud",
+  "assertions": {
+    "obtain": "infestusfrontier_tests:construction.organ_bud.obtain",
+    "use": "infestusfrontier_tests:construction.organ_bud.use",
+    "guide": "infestusfrontier_client:construction.organ_bud.guide"
+  }
+}
+```
+
+`catalog` groups aliases that share the listed real representation; it does not
+authorize another registration. Families may list their finite actual registry
+IDs. `producer` names the real recipe, mutation or construction operation. Obtain
+and use assertions are GameTests and call `ContentAssertion.passGameTest` only
+after their behavior succeeds. Guide assertions call `ContentAssertion.passGuide`
+after the client has observed the named page/recipe behavior. Their exact markers
+are required by the integration harness, so a registration without the behavior
+test is insufficient. Guide assertions are schema-checked and staged before
+IF-004; at and after IF-004 the emitted client requirement includes every eligible
+staged and new assertion.
+
+Item and mutation assignment comes from `.ktask/content-plan.json`; block assignment
+comes from the queue's `Blocks` fields. Contributors for unknown or later tasks,
+misowned or duplicate catalog IDs, missing producers/assertions and incomplete
+accepted tasks fail by exact identifier. The checker admits at most 4096 distinct
+identifiers, 16384 mapping/dependency edges and 1 MiB per JSON input. It performs
+no game/world scan. The isolated IF-108 GameTest separately proves the bootstrap
+has no production item or block registrations; later checkpoints replace that
+empty-state expectation with their named contributors.
+
 `verifyAll` adds integrationHarnessTest and required-profile
 smoke without removing its existing core, distribution or GameTest checks. Its
 smoke always uses required, independent of a caller's profile selection; reuse the

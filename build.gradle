@@ -54,6 +54,7 @@ sourceSets {
     integrationClient {
         java.srcDir 'src/testMod/java'
         java.include 'org/jd/infestusfrontier/testmod/integration/BootstrapClient.java'
+        java.include 'org/jd/infestusfrontier/testmod/integration/ContentAssertion.java'
         resources.srcDir 'src/testMod/resources/integration/client'
     }
 }
@@ -186,10 +187,27 @@ def prepareGameTest = tasks.register('prepareGameTest', Copy) {
 }
 tasks.named('runGameTestServer') { dependsOn prepareGameTest }
 tasks.named('runGameTestServer') { mustRunAfter ':core:test', distribution }
+def contentCoverageOutput = layout.buildDirectory.file('content-coverage/requirements.json')
+def requestedContentThrough = providers.gradleProperty('contentThrough').orNull
+def checkContentCoverage = tasks.register('checkContentCoverage', Exec) {
+    group = 'verification'
+    description = 'Validates working-tree catalog coverage and emits runtime assertion requirements.'
+    inputs.file '.ktask/tasks.md'
+    inputs.file '.ktask/content-plan.json'
+    inputs.file 'scripts/check_content_coverage.py'
+    inputs.file 'src/testMod/resources/content-checkpoint.json'
+    inputs.files(fileTree('src/testMod/resources') { include '*/coverage.json' })
+    inputs.property 'contentThrough', requestedContentThrough ?: ''
+    outputs.file contentCoverageOutput
+    def command = ['python3', file('scripts/check_content_coverage.py').absolutePath,
+                   '--output', contentCoverageOutput.get().asFile.absolutePath]
+    if (requestedContentThrough) command += ['--through', requestedContentThrough]
+    commandLine command
+}
 tasks.register('verifyAll') {
     group = 'verification'
     description = 'Authoritative bootstrap gate: pure tests, production JAR contracts, isolated Minecraft GameTests.'
-    dependsOn ':core:check', tasks.named('build'), distribution
+    dependsOn ':core:check', tasks.named('build'), distribution, checkContentCoverage
 }
 
 apply from: 'gradle/integration/bootstrap.gradle'
