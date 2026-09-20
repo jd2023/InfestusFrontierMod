@@ -76,8 +76,10 @@ configurations {
 dependencies {
     implementation project(':core')
     implementation project(':ui')
+    compileOnly 'com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4'
     testModImplementation sourceSets.main.output
     integrationClientImplementation sourceSets.main.output
+    integrationClientImplementation 'com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4'
     if (omittedRequired != 'modonomicon') {
         runtimeOnly 'com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4'
     }

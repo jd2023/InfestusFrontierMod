@@ -1,0 +1,20 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.organ_bud.name",
+  "description": "book.infestusfrontier.entry.organ_bud.description",
+  "icon": "infestusfrontier:construction/organ_bud",
+  "x": 2,
+  "y": 4,
+  "parents": [{ "entry": "infestusfrontier:construction/spore_culture" }],
+  "condition": {
+    "type": "modonomicon:advancement",
+    "advancement_id": "infestusfrontier:discovery/spore_culture"
+  },
+  "pages": [
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:construction/organ_bud",
+      "text": "book.infestusfrontier.entry.organ_bud.page.text"
+    }
+  ]
+}

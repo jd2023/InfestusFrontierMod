@@ -93,7 +93,7 @@ abstract class VerifyClientAutomation extends DefaultTask {
                     !classes.contains('org/jd/infestusfrontier/testmod/integration/client/BootstrapGuideScenario.class') ||
                     classes.any { !(it.startsWith('org/jd/infestusfrontier/testmod/integration/BootstrapClient') ||
                             it == 'org/jd/infestusfrontier/testmod/integration/ContentAssertion.class' ||
-                            it == 'org/jd/infestusfrontier/testmod/integration/ContentRequirements.class' ||
+                            it.startsWith('org/jd/infestusfrontier/testmod/integration/ContentRequirements') ||
                             it ==~ 'org/jd/infestusfrontier/testmod/[^/]+/client/.+\\.class') }) {
                 throw new GradleException("Client automation contains missing hooks or unrelated fixtures: ${classes}")
             }

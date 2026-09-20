@@ -65,7 +65,7 @@ public final class CultureBowlMenu extends AbstractContainerMenu {
                 if (payload.intent() == BowlIntentPayload.Intent.EXTRACT_SLOT && !getCarried().isEmpty()) {
                     pendingRefusal = BowlRefusal.CARRIED_STACK;
                 } else {
-                    var result = target.applyMenuIntent(payload);
+                    var result = target.applyMenuIntent(player, payload);
                     pendingRefusal = result.refusal();
                     if (!result.extracted().isEmpty()) setCarried(result.extracted());
                 }

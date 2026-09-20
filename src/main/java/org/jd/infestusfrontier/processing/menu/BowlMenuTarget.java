@@ -3,6 +3,7 @@ package org.jd.infestusfrontier.processing.menu;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
 /** Narrow processing-owned port used by the menu adapter. */
@@ -11,7 +12,7 @@ public interface BowlMenuTarget {
     BlockPos menuPosition();
     boolean isPresentIn(ServerLevel level);
     CultureBowlMenuSnapshot menuSnapshot(BowlRefusal refusal);
-    ApplyResult applyMenuIntent(BowlIntentPayload payload);
+    ApplyResult applyMenuIntent(ServerPlayer player, BowlIntentPayload payload);
 
     record ApplyResult(BowlRefusal refusal, ItemStack extracted) {
         public ApplyResult {

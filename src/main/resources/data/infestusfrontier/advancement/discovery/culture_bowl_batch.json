@@ -1,0 +1,6 @@
+{
+  "parent": "infestusfrontier:discovery/living_substrate",
+  "criteria": {
+    "observed": { "trigger": "minecraft:impossible" }
+  }
+}

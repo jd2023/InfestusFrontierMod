@@ -9,11 +9,15 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.phys.Vec3;
 import org.jd.infestusfrontier.interaction.api.ProbeAccess;
 import org.jd.infestusfrontier.interaction.api.ProbeTarget;
+import org.jd.infestusfrontier.discovery.api.DiscoveryObserver;
 
 /** Interaction owns target selection and authorization; target features own their mutations. */
 final class SynapticProbeItem extends Item {
-    SynapticProbeItem(Properties properties) {
+    private final DiscoveryObserver discovery;
+
+    SynapticProbeItem(Properties properties, DiscoveryObserver discovery) {
         super(properties);
+        this.discovery = discovery;
     }
 
     @Override
@@ -37,6 +41,7 @@ final class SynapticProbeItem extends Item {
         }
         if (owner == null && !target.claimProbeOwner(player.getUUID())) return InteractionResult.FAIL;
         target.openProbeMenu(serverPlayer);
+        discovery.complete(serverPlayer, DiscoveryObserver.Milestone.SYNAPTIC_PROBE);
         return InteractionResult.CONSUME;
     }
 }

@@ -1,0 +1,11 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.nutrient_mash.name",
+  "description": "book.infestusfrontier.entry.nutrient_mash.description",
+  "icon": "infestusfrontier:processing/nutrient_mash",
+  "x": -1,
+  "y": 8,
+  "parents": [{ "entry": "infestusfrontier:processing/culture_bowl" }],
+  "condition": { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/living_substrate" },
+  "pages": [{ "type": "modonomicon:text", "title": "book.infestusfrontier.entry.nutrient_mash.name", "text": "book.infestusfrontier.entry.nutrient_mash.page.text" }]
+}

@@ -1,0 +1,9 @@
+{
+  "requires": "infestusfrontier_tests:discovery.waking_genome.use",
+  "commands": [
+    "time set noon"
+  ],
+  "captures": [
+    "waking-genome-guide.png"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "infestusfrontier:discovery/spore_culture",
+  "criteria": {
+    "observed": { "trigger": "minecraft:impossible" }
+  }
+}

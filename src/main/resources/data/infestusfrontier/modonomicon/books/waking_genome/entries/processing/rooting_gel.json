@@ -1,0 +1,11 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.rooting_gel.name",
+  "description": "book.infestusfrontier.entry.rooting_gel.description",
+  "icon": "infestusfrontier:processing/rooting_gel",
+  "x": 3,
+  "y": 8,
+  "parents": [{ "entry": "infestusfrontier:processing/culture_bowl" }],
+  "condition": { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/living_substrate" },
+  "pages": [{ "type": "modonomicon:text", "title": "book.infestusfrontier.entry.rooting_gel.name", "text": "book.infestusfrontier.entry.rooting_gel.page.text" }]
+}

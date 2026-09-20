@@ -29,6 +29,9 @@ import org.jd.infestusfrontier.processing.menu.BowlRefusal;
 import org.jd.infestusfrontier.processing.menu.CultureBowlMenu;
 import org.jd.infestusfrontier.processing.menu.CultureBowlMenuSnapshot;
 import org.jd.infestusfrontier.storage.api.QuantityStore;
+import org.jd.infestusfrontier.discovery.api.DiscoveryObserver;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import java.util.function.Supplier;
 
 final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMenuTarget {
     private BatchWork work;
@@ -37,8 +40,12 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
     private String selected = "I000";
     private CompoundTag rejected;
     private UUID owner;
-    CultureBowlEntity(BlockPos pos, BlockState state) {
-        super(ProcessingModule.BOWL_ENTITY.get(), pos, state);
+    private final DiscoveryObserver discovery;
+    private ServerPlayer completionPlayer;
+    CultureBowlEntity(BlockPos pos, BlockState state, Supplier<BlockEntityType<CultureBowlEntity>> entityType,
+            DiscoveryObserver discovery) {
+        super(entityType.get(), pos, state);
+        this.discovery = discovery;
         work = BatchWork.create(new QuantityStore(Collections.nCopies(9, QuantityStore.ItemSlot.empty(64)),
                 List.of(QuantityStore.Tank.empty(BowlSave.WATER_CAPACITY))), this::admit);
     }
@@ -47,9 +54,19 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
         if (rejected != null || !work.isActive() || level == null || level.isClientSide) return;
         if (!getBlockState().canSurvive(level, worldPosition)) return;
         work.advance(1);
-        if (!work.isActive()) commandRevision = work.revision();
+        if (!work.isActive()) {
+            commandRevision = work.revision();
+            completeDiscovery();
+        }
         setChanged();
         updateAppearance();
+    }
+    private void completeDiscovery() {
+        if (owner == null || !(level instanceof ServerLevel serverLevel)) return;
+        var player = completionPlayer != null && completionPlayer.getUUID().equals(owner)
+                ? completionPlayer : serverLevel.getServer().getPlayerList().getPlayer(owner);
+        if (player != null) discovery.complete(player, DiscoveryObserver.Milestone.CULTURE_BOWL_BATCH);
+        completionPlayer = null;
     }
     @Override public void setChanged() {
         // Only the owning loaded chunk is dirtied; no comparator/neighbor cascade is needed.
@@ -63,7 +80,9 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
         var stack = player.getItemInHand(hand);
         if (stack.is(Items.STICK)) {
             if (player.isShiftKeyDown()) {
-                message(player, "cancel." + work.cancel(work.revision()).name().toLowerCase(java.util.Locale.ROOT));
+                var cancelled = work.cancel(work.revision());
+                if (cancelled == BatchWork.CancelResult.CANCELLED) completionPlayer = null;
+                message(player, "cancel." + cancelled.name().toLowerCase(java.util.Locale.ROOT));
             } else if (!work.isActive()) {
                 var ids = List.copyOf(CultureBowlRecipes.all().keySet());
                 selected = ids.get((ids.indexOf(selected) + 1) % ids.size());
@@ -77,7 +96,10 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
             else {
                 var result = work.start(new BatchWork.StartRequest(selected), work.revision());
                 if (result instanceof BatchWork.Refused refused) message(player, "start." + refused.reason().name().toLowerCase(java.util.Locale.ROOT));
-                else message(player, "started");
+                else {
+                    if (player instanceof ServerPlayer serverPlayer) completionPlayer = serverPlayer;
+                    message(player, "started");
+                }
             }
         } else if (stack.is(Items.WATER_BUCKET) && stack.getComponentsPatch().isEmpty()) {
             if (work.insertWater(1000, work.revision())) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
@@ -140,6 +162,7 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
     @Override protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
+        completionPlayer = null;
         try {
             if (!tag.contains("bowl", Tag.TAG_COMPOUND)) throw new IllegalArgumentException("Missing Bowl state");
             var loaded = BowlSave.read(tag.getCompound("bowl"));
@@ -202,22 +225,23 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
                 state.history().completedBatches(), selected, refusal);
     }
 
-    @Override public BowlMenuTarget.ApplyResult applyMenuIntent(BowlIntentPayload payload) {
+    @Override public BowlMenuTarget.ApplyResult applyMenuIntent(ServerPlayer player, BowlIntentPayload payload) {
         if (rejected != null) return BowlMenuTarget.ApplyResult.refused(BowlRefusal.REVISION_EXHAUSTED);
         if (payload.revision() != commandRevision) return BowlMenuTarget.ApplyResult.refused(BowlRefusal.STALE_REVISION);
         return switch (payload.intent()) {
-            case START -> startFromMenu(payload.recipe(), work.revision());
+            case START -> startFromMenu(player, payload.recipe(), work.revision());
             case CANCEL -> cancelFromMenu(work.revision());
             case EXTRACT_SLOT -> extractFromMenu(payload.slot(), work.revision());
         };
     }
 
-    private BowlMenuTarget.ApplyResult startFromMenu(String recipe, long revision) {
+    private BowlMenuTarget.ApplyResult startFromMenu(ServerPlayer player, String recipe, long revision) {
         if (recipe.isBlank()) return BowlMenuTarget.ApplyResult.refused(BowlRefusal.UNKNOWN_RECIPE);
         var result = work.start(new BatchWork.StartRequest(recipe), revision);
         if (result instanceof BatchWork.Started) {
             commandRevision = work.revision();
             selected = recipe;
+            completionPlayer = player;
             setChanged();
             updateAppearance();
             return BowlMenuTarget.ApplyResult.accepted();
@@ -240,6 +264,7 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
         var result = work.cancel(revision);
         if (result == BatchWork.CancelResult.CANCELLED) {
             commandRevision = work.revision();
+            completionPlayer = null;
             setChanged();
             updateAppearance();
             return BowlMenuTarget.ApplyResult.accepted();

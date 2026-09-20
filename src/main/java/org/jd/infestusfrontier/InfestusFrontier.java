@@ -4,6 +4,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.bus.api.IEventBus;
 import org.jd.infestusfrontier.construction.ConstructionModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.discovery.DiscoveryModule;
 import org.jd.infestusfrontier.integration.RuntimeIdentity;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 
@@ -14,9 +15,12 @@ public final class InfestusFrontier {
 
     public InfestusFrontier(IEventBus modBus) {
         RuntimeIdentity.install();
-        new org.jd.infestusfrontier.processing.ProcessingModule().register(modBus);
-        new InteractionModule().register(modBus);
-        var ecology = new EcologyModule();
+        var discovery = new DiscoveryModule();
+        discovery.register();
+        var observer = discovery.observer();
+        new org.jd.infestusfrontier.processing.ProcessingModule(observer).register(modBus);
+        new InteractionModule(observer).register(modBus);
+        var ecology = new EcologyModule(observer);
         ecology.register(modBus);
         new ConstructionModule(ecology::applyCulture).register(modBus);
     }

@@ -1,0 +1,6 @@
+{
+  "parent": "infestusfrontier:discovery/root",
+  "criteria": {
+    "observed": { "trigger": "minecraft:impossible" }
+  }
+}

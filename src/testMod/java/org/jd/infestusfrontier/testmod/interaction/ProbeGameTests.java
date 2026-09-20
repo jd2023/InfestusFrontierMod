@@ -33,6 +33,7 @@ import org.jd.infestusfrontier.processing.menu.BowlRefusal;
 import org.jd.infestusfrontier.processing.menu.CultureBowlMenu;
 import org.jd.infestusfrontier.processing.menu.CultureBowlMenuSnapshot;
 import org.jd.infestusfrontier.testmod.integration.ContentAssertion;
+import org.jd.infestusfrontier.testmod.integration.AdvancementRecordingPlayer;
 
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
@@ -48,7 +49,7 @@ public final class ProbeGameTests {
         helper.assertTrue(probe.is(BuiltInRegistries.ITEM.get(id("interaction/synaptic_probe"))) && probe.getCount() == 1,
                 "Craft one reusable Synaptic Probe");
 
-        var owner = FakePlayerFactory.getMinecraft(helper.getLevel());
+        var owner = advancementPlayer(helper, "ProbeOwner");
         owner.setGameMode(GameType.SURVIVAL);
         var pos = placeOwned(helper, owner);
         helper.assertTrue(use(owner, pos, probe).consumesAction(), "Probe recognizes the Bowl target");
@@ -63,6 +64,9 @@ public final class ProbeGameTests {
                 "Unsupported held blocks proceed to placement beside the Bowl");
         ContentAssertion.passGameTest(helper, "infestusfrontier_tests:interaction.synaptic_probe.obtain");
         ContentAssertion.passGameTest(helper, "infestusfrontier_tests:interaction.synaptic_probe.use");
+        var milestone = helper.getLevel().getServer().getAdvancements().get(id("discovery/synaptic_probe"));
+        helper.assertTrue(owner.wasAwarded(milestone.id()),
+                "Using the Probe on a valid target earns server-owned ST-02 progress");
         helper.succeed();
     }
 
@@ -233,6 +237,13 @@ public final class ProbeGameTests {
 
     private static ServerPlayer player(GameTestHelper helper, String name) {
         var player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.nameUUIDFromBytes(name.getBytes(java.nio.charset.StandardCharsets.UTF_8)), name));
+        player.setGameMode(GameType.SURVIVAL);
+        return player;
+    }
+
+    private static AdvancementRecordingPlayer advancementPlayer(GameTestHelper helper, String name) {
+        var profile = new GameProfile(UUID.nameUUIDFromBytes(name.getBytes(java.nio.charset.StandardCharsets.UTF_8)), name);
+        var player = new AdvancementRecordingPlayer(helper.getLevel(), profile);
         player.setGameMode(GameType.SURVIVAL);
         return player;
     }

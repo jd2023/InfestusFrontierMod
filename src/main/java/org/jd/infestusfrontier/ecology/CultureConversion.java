@@ -12,20 +12,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.foundation.TickQuota;
+import org.jd.infestusfrontier.discovery.api.DiscoveryObserver;
 
 final class CultureConversion {
     static final int CONVERSIONS_PER_SERVER_TICK = 16;
 
     private final Supplier<LivingSubstrateBlock> substrate;
     private final TickQuota quota;
+    private final DiscoveryObserver discovery;
 
-    CultureConversion(Supplier<LivingSubstrateBlock> substrate) {
-        this(substrate, new TickQuota(CONVERSIONS_PER_SERVER_TICK));
+    CultureConversion(Supplier<LivingSubstrateBlock> substrate, DiscoveryObserver discovery) {
+        this(substrate, new TickQuota(CONVERSIONS_PER_SERVER_TICK), discovery);
     }
 
-    CultureConversion(Supplier<LivingSubstrateBlock> substrate, TickQuota quota) {
+    CultureConversion(Supplier<LivingSubstrateBlock> substrate, TickQuota quota, DiscoveryObserver discovery) {
         this.substrate = substrate;
         this.quota = quota;
+        this.discovery = discovery;
     }
 
     InteractionResult apply(UseOnContext context) {
@@ -60,6 +63,9 @@ final class CultureConversion {
             return InteractionResult.FAIL;
         }
         culture.consume(1, player);
+        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            discovery.complete(serverPlayer, DiscoveryObserver.Milestone.LIVING_SUBSTRATE);
+        }
         return InteractionResult.CONSUME;
     }
 

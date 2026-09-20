@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item;
 import org.jd.infestusfrontier.processing.api.CultureBowlRecipes;
 
 /** Finite registry translation; no arbitrary IDs or item components enter Bowl storage. */
-final class BowlResources {
+public final class BowlResources {
     private static final Map<String, ResourceLocation> IDS = create();
     private static Map<String, ResourceLocation> create() {
         var ids = new LinkedHashMap<String, ResourceLocation>();
@@ -30,7 +30,7 @@ final class BowlResources {
         var id = BuiltInRegistries.ITEM.getKey(item);
         return IDS.entrySet().stream().filter(entry -> entry.getValue().equals(id)).map(Map.Entry::getKey).findFirst().orElse("");
     }
-    static Item item(String key) {
+    public static Item item(String key) {
         var id = IDS.get(key);
         if (id == null) throw new IllegalArgumentException("Unsupported Bowl item: " + key);
         return BuiltInRegistries.ITEM.getOptional(id).orElseThrow();

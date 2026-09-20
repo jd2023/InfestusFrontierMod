@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.testmod.integration.ContentAssertion;
+import org.jd.infestusfrontier.testmod.integration.AdvancementRecordingPlayer;
 
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
@@ -31,7 +32,9 @@ public final class EcologyGameTests {
     public static void visibleSelectedGroundConvertsAndPaysExactlyOnce(GameTestHelper helper) {
         BlockPos pos = helper.absolutePos(BlockPos.ZERO);
         helper.getLevel().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = new AdvancementRecordingPlayer(helper.getLevel(), new com.mojang.authlib.GameProfile(
+                java.util.UUID.fromString("e04828e4-f69c-42a6-9c9a-61080f3426bd"), "CultureOwner"));
+        player.setGameMode(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE), 2));
 
         var result = useHeldOn(player, pos, Direction.UP);
@@ -44,6 +47,9 @@ public final class EcologyGameTests {
         helper.assertTrue(!useHeldOn(player, pos, Direction.UP).consumesAction()
                         && player.getMainHandItem().getCount() == 1,
                 "Soil tag membership must not allow culture to convert living substrate again");
+        var milestone = helper.getLevel().getServer().getAdvancements().get(id("discovery/living_substrate"));
+        helper.assertTrue(player.wasAwarded(milestone.id()),
+                "A successful selected conversion earns server-owned T0-01 progress");
         ContentAssertion.passGameTest(helper, "infestusfrontier_tests:ecology.living_substrate.obtain");
     }
 

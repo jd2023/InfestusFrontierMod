@@ -304,6 +304,7 @@ def _read_contributors(
                     "producer": producer,
                     "assertions": normalized_assertions,
                     "guide": f"{path_owner}/{entry['guide']}",
+                    "entry": guide["entry"],
                 }
                 for catalog in catalogs:
                     representations[catalog] = normalized

@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jd.infestusfrontier.testmod.integration.ContentAssertion;
+import org.jd.infestusfrontier.testmod.integration.AdvancementRecordingPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -49,7 +50,8 @@ public final class BowlGameTests {
         helper.assertTrue(recipe.matches(input, helper.getLevel()), "Exact Bowl crafting ingredients");
         var crafted = recipe.assemble(input, helper.getLevel().registryAccess());
         helper.assertTrue(crafted.is(BuiltInRegistries.ITEM.get(id("processing/culture_bowl"))) && crafted.getCount() == 1, "Craft one Bowl");
-        var player = net.neoforged.neoforge.common.util.FakePlayerFactory.getMinecraft(helper.getLevel());
+        var player = new AdvancementRecordingPlayer(helper.getLevel(), new com.mojang.authlib.GameProfile(
+                java.util.UUID.fromString("70bd1925-1784-48bf-9706-14128474beef"), "BowlOperator"));
         player.setGameMode(GameType.SURVIVAL);
         var support = helper.absolutePos(BlockPos.ZERO);
         helper.getLevel().setBlock(support, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), 2);
@@ -70,10 +72,13 @@ public final class BowlGameTests {
         String[] outputs = {"spore_culture", "organ_bud", "elastic_gel", "nutrient_mash", "honey_culture", "rooting_gel"};
         int[] water = {100, 0, 50, 100, 0, 50};
         var positions = new ArrayList<BlockPos>();
-        var player = net.neoforged.neoforge.common.util.FakePlayerFactory.getMinecraft(helper.getLevel());
+        var player = new AdvancementRecordingPlayer(helper.getLevel(), new com.mojang.authlib.GameProfile(
+                java.util.UUID.fromString("68fa29bc-e0a5-4a66-98af-adfb3ad57b77"), "BatchOperator"));
         player.setGameMode(GameType.SURVIVAL);
         for (int i = 0; i < 6; i++) {
             var pos = place(helper, new BlockPos(i, 1, 0)); positions.add(pos);
+            ((org.jd.infestusfrontier.interaction.api.ProbeTarget) helper.getLevel().getBlockEntity(pos))
+                    .claimProbeOwner(player.getUUID());
             for (int cycle = 0; cycle < i; cycle++) use(helper, pos, player, new ItemStack(Items.STICK), false);
             for (String ingredient : inputs[i]) use(helper, pos, player, stack(ingredient, 1), false);
             if (water[i] > 0) {
@@ -123,6 +128,11 @@ public final class BowlGameTests {
                 ContentAssertion.passGameTest(helper, "infestusfrontier_tests:processing." + outputs[i] + ".use");
             }
             ContentAssertion.passGameTest(helper, "infestusfrontier_tests:processing.culture_bowl.use");
+            var milestone = helper.getLevel().getServer().getAdvancements().get(
+                    id("discovery/culture_bowl_batch"));
+            helper.assertTrue(player.wasAwarded(milestone.id()),
+                    "A completed rooted Bowl batch earns server-owned T0-02 progress");
+            helper.succeed();
         });
     }
 

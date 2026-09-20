@@ -32,15 +32,23 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
+import org.jd.infestusfrontier.discovery.api.DiscoveryObserver;
 
 final class CultureBowlBlock extends BaseEntityBlock {
     static final BooleanProperty ACTIVE = BooleanProperty.create("active");
     private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 7, 15);
-    CultureBowlBlock(Properties properties) {
+    private final Supplier<BlockEntityType<CultureBowlEntity>> entityType;
+    private final DiscoveryObserver discovery;
+
+    CultureBowlBlock(Properties properties, Supplier<BlockEntityType<CultureBowlEntity>> entityType,
+            DiscoveryObserver discovery) {
         super(properties);
+        this.entityType = entityType;
+        this.discovery = discovery;
         registerDefaultState(stateDefinition.any().setValue(ACTIVE, false));
     }
-    @Override protected MapCodec<? extends BaseEntityBlock> codec() { return simpleCodec(CultureBowlBlock::new); }
+    @Override protected MapCodec<? extends BaseEntityBlock> codec() { return MapCodec.unit(this); }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) { builder.add(ACTIVE); }
     @Override protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) { return SHAPE; }
@@ -48,14 +56,16 @@ final class CultureBowlBlock extends BaseEntityBlock {
         return level.hasChunkAt(pos.below()) && level.getBlockState(pos.below()).is(
                 BuiltInRegistries.BLOCK.get(ResourceLocation.parse("infestusfrontier:ecology/living_substrate")));
     }
-    @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new CultureBowlEntity(pos, state); }
+    @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new CultureBowlEntity(pos, state, entityType, discovery);
+    }
     @Override public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         if (!level.isClientSide && placer instanceof Player player && level.getBlockEntity(pos) instanceof CultureBowlEntity bowl) {
             bowl.claimProbeOwner(player.getUUID());
         }
     }
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ProcessingModule.BOWL_ENTITY.get(),
+        return level.isClientSide ? null : createTickerHelper(type, entityType.get(),
                 (world, pos, current, bowl) -> bowl.tick());
     }
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,

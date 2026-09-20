@@ -1,0 +1,30 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.culture_bowl.name",
+  "description": "book.infestusfrontier.entry.culture_bowl.description",
+  "icon": "infestusfrontier:processing/culture_bowl",
+  "x": 0,
+  "y": 6,
+  "parents": [{ "entry": "infestusfrontier:ecology/living_substrate" }],
+  "condition": {
+    "type": "modonomicon:advancement",
+    "advancement_id": "infestusfrontier:discovery/living_substrate"
+  },
+  "pages": [
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:processing/culture_bowl",
+      "text": "book.infestusfrontier.entry.culture_bowl.craft.text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "book.infestusfrontier.entry.culture_bowl.controls.title",
+      "text": "book.infestusfrontier.entry.culture_bowl.controls.text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "book.infestusfrontier.entry.culture_bowl.recipes.title",
+      "text": "book.infestusfrontier.entry.culture_bowl.recipes.text"
+    }
+  ]
+}

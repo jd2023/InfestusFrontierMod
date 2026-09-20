@@ -1,0 +1,5 @@
+{
+  "criteria": {
+    "observed": { "trigger": "minecraft:impossible" }
+  }
+}

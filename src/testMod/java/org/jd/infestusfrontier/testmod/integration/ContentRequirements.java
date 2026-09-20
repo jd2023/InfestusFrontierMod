@@ -7,9 +7,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /** The same generated working-tree requirements are packaged for both test runtimes. */
-public record ContentRequirements(boolean emptyRegistry, List<String> clientAssertions) {
+public record ContentRequirements(boolean emptyRegistry, List<String> clientAssertions,
+        List<GuideRequirement> guideRequirements) {
     public ContentRequirements {
         clientAssertions = List.copyOf(clientAssertions);
+        guideRequirements = List.copyOf(guideRequirements);
     }
 
     public static ContentRequirements read() {
@@ -26,9 +28,19 @@ public record ContentRequirements(boolean emptyRegistry, List<String> clientAsse
                     }
                 }
             }
-            return new ContentRequirements(requirements.get("emptyRegistry").getAsBoolean(), List.copyOf(names));
+            var guides = new java.util.ArrayList<GuideRequirement>();
+            for (var value : requirements.getAsJsonArray("representations")) {
+                var representation = value.getAsJsonObject();
+                guides.add(new GuideRequirement(
+                        representation.get("entry").getAsString(),
+                        representation.getAsJsonObject("assertions").get("guide").getAsString()));
+            }
+            return new ContentRequirements(requirements.get("emptyRegistry").getAsBoolean(),
+                    List.copyOf(names), List.copyOf(guides));
         } catch (IOException exception) {
             throw new IllegalStateException("Cannot read content requirements", exception);
         }
     }
+
+    public record GuideRequirement(String entry, String assertion) {}
 }
