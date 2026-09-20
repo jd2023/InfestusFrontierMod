@@ -93,6 +93,9 @@ fully validated candidate before replacing balances. Restored active work must m
 one recipe alternative, earned water/time choices, outputs and returned containers.
 Allocation lists are bounded before copying (9 item entries per category, 2 fluid
 entries), and quantities use checked arithmetic. Organ owns the single history.
+Start and restore reserve revision capacity for each remaining work unit and a
+separate completion after quota refusal (plus start's own transition). Repeated
+admission refusals without progress leave the revision unchanged.
 
 The server adapter uses nine item slots and one 2000 mB tank, with only catalog
 resources and component-free input stacks. NBT list bounds, types, IDs, shape and

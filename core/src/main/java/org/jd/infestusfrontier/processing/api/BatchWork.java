@@ -78,8 +78,9 @@ public final class BatchWork {
             if (active.batchId() >= state.nextBatchId() || active.batchId() <= history.snapshot().lastCompletedBatchId()) {
                 throw new IllegalArgumentException("Active Bowl batch identifier is inconsistent");
             }
-            int remaining = Math.max(1, active.requiredWorkUnits() - active.completedWorkUnits());
-            if (state.revision() > Long.MAX_VALUE - 1L - remaining || quantities.revision() >= Long.MAX_VALUE - 1) {
+            int remaining = active.requiredWorkUnits() - active.completedWorkUnits();
+            // Each remaining work unit may advance separately; deferred completion needs one more revision.
+            if (state.revision() > Long.MAX_VALUE - 2L - remaining || quantities.revision() >= Long.MAX_VALUE - 1) {
                 throw new IllegalArgumentException("Active Bowl has exhausted revision capacity");
             }
             if (!quantities.hasReservation(active.reservationId())
@@ -160,7 +161,8 @@ public final class BatchWork {
         if (revision == Long.MAX_VALUE - 1) return new Refused(StartRefusal.REVISION_EXHAUSTED, state());
         var recipe = CultureBowlRecipes.find(request.recipeId()).orElse(null);
         if (recipe == null) return new Refused(StartRefusal.UNKNOWN_RECIPE, state());
-        if (revision > Long.MAX_VALUE - 2L - adjustedWork(recipe.baseWorkUnits())) {
+        // Reserve the start, every work tick and a separate completion after quota refusal.
+        if (revision > Long.MAX_VALUE - 3L - adjustedWork(recipe.baseWorkUnits())) {
             return new Refused(StartRefusal.REVISION_EXHAUSTED, state());
         }
         if (nextBatchId == Long.MAX_VALUE) return new Refused(StartRefusal.IDENTIFIER_EXHAUSTED, state());
