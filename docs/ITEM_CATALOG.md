@@ -123,7 +123,7 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I018 | Living Fang | Awaken I017 | Base for separately designed piercing/control weapon branches. |
 | I050 | Skeletal Graft | Bone Loom: 1 Bone Plate + 1 Binder + 25 BU → 1 | Reinforce one cell or permitted organ skeleton; the plate is not duplicated. |
 | I051 | Mutation Graft | Host rank I at T0; genetic/higher grafts from T2. Typed family under “Mutation grafts” below. | Installed once; target, equipment slot and rank are explicit. An installed armor graft cannot be extracted. |
-| I019 | Biomass Bucket | Fill a vanilla bucket with exactly 1,000 mB from a compatible store | Real fluid transfer. Tank transfer or deliberate placement into a finite spill; containment and damage follow the Block Catalog's containment rules. |
+| I019 | Biomass Bucket | Fill a vanilla bucket with exactly 1,000 mB from a compatible store | Real fluid transfer. It empties only when the complete 1,000 mB fits and otherwise remains held unchanged. World placement stays unavailable until finite spill admission exists; containment and damage follow the Block Catalog's containment rules. |
 
 ## 3. T1 — active ingredients and tissue treatments
 

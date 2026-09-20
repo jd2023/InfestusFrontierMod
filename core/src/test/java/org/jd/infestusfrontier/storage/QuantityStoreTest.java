@@ -12,6 +12,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class QuantityStoreTest {
     @Test
+    void fluidOutputReservationIsExactAndFullDestinationIsUnchanged() {
+        var store = new QuantityStore(List.of(), List.of(new QuantityStore.Tank("biomass", 950, 1000)));
+        var request = new QuantityStore.ReservationRequest(
+                Map.of(), Map.of(), Map.of(), Map.of(), Map.of("biomass", 50));
+        var reservation = assertInstanceOf(QuantityStore.Reserved.class,
+                store.reserve(request, store.revision()));
+        assertEquals(950, store.fluidAmount("biomass"));
+        assertEquals(QuantityStore.CommitResult.COMMITTED, store.commit(reservation.reservationId()));
+        assertEquals(1000, store.fluidAmount("biomass"));
+
+        var before = store.snapshot();
+        assertInstanceOf(QuantityStore.PreviewRefused.class,
+                store.preview(request, store.revision()));
+        assertEquals(before, store.snapshot());
+    }
+
+    @Test
     void reserveThenCommitIsConservativeAndReloadable() {
         var store = new QuantityStore(
                 List.of(

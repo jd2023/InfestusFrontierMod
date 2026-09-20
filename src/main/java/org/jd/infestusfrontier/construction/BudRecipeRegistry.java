@@ -129,9 +129,11 @@ final class BudRecipeRegistry implements BudRecipeRegistrar {
             if (id == null || !BuiltInRegistries.BLOCK.containsKey(id)) return false;
             Block replacement = BuiltInRegistries.BLOCK.getOptional(id).orElseThrow();
             if (replacement == bud || !isBud() || !updateAreaLoaded()) return false;
+            var replacementState = replacement.defaultBlockState();
+            if (!replacementState.canSurvive(level, pos)) return false;
             // Construction installs one body, without vanilla neighbor/shape cascades. Output owners
             // must keep their own onPlace/onBlockStateChange callbacks bounded and loaded-only.
-            return level.setBlock(pos, replacement.defaultBlockState(),
+            return level.setBlock(pos, replacementState,
                     Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE, 0);
         }
 

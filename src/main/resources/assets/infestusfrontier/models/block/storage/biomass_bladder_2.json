@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {"shell": "infestusfrontier:block/organ_bud", "biomass": "infestusfrontier:block/ecology/living_substrate_mature_1", "particle": "infestusfrontier:block/organ_bud"},
+  "elements": [
+    {"from": [1,0,1], "to": [15,2,15], "faces": {"north":{"texture":"#shell"},"south":{"texture":"#shell"},"east":{"texture":"#shell"},"west":{"texture":"#shell"},"up":{"texture":"#shell"},"down":{"texture":"#shell"}}},
+    {"from": [2,2,2], "to": [14,8,14], "faces": {"north":{"texture":"#biomass"},"south":{"texture":"#biomass"},"east":{"texture":"#biomass"},"west":{"texture":"#biomass"},"up":{"texture":"#biomass"},"down":{"texture":"#biomass"}}}
+  ]
+}

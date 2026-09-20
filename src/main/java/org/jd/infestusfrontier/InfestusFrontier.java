@@ -24,6 +24,8 @@ public final class InfestusFrontier {
         new InteractionModule(observer).register(modBus);
         var ecology = new EcologyModule(observer);
         ecology.register(modBus);
-        new ConstructionModule(ecology::applyCulture).register(modBus);
+        var construction = new ConstructionModule(ecology::applyCulture);
+        new org.jd.infestusfrontier.processing.digestion.DigestionModule(construction.budRecipes()).register(modBus);
+        construction.register(modBus);
     }
 }

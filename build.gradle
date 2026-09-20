@@ -47,6 +47,12 @@ repositories {
 }
 
 sourceSets {
+    // ModDev keys development mod folders by source-set name. Mirror the isolated
+    // UI output under a distinct dev-only name so native runs load it with the mod.
+    devUi {
+        java.setSrcDirs([project(':ui').file('src/main/java')])
+        resources.setSrcDirs([project(':ui').file('src/main/resources')])
+    }
     testMod {
         java.exclude 'org/jd/infestusfrontier/testmod/integration/BootstrapClient.java'
         java.exclude '**/client/**'
@@ -115,6 +121,7 @@ neoForge {
         infestusfrontier {
             sourceSet sourceSets.main
             sourceSet project(':core').sourceSets.main
+            sourceSet sourceSets.devUi
         }
         infestusfrontier_tests { sourceSet sourceSets.testMod }
         infestusfrontier_client { sourceSet sourceSets.integrationClient }

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {"shell": "infestusfrontier:block/organ_bud", "particle": "infestusfrontier:block/organ_bud"},
+  "elements": [
+    {"from": [1,0,1], "to": [15,2,15], "faces": {"north":{"texture":"#shell"},"south":{"texture":"#shell"},"east":{"texture":"#shell"},"west":{"texture":"#shell"},"up":{"texture":"#shell"},"down":{"texture":"#shell"}}}
+  ]
+}

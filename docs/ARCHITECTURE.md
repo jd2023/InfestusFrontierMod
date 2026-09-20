@@ -141,6 +141,30 @@ hand loading/collection, tick completion, save/reload, recovery, corrupt saves a
 cross-dimension contention. The connected client fixture observes the Bowl models
 and all four collected material icons in a disposable server scene.
 
+## Starter biomass adapter
+
+Storage extends `QuantityStore` reservations to finite fluid outputs; digestion and
+portable transfers use the same preview/reserve/commit invariant as item recipes.
+The Digestive Sac holds one item slot, one 1,000 mB biomass tank and one active
+batch. Its finite starter recipes are wheat (100 mB, 40 loaded ticks) and rotten
+flesh (50 mB, 160 loaded ticks). The complete output is reserved before the hand-fed
+item is accepted. Loaded rooted Sac ticks alone advance work; uprooting pauses it,
+and normal recovery retains the input, reservation, progress, output and history.
+
+The starter Biomass Bladder owns one 4,000 mB biomass tank and exposes an
+`EquipmentFueling` port. Equipment remains the compatibility and destination owner;
+an incompatible target refuses before source debit. I019 is an unstackable full
+1,000 mB transaction item, not a placeable fluid container. Filling and emptying
+reserve the complete source or destination change, so cancellation and refusal
+leave exact mB unchanged. No ampoule or armor registration is introduced here.
+
+One server-identity admission table bounds bucket/equipment transactions to 64 per
+tick across dimensions and four per player in any 20 ticks. It retains at most
+1,024 player windows, prunes at most 64 expired windows per request, creates no
+queue and weakly retains no stopped server. Idle Bladders have no ticker; idle Sacs
+return before block probes. Neither organ scans neighbors, requests chunk tickets,
+spawns rejected output nor performs offline catch-up.
+
 ## Probe and organ-menu adapter
 
 Interaction owns the reusable Synaptic Probe item, server-observed target selection,

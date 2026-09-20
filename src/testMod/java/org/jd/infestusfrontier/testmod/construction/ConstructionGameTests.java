@@ -103,7 +103,7 @@ public final class ConstructionGameTests {
         Block organBud = block(BUD);
         helper.getLevel().setBlockAndUpdate(budPos, organBud.defaultBlockState());
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BOWL, 2));
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.COBBLESTONE, 2));
         var hit = new BlockHitResult(Vec3.atCenterOf(budPos), Direction.UP, budPos, false);
         var result = helper.getLevel().getBlockState(budPos).useItemOn(
                 player.getItemInHand(InteractionHand.MAIN_HAND),
