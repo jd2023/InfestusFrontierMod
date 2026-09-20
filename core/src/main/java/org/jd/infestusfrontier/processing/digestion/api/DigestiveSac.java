@@ -64,7 +64,7 @@ public final class DigestiveSac {
         var recipe = RECIPES.get(item);
         if (recipe == null) return new FeedRefused(FeedRefusal.UNSUPPORTED, snapshot());
         if (activeBatch != null) return new FeedRefused(FeedRefusal.ACTIVE_BATCH, snapshot());
-        if (revision > Long.MAX_VALUE - 2L - recipe.workUnits() || nextBatchId == Long.MAX_VALUE) {
+        if (revision > Long.MAX_VALUE - 3L - recipe.workUnits() || nextBatchId == Long.MAX_VALUE) {
             return new FeedRefused(FeedRefusal.EXHAUSTED, snapshot());
         }
 

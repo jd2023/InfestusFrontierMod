@@ -1,5 +1,6 @@
 package org.jd.infestusfrontier.processing.digestion;
 
+import org.jd.infestusfrontier.discovery.api.DiscoveryObserver;
 import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
@@ -29,13 +30,15 @@ public final class DigestionModule {
     private final DeferredRegister.Items items = DeferredRegister.createItems(InfestusFrontier.MOD_ID);
     private final DeferredRegister<BlockEntityType<?>> entities = DeferredRegister.create(
             Registries.BLOCK_ENTITY_TYPE, InfestusFrontier.MOD_ID);
+    private final DiscoveryObserver discovery;
     private final Supplier<Item> biomassBucket;
     private final Supplier<DigestiveSacBlock> sac;
     private final Supplier<BiomassBladderBlock> bladder;
     private final Supplier<BlockEntityType<DigestiveSacEntity>> sacEntity;
     private final Supplier<BlockEntityType<BiomassBladderEntity>> bladderEntity;
 
-    public DigestionModule(BudRecipeRegistrar construction) {
+    public DigestionModule(BudRecipeRegistrar construction, DiscoveryObserver discovery) {
+        this.discovery = discovery;
         biomassBucket = items.register(BUCKET, () -> new BiomassBucketItem(new Item.Properties()));
         sac = blocks.register(SAC, this::createSac);
         bladder = blocks.register(BLADDER, this::createBladder);
@@ -60,11 +63,11 @@ public final class DigestionModule {
     }
     private BlockEntityType<DigestiveSacEntity> createSacEntity() {
         return BlockEntityType.Builder.of(
-                (pos, state) -> new DigestiveSacEntity(pos, state, sacEntity), sac.get()).build(null);
+                (pos, state) -> new DigestiveSacEntity(pos, state, sacEntity, discovery), sac.get()).build(null);
     }
     private BlockEntityType<BiomassBladderEntity> createBladderEntity() {
         return BlockEntityType.Builder.of(
-                (pos, state) -> new BiomassBladderEntity(pos, state, bladderEntity), bladder.get()).build(null);
+                (pos, state) -> new BiomassBladderEntity(pos, state, bladderEntity, discovery), bladder.get()).build(null);
     }
     private static BlockBehaviour.Properties properties(MapColor color) {
         return BlockBehaviour.Properties.of().mapColor(color).strength(0.7F).noOcclusion()

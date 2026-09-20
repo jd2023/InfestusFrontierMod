@@ -165,10 +165,21 @@ queue and weakly retains no stopped server. Idle Bladders have no ticker; idle S
 return before block probes. Neither organ scans neighbors, requests chunk tickets,
 spawns rejected output nor performs offline catch-up.
 
-Sac restoration rejects a next-batch identifier at or behind completed history;
+Sac admission reserves revision capacity for its start, every remaining progress
+transition, completion and a restorable final state. Quota refusals without progress
+do not advance the revision. Sac restoration rejects a next-batch identifier at or behind completed history;
 completion checks history eligibility before committing reserved quantities.
 Unsupported main/offhand interactions pass through on both logical sides; only
 catalog feeds and recognized buckets are consumed by the direct hand controls.
+
+Discovery uses vanilla inventory criteria to reveal all three biomass guide entries
+independently of Bud completion. Successful bucket commits and Bladder withdrawals
+report milestones through `DiscoveryObserver`; refusal and possession earn none.
+The Sac persists one operator UUID and one pending completion bit beside its batch.
+Completion credits only the feeder, resolving the current online player once on
+completion and once per 20 loaded ticks while pending, or on direct interaction.
+Recovery preserves that evidence; a pending credit prevents new batch admission
+until delivered, without blocking tank transfers or retaining player references.
 
 Biomass uses static baked models: at most 11 cuboids per organ, nine for the
 bucket. The Bladder has one shared translucent membrane/frame model and four

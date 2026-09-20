@@ -1,5 +1,7 @@
 package org.jd.infestusfrontier.processing.digestion;
 
+import net.minecraft.server.level.ServerPlayer;
+import org.jd.infestusfrontier.discovery.api.DiscoveryObserver;
 import com.mojang.logging.LogUtils;
 import java.util.List;
 import java.util.function.Supplier;
@@ -19,17 +21,26 @@ import org.jd.infestusfrontier.storage.api.QuantityStore;
 
 final class BiomassBladderEntity extends BlockEntity implements EquipmentFueling {
     static final int CAPACITY = 4_000;
+    private final DiscoveryObserver discovery;
     private QuantityStore store = emptyStore();
     private CompoundTag rejected;
 
     BiomassBladderEntity(BlockPos pos, BlockState state,
-            Supplier<BlockEntityType<BiomassBladderEntity>> type) {
+            Supplier<BlockEntityType<BiomassBladderEntity>> type,
+            DiscoveryObserver discovery) {
         super(type.get(), pos, state);
+        this.discovery = discovery;
     }
 
     boolean interact(Player player, InteractionHand hand, Item biomassBucket) {
         if (rejected != null) return false;
-        if (BiomassInteractions.transfer(store, player, hand, biomassBucket)) {
+        var result = BiomassInteractions.transfer(store, player, hand, biomassBucket, discovery);
+        if (result != BiomassInteractions.TransferResult.PASS) {
+            if (result == BiomassInteractions.TransferResult.FILLED_BUCKET
+                    && player instanceof ServerPlayer serverPlayer) {
+                discovery.complete(serverPlayer,
+                        DiscoveryObserver.Milestone.BIOMASS_BLADDER);
+            }
             setChanged();
             BiomassInteractions.status(player, store.fluidAmount("biomass"), CAPACITY);
             return true;

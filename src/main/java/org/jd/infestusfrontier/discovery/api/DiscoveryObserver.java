@@ -14,7 +14,10 @@ public interface DiscoveryObserver {
         SYNAPTIC_PROBE("synaptic_probe"),
         LIVING_SUBSTRATE("living_substrate"),
         CULTURE_BOWL_BATCH("culture_bowl_batch"),
-        ORGAN_BUD("organ_bud");
+        ORGAN_BUD("organ_bud"),
+        DIGESTIVE_SAC("digestive_sac"),
+        BIOMASS_BLADDER("biomass_bladder"),
+        BIOMASS_BUCKET("biomass_bucket");
 
         private final String path;
 

@@ -51,7 +51,7 @@ final class BiomassBladderBlock extends BaseEntityBlock {
         return DigestionModule.isRooted(level, pos);
     }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new BiomassBladderEntity(pos, state, entityType);
+        return entityType.get().create(pos, state);
     }
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
             Player player, InteractionHand hand, BlockHitResult hit) {

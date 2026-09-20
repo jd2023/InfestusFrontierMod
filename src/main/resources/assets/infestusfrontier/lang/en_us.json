@@ -169,5 +169,9 @@
   "book.infestusfrontier.recipe.water": "Water: %s mB",
   "book.infestusfrontier.recipe.output": "Produces: ",
   "book.infestusfrontier.recipe.returned": "Returns: ",
-  "book.infestusfrontier.recipe.duration": "Duration: %s loaded seconds"
+  "book.infestusfrontier.recipe.duration": "Duration: %s loaded seconds",
+  "message.infestusfrontier.digestive_sac.pending_credit": "Waiting for the previous feeder to return and receive their achievement.",
+  "advancement.infestusfrontier.digestive_sac.description": "Digest an organic batch into retained biomass.",
+  "advancement.infestusfrontier.biomass_bladder.description": "Withdraw stored biomass from a Bladder.",
+  "advancement.infestusfrontier.biomass_bucket.description": "Transfer a full bucket of biomass."
 }

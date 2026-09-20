@@ -54,7 +54,7 @@ final class DigestiveSacBlock extends BaseEntityBlock {
         return DigestionModule.isRooted(level, pos);
     }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new DigestiveSacEntity(pos, state, entityType);
+        return entityType.get().create(pos, state);
     }
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return level.isClientSide ? null : createTickerHelper(type, entityType.get(),

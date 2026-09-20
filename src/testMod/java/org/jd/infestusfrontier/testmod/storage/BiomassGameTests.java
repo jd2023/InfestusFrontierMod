@@ -171,6 +171,105 @@ public final class BiomassGameTests {
         helper.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void acquiredBiomassRevealsInstructionsWithoutOperation(GameTestHelper helper) {
+        for (var itemId : java.util.List.of(SAC, BLADDER, BUCKET)) {
+            var player = recordingPlayer(helper, "AcquiredBiomass");
+            player.setGameMode(GameType.CREATIVE);
+            var stack = new ItemStack(item(itemId));
+            player.getInventory().setItem(0, stack);
+            net.minecraft.advancements.CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), stack);
+            String leaf = itemId.getPath().substring(itemId.getPath().indexOf('/') + 1);
+            helper.assertTrue(player.wasAwarded(id("discovery/acquired/" + leaf)),
+                    "Receiving " + leaf + " reveals its instructions without a Bud craft");
+            var resource = helper.getLevel().getServer().getResourceManager().getResource(id(
+                    "modonomicon/books/waking_genome/entries/" + itemId.getPath() + ".json")).orElseThrow();
+            try (var reader = resource.openAsReader()) {
+                var condition = com.google.gson.JsonParser.parseReader(reader).getAsJsonObject()
+                        .getAsJsonObject("condition");
+                helper.assertTrue(condition.get("type").getAsString().equals("modonomicon:or")
+                                && java.util.stream.StreamSupport.stream(condition.getAsJsonArray("children").spliterator(), false)
+                                .map(com.google.gson.JsonElement::getAsJsonObject)
+                                .anyMatch(child -> child.get("type").getAsString().equals("modonomicon:advancement")
+                                        && child.get("advancement_id").getAsString().equals("infestusfrontier:discovery/acquired/" + leaf)),
+                        "Guide condition must accept the independently earned acquisition for " + leaf);
+            } catch (java.io.IOException exception) {
+                throw new IllegalStateException(exception);
+            }
+            for (String operation : java.util.List.of("digestive_sac", "biomass_bladder", "biomass_bucket", "organ_bud")) {
+                helper.assertTrue(!player.wasAwarded(id("discovery/" + operation)),
+                        "Possession cannot award operation " + operation);
+            }
+        }
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void sacCreditSurvivesReloadRecoveryAndCreditsOnlyItsOperator(GameTestHelper helper) {
+        var pos = placeBud(helper, new BlockPos(1, 1, 1));
+        helper.getLevel().setBlock(pos, block(SAC).defaultBlockState(), 2);
+        var operator = recordingPlayer(helper, "SacOperator");
+        var visitor = recordingPlayer(helper, "SacVisitor");
+        use(helper, pos, operator, new ItemStack(Items.WHEAT));
+        for (int t = 0; t < 20; t++) tick(helper.getLevel().getBlockEntity(pos));
+        var saved = helper.getLevel().getBlockEntity(pos).saveWithId(helper.getLevel().registryAccess());
+        helper.getLevel().removeBlockEntity(pos);
+        helper.getLevel().setBlockEntity(BlockEntity.loadStatic(pos, helper.getLevel().getBlockState(pos),
+                saved, helper.getLevel().registryAccess()));
+        for (int t = 0; t < 20; t++) tick(helper.getLevel().getBlockEntity(pos));
+        helper.assertTrue(biomass(helper, pos, "sac") == 100 && !operator.wasAwarded(id("discovery/digestive_sac")),
+                "Offline operator completion commits biomass without retaining a player object");
+        var drops = Block.getDrops(helper.getLevel().getBlockState(pos), helper.getLevel(), pos,
+                helper.getLevel().getBlockEntity(pos));
+        helper.assertTrue(drops.size() == 1, "One recovered Sac retains pending operation credit");
+        helper.getLevel().removeBlock(pos, false);
+        visitor.setItemInHand(InteractionHand.MAIN_HAND, drops.getFirst());
+        drops.getFirst().getItem().useOn(new UseOnContext(visitor, InteractionHand.MAIN_HAND,
+                new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
+        use(helper, pos, visitor, new ItemStack(Items.WHEAT));
+        helper.assertTrue(visitor.getMainHandItem().is(Items.WHEAT)
+                        && !visitor.wasAwarded(id("discovery/digestive_sac")),
+                "A visitor cannot overwrite undelivered credit or claim another player's batch");
+        var reconnected = new org.jd.infestusfrontier.testmod.integration.AdvancementRecordingPlayer(
+                helper.getLevel(), operator.getGameProfile());
+        use(helper, pos, reconnected, new ItemStack(Items.BUCKET));
+        helper.assertTrue(reconnected.wasAwarded(id("discovery/digestive_sac"))
+                        && !reconnected.wasAwarded(id("discovery/biomass_bucket"))
+                        && biomass(helper, pos, "sac") == 100,
+                "Reconnected operator receives retained batch credit; refused bucket earns none");
+        use(helper, pos, visitor, new ItemStack(Items.WHEAT));
+        helper.assertTrue(visitor.getMainHandItem().isEmpty(), "Delivered credit releases the next batch");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void onlyCommittedPortableTransfersEarnOperationCredit(GameTestHelper helper) {
+        var pos = placeBud(helper, new BlockPos(1, 1, 1));
+        helper.getLevel().setBlock(pos, block(BLADDER).defaultBlockState(), 2);
+        var player = recordingPlayer(helper, "BladderOperator");
+        use(helper, pos, player, new ItemStack(Items.BUCKET));
+        helper.assertTrue(!player.wasAwarded(id("discovery/biomass_bucket"))
+                        && !player.wasAwarded(id("discovery/biomass_bladder")),
+                "An empty Bladder refusal earns no operation credit");
+        use(helper, pos, player, new ItemStack(item(BUCKET)));
+        helper.assertTrue(player.wasAwarded(id("discovery/biomass_bucket"))
+                        && !player.wasAwarded(id("discovery/biomass_bladder")),
+                "A committed bucket transfer earns portable credit; storage alone is not delivery");
+        use(helper, pos, player, new ItemStack(Items.BUCKET));
+        helper.assertTrue(player.wasAwarded(id("discovery/biomass_bladder"))
+                        && biomass(helper, pos, "bladder") == 0,
+                "A committed withdrawal earns the Bladder storage-and-delivery milestone");
+        helper.succeed();
+    }
+
+    private static org.jd.infestusfrontier.testmod.integration.AdvancementRecordingPlayer recordingPlayer(
+            GameTestHelper helper, String name) {
+        var player = new org.jd.infestusfrontier.testmod.integration.AdvancementRecordingPlayer(helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), name));
+        player.setGameMode(GameType.SURVIVAL);
+        return player;
+    }
+
     private static BlockPos placeBud(GameTestHelper helper, BlockPos relative) {
         var pos = helper.absolutePos(relative);
         helper.getLevel().setBlock(pos.below(), block(SUBSTRATE).defaultBlockState(), 2);

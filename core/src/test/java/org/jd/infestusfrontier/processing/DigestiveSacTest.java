@@ -9,6 +9,42 @@ import org.junit.jupiter.api.Test;
 
 final class DigestiveSacTest {
     @Test
+    void revisionAdmissionLeavesEverySavedTransitionRestorable() {
+        for (String feed : new String[] {"wheat", "rotten_flesh"}) {
+            int work = DigestiveSac.recipe(feed).workUnits();
+            var empty = DigestiveSac.create(1_000, () -> true).snapshot();
+            var exhausted = DigestiveSac.restore(new DigestiveSac.State(empty.schema(),
+                    Long.MAX_VALUE - work - 2, empty.nextBatchId(), null,
+                    empty.quantities(), empty.history()), () -> true);
+            var before = exhausted.snapshot();
+            assertEquals(DigestiveSac.FeedRefusal.EXHAUSTED,
+                    assertInstanceOf(DigestiveSac.FeedRefused.class, exhausted.feed(feed)).reason());
+            assertEquals(before, exhausted.snapshot());
+
+            var sac = DigestiveSac.restore(new DigestiveSac.State(empty.schema(),
+                    Long.MAX_VALUE - work - 3, empty.nextBatchId(), null,
+                    empty.quantities(), empty.history()), () -> false);
+            assertInstanceOf(DigestiveSac.Fed.class, sac.feed(feed));
+            sac = DigestiveSac.restore(sac.snapshot(), () -> false);
+            for (int tick = 0; tick < work; tick++) {
+                sac.advance(1);
+                sac = DigestiveSac.restore(sac.snapshot(), () -> false);
+            }
+            var deferred = sac.snapshot();
+            for (int retry = 0; retry < 100; retry++) sac.advance(1);
+            assertEquals(deferred, sac.snapshot(), "Quota refusal cannot spend revision headroom");
+            sac = DigestiveSac.restore(sac.snapshot(), () -> true);
+            sac.advance(0);
+            assertEquals(Long.MAX_VALUE - 1, sac.snapshot().revision());
+            assertEquals(DigestiveSac.recipe(feed).biomass(), sac.snapshot().biomass());
+            assertEquals(1, sac.snapshot().history().completedBatches());
+            var complete = DigestiveSac.restore(sac.snapshot(), () -> true);
+            assertEquals(sac.snapshot(), complete.advance(1));
+            assertInstanceOf(DigestiveSac.FeedRefused.class, complete.feed(feed));
+        }
+    }
+
+    @Test
     void staleIdleBatchCounterIsRejectedBeforeAnotherFeedCanCommit() {
         var sac = DigestiveSac.create(1_000, () -> true);
         sac.feed("wheat");

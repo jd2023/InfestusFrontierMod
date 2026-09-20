@@ -5,9 +5,29 @@
   "icon": "infestusfrontier:processing/digestive_sac",
   "x": 6,
   "y": 5,
-  "parents": [{"entry": "infestusfrontier:construction/organ_bud"}],
-  "condition": {"type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/organ_bud"},
+  "parents": [
+    {
+      "entry": "infestusfrontier:construction/organ_bud"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/organ_bud"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/acquired/digestive_sac"
+      }
+    ]
+  },
   "pages": [
-    {"type": "modonomicon:text", "title": "book.infestusfrontier.entry.digestive_sac.name", "text": "book.infestusfrontier.entry.digestive_sac.page.text"}
+    {
+      "type": "modonomicon:text",
+      "title": "book.infestusfrontier.entry.digestive_sac.name",
+      "text": "book.infestusfrontier.entry.digestive_sac.page.text"
+    }
   ]
 }
