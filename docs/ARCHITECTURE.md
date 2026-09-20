@@ -306,8 +306,10 @@ missing chunks, invalid hit coordinates, occlusion or unavailable shape data
 refuse before payment. No chunk tickets or block-entity lookups are permitted.
 One server-wide quota admits 16 conversions/tick.
 Replacement sends client state without recursive neighbor notifications. Static
-cells have no ticker or block entity; finite stage/pigment block states and seeded
-weighted models carry appearance. Vanilla soil tag membership supports vegetation;
+cells have no ticker or block entity; finite stage, pigment, function and framework
+block states plus seeded weighted models carry appearance. Lumen Secretion changes
+only a mature cell's function and emits block light; Skeletal Graft changes only its
+framework. Neither treatment creates a machine upgrade or block entity. Vanilla soil tag membership supports vegetation;
 already-living cells explicitly refuse culture conversion.
 
 Ownership uses a schema-1 per-dimension `SavedData` map capped at 65,536 cells.
@@ -327,7 +329,8 @@ unloaded ray paths, alongside vegetation updates and shared-quota GameTests.
 Construction owns the startup-only `BudRecipeRegistrar` and the deterministic
 `BudConstructionPort`. Production attaches only implemented recipes. One use
 validates one visible bud and all remaining inventory costs before replacement
-and payment; duplicate uses encounter the replaced target. The shared server-tick
+and payment; every implemented organ mutation also requires loaded Living Substrate
+support, and duplicate uses encounter the replaced target. The shared server-tick
 quota admits at most 16 replacements across dimensions. Idle buds have no ticker
 or block entity. Registry data is finite startup data, not player-supplied input.
 
@@ -339,6 +342,25 @@ output owners must keep placement/state-change callbacks bounded and loaded-only
 any necessary organ connection update belongs to that owner's bounded service.
 Adapter GameTests cover the loaded/unloaded boundary, unchanged refusal, exact
 payment and duplicate use without installing production placeholder recipes.
+
+Construction shell blocks are ordinary static blocks. Living Skin full blocks,
+slabs, cornering stairs and multi-face coverings, Rib Frames and Membrane Windows
+have no block entity or ticker; window connection properties own
+only visible joins and the thin pane model supplies both faces. The Seed Pouch is
+the single stateful shell part: it admits at most four registry item types and one
+stack per type, retains one item for planting during ordinary withdrawal and has
+no ticker. Explicit player recovery may take that reserve. Removal emits at most
+four bounded stacks, once, from the pouch's sole authoritative store.
+
+`Structure.inspect(origin, ruleId, budget)` evaluates a registered ordered list of
+relative cells, never neighboring connectivity. Rules contain 1..4,096 unique
+positions and at most one expected core. A request continuation stores only its
+origin, rule, cursor and counters; it retains no world reference or cell cache.
+One call reads at most 64 loaded cells and all requests share a 256-cell server-tick
+`TickQuota`. The loaded predicate runs before every state read. Missing chunks,
+call exhaustion and shared exhaustion return `Deferred`; mismatches return
+`Invalid`, and a complete matching plan returns `Valid`. Passive parts cannot carry
+a core identity, so sharing or removing a wall cannot create a second core.
 
 ## Integration bootstrap harness
 

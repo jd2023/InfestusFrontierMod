@@ -32,6 +32,7 @@ public final class BudAdapterGameTests {
         level.getChunk(chunkX, chunkZ);
         BlockPos pos = new BlockPos(chunkX * 16 + 15, origin.getY(), chunkZ * 16 + 8);
         Block bud = bud();
+        level.setBlock(pos.below(), substrate().defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
         level.setBlock(pos, bud.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
         helper.assertTrue(source.getChunkNow(chunkX + 1, chunkZ) == null, "Fixture requires an unloaded east neighbor");
         int loadedBefore = source.getLoadedChunksCount();
@@ -52,6 +53,7 @@ public final class BudAdapterGameTests {
         var level = helper.getLevel();
         BlockPos pos = helper.absolutePos(BlockPos.ZERO);
         Block bud = bud();
+        level.setBlock(pos.below(), substrate().defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
         level.setBlock(pos, bud.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var recipes = recipes();
@@ -109,5 +111,9 @@ public final class BudAdapterGameTests {
 
     private static Block bud() {
         return BuiltInRegistries.BLOCK.getOptional(ResourceLocation.parse("infestusfrontier:construction/organ_bud")).orElseThrow();
+    }
+
+    private static Block substrate() {
+        return BuiltInRegistries.BLOCK.getOptional(ResourceLocation.parse("infestusfrontier:ecology/living_substrate")).orElseThrow();
     }
 }

@@ -27,6 +27,7 @@ final class EcologyContent {
                 BlockBehaviour.Properties.of()
                         .mapColor(MapColor.COLOR_RED)
                         .strength(0.8F)
+                        .lightLevel(LivingSubstrateBlock::light)
                         .speedFactor(0.8F)
                         .pushReaction(PushReaction.BLOCK)
                         .sound(SoundType.NETHER_WART));

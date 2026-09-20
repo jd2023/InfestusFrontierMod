@@ -27,7 +27,7 @@ class BudConstructionPortTest {
 
         assertEquals(BudConstructionResult.INCOMPLETE, port.apply("bowl", stock, site, admission));
         assertEquals(BudConstructionResult.UNAVAILABLE, port.apply("glass", stock, site, admission));
-        assertTrue(site.bud);
+        assertTrue(site.isBud());
         assertEquals(Map.of("rotten_flesh", 1, "bowl", 1), stock.snapshot());
         assertEquals(0, admission.calls);
     }
@@ -56,7 +56,19 @@ class BudConstructionPortTest {
         assertEquals(
                 BudConstructionResult.ADMISSION_EXHAUSTED,
                 port.apply("bowl", stock, site, new CountingAdmission(false)));
-        assertTrue(site.bud);
+        assertTrue(site.isBud());
+        assertEquals(Map.of("rotten_flesh", 2, "bowl", 1), stock.snapshot());
+    }
+
+    @Test
+    void incompatibleSubstrateRefusesBeforeAdmissionOrPayment() {
+        var port = new BudConstructionPort(List.of(SAC));
+        var stock = new MutableStock(Map.of("rotten_flesh", 2, "bowl", 1));
+        var admission = new CountingAdmission(true);
+        var site = new MutableSite() { @Override public boolean isCompatible() { return false; } };
+        assertEquals(BudConstructionResult.INCOMPATIBLE_SITE, port.apply("bowl", stock, site, admission));
+        assertTrue(site.isBud());
+        assertEquals(0, admission.calls);
         assertEquals(Map.of("rotten_flesh", 2, "bowl", 1), stock.snapshot());
     }
 
@@ -113,7 +125,7 @@ class BudConstructionPortTest {
         }
     }
 
-    private static final class MutableSite implements BudConstructionPort.Site {
+    private static class MutableSite implements BudConstructionPort.Site {
         private boolean bud = true;
         private String output;
 

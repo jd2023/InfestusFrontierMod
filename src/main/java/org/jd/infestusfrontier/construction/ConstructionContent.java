@@ -2,7 +2,12 @@ package org.jd.infestusfrontier.construction;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
@@ -15,10 +20,21 @@ import org.jd.infestusfrontier.construction.api.CultureUse;
 final class ConstructionContent {
     static final String SPORE_CULTURE = "construction/spore_culture";
     static final String ORGAN_BUD = "construction/organ_bud";
+    static final String SEED_POUCH = "construction/seed_pouch";
+    static final String LIVING_SKIN = "construction/living_skin";
+    static final String LIVING_SKIN_SLAB = "construction/living_skin_slab";
+    static final String LIVING_SKIN_STAIRS = "construction/living_skin_stairs";
+    static final String LIVING_SKIN_COVERING = "construction/living_skin_covering";
+    static final String RIB_FRAME = "construction/rib_frame";
+    static final String MEMBRANE_WINDOW = "construction/membrane_window";
 
     private final DeferredRegister.Blocks blocks = DeferredRegister.createBlocks(InfestusFrontier.MOD_ID);
     private final DeferredRegister.Items items = DeferredRegister.createItems(InfestusFrontier.MOD_ID);
+    private final DeferredRegister<BlockEntityType<?>> entities = DeferredRegister.create(
+            Registries.BLOCK_ENTITY_TYPE, InfestusFrontier.MOD_ID);
     private final DeferredBlock<OrganBudBlock> organBud;
+    private final DeferredBlock<SeedPouchBlock> seedPouch;
+    private final java.util.function.Supplier<BlockEntityType<SeedPouchEntity>> seedPouchEntity;
     @SuppressWarnings("unused")
     private final DeferredItem<Item> sporeCulture;
     @SuppressWarnings("unused")
@@ -33,13 +49,46 @@ final class ConstructionContent {
                         .strength(0.4F)
                         .sound(SoundType.WART_BLOCK)
                         .noOcclusion());
+        seedPouch = blocks.register(SEED_POUCH, this::createSeedPouch);
+        seedPouchEntity = entities.register(SEED_POUCH, this::createSeedPouchEntity);
+        var skin = blocks.registerSimpleBlock(LIVING_SKIN, BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_RED).strength(0.8F).sound(SoundType.WART_BLOCK));
+        var skinSlab = blocks.register(LIVING_SKIN_SLAB, () -> new SlabBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_RED).strength(0.8F).sound(SoundType.WART_BLOCK)));
+        var skinStairs = blocks.register(LIVING_SKIN_STAIRS, () -> new StairBlock(skin.get().defaultBlockState(),
+                BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(0.8F).sound(SoundType.WART_BLOCK)));
+        var skinCovering = blocks.register(LIVING_SKIN_COVERING, () -> new LivingSkinCoveringBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_RED).strength(0.2F).sound(SoundType.WART_BLOCK).noOcclusion()));
+        var ribs = blocks.register(RIB_FRAME, () -> new RotatedPillarBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.SAND).strength(1.5F).sound(SoundType.BONE_BLOCK)));
+        var window = blocks.register(MEMBRANE_WINDOW, () -> new MembraneWindowBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_LIGHT_BLUE).strength(0.5F).sound(SoundType.GLASS)
+                .noOcclusion().isViewBlocking((state, level, pos) -> false)));
         sporeCulture = items.register(SPORE_CULTURE,
                 () -> new SporeCultureItem(new Item.Properties(), cultureUse));
         organBudItem = items.registerSimpleBlockItem(organBud, new Item.Properties());
+        items.register(SEED_POUCH, () -> new BlockItem(seedPouch.get(), new Item.Properties().stacksTo(1)));
+        items.registerSimpleBlockItem(skin, new Item.Properties());
+        items.registerSimpleBlockItem(skinSlab, new Item.Properties());
+        items.registerSimpleBlockItem(skinStairs, new Item.Properties());
+        items.registerSimpleBlockItem(skinCovering, new Item.Properties());
+        items.registerSimpleBlockItem(ribs, new Item.Properties());
+        items.registerSimpleBlockItem(window, new Item.Properties());
+    }
+
+    private SeedPouchBlock createSeedPouch() {
+        return new SeedPouchBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN).strength(0.6F)
+                .sound(SoundType.WOOL).noOcclusion(), seedPouchEntity);
+    }
+
+    private BlockEntityType<SeedPouchEntity> createSeedPouchEntity() {
+        return BlockEntityType.Builder.of(
+                (pos, state) -> new SeedPouchEntity(pos, state, seedPouchEntity), seedPouch.get()).build(null);
     }
 
     void register(IEventBus modBus) {
         blocks.register(modBus);
         items.register(modBus);
+        entities.register(modBus);
     }
 }

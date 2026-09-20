@@ -29,6 +29,7 @@ public final class BudConstructionPort {
         var recipe = recipesByTrigger.get(heldIngredient);
         if (recipe == null) return BudConstructionResult.UNAVAILABLE;
         if (!site.isBud()) return BudConstructionResult.TARGET_CHANGED;
+        if (!site.isCompatible()) return BudConstructionResult.INCOMPATIBLE_SITE;
         if (!hasAll(stock, recipe.costs())) return BudConstructionResult.INCOMPLETE;
         if (!admission.take()) return BudConstructionResult.ADMISSION_EXHAUSTED;
         if (!site.replace(recipe.output())) return BudConstructionResult.TARGET_CHANGED;
@@ -50,6 +51,7 @@ public final class BudConstructionPort {
 
     public interface Site {
         boolean isBud();
+        default boolean isCompatible() { return true; }
         boolean replace(String output);
     }
 

@@ -1,0 +1,1 @@
+{ "schema":1, "entry":"infestusfrontier:construction/living_skin", "title":"Living Skin", "obtain":"Craft one Sheet, dirt and Culture into four skin blocks, then cut slabs, cornering stairs or four thin coverings.", "use":"Place passive enclosure shapes; they contain no machine state or biomass production.", "assertion":"infestusfrontier_client:construction.living_skin.guide" }

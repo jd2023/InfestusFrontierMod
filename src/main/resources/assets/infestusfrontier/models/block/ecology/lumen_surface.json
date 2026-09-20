@@ -1,0 +1,8 @@
+{
+  "ambientocclusion": false,
+  "textures": { "lumen": "infestusfrontier:item/lumen_secretion", "particle": "infestusfrontier:item/lumen_secretion" },
+  "elements": [
+    { "from": [2,15.8,2], "to": [14,16,14], "shade": false,
+      "faces": { "up": { "texture": "#lumen" }, "down": { "texture": "#lumen" } } }
+  ]
+}

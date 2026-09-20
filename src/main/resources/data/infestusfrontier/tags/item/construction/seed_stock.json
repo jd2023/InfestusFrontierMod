@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:saplings",
+    "#minecraft:villager_plantable_seeds",
+    "minecraft:carrot",
+    "minecraft:potato"
+  ]
+}

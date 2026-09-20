@@ -3,6 +3,8 @@ package org.jd.infestusfrontier.ecology;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.ItemInteractionResult;
@@ -25,10 +27,13 @@ import org.jd.infestusfrontier.ecology.api.LivingCell;
 final class LivingSubstrateBlock extends Block {
     static final EnumProperty<Stage> STAGE = EnumProperty.create("stage", Stage.class);
     static final EnumProperty<Pigment> PIGMENT = EnumProperty.create("pigment", Pigment.class);
+    static final EnumProperty<Function> FUNCTION = EnumProperty.create("function", Function.class);
+    static final EnumProperty<Framework> FRAMEWORK = EnumProperty.create("framework", Framework.class);
 
     LivingSubstrateBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(STAGE, Stage.BASIC).setValue(PIGMENT, Pigment.UNDYED));
+        registerDefaultState(stateDefinition.any().setValue(STAGE, Stage.BASIC).setValue(PIGMENT, Pigment.UNDYED)
+                .setValue(FUNCTION, Function.PLAIN).setValue(FRAMEWORK, Framework.UNREINFORCED));
     }
 
     @Override
@@ -38,7 +43,7 @@ final class LivingSubstrateBlock extends Block {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(STAGE, PIGMENT);
+        builder.add(STAGE, PIGMENT, FUNCTION, FRAMEWORK);
     }
 
     @Override
@@ -72,7 +77,9 @@ final class LivingSubstrateBlock extends Block {
         if (!result.applied()) return ItemInteractionResult.FAIL;
         BlockState changed = state
                 .setValue(STAGE, Stage.from(result.cell().maturity()))
-                .setValue(PIGMENT, Pigment.from(result.cell().pigment()));
+                .setValue(PIGMENT, Pigment.from(result.cell().pigment()))
+                .setValue(FUNCTION, Function.from(result.cell().function()))
+                .setValue(FRAMEWORK, Framework.from(result.cell().framework()));
         if (!level.setBlock(pos, changed, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE, 0)) {
             return ItemInteractionResult.FAIL;
         }
@@ -85,8 +92,8 @@ final class LivingSubstrateBlock extends Block {
         LivingCell cell = new LivingCell(
                 state.getValue(STAGE).maturity,
                 LivingCell.Host.ORDINARY,
-                LivingCell.Function.PLAIN,
-                LivingCell.Framework.UNREINFORCED,
+                state.getValue(FUNCTION).function,
+                state.getValue(FRAMEWORK).framework,
                 LivingCell.Lining.NONE,
                 state.getValue(PIGMENT).pigment,
                 owner);
@@ -95,6 +102,13 @@ final class LivingSubstrateBlock extends Block {
 
     private static LivingCell.Treatment treatment(ItemStack stack) {
         if (stack.is(Items.BONE_MEAL)) return new LivingCell.Treatment.Grow();
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        if (id.equals(ResourceLocation.fromNamespaceAndPath("infestusfrontier", "processing/lumen_secretion"))) {
+            return new LivingCell.Treatment.SetFunction(LivingCell.Function.LUMEN);
+        }
+        if (id.equals(ResourceLocation.fromNamespaceAndPath("infestusfrontier", "processing/skeletal_graft"))) {
+            return new LivingCell.Treatment.SetFramework(LivingCell.Framework.BONE_RIBBED);
+        }
         if (stack.getItem() instanceof DyeItem dye) {
             Pigment pigment = Pigment.fromName(dye.getDyeColor().getName());
             return pigment == null ? null : new LivingCell.Treatment.SetPigment(pigment.pigment);
@@ -125,6 +139,33 @@ final class LivingSubstrateBlock extends Block {
 
     static int tint(BlockState state) {
         return state.getValue(PIGMENT).color;
+    }
+
+    static int light(BlockState state) { return state.getValue(FUNCTION) == Function.LUMEN ? 12 : 0; }
+
+    enum Function implements StringRepresentable {
+        PLAIN("plain", LivingCell.Function.PLAIN), LUMEN("lumen", LivingCell.Function.LUMEN);
+        private final String name; private final LivingCell.Function function;
+        Function(String name, LivingCell.Function function) { this.name = name; this.function = function; }
+        static Function from(LivingCell.Function function) {
+            if (function == LivingCell.Function.LUMEN) return LUMEN;
+            if (function == LivingCell.Function.PLAIN) return PLAIN;
+            throw new IllegalArgumentException("Unregistered substrate function " + function);
+        }
+        @Override public String getSerializedName() { return name; }
+    }
+
+    enum Framework implements StringRepresentable {
+        UNREINFORCED("unreinforced", LivingCell.Framework.UNREINFORCED),
+        BONE_RIBBED("bone_ribbed", LivingCell.Framework.BONE_RIBBED);
+        private final String name; private final LivingCell.Framework framework;
+        Framework(String name, LivingCell.Framework framework) { this.name = name; this.framework = framework; }
+        static Framework from(LivingCell.Framework framework) {
+            if (framework == LivingCell.Framework.BONE_RIBBED) return BONE_RIBBED;
+            if (framework == LivingCell.Framework.UNREINFORCED) return UNREINFORCED;
+            throw new IllegalArgumentException("Unregistered substrate framework " + framework);
+        }
+        @Override public String getSerializedName() { return name; }
     }
 
     enum Stage implements StringRepresentable {

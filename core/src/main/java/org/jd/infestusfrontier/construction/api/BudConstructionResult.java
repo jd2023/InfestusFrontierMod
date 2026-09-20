@@ -6,5 +6,6 @@ public enum BudConstructionResult {
     UNAVAILABLE,
     INCOMPLETE,
     TARGET_CHANGED,
+    INCOMPATIBLE_SITE,
     ADMISSION_EXHAUSTED
 }

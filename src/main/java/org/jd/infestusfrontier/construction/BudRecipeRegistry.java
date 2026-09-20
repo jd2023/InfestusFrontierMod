@@ -124,6 +124,15 @@ final class BudRecipeRegistry implements BudRecipeRegistrar {
         }
 
         @Override
+        public boolean isCompatible() {
+            var supportChunk = level.getChunkSource().getChunkNow(pos.getX() >> 4, (pos.getZ()) >> 4);
+            if (supportChunk == null) return false;
+            var substrate = BuiltInRegistries.BLOCK.getOptional(ResourceLocation.fromNamespaceAndPath(
+                    "infestusfrontier", "ecology/living_substrate")).orElse(null);
+            return substrate != null && supportChunk.getBlockState(pos.below()).is(substrate);
+        }
+
+        @Override
         public boolean replace(String output) {
             ResourceLocation id = ResourceLocation.tryParse(output);
             if (id == null || !BuiltInRegistries.BLOCK.containsKey(id)) return false;

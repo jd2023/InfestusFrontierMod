@@ -1,0 +1,1 @@
+{ "schema":1, "entry":"infestusfrontier:construction/seed_pouch", "title":"Seed Pouch", "obtain":"Craft leather, a Membrane Sheet and Spore Culture into one pouch.", "use":"Insert up to four planting-stock types; ordinary withdrawal retains one of each for replanting.", "assertion":"infestusfrontier_client:construction.seed_pouch.guide" }

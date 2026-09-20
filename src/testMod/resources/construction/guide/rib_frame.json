@@ -1,0 +1,1 @@
+{ "schema":1, "entry":"infestusfrontier:construction/rib_frame", "title":"Rib Frame", "obtain":"Craft two Bone Plates and one Sheet into two frames.", "use":"Orient the passive load-bearing frame as a beam or support.", "assertion":"infestusfrontier_client:construction.rib_frame.guide" }

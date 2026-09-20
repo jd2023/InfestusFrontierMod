@@ -1,12 +1,14 @@
 {
   "requires": "infestusfrontier_tests:construction.organ_bud.obtain",
   "commands": [
-    "time set noon",
-    "weather clear",
     "tp FixturePlayer 0.5 -60 0.5 0 15",
-    "setblock 0 -60 3 infestusfrontier:construction/organ_bud",
+    "setblock -3 -60 4 infestusfrontier:construction/living_skin",
+    "setblock -2 -60 4 infestusfrontier:construction/rib_frame[axis=y]",
+    "fill -1 -60 4 1 -60 4 infestusfrontier:construction/membrane_window",
+    "setblock 2 -60 4 infestusfrontier:construction/seed_pouch",
+    "setblock 2 -61 4 infestusfrontier:ecology/living_substrate[stage=mature]",
+    "setblock 3 -60 4 infestusfrontier:ecology/living_substrate[stage=mature,function=lumen,framework=bone_ribbed]",
     "item replace entity FixturePlayer weapon.mainhand with infestusfrontier:construction/spore_culture",
-    "item replace entity FixturePlayer weapon.offhand with infestusfrontier:construction/organ_bud",
-    "item replace entity FixturePlayer hotbar.1 with infestusfrontier:construction/organ_bud"
+    "item replace entity FixturePlayer weapon.offhand with infestusfrontier:construction/organ_bud"
   ]
 }

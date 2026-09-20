@@ -1,16 +1,18 @@
 {
-  "variants": {
-    "stage=basic": [
+  "multipart": [
+    { "when": { "stage": "basic" }, "apply": [
       { "model": "infestusfrontier:block/ecology/living_substrate_basic_0", "weight": 3 },
       { "model": "infestusfrontier:block/ecology/living_substrate_basic_1", "weight": 1 }
-    ],
-    "stage=young": [
+    ] },
+    { "when": { "stage": "young" }, "apply": [
       { "model": "infestusfrontier:block/ecology/living_substrate_young_0", "weight": 3 },
       { "model": "infestusfrontier:block/ecology/living_substrate_young_1", "weight": 1 }
-    ],
-    "stage=mature": [
+    ] },
+    { "when": { "stage": "mature" }, "apply": [
       { "model": "infestusfrontier:block/ecology/living_substrate_mature_0", "weight": 3 },
       { "model": "infestusfrontier:block/ecology/living_substrate_mature_1", "weight": 1 }
-    ]
-  }
+    ] },
+    { "when": { "function": "lumen" }, "apply": { "model": "infestusfrontier:block/ecology/lumen_surface" } },
+    { "when": { "framework": "bone_ribbed" }, "apply": { "model": "infestusfrontier:block/ecology/bone_ribs" } }
+  ]
 }

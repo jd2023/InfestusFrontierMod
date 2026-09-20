@@ -28,6 +28,66 @@
           }
         }
       ]
+    },
+    {
+      "task": "IF-008",
+      "entries": [
+        {
+          "catalog": ["T0-09"],
+          "registry": ["infestusfrontier:construction/seed_pouch"],
+          "producer": "infestusfrontier:construction/seed_pouch",
+          "guide": "guide/seed_pouch.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:construction.seed_pouch.obtain",
+            "use": "infestusfrontier_tests:construction.seed_pouch.use",
+            "guide": "infestusfrontier_client:construction.seed_pouch.guide"
+          }
+        },
+        {
+          "catalog": ["T0-10"],
+          "registry": ["infestusfrontier:construction/living_skin", "infestusfrontier:construction/living_skin_slab", "infestusfrontier:construction/living_skin_stairs", "infestusfrontier:construction/living_skin_covering"],
+          "producer": "infestusfrontier:construction/living_skin",
+          "guide": "guide/living_skin.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:construction.living_skin.obtain",
+            "use": "infestusfrontier_tests:construction.living_skin.use",
+            "guide": "infestusfrontier_client:construction.living_skin.guide"
+          }
+        },
+        {
+          "catalog": ["T0-11"],
+          "registry": ["infestusfrontier:construction/rib_frame"],
+          "producer": "infestusfrontier:construction/rib_frame",
+          "guide": "guide/rib_frame.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:construction.rib_frame.obtain",
+            "use": "infestusfrontier_tests:construction.rib_frame.use",
+            "guide": "infestusfrontier_client:construction.rib_frame.guide"
+          }
+        },
+        {
+          "catalog": ["T0-12"],
+          "registry": ["infestusfrontier:construction/membrane_window"],
+          "producer": "infestusfrontier:construction/membrane_window",
+          "guide": "guide/membrane_window.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:construction.membrane_window.obtain",
+            "use": "infestusfrontier_tests:construction.membrane_window.use",
+            "guide": "infestusfrontier_client:construction.membrane_window.guide"
+          }
+        },
+        {
+          "catalog": ["T0-13"],
+          "registry": ["infestusfrontier:ecology/living_substrate", "infestusfrontier:processing/lumen_secretion"],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/lumen_tissue.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:construction.lumen_tissue.obtain",
+            "use": "infestusfrontier_tests:construction.lumen_tissue.use",
+            "guide": "infestusfrontier_client:construction.lumen_tissue.guide"
+          }
+        }
+      ]
     }
   ]
 }

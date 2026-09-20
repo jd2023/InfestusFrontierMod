@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "axis=y": { "model": "infestusfrontier:block/construction/rib_frame" },
+    "axis=z": { "model": "infestusfrontier:block/construction/rib_frame", "x": 90 },
+    "axis=x": { "model": "infestusfrontier:block/construction/rib_frame", "x": 90, "y": 90 }
+  }
+}

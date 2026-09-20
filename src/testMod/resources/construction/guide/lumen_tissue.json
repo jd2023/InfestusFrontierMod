@@ -1,0 +1,1 @@
+{ "schema":1, "entry":"infestusfrontier:construction/lumen_tissue", "title":"Lumen Tissue", "obtain":"Prepare Lumen Secretion from a real glow source in the Bowl.", "use":"Apply one dose to mature substrate for light; incompatible or immature cells refuse unchanged.", "assertion":"infestusfrontier_client:construction.lumen_tissue.guide" }

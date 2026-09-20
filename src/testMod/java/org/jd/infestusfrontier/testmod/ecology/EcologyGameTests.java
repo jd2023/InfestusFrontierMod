@@ -186,8 +186,8 @@ public final class EcologyGameTests {
             helper.assertTrue(state.skipRendering(state, direction),
                     "Substrate must cull its connected " + direction + " face");
         }
-        helper.assertTrue(state.getValues().size() == 2,
-                "Only anatomy stage and pigment may be stored; visual variation must not be random history");
+        helper.assertTrue(state.getValues().size() == 4,
+                "Only maturity, pigment, function and framework may be stored; visual variation must not be random history");
         BlockPos pos = helper.absolutePos(BlockPos.ZERO);
         helper.assertTrue(state.getSeed(pos) == state.getSeed(pos),
                 "Variant selection must be deterministic for a position");
