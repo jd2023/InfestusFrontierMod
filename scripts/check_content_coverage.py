@@ -252,6 +252,10 @@ def _read_contributors(
                 )
                 catalogs = _string_list(entry["catalog"], catalog_hint, CATALOG_ID)
                 catalog_hint = "/".join(catalogs)
+                if len(catalogs) > 1 and frozenset(catalogs) not in KNOWN_ALIASES:
+                    raise CoverageError(
+                        f"{catalog_hint}: only declared catalog aliases may share a representation"
+                    )
                 registries = _string_list(entry["registry"], catalog_hint, RESOURCE_ID)
                 producer = _resource(entry["producer"], f"{catalog_hint} producer")
                 assertions = entry["assertions"]

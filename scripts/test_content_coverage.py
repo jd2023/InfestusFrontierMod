@@ -227,10 +227,56 @@ class CoverageTests(unittest.TestCase):
         self.assertEqual(bud["catalog"], ["I001", "T0-16"])
         self.assertEqual(len(bud["registry"]), 1)
 
+        reordered = copy.deepcopy(CONSTRUCTION)
+        reordered["contributions"][0]["entries"][1]["catalog"].reverse()
+        self.fixture.contributor(reordered)
+        self.assertEqual(len(coverage.validate(self.fixture.root)["representations"]), 2)
+
         broken = copy.deepcopy(CONSTRUCTION)
         broken["contributions"][0]["entries"][1:] = [entry("I001"), entry("T0-16")]
         self.fixture.contributor(broken)
         self.assert_rejected("I001/T0-16", lambda: coverage.validate(self.fixture.root))
+
+        broken["contributions"][0]["entries"] = [entry("I001", "T0-16", "I000")]
+        self.fixture.contributor(broken)
+        self.assert_rejected("I000", lambda: coverage.validate(self.fixture.root))
+
+    def test_unrelated_items_ranks_and_blocks_cannot_share_assertions(self):
+        for section, catalogs, task, owner in (
+            ("items", ("I002", "I003"), "IF-007", "construction"),
+            ("mutations", ("M1.II", "M1.III"), "IF-077", "equipment"),
+            ("blocks", ("T0-03", "T0-04"), "IF-007", "construction"),
+        ):
+            with self.subTest(catalogs=catalogs):
+                fixture = Fixture()
+                try:
+                    blocks = ",".join(catalogs) if section == "blocks" else "none"
+                    (fixture.root / ".ktask/tasks.md").write_text(
+                        "IF-108 Harness\nOwner: integration\nBlocks: none\n\n"
+                        f"{task} Content\nOwner: {owner}\nBlocks: {blocks}\n"
+                    )
+                    plan = {"items": {}, "mutations": {}, "services": {},
+                            "requires": {}, "excluded_items": []}
+                    if section != "blocks":
+                        plan[section] = dict.fromkeys(catalogs, task)
+                    (fixture.root / ".ktask/content-plan.json").write_text(json.dumps(plan))
+                    fixture.checkpoint(task)
+                    contribution = {"task": task, "entries": [entry(c) for c in catalogs]}
+                    document = {"schema": 1, "owner": owner, "contributions": [contribution]}
+                    fixture.contributor(document)
+                    result = coverage.validate(fixture.root)
+                    self.assertEqual(len(result["representations"]), 2)
+                    self.assertEqual(len(result["assertions"]["gameTest"]), 4)
+
+                    # Retain only the first content's registry, producer and tests.
+                    contribution["entries"] = [entry(*catalogs)]
+                    fixture.contributor(document)
+                    with self.assertRaises(coverage.CoverageError) as caught:
+                        coverage.validate(fixture.root)
+                    for catalog in catalogs:
+                        self.assertIn(catalog, str(caught.exception))
+                finally:
+                    fixture.close()
 
     def test_guide_assertions_stage_then_become_client_requirements(self):
         self.fixture.checkpoint("IF-095")

@@ -263,8 +263,10 @@ has exactly these fields:
 ```
 
 `catalog` groups aliases that share the listed real representation; it does not
-authorize another registration. Families may list their finite actual registry
-IDs. `producer` names the real recipe, mutation or construction operation. Obtain
+authorize another registration. Multiple catalog IDs must exactly match a declared
+`KNOWN_ALIASES` group in the checker, independent of order; unrelated items, blocks
+and ranks require separate representations and named assertions. Families may list
+their finite actual registry IDs. `producer` names the real recipe, mutation or construction operation. Obtain
 and use assertions are GameTests and call `ContentAssertion.passGameTest` only
 after their behavior succeeds. Owner client contributors live under
 `src/testMod/java/org/jd/infestusfrontier/testmod/<owner>/client/`, implement
