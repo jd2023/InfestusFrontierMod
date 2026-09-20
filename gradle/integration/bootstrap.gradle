@@ -1,0 +1,176 @@
+import groovy.json.JsonOutput
+
+abstract class WriteIntegrationClientLaunchSpec extends DefaultTask {
+    @Classpath abstract ConfigurableFileCollection getLaunchClasspath()
+    @InputFile abstract RegularFileProperty getVmArgsFile()
+    @InputFile abstract RegularFileProperty getProgramArgsFile()
+    @Input abstract ListProperty<String> getModFolders()
+    @OutputFile abstract RegularFileProperty getOutputFile()
+
+    @TaskAction void writeSpec() {
+        def command = ['java', '-Dinfestus.integration=true', "-Dfml.modFolders=${modFolders.get().join(File.pathSeparator)}",
+                       "@${vmArgsFile.get().asFile.absolutePath}", '-Dfile.encoding=UTF-8',
+                       '-Duser.language=en', '-Duser.country=US', '-cp', launchClasspath.asPath,
+                       'net.neoforged.devlaunch.Main', "@${programArgsFile.get().asFile.absolutePath}"]
+        def output = outputFile.get().asFile
+        output.parentFile.mkdirs()
+        output.text = JsonOutput.prettyPrint(JsonOutput.toJson([schema: 1, command: command])) + '\n'
+    }
+}
+
+def integrationPython = providers.provider { project.file('gradle/integration/harness.py').absolutePath }
+def integrationSelectedProfile = project.ext.selectedIntegrationProfile
+def integrationOmittedRequired = providers.gradleProperty('omitRequired').orElse('').get()
+def integrationOutput = { String taskName ->
+    layout.buildDirectory.dir("integration/evidence/${integrationSelectedProfile}/${taskName}").get().asFile
+}
+
+tasks.register('integrationHarnessTest', Exec) {
+    group = 'verification'
+    def requestedFixture = providers.gradleProperty('integrationFixture').orElse('').get()
+    if (requestedFixture && requestedFixture != 'wrong-mod-version') {
+        throw new GradleException("Invalid integrationFixture '${requestedFixture}'; expected wrong-mod-version")
+    }
+    commandLine(requestedFixture
+            ? ['python3', integrationPython.get(), 'evaluate', project.file('gradle/integration/fixtures/wrong-mod-version.json').absolutePath]
+            : ['timeout', '--kill-after=2s', '58s', 'python3', '-m', 'unittest', 'discover', '-v', '-s', 'gradle/integration', '-p', 'test_*.py'])
+}
+
+def validateIntegrationInputs = tasks.register('validateIntegrationInputs', Exec) {
+    def profileFile = providers.gradleProperty('integrationProfileFile').orElse('').get()
+    commandLine(['python3', integrationPython.get(), 'validate-config',
+                 '--profile', integrationSelectedProfile,
+                 '--scenario', providers.gradleProperty('scenario').orElse('bootstrap').get()] +
+                (profileFile ? ['--file', project.file(profileFile).absolutePath] : []))
+}
+
+def stagedProfile = layout.buildDirectory.dir("integration/staged/${integrationSelectedProfile}")
+def stageIntegration = tasks.register('stageIntegrationProfile', Sync) {
+    dependsOn tasks.named('jar')
+    into stagedProfile
+    from(configurations.integrationInstaller) {
+        into 'installer'
+        rename { 'neoforge-installer.jar' }
+    }
+    from(tasks.named('jar', Jar).flatMap { it.archiveFile }) { into 'mods' }
+    if (integrationOmittedRequired != 'modonomicon') {
+        from(configurations.integrationModonomicon) { into 'mods' }
+    }
+    if (integrationOmittedRequired != 'geckolib') {
+        from(configurations.integrationGeckolib) { into 'mods' }
+    }
+    if (integrationSelectedProfile in ['jei', 'combined']) {
+        from(configurations.integrationJei) { into 'mods' }
+    }
+    if (integrationSelectedProfile in ['curios', 'combined']) {
+        from(configurations.integrationCurios) { into 'mods' }
+    }
+}
+
+def gameTestModFolders = [
+    "infestusfrontier%%${layout.buildDirectory.dir('classes/java/main').get().asFile.absolutePath}",
+    "infestusfrontier%%${layout.buildDirectory.dir('resources/main').get().asFile.absolutePath}",
+    "infestusfrontier%%${project(':core').layout.buildDirectory.dir('classes/java/main').get().asFile.absolutePath}",
+    "infestusfrontier%%${project(':core').layout.buildDirectory.dir('resources/main').get().asFile.absolutePath}",
+    "infestusfrontier_tests%%${layout.buildDirectory.dir('classes/java/testMod').get().asFile.absolutePath}",
+    "infestusfrontier_tests%%${layout.buildDirectory.dir('resources/testMod').get().asFile.absolutePath}",
+]
+def clientAutomationJar = tasks.register('integrationClientJar', Jar) {
+    archiveClassifier = 'client-automation'
+    from sourceSets.integrationClient.output
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+abstract class VerifyClientAutomation extends DefaultTask {
+    @InputFile abstract RegularFileProperty getArtifact()
+    @TaskAction void verify() {
+        new java.util.zip.ZipFile(artifact.get().asFile).withCloseable { jar ->
+            def classes = jar.entries().findAll { it.name.endsWith('.class') }.collect { it.name }
+            if (!classes.contains('org/jd/infestusfrontier/testmod/integration/BootstrapClient.class') ||
+                    classes.any { !it.startsWith('org/jd/infestusfrontier/testmod/integration/BootstrapClient') }) {
+                throw new GradleException("Client automation contains missing hooks or unrelated fixtures: ${classes}")
+            }
+            if (jar.getEntry('META-INF/neoforge.mods.toml') == null)
+                throw new GradleException('Client automation metadata missing')
+        }
+    }
+}
+def verifyClientAutomation = tasks.register('verifyClientAutomation', VerifyClientAutomation) {
+    artifact = clientAutomationJar.flatMap { it.archiveFile }
+}
+def writeClientSpec = tasks.register('writeIntegrationClientLaunchSpec', WriteIntegrationClientLaunchSpec) {
+    dependsOn tasks.named('prepareIntegrationClientRun'), verifyClientAutomation, project(':core').tasks.named('jar')
+    launchClasspath.from(sourceSets.integrationClient.runtimeClasspath - sourceSets.integrationClient.output)
+    launchClasspath.from(clientAutomationJar.flatMap { it.archiveFile })
+    vmArgsFile = layout.buildDirectory.file('moddev/integrationClientRunVmArgs.txt')
+    programArgsFile = layout.buildDirectory.file('moddev/integrationClientRunProgramArgs.txt')
+    modFolders.set(gameTestModFolders.findAll { !it.startsWith('infestusfrontier_tests%%') } +
+            ["infestusfrontier_client%%${clientAutomationJar.get().archiveFile.get().asFile.absolutePath}"])
+    outputFile = layout.buildDirectory.file('integration/client-launch.json')
+}
+
+def writeGameTestSpec = tasks.register('writeIntegrationGameTestLaunchSpec', WriteIntegrationClientLaunchSpec) {
+    dependsOn tasks.named('prepareGameTestServerRun'), tasks.named('testModClasses'), project(':core').tasks.named('jar')
+    launchClasspath.from sourceSets.testMod.runtimeClasspath
+    vmArgsFile = layout.buildDirectory.file('moddev/gameTestServerRunVmArgs.txt')
+    programArgsFile = layout.buildDirectory.file('moddev/gameTestServerRunProgramArgs.txt')
+    modFolders.set(gameTestModFolders)
+    outputFile = layout.buildDirectory.file('integration/gametest-launch.json')
+}
+
+def captureDestination = providers.gradleProperty('captureDir')
+        .map { project.file(it) }
+        .orElse(layout.buildDirectory.dir("integration/evidence/${integrationSelectedProfile}/captureClient").map { it.asFile })
+def packagedDestination = layout.buildDirectory.dir("integration/evidence/${integrationSelectedProfile}/packagedServerSmoke")
+
+tasks.register('captureClient', Exec) {
+    group = 'verification'
+    description = 'Captures the title and joined-world bootstrap states with a real disposable client.'
+    dependsOn stageIntegration, writeClientSpec, validateIntegrationInputs
+    inputs.property 'modProfile', integrationSelectedProfile
+    inputs.property 'scenario', providers.gradleProperty('scenario').orElse('bootstrap')
+    outputs.file captureDestination.map { new File(it, 'result.json') }
+    outputs.upToDateWhen { false }
+    commandLine 'python3', integrationPython.get(), 'client-scenario',
+            '--root', project.projectDir.absolutePath,
+            '--staged', stagedProfile.get().asFile.absolutePath,
+            '--launch-spec', layout.buildDirectory.file('integration/client-launch.json').get().asFile.absolutePath,
+            '--output', captureDestination.get().absolutePath,
+            '--profile', integrationSelectedProfile,
+            '--capture'
+}
+
+tasks.register('packagedServerSmoke', Exec) {
+    group = 'verification'
+    description = 'Runs the release JAR on a disposable dedicated server with a real joining client.'
+    dependsOn stageIntegration, writeClientSpec, validateIntegrationInputs, tasks.named('verifyDistribution')
+    inputs.property 'modProfile', integrationSelectedProfile
+    outputs.file packagedDestination.map { it.file('result.json') }
+    outputs.upToDateWhen { false }
+    commandLine 'python3', integrationPython.get(), 'client-scenario',
+            '--root', project.projectDir.absolutePath,
+            '--staged', stagedProfile.get().asFile.absolutePath,
+            '--launch-spec', layout.buildDirectory.file('integration/client-launch.json').get().asFile.absolutePath,
+            '--output', packagedDestination.get().asFile.absolutePath,
+            '--profile', integrationSelectedProfile
+}
+
+def profileSmokeDestination = integrationOutput('profileSmoke')
+tasks.register('profileSmoke', Exec) {
+    group = 'verification'
+    description = 'Runs the bounded real GameTest bootstrap for the selected integration profile.'
+    dependsOn writeGameTestSpec, validateIntegrationInputs
+    inputs.property 'modProfile', integrationSelectedProfile
+    inputs.property 'omitRequired', integrationOmittedRequired
+    outputs.file new File(profileSmokeDestination, 'result.json')
+    outputs.upToDateWhen { false }
+    commandLine(['python3', integrationPython.get(), 'profile-smoke',
+                 '--root', project.projectDir.absolutePath,
+                 '--launch-spec', layout.buildDirectory.file('integration/gametest-launch.json').get().asFile.absolutePath,
+                 '--output', profileSmokeDestination.absolutePath,
+                 '--profile', integrationSelectedProfile] + (integrationOmittedRequired ? ['--omit', integrationOmittedRequired] : []))
+}
+
+tasks.named('verifyAll') {
+    dependsOn tasks.named('integrationHarnessTest'), verifyClientAutomation, tasks.named('profileSmoke')
+}

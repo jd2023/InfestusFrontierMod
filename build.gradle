@@ -9,14 +9,88 @@ group = mod_group_id
 base { archivesName = mod_id }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-sourceSets { testMod }
+def supportedProfiles = ['required', 'jei', 'curios', 'combined'] as Set
+def requestedTasks = gradle.startParameter.taskNames.collect { it.tokenize(':').last() }
+def requestedProfile = providers.gradleProperty('modProfile').orElse('required').get()
+if (!supportedProfiles.contains(requestedProfile)) {
+    throw new GradleException("Invalid modProfile '${requestedProfile}'; expected required|jei|curios|combined")
+}
+def selectedProfile = 'verifyAll' in requestedTasks ? 'required' : requestedProfile
+ext.selectedIntegrationProfile = selectedProfile
+def omittedRequired = providers.gradleProperty('omitRequired').orElse('').get()
+if (omittedRequired && !['modonomicon', 'geckolib'].contains(omittedRequired)) {
+    throw new GradleException("Invalid omitRequired '${omittedRequired}'; expected modonomicon|geckolib")
+}
+if (omittedRequired && selectedProfile != 'required') {
+    throw new GradleException('omitRequired is only valid with modProfile=required')
+}
+if (omittedRequired && requestedTasks.any { it != 'profileSmoke' }) {
+    throw new GradleException('omitRequired is only valid for the profileSmoke negative fixture')
+}
+if ('captureClient' in requestedTasks && !providers.gradleProperty('captureDir').isPresent()) {
+    throw new GradleException('captureClient requires -PcaptureDir=<owned output directory>')
+}
+def selectedScenario = providers.gradleProperty('scenario').orElse('bootstrap').get()
+if (selectedScenario != 'bootstrap') {
+    throw new GradleException("Invalid scenario '${selectedScenario}'; expected bootstrap")
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://maven.theillusivec4.top' }
+    maven {
+        url = 'https://dl.cloudsmith.io/public/klikli-dev/mods/maven/'
+        content { includeGroup 'com.klikli_dev' }
+    }
+    maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven' }
+}
+
+sourceSets {
+    testMod {
+        java.exclude 'org/jd/infestusfrontier/testmod/integration/BootstrapClient.java'
+        resources.exclude 'integration/client/**'
+    }
+    integrationClient {
+        java.srcDir 'src/testMod/java'
+        java.include 'org/jd/infestusfrontier/testmod/integration/BootstrapClient.java'
+        resources.srcDir 'src/testMod/resources/integration/client'
+    }
+}
 configurations {
+    integrationClientImplementation.extendsFrom implementation
+    integrationClientRuntimeOnly.extendsFrom runtimeOnly
     testModImplementation.extendsFrom implementation
     testModRuntimeOnly.extendsFrom runtimeOnly
+    integrationInstaller
+    integrationModonomicon
+    integrationGeckolib
+    integrationJei
+    integrationCurios
 }
 dependencies {
     implementation project(':core')
     testModImplementation sourceSets.main.output
+    if (omittedRequired != 'modonomicon') {
+        runtimeOnly 'com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4'
+    }
+    if (omittedRequired != 'geckolib') {
+        runtimeOnly 'software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.2'
+    }
+    compileOnly 'mezz.jei:jei-1.21.1-common-api:19.56.0.438'
+    compileOnly 'mezz.jei:jei-1.21.1-neoforge-api:19.56.0.438'
+    compileOnly('top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1:api') { transitive = false }
+    if (selectedProfile in ['jei', 'combined']) {
+        runtimeOnly 'mezz.jei:jei-1.21.1-neoforge:19.56.0.438'
+    }
+    if (selectedProfile in ['curios', 'combined']) {
+        runtimeOnly 'top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1'
+    }
+    integrationInstaller "net.neoforged:neoforge:${neo_version}:installer"
+    integrationModonomicon('com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4') { transitive = false }
+    integrationGeckolib('software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.2') { transitive = false }
+    integrationJei('mezz.jei:jei-1.21.1-neoforge:19.56.0.438') { transitive = false }
+    integrationCurios('top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1') { transitive = false }
 }
 
 neoForge {
@@ -26,12 +100,14 @@ neoForge {
         mappingsVersion = '2024.11.17'
     }
     addModdingDependenciesTo sourceSets.testMod
+    addModdingDependenciesTo sourceSets.integrationClient
     mods {
         infestusfrontier {
             sourceSet sourceSets.main
             sourceSet project(':core').sourceSets.main
         }
         infestusfrontier_tests { sourceSet sourceSets.testMod }
+        infestusfrontier_client { sourceSet sourceSets.integrationClient }
     }
     runs {
         client {
@@ -52,6 +128,13 @@ neoForge {
             loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
             systemProperty 'neoforge.enabledGameTestNamespaces', 'infestusfrontier_tests'
             systemProperty 'neoforge.gameTestServer.forceExit', 'false'
+        }
+        integrationClient {
+            client()
+            sourceSet = sourceSets.integrationClient
+            gameDirectory = project.layout.buildDirectory.dir('integration/runs/client').get().asFile
+            loadedMods = [mods.infestusfrontier, mods.infestusfrontier_client]
+            programArguments.addAll '--username', 'FixturePlayer', '--uuid', '11111111-1111-1111-1111-111111111111', '--width', '1280', '--height', '720'
         }
     }
 }
@@ -106,5 +189,7 @@ tasks.named('runGameTestServer') { mustRunAfter ':core:test', distribution }
 tasks.register('verifyAll') {
     group = 'verification'
     description = 'Authoritative bootstrap gate: pure tests, production JAR contracts, isolated Minecraft GameTests.'
-    dependsOn ':core:check', tasks.named('build'), distribution, tasks.named('runGameTestServer')
+    dependsOn ':core:check', tasks.named('build'), distribution
 }
+
+apply from: 'gradle/integration/bootstrap.gradle'

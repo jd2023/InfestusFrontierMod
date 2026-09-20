@@ -22,3 +22,17 @@ type="required"
 versionRange="[1.21.1]"
 ordering="NONE"
 side="BOTH"
+
+[[dependencies.infestusfrontier]]
+modId="modonomicon"
+type="required"
+versionRange="[1.120.4]"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.infestusfrontier]]
+modId="geckolib"
+type="required"
+versionRange="[4.9.2]"
+ordering="AFTER"
+side="BOTH"
