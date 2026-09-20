@@ -1,16 +1,25 @@
 package org.jd.infestusfrontier.processing;
 
+import java.util.List;
+import java.util.Set;
+
 enum PreparationOrgan {
-    MEMBRANE_RACK("I002", "water", "membrane_sheet"),
-    BONE_LOOM("I003", "biomass", "bone_plate");
+    MEMBRANE_RACK("I002", List.of("I002"), "water", Set.of("membrane_sheet")),
+    BONE_LOOM("I003", List.of("I050", "I003"), "biomass", Set.of("bone_plate", "skeletal_graft"));
 
-    final String recipeId;
+    final String defaultRecipeId;
+    final List<String> recipePriority;
     final String fluid;
-    final String output;
+    final Set<String> outputs;
 
-    PreparationOrgan(String recipeId, String fluid, String output) {
-        this.recipeId = recipeId;
+    PreparationOrgan(String defaultRecipeId, List<String> recipePriority, String fluid, Set<String> outputs) {
+        this.defaultRecipeId = defaultRecipeId;
+        this.recipePriority = List.copyOf(recipePriority);
         this.fluid = fluid;
-        this.output = output;
+        this.outputs = Set.copyOf(outputs);
+    }
+
+    boolean supports(String recipeId) {
+        return recipePriority.contains(recipeId);
     }
 }

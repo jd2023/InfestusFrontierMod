@@ -14,6 +14,7 @@ import org.jd.infestusfrontier.storage.api.QuantityStore;
 /** Strict bounded platform codec. Domain restore validates conservation and recipe identity. */
 final class BowlSave {
     static final int WATER_CAPACITY = 2000;
+    static final int BIOMASS_CAPACITY = 2000;
     record Loaded(BatchWork.State state, String selected) {}
     static Loaded read(CompoundTag tag) {
         int schema = integer(tag, "schema");
@@ -22,11 +23,20 @@ final class BowlSave {
         CultureBowlRecipes.recipe(selected);
         var slots = readList(tag, "items", 9, slot -> new QuantityStore.ItemSlot(
                 text(slot, "resource"), integer(slot, "count"), integer(slot, "capacity")));
-        var tanks = readList(tag, "tanks", 1, tank -> new QuantityStore.Tank(
-                text(tank, "resource"), integer(tank, "count"), integer(tank, "capacity")));
-        if (slots.size() != 9 || tanks.size() != 1 || tanks.getFirst().capacity() != WATER_CAPACITY
+        var tanks = new ArrayList<>(readList(tag, "tanks", 2, tank -> new QuantityStore.Tank(
+                text(tank, "resource"), integer(tank, "count"), integer(tank, "capacity"))));
+        if (tanks.size() == 1 && tanks.getFirst().capacity() == WATER_CAPACITY
+                && (tanks.getFirst().isEmpty() || tanks.getFirst().resource().equals("water"))) {
+            tanks.add(QuantityStore.Tank.empty(BIOMASS_CAPACITY));
+        }
+        if (slots.size() != 9 || tanks.size() != 2 || tanks.getFirst().capacity() != WATER_CAPACITY
                 || (!tanks.getFirst().isEmpty() && !tanks.getFirst().resource().equals("water"))) {
             throw new IllegalArgumentException("Invalid Bowl store shape");
+        }
+        var biomass = tanks.get(1);
+        if (biomass.capacity() != BIOMASS_CAPACITY
+                || (!biomass.isEmpty() && !biomass.resource().equals("biomass"))) {
+            throw new IllegalArgumentException("Invalid Bowl biomass tank");
         }
         for (var slot : slots) {
             if (!slot.isEmpty() && slot.capacity() > BowlResources.item(slot.resource()).getDefaultMaxStackSize()) {
@@ -35,7 +45,7 @@ final class BowlSave {
         }
         var reservations = readList(tag, "reservations", 1, reservation -> new QuantityStore.ReservationSnapshot(
                 number(reservation, "id"), itemAllocations(reservation, "inputs"),
-                readList(reservation, "fluids", 1, a -> new QuantityStore.FluidAllocation(integer(a, "index"), text(a, "resource"), integer(a, "count"))),
+                readList(reservation, "fluids", 2, a -> new QuantityStore.FluidAllocation(integer(a, "index"), text(a, "resource"), integer(a, "count"))),
                 itemAllocations(reservation, "outputs"), itemAllocations(reservation, "returns")));
         var quantities = new QuantityStore.Snapshot(number(tag, "storeRevision"), number(tag, "nextReservation"), slots, tanks, reservations);
         var choices = readList(tag, "choices", 3, choice -> OrganHistory.GrowthChoice.valueOf(text(choice, "choice")));

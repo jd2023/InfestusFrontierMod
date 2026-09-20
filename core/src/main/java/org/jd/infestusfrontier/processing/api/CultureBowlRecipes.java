@@ -7,10 +7,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-/** The finite M0 Culture Bowl recipe catalog. Binder-dependent recipes are deliberately absent. */
+/** The finite starter Culture Bowl recipe catalog. */
 public final class CultureBowlRecipes {
     public static final int BASE_WORK_UNITS = 20 * 60;
-    public static final int BIOMASS_BU = 0;
     private static final Map<String, Recipe> RECIPES = createRecipes();
     private static final BatchRecipeCatalog CATALOG = (recipeId, history) -> find(recipeId)
             .map(recipe -> recipe.itemInputAlternatives().stream().map(inputs ->
@@ -72,6 +71,13 @@ public final class CultureBowlRecipes {
                 Map.of(),
                 BASE_WORK_UNITS));
         add(recipes, new Recipe(
+                "I004",
+                List.of(Map.of("membrane_sheet", 1, "spore_culture", 1)),
+                Map.of("biomass", 100),
+                Map.of("fusion_binder", 4),
+                Map.of(),
+                BASE_WORK_UNITS));
+        add(recipes, new Recipe(
                 "I005",
                 List.of(Map.of("slime_ball", 1, "spore_culture", 1)),
                 Map.of("water", 50),
@@ -79,10 +85,27 @@ public final class CultureBowlRecipes {
                 Map.of(),
                 BASE_WORK_UNITS));
         add(recipes, new Recipe(
+                "I006",
+                List.of(
+                        Map.of("glow_ink_sac", 1, "fusion_binder", 1),
+                        Map.of("glow_berries", 2, "fusion_binder", 1),
+                        Map.of("glowstone_dust", 1, "fusion_binder", 1)),
+                Map.of("biomass", 25),
+                Map.of("lumen_secretion", 2),
+                Map.of(),
+                BASE_WORK_UNITS));
+        add(recipes, new Recipe(
                 "I007",
                 List.of(Map.of("wheat", 1, "carrot", 1)),
                 Map.of("water", 100),
                 Map.of("nutrient_mash", 2),
+                Map.of(),
+                BASE_WORK_UNITS));
+        add(recipes, new Recipe(
+                "I029",
+                List.of(Map.of("charcoal", 1, "fusion_binder", 1)),
+                Map.of("biomass", 25),
+                Map.of("char_gland_feed", 1),
                 Map.of(),
                 BASE_WORK_UNITS));
         add(recipes, new Recipe(

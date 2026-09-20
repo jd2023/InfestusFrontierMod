@@ -17,12 +17,14 @@ public final class BowlResources {
             recipe.outputs().keySet().forEach(key -> ids.put(key, id(key)));
             recipe.returnedContainers().keySet().forEach(key -> ids.put(key, id(key)));
         }
+        ids.put("biomass_bucket", ResourceLocation.parse("infestusfrontier:storage/biomass_bucket"));
         return Map.copyOf(ids);
     }
     private static ResourceLocation id(String key) {
         return ResourceLocation.parse(switch (key) {
             case "spore_culture", "organ_bud" -> "infestusfrontier:construction/" + key;
-            case "elastic_gel", "nutrient_mash", "honey_culture", "rooting_gel" -> "infestusfrontier:processing/" + key;
+            case "membrane_sheet", "fusion_binder", "elastic_gel", "lumen_secretion", "nutrient_mash",
+                    "char_gland_feed", "honey_culture", "rooting_gel" -> "infestusfrontier:processing/" + key;
             default -> "minecraft:" + key;
         });
     }

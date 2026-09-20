@@ -31,13 +31,12 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class BowlGameTests {
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void bowlAndOnlyItsProducedMaterialsAreRegistered(GameTestHelper helper) {
-        for (String name : new String[] {"culture_bowl", "elastic_gel", "nutrient_mash", "honey_culture", "rooting_gel"}) {
+    public static void bowlAndItsProducedMaterialsAreRegistered(GameTestHelper helper) {
+        for (String name : new String[] {"culture_bowl", "fusion_binder", "elastic_gel", "lumen_secretion",
+                "nutrient_mash", "char_gland_feed", "honey_culture", "rooting_gel", "skeletal_graft"}) {
             helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse("infestusfrontier:processing/" + name)),
                     "Missing playable Bowl content: " + name);
         }
-        helper.assertTrue(!BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse("infestusfrontier:processing/organic_binder")),
-                "Binder must wait for its producer");
         helper.succeed();
     }
 
@@ -66,16 +65,22 @@ public final class BowlGameTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 1350, batch = "bowl_recipes")
-    public static void allSixRecipesRunOnLoadedServerTicks(GameTestHelper helper) {
+    public static void allNineRecipesRunOnLoadedServerTicks(GameTestHelper helper) {
         String[][] inputs = {{"red_mushroom", "wheat_seeds"}, {"spore_culture", "rotten_flesh", "rotten_flesh", "bone_meal"},
-                {"slime_ball", "spore_culture"}, {"wheat", "carrot"}, {"honey_bottle", "spore_culture"}, {"wheat_seeds", "spore_culture"}};
-        String[] outputs = {"spore_culture", "organ_bud", "elastic_gel", "nutrient_mash", "honey_culture", "rooting_gel"};
-        int[] water = {100, 0, 50, 100, 0, 50};
+                {"membrane_sheet", "spore_culture"}, {"slime_ball", "spore_culture"},
+                {"glow_ink_sac", "fusion_binder"}, {"wheat", "carrot"},
+                {"charcoal", "fusion_binder"}, {"honey_bottle", "spore_culture"},
+                {"wheat_seeds", "spore_culture"}};
+        String[] outputs = {"spore_culture", "organ_bud", "fusion_binder", "elastic_gel", "lumen_secretion",
+                "nutrient_mash", "char_gland_feed", "honey_culture", "rooting_gel"};
+        int[] outputCounts = {1, 1, 4, 2, 2, 2, 1, 2, 2};
+        int[] water = {100, 0, 0, 50, 0, 100, 0, 0, 50};
+        int[] biomass = {0, 0, 100, 0, 25, 0, 25, 0, 0};
         var positions = new ArrayList<BlockPos>();
         var player = new AdvancementRecordingPlayer(helper.getLevel(), new com.mojang.authlib.GameProfile(
                 java.util.UUID.fromString("68fa29bc-e0a5-4a66-98af-adfb3ad57b77"), "BatchOperator"));
         player.setGameMode(GameType.SURVIVAL);
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < outputs.length; i++) {
             var pos = place(helper, new BlockPos(i, 1, 0)); positions.add(pos);
             ((org.jd.infestusfrontier.interaction.api.ProbeTarget) helper.getLevel().getBlockEntity(pos))
                     .claimProbeOwner(player.getUUID());
@@ -88,6 +93,13 @@ public final class BowlGameTests {
                 use(helper, pos, player, new ItemStack(Items.WATER_BUCKET), false);
                 helper.assertTrue(player.getMainHandItem().is(Items.BUCKET), "Return water bucket");
             }
+            if (biomass[i] > 0) {
+                var before = data(helper, pos);
+                use(helper, pos, player, ItemStack.EMPTY, false);
+                helper.assertTrue(before.equals(data(helper, pos)), "Insufficient BU must preserve every balance/count");
+                use(helper, pos, player, stack("biomass_bucket", 1), false);
+                helper.assertTrue(player.getMainHandItem().is(Items.BUCKET), "Return biomass bucket");
+            }
             use(helper, pos, player, ItemStack.EMPTY, false);
             helper.assertTrue(data(helper, pos).getCompound("bowl").contains("active"), "Batch started: " + outputs[i]);
             var before = data(helper, pos);
@@ -95,7 +107,7 @@ public final class BowlGameTests {
             helper.assertTrue(before.equals(data(helper, pos)), "Duplicate start leaves all state unchanged");
         }
         helper.runAfterDelay(600, () -> {
-            var pos = positions.get(4);
+            var pos = positions.get(2);
             var before = data(helper, pos);
             helper.getLevel().removeBlockEntity(pos);
             var restored = BlockEntity.loadStatic(pos, helper.getLevel().getBlockState(pos), before, helper.getLevel().registryAccess());
@@ -107,7 +119,7 @@ public final class BowlGameTests {
                     "Offline initiator must not receive awards through a stale player reference");
             var reconnected = new AdvancementRecordingPlayer(helper.getLevel(), player.getGameProfile());
             reconnected.setGameMode(GameType.SURVIVAL);
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < outputs.length; i++) {
                 var pos = positions.get(i);
                 var receipt = data(helper, pos);
                 if (i == 1) {
@@ -129,23 +141,27 @@ public final class BowlGameTests {
                     "Reloaded completion evidence credits the current player after reconnect");
             helper.assertTrue(reconnected.wasAwarded(id("discovery/organ_bud")),
                     "Growing a Bud completes T0-16");
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < outputs.length; i++) {
                 var pos = positions.get(i); var saved = data(helper, pos).getCompound("bowl");
                 helper.assertTrue(!saved.contains("active") && saved.getLong("completed") == 1, "One completion, one count: " + outputs[i]);
-                helper.assertTrue(count(saved, outputs[i]) == (i < 2 ? 1 : 2), "Exact recipe output: " + outputs[i]);
+                helper.assertTrue(count(saved, outputs[i]) == outputCounts[i], "Exact recipe output: " + outputs[i]);
                 for (String ingredient : inputs[i]) helper.assertTrue(count(saved, ingredient) == 0, "Consumed recipe input: " + ingredient);
                 helper.assertTrue(saved.getList("tanks", 10).getCompound(0).getInt("count") == (water[i] > 0 ? 1000 - water[i] : 0), "Exact water debit");
-                if (i == 4) helper.assertTrue(count(saved, "glass_bottle") == 1, "Honey returns exactly one bottle after reload");
+                helper.assertTrue(saved.getList("tanks", 10).getCompound(1).getInt("count") == (biomass[i] > 0 ? 1000 - biomass[i] : 0), "Exact biomass debit");
+                if (i == 7) helper.assertTrue(count(saved, "glass_bottle") == 1, "Honey returns exactly one bottle after reload");
                 for (int slot = 0; slot < 9; slot++) use(helper, pos, player, ItemStack.EMPTY, true);
                 helper.assertTrue(count(data(helper, pos).getCompound("bowl"), outputs[i]) == 0, "Manual collection removes products");
                 if (i >= 2) {
                     // Each produced material is a non-food preparation, and can be retained/retrieved intact.
-                    var product = stack(outputs[i], 2);
+                    var product = stack(outputs[i], outputCounts[i]);
+                    var productItem = product.getItem();
                     helper.assertTrue(!product.has(DataComponents.FOOD), "Prepared material is not player food");
                     use(helper, pos, player, product, false);
-                    helper.assertTrue(player.getMainHandItem().getCount() == 1, "Deposit one produced dose");
+                    helper.assertTrue(player.getMainHandItem().getCount() == outputCounts[i] - 1,
+                            "Deposit one produced dose");
                     use(helper, pos, player, ItemStack.EMPTY, true);
-                    helper.assertTrue(player.getMainHandItem().is(product.getItem()) && player.getMainHandItem().getCount() == 1, "Retrieve same dose");
+                    helper.assertTrue(player.getMainHandItem().is(productItem) && player.getMainHandItem().getCount() == 1,
+                            "Retrieve same dose: " + outputs[i]);
 
                 }
             }
@@ -213,7 +229,7 @@ public final class BowlGameTests {
         nether.setBlock(remotePos, BuiltInRegistries.BLOCK.get(id("processing/culture_bowl")).defaultBlockState(), 2);
         for (int i = 0; i < 17; i++) {
             var pos = place(helper, new BlockPos(i % 5, 1, i / 5));
-            for (int cycle = 0; cycle < 4; cycle++) use(helper, pos, player, new ItemStack(Items.STICK), false);
+            for (int cycle = 0; cycle < 7; cycle++) use(helper, pos, player, new ItemStack(Items.STICK), false);
             use(helper, pos, player, stack("honey_bottle", 1), false);
             use(helper, pos, player, stack("spore_culture", 1), false);
             use(helper, pos, player, ItemStack.EMPTY, false);
@@ -259,7 +275,7 @@ public final class BowlGameTests {
         var pos = place(helper, new BlockPos(0, 1, 0));
         var player = net.neoforged.neoforge.common.util.FakePlayerFactory.getMinecraft(helper.getLevel());
         player.setGameMode(GameType.SURVIVAL);
-        for (int cycle = 0; cycle < 4; cycle++) use(helper, pos, player, new ItemStack(Items.STICK), false);
+        for (int cycle = 0; cycle < 7; cycle++) use(helper, pos, player, new ItemStack(Items.STICK), false);
         var saved = data(helper, pos);
         var slots = saved.getCompound("bowl").getList("items", 10);
         String[] keys = {"honey_bottle", "spore_culture", "honey_culture", "glass_bottle", "wheat", "carrot", "bone_meal", "slime_ball", "red_mushroom"};
@@ -293,7 +309,7 @@ public final class BowlGameTests {
         saved.getCompound("bowl").putLong("nextBatch", 513);
         helper.getLevel().getBlockEntity(pos).loadWithComponents(saved, helper.getLevel().registryAccess());
         for (int i = 0; i < 3; i++) use(helper, pos, player, new ItemStack(Items.GLASS_BOTTLE), true);
-        for (int i = 0; i < 5; i++) use(helper, pos, player, new ItemStack(Items.STICK), false);
+        for (int i = 0; i < 8; i++) use(helper, pos, player, new ItemStack(Items.STICK), false);
         use(helper, pos, player, stack("spore_culture", 1), false);
         use(helper, pos, player, stack("wheat_seeds", 1), false);
         use(helper, pos, player, new ItemStack(Items.WATER_BUCKET), false);
@@ -339,7 +355,10 @@ public final class BowlGameTests {
     private static ItemStack stack(String key, int count) {
         String path = switch (key) {
             case "spore_culture", "organ_bud" -> "infestusfrontier:construction/" + key;
-            case "elastic_gel", "nutrient_mash", "honey_culture", "rooting_gel" -> "infestusfrontier:processing/" + key;
+            case "membrane_sheet", "fusion_binder", "elastic_gel", "lumen_secretion", "nutrient_mash",
+                    "char_gland_feed", "honey_culture", "rooting_gel", "skeletal_graft" ->
+                    "infestusfrontier:processing/" + key;
+            case "biomass_bucket" -> "infestusfrontier:storage/biomass_bucket";
             default -> "minecraft:" + key;
         };
         return new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse(path)), count);

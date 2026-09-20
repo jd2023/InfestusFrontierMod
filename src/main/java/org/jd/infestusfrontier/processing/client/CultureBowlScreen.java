@@ -14,7 +14,8 @@ import org.jd.infestusfrontier.ui.client.OrganScreen;
 
 /** Thin rendering adapter over the internal UI layout and immutable processing snapshot. */
 public final class CultureBowlScreen extends OrganScreen<CultureBowlMenu> {
-    private static final List<String> RECIPES = List.of("I000", "I001", "I005", "I007", "I030", "I033");
+    private static final List<String> RECIPES = List.copyOf(
+            org.jd.infestusfrontier.processing.api.CultureBowlRecipes.all().keySet());
     private String selectedRecipe;
 
     public CultureBowlScreen(CultureBowlMenu menu, Inventory inventory, Component title) {
@@ -49,13 +50,16 @@ public final class CultureBowlScreen extends OrganScreen<CultureBowlMenu> {
     @Override protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         panel(graphics);
         bar(graphics, 130, menu.snapshot().water(), menu.snapshot().waterCapacity(), 0xFF3A9FC4);
-        bar(graphics, 143, menu.snapshot().completedWork(), menu.snapshot().requiredWork(), 0xFF82B94B);
+        bar(graphics, 143, menu.snapshot().biomass(), menu.snapshot().biomassCapacity(), 0xFF8D4463);
+        bar(graphics, 156, menu.snapshot().completedWork(), menu.snapshot().requiredWork(), 0xFF82B94B);
     }
 
     @Override protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawString(font, title, 12, 9, UiTheme.TEXT, false);
         graphics.drawString(font, Component.translatable("screen.infestusfrontier.bowl.water",
                 menu.snapshot().water(), menu.snapshot().waterCapacity()), 12, 120, UiTheme.MUTED_TEXT, false);
+        graphics.drawString(font, Component.translatable("screen.infestusfrontier.bowl.biomass",
+                menu.snapshot().biomass(), menu.snapshot().biomassCapacity()), 126, 120, UiTheme.MUTED_TEXT, false);
         graphics.drawString(font, Component.translatable("screen.infestusfrontier.bowl.state." +
                 menu.snapshot().state().name().toLowerCase(java.util.Locale.ROOT)), 12, 91, UiTheme.TEXT, false);
         graphics.drawString(font, Component.translatable("screen.infestusfrontier.bowl.completed",

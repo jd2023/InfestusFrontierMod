@@ -252,7 +252,7 @@ public final class ProbeGameTests {
     public static void maximumSnapshotRoundTripsBelowFourKiB(GameTestHelper helper) {
         var slots = java.util.stream.IntStream.range(0, 9)
                 .mapToObj(i -> new CultureBowlMenuSnapshot.Slot("infestusfrontier:processing/nutrient_mash", 64)).toList();
-        var snapshot = new CultureBowlMenuSnapshot(Long.MAX_VALUE - 1, slots, 2000, 2000,
+        var snapshot = new CultureBowlMenuSnapshot(Long.MAX_VALUE - 1, slots, 2000, 2000, 2000, 2000,
                 CultureBowlMenuSnapshot.State.WORKING, 1199, 1200, Long.MAX_VALUE - 1, "I033", BowlRefusal.RATE_LIMITED);
         var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), helper.getLevel().registryAccess(), ConnectionType.NEOFORGE);
         CultureBowlMenuSnapshot.CODEC.encode(buffer, snapshot);

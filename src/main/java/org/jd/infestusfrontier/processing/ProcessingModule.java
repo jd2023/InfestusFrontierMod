@@ -89,7 +89,8 @@ public final class ProcessingModule {
         items.register("processing/bone_loom", () -> new BlockItem(boneLoom.get(), new Item.Properties().stacksTo(1)));
         items.register("processing/membrane_sheet", () -> new Item(new Item.Properties()));
         items.register("processing/bone_plate", () -> new Item(new Item.Properties()));
-        for (String name : new String[] {"elastic_gel", "nutrient_mash", "honey_culture", "rooting_gel"}) {
+        for (String name : new String[] {"fusion_binder", "elastic_gel", "lumen_secretion", "nutrient_mash",
+                "char_gland_feed", "honey_culture", "rooting_gel", "skeletal_graft"}) {
             items.register("processing/" + name, () -> new Item(new Item.Properties()));
         }
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(this::allowBowlControls);

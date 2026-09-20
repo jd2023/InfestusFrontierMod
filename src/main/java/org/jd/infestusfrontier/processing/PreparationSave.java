@@ -78,7 +78,7 @@ final class PreparationSave {
             var saved = tag.getCompound("active");
             active = new BatchWork.ActiveBatch(number(saved, "id"), text(saved, "recipe"),
                     number(saved, "reservation"), integer(saved, "work"), integer(saved, "required"));
-            if (!active.recipeId().equals(organ.recipeId)) throw new IllegalArgumentException("Wrong preparation recipe");
+            if (!organ.supports(active.recipeId())) throw new IllegalArgumentException("Wrong preparation recipe");
         }
         return new BatchWork.State(BatchWork.SNAPSHOT_SCHEMA, number(tag, "revision"), number(tag, "nextBatch"),
                 active, store, history);

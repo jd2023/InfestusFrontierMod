@@ -77,16 +77,31 @@ public final class QuantityStore {
     }
 
     public boolean insertFluid(String resource, int amount) {
-        if (resource == null || resource.length() > 64 || resource.isBlank() || amount < 1) throw new IllegalArgumentException("Invalid fluid");
-        if (!reservations.isEmpty() || revision >= Long.MAX_VALUE - 1) return false;
+        validateFluid(resource, amount);
         for (int i = 0; i < tanks.size(); i++) {
-            var tank = tanks.get(i);
-            if ((!tank.isEmpty() && !tank.resource().equals(resource)) || amount > tank.capacity() - tank.amount()) continue;
-            tanks.set(i, new Tank(resource, tank.amount() + amount, tank.capacity()));
-            revision++;
-            return true;
+            if (insertFluid(i, resource, amount)) return true;
         }
         return false;
+    }
+
+    /** Inserts only into the owning adapter's designated finite tank. */
+    public boolean insertFluid(int tankIndex, String resource, int amount) {
+        validateFluid(resource, amount);
+        if (tankIndex < 0 || tankIndex >= tanks.size() || !reservations.isEmpty()
+                || revision >= Long.MAX_VALUE - 1) return false;
+        var tank = tanks.get(tankIndex);
+        if ((!tank.isEmpty() && !tank.resource().equals(resource)) || amount > tank.capacity() - tank.amount()) {
+            return false;
+        }
+        tanks.set(tankIndex, new Tank(resource, tank.amount() + amount, tank.capacity()));
+        revision++;
+        return true;
+    }
+
+    private static void validateFluid(String resource, int amount) {
+        if (resource == null || resource.length() > 64 || resource.isBlank() || amount < 1) {
+            throw new IllegalArgumentException("Invalid fluid");
+        }
     }
 
     public boolean extractItemSlot(int index) {

@@ -17,20 +17,108 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CultureBowlBatchWorkTest {
     @Test
-    void bowlCatalogContainsOnlyTheSixAuthorizedRecipes() {
+    void bowlCatalogContainsTheNineAuthorizedRecipesWithExactBinderCosts() {
         assertEquals(
-                List.of("I000", "I001", "I005", "I007", "I030", "I033"),
+                List.of("I000", "I001", "I004", "I005", "I006", "I007", "I029", "I030", "I033"),
                 new ArrayList<>(CultureBowlRecipes.all().keySet()));
         assertEquals(1, CultureBowlRecipes.recipe("I000").outputs().get("spore_culture"));
         assertEquals(1, CultureBowlRecipes.recipe("I001").outputs().get("organ_bud"));
+        assertEquals(Map.of("membrane_sheet", 1, "spore_culture", 1),
+                CultureBowlRecipes.recipe("I004").itemInputAlternatives().getFirst());
+        assertEquals(Map.of("biomass", 100), CultureBowlRecipes.recipe("I004").fluidInputs());
+        assertEquals(Map.of("fusion_binder", 4), CultureBowlRecipes.recipe("I004").outputs());
         assertEquals(2, CultureBowlRecipes.recipe("I005").outputs().get("elastic_gel"));
+        assertEquals(List.of(
+                        Map.of("glow_ink_sac", 1, "fusion_binder", 1),
+                        Map.of("glow_berries", 2, "fusion_binder", 1),
+                        Map.of("glowstone_dust", 1, "fusion_binder", 1)),
+                CultureBowlRecipes.recipe("I006").itemInputAlternatives());
+        assertEquals(Map.of("biomass", 25), CultureBowlRecipes.recipe("I006").fluidInputs());
+        assertEquals(Map.of("lumen_secretion", 2), CultureBowlRecipes.recipe("I006").outputs());
         assertEquals(2, CultureBowlRecipes.recipe("I007").outputs().get("nutrient_mash"));
+        assertEquals(Map.of("charcoal", 1, "fusion_binder", 1),
+                CultureBowlRecipes.recipe("I029").itemInputAlternatives().getFirst());
+        assertEquals(Map.of("biomass", 25), CultureBowlRecipes.recipe("I029").fluidInputs());
+        assertEquals(Map.of("char_gland_feed", 1), CultureBowlRecipes.recipe("I029").outputs());
         assertEquals(2, CultureBowlRecipes.recipe("I030").outputs().get("honey_culture"));
         assertEquals(1, CultureBowlRecipes.recipe("I030").returnedContainers().get("glass_bottle"));
         assertEquals(2, CultureBowlRecipes.recipe("I033").outputs().get("rooting_gel"));
-        assertTrue(CultureBowlRecipes.find("I004").isEmpty());
-        assertTrue(CultureBowlRecipes.find("I006").isEmpty());
-        assertTrue(CultureBowlRecipes.find("I029").isEmpty());
+    }
+
+    @Test
+    void binderRefusalsLeaveInputsBiomassAndHistoryUnchanged() {
+        var insufficient = BatchWork.create(store(
+                List.of(item("membrane_sheet", 1), item("spore_culture", 1)),
+                List.of(tank("biomass", 99, 2000))), () -> true);
+        var insufficientBefore = insufficient.state();
+        var insufficientResult = assertInstanceOf(BatchWork.Refused.class,
+                insufficient.start(new BatchWork.StartRequest("I004"), insufficient.revision()));
+        assertEquals(BatchWork.StartRefusal.INSUFFICIENT_FLUID, insufficientResult.reason());
+        assertEquals(insufficientBefore, insufficient.state());
+
+        var full = BatchWork.create(store(
+                List.of(item("membrane_sheet", 1), item("spore_culture", 1), item("fusion_binder", 64),
+                        item("filler_1", 64), item("filler_2", 64), item("filler_3", 64),
+                        item("filler_4", 64), item("filler_5", 64), item("filler_6", 64)),
+                List.of(tank("biomass", 100, 2000))), () -> true);
+        var fullBefore = full.state();
+        var fullResult = assertInstanceOf(BatchWork.Refused.class,
+                full.start(new BatchWork.StartRequest("I004"), full.revision()));
+        assertEquals(BatchWork.StartRefusal.OUTPUT_FULL, fullResult.reason());
+        assertEquals(fullBefore, full.state());
+    }
+
+    @Test
+    void designatedBowlTanksNeverAcceptTheOtherProcessFluid() {
+        var work = BatchWork.create(store(List.of(), List.of(
+                QuantityStore.Tank.empty(2000), QuantityStore.Tank.empty(2000))), () -> true);
+        assertTrue(work.insertWater(1500, work.revision()));
+        var beforeOverflow = work.state();
+        assertTrue(!work.insertWater(1000, work.revision()));
+        assertEquals(beforeOverflow, work.state());
+        assertTrue(work.insertFluid(1, "biomass", 1000, work.revision()));
+        assertEquals("water", work.state().quantities().tanks().get(0).resource());
+        assertEquals("biomass", work.state().quantities().tanks().get(1).resource());
+    }
+
+    @Test
+    void partialBinderCompletionAcrossReloadCannotMintASecondBatch() {
+        var work = BatchWork.create(store(
+                List.of(item("membrane_sheet", 1), item("spore_culture", 1)),
+                List.of(tank("biomass", 100, 2000))), () -> true);
+        assertInstanceOf(BatchWork.Started.class,
+                work.start(new BatchWork.StartRequest("I004"), work.revision()));
+        var midway = work.advance(731);
+        var restored = BatchWork.restore(midway, () -> true);
+
+        var completed = restored.advance(469);
+        assertEquals(BatchWork.Status.IDLE, completed.status());
+        assertEquals(4, completed.quantities().itemCount("fusion_binder"));
+        assertEquals(0, completed.quantities().itemCount("membrane_sheet"));
+        assertEquals(0, completed.quantities().itemCount("spore_culture"));
+        assertEquals(0, completed.quantities().fluidAmount("biomass"));
+        assertEquals(1, completed.history().completedBatches());
+
+        var completedReload = BatchWork.restore(completed, () -> true);
+        assertEquals(completed, completedReload.advance(1200));
+        assertEquals(4, completedReload.state().quantities().itemCount("fusion_binder"));
+        assertEquals(1, completedReload.state().history().completedBatches());
+    }
+
+    @Test
+    void everyLumenSourceAndCharFeedConsumeActualBinderAndBiomass() {
+        assertBatch("I006", store(
+                List.of(item("glow_ink_sac", 1), item("fusion_binder", 1)),
+                List.of(tank("biomass", 25, 2000))), Map.of("lumen_secretion", 2));
+        assertBatch("I006", store(
+                List.of(item("glow_berries", 2), item("fusion_binder", 1)),
+                List.of(tank("biomass", 25, 2000))), Map.of("lumen_secretion", 2));
+        assertBatch("I006", store(
+                List.of(item("glowstone_dust", 1), item("fusion_binder", 1)),
+                List.of(tank("biomass", 25, 2000))), Map.of("lumen_secretion", 2));
+        assertBatch("I029", store(
+                List.of(item("charcoal", 1), item("fusion_binder", 1)),
+                List.of(tank("biomass", 25, 2000))), Map.of("char_gland_feed", 1));
     }
 
     @Test

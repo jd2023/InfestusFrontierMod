@@ -25,7 +25,7 @@ public final class JeiDiscoveryScenario implements IModPlugin {
             throw new IllegalStateException("JEI must expose every Bowl alternative");
         verifyIngredients(type);
         verifyPreparation("membrane_rack", "I002");
-        verifyPreparation("bone_loom", "I003");
+        verifyPreparation("bone_loom", "I003", "I050");
         if (opened.equals(typePath)) {
             if (game.screen == null || !game.screen.getClass().getName().contains("RecipesGui"))
                 throw new IllegalStateException("JEI recipe browser did not open");
@@ -48,16 +48,22 @@ public final class JeiDiscoveryScenario implements IModPlugin {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void verifyPreparation(String typePath, String catalogId) {
+    private static void verifyPreparation(String typePath, String... catalogIds) {
         var type = runtime.getRecipeManager().getRecipeType(
                 ResourceLocation.parse("infestusfrontier:" + typePath)).orElseThrow();
-        var recipe = org.jd.infestusfrontier.processing.api.PreparationRecipes.recipe(catalogId);
         var displays = runtime.getRecipeManager().createRecipeLookup(type).get().toList();
-        if (displays.size() != recipe.routes().size()) throw new IllegalStateException("JEI route count differs for " + catalogId);
+        int expectedRoutes = java.util.Arrays.stream(catalogIds)
+                .map(org.jd.infestusfrontier.processing.api.PreparationRecipes::recipe)
+                .mapToInt(recipe -> recipe.routes().size()).sum();
+        if (displays.size() != expectedRoutes) throw new IllegalStateException("JEI route count differs for " + typePath);
         var category = runtime.getRecipeManager().getRecipeCategory(type);
-        for (int route = 0; route < displays.size(); route++) {
+        int displayIndex = 0;
+        for (String catalogId : catalogIds) {
+            var recipe = org.jd.infestusfrontier.processing.api.PreparationRecipes.recipe(catalogId);
+            for (int route = 0; route < recipe.routes().size(); route++) {
+            var display = displays.get(displayIndex++);
             var ingredients = runtime.getRecipeManager().getRecipeIngredients(
-                    (mezz.jei.api.recipe.category.IRecipeCategory) category, displays.get(route));
+                    (mezz.jei.api.recipe.category.IRecipeCategory) category, display);
             checkPreparationItems(ingredients.getIngredients(mezz.jei.api.recipe.RecipeIngredientRole.INPUT),
                     recipe.routes().get(route).itemInputs());
             checkPreparationItems(ingredients.getIngredients(mezz.jei.api.recipe.RecipeIngredientRole.OUTPUT), recipe.outputs());
@@ -72,7 +78,7 @@ public final class JeiDiscoveryScenario implements IModPlugin {
                 throw new IllegalStateException("JEI preparation water differs for " + catalogId);
             }
             var rendered = new RecordedLabels(net.minecraft.client.Minecraft.getInstance());
-            ((mezz.jei.api.recipe.category.IRecipeCategory) category).draw(displays.get(route), null, rendered, -1, -1);
+            ((mezz.jei.api.recipe.category.IRecipeCategory) category).draw(display, null, rendered, -1, -1);
             String duration = net.minecraft.network.chat.Component.translatable("jei.infestusfrontier.duration",
                     recipe.routes().get(route).workUnits()
                             / org.jd.infestusfrontier.processing.api.PreparationRecipes.TICKS_PER_SECOND).getString();
@@ -80,6 +86,7 @@ public final class JeiDiscoveryScenario implements IModPlugin {
                     recipe.fluidInputs().getOrDefault("biomass", 0)).getString();
             if (!rendered.labels.contains(duration) || !rendered.labels.contains(biomass)) {
                 throw new IllegalStateException("JEI drawn duration/biomass differ for " + catalogId + ": " + rendered.labels);
+            }
             }
         }
     }
@@ -126,6 +133,16 @@ public final class JeiDiscoveryScenario implements IModPlugin {
                 }
             }
             if (water != recipe.fluidInputs().getOrDefault("water", 0)) throw new IllegalStateException("Wrong JEI water amount");
+            var rendered = new RecordedLabels(net.minecraft.client.Minecraft.getInstance());
+            category.draw(display, null, rendered, -1, -1);
+            String duration = net.minecraft.network.chat.Component.translatable("jei.infestusfrontier.duration",
+                    recipe.baseWorkUnits() / org.jd.infestusfrontier.processing.api.PreparationRecipes.TICKS_PER_SECOND)
+                    .getString();
+            String biomass = net.minecraft.network.chat.Component.translatable("jei.infestusfrontier.biomass",
+                    recipe.fluidInputs().getOrDefault("biomass", 0)).getString();
+            if (!rendered.labels.contains(duration) || !rendered.labels.contains(biomass)) {
+                throw new IllegalStateException("JEI Bowl costs differ for " + recipe.catalogId() + ": " + rendered.labels);
+            }
         }
     }
 

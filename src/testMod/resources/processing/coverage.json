@@ -130,6 +130,55 @@
           }
         }
       ]
+    },
+    {
+      "task": "IF-096",
+      "entries": [
+        {
+          "catalog": ["I004"],
+          "registry": ["infestusfrontier:processing/fusion_binder"],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/fusion_binder.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.fusion_binder.obtain",
+            "use": "infestusfrontier_tests:processing.fusion_binder.use",
+            "guide": "infestusfrontier_client:processing.fusion_binder.guide"
+          }
+        },
+        {
+          "catalog": ["I006"],
+          "registry": ["infestusfrontier:processing/lumen_secretion"],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/lumen_secretion.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.lumen_secretion.obtain",
+            "use": "infestusfrontier_tests:processing.lumen_secretion.use",
+            "guide": "infestusfrontier_client:processing.lumen_secretion.guide"
+          }
+        },
+        {
+          "catalog": ["I029"],
+          "registry": ["infestusfrontier:processing/char_gland_feed"],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/char_gland_feed.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.char_gland_feed.obtain",
+            "use": "infestusfrontier_tests:processing.char_gland_feed.use",
+            "guide": "infestusfrontier_client:processing.char_gland_feed.guide"
+          }
+        },
+        {
+          "catalog": ["I050"],
+          "registry": ["infestusfrontier:processing/skeletal_graft"],
+          "producer": "infestusfrontier:processing/bone_loom",
+          "guide": "guide/skeletal_graft.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.skeletal_graft.obtain",
+            "use": "infestusfrontier_tests:processing.skeletal_graft.use",
+            "guide": "infestusfrontier_client:processing.skeletal_graft.guide"
+          }
+        }
+      ]
     }
   ]
 }

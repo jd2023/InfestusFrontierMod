@@ -16,15 +16,39 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PreparationBatchWorkTest {
     @Test
-    void catalogOwnsOnlyMembraneAndPlateWithoutPrematureGraftsOrBoneBlocks() {
-        assertEquals(List.of("I002", "I003"), new ArrayList<>(PreparationRecipes.all().keySet()));
+    void catalogOwnsMembranePlateAndTheExactSkeletalGraftRoute() {
+        assertEquals(List.of("I002", "I003", "I050"), new ArrayList<>(PreparationRecipes.all().keySet()));
         assertEquals(400, PreparationRecipes.recipe("I002").routes().getFirst().workUnits());
         assertEquals(800, PreparationRecipes.recipe("I002").routes().get(1).workUnits());
         assertEquals(Map.of("membrane_sheet", 1), PreparationRecipes.recipe("I002").outputs());
         assertEquals(Map.of("bone_plate", 1), PreparationRecipes.recipe("I003").outputs());
-        assertTrue(PreparationRecipes.find("I050").isEmpty());
+        assertEquals(Map.of("bone_plate", 1, "fusion_binder", 1),
+                PreparationRecipes.recipe("I050").routes().getFirst().itemInputs());
+        assertEquals(Map.of("biomass", 25), PreparationRecipes.recipe("I050").fluidInputs());
+        assertEquals(Map.of("skeletal_graft", 1), PreparationRecipes.recipe("I050").outputs());
+        assertEquals(400, PreparationRecipes.recipe("I050").routes().getFirst().workUnits());
         assertTrue(PreparationRecipes.recipe("I003").routes().stream()
                 .noneMatch(route -> route.itemInputs().containsKey("bone_block")));
+    }
+
+    @Test
+    void skeletalGraftRefusesInsufficientBiomassAndFullOutputUnchanged() {
+        var insufficient = work(store(
+                List.of(item("bone_plate", 1), item("fusion_binder", 1)),
+                List.of(tank("biomass", 24))));
+        var insufficientBefore = insufficient.state();
+        var insufficientResult = assertInstanceOf(BatchWork.Refused.class,
+                insufficient.start(new BatchWork.StartRequest("I050"), insufficient.revision()));
+        assertEquals(BatchWork.StartRefusal.INSUFFICIENT_FLUID, insufficientResult.reason());
+        assertEquals(insufficientBefore, insufficient.state());
+
+        var full = work(store(List.of(item("bone_plate", 1), item("fusion_binder", 1),
+                item("skeletal_graft", 64), item("filler", 64)), List.of(tank("biomass", 25))));
+        var fullBefore = full.state();
+        var fullResult = assertInstanceOf(BatchWork.Refused.class,
+                full.start(new BatchWork.StartRequest("I050"), full.revision()));
+        assertEquals(BatchWork.StartRefusal.OUTPUT_FULL, fullResult.reason());
+        assertEquals(fullBefore, full.state());
     }
 
     @Test

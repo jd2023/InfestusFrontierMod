@@ -23,7 +23,8 @@ public final class PreparationResources {
 
     private static ResourceLocation id(String key) {
         return ResourceLocation.parse(switch (key) {
-            case "membrane_sheet", "bone_plate" -> "infestusfrontier:processing/" + key;
+            case "membrane_sheet", "bone_plate", "fusion_binder", "skeletal_graft" ->
+                    "infestusfrontier:processing/" + key;
             default -> "minecraft:" + key;
         });
     }

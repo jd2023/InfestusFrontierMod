@@ -43,16 +43,19 @@ public final class DiscoveryGuideScenario implements ContentGuideScenario, Conte
         return List.of(new UiView("waking-genome-guide.png", 3),
                 new UiView("bowl-guide-controls.png", 3), new UiView("bowl-guide-recipes-1.png", 3),
                 new UiView("bowl-guide-recipes-2.png", 3), new UiView("bowl-guide-recipes-3.png", 3),
+                new UiView("bowl-guide-recipes-4.png", 3), new UiView("bowl-guide-recipes-5.png", 3),
                 new UiView("bowl-recipe-browser.png", 3), new UiView("preparation-items.png", 3),
                 new UiView("rack-guide-flesh.png", 3), new UiView("rack-guide-leather.png", 3),
-                new UiView("loom-guide.png", 3), new UiView("rack-recipe-browser.png", 3),
+                new UiView("loom-guide.png", 3), new UiView("loom-guide-graft.png", 3),
+                new UiView("rack-recipe-browser.png", 3),
                 new UiView("loom-recipe-browser.png", 3));
     }
 
     @Override
     public boolean prepareUi(Minecraft minecraft, UiView view) {
         if (view.filename().equals("preparation-items.png")) {
-            for (var slot : java.util.Map.of(10, "membrane_sheet", 12, "bone_plate").entrySet()) {
+            for (var slot : java.util.Map.of(10, "membrane_sheet", 12, "bone_plate",
+                    15, "char_gland_feed", 16, "skeletal_graft").entrySet()) {
                 var stack = minecraft.player.getInventory().getItem(slot.getKey());
                 if (!stack.is(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(ResourceLocation.parse(
                         "infestusfrontier:processing/" + slot.getValue())))) {
@@ -88,13 +91,17 @@ public final class DiscoveryGuideScenario implements ContentGuideScenario, Conte
             case "waking-genome-guide.png" -> FIRST_ENTRY;
             case "rack-guide-flesh.png", "rack-guide-leather.png", "rack-recipe-browser.png" ->
                     ResourceLocation.parse("infestusfrontier:processing/membrane_rack");
-            case "loom-guide.png", "loom-recipe-browser.png" -> ResourceLocation.parse("infestusfrontier:processing/bone_loom");
+            case "loom-guide.png", "loom-guide-graft.png", "loom-recipe-browser.png" ->
+                    ResourceLocation.parse("infestusfrontier:processing/bone_loom");
             default -> ResourceLocation.parse("infestusfrontier:processing/culture_bowl");
         };
         int target = switch (view.filename()) {
             case "bowl-guide-recipes-1.png", "bowl-recipe-browser.png", "rack-guide-leather.png" -> 2;
             case "bowl-guide-recipes-2.png" -> 4;
             case "bowl-guide-recipes-3.png" -> 6;
+            case "bowl-guide-recipes-4.png" -> 8;
+            case "bowl-guide-recipes-5.png" -> 10;
+            case "loom-guide-graft.png" -> 2;
             default -> 0;
         };
         if (minecraft.screen instanceof BookEntryScreen screen && screen.getEntry().getId().equals(entry)
@@ -152,41 +159,46 @@ public final class DiscoveryGuideScenario implements ContentGuideScenario, Conte
                 if (!text.contains(expected)) throw new IllegalStateException("Guide lacks " + expected);
             }
             if (!text.contains(recipe.fluidInputs().getOrDefault("water", 0) + " mB")
-                    || !text.contains(recipe.baseWorkUnits() / 20 + " loaded seconds") || !text.contains("0 BU"))
+                    || !text.contains(recipe.baseWorkUnits() / 20 + " loaded seconds")
+                    || !text.contains(recipe.fluidInputs().getOrDefault("biomass", 0) + " BU"))
                 throw new IllegalStateException("Guide recipe costs differ from processing " + recipe.catalogId());
         }
     }
 
     private static void verifyPreparationRecipes(com.klikli_dev.modonomicon.book.entries.BookEntry entry) {
-        String catalogId = switch (entry.getId().getPath()) {
-            case "processing/membrane_rack", "processing/membrane_sheet" -> "I002";
-            case "processing/bone_loom", "processing/bone_plate" -> "I003";
-            default -> "";
+        var catalogIds = switch (entry.getId().getPath()) {
+            case "processing/membrane_rack", "processing/membrane_sheet" -> List.of("I002");
+            case "processing/bone_loom" -> List.of("I003", "I050");
+            case "processing/bone_plate" -> List.of("I003");
+            case "processing/skeletal_graft" -> List.of("I050");
+            default -> List.<String>of();
         };
-        if (catalogId.isEmpty()) return;
-        var recipe = org.jd.infestusfrontier.processing.api.PreparationRecipes.recipe(catalogId);
+        if (catalogIds.isEmpty()) return;
         String text = entry.getPages().stream()
                 .filter(com.klikli_dev.modonomicon.book.page.BookTextPage.class::isInstance)
                 .map(com.klikli_dev.modonomicon.book.page.BookTextPage.class::cast)
                 .map(page -> page.getText().getString()).collect(java.util.stream.Collectors.joining("\n"));
-        for (var route : recipe.routes()) {
-            for (var item : route.itemInputs().entrySet()) {
-                String expected = item.getValue() + " × "
-                        + org.jd.infestusfrontier.processing.PreparationResources.item(item.getKey()).getDescription().getString();
+        for (String catalogId : catalogIds) {
+            var recipe = org.jd.infestusfrontier.processing.api.PreparationRecipes.recipe(catalogId);
+            for (var route : recipe.routes()) {
+                for (var item : route.itemInputs().entrySet()) {
+                    String expected = item.getValue() + " × "
+                            + org.jd.infestusfrontier.processing.PreparationResources.item(item.getKey()).getDescription().getString();
+                    if (!text.contains(expected)) throw new IllegalStateException("Guide lacks " + expected);
+                }
+                String duration = route.workUnits() / org.jd.infestusfrontier.processing.api.PreparationRecipes.TICKS_PER_SECOND
+                        + " loaded seconds";
+                if (!text.contains(duration)) throw new IllegalStateException("Guide lacks " + duration);
+            }
+            for (var output : recipe.outputs().entrySet()) {
+                String expected = output.getValue() + " × "
+                        + org.jd.infestusfrontier.processing.PreparationResources.item(output.getKey()).getDescription().getString();
                 if (!text.contains(expected)) throw new IllegalStateException("Guide lacks " + expected);
             }
-            String duration = route.workUnits() / org.jd.infestusfrontier.processing.api.PreparationRecipes.TICKS_PER_SECOND
-                    + " loaded seconds";
-            if (!text.contains(duration)) throw new IllegalStateException("Guide lacks " + duration);
-        }
-        for (var output : recipe.outputs().entrySet()) {
-            String expected = output.getValue() + " × "
-                    + org.jd.infestusfrontier.processing.PreparationResources.item(output.getKey()).getDescription().getString();
-            if (!text.contains(expected)) throw new IllegalStateException("Guide lacks " + expected);
-        }
-        int fluid = recipe.fluidInputs().values().stream().findFirst().orElse(0);
-        if (!text.contains(fluid + (catalogId.equals("I002") ? " mB" : " BU"))) {
-            throw new IllegalStateException("Guide fluid cost differs from processing " + catalogId);
+            int fluid = recipe.fluidInputs().values().stream().findFirst().orElse(0);
+            if (!text.contains(fluid + (catalogId.equals("I002") ? " mB" : " BU"))) {
+                throw new IllegalStateException("Guide fluid cost differs from processing " + catalogId);
+            }
         }
     }
 

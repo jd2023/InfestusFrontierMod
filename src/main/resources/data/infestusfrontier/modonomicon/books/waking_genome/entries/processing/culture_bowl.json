@@ -44,11 +44,23 @@
     },
     {
       "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I004"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
       "recipe": "I005"
     },
     {
       "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I006"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
       "recipe": "I007"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I029"
     },
     {
       "type": "infestusfrontier:bowl_recipe",

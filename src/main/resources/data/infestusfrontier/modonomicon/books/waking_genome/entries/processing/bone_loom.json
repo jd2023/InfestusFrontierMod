@@ -12,6 +12,7 @@
   ] },
   "pages": [
     { "type": "modonomicon:crafting_recipe", "recipe_id_1": "infestusfrontier:processing/bone_loom", "text": "book.infestusfrontier.entry.bone_loom.controls.text" },
-    { "type": "infestusfrontier:preparation_recipe", "recipe": "I003", "route": 0 }
+    { "type": "infestusfrontier:preparation_recipe", "recipe": "I003", "route": 0 },
+    { "type": "infestusfrontier:preparation_recipe", "recipe": "I050", "route": 0 }
   ]
 }

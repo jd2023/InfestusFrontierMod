@@ -69,7 +69,7 @@ public final class ProbeMultiplayerScenario implements ContentMultiplayerScenari
                     LogUtils.getLogger().info("INFESTUS_PROBE_RESET role={}", role);
             }
             case "start" -> {
-                if (owner && ticks == 1) { click(game, "recipe-4"); click(game, "start"); }
+                if (owner && ticks == 1) { click(game, "recipe-7"); click(game, "start"); }
                 if (snapshot.state() == CultureBowlMenuSnapshot.State.WORKING && snapshot.completedWork() >= 20) {
                     activeRevision = snapshot.revision();
                     lastProgress = snapshot.completedWork();

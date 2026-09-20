@@ -58,7 +58,7 @@ public final class CultureBowlJeiPlugin implements IModPlugin {
     public void registerRecipes(IRecipeRegistration registration) {
         registration.addRecipes(TYPE, BowlDisplayRecipe.all());
         registration.addRecipes(RACK_TYPE, PreparationDisplayRecipe.all("I002"));
-        registration.addRecipes(LOOM_TYPE, PreparationDisplayRecipe.all("I003"));
+        registration.addRecipes(LOOM_TYPE, PreparationDisplayRecipe.all("I003", "I050"));
     }
 
     @Override
@@ -175,7 +175,8 @@ public final class CultureBowlJeiPlugin implements IModPlugin {
                 for (var inputs : recipe.itemInputAlternatives()) {
                     result.add(new BowlDisplayRecipe(recipe.catalogId(), alternative++, sorted(inputs),
                             recipe.fluidInputs().getOrDefault("water", 0), sorted(recipe.outputs()),
-                            sorted(recipe.returnedContainers()), recipe.baseWorkUnits() / 20, CultureBowlRecipes.BIOMASS_BU));
+                            sorted(recipe.returnedContainers()), recipe.baseWorkUnits() / 20,
+                            recipe.fluidInputs().getOrDefault("biomass", 0)));
                 }
             }
             return List.copyOf(result);
@@ -191,15 +192,18 @@ public final class CultureBowlJeiPlugin implements IModPlugin {
 
     record PreparationDisplayRecipe(String catalogId, int route, Map<String, Integer> itemInputs,
             int waterMb, int biomassBu, Map<String, Integer> outputs, int durationSeconds) {
-        static List<PreparationDisplayRecipe> all(String catalogId) {
-            var recipe = PreparationRecipes.recipe(catalogId);
+        static List<PreparationDisplayRecipe> all(String... catalogIds) {
             var result = new ArrayList<PreparationDisplayRecipe>();
-            for (int route = 0; route < recipe.routes().size(); route++) {
-                var selected = recipe.routes().get(route);
-                result.add(new PreparationDisplayRecipe(catalogId, route, BowlDisplayRecipe.sorted(selected.itemInputs()),
-                        recipe.fluidInputs().getOrDefault("water", 0),
-                        recipe.fluidInputs().getOrDefault("biomass", 0), BowlDisplayRecipe.sorted(recipe.outputs()),
-                        selected.workUnits() / PreparationRecipes.TICKS_PER_SECOND));
+            for (String catalogId : catalogIds) {
+                var recipe = PreparationRecipes.recipe(catalogId);
+                for (int route = 0; route < recipe.routes().size(); route++) {
+                    var selected = recipe.routes().get(route);
+                    result.add(new PreparationDisplayRecipe(catalogId, route,
+                            BowlDisplayRecipe.sorted(selected.itemInputs()),
+                            recipe.fluidInputs().getOrDefault("water", 0),
+                            recipe.fluidInputs().getOrDefault("biomass", 0), BowlDisplayRecipe.sorted(recipe.outputs()),
+                            selected.workUnits() / PreparationRecipes.TICKS_PER_SECOND));
+                }
             }
             return List.copyOf(result);
         }

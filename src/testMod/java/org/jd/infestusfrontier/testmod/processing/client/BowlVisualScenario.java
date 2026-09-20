@@ -19,15 +19,17 @@ public final class BowlVisualScenario implements ContentVisualScenario {
         boolean ready = game.level.getBlockState(new BlockPos(-2, -60, 3)).is(bowl)
                 && game.level.getBlockState(new BlockPos(-2, -60, 4)).is(bowl);
         int slot = 1;
-        for (String name : List.of("elastic_gel", "nutrient_mash", "honey_culture", "rooting_gel")) {
+        for (String name : List.of("fusion_binder", "lumen_secretion", "char_gland_feed", "skeletal_graft")) {
             var stack = game.player.getInventory().getItem(slot++);
-            ready &= stack.is(BuiltInRegistries.ITEM.get(id(name))) && stack.getCount() == 2;
+            int expected = name.equals("fusion_binder") ? 4 : name.equals("lumen_secretion") ? 2 : 1;
+            ready &= stack.is(BuiltInRegistries.ITEM.get(id(name))) && stack.getCount() == expected;
             if (ready && game.getItemRenderer().getModel(stack, game.level, game.player, 0).getParticleIcon()
                     .contents().name().toString().equals("minecraft:missingno")) {
                 throw new IllegalStateException("Missing Bowl product model: " + name);
             }
         }
-        for (String name : List.of("membrane_sheet", "bone_plate")) {
+        for (String name : List.of("membrane_sheet", "bone_plate", "fusion_binder", "lumen_secretion",
+                "char_gland_feed", "skeletal_graft")) {
             var stack = new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(id(name)));
             String texture = game.getItemRenderer().getModel(stack, game.level, game.player, 0)
                     .getParticleIcon().contents().name().toString();

@@ -142,11 +142,17 @@ public final class BatchWork {
     }
 
     public boolean insertWater(int amount, long expectedRevision) {
-        return insertFluid("water", amount, expectedRevision);
+        return insertFluid(0, "water", amount, expectedRevision);
     }
 
     public boolean insertFluid(String resource, int amount, long expectedRevision) {
         if (!canTransfer(expectedRevision) || !quantities.insertFluid(resource, amount)) return false;
+        incrementRevision();
+        return true;
+    }
+
+    public boolean insertFluid(int tankIndex, String resource, int amount, long expectedRevision) {
+        if (!canTransfer(expectedRevision) || !quantities.insertFluid(tankIndex, resource, amount)) return false;
         incrementRevision();
         return true;
     }

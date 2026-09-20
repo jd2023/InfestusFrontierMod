@@ -16,14 +16,14 @@ public final class OrganScreenLayout {
         }
         int left = (viewportWidth - WIDTH) / 2;
         int top = (viewportHeight - HEIGHT) / 2;
-        var controls = new ArrayList<Control>(17);
+        var controls = new ArrayList<Control>(20);
         for (int slot = 0; slot < 9; slot++) {
             controls.add(new Control("slot-" + slot,
                     new Bounds(left + 12 + slot % 3 * 20, top + 28 + slot / 3 * 20, 18, 18)));
         }
-        for (int recipe = 0; recipe < 6; recipe++) {
+        for (int recipe = 0; recipe < 9; recipe++) {
             controls.add(new Control("recipe-" + recipe,
-                    new Bounds(left + 84 + recipe % 2 * 74, top + 28 + recipe / 2 * 22, 70, 18)));
+                    new Bounds(left + 84 + recipe % 3 * 48, top + 28 + recipe / 3 * 22, 46, 18)));
         }
         controls.add(new Control("start", new Bounds(left + 84, top + 100, 70, 20)));
         controls.add(new Control("cancel", new Bounds(left + 158, top + 100, 70, 20)));

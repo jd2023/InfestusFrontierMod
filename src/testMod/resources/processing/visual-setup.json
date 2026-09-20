@@ -3,20 +3,20 @@
   "commands": [
     "fill -2 -61 3 -2 -61 4 infestusfrontier:ecology/living_substrate",
     "fill -2 -60 3 -2 -60 4 infestusfrontier:processing/culture_bowl",
-    "item replace entity @a hotbar.1 with infestusfrontier:processing/elastic_gel 2",
-    "item replace entity @a hotbar.2 with infestusfrontier:processing/nutrient_mash 2",
-    "item replace entity @a hotbar.3 with infestusfrontier:processing/honey_culture 2",
-    "item replace entity @a hotbar.4 with infestusfrontier:processing/rooting_gel 2",
+    "item replace entity @a hotbar.1 with infestusfrontier:processing/fusion_binder 4",
+    "item replace entity @a hotbar.2 with infestusfrontier:processing/lumen_secretion 2",
+    "item replace entity @a hotbar.3 with infestusfrontier:processing/char_gland_feed",
+    "item replace entity @a hotbar.4 with infestusfrontier:processing/skeletal_graft",
     "data modify block -2 -60 3 bowl.selected set value \"I030\"",
     "data modify block -2 -60 3 bowl.items[0] set value {resource:\"honey_bottle\",count:1,capacity:16}",
     "data modify block -2 -60 3 bowl.items[1] set value {resource:\"spore_culture\",count:1,capacity:64}",
     "fill 1 -61 2 3 -61 2 infestusfrontier:ecology/living_substrate",
     "setblock 1 -60 2 infestusfrontier:processing/membrane_rack",
     "setblock 3 -60 2 infestusfrontier:processing/bone_loom",
-    "item replace entity @a inventory.4 with infestusfrontier:processing/membrane_rack",
     "item replace entity @a inventory.1 with infestusfrontier:processing/membrane_sheet",
-    "item replace entity @a inventory.2 with infestusfrontier:processing/bone_loom",
-    "item replace entity @a inventory.3 with infestusfrontier:processing/bone_plate"
+    "item replace entity @a inventory.3 with infestusfrontier:processing/bone_plate",
+    "item replace entity @a inventory.6 with infestusfrontier:processing/char_gland_feed",
+    "item replace entity @a inventory.7 with infestusfrontier:processing/skeletal_graft"
   ],
   "captures": [
     "processing-bowls.png",
@@ -25,6 +25,7 @@
     "rack-guide-flesh.png",
     "rack-guide-leather.png",
     "loom-guide.png",
+    "loom-guide-graft.png",
     "rack-recipe-browser.png",
     "loom-recipe-browser.png"
   ]

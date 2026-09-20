@@ -75,7 +75,9 @@ final class PreparationBlock extends BaseEntityBlock {
     private boolean directControl(ItemStack stack) {
         String key = PreparationResources.key(stack.getItem());
         return !key.isEmpty() && (key.equals("biomass_bucket")
-                || org.jd.infestusfrontier.processing.api.PreparationRecipes.recipe(organ.recipeId).routes().stream()
+                || organ.recipePriority.stream()
+                        .map(org.jd.infestusfrontier.processing.api.PreparationRecipes::recipe)
+                        .flatMap(recipe -> recipe.routes().stream())
                         .anyMatch(route -> route.itemInputs().containsKey(key)))
                 || stack.is(net.minecraft.world.item.Items.WATER_BUCKET);
     }

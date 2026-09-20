@@ -116,8 +116,8 @@ Start and restore reserve revision capacity for each remaining work unit and a
 separate completion after quota refusal (plus start's own transition). Repeated
 admission refusals without progress leave the revision unchanged.
 
-The server adapter uses nine item slots and one 2000 mB tank, with only catalog
-resources and component-free input stacks. NBT list bounds, types, IDs, shape and
+The server adapter uses nine item slots, one 2000 mB water tank and one 2000 BU
+biomass tank, with only catalog resources and component-free input stacks. NBT list bounds, types, IDs, shape and
 stack limits are checked before domain restoration. Rejected saves disable edits
 and retain their original data on save/recovery. Breaking produces one block item
 carrying that state; placement consumes it. There is no second contents drop.

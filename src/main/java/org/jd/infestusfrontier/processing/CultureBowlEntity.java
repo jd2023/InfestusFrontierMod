@@ -23,6 +23,7 @@ import org.jd.infestusfrontier.organ.api.OrganHistory;
 import org.jd.infestusfrontier.interaction.api.ProbeTarget;
 import org.jd.infestusfrontier.processing.api.BatchWork;
 import org.jd.infestusfrontier.processing.api.CultureBowlRecipes;
+import org.jd.infestusfrontier.processing.digestion.BiomassBucketTransfer;
 import org.jd.infestusfrontier.processing.menu.BowlIntentPayload;
 import org.jd.infestusfrontier.processing.menu.BowlMenuTarget;
 import org.jd.infestusfrontier.processing.menu.BowlRefusal;
@@ -48,7 +49,8 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
         super(entityType.get(), pos, state);
         this.discovery = discovery;
         work = BatchWork.create(new QuantityStore(Collections.nCopies(9, QuantityStore.ItemSlot.empty(64)),
-                List.of(QuantityStore.Tank.empty(BowlSave.WATER_CAPACITY))), this::admit);
+                List.of(QuantityStore.Tank.empty(BowlSave.WATER_CAPACITY),
+                        QuantityStore.Tank.empty(BowlSave.BIOMASS_CAPACITY))), this::admit);
     }
     private boolean admit() { return level != null && !level.isClientSide && RecipeAdmission.take(level.getServer()); }
     void tick() {
@@ -114,6 +116,9 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
         } else if (stack.is(Items.WATER_BUCKET) && stack.getComponentsPatch().isEmpty()) {
             if (work.insertWater(1000, work.revision())) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
             else message(player, "transfer_refused");
+        } else if (stack.is(BowlResources.item("biomass_bucket")) && stack.getComponentsPatch().isEmpty()) {
+            BiomassBucketTransfer.empty(player, hand, BowlResources.item("biomass_bucket"),
+                    () -> work.insertFluid(1, "biomass", 1000, work.revision()), discovery);
         } else {
             String resource = BowlResources.key(stack.getItem());
             if (!resource.isEmpty() && stack.getComponentsPatch().isEmpty()
@@ -126,7 +131,9 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
         var state = work.state();
         player.displayClientMessage(Component.translatable("message.infestusfrontier.bowl.status",
                 BowlResources.item(CultureBowlRecipes.recipe(selected).outputs().keySet().iterator().next()).getDescription(),
-                state.quantities().fluidAmount("water"), state.quantities().tanks().getFirst().capacity(), state.history().completedBatches()), true);
+                state.quantities().fluidAmount("water"), state.quantities().tanks().getFirst().capacity(),
+                state.quantities().fluidAmount("biomass"), state.quantities().tanks().get(1).capacity(),
+                state.history().completedBatches()), true);
     }
     private void showRecipe(Player player) {
         var recipe = CultureBowlRecipes.recipe(selected);
@@ -139,6 +146,8 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
         }
         if (recipe.fluidInputs().containsKey("water")) description.append(Component.translatable(
                 "message.infestusfrontier.bowl.base_water", recipe.fluidInputs().get("water")));
+        if (recipe.fluidInputs().containsKey("biomass")) description.append(Component.translatable(
+                "message.infestusfrontier.bowl.base_biomass", recipe.fluidInputs().get("biomass")));
         player.displayClientMessage(description, false);
     }
     private void collect(Player player, InteractionHand hand) {
@@ -220,7 +229,8 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
     @Override public CultureBowlMenuSnapshot menuSnapshot(BowlRefusal refusal) {
         if (rejected != null) {
             return new CultureBowlMenuSnapshot(0, Collections.nCopies(9, new CultureBowlMenuSnapshot.Slot("", 0)),
-                    0, BowlSave.WATER_CAPACITY, CultureBowlMenuSnapshot.State.INVALID_SAVE, 0, 0, 0, selected, refusal);
+                    0, BowlSave.WATER_CAPACITY, 0, BowlSave.BIOMASS_CAPACITY,
+                    CultureBowlMenuSnapshot.State.INVALID_SAVE, 0, 0, 0, selected, refusal);
         }
         var state = work.state();
         var slots = state.quantities().itemSlots().stream().map(slot -> slot.isEmpty()
@@ -234,7 +244,8 @@ final class CultureBowlEntity extends BlockEntity implements ProbeTarget, BowlMe
             case COMPLETION_BLOCKED -> CultureBowlMenuSnapshot.State.COMPLETION_BLOCKED;
         };
         return new CultureBowlMenuSnapshot(commandRevision, slots, state.quantities().fluidAmount("water"),
-                state.quantities().tanks().getFirst().capacity(), status,
+                state.quantities().tanks().getFirst().capacity(), state.quantities().fluidAmount("biomass"),
+                state.quantities().tanks().get(1).capacity(), status,
                 active == null ? 0 : active.completedWorkUnits(), active == null ? 0 : active.requiredWorkUnits(),
                 state.history().completedBatches(), selected, refusal);
     }

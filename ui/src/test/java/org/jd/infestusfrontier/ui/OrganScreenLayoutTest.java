@@ -21,7 +21,7 @@ final class OrganScreenLayoutTest {
                 seen.add(b);
                 assertTrue(control.bounds().contains(control.bounds().centerX(), control.bounds().centerY()));
             }
-            assertEquals(17, layout.focusOrder().size(), "nine slots, six recipes, start and cancel");
+            assertEquals(20, layout.focusOrder().size(), "nine slots, nine recipes, start and cancel");
         }
     }
 

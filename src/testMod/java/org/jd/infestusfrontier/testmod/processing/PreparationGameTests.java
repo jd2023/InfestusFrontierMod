@@ -31,6 +31,8 @@ public final class PreparationGameTests {
     private static final ResourceLocation LOOM = id("processing/bone_loom");
     private static final ResourceLocation SHEET = id("processing/membrane_sheet");
     private static final ResourceLocation PLATE = id("processing/bone_plate");
+    private static final ResourceLocation BINDER = id("processing/fusion_binder");
+    private static final ResourceLocation GRAFT = id("processing/skeletal_graft");
     private static final ResourceLocation BIOMASS_BUCKET = id("storage/biomass_bucket");
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
@@ -108,6 +110,40 @@ public final class PreparationGameTests {
         ContentAssertion.passGameTest(helper, "infestusfrontier_tests:processing.bone_plate.obtain");
         ContentAssertion.passGameTest(helper, "infestusfrontier_tests:processing.bone_loom.use");
         ContentAssertion.passGameTest(helper, "infestusfrontier_tests:processing.bone_plate.use");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void loomConsumesPlateBinderAndExactBiomassForSkeletalGraft(GameTestHelper helper) {
+        var pos = place(helper, LOOM, new BlockPos(1, 1, 1));
+        var player = player(helper, "SkeletalGraft");
+        use(helper, pos, player, new ItemStack(item(PLATE)));
+        use(helper, pos, player, new ItemStack(item(BINDER)));
+        var beforeBiomass = data(helper, pos);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(beforeBiomass.equals(data(helper, pos)),
+                "Missing graft biomass refuses without reserving the Plate or Binder");
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        helper.assertTrue(player.getMainHandItem().is(Items.BUCKET), "Loom returns the biomass bucket");
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(active(data(helper, pos)).getString("recipe").equals("I050")
+                        && active(data(helper, pos)).getInt("required") == 400,
+                "Plate and Binder select the 20-second graft route");
+        tick(helper, pos, 137);
+        var saved = helper.getLevel().getBlockEntity(pos).saveWithId(helper.getLevel().registryAccess());
+        helper.getLevel().removeBlockEntity(pos);
+        helper.getLevel().setBlockEntity(BlockEntity.loadStatic(pos, helper.getLevel().getBlockState(pos),
+                saved, helper.getLevel().registryAccess()));
+        tick(helper, pos, 263);
+        var complete = data(helper, pos);
+        helper.assertTrue(count(complete, "skeletal_graft") == 1 && count(complete, "bone_plate") == 0
+                        && count(complete, "fusion_binder") == 0 && tank(complete, "biomass") == 975
+                        && complete.getCompound("preparation").getLong("completed") == 1,
+                "Reloaded graft consumes one Plate, one Binder and exactly 25 BU once");
+        tick(helper, pos, 400);
+        helper.assertTrue(complete.equals(data(helper, pos)), "Completed graft cannot replay after reload");
+        ContentAssertion.passGameTest(helper, "infestusfrontier_tests:processing.skeletal_graft.obtain");
+        ContentAssertion.passGameTest(helper, "infestusfrontier_tests:processing.skeletal_graft.use");
         helper.succeed();
     }
 

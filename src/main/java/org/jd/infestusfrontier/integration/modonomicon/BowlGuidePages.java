@@ -31,7 +31,8 @@ public final class BowlGuidePages {
         if (!recipe.returnedContainers().isEmpty()) text.append("\n").append(
                 Component.translatable("book.infestusfrontier.recipe.returned")).append(items(recipe.returnedContainers()));
         text.append("\n\n").append(Component.translatable("book.infestusfrontier.recipe.duration", recipe.baseWorkUnits() / 20));
-        text.append("\n").append(Component.translatable("jei.infestusfrontier.biomass", CultureBowlRecipes.BIOMASS_BU));
+        text.append("\n").append(Component.translatable("jei.infestusfrontier.biomass",
+                recipe.fluidInputs().getOrDefault("biomass", 0)));
         var output = recipe.outputs().keySet().iterator().next();
         return new BookTextPage(new BookTextHolder(BowlResources.item(output).getDescription()),
                 new BookTextHolder(text), false, true, "", new BookTrueCondition());

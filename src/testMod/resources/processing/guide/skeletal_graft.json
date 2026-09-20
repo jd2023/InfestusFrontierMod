@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/skeletal_graft",
+  "title": "Skeletal Graft",
+  "obtain": "In a Bone Loom, consume one Bone Plate, one Binder and 25 BU over 20 loaded seconds for one graft.",
+  "use": "The graft reinforces one eligible cell or organ skeleton; the source Plate is not duplicated.",
+  "assertion": "infestusfrontier_client:processing.skeletal_graft.guide"
+}

@@ -58,7 +58,7 @@ final class PreparationBlockEntity extends BlockEntity {
         if (stack.isEmpty()) {
             if (player.isShiftKeyDown()) collect(player, hand);
             else {
-                var result = work.start(new BatchWork.StartRequest(organ.recipeId), work.revision());
+                var result = work.start(new BatchWork.StartRequest(selectedRecipe()), work.revision());
                 if (result instanceof BatchWork.Refused refused) message(player,
                         "refused." + refused.reason().name().toLowerCase(java.util.Locale.ROOT));
                 else message(player, "started");
@@ -90,8 +90,16 @@ final class PreparationBlockEntity extends BlockEntity {
     }
 
     private boolean allowedInput(String resource) {
-        return PreparationRecipes.recipe(organ.recipeId).routes().stream()
+        return organ.recipePriority.stream().map(PreparationRecipes::recipe).flatMap(recipe -> recipe.routes().stream())
                 .anyMatch(route -> route.itemInputs().containsKey(resource));
+    }
+
+    private String selectedRecipe() {
+        var quantities = work.state().quantities();
+        return organ.recipePriority.stream().filter(recipeId -> PreparationRecipes.recipe(recipeId).routes().stream()
+                        .anyMatch(route -> route.itemInputs().entrySet().stream()
+                                .allMatch(input -> quantities.itemCount(input.getKey()) >= input.getValue())))
+                .findFirst().orElse(organ.defaultRecipeId);
     }
 
     private void collect(Player player, InteractionHand hand) {
@@ -101,7 +109,7 @@ final class PreparationBlockEntity extends BlockEntity {
             var slot = slots.get(index);
             if (slot.isEmpty()) continue;
             if (selected < 0) selected = index;
-            if (slot.resource().equals(organ.output)) { selected = index; break; }
+            if (organ.outputs.contains(slot.resource())) { selected = index; break; }
         }
         if (selected >= 0) {
             var slot = slots.get(selected);

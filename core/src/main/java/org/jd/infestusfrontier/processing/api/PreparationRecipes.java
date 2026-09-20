@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-/** Finite T0 Rack/Loom recipes. Binder-dependent skeletal grafts are deliberately absent. */
+/** Finite T0 Rack/Loom recipe catalog. */
 public final class PreparationRecipes {
     public static final int TICKS_PER_SECOND = 20;
     private static final Map<String, Recipe> RECIPES = createRecipes();
@@ -36,6 +36,9 @@ public final class PreparationRecipes {
         add(recipes, new Recipe("I003", List.of(
                 new Route(Map.of("bone", 1), 20 * TICKS_PER_SECOND)),
                 Map.of("biomass", 50), Map.of("bone_plate", 1)));
+        add(recipes, new Recipe("I050", List.of(
+                new Route(Map.of("bone_plate", 1, "fusion_binder", 1), 20 * TICKS_PER_SECOND)),
+                Map.of("biomass", 25), Map.of("skeletal_graft", 1)));
         return Collections.unmodifiableMap(recipes);
     }
 
