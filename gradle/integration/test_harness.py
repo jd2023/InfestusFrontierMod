@@ -35,6 +35,28 @@ def alive(pid: int) -> bool:
         return False
 
 
+class VisualSetupTest(unittest.TestCase):
+    def test_only_active_owner_fixture_commands_are_sent(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            fixture = root / "src/testMod/resources/construction/visual-setup.json"
+            fixture.parent.mkdir(parents=True)
+            fixture.write_text(json.dumps({"requires": "bud.obtain", "commands": ["give FixturePlayer minecraft:stone"]}))
+            self.assertEqual([], harness.visual_setup_commands(root, {"gameTest": []}))
+            self.assertEqual(["give FixturePlayer minecraft:stone"],
+                             harness.visual_setup_commands(root, {"gameTest": ["bud.obtain"]}))
+
+    def test_rejects_excessive_or_multiline_commands(self):
+        for commands in (["say one\nsay two"], ["say test"] * 17):
+            with self.subTest(commands=commands), tempfile.TemporaryDirectory() as raw:
+                root = Path(raw)
+                fixture = root / "src/testMod/resources/construction/visual-setup.json"
+                fixture.parent.mkdir(parents=True)
+                fixture.write_text(json.dumps({"requires": "bud.obtain", "commands": commands}))
+                with self.assertRaisesRegex(harness.HarnessFailure, "visual setup"):
+                    harness.visual_setup_commands(root, {"gameTest": ["bud.obtain"]})
+
+
 class EvaluatorTest(EvidenceCase):
     def result_for_profile(self, profile):
         result = self.result()

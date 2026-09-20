@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -41,9 +42,10 @@ final class BudRecipeRegistry implements BudRecipeRegistrar {
     }
 
     BudConstructionResult apply(Level level, BlockPos pos, Block bud, Player player, ItemStack held) {
+        if (!(level instanceof ServerLevel serverLevel)) return BudConstructionResult.UNAVAILABLE;
         String heldIngredient = BuiltInRegistries.ITEM.getKey(held.getItem()).toString();
         var stock = new PlayerStock(player);
-        var site = new LevelSite(level, pos, bud);
+        var site = new LevelSite(serverLevel, pos, bud);
         return sealedPort().apply(
                 heldIngredient,
                 stock,
@@ -105,11 +107,11 @@ final class BudRecipeRegistry implements BudRecipeRegistrar {
     }
 
     private static final class LevelSite implements BudConstructionPort.Site {
-        private final Level level;
+        private final ServerLevel level;
         private final BlockPos pos;
         private final Block bud;
 
-        private LevelSite(Level level, BlockPos pos, Block bud) {
+        private LevelSite(ServerLevel level, BlockPos pos, Block bud) {
             this.level = level;
             this.pos = pos;
             this.bud = bud;
@@ -117,7 +119,8 @@ final class BudRecipeRegistry implements BudRecipeRegistrar {
 
         @Override
         public boolean isBud() {
-            return level.isLoaded(pos) && level.getBlockState(pos).is(bud);
+            var chunk = level.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4);
+            return chunk != null && chunk.getBlockState(pos).is(bud);
         }
 
         @Override
@@ -125,8 +128,21 @@ final class BudRecipeRegistry implements BudRecipeRegistrar {
             ResourceLocation id = ResourceLocation.tryParse(output);
             if (id == null || !BuiltInRegistries.BLOCK.containsKey(id)) return false;
             Block replacement = BuiltInRegistries.BLOCK.getOptional(id).orElseThrow();
-            if (replacement == bud || !isBud()) return false;
-            return level.setBlockAndUpdate(pos, replacement.defaultBlockState());
+            if (replacement == bud || !isBud() || !updateAreaLoaded()) return false;
+            // Construction installs one body, without vanilla neighbor/shape cascades. Output owners
+            // must keep their own onPlace/onBlockStateChange callbacks bounded and loaded-only.
+            return level.setBlock(pos, replacement.defaultBlockState(),
+                    Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE, 0);
+        }
+
+        private boolean updateAreaLoaded() {
+            // A one-block halo intersects at most four chunks, including diagonal boundaries.
+            for (int x = (pos.getX() - 1) >> 4; x <= (pos.getX() + 1) >> 4; x++) {
+                for (int z = (pos.getZ() - 1) >> 4; z <= (pos.getZ() + 1) >> 4; z++) {
+                    if (level.getChunkSource().getChunkNow(x, z) == null) return false;
+                }
+            }
+            return true;
         }
     }
 }

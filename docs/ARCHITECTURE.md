@@ -126,6 +126,24 @@ failure stops freight admission with cargo retained. No timeout invents success.
 Test process termination at every commit boundary, truncated final records,
 duplicate acknowledgments, slow-disk back-pressure and snapshot replacement.
 
+## Bud construction adapter
+
+Construction owns the startup-only `BudRecipeRegistrar` and the deterministic
+`BudConstructionPort`. Production attaches only implemented recipes. One use
+validates one visible bud and all remaining inventory costs before replacement
+and payment; duplicate uses encounter the replaced target. The shared server-tick
+quota admits at most 16 replacements across dimensions. Idle buds have no ticker
+or block entity. Registry data is finite startup data, not player-supplied input.
+
+The platform adapter probes the target and a one-block horizontal halo (at most
+four loaded-chunk checks). An unavailable chunk refuses before mutation/payment.
+Replacement sends the client update with known shape and recursion depth zero;
+it does not initiate vanilla neighbor notifications or shape cascades. Registered
+output owners must keep placement/state-change callbacks bounded and loaded-only;
+any necessary organ connection update belongs to that owner's bounded service.
+Adapter GameTests cover the loaded/unloaded boundary, unchanged refusal, exact
+payment and duplicate use without installing production placeholder recipes.
+
 ## Integration bootstrap harness
 
 Integration owns library-profile selection, runtime identity checks, isolated
@@ -190,9 +208,15 @@ mod as success.
 | `./gradlew packagedServerSmoke -PmodProfile=<p>` | Install the release JAR and pinned profile libraries in a disposable dedicated server; await readiness, join using a real Minecraft client, disconnect, then stop both cleanly. Assert server-side player UUID/name join and subsequent removal plus client play-state entry/exit. Server-list ping, TCP connect or simulated player objects cannot replace this evidence. |
 | `./gradlew profileSmoke -PmodProfile=required -PomitRequired=<id>` | Only `modonomicon` or `geckolib` is allowed. Remove that actual runtime artifact, retain the release mod's required-dependency declaration, require loader refusal before world readiness and a diagnostic naming both the missing ID and dependent mod. Wrapper exits zero only for that expected refusal and cleanup; crash/timeout/generic failure is insufficient. |
 
-Bootstrap uses seed 11, a default superflat disposable Overworld and the fixture
-player's spawn camera at yaw 0, pitch 15 for the world image. Bind the server to loopback
-on an allocated port, allow only the fixture player, and disable online-account
+Bootstrap uses seed 11, a default superflat disposable Overworld and a camera at
+yaw 0, pitch 15 for the world image. Owner `visual-setup.json` fixtures may prepare
+the disposable player's inventory and scene through server console commands after
+join. Each names an active GameTest assertion and at most 16 single-line commands
+of 256 characters; all active fixtures together admit at most 64 commands. The
+client's development-only `ContentVisualScenario` providers wait for the resulting
+world/inventory packets before rendering/capture, under the existing capture
+deadline. The setup never modifies an ordinary world or fabricates client state.
+Bind the server to loopback on an allocated port, allow only the fixture player, and disable online-account
 authentication solely in this owned disposable server. The client runs with an
 isolated game directory and deterministic fixture identity; no personal account,
 ordinary save or production-server access is required. Wait for rendered frames

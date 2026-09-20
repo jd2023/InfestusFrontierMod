@@ -695,8 +695,30 @@ def _prepare_server(s, staged, output):
     return server_dir, client_dir, releases[0], port
 
 
+def visual_setup_commands(root, requirements):
+    """Bounded owner fixtures run only on this harness's disposable server."""
+    commands = []
+    active = set((requirements or {}).get("gameTest", []))
+    for path in sorted((root / "src/testMod/resources").glob("*/visual-setup.json")):
+        if path.stat().st_size > 8192:
+            raise HarnessFailure(f"oversized visual setup: {path}")
+        fixture = json.loads(path.read_text())
+        batch = fixture.get("commands")
+        if (set(fixture) != {"requires", "commands"}
+                or not isinstance(fixture["requires"], str)
+                or not isinstance(batch, list) or not 1 <= len(batch) <= 16
+                or any(not isinstance(line, str) or not 1 <= len(line) <= 256
+                       or "\n" in line or "\r" in line for line in batch)):
+            raise HarnessFailure(f"invalid visual setup: {path}")
+        if fixture["requires"] in active:
+            commands.extend(batch)
+        if len(commands) > 64:
+            raise HarnessFailure("excessive visual setup commands")
+    return commands
+
+
 def _client_lifecycle(
-    s, server_command, client_command, server_dir, client_dir, output, port
+    s, server_command, client_command, server_dir, client_dir, output, port, setup_commands=()
 ):
     server = s.start("server", server_command, server_dir, output / "server.log")
     s.markers("readiness", s.limits["readiness"], [(server, "Done (")])
@@ -724,6 +746,8 @@ def _client_lifecycle(
             (client, f"INFESTUS_CLIENT_PLAY_ENTER {identity}"),
         ],
     )
+    for command in setup_commands:
+        server.send(command)
     s.markers(
         "capture",
         s.limits["capture"],
@@ -860,7 +884,8 @@ def run_client_scenario(
                     "-screen 0 1280x720x24",
                 ] + _read_spec(launch_spec)
             _client_lifecycle(
-                s, server_command, client_command, server_dir, client_dir, output, port
+                s, server_command, client_command, server_dir, client_dir, output, port,
+                () if fixture else visual_setup_commands(root, content_requirements),
             )
     except Exception as exc:
         failure = str(exc)

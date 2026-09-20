@@ -1,0 +1,12 @@
+{
+  "requires": "infestusfrontier_tests:construction.organ_bud.obtain",
+  "commands": [
+    "time set noon",
+    "weather clear",
+    "tp FixturePlayer 0.5 -60 0.5 0 15",
+    "setblock 0 -60 3 infestusfrontier:construction/organ_bud",
+    "item replace entity FixturePlayer weapon.mainhand with infestusfrontier:construction/spore_culture",
+    "item replace entity FixturePlayer weapon.offhand with infestusfrontier:construction/organ_bud",
+    "item replace entity FixturePlayer hotbar.1 with infestusfrontier:construction/organ_bud"
+  ]
+}

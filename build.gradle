@@ -51,7 +51,7 @@ sourceSets {
         java.exclude 'org/jd/infestusfrontier/testmod/integration/BootstrapClient.java'
         java.exclude '**/client/**'
         resources.exclude 'integration/client/**'
-        resources.exclude 'META-INF/services/org.jd.infestusfrontier.testmod.integration.client.ContentGuideScenario'
+        resources.exclude 'META-INF/services/org.jd.infestusfrontier.testmod.integration.client.*'
     }
     integrationClient {
         java.srcDir 'src/testMod/java'

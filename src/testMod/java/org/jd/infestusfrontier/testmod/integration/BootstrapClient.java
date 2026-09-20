@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.ServiceLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.ConnectScreen;
@@ -19,6 +21,7 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 import org.jd.infestusfrontier.testmod.integration.client.GuideScenarios;
+import org.jd.infestusfrontier.testmod.integration.client.ContentVisualScenario;
 
 /** Disposable-client automation used only by the integration harness. */
 @Mod(value = "infestusfrontier_client", dist = Dist.CLIENT)
@@ -29,6 +32,8 @@ public final class BootstrapClient {
     private Stage stage = Stage.TITLE_LOAD;
     private boolean worldRendered;
     private GuideScenarios guideScenarios;
+    private final List<ContentVisualScenario> visuals = ServiceLoader.load(ContentVisualScenario.class)
+            .stream().map(ServiceLoader.Provider::get).toList();
 
     public BootstrapClient() {
         NeoForge.EVENT_BUS.addListener(this::tick);
@@ -48,6 +53,9 @@ public final class BootstrapClient {
                 case TITLE_LOAD -> prepareTitle(minecraft);
                 case CONNECT -> connect(minecraft);
                 case WORLD -> captureWorld(minecraft);
+                case WORLD_SETUP -> {
+                    if (visuals.stream().allMatch(scene -> scene.ready(minecraft))) stage = Stage.WORLD_RENDER;
+                }
                 case GUIDES -> {
                     if (guideScenarios == null) guideScenarios = new GuideScenarios();
                     if (guideScenarios.tick(minecraft)) stage = Stage.DISCONNECT;
@@ -100,7 +108,7 @@ public final class BootstrapClient {
         minecraft.player.xRotO = 15;
         minecraft.options.hideGui = false;
         LOGGER.info("INFESTUS_CLIENT_PLAY_ENTER name={} uuid={}", minecraft.player.getGameProfile().getName(), minecraft.player.getUUID());
-        stage = Stage.WORLD_RENDER;
+        stage = Stage.WORLD_SETUP;
     }
 
     private void worldRendered(RenderLevelStageEvent event) {
@@ -167,5 +175,5 @@ public final class BootstrapClient {
         });
     }
 
-    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_RENDER, GUIDES, DISCONNECT, STOP, DONE }
+    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_SETUP, WORLD_RENDER, GUIDES, DISCONNECT, STOP, DONE }
 }
