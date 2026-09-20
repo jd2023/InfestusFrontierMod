@@ -1,6 +1,8 @@
 # Implementation queue — M0–M10
 # Contract format and shared requirements: docs/TASK_TEMPLATE.md.
 # ktask owns status markers; packet identities exclude those markers.
+# Scope paths are starting points. Necessary implementation, test, harness and
+# configuration repairs belong to the current task; independent review checks them.
 
 [DONE] IF-094 Bounded progression graph validation
 Milestone: M0
@@ -17,7 +19,7 @@ Evidence: rules
 
 ---
 
-IF-001 Pin library profiles and validate client/server bootstrap
+[DONE] IF-001 Pin library profiles and validate client/server bootstrap
 Milestone: M0
 Owner: integration
 Depends: IF-094
@@ -39,10 +41,10 @@ Depends: IF-001
 Spec: docs/DEPENDENCIES.md, docs/ARCHITECTURE.md
 Blocks: none
 Scope: ["src/testMod/resources/integration/bootstrap-profiles.json"]
-Contract: Add the fixed qualification manifest consumed by the accepted IF-001 harness: schema 1, scenario bootstrap, ordered profiles required/jei/curios/combined, seed 11 and the ARCHITECTURE deadlines. Freeze the candidate before evidence. Run the existing harness and evaluators for all four profiles; no harness, pin, production or gate changes. This packet completes all four-profile smoke, capture and packaged-server obligations; missing-required-library fixtures remain negative tests, never extra supported profiles.
+Contract: Add the fixed qualification manifest consumed by the IF-001 harness: schema 1, scenario bootstrap, ordered profiles required/jei/curios/combined, seed 11 and the ARCHITECTURE deadlines. Run and repair the harness, evaluators and implementation as needed to qualify all four profiles, retaining the declared dependency pins. This packet completes all four-profile smoke, capture and packaged-server obligations; missing-required-library fixtures remain negative tests, never extra supported profiles.
 Red: Run ./gradlew integrationHarnessTest -PintegrationFixture=wrong-mod-version; the production evaluator must exit nonzero for a synthetic runtime version differing from the pin, naming the mod ID. The ordinary fast suite asserts that rejection as a passing regression. Do not alter library pins or the final qualification profile to manufacture a failure.
-Accept: Run ./gradlew :core:verifyBoundary :core:compileJava integrationHarnessTest and, for each p in required, jei, curios, combined, ./gradlew profileSmoke -PmodProfile=<p>, ./gradlew captureClient -PmodProfile=<p> -Pscenario=bootstrap -PcaptureDir=build/integration/evidence/<p>/capture, and ./gradlew packagedServerSmoke -PmodProfile=<p>. Each command consumes -PintegrationProfileFile=src/testMod/resources/integration/bootstrap-profiles.json and rejects disagreement with the CLI. Inspect both captures for each profile; require exact selected loaded-mod IDs/versions, absent unselected optionals, real GameTests, actual player join/disconnect, readiness and clean stop. Re-run both IF-001 negative loader fixtures through fast regression coverage; retain IF-001 real loader evidence. Run ./.ktask/verify.sh and verifyDistribution. Artifacts identify the frozen candidate and release JAR digest; no success claim for a partial matrix or stale capture.
-Bounds: Same topology and per-command deadlines as IF-001. Four serial profiles cost at most 4*(180+420+420)=4080 s; allow 600 s preparation inside a 4800 s matrix deadline including cleanup. Reserve 1200 s for the existing full gate within the configured 7200 s worker budget; no retries or deadline increases. Engineering failures return for scoped repair, never reduced assertions or omitted profiles.
+Accept: Run ./gradlew :core:verifyBoundary :core:compileJava integrationHarnessTest and, for each p in required, jei, curios, combined, ./gradlew profileSmoke -PmodProfile=<p>, ./gradlew captureClient -PmodProfile=<p> -Pscenario=bootstrap -PcaptureDir=build/integration/evidence/<p>/capture, and ./gradlew packagedServerSmoke -PmodProfile=<p>. Each command consumes -PintegrationProfileFile=src/testMod/resources/integration/bootstrap-profiles.json and rejects disagreement with the CLI. Inspect both captures for each profile; require exact selected loaded-mod IDs/versions, absent unselected optionals, real GameTests, actual player join/disconnect, readiness and clean stop. Re-run both IF-001 negative loader fixtures through fast regression coverage; retain IF-001 real loader evidence. Acceptance runs ./.ktask/verify.sh, including verifyDistribution. Artifacts identify the frozen candidate and release JAR digest; no success claim for a partial matrix or stale capture.
+Bounds: Same topology and per-command deadlines as IF-001. Four serial profiles cost at most 4*(180+420+420)=4080 s; allow 600 s preparation inside a 4800 s matrix deadline including cleanup. Reserve 1200 s for the existing full gate within the configured 7200 s worker budget. Diagnose failures, repair and rerun affected checks within the attempt budget; native ktask owns further attempts. Never reduce assertions or omit profiles.
 Evidence: integration, visual
 
 ---
@@ -521,7 +523,7 @@ Blocks: none
 Scope: ["@module:campaign"]
 Contract: Automate the declared reference farm using separate planter/grower/harvester/collector/storage/control operations; validate positive reserves under full-output and chunk pause. Add route visuals and performance counters to reusable lab harness. Use existing Bed/Cilia, starter Stack and filtration Kidney; direct adjacent electrical coupling makes the stated lossless reference ledger applicable. Tissue-route losses are measured separately.
 Red: Remove one planting reserve or reverse a port and named assertion fails before resource exhaustion; capture verifies pulse direction.
-Accept: Run three cycles then restart without external feed; compare serial and parallel layouts for throughput, footprint and BU/item; no economy tuning in this task.
+Accept: Run three cycles then restart without external feed; compare serial and parallel layouts for throughput, footprint and BU/item. Repair failures while preserving specified resource accounting.
 Bounds: <=256 organs fixture, 12000 loaded ticks/run, explicit seed/water reserves and exact conservation.
 Evidence: rules, game, visual, soak
 
@@ -1826,7 +1828,7 @@ Blocks: none
 Scope: ["@module:campaign","scripts/check_content_coverage.py","build.gradle"]
 Contract: Audit and complete the existing incremental executable coverage manifest for every in-scope block/item/armor rank and guide prerequisite. Recipes generated by each owner must be reachable without creative items. Verify two materially different supported refinery/base/armor routes; exclusions are the proposal/Fold entries in the implementation context, not missing approved branches.
 Red: Delete one recipe, rename an item ID, omit a guide parent or leave a graft effect unimplemented: coverage fails at exact entry.
-Accept: All in-scope catalog entries have registry/obtain/use/recipe/guide assertions, not empty registration checks. Record missing branch as failing implementation, never delete catalog entry to pass. Only add this deterministic coverage check to verifyAll in build.gradle; do not alter existing gates or dependencies.
+Accept: All in-scope catalog entries have registry/obtain/use/recipe/guide assertions, not empty registration checks. Repair missing branches, never delete catalog entries to pass. Add deterministic coverage to verifyAll; repair defective checks without removing their intended coverage.
 Bounds: Finite manifest and deterministic graph walk at build time; no runtime world scans.
 Evidence: rules, game, integration
 
@@ -1854,7 +1856,7 @@ Depends: IF-091
 Spec: docs/PROGRESSION_MAP.md, docs/PERFORMANCE.md
 Blocks: none
 Scope: ["@module:campaign","build.gradle"]
-Contract: Implement the dense three-world stress harness with maximum declared organs/entities/spills and a short deterministic stress regression in verifyAll. Add separate qualification command running three30-minute fixed-seed trials against an equivalent idle baseline. This packet implements the harness; IF-107 runs long qualification against the frozen candidate. Commands: ./gradlew stressRegression (verifyAll dependency) and ./gradlew qualifyColony -PtrialSeeds=11,29,47 -PidleSeconds=300 -PactiveSeconds=1800 -PoutputDir=<evidence>. Add only these harness hooks to build.gradle; never relax other gates.
+Contract: Implement the dense three-world stress harness with maximum declared organs/entities/spills and a short deterministic stress regression in verifyAll. Add separate qualification command running three30-minute fixed-seed trials against an equivalent idle baseline. This packet implements the harness; IF-107 runs long qualification against the final candidate. Commands: ./gradlew stressRegression (verifyAll dependency) and ./gradlew qualifyColony -PtrialSeeds=11,29,47 -PidleSeconds=300 -PactiveSeconds=1800 -PoutputDir=<evidence>. Integrate these checks into the build and repair prerequisite defects without relaxing acceptance requirements.
 Red: At every configured ceiling, one excess operation refuses/defer safely; forced unload/restart does not grow queues, lose escrow or duplicate fuel.
 Accept: Short runs verify calibrated timing/percentile collection, resource ledgers, warm-up exclusion, retained-job/chunk/memory accounting and injected budget failures. Publish exact named command/options and hardware metadata schema for IF-107; do not claim90-minute qualification from short tests.
 Bounds: Hard budgets from owning services remain authoritative; no global cap silently raised to pass throughput; measured host-dependent target recorded separately.
@@ -1869,10 +1871,10 @@ Depends: IF-092
 Spec: docs/PROGRESSION_MAP.md, docs/PERFORMANCE.md
 Blocks: none
 Scope: ["@module:campaign"]
-Contract: Add a fixed qualification scenario/profile under testMod campaign resources, then freeze candidate and run the existing harness for three fixed-seed trials, each5 minutes idle plus30 minutes active; exclude first60s idle and first5 minutes active from metric summaries. No harness design or production edits. Record soak with a7200s inner deadline; task worker budget10800s.
+Contract: Add a fixed qualification scenario/profile under testMod campaign resources and run the harness for three fixed-seed trials, each5 minutes idle plus30 minutes active; exclude first60s idle and first5 minutes active from metric summaries. Repair harness and production defects within this task, then qualify the final implementation. Record soak with a7200s inner deadline; task worker budget10800s.
 Red: An intentionally impossible tick-cost threshold makes the same qualification result evaluator fail at its named metric; use a short run to demonstrate that assertion before the final profile.
-Accept: All three runs report p50/p95/p99 MSPT, memory/chunk counts and retained jobs. Require<=5ms p95 incremental mod tick cost and no upward retained-job growth after warm-up. Test artifacts name final candidate, hardware, seeds and run durations. Any edit invalidates all qualification receipts.
-Bounds: Existing server quotas unchanged; finite126000 loaded ticks total (105 minutes), including the matched idle references. Task budget10800s; no production tuning.
+Accept: All three runs report p50/p95/p99 MSPT, memory/chunk counts and retained jobs. Require<=5ms p95 incremental mod tick cost and no upward retained-job growth after warm-up. Test artifacts name final candidate, hardware, seeds and run durations. Rerun affected qualification after behavior or measurement changes; unrelated documentation edits do not invalidate measurements.
+Bounds: Existing server quotas unchanged; finite126000 loaded ticks total (105 minutes), including the matched idle references. Task budget10800s; optimize implementation without raising quotas or weakening targets.
 Evidence: rules, game, soak
 
 ---
@@ -1886,6 +1888,6 @@ Blocks: none
 Scope: ["@module:campaign"]
 Contract: Implement reusable campaign action fixtures, then execute fresh-world Survival route through Overworld workshop, Nether export base, End self-supply and three-world synthesis using real actions. Validate second layout and distinct armor lineage. Capture screens/structures/all model faces in actual client; smart reviewer judges visibility and clipping, not only pixel diffs.
 Red: Break a native bootstrap link, hide a required recipe or invert a logistics face and playthrough must fail at named action. No direct grants after starting fixture.
-Accept: Both routes finish without administrative unlocks. Measured failures remain failing and return to the coordinator for a narrowly owned tuning/fix task; this campaign packet cannot change production recipes or balance. Required gameplay/features complete; no automatic public release/license grant.
+Accept: Both routes finish without administrative unlocks. Diagnose and repair measured failures in their owning modules within this task, preserving gameplay requirements and resource accounting; rerun affected routes. Required gameplay/features complete; no automatic public release/license grant.
 Bounds: Finite scripted checkpoints with per-action timeouts and conservation ledgers; no real user saves. Final gate includes multiplayer and dense-base results.
 Evidence: rules, game, visual, integration, soak

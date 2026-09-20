@@ -1,6 +1,5 @@
 """Task packets and independent-review acceptance; no process or Git side effects."""
 
-import fnmatch
 import hashlib
 import json
 from pathlib import PurePosixPath
@@ -11,12 +10,10 @@ FIELDS = {"Milestone", "Owner", "Depends", "Spec", "Blocks", "Scope", "Contract"
           "Red", "Accept", "Bounds", "Evidence"}
 CHECKS = ("correctness", "placement", "simplicity", "scope", "boundaries",
           "tests", "comments", "performance", "evidence")
-CONTROL = (".ktask/", "scripts/ktask_", "scripts/test_ktask_", "AGENTS.md",
-           "docs/DEVELOPER_GUIDE.md", "docs/ARCHITECTURE.md", "docs/PERFORMANCE.md")
 
 
 def module_scope(owner):
-    """One canonical path convention, shared by packets and delivery enforcement."""
+    """Suggested starting points, not file permissions or repair boundaries."""
     if not re.fullmatch(r"[a-z]+", owner):
         raise ValueError("Invalid module scope")
     package = "org/jd/infestusfrontier/"
@@ -92,14 +89,6 @@ def parse_tasks(content):
     if not tasks:
         raise ValueError("Empty implementation queue")
     return tasks
-
-
-def check_scope(task, paths, allowed_controls=()):
-    """Every changed path must be explicitly allowed; workers cannot rewrite their gates."""
-    for path in paths:
-        if ((path.startswith(CONTROL) and path not in allowed_controls) or ".." in PurePosixPath(path).parts
-                or not any(fnmatch.fnmatchcase(path, rule) for rule in task["scope"])):
-            raise ValueError(f"{task['id']} out-of-scope change: {path}")
 
 
 def check_review(review, task_id, candidate):

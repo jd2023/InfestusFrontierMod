@@ -242,8 +242,9 @@ server runs are recorded task evidence, not four extra copies of the full gate.
 IF-127 runs four times (180+420+420) seconds at most: 4080 seconds runtime, plus
 600 seconds preparation inside a 4800-second matrix deadline. Reserve 1200 seconds
 for the existing gate within the unchanged 7200-second worker budget. Qualification
-has no production-edit scope; changed code invalidates its evidence and requires
-a scoped repair before requalification. These are execution ceilings, not measured
+may repair implementation and harness defects in their owning modules. Rerun
+affected checks after repairs; final matrix evidence must describe the delivered
+implementation. These are execution ceilings, not measured
 performance claims.
 
 ## Enforcement and growth

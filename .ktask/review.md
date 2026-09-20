@@ -23,6 +23,9 @@ Check:
 - placement: one behavior owner, platform/UI adapters contain no gameplay policy;
 - simplicity: real callers justify each abstraction/API; one rule needs one change;
 - scope: every file/hunk necessary, no unrelated cleanup or weakened gates;
+  necessary cross-module, prerequisite, harness, test and configuration repairs
+  are authorized regardless of the packet's Scope paths; review their behavior,
+  not whether a file appeared in a predicted list;
 - boundaries: inward acyclic dependencies, hidden internals, small interfaces;
 - tests: actual behavioral red assertion, green and adjacent checks; no vacuous
   assertions, implementation-as-oracle, flakiness, suppressed errors or omissions;
@@ -38,6 +41,7 @@ Check every owned item/rank in content-plan.json against its incremental coverag
 contributor. Multi-organ work needs independent observable tests per organ, not
 one successful demonstration standing in for all implementations.
 Check artifact freshness and that commands exercise changed code. Missing evidence
-is rejection, not a request for the user to test every feature. A design gap goes
-back to the coordinator with an exact correction, not a numerical question to the
-user. The adapter owns acceptance and delivery.
+is rejection with actionable engineering findings for autonomous repair, not a
+request for the user to test features or grant file permissions. Require standard
+test results and current artifacts, not custom phase receipts. Product decisions
+and external authority are the exceptions. The adapter owns acceptance and delivery.

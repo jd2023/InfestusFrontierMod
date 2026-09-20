@@ -18,7 +18,7 @@ def queue_digest(root):
 
 
 def implementation_paths(root, paths, baseline, git, commit=None):
-    """Exclude only status-only edits; contract edits remain subject to scope checks."""
+    """Exclude status-only edits from the implementation diff."""
     paths = set(paths)
     if QUEUE in paths:
         before = git(root, 'show', f'{baseline}:{QUEUE}')

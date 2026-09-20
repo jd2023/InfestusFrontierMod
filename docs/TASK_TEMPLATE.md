@@ -15,7 +15,7 @@ Required fields in `.ktask/tasks.md`:
 | Depends | Earlier accepted packets; none only for the first task |
 | Spec | Existing authoritative files; Contract identifies the relevant entries |
 | Blocks | Primary ownership of catalog blocks; each in-scope entry occurs once |
-| Scope | Exact paths/globs; shared-file edits only for this feature's wiring/data |
+| Scope | Suggested starting paths/globs, not editing permissions |
 | Contract | Commands, state transitions, inputs/outputs and refusal behavior |
 | Red | Behavioral assertion that fails before implementation |
 | Accept | Observable success and adjacent regression outcomes |
@@ -36,11 +36,12 @@ changing them invalidates that task's acceptance, not unrelated task receipts.
 Scope profile `@module:name` expands the path convention once, in
 `scripts/ktask_contracts.py`: that module's core, platform, client, tests,
 namespaced data/assets and composition bridge. Shared translation/vanilla-tag
-files permit only its own entries. Campaign scope excludes production sources.
-Additional paths explicitly grant task-specific cross-module integration work.
+files remain organized by behavior owner. Campaign and qualification tasks may
+repair the production behavior or harness they exercise.
 Inspect exact expanded paths with
-`python3 scripts/ktask_workflow.py scope IF-003`; process-control paths are always
-forbidden to workers. Do not duplicate the expansion in every packet.
+`python3 scripts/ktask_workflow.py scope IF-003`. Necessary code, test, harness,
+build, documentation and project-configuration repairs need no separate permission.
+Do not duplicate the expansion in every packet.
 
 For each content packet, include its recipes/tags/translations, original readable
 assets, guide/advancement entries and discovery tests for the content actually
@@ -61,14 +62,15 @@ unloaded endpoints and invalid network input must preserve stated invariants.
 
 Tests cover public behavior and one meaningful negative case, then adjacent
 regressions. The authoritative gate is always `bash .ktask/verify.sh`; a task may
-add checks, not replace it. Client-visible changes require inspected captures;
+repair faulty checks with regression evidence while preserving their intended
+acceptance outcomes. Client-visible changes require inspected captures;
 resource/process changes require conservation assertions; scalable work requires
 shared-budget contention and measured performance.
 Multi-behavior packets need independent success and refusal assertions for every
 behavior. Split them when those outcomes can be delivered separately. A stronger
 reviewer cannot compensate for an undefined implementation contract.
 
-Coordinator owns packet readiness, numerical baselines and design corrections.
-Worker implements the supplied contract; reviewer cannot waive missing behavior.
-If a packet proves too large, coordinator splits it before another attempt, keeping
-one primary owner per catalog entry and preserving accepted predecessor receipts.
+Planning owns packet readiness, numerical baselines and initial design. Workers
+resolve engineering gaps and repair prerequisites within the current task.
+Reviewers require concrete corrections, not a separate permission round trip.
+Neither role may waive missing behavior or rewrite live queue progress.

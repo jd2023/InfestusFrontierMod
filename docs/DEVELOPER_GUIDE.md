@@ -30,8 +30,10 @@ a recommendation and its tradeoff when discussing that choice; keep the question
 register itself questions-only. Put resolved rules in their specifications and
 remove the questions. State rules directly, without attribution or change history.
 Implementation follows the scoped M0–M10 task queue. The planning coordinator
-owns research, design, numerical baselines and module interfaces; implementation
-workers receive defined contracts. Do not promote prototype implementations wholesale.
+owns initial research, design, numerical baselines and module interfaces.
+Workers resolve technical gaps and repair necessary prerequisite implementations,
+tests, harnesses and project configuration without requesting file permissions.
+Do not promote prototype implementations wholesale.
 
 ## Deep modularity: mandatory
 
@@ -62,11 +64,14 @@ failure diagnostics, performance bounds and tests. Follow `ARCHITECTURE.md`.
 ## Change and validation discipline
 
 1. Read instructions and owning specification; inspect clean Git state/checkpoint.
-2. State the outcome, owning module, allowed files, non-goals and adjacent risks.
+2. State the outcome, owning module, starting files, non-goals and adjacent risks.
 3. Discuss material server/client costs under `PERFORMANCE.md`.
 4. Write the smallest meaningful failing test; prove it detects the missing behavior.
-5. Implement behind the module boundary; do not expand scope opportunistically.
-6. Run focused tests, then adjacent regressions and `./.ktask/verify.sh`.
+5. Implement and repair in each behavior's owning module. Scope paths are starting
+   points, not an allowlist; necessary cross-module repairs are part of the task.
+6. Run focused tests and adjacent regressions. The acceptance hook runs
+   `./.ktask/verify.sh`; workers may run it earlier for diagnosis, but need not
+   duplicate a full-gate run solely for handoff.
 7. Run the required client/visual/integration/performance checks for affected features.
 8. Review the entire diff, including generated outputs and assets: correctness,
    placement, simplicity, scope, abstractions, isolation, test quality, comments
@@ -86,8 +91,9 @@ Acceptance checks must exercise a defined behavior and reliably distinguish succ
 from failure. Do not build general-purpose source analyzers as prerequisites for
 gameplay. Use compiler/classpath boundaries, focused tests and actual client/server
 runs; review owns architecture properties those checks cannot prove. Removing or
-replacing a faulty gate requires an explicit contract correction, not a worker
-silently suppressing its failure.
+replacing a faulty gate is authorized engineering work: demonstrate its defect,
+preserve the intended acceptance outcome and review the correction independently.
+Never suppress a genuine failure or weaken requirements to get green.
 
 Pure tests cover rules and limits. Contract tests cover commands and invariants.
 Platform tests cover registry/data/save/network boundaries. GameTests exercise real
@@ -124,8 +130,9 @@ the delivery adapter owns those actions, not the worker. No force pushes, merges
 to main, remote creation, public releases, license grants or migration promises.
 The authoritative gate is the same entry point CI/ktask call. Routine failures
 receive bounded strong-model repair and fresh review; exhausted engineering work
-returns to the planning coordinator for re-scoping, not a numerical assignment
-to the user. Only new product choices or external authority require human input.
+reports the remaining defect honestly. File boundaries and faulty infrastructure
+are not reasons to request coordinator permission or human intervention.
+Only new product choices or external authority require human input.
 
 Low-value comments are defects. Keep useful API/function/type contracts; remove
 narration, obsolete discussion and comments compensating for confusing code.

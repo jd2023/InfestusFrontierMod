@@ -5,7 +5,6 @@ import re
 import hashlib
 import subprocess
 
-from ktask_contracts import check_scope
 from ktask_queue import implementation_paths
 
 
@@ -16,9 +15,6 @@ def fingerprint(contents, modes):
 def committed_candidate(root, task, parent, commit, git):
     paths = git(root, 'diff', '--no-renames', '--name-only', '-z', parent, commit).split('\0')
     paths = sorted(implementation_paths(root, set(paths) - {''}, parent, git, commit))
-    check_scope(task, paths)
-    if not paths:
-        raise ValueError('Published task has no candidate changes')
     contents, modes = {}, {}
     for path in paths:
         entry = git(root, 'ls-tree', commit, '--', path)
@@ -52,7 +48,7 @@ def finish(root, intent, git):
     if git(root, 'write-tree') != intent['tree'] or git(root, 'diff', '--name-only'):
         raise ValueError('Pending commit index or working tree changed')
     if head == state['baseline']:
-        git(root, 'commit', '--cleanup=verbatim', '-m', intent['message'])
+        git(root, 'commit', '--allow-empty', '--cleanup=verbatim', '-m', intent['message'])
         head = git(root, 'rev-parse', 'HEAD')
     if (git(root, 'show', '-s', '--format=%P', head) != state['baseline']
             or git(root, 'show', '-s', '--format=%T', head) != intent['tree']

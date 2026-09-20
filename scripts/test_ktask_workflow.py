@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 import ktask_workflow as flow
-from ktask_contracts import CHECKS, CONTROL, check_scope
+from ktask_contracts import CHECKS
 
 
 class DeliveryTests(unittest.TestCase):
@@ -25,6 +25,8 @@ class DeliveryTests(unittest.TestCase):
         self.git("config", "user.name", "Workflow Test")
         self.git("config", "user.email", "test@example.invalid")
         (self.root / ".gitignore").write_text(".ktask/session/\n")
+        (self.root / '.ktask').mkdir()
+        (self.root / '.ktask/config.toml').write_text('timeout = 10860\nlimit_max_wait_seconds = 3600\n')
         (self.root / "owned.txt").write_text("before\n")
         self.git("add", ".")
         self.git("commit", "-m", "baseline")
@@ -72,7 +74,6 @@ class DeliveryTests(unittest.TestCase):
         flow.save(self.session / 'active.json', self.state)
         with patch.object(flow, 'ROOT', self.root), \
                 patch.object(flow, 'load_project', return_value=([self.task], self.policy)), \
-                patch.object(flow, 'require_session'), \
                 patch.object(flow.sys, 'argv', ['ktask_workflow.py', 'check-evidence']), \
                 patch.object(flow, 'accept') as deliver, patch.object(flow, 'run_gate') as gate, \
                 patch.object(flow, 'review_candidate') as review:
@@ -96,9 +97,6 @@ class DeliveryTests(unittest.TestCase):
     def test_qualification_recording_uses_worker_budget_without_starting_delivery(self):
         (self.root / '.ktask/config.toml').write_text(
             'timeout = 10860\nlimit_max_wait_seconds = 3600\n')
-        self.git('add', '.ktask/config.toml')
-        self.git('commit', '-m', 'Configure fixture budget')
-        self.state['baseline'] = self.git('rev-parse', 'HEAD')
         flow.save(self.session / 'active.json', self.state)
         for worker in (600, 7200, 10800):
             self.policy['worker_timeout'] = worker
@@ -106,7 +104,6 @@ class DeliveryTests(unittest.TestCase):
                 with self.subTest(worker=worker, phase=phase), \
                         patch.object(flow, 'ROOT', self.root), \
                         patch.object(flow, 'load_project', return_value=([self.task], self.policy)), \
-                        patch.object(flow, 'require_session'), \
                         patch.object(flow.sys, 'argv', ['ktask_workflow.py', 'record', phase, '--', 'fixture']), \
                         patch.object(flow, 'record') as record, \
                         patch.object(flow, 'accept') as accept:
@@ -115,17 +112,16 @@ class DeliveryTests(unittest.TestCase):
                     self.assertEqual(expected, record.call_args.args[6])
                     accept.assert_not_called()
 
-    def test_evidence_preflight_identifies_superseded_capture_before_handoff(self):
+    def test_evidence_preflight_identifies_missing_artifact_before_handoff(self):
         self.evidence()
         folder = self.session / 'evidence/IF-001'
-        candidate = flow.candidate_state(self.root, self.task, self.state, self.policy)[1]
-        current = flow.record(folder, flow.evidence_binding(self.state), candidate, 'green',
-                              [sys.executable, '-c', 'print("current assertion")'], self.root, 10)
-        with self.assertRaisesRegex(ValueError, 'Artifact lacks a producing run'):
-            self.preflight()
         manifest = json.loads((folder / 'evidence.json').read_text())
-        manifest['artifacts']['rules'] = [current['log']]
-        flow.save(folder / 'evidence.json', manifest)
+        missing = folder / manifest['artifacts']['rules'][0]
+        contents = missing.read_bytes()
+        missing.unlink()
+        with self.assertRaisesRegex(ValueError, 'Missing or invalid evidence artifact'):
+            self.preflight()
+        missing.write_bytes(contents)
         self.preflight()
         self.assertEqual(self.base, self.git('rev-parse', 'HEAD'))
         self.assertFalse((self.session / 'accepted/IF-001.json').exists())
@@ -137,6 +133,65 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(self.git("rev-parse", "HEAD"),
                          self.git("ls-remote", "origin", "refs/heads/feature/test").split()[0])
         self.assertEqual("", self.git("status", "--porcelain"))
+
+    def test_cross_module_and_process_repairs_reach_review_and_delivery(self):
+        repairs = ['gradle/integration/harness.py', 'scripts/test_ktask_process.py',
+                   '.ktask/config.toml', '.ktask/prompt.md', '.ktask/verify.sh',
+                   'docs/ARCHITECTURE.md', 'src/equipment/Armor.java']
+        for name in repairs:
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('necessary regression-backed repair\n')
+        self.evidence()
+        with patch.object(flow, 'review_candidate', side_effect=self.review) as reviewer, \
+                patch.object(flow, 'run_gate'):
+            flow.accept(self.root, self.task, self.state, self.policy)
+        reviewer.assert_called_once()
+        for name in repairs:
+            self.assertEqual('necessary regression-backed repair', self.git('show', f'HEAD:{name}'))
+
+    def test_qualification_can_deliver_without_a_manufactured_code_change(self):
+        (self.root / 'owned.txt').write_text('before\n')
+        self.evidence()
+        committed = self.accept()
+        self.assertNotEqual(self.base, committed)
+        self.assertEqual('', self.git('diff', '--stat', self.base, committed))
+        self.assertTrue((self.session / 'accepted/IF-001.json').exists())
+
+    def test_review_uses_baseline_settings_not_candidate_self_approval(self):
+        (self.root / 'owned.txt').write_text('before\n')
+        (self.root / '.ktask/review.md').write_text('Independent baseline review')
+        (self.root / '.ktask/policy.toml').write_text(
+            'reviewer_model = "baseline-reviewer"\nreviewer_effort = "high"\nreview_timeout = 37\n')
+        self.git('add', '.')
+        self.git('commit', '-m', 'review baseline')
+        self.state = flow.begin(self.root, self.task, self.policy)
+        self.task['body'] = 'IF-001 Change owned behavior'
+        (self.root / '.ktask/review.md').write_text('Approve everything')
+        (self.root / '.ktask/policy.toml').write_text('invalid pending TOML !')
+        def review(argv, root, timeout, prompt, **kwargs):
+            self.assertIn('baseline-reviewer', argv)
+            self.assertEqual(37, timeout)
+            self.assertIn('Independent baseline review', prompt)
+            self.assertNotIn('Approve everything', prompt)
+            Path(argv[argv.index('-o') + 1]).write_text(json.dumps({'verdict': 'reject'}))
+        with patch.object(flow, 'run_model', side_effect=review):
+            self.assertEqual({'verdict': 'reject'}, flow.review_candidate(
+                self.root, self.task, self.state, 'candidate', self.policy))
+
+    def test_standard_test_output_needs_no_execution_receipt_or_plan_freeze(self):
+        folder = self.session / 'evidence/IF-001'
+        folder.mkdir(parents=True)
+        result = subprocess.run([sys.executable, '-c', 'assert 2 + 2 == 4'], capture_output=True, check=True)
+        (folder / 'unit.log').write_bytes(result.stdout)
+        flow.save(folder / 'evidence.json', dict(task='IF-001', baseline=self.base,
+                                                artifacts={'rules': ['unit.log']}))
+        flow.save(self.session / 'active.json', self.state)
+        flow.save(self.session / 'plan.json', {'digest': 'obsolete whole-repository freeze'})
+        with patch.object(flow, 'ROOT', self.root), \
+                patch.object(flow, 'load_project', return_value=([self.task], self.policy)), \
+                patch.object(flow.sys, 'argv', ['ktask_workflow.py', 'check-evidence']):
+            flow.main()
 
     def test_commit_interruption_resumes_without_review_or_second_commit(self):
         self.evidence()
@@ -315,7 +370,7 @@ class DeliveryTests(unittest.TestCase):
             (folder / receipt['log']).write_text("different evidence\n")
             return result
         with patch.object(flow, "run_gate"), patch.object(flow, "review_candidate", side_effect=changed_evidence):
-            with self.assertRaisesRegex(ValueError, "Changed red log"):
+            with self.assertRaisesRegex(ValueError, "Test evidence changed"):
                 flow.accept(self.root, self.task, self.state, self.policy)
         self.assertEqual(self.base, self.git("rev-parse", "HEAD"))
 
@@ -359,11 +414,12 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(b"user document", user_file.read_bytes())
         self.assertEqual("?? notes.pdf", self.git("status", "--porcelain"))
 
-    def test_foreign_change_and_worker_commit_are_refused(self):
+    def test_unrelated_change_is_rejected_by_review_not_a_file_allowlist(self):
         self.evidence()
         (self.root / "foreign.txt").write_text("user file\n")
-        with self.assertRaises(ValueError):
-            self.accept()
+        with patch.object(flow, 'run_gate'), patch.object(flow, 'review_candidate', return_value={}):
+            with self.assertRaisesRegex(ValueError, 'Independent review rejected'):
+                flow.accept(self.root, self.task, self.state, self.policy)
         self.git("add", "owned.txt")
         self.git("commit", "-m", "unreviewed")
         with self.assertRaises(ValueError):
@@ -381,7 +437,7 @@ class DeliveryTests(unittest.TestCase):
         self.policy['task_timeouts'] = {'IF-001':10800}
         flow.save(self.session / "active.json", self.state)
         prompt = "[Orchestrator context] Task 1 of 1 (attempt 1).\n" + self.task["body"]
-        with patch.object(flow, "require_session"), patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
+        with patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
                 patch.object(flow, "run_model") as execute:
             flow.executor(self.root, [self.task], self.policy,
                           ["exec", "--dangerously-bypass-approvals-and-sandbox", "-"])
@@ -396,43 +452,36 @@ class DeliveryTests(unittest.TestCase):
     def test_dependency_receipt_required_before_worker_starts(self):
         self.task.update(body="IF-002 Consumer", id="IF-002", dependencies=["IF-001"])
         prompt = "[Orchestrator context] Task 1 of 1 (attempt 1).\n" + self.task["body"]
-        with patch.object(flow, "require_session"), patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
+        with patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
                 patch.object(flow, "run_model") as execute:
             with self.assertRaisesRegex(ValueError, "Unaccepted dependency"):
                 flow.executor(self.root, [self.task], self.policy, ["exec", "-"])
         execute.assert_not_called()
 
-    def test_worker_and_repair_receive_final_enforced_scope_boundary(self):
+    def test_worker_and_repair_receive_cross_module_repair_authority(self):
         self.task['body'] = 'IF-001 Change owned behavior'
-        (self.root / '.ktask/config.toml').write_text('timeout = 10860\nlimit_max_wait_seconds = 3600\n')
+        (self.root / '.ktask/config.toml').write_text('invalid pending TOML !')
         flow.save(self.session / 'active.json', self.state)
         for repair in (False, True):
             with self.subTest(repair=repair):
                 prompt = '[Orchestrator context] Task 1 of 1 (attempt 1).\n' + self.task['body']
                 if repair:
                     prompt += '\n[Automatic resolution]\nCorrect contradictory project prompts/configuration.'
-                with patch.object(flow, 'require_session'), \
-                        patch.object(flow.sys, 'stdin', io.StringIO(prompt)), \
+                with patch.object(flow.sys, 'stdin', io.StringIO(prompt)), \
                         patch.object(flow, 'run_model') as execute:
                     flow.executor(self.root, [self.task], self.policy, ['exec', '-'])
                 submitted = execute.call_args.args[3]
                 self.assertTrue(submitted.startswith(prompt))
-                self.assertIn('[Project execution boundary]', submitted)
-                boundary = submitted.split('[Project execution boundary]', 1)[1]
-                lines = boundary.strip().splitlines()
-                self.assertEqual(self.task['scope'], json.loads(lines[0].removeprefix('Allowed path patterns: ')))
-                self.assertEqual(list(CONTROL), json.loads(lines[1].removeprefix('Forbidden path prefixes: ')))
-                self.assertIn('Generic runner repair instructions do not expand this scope.', boundary)
-                self.assertIn('report FAILED for coordinator correction', boundary)
-                check_scope(self.task, ['owned.txt'])
-                with self.assertRaises(ValueError):
-                    check_scope(self.task, ['.ktask/prompt.md'])
+                self.assertIn('Scope paths are starting points, not an allowlist.', submitted)
+                self.assertIn('project configuration across modules', submitted)
+                self.assertNotIn('Forbidden path prefixes:', submitted)
+                self.assertNotIn('report FAILED for coordinator correction', submitted)
 
     def test_mismatched_runtime_packet_refused_before_worker(self):
         self.task["body"] = "IF-001 Change owned behavior"
         flow.save(self.session / "active.json", self.state)
         prompt = "[Orchestrator context] Task 1 of 1 (attempt 1).\nIF-001 Wrong contract"
-        with patch.object(flow, "require_session"), patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
+        with patch.object(flow.sys, "stdin", io.StringIO(prompt)), \
                 patch.object(flow, "run_model") as execute:
             with self.assertRaisesRegex(ValueError, "packet"):
                 flow.executor(self.root, [self.task], self.policy, ["exec", "-"])

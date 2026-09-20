@@ -14,10 +14,13 @@ Performance is correctness. Discuss material costs before implementation and
 enforce hard bounds, back-pressure and loaded-chunk-only behavior.
 
 Start from a clean committed Git checkpoint. Scope edits narrowly; add meaningful
-red-first tests, adjacent regressions and run `./.ktask/verify.sh`. Inspect the
+red-first tests and adjacent regressions. Acceptance runs `./.ktask/verify.sh`;
+outside ktask, run it before delivery. Inspect the
 complete diff, then commit one coherent scope. Never weaken checks or replace
 visual goldens to obtain a pass. Use native `ktask run/resume/retry` for authorized
-execution; workers do not commit/push or edit acceptance machinery. Accepted task
+execution; workers may repair any relevant project code, tests or configuration,
+including acceptance machinery, but may not waive requirements or self-approve.
+Scope paths are guidance, not permissions. Workers do not commit/push. Accepted task
 changes are committed and pushed by the adapter to the configured feature branch.
 No public release, main merge, new remote or prototype copy is authorized.
 

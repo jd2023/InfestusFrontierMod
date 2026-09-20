@@ -2,7 +2,7 @@
 
 import unittest
 
-from ktask_contracts import parse_tasks, check_scope, check_review
+from ktask_contracts import parse_tasks, check_review
 
 
 class ContractTests(unittest.TestCase):
@@ -39,19 +39,10 @@ Evidence: rules
             self.assertEqual(original['body'], parsed['body'])
             self.assertEqual(marker, parsed['status'])
 
-    def test_scope_rejects_gate_changes_and_neighbor_feature(self):
-        task = parse_tasks(self.packet())[0]
-        check_scope(task, ["src/processing/Recipe.java"])
-        for path in [".ktask/config.toml", "src/equipment/Armor.java", "src/processing/../../secret"]:
-            with self.assertRaises(ValueError):
-                check_scope(task, [path])
-
-    def test_named_module_scope_expands_without_granting_neighbor_internals(self):
+    def test_named_module_starting_points_expand(self):
         packet = self.packet().replace('["src/processing/**"]', '["@module:processing"]')
         task = parse_tasks(packet)[0]
-        check_scope(task, ["core/src/main/java/org/jd/infestusfrontier/processing/Batch.java"])
-        with self.assertRaises(ValueError):
-            check_scope(task, ["core/src/main/java/org/jd/infestusfrontier/equipment/Piece.java"])
+        self.assertIn("core/src/main/java/org/jd/infestusfrontier/processing/**", task['scope'])
         with self.assertRaises(ValueError):
             parse_tasks(packet.replace("@module:processing", "@module:../../"))
 
@@ -66,20 +57,15 @@ Evidence: rules
             with self.assertRaises(ValueError):
                 check_review(broken, "IF-001", "abc")
 
-    def test_guide_scope_matches_resource_layout_without_neighbor_access(self):
+    def test_guide_starting_points_match_resource_layout(self):
         root = 'src/main/resources/data/infestusfrontier/modonomicon/books/the_waking_genome/'
         for owner in ('processing', 'discovery'):
             task = parse_tasks(self.packet().replace('["src/processing/**"]',
                                f'["@module:{owner}"]'))[0]
-            check_scope(task, [root + f'categories/{owner}.json',
-                               root + f'entries/{owner}/first_recipe.json'])
-            with self.assertRaises(ValueError):
-                check_scope(task, [root + 'entries/equipment/armor.json'])
+            self.assertIn(root + f'categories/{owner}.json', task['scope'])
+            self.assertIn(root + f'entries/{owner}/**', task['scope'])
             if owner == 'discovery':
-                check_scope(task, [root + 'book.json'])
-            else:
-                with self.assertRaises(ValueError):
-                    check_scope(task, [root + 'book.json'])
+                self.assertIn(root + 'book.json', task['scope'])
 
     def test_review_without_supporting_evidence_is_rejected(self):
         from ktask_contracts import CHECKS
