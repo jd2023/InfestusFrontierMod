@@ -1,0 +1,12 @@
+{
+  "requires": "infestusfrontier_tests:ecology.living_substrate.use",
+  "commands": [
+    "setblock -4 -60 4 infestusfrontier:ecology/living_substrate[stage=basic]",
+    "setblock -3 -60 4 infestusfrontier:ecology/living_substrate[stage=young]",
+    "setblock -2 -60 4 infestusfrontier:ecology/living_substrate[stage=mature]",
+    "setblock 3 -59 5 infestusfrontier:ecology/living_substrate[stage=young,pigment=cyan]",
+    "setblock 3 -58 5 infestusfrontier:ecology/living_substrate[stage=mature,pigment=cyan]",
+    "setblock 1 -57 4 infestusfrontier:ecology/living_substrate[stage=mature]",
+    "setblock 2 -57 4 infestusfrontier:ecology/living_substrate[stage=mature]"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    { "item": "minecraft:dirt" },
+    { "item": "infestusfrontier:construction/spore_culture" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "infestusfrontier:ecology/living_substrate"
+  }
+}

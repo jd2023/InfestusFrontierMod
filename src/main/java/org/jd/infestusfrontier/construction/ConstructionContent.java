@@ -10,6 +10,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.construction.api.CultureUse;
 
 final class ConstructionContent {
     static final String SPORE_CULTURE = "construction/spore_culture";
@@ -23,7 +24,7 @@ final class ConstructionContent {
     @SuppressWarnings("unused")
     private final DeferredItem<BlockItem> organBudItem;
 
-    ConstructionContent(BudRecipeRegistry budRecipes) {
+    ConstructionContent(BudRecipeRegistry budRecipes, CultureUse cultureUse) {
         organBud = blocks.registerBlock(
                 ORGAN_BUD,
                 properties -> new OrganBudBlock(properties, budRecipes),
@@ -32,7 +33,8 @@ final class ConstructionContent {
                         .strength(0.4F)
                         .sound(SoundType.WART_BLOCK)
                         .noOcclusion());
-        sporeCulture = items.registerSimpleItem(SPORE_CULTURE, new Item.Properties());
+        sporeCulture = items.register(SPORE_CULTURE,
+                () -> new SporeCultureItem(new Item.Properties(), cultureUse));
         organBudItem = items.registerSimpleBlockItem(organBud, new Item.Properties());
     }
 
