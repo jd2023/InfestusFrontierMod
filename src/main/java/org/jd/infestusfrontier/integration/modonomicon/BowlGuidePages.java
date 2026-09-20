@@ -20,9 +20,19 @@ public final class BowlGuidePages {
     private static BookTextPage page(String catalogId) {
         var recipe = CultureBowlRecipes.recipe(catalogId);
         var text = Component.empty();
-        for (int i = 0; i < recipe.itemInputAlternatives().size(); i++) {
-            if (i > 0) text.append("\n").append(Component.translatable("book.infestusfrontier.recipe.or")).append("\n");
-            text.append(items(recipe.itemInputAlternatives().get(i)));
+        var alternatives = recipe.itemInputAlternatives();
+        var common = new java.util.LinkedHashMap<>(alternatives.getFirst());
+        if (alternatives.size() > 1) {
+            common.entrySet().removeIf(item -> alternatives.stream().anyMatch(
+                    route -> !item.getValue().equals(route.get(item.getKey()))));
+        } else common.clear();
+        if (!common.isEmpty()) text.append(items(common)).append("\n")
+                .append(Component.translatable("book.infestusfrontier.recipe.plus_one_of")).append("\n");
+        for (int i = 0; i < alternatives.size(); i++) {
+            if (i > 0) text.append("\n").append(Component.translatable("book.infestusfrontier.recipe.or")).append(" ");
+            var distinct = new java.util.LinkedHashMap<>(alternatives.get(i));
+            common.keySet().forEach(distinct::remove);
+            text.append(items(distinct));
         }
         text.append("\n\n").append(Component.translatable("book.infestusfrontier.recipe.water",
                 recipe.fluidInputs().getOrDefault("water", 0)));

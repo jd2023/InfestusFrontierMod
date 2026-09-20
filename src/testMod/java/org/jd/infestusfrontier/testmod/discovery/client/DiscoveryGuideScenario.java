@@ -138,11 +138,29 @@ public final class DiscoveryGuideScenario implements ContentGuideScenario, Conte
         if (entry == null || entry.getPages().isEmpty()) {
             throw new IllegalStateException("Guide is missing contributed entry pages " + next.entry());
         }
+        verifyRecipePageBounds(minecraft, entry);
         verifyRecipes(entry);
         BookGuiManager.get().openEntry(GuideAccess.BOOK_ID, entryId, 0);
         opened = next;
         return false;
     }
+    private static void verifyRecipePageBounds(Minecraft game,
+            com.klikli_dev.modonomicon.book.entries.BookEntry entry) {
+        for (var page : entry.getPages()) {
+            if (!(page instanceof com.klikli_dev.modonomicon.book.page.BookTextPage textPage)
+                    || !textPage.getText().hasComponent()) continue;
+            // Component pages use the ordinary font at full size in BookTextPageRenderer.
+            var renderer = new com.klikli_dev.modonomicon.client.render.page.BookTextPageRenderer(textPage);
+            var book = BookDataManager.get().getBook(GuideAccess.BOOK_ID);
+            int width = BookEntryScreen.PAGE_WIDTH + book.getBookTextOffsetWidth() - book.getBookTextOffsetX();
+            int height = game.font.split(textPage.getText().getComponent(), width).size() * game.font.lineHeight;
+            int available = BookEntryScreen.PAGE_HEIGHT - renderer.getTextY()
+                    + book.getBookTextOffsetHeight() - book.getBookTextOffsetY();
+            if (height > available) throw new IllegalStateException("Guide recipe text overflows "
+                    + entry.getId() + " / " + textPage.getTitle().getString() + ": " + height + " > " + available);
+        }
+    }
+
     private static void verifyRecipes(com.klikli_dev.modonomicon.book.entries.BookEntry entry) {
         if (!entry.getId().getPath().equals("processing/culture_bowl")) {
             verifyPreparationRecipes(entry);

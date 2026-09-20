@@ -128,7 +128,7 @@ online-player lookup described above. Active work probes only the loaded support
 cell, never requests a ticket, and never reads wall time. Every dimension shares
 one server-identity `SharedRecipeCompletionAdmission` (16 completions/tick); excess
 completed work retains its reservation until admitted. There is no pending queue.
-One transition scans at most nine slots, one tank and one reservation. Marking the
+One transition scans at most nine slots, two tanks and one reservation. Marking the
 owning chunk dirty avoids comparator neighbor callbacks. Only start/finish/cancel
 change the client block state. The Probe menu is the sole custom-packet path: it
 sends bounded intents and immutable changed snapshots, never automatic exports,

@@ -178,6 +178,7 @@
   "book.infestusfrontier.entry.biomass_bucket.description": "A measured portable 1000 mB transfer.",
   "book.infestusfrontier.entry.biomass_bucket.page.text": "Use an empty vanilla bucket on a compatible tank holding at least 1000 mB. Empty I019 into another compatible tank only when its complete 1000 mB fits. World placement is unavailable until finite containment exists.",
   "book.infestusfrontier.recipe.or": "OR",
+  "book.infestusfrontier.recipe.plus_one_of": "plus one of:",
   "book.infestusfrontier.recipe.water": "Water: %s mB",
   "book.infestusfrontier.recipe.output": "Produces: ",
   "book.infestusfrontier.recipe.returned": "Returns: ",
