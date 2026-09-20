@@ -164,34 +164,39 @@ class EvidenceRegressionTest(EvidenceCase):
                     harness.ResultEvaluator().evaluate(result)
 
     def test_zero_exit_loader_refusal_requires_named_diagnostic(self):
-        with tempfile.TemporaryDirectory() as raw:
-            result = self.result()
-            result["command"] = "profileSmoke"
-            result["omittedRequired"] = "modonomicon"
-            result["runtimeMods"] = {}
-            result["children"] = [
-                c for c in result["children"] if c["role"] == "server"
-            ]
-            result["assertions"] = {name: True for name in harness.NEGATIVE_ASSERTIONS}
-            result["phaseDurationsSeconds"] = {
-                "loaderRefusal": 1,
-                "shutdown": 0,
-                "cleanup": 0,
-                "total": 1,
-            }
-            log = Path(raw) / "server.log"
-            log.write_text(
-                "Missing or unsupported mandatory dependencies\nMod ID: 'modonomicon', Requested by: 'infestusfrontier'\nMod loading has failed\n"
-            )
-            result["artifacts"] = {"server.log": str(log)}
-            result["artifactDigests"] = {"server.log": harness._sha256(log)}
-            try:
-                harness.ResultEvaluator().evaluate(result)
-            except harness.HarnessFailure as exc:
-                self.fail(
-                    f"valid named loader refusal with completed zero exit was rejected: {exc}"
+        for omitted in ("modonomicon", "geckolib"):
+            with self.subTest(omitted=omitted), tempfile.TemporaryDirectory() as raw:
+                result = self.result()
+                result["command"] = "profileSmoke"
+                result["omittedRequired"] = omitted
+                result["runtimeMods"] = {}
+                result["children"] = [
+                    c for c in result["children"] if c["role"] == "server"
+                ]
+                result["assertions"] = {
+                    name: True for name in harness.NEGATIVE_ASSERTIONS
+                }
+                result["phaseDurationsSeconds"] = {
+                    "loaderRefusal": 1,
+                    "shutdown": 0,
+                    "cleanup": 0,
+                    "total": 1,
+                }
+                log = Path(raw) / "server.log"
+                log.write_text(
+                    "Missing or unsupported mandatory dependencies\n"
+                    f"Mod ID: '{omitted}', Requested by: 'infestusfrontier'\n"
+                    "Mod loading has failed\n"
                 )
-            log.write_text("generic failure: modonomicon infestusfrontier\n")
-            result["artifactDigests"]["server.log"] = harness._sha256(log)
-            with self.assertRaisesRegex(harness.HarnessFailure, "loader refusal"):
-                harness.ResultEvaluator().evaluate(result)
+                result["artifacts"] = {"server.log": str(log)}
+                result["artifactDigests"] = {"server.log": harness._sha256(log)}
+                try:
+                    harness.ResultEvaluator().evaluate(result)
+                except harness.HarnessFailure as exc:
+                    self.fail(
+                        f"valid named loader refusal with completed zero exit was rejected: {exc}"
+                    )
+                log.write_text(f"generic failure: {omitted} infestusfrontier\n")
+                result["artifactDigests"]["server.log"] = harness._sha256(log)
+                with self.assertRaisesRegex(harness.HarnessFailure, "loader refusal"):
+                    harness.ResultEvaluator().evaluate(result)
