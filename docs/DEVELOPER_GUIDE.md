@@ -76,9 +76,11 @@ failure diagnostics, performance bounds and tests. Follow `ARCHITECTURE.md`.
 8. Review the entire diff, including generated outputs and assets: correctness,
    placement, simplicity, scope, abstractions, isolation, test quality, comments
    and performance. Refactor and repeat tests until no acceptance defects remain.
-9. Obtain fresh independent smart-model review; its author must not be the worker
-   or repair session. Every required check must pass. Delivery then commits the
-   coherent scope, pushes the authorized feature branch and confirms the remote.
+9. Commit and push the coherent task scope to the authorized feature branch.
+   ktask checks remote synchronization, runs the full gate and obtains a fresh
+   independent smart-model review. Fix rejection findings with repair commits;
+   ktask advances only after acceptance. Outside ktask, obtain independent review
+   before delivery.
 
 Dirty unrelated work belongs to the user; preserve it. A failed or flaky test is
 evidence to investigate, not a reason to delete assertions, skip a check or retry
@@ -125,8 +127,8 @@ an explicit required/optional decision. See `DEPENDENCIES.md`.
 
 ## Delivery
 
-Accepted task changes are committed and pushed to the configured feature branch;
-the delivery adapter owns those actions, not the worker. No force pushes, merges
+Workers commit and push task changes to the configured feature branch. Independent
+acceptance follows; rejected candidates receive repair commits. No force pushes, merges
 to main, remote creation, public releases, license grants or migration promises.
 The authoritative gate is the same entry point CI/ktask call. Routine failures
 receive bounded strong-model repair and fresh review; exhausted engineering work

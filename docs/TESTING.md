@@ -1,18 +1,15 @@
 # Testing and evidence
 
-Run `./.ktask/verify.sh` from any directory. It runs `verifyAll`, preserves the log
-in `build/verification/full-gate.log`, requires a nonzero count of passing required
-GameTests and rejects severe output. There is no skip flag. Use Bash and ripgrep.
+Run `bash .ktask/verify.sh` from the repository. It runs `verifyAll` and preserves
+the log in `build/verification/full-gate.log`. Gradle and the integration harness
+determine success, including required GameTest execution; the shell does not
+reinterpret arbitrary log words as failures.
 
 Current layers:
 
-- `python3 -m unittest discover -s scripts -p 'test_ktask_*.py'`:
-  packet dependencies/scopes, review binding, changed code/evidence refusal,
-  actual temporary Git commit/push, rejected delivery, push-only retry, protected
-  user files, worker argv and process-group ownership. No model calls.
-- `python3 scripts/ktask_workflow.py validate`: ordered task contracts and exactly
-  one implementation owner for every in-scope block. This is planning coverage,
-  not evidence that those blocks exist in the mod.
+- `bash scripts/test_acceptance.sh`: isolated acceptance-hook checks with a stub
+  reviewer: approval, rejection, test failure, missing output and reviewer failure.
+  Run when changing the hook; it does not launch models or the project queue.
 
 - `python3 scripts/check_design_docs.py --self-test` and its normal invocation:
   prerequisite grammar, unknown references/cycles, block and armor-family guide

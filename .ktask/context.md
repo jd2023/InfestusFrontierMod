@@ -16,10 +16,11 @@ Planning defines the intended product. Workers implement and autonomously repair
 necessary code, tests, harnesses, documentation and project configuration across
 modules. Scope paths are starting points, never permission barriers. Technical
 gaps are engineering work. Independent review checks every repair for relevance,
-correctness and preserved requirements. Acceptance owns commits and pushes.
+correctness and preserved requirements. Workers commit and push; ktask verifies
+the remote, runs the mod tests and obtains independent review before advancing.
 Workers never self-approve, edit the live queue/progress or fabricate evidence.
 
 Gate: bash .ktask/verify.sh.
-Evidence: .ktask/session/evidence/<task-id>/.
+Evidence: build/evidence/<task-id>/notes.md and ordinary test artifacts.
 Report: exact path in the orchestrator header, not a guessed queue path.
 Status: ktask status.

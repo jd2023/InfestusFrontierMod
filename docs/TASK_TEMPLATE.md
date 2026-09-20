@@ -26,22 +26,14 @@ Required fields in `.ktask/tasks.md`:
 to one completing task; block ownership remains in Blocks. Requires names actual
 input IDs or named services and must resolve to the task or an accepted dependency.
 This file contains ownership and dependency edges, never recipe costs or prose.
-Keep it synchronized when splitting/reordering tasks. The validator rejects
-missing/duplicate obligations, unknown inputs and consumers preceding producers.
-It checks declared edges, not inferred natural-language recipe meaning; readiness
-must also inspect every recipe's real ingredients and installed services.
-Each packet fingerprint includes its own content obligations and required inputs;
-changing them invalidates that task's acceptance, not unrelated task receipts.
+Keep it synchronized when splitting/reordering tasks. Planning and review check
+missing/duplicate obligations, unknown inputs and consumers preceding producers,
+including each recipe's real ingredients and installed services.
 
-Scope profile `@module:name` expands the path convention once, in
-`scripts/ktask_contracts.py`: that module's core, platform, client, tests,
-namespaced data/assets and composition bridge. Shared translation/vanilla-tag
-files remain organized by behavior owner. Campaign and qualification tasks may
-repair the production behavior or harness they exercise.
-Inspect exact expanded paths with
-`python3 scripts/ktask_workflow.py scope IF-003`. Necessary code, test, harness,
+Scope hint `@module:name` means that module's core, platform, client, tests,
+data/assets and composition bridge. Campaign and qualification tasks may repair
+the production behavior or harness they exercise. Necessary code, test, harness,
 build, documentation and project-configuration repairs need no separate permission.
-Do not duplicate the expansion in every packet.
 
 For each content packet, include its recipes/tags/translations, original readable
 assets, guide/advancement entries and discovery tests for the content actually

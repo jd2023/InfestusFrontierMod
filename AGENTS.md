@@ -15,13 +15,13 @@ enforce hard bounds, back-pressure and loaded-chunk-only behavior.
 
 Start from a clean committed Git checkpoint. Scope edits narrowly; add meaningful
 red-first tests and adjacent regressions. Acceptance runs `./.ktask/verify.sh`;
-outside ktask, run it before delivery. Inspect the
-complete diff, then commit one coherent scope. Never weaken checks or replace
+outside ktask, run it before delivery. Inspect the complete diff, then commit one
+coherent scope. Never weaken checks or replace
 visual goldens to obtain a pass. Use native `ktask run/resume/retry` for authorized
 execution; workers may repair any relevant project code, tests or configuration,
 including acceptance machinery, but may not waive requirements or self-approve.
-Scope paths are guidance, not permissions. Workers do not commit/push. Accepted task
-changes are committed and pushed by the adapter to the configured feature branch.
+Scope paths are guidance, not permissions. Workers commit and push to the
+configured feature branch; ktask runs independent tests/review before marking DONE.
 No public release, main merge, new remote or prototype copy is authorized.
 
 The prototype in the sibling folder is reference evidence, not production code
