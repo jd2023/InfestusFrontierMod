@@ -66,7 +66,7 @@ public final class CultureBowlScreen extends OrganScreen<CultureBowlMenu> {
                 menu.snapshot().completedBatches()), 12, 102, UiTheme.MUTED_TEXT, false);
         if (menu.snapshot().refusal() != org.jd.infestusfrontier.processing.menu.BowlRefusal.NONE) {
             graphics.drawString(font, Component.translatable("screen.infestusfrontier.bowl.refusal." +
-                    menu.snapshot().refusal().name().toLowerCase(java.util.Locale.ROOT)), 12, 155, 0xFFFFA0A0, false);
+                    menu.snapshot().refusal().name().toLowerCase(java.util.Locale.ROOT)), 12, 168, 0xFFFFA0A0, false);
         }
     }
 

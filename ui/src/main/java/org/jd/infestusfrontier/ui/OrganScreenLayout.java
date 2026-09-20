@@ -6,7 +6,7 @@ import java.util.List;
 /** Fixed logical layout centered in the GUI-scaled viewport. */
 public final class OrganScreenLayout {
     public static final int WIDTH = 248;
-    public static final int HEIGHT = 166;
+    public static final int HEIGHT = 180;
     private final Bounds panel;
     private final List<Control> focusOrder;
 

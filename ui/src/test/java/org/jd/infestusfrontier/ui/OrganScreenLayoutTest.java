@@ -11,6 +11,8 @@ final class OrganScreenLayoutTest {
             int width = (int) Math.ceil(1280.0 / scale);
             int height = (int) Math.ceil(720.0 / scale);
             var layout = OrganScreenLayout.centered(width, height);
+            assertTrue(new OrganScreenLayout.Bounds(0, 0, width, height).contains(layout.panel()),
+                    "panel outside viewport at scale " + scale);
             var seen = new java.util.ArrayList<OrganScreenLayout.Bounds>();
             for (var control : layout.focusOrder()) {
                 assertTrue(control.bounds().width() >= 16 && control.bounds().height() >= 16, "click target at scale " + scale);
