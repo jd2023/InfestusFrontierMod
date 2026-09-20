@@ -84,6 +84,39 @@ condition and leaves uncommitted resources unchanged.
 - Optional adapters load only when their library is present. Core retains an empty
   external dependency classpath. testMod/campaign code never enters release JARs.
 
+## Culture Bowl adapter
+
+Processing owns the Bowl block entity, finite registry translation and strict schema-1
+NBT codec. Hand interactions submit commands to `BatchWork`; the block owns no
+parallel balances or counters. Storage alone validates reservations and commits a
+fully validated candidate before replacing balances. Restored active work must match
+one recipe alternative, earned water/time choices, outputs and returned containers.
+Allocation lists are bounded before copying (9 item entries per category, 2 fluid
+entries), and quantities use checked arithmetic. Organ owns the single history.
+
+The server adapter uses nine item slots and one 2000 mB tank, with only catalog
+resources and component-free input stacks. NBT list bounds, types, IDs, shape and
+stack limits are checked before domain restoration. Rejected saves disable edits
+and retain their original data on save/recovery. Breaking produces one block item
+carrying that state; placement consumes it. There is no second contents drop.
+
+Only active loaded block entities advance one work unit/tick; idle tick callbacks
+return without snapshots or probes. Active work probes only the loaded supporting
+cell, never requests a ticket, and never reads wall time. Every dimension shares
+one server-identity `SharedRecipeCompletionAdmission` (16 completions/tick); excess
+completed work retains its reservation until admitted. There is no pending queue.
+One transition scans at most nine slots, one tank and one reservation. Marking the
+owning chunk dirty avoids comparator neighbor callbacks. Only start/finish/cancel
+change the client block state; there are no custom packets, automatic exports,
+particles, renderers or ambient scans. Bowl geometry has at most 13 cuboids; the
+four item silhouettes reuse the production substrate texture with finite tints.
+
+Core tests cover recipe conservation, refusal equality, hostile restore, choices,
+transfer locking and shared admission. GameTests cover actual recipes/registration,
+hand loading/collection, tick completion, save/reload, recovery, corrupt saves and
+cross-dimension contention. The connected client fixture observes the Bowl models
+and all four collected material icons in a disposable server scene.
+
 ## Freight persistence protocol
 
 The durability boundary is Cargo Lock to Cargo Lock, not arbitrary external

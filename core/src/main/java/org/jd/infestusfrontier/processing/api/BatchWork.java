@@ -42,6 +42,7 @@ public final class BatchWork {
             CompletionAdmission completionAdmission) {
         Objects.requireNonNull(initialQuantities, "initialQuantities");
         Objects.requireNonNull(initialHistory, "initialHistory");
+        if (!initialQuantities.snapshot().reservations().isEmpty()) throw new IllegalArgumentException("New Bowl must be idle");
         long nextBatchId = initialHistory.lastCompletedBatchId() == Long.MAX_VALUE
                 ? Long.MAX_VALUE
                 : initialHistory.lastCompletedBatchId() + 1;
@@ -77,14 +78,62 @@ public final class BatchWork {
             if (active.batchId() >= state.nextBatchId() || active.batchId() <= history.snapshot().lastCompletedBatchId()) {
                 throw new IllegalArgumentException("Active Bowl batch identifier is inconsistent");
             }
+            int remaining = Math.max(1, active.requiredWorkUnits() - active.completedWorkUnits());
+            if (state.revision() > Long.MAX_VALUE - 1L - remaining || quantities.revision() >= Long.MAX_VALUE - 1) {
+                throw new IllegalArgumentException("Active Bowl has exhausted revision capacity");
+            }
             if (!quantities.hasReservation(active.reservationId())
                     || quantities.snapshot().reservations().size() != 1) {
                 throw new IllegalArgumentException("Active Bowl reservation is missing");
             }
         }
-        return new BatchWork(
+        var restored = new BatchWork(
                 state.revision(), state.nextBatchId(), active, quantities, history, completionAdmission);
+        if (active != null) restored.validateActiveRecipe();
+        return restored;
     }
+
+    private void validateActiveRecipe() {
+        var recipe = CultureBowlRecipes.recipe(activeBatch.recipeId());
+        var reservation = quantities.snapshot().reservations().getFirst();
+        var inputs = new LinkedHashMap<String, Integer>();
+        var fluids = new LinkedHashMap<String, Integer>();
+        var outputs = new LinkedHashMap<String, Integer>();
+        var returned = new LinkedHashMap<String, Integer>();
+        reservation.inputItems().forEach(a -> inputs.merge(a.resource(), a.amount(), Math::addExact));
+        reservation.inputFluids().forEach(a -> fluids.merge(a.resource(), a.amount(), Math::addExact));
+        reservation.itemOutputs().forEach(a -> outputs.merge(a.resource(), a.amount(), Math::addExact));
+        reservation.returnedContainers().forEach(a -> returned.merge(a.resource(), a.amount(), Math::addExact));
+        if (!recipe.itemInputAlternatives().contains(inputs) || !adjustedFluids(recipe.fluidInputs()).equals(fluids)
+                || !recipe.outputs().equals(outputs) || !recipe.returnedContainers().equals(returned)
+                || activeBatch.requiredWorkUnits() != adjustedWork(recipe.baseWorkUnits())) {
+            throw new IllegalArgumentException("Active reservation does not match its earned recipe");
+        }
+    }
+
+    public boolean insertItem(String resource, int amount, int capacity, long expectedRevision) {
+        if (!canTransfer(expectedRevision) || !quantities.insertItem(resource, amount, capacity)) return false;
+        incrementRevision();
+        return true;
+    }
+
+    public boolean insertWater(int amount, long expectedRevision) {
+        if (!canTransfer(expectedRevision) || !quantities.insertFluid("water", amount)) return false;
+        incrementRevision();
+        return true;
+    }
+
+    public boolean extractItemSlot(int index, long expectedRevision) {
+        if (!canTransfer(expectedRevision) || !quantities.extractItemSlot(index)) return false;
+        incrementRevision();
+        return true;
+    }
+
+    private boolean canTransfer(long expectedRevision) {
+        return expectedRevision == revision && activeBatch == null && revision < Long.MAX_VALUE - 1;
+    }
+
+    public boolean isActive() { return activeBatch != null; }
 
     public long revision() {
         return revision;
@@ -111,6 +160,9 @@ public final class BatchWork {
         if (revision == Long.MAX_VALUE - 1) return new Refused(StartRefusal.REVISION_EXHAUSTED, state());
         var recipe = CultureBowlRecipes.find(request.recipeId()).orElse(null);
         if (recipe == null) return new Refused(StartRefusal.UNKNOWN_RECIPE, state());
+        if (revision > Long.MAX_VALUE - 2L - adjustedWork(recipe.baseWorkUnits())) {
+            return new Refused(StartRefusal.REVISION_EXHAUSTED, state());
+        }
         if (nextBatchId == Long.MAX_VALUE) return new Refused(StartRefusal.IDENTIFIER_EXHAUSTED, state());
 
         var itemInputs = selectInputs(recipe);

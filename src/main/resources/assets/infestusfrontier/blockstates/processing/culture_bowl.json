@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "infestusfrontier:block/processing/culture_bowl"
+    },
+    "active=true": {
+      "model": "infestusfrontier:block/processing/culture_bowl_active"
+    }
+  }
+}

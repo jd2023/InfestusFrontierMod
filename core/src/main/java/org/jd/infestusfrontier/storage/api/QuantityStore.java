@@ -49,11 +49,52 @@ public final class QuantityStore {
                 throw new IllegalArgumentException("Duplicate reservation identifier");
             }
         }
+        if (!reservations.isEmpty() && revision >= Long.MAX_VALUE - 1) {
+            throw new IllegalArgumentException("Reservation has exhausted revision capacity");
+        }
         validateReservedState();
     }
 
     public static QuantityStore restore(Snapshot snapshot) {
         return new QuantityStore(Objects.requireNonNull(snapshot, "snapshot"));
+    }
+
+    /** Manual transfers refuse while a batch owns the store. No partial insertion. */
+    public boolean insertItem(String resource, int amount, int capacity) {
+        new ItemSlot(resource, amount, capacity);
+        if (amount < 1 || !reservations.isEmpty() || revision >= Long.MAX_VALUE - 1) return false;
+        for (boolean matching : new boolean[] {true, false}) {
+            for (int i = 0; i < itemSlots.size(); i++) {
+                var slot = itemSlots.get(i);
+                if (matching ? !slot.resource().equals(resource) : !slot.isEmpty()) continue;
+                if (slot.count() + amount > Math.min(slot.capacity(), capacity)) continue;
+                itemSlots.set(i, new ItemSlot(resource, slot.count() + amount, Math.min(slot.capacity(), capacity)));
+                revision++;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean insertFluid(String resource, int amount) {
+        if (resource == null || resource.length() > 64 || resource.isBlank() || amount < 1) throw new IllegalArgumentException("Invalid fluid");
+        if (!reservations.isEmpty() || revision >= Long.MAX_VALUE - 1) return false;
+        for (int i = 0; i < tanks.size(); i++) {
+            var tank = tanks.get(i);
+            if ((!tank.isEmpty() && !tank.resource().equals(resource)) || amount > tank.capacity() - tank.amount()) continue;
+            tanks.set(i, new Tank(resource, tank.amount() + amount, tank.capacity()));
+            revision++;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean extractItemSlot(int index) {
+        if (index < 0 || index >= itemSlots.size() || !reservations.isEmpty()
+                || revision >= Long.MAX_VALUE - 1 || itemSlots.get(index).isEmpty()) return false;
+        itemSlots.set(index, ItemSlot.empty(64));
+        revision++;
+        return true;
     }
 
     public long revision() {
@@ -105,7 +146,7 @@ public final class QuantityStore {
     public ReserveResult reserve(ReservationRequest request, long expectedRevision) {
         Objects.requireNonNull(request, "request");
         if (expectedRevision != revision) return refused(ReserveRefusal.STALE_REVISION, "");
-        if (revision == Long.MAX_VALUE - 1) return refused(ReserveRefusal.REVISION_EXHAUSTED, "");
+        if (revision >= Long.MAX_VALUE - 2) return refused(ReserveRefusal.REVISION_EXHAUSTED, "");
         if (reservations.size() == MAX_RESERVATIONS) {
             return refused(ReserveRefusal.RESERVATION_LIMIT, "");
         }
@@ -139,11 +180,14 @@ public final class QuantityStore {
         var reservation = reservations.get(reservationId);
         if (reservation == null) return CommitResult.UNKNOWN_RESERVATION;
         if (revision == Long.MAX_VALUE - 1) throw new IllegalStateException("Store revision is exhausted");
-        validateCommit(reservation);
-        applyItemInputs(reservation.inputItems());
-        applyFluidInputs(reservation.inputFluids());
-        applyItemOutputs(reservation.returnedContainers());
-        applyItemOutputs(reservation.itemOutputs());
+        validateReservedState();
+        var trial = new QuantityStore(itemSlots, tanks);
+        trial.applyItemInputs(reservation.inputItems());
+        trial.applyFluidInputs(reservation.inputFluids());
+        trial.applyItemOutputs(reservation.returnedContainers());
+        trial.applyItemOutputs(reservation.itemOutputs());
+        for (int i = 0; i < itemSlots.size(); i++) itemSlots.set(i, trial.itemSlots.get(i));
+        for (int i = 0; i < tanks.size(); i++) tanks.set(i, trial.tanks.get(i));
         reservations.remove(reservationId);
         revision++;
         return CommitResult.COMMITTED;
@@ -245,7 +289,7 @@ public final class QuantityStore {
     private int[] reservedInputAmounts() {
         var amounts = new int[itemSlots.size()];
         for (var reservation : reservations.values()) {
-            for (var allocation : reservation.inputItems()) amounts[allocation.index()] += allocation.amount();
+            for (var allocation : reservation.inputItems()) amounts[allocation.index()] = Math.addExact(amounts[allocation.index()], allocation.amount());
         }
         return amounts;
     }
@@ -253,7 +297,7 @@ public final class QuantityStore {
     private int[] reservedFluidInputAmounts() {
         var amounts = new int[tanks.size()];
         for (var reservation : reservations.values()) {
-            for (var allocation : reservation.inputFluids()) amounts[allocation.index()] += allocation.amount();
+            for (var allocation : reservation.inputFluids()) amounts[allocation.index()] = Math.addExact(amounts[allocation.index()], allocation.amount());
         }
         return amounts;
     }
@@ -271,8 +315,8 @@ public final class QuantityStore {
     private int[] reservedOutputAmounts() {
         var amounts = new int[itemSlots.size()];
         for (var reservation : reservations.values()) {
-            for (var allocation : reservation.returnedContainers()) amounts[allocation.index()] += allocation.amount();
-            for (var allocation : reservation.itemOutputs()) amounts[allocation.index()] += allocation.amount();
+            for (var allocation : reservation.returnedContainers()) amounts[allocation.index()] = Math.addExact(amounts[allocation.index()], allocation.amount());
+            for (var allocation : reservation.itemOutputs()) amounts[allocation.index()] = Math.addExact(amounts[allocation.index()], allocation.amount());
         }
         return amounts;
     }
@@ -301,21 +345,6 @@ public final class QuantityStore {
 
     private ReservationRefused refused(ReserveRefusal reason, String resource) {
         return new ReservationRefused(reason, resource, snapshot());
-    }
-
-    private void validateCommit(ReservationSnapshot reservation) {
-        for (var allocation : reservation.inputItems()) {
-            var slot = itemSlots.get(allocation.index());
-            if (!slot.resource().equals(allocation.resource()) || slot.count() < allocation.amount()) {
-                throw new IllegalStateException("Reserved item input changed");
-            }
-        }
-        for (var allocation : reservation.inputFluids()) {
-            var tank = tanks.get(allocation.index());
-            if (!tank.resource().equals(allocation.resource()) || tank.amount() < allocation.amount()) {
-                throw new IllegalStateException("Reserved fluid input changed");
-            }
-        }
     }
 
     private void applyItemInputs(List<ItemAllocation> allocations) {
@@ -432,7 +461,7 @@ public final class QuantityStore {
         if (source.size() > maximumEntries) throw new IllegalArgumentException("Too many resource entries");
         var copy = new LinkedHashMap<String, Integer>();
         for (var entry : source.entrySet()) {
-            if (entry.getKey() == null || entry.getKey().isBlank() || entry.getValue() == null || entry.getValue() < 1) {
+            if (entry.getKey() == null || entry.getKey().length() > 64 || entry.getKey().isBlank() || entry.getValue() == null || entry.getValue() < 1) {
                 throw new IllegalArgumentException("Quantities require named resources and positive amounts");
             }
             copy.put(entry.getKey(), entry.getValue());
@@ -495,7 +524,7 @@ public final class QuantityStore {
             if (capacity < 1 || capacity > 64) throw new IllegalArgumentException("Item slot capacity must be 1..64");
             if (count < 0 || count > capacity) throw new IllegalArgumentException("Item count is outside slot capacity");
             if (count == 0) resource = "";
-            if (resource == null || (count > 0 && resource.isBlank())) {
+            if (resource == null || resource.length() > 64 || (count > 0 && resource.isBlank())) {
                 throw new IllegalArgumentException("A non-empty slot requires an item");
             }
         }
@@ -514,7 +543,7 @@ public final class QuantityStore {
             if (capacity < 1) throw new IllegalArgumentException("Tank capacity must be positive");
             if (amount < 0 || amount > capacity) throw new IllegalArgumentException("Fluid amount is outside tank capacity");
             if (amount == 0) resource = "";
-            if (resource == null || (amount > 0 && resource.isBlank())) {
+            if (resource == null || resource.length() > 64 || (amount > 0 && resource.isBlank())) {
                 throw new IllegalArgumentException("A non-empty tank requires a fluid");
             }
         }
@@ -530,7 +559,7 @@ public final class QuantityStore {
 
     public record ItemAllocation(int index, String resource, int amount) {
         public ItemAllocation {
-            if (index < 0 || resource == null || resource.isBlank() || amount < 1) {
+            if (index < 0 || resource == null || resource.length() > 64 || resource.isBlank() || amount < 1 || amount > 64) {
                 throw new IllegalArgumentException("Invalid item allocation");
             }
         }
@@ -538,7 +567,7 @@ public final class QuantityStore {
 
     public record FluidAllocation(int index, String resource, int amount) {
         public FluidAllocation {
-            if (index < 0 || resource == null || resource.isBlank() || amount < 1) {
+            if (index < 0 || resource == null || resource.length() > 64 || resource.isBlank() || amount < 1 || amount > Integer.MAX_VALUE / MAX_TANKS) {
                 throw new IllegalArgumentException("Invalid fluid allocation");
             }
         }
@@ -551,6 +580,10 @@ public final class QuantityStore {
             List<ItemAllocation> itemOutputs,
             List<ItemAllocation> returnedContainers) {
         public ReservationSnapshot {
+            if (inputItems.size() > MAX_ITEM_SLOTS || inputFluids.size() > MAX_TANKS
+                    || itemOutputs.size() > MAX_ITEM_SLOTS || returnedContainers.size() > MAX_ITEM_SLOTS) {
+                throw new IllegalArgumentException("Reservation allocations exceed store bounds");
+            }
             inputItems = List.copyOf(Objects.requireNonNull(inputItems, "inputItems"));
             inputFluids = List.copyOf(Objects.requireNonNull(inputFluids, "inputFluids"));
             itemOutputs = List.copyOf(Objects.requireNonNull(itemOutputs, "itemOutputs"));
@@ -565,6 +598,8 @@ public final class QuantityStore {
             List<Tank> tanks,
             List<ReservationSnapshot> reservations) {
         public Snapshot {
+            validateShape(itemSlots, tanks);
+            if (reservations.size() > MAX_RESERVATIONS) throw new IllegalArgumentException("Too many reservations");
             itemSlots = List.copyOf(Objects.requireNonNull(itemSlots, "itemSlots"));
             tanks = List.copyOf(Objects.requireNonNull(tanks, "tanks"));
             reservations = List.copyOf(Objects.requireNonNull(reservations, "reservations"));

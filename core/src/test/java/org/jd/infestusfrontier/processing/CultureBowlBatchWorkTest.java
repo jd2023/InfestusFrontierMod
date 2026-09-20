@@ -297,6 +297,8 @@ class CultureBowlBatchWorkTest {
         assertEquals(BatchWork.Status.IDLE, completed.status());
         assertEquals(1, completed.history().completedBatches());
         outputs.forEach((item, amount) -> assertEquals(amount, completed.quantities().itemCount(item), item));
+        store.snapshot().itemSlots().stream().filter(slot -> !slot.isEmpty()).forEach(slot ->
+                assertEquals(0, completed.quantities().itemCount(slot.resource()), "Consumed input: " + slot.resource()));
     }
 
     private static QuantityStore store(List<QuantityStore.ItemSlot> items, List<QuantityStore.Tank> tanks) {

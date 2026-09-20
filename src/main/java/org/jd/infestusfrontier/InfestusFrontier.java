@@ -13,6 +13,7 @@ public final class InfestusFrontier {
 
     public InfestusFrontier(IEventBus modBus) {
         RuntimeIdentity.install();
+        new org.jd.infestusfrontier.processing.ProcessingModule().register(modBus);
         var ecology = new EcologyModule();
         ecology.register(modBus);
         new ConstructionModule(ecology::applyCulture).register(modBus);

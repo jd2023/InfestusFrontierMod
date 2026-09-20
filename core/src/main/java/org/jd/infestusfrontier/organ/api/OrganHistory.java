@@ -109,6 +109,7 @@ public final class OrganHistory {
 
     public record Snapshot(long completedBatches, long lastCompletedBatchId, List<GrowthChoice> choices) {
         public Snapshot {
+            if (choices.size() > MAX_CHOICES) throw new IllegalArgumentException("Too many growth choices");
             choices = List.copyOf(Objects.requireNonNull(choices, "choices"));
         }
 

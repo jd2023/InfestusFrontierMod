@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "owner": "processing",
+  "contributions": [
+    {
+      "task": "IF-002",
+      "entries": [
+        {
+          "catalog": [
+            "T0-02"
+          ],
+          "registry": [
+            "infestusfrontier:processing/culture_bowl"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/culture_bowl.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.culture_bowl.obtain",
+            "use": "infestusfrontier_tests:processing.culture_bowl.use",
+            "guide": "infestusfrontier_client:processing.culture_bowl.guide"
+          }
+        },
+        {
+          "catalog": [
+            "I005"
+          ],
+          "registry": [
+            "infestusfrontier:processing/elastic_gel"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/elastic_gel.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.elastic_gel.obtain",
+            "use": "infestusfrontier_tests:processing.elastic_gel.use",
+            "guide": "infestusfrontier_client:processing.elastic_gel.guide"
+          }
+        },
+        {
+          "catalog": [
+            "I007"
+          ],
+          "registry": [
+            "infestusfrontier:processing/nutrient_mash"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/nutrient_mash.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.nutrient_mash.obtain",
+            "use": "infestusfrontier_tests:processing.nutrient_mash.use",
+            "guide": "infestusfrontier_client:processing.nutrient_mash.guide"
+          }
+        },
+        {
+          "catalog": [
+            "I030"
+          ],
+          "registry": [
+            "infestusfrontier:processing/honey_culture"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/honey_culture.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.honey_culture.obtain",
+            "use": "infestusfrontier_tests:processing.honey_culture.use",
+            "guide": "infestusfrontier_client:processing.honey_culture.guide"
+          }
+        },
+        {
+          "catalog": [
+            "I033"
+          ],
+          "registry": [
+            "infestusfrontier:processing/rooting_gel"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/rooting_gel.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.rooting_gel.obtain",
+            "use": "infestusfrontier_tests:processing.rooting_gel.use",
+            "guide": "infestusfrontier_client:processing.rooting_gel.guide"
+          }
+        }
+      ]
+    }
+  ]
+}

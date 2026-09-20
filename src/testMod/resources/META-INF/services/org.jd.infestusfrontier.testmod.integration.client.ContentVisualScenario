@@ -1,2 +1,3 @@
 org.jd.infestusfrontier.testmod.construction.client.ConstructionVisualScenario
 org.jd.infestusfrontier.testmod.ecology.client.EcologyVisualScenario
+org.jd.infestusfrontier.testmod.processing.client.BowlVisualScenario
