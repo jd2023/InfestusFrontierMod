@@ -35,7 +35,11 @@ final class CultureConversion {
         Direction face = context.getClickedFace();
         ItemStack culture = context.getItemInHand();
         Player player = context.getPlayer();
-        if (player == null || culture.isEmpty() || !eligible(level.getBlockState(pos)) || !visible(level, pos, face)) {
+        if (player == null || culture.isEmpty()) return InteractionResult.FAIL;
+        var target = level.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4);
+        if (target == null) return InteractionResult.FAIL;
+        BlockState original = target.getBlockState(pos);
+        if (!eligible(original) || !visible(level, pos, face)) {
             return InteractionResult.FAIL;
         }
         if (level.isClientSide) return InteractionResult.SUCCESS;
@@ -49,7 +53,6 @@ final class CultureConversion {
             return InteractionResult.FAIL;
         }
 
-        BlockState original = level.getBlockState(pos);
         BlockState replacement = substrate.get().defaultBlockState();
         int flags = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
         if (!level.setBlock(pos, replacement, flags, 0)) return InteractionResult.FAIL;
@@ -61,17 +64,15 @@ final class CultureConversion {
         return InteractionResult.CONSUME;
     }
 
-    private static boolean eligible(BlockState state) {
-        return state.is(EcologyTags.CULTURE_ELIGIBLE);
+    private boolean eligible(BlockState state) {
+        return !state.is(substrate.get()) && state.is(EcologyTags.CULTURE_ELIGIBLE);
     }
 
     private static boolean visible(Level level, BlockPos pos, Direction face) {
         BlockPos neighborPos = pos.relative(face);
-        if (level instanceof ServerLevel serverLevel
-                && serverLevel.getChunkSource().getChunkNow(neighborPos.getX() >> 4, neighborPos.getZ() >> 4) == null) {
-            return false;
-        }
-        BlockState neighbor = level.getBlockState(neighborPos);
+        var neighborChunk = level.getChunkSource().getChunkNow(neighborPos.getX() >> 4, neighborPos.getZ() >> 4);
+        if (neighborChunk == null) return false;
+        BlockState neighbor = neighborChunk.getBlockState(neighborPos);
         return !neighbor.isFaceSturdy(level, neighborPos, face.getOpposite(), SupportType.FULL);
     }
 }

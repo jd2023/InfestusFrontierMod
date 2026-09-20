@@ -126,6 +126,29 @@ failure stops freight admission with cargo retained. No timeout invents success.
 Test process termination at every commit boundary, truncated final records,
 duplicate acknowledgments, slow-disk back-pressure and snapshot replacement.
 
+## Substrate adapter
+
+Ecology owns immutable `LivingCell` transitions and the Minecraft block, conversion,
+appearance and ownership adapters. Construction injects culture use through its
+`CultureUse` port; it does not implement substrate rules. Native growth receives
+an environment resolved by the server adapter. The current playable registration
+is ordinary substrate; later native content must supply its actual environment.
+
+One culture use probes only the selected FULL chunk and the clicked face's adjacent
+FULL chunk, both without loading. One server-wide quota admits 16 conversions/tick.
+Replacement sends client state without recursive neighbor notifications. Static
+cells have no ticker or block entity; finite stage/pigment block states and seeded
+weighted models carry appearance. Vanilla soil tag membership supports vegetation;
+already-living cells explicitly refuse culture conversion.
+
+Ownership uses a schema-1 per-dimension `SavedData` map capped at 65,536 cells.
+Validate the schema, list bound and every position/UUID before accepting the map.
+Unsupported or malformed records yield a non-dirty rejected state that refuses
+claims and mutations, logs the reason once and never rewrites the original file.
+Do not throw from the deserializer: Minecraft catches exceptions and may create
+empty replacement data. Tests exercise the real storage loader and serialized
+round trips, alongside conversion, vegetation updates and shared-quota GameTests.
+
 ## Bud construction adapter
 
 Construction owns the startup-only `BudRecipeRegistrar` and the deterministic

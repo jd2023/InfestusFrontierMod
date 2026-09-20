@@ -30,7 +30,8 @@ public record LivingCell(
 
     public MutationResult mutate(Treatment treatment) {
         Objects.requireNonNull(treatment, "treatment");
-        if (treatment instanceof Treatment.Grow) {
+        if (treatment instanceof Treatment.Grow growth) {
+            if (host != Host.ORDINARY && host != growth.environment()) return refused(MutationStatus.INCOMPATIBLE);
             return switch (maturity) {
                 case BASIC -> applied(new LivingCell(Maturity.YOUNG, host, function, framework, lining, pigment, owner));
                 case YOUNG -> applied(new LivingCell(Maturity.MATURE, host, function, framework, lining, pigment, owner));
@@ -69,7 +70,8 @@ public record LivingCell(
             if (function != Function.PLAIN || !compatible(requested, function, lining)) {
                 return refused(MutationStatus.INCOMPATIBLE);
             }
-            return applied(new LivingCell(maturity, requested, function, framework, lining, pigment, owner));
+            Maturity nextMaturity = requested == Host.ORDINARY ? maturity : Maturity.YOUNG;
+            return applied(new LivingCell(nextMaturity, requested, function, framework, lining, pigment, owner));
         }
         throw new IllegalArgumentException("Unknown treatment " + treatment.getClass().getName());
     }
@@ -146,7 +148,16 @@ public record LivingCell(
     }
 
     public sealed interface Treatment {
-        record Grow() implements Treatment {}
+        /** Environment is resolved by the server adapter, never supplied by a client intent. */
+        record Grow(Host environment) implements Treatment {
+            public Grow {
+                Objects.requireNonNull(environment, "environment");
+            }
+
+            public Grow() {
+                this(Host.ORDINARY);
+            }
+        }
         record SetHost(Host host) implements Treatment {}
         record SetFunction(Function function) implements Treatment {}
         record SetFramework(Framework framework) implements Treatment {}

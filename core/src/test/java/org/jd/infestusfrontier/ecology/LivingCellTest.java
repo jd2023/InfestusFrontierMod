@@ -72,6 +72,7 @@ final class LivingCellTest {
     void incompatibleNativeHostMutationPreservesEveryProperty() {
         LivingCell anchored = matureCell()
                 .mutate(new Treatment.SetHost(Host.ANCHORED)).cell()
+                .mutate(new Treatment.Grow(Host.ANCHORED)).cell()
                 .mutate(new Treatment.SetLining(Lining.SPATIAL_WEAVE)).cell()
                 .mutate(new Treatment.SetPigment(Pigment.PURPLE)).cell();
 
@@ -79,6 +80,37 @@ final class LivingCellTest {
 
         assertEquals(MutationStatus.INCOMPATIBLE, result.status());
         assertEquals(anchored, result.cell());
+    }
+
+    @Test
+    void changingNativeHostRequiresLocalMaturationAndPreservesIndependentAnatomy() {
+        for (Host host : new Host[] {Host.THERMAL, Host.ANCHORED}) {
+            LivingCell original = matureCell()
+                    .mutate(new Treatment.SetFramework(Framework.BONE_RIBBED)).cell()
+                    .mutate(new Treatment.SetLining(Lining.SEALED_MEMBRANE)).cell()
+                    .mutate(new Treatment.SetPigment(Pigment.CYAN)).cell();
+            var mutation = original.mutate(new Treatment.SetHost(host));
+            assertTrue(mutation.applied());
+            LivingCell pending = mutation.cell();
+            assertEquals(Maturity.YOUNG, pending.maturity());
+            assertEquals(host, pending.host());
+            assertEquals(original.framework(), pending.framework());
+            assertEquals(original.lining(), pending.lining());
+            assertEquals(original.pigment(), pending.pigment());
+            assertEquals(original.owner(), pending.owner());
+            assertEquals(MutationStatus.REQUIRES_MATURE,
+                    pending.mutate(new Treatment.SetFunction(Function.LUMEN)).status());
+            var importedGrowth = pending.mutate(new Treatment.Grow());
+            assertEquals(MutationStatus.INCOMPATIBLE, importedGrowth.status());
+            assertEquals(pending, importedGrowth.cell());
+            Host wrongNative = host == Host.THERMAL ? Host.ANCHORED : Host.THERMAL;
+            assertEquals(pending, pending.mutate(new Treatment.Grow(wrongNative)).cell());
+            var localGrowth = pending.mutate(new Treatment.Grow(host));
+            assertTrue(localGrowth.applied());
+            assertEquals(new LivingCell(Maturity.MATURE, host, Function.PLAIN,
+                    original.framework(), original.lining(), original.pigment(), OWNER), localGrowth.cell());
+            assertTrue(localGrowth.cell().mutate(new Treatment.SetFunction(Function.LUMEN)).applied());
+        }
     }
 
     private static LivingCell matureCell() {

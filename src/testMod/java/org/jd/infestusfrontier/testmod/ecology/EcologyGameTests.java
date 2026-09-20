@@ -41,6 +41,9 @@ public final class EcologyGameTests {
                 "Culture must replace only the selected ground cell");
         helper.assertTrue(player.getMainHandItem().getCount() == 1,
                 "One successful conversion must spend exactly one Culture");
+        helper.assertTrue(!useHeldOn(player, pos, Direction.UP).consumesAction()
+                        && player.getMainHandItem().getCount() == 1,
+                "Soil tag membership must not allow culture to convert living substrate again");
         ContentAssertion.passGameTest(helper, "infestusfrontier_tests:ecology.living_substrate.obtain");
     }
 
@@ -90,6 +93,13 @@ public final class EcologyGameTests {
         helper.assertTrue(helper.getLevel().getBlockState(soil.above()).is(Blocks.SHORT_GRASS),
                 "Conversion must not break or consume supported grass");
 
+        helper.getLevel().setBlockAndUpdate(soil.above().north(), Blocks.STONE.defaultBlockState());
+        helper.assertTrue(helper.getLevel().getBlockState(soil.above()).is(Blocks.SHORT_GRASS),
+                "Living cover must survive an actual neighboring block update after conversion");
+        helper.assertTrue(Blocks.SHORT_GRASS.defaultBlockState().canSurvive(helper.getLevel(), soil.above())
+                        && Blocks.OAK_SAPLING.defaultBlockState().canSurvive(helper.getLevel(), soil.above()),
+                "Converted ground must remain valid soil for grass and saplings");
+
         BlockPos tree = soil.east(2);
         helper.getLevel().setBlockAndUpdate(tree, Blocks.OAK_LOG.defaultBlockState());
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE)));
@@ -135,6 +145,12 @@ public final class EcologyGameTests {
         helper.assertTrue(!stillDenied.consumesAction() && other.getMainHandItem().getCount() == 1
                         && helper.getLevel().getBlockState(pos).toString().contains("pigment=cyan"),
                 "Ownership must remain unchanged through growth and pigment mutation");
+
+        other.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE)));
+        helper.assertTrue(!useHeldOn(other, pos, Direction.UP).consumesAction()
+                        && other.getMainHandItem().getCount() == 1
+                        && helper.getLevel().getBlockState(pos).toString().equals(state),
+                "Culture must not reset a grown cell's maturity, pigment or ownership through its soil tag");
 
         var drops = Block.getDrops(helper.getLevel().getBlockState(pos), helper.getLevel(), pos, null, owner, ItemStack.EMPTY);
         helper.assertTrue(drops.size() == 1 && drops.getFirst().getItem() instanceof BlockItem,
@@ -188,6 +204,52 @@ public final class EcologyGameTests {
                     "A quota refusal must preserve the seventeenth Culture payment");
             helper.succeed();
         });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void unloadedTargetRefusesWithoutLoadingOrSpending(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var source = level.getChunkSource();
+        BlockPos origin = helper.absolutePos(BlockPos.ZERO);
+        BlockPos target = new BlockPos(origin.getX() + 8192, -61, origin.getZ());
+        int chunkX = target.getX() >> 4;
+        int chunkZ = target.getZ() >> 4;
+        helper.assertTrue(source.getChunkNow(chunkX, chunkZ) == null, "Target fixture must be unloaded");
+        int loadedBefore = source.getLoadedChunksCount();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE), 2));
+        var result = useHeldOn(player, target, Direction.UP);
+        helper.assertTrue(source.getChunkNow(chunkX, chunkZ) == null
+                        && source.getLoadedChunksCount() == loadedBefore,
+                "Culture must not load its target chunk, even before eligibility checks");
+        helper.assertTrue(!result.consumesAction() && player.getMainHandItem().getCount() == 2,
+                "An unloaded target must refuse without payment");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void unloadedClickedFaceNeighborRefusesWithoutLoadingOrSpending(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var source = level.getChunkSource();
+        BlockPos origin = helper.absolutePos(BlockPos.ZERO);
+        int chunkX = (origin.getX() >> 4) + 256;
+        int chunkZ = origin.getZ() >> 4;
+        level.getChunk(chunkX, chunkZ);
+        BlockPos target = new BlockPos(chunkX * 16 + 15, origin.getY(), chunkZ * 16 + 8);
+        level.setBlock(target, Blocks.DIRT.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+        helper.assertTrue(source.getChunkNow(chunkX + 1, chunkZ) == null,
+                "Clicked east face fixture must have an unloaded adjacent chunk");
+        int loadedBefore = source.getLoadedChunksCount();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE), 2));
+        var result = useHeldOn(player, target, Direction.EAST);
+        helper.assertTrue(source.getChunkNow(chunkX + 1, chunkZ) == null
+                        && source.getLoadedChunksCount() == loadedBefore,
+                "Visibility checks must not load the adjacent chunk");
+        helper.assertTrue(!result.consumesAction() && player.getMainHandItem().getCount() == 2
+                        && level.getBlockState(target).is(Blocks.DIRT),
+                "Unavailable clicked face must preserve target and payment");
+        helper.succeed();
     }
 
     private static net.minecraft.world.InteractionResult useHeldOn(

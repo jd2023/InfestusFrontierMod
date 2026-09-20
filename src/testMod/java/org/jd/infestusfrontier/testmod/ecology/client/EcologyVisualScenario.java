@@ -25,13 +25,23 @@ public final class EcologyVisualScenario implements ContentVisualScenario {
             texturesChecked = true;
         }
         if (minecraft.level == null) return false;
-        boolean ready = stage(minecraft, new BlockPos(-4, -60, 4), "stage=basic")
-                && stage(minecraft, new BlockPos(-3, -60, 4), "stage=young")
-                && stage(minecraft, new BlockPos(-2, -60, 4), "stage=mature")
-                && stage(minecraft, new BlockPos(3, -59, 5), "pigment=cyan")
-                && stage(minecraft, new BlockPos(3, -58, 5), "stage=mature")
-                && stage(minecraft, new BlockPos(1, -57, 4), "stage=mature")
-                && stage(minecraft, new BlockPos(2, -57, 4), "stage=mature");
+        boolean ready = true;
+        String[] stages = {"basic", "young", "mature"};
+        for (int index = 0; index < stages.length; index++) {
+            String property = "stage=" + stages[index];
+            for (int offset = 0; offset < 3; offset++) {
+                ready &= stage(minecraft, new BlockPos(-4 + index, -61, 5 + offset), property);
+            }
+            for (int offset = 0; offset < 2; offset++) {
+                ready &= stage(minecraft, new BlockPos(2 + index, -60 + offset, 7), property);
+            }
+            for (int offset = 0; offset < 6; offset++) {
+                BlockPos underside = new BlockPos(-1 + index, -57, 8 + offset);
+                ready &= stage(minecraft, underside, property) && stage(minecraft, underside, "pigment=white");
+            }
+        }
+        ready &= stage(minecraft, new BlockPos(5, -60, 7), "pigment=cyan")
+                && stage(minecraft, new BlockPos(5, -59, 7), "pigment=cyan");
         settledTicks = ready ? Math.min(6, settledTicks + 1) : 0;
         return settledTicks == 6;
     }

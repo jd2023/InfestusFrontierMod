@@ -97,7 +97,7 @@ Native mutation changes the **kind of living bed**, not its reinforcement grade.
 | **Anchored Substrate** | Anchor Seed, followed by local conditioning in the End. | Spatial Nursery, Spatial Conditioner, Chorus Orchard and End DNA-processing foundations. |
 | **Adaptive Substrate** — long-term | Adaptive Seed grafted into local root-bearing ground in the Fold, followed by local phase exposure. | Founder Nursery and phase-dependent native habitats. This branch starts from the local ground, not from an imported ordinary bed. |
 
-Changing family preserves installed reinforcement only if compatible; the preview identifies any lining that must be replaced. The new native bed needs local maturation before native production starts. Removing and placing it elsewhere preserves the block, but cannot transplant the dimension's growing conditions.
+Changing family preserves installed reinforcement only if compatible; the preview identifies any lining that must be replaced. The new native bed starts young and needs local feeding or conditioning to mature before native production starts. Ordinary bone meal outside that bed’s native environment cannot complete this step. Removing and placing it elsewhere preserves the block, but cannot transplant the dimension's growing conditions.
 
 Ordinary veins and service surfaces may use a native bed where their recipe and environment permit. That does not make ordinary crops grow in lava or allow an Anchored Substrate block to operate a Thermal Nursery.
 
