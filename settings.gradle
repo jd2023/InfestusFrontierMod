@@ -7,3 +7,4 @@ pluginManagement {
 
 rootProject.name = 'InfestusFrontier'
 include 'core'
+include 'ui'

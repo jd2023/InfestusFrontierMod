@@ -3,6 +3,6 @@
   "entry": "infestusfrontier:processing/culture_bowl",
   "title": "Culture Bowl",
   "obtain": "Craft a flower pot, Spore Culture and wheat seed into one Bowl; place it on Living Substrate.",
-  "use": "Use a stick to cycle recipes. Insert ingredients one at a time and water by bucket. Use an empty hand to start; sneak-use an empty hand to collect, or a stick to cancel. Sneak-use a clock for earned incubation growth, a glass bottle for water economy. Break and replace to move the one saved core.",
+  "use": "Use a Synaptic Probe to select, start or cancel a recipe and collect retained slots. Insert ingredients one at a time and water by bucket. Direct stick and empty-hand controls remain available. Sneak-use a clock for earned incubation growth, or a glass bottle for water economy. Break and replace to move the one saved core and owner.",
   "assertion": "infestusfrontier_client:processing.culture_bowl.guide"
 }

@@ -110,7 +110,8 @@ one server-identity `SharedRecipeCompletionAdmission` (16 completions/tick); exc
 completed work retains its reservation until admitted. There is no pending queue.
 One transition scans at most nine slots, one tank and one reservation. Marking the
 owning chunk dirty avoids comparator neighbor callbacks. Only start/finish/cancel
-change the client block state; there are no custom packets, automatic exports,
+change the client block state. The Probe menu is the sole custom-packet path: it
+sends bounded intents and immutable changed snapshots, never automatic exports,
 particles, renderers or ambient scans. Bowl geometry has at most 13 cuboids; the
 four item silhouettes reuse the production substrate texture with finite tints.
 
@@ -119,6 +120,31 @@ transfer locking and shared admission. GameTests cover actual recipes/registrati
 hand loading/collection, tick completion, save/reload, recovery, corrupt saves and
 cross-dimension contention. The connected client fixture observes the Bowl models
 and all four collected material icons in a disposable server scene.
+
+## Probe and organ-menu adapter
+
+Interaction owns the reusable Synaptic Probe item, server-observed target selection,
+reach and owner checks. A first Probe use claims an unowned legacy/test Bowl; its owner
+persists with the single recovered core. Other players may inspect an open snapshot but
+their intents refuse unchanged. The Probe never requests a chunk ticket and one use
+examines only the selected loaded block entity. Unsupported held-item interactions pass
+through to normal item placement, so building beside an organ is not intercepted.
+
+Processing owns the Culture Bowl menu target and every recipe transition. The client
+screen composes the internal `ui` module's fixed logical layout, accessible palette and
+focus order. It observes an immutable snapshot and sends only start, cancel or slot-
+collection intents; it does not edit balances, recipes or progress. A snapshot contains
+the Bowl revision, exactly nine bounded slots, water amount/capacity, work state and
+progress, completed count, selected recipe and latest refusal code. Its codec is bounded
+below 4 KiB before allocation.
+
+Vanilla permits one open menu per player. Each menu admits at most four intents in any
+20-tick window, and one server-identity quota admits at most 64 intents/tick across
+dimensions; refused excess is not queued. Every intent revalidates menu ID, exact target,
+loaded state, dimension, reach, owner, revision and slot/recipe shape on the server.
+Open menus compare snapshots each player tick but send only changes, at most once per
+10 ticks per viewer. Idle menus send nothing. Reopening always receives one current
+snapshot in the bounded menu-open payload.
 
 ## Freight persistence protocol
 

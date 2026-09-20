@@ -149,7 +149,9 @@ public final class BowlGameTests {
         var hit = new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false);
         drops.getFirst().getItem().useOn(new UseOnContext(player, InteractionHand.MAIN_HAND, hit));
         helper.assertTrue(player.getMainHandItem().isEmpty(), "Recovery placement consumes the one core");
-        helper.assertTrue(capped.equals(data(helper, pos)), "Dismantling retains exactly one history and choices");
+        helper.assertTrue(capped.getCompound("bowl").equals(data(helper, pos).getCompound("bowl"))
+                        && data(helper, pos).hasUUID("owner"),
+                "Dismantling retains exactly one history and claims an unowned legacy core");
         var invalid = data(helper, pos); invalid.getCompound("bowl").putInt("schema", 99);
         helper.getLevel().getBlockEntity(pos).loadWithComponents(invalid, helper.getLevel().registryAccess());
         use(helper, pos, player, stack("wheat_seeds", 1), false);

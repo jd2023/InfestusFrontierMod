@@ -37,6 +37,8 @@ public final class BootstrapClient {
 
     private List<ContentVisualScenario.View> detailViews = List.of();
     private int detailIndex;
+    private List<UiCapture> uiCaptures = List.of();
+    private int uiIndex;
 
     public BootstrapClient() {
         NeoForge.EVENT_BUS.addListener(this::tick);
@@ -59,15 +61,18 @@ public final class BootstrapClient {
                 case WORLD_SETUP -> {
                     if (visuals.stream().allMatch(scene -> scene.ready(minecraft))) {
                         detailViews = visuals.stream().flatMap(scene -> scene.detailViews().stream()).toList();
-                        if (detailViews.size() > 16 || detailViews.stream().map(ContentVisualScenario.View::filename)
-                                .distinct().count() != detailViews.size()) {
+                        uiCaptures = visuals.stream().flatMap(scene -> scene.uiViews().stream()
+                                .map(view -> new UiCapture(scene, view))).toList();
+                        var names = java.util.stream.Stream.concat(detailViews.stream().map(ContentVisualScenario.View::filename),
+                                uiCaptures.stream().map(capture -> capture.view().filename())).toList();
+                        if (names.size() > 16 || names.stream().distinct().count() != names.size()) {
                             throw new IllegalStateException("Excessive or duplicate detail captures");
                         }
                         stage = Stage.WORLD_RENDER;
                     }
                 }
                 case DETAILS -> {
-                    if (detailIndex == detailViews.size()) stage = Stage.GUIDES;
+                    if (detailIndex == detailViews.size()) stage = Stage.UI_SETUP;
                     else {
                         var view = detailViews.get(detailIndex);
                         minecraft.player.setYRot(view.yaw());
@@ -77,13 +82,14 @@ public final class BootstrapClient {
                         stage = Stage.DETAIL_RENDER;
                     }
                 }
+                case UI_SETUP -> prepareUi(minecraft);
                 case GUIDES -> {
                     if (guideScenarios == null) guideScenarios = new GuideScenarios();
                     if (guideScenarios.tick(minecraft)) stage = Stage.DISCONNECT;
                 }
                 case DISCONNECT -> disconnect(minecraft);
                 case STOP -> stop(minecraft);
-                case TITLE, WAIT, WORLD_RENDER, DETAIL_RENDER, DONE -> { }
+                case TITLE, WAIT, WORLD_RENDER, DETAIL_RENDER, UI_RENDER, DONE -> { }
             }
         } catch (Exception exception) {
             LOGGER.error("INFESTUS_CLIENT_FAILURE stage={}", stage, exception);
@@ -175,6 +181,15 @@ public final class BootstrapClient {
                     stage = Stage.DETAILS;
                 });
             }
+            if (stage == Stage.UI_RENDER && minecraft.screen != null) {
+                var capture = uiCaptures.get(uiIndex);
+                LOGGER.info("INFESTUS_CLIENT_UI_RENDERED name={} scale={}", capture.view().filename(), capture.view().guiScale());
+                stage = Stage.WAIT;
+                grab(minecraft, capture.view().filename(), () -> {
+                    uiIndex++;
+                    stage = Stage.UI_SETUP;
+                });
+            }
         } catch (Exception exception) {
             LOGGER.error("INFESTUS_CLIENT_FAILURE render", exception);
             stage = Stage.DONE;
@@ -187,6 +202,22 @@ public final class BootstrapClient {
         minecraft.disconnect(new TitleScreen());
         LOGGER.info("INFESTUS_CLIENT_PLAY_EXIT");
         stage = Stage.STOP;
+    }
+
+    private void prepareUi(Minecraft minecraft) {
+        if (uiIndex == uiCaptures.size()) {
+            if (minecraft.screen != null) minecraft.setScreen(null);
+            minecraft.resizeDisplay();
+            stage = Stage.GUIDES;
+            return;
+        }
+        var capture = uiCaptures.get(uiIndex);
+        if (minecraft.getWindow().getGuiScale() != capture.view().guiScale()) {
+            minecraft.getWindow().setGuiScale(capture.view().guiScale());
+            if (minecraft.screen != null) minecraft.screen.resize(minecraft,
+                    minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
+        }
+        if (capture.scenario().prepareUi(minecraft, capture.view())) stage = Stage.UI_RENDER;
     }
 
     private void stop(Minecraft minecraft) {
@@ -209,5 +240,6 @@ public final class BootstrapClient {
         });
     }
 
-    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_SETUP, WORLD_RENDER, DETAILS, DETAIL_RENDER, GUIDES, DISCONNECT, STOP, DONE }
+    private record UiCapture(ContentVisualScenario scenario, ContentVisualScenario.UiView view) {}
+    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_SETUP, WORLD_RENDER, DETAILS, DETAIL_RENDER, UI_SETUP, UI_RENDER, GUIDES, DISCONNECT, STOP, DONE }
 }
