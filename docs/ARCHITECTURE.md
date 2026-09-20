@@ -348,19 +348,36 @@ slabs, cornering stairs and multi-face coverings, Rib Frames and Membrane Window
 have no block entity or ticker; window connection properties own
 only visible joins and the thin pane model supplies both faces. The Seed Pouch is
 the single stateful shell part: it admits at most four registry item types and one
-stack per type, retains one item for planting during ordinary withdrawal and has
-no ticker. Explicit player recovery may take that reserve. Removal emits at most
-four bounded stacks, once, from the pouch's sole authoritative store.
+stack per type, retains the player-selected per-type planting reserve during
+ordinary withdrawal and has no ticker. Explicit player recovery may take that
+reserve. Unsupported or malformed saves refuse transfers, retain their original
+payload, and travel in one recovered block item when dismantled; valid records
+are restored atomically, never partially. Valid removal emits at most four
+bounded stacks, once, from the pouch's sole authoritative store.
 
 `Structure.inspect(origin, ruleId, budget)` evaluates a registered ordered list of
 relative cells, never neighboring connectivity. Rules contain 1..4,096 unique
 positions and at most one expected core. A request continuation stores only its
-origin, rule, cursor and counters; it retains no world reference or cell cache.
+origin, rule, cursor, revision and counters; it retains no world reference or cell cache.
+The server-thread loaded view supplies a monotonic revision invalidated by state,
+core-identity and loaded-status changes. A changed revision invalidates both
+continuations and cached terminal results and returns `Deferred(WORLD_CHANGED)`;
+the next call restarts the bounded plan. A conservative world-wide revision is
+valid; no position subscriptions, per-cell cache or change queue is required.
 One call reads at most 64 loaded cells and all requests share a 256-cell server-tick
 `TickQuota`. The loaded predicate runs before every state read. Missing chunks,
 call exhaustion and shared exhaustion return `Deferred`; mismatches return
 `Invalid`, and a complete matching plan returns `Valid`. Passive parts cannot carry
 a core identity, so sharing or removing a wall cannot create a second core.
+
+Window panels use an original 32×32 periodic translucent pixel material, with
+explicit double-sided half-panels and border segments omitted at horizontal and
+vertical joins. Their worst case is 13 six-face boxes per cell; straight joined
+interiors use two half-panels. Rib Frames use an original 32×32 calcium-grain pixel
+material and nine stepped arch segments (54 quads), with matching static collision
+shapes for all three axes. These textures and models were authored for this
+repository using periodic functions and explicit geometry; no prototype or third-party
+image pixels were copied. They have no custom renderer, animation or ticker.
 
 ## Integration bootstrap harness
 
@@ -430,13 +447,15 @@ Bootstrap uses seed 11, a default superflat disposable Overworld and a camera at
 yaw 0, pitch 15 for the world image. Owner `visual-setup.json` fixtures may prepare
 the disposable player's inventory and scene through server console commands after
 join. Each names an active GameTest assertion and at most 16 single-line commands
-of 256 characters; all active fixtures together admit at most 64 commands. The
+of 256 characters; all active fixtures together admit at most 72 commands. The
 client's development-only `ContentVisualScenario` providers wait for the resulting
 world/inventory packets before rendering/capture, under the existing capture
-deadline. Owners may additionally declare up to 24 unique detail capture names
+deadline. Owners may additionally declare up to 28 unique detail capture names
 across all active fixtures. Client contributors supply matching bounded camera
 angles; the shared capture adapter renders and saves these after the unchanged
-overview, within the existing disconnect deadline. Each required image must be a
+overview, within the existing disconnect deadline. A reverse-view contributor
+may temporarily install one unregistered client camera entity and must restore
+the original camera through `finishView`; it never moves the actual player. Each required image must be a
 fresh 1280x720 PNG under the same 4 MiB/digest checks; missing detail captures fail
 acceptance. The setup never modifies an ordinary world or fabricates client state.
 Bind the server to loopback on an allocated port, allow only the fixture identities, and disable online-account
@@ -455,7 +474,7 @@ progress within the 10-tick snapshot cadence. Missing/mismatched observations,
 identity, mod lists, clean disconnect or process cleanup fail acceptance.
 When discovery is active, a fresh Survival phase before scene setup supplies ordinary starter
 materials from its owner-local `survival-setup.json` (the same schema and combined
-64-command ceiling as visual setup) and uses actual inventory clicks and block-use packets to craft Culture,
+72-command ceiling as visual setup) and uses actual inventory clicks and block-use packets to craft Culture,
 convert ground, craft/place a Bowl, renew Culture and recraft a lost book. It observes
 synchronized prerequisites and advancements, and exercises a rebound guide key.
 This phase admits 100 seconds (including the 60-second base batch) within the same

@@ -12,25 +12,34 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 /** Connected pane whose straight interior cells omit the center rib. */
 final class MembraneWindowBlock extends IronBarsBlock {
+    static final BooleanProperty UP = BooleanProperty.create("up");
+    static final BooleanProperty DOWN = BooleanProperty.create("down");
     static final BooleanProperty POST = BooleanProperty.create("post");
 
     MembraneWindowBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(POST, true));
+        registerDefaultState(defaultBlockState().setValue(POST, true).setValue(UP, false).setValue(DOWN, false));
     }
 
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(POST);
+        builder.add(POST, UP, DOWN);
     }
 
     @Override public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return withPost(super.getStateForPlacement(context));
+        var level = context.getLevel();
+        var pos = context.getClickedPos();
+        return withPost(super.getStateForPlacement(context))
+                .setValue(UP, level.hasChunkAt(pos.above()) && level.getBlockState(pos.above()).is(this))
+                .setValue(DOWN, level.hasChunkAt(pos.below()) && level.getBlockState(pos.below()).is(this));
     }
 
     @Override protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbor,
             LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        return withPost(super.updateShape(state, direction, neighbor, level, pos, neighborPos));
+        var updated = withPost(super.updateShape(state, direction, neighbor, level, pos, neighborPos));
+        if (direction == Direction.UP) updated = updated.setValue(UP, neighbor.is(this));
+        if (direction == Direction.DOWN) updated = updated.setValue(DOWN, neighbor.is(this));
+        return updated;
     }
 
     private static BlockState withPost(BlockState state) {

@@ -1,6 +1,6 @@
 {
   "category":"infestusfrontier:contact", "name":"book.infestusfrontier.entry.membrane_window.name",
   "description":"book.infestusfrontier.entry.membrane_window.description", "icon":"infestusfrontier:construction/membrane_window",
-  "x":6, "y":5, "parents":[{"entry":"infestusfrontier:construction/organ_bud"}],
+  "x":6, "y":4, "parents":[{"entry":"infestusfrontier:construction/organ_bud"}],
   "pages":[{"type":"modonomicon:crafting_recipe", "recipe_id_1":"infestusfrontier:construction/membrane_window", "text":"book.infestusfrontier.entry.membrane_window.page.text"}]
 }

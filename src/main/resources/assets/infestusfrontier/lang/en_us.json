@@ -9,7 +9,7 @@
   "block.infestusfrontier.construction.membrane_window": "Membrane Window",
   "book.infestusfrontier.entry.seed_pouch.name": "Seed Pouch",
   "book.infestusfrontier.entry.seed_pouch.description": "Keep planting stock in a finite rooted store.",
-  "book.infestusfrontier.entry.seed_pouch.page.text": "Craft the pouch from leather, a Membrane Sheet and Spore Culture. It accepts four seed, sapling, carrot or potato types, up to one stack each. Empty-hand withdrawal keeps one item reserved for replanting; sneak-use explicitly retrieves the reserve.",
+  "book.infestusfrontier.entry.seed_pouch.page.text": "Store four planting-stock types, up to 64 each. Empty hands take surplus; sneak-empty hands recover reserves. Use a stick to raise the per-type reserve, sneak-stick to lower it (0–64; starts at 1).",
   "book.infestusfrontier.entry.living_skin.name": "Living Skin",
   "book.infestusfrontier.entry.living_skin.description": "Passive biological enclosure material.",
   "book.infestusfrontier.entry.living_skin.page.text": "One Membrane Sheet, dirt and Spore Culture yield four full skin blocks. Cut them into volume-conserving slabs, cornering stairs or thin multi-face coverings. Every shape is passive: it encloses rooms but produces no biomass and carries no machine state.",
@@ -171,7 +171,7 @@
   "book.infestusfrontier.entry.living_substrate.page.text": "Apply one Spore Culture to the visible face of eligible dirt or host stone. Only that selected loaded cell changes; no autonomous spread or chunk loading occurs. Bone meal grows your cell from basic to young, then mature.",
   "book.infestusfrontier.entry.organ_bud.name": "Organ Bud",
   "book.infestusfrontier.entry.organ_bud.description": "A placeable precursor for living organs.",
-  "book.infestusfrontier.entry.organ_bud.page.text": "Craft a Bud using the recipe above, or grow it in a rooted Bowl using the next page. Plant it for registered organ construction.",
+  "book.infestusfrontier.entry.organ_bud.page.text": "Craft a Bud, or grow one in a rooted Bowl. Plant on Living Substrate. To grow a Loom, hold a bone and carry two bones plus two sticks; one use pays both and replaces the Bud.",
   "book.infestusfrontier.entry.culture_bowl.name": "Culture Bowl",
   "book.infestusfrontier.entry.culture_bowl.description": "Run one reserved starter preparation at a time.",
   "book.infestusfrontier.entry.culture_bowl.craft.text": "Craft the Bowl using the recipe above. Place it only on Living Substrate.",
@@ -246,5 +246,7 @@
   "book.infestusfrontier.entry.skeletal_graft.page.text": "Load a Bone Plate and Fusion Binder into the Loom with biomass. The Plate becomes the graft and is not duplicated.",
   "book.infestusfrontier.recipe.biomass": "Biomass: %s BU",
   "jei.infestusfrontier.membrane_rack": "Membrane Rack",
-  "jei.infestusfrontier.bone_loom": "Bone Loom"
+  "jei.infestusfrontier.bone_loom": "Bone Loom",
+  "message.infestusfrontier.seed_pouch.reserve": "Planting reserve: %s per type (stick: +1; sneak-stick: -1)",
+  "message.infestusfrontier.seed_pouch.invalid_save": "Pouch data is unsupported or damaged. Transfers paused; dismantle to preserve the original data."
 }

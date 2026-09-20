@@ -1,1 +1,1 @@
-{ "parent":"minecraft:item/generated", "textures":{"layer0":"infestusfrontier:block/ecology/living_substrate_mature_0"} }
+{ "parent": "infestusfrontier:block/construction/living_skin_covering" }

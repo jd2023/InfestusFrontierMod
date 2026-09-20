@@ -57,7 +57,7 @@ class VisualSetupTest(unittest.TestCase):
                              harness._visual_setup(root, {"gameTest": ["guide.use"]}, "survival-setup.json"))
             with self.assertRaisesRegex(harness.HarnessFailure, "combined setup"):
                 harness._client_lifecycle(None, None, None, None, None, root, None,
-                                         setup_commands=["say visual"] * 64, discovery_setup=["say survival"])
+                                         setup_commands=["say visual"] * 72, discovery_setup=["say survival"])
 
     def test_owner_detail_captures_are_bounded_and_activation_scoped(self):
         with tempfile.TemporaryDirectory() as raw:
@@ -70,12 +70,12 @@ class VisualSetupTest(unittest.TestCase):
             self.assertEqual([], harness.visual_setup_captures(root, {"gameTest": []}))
             self.assertEqual(["ecology-underside.png"],
                              harness.visual_setup_captures(root, {"gameTest": ["substrate.use"]}))
-            fixture["captures"] = [f"view-{i}.png" for i in range(24)]
+            fixture["captures"] = [f"view-{i}.png" for i in range(28)]
             path.write_text(json.dumps(fixture))
             self.assertEqual(fixture["captures"],
                              harness.visual_setup_captures(root, {"gameTest": ["substrate.use"]}))
             for names in (["../escape.png"], ["bootstrap-world.png"], ["same.png"] * 2,
-                          [f"view-{i}.png" for i in range(25)]):
+                          [f"view-{i}.png" for i in range(29)]):
                 fixture["captures"] = names
                 path.write_text(json.dumps(fixture))
                 with self.assertRaisesRegex(harness.HarnessFailure, "visual setup"):
@@ -88,10 +88,10 @@ class VisualSetupTest(unittest.TestCase):
                 path = root / f"src/testMod/resources/{owner}/visual-setup.json"
                 path.parent.mkdir(parents=True)
                 fixture = {"requires": f"{owner}.use", "commands": ["say fixture"],
-                           "captures": [f"{owner}-{i}.png" for i in range(12)]}
+                           "captures": [f"{owner}-{i}.png" for i in range(14)]}
                 path.write_text(json.dumps(fixture))
             requirements = {"gameTest": ["ecology.use", "processing.use"]}
-            self.assertEqual(24, len(harness.visual_setup_captures(root, requirements)))
+            self.assertEqual(28, len(harness.visual_setup_captures(root, requirements)))
             fixture["captures"].append("processing-extra.png")
             path.write_text(json.dumps(fixture))
             with self.assertRaisesRegex(harness.HarnessFailure, "excessive.*captures"):

@@ -167,6 +167,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Does:** A rooted, accessible store for seeds and planting stock; reserves a chosen amount for replanting before offering surplus to automation.
 - **Input → output:** Seeds, saplings, carrots or potatoes → the same stored items, supplied on request.
 - **Create:** 1 leather + 1 Membrane Sheet + 1 Spore Culture.
+- **Hand controls and bounds:** Each pouch holds four planting-stock types, up to 64 of each. Use a stick to raise the per-type planting reserve by one, or sneak-use a stick to lower it; selection cycles through 0–64 and starts at 1. Empty hands withdraw surplus from the first available type; sneak-empty hands recover a stored type including its reserve. A held building item in either hand passes through. Unsupported or malformed saves pause transfers and preserve the original data in the recovered pouch when dismantled.
 - **Growth:** Add neighboring pouches for more stock types. Contractile Fiber treatment adds named planting filters; it never changes one seed species into another.
 
 ### T0-10 — Living Skin

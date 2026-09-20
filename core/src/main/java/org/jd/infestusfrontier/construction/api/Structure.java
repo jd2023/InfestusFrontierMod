@@ -37,6 +37,12 @@ public final class Structure {
         Rule rule = rules.get(ruleId);
         if (rule == null) return new Invalid(InvalidReason.UNKNOWN_RULE, 0, null);
         budget.bind(origin, ruleId);
+        long revision = view.revision();
+        if (budget.revision != null && budget.revision != revision) {
+            budget.reset(revision);
+            return new Deferred(DeferredReason.WORLD_CHANGED, 0, 0);
+        }
+        budget.revision = revision;
         if (budget.terminal != null) return budget.terminal;
 
         int inspectedThisCall = 0;
@@ -76,9 +82,9 @@ public final class Structure {
     public record Invalid(InvalidReason reason, int inspectedCells, CellPos position) implements Inspection {}
     public record Deferred(DeferredReason reason, int nextCell, int inspectedCells) implements Inspection {}
     public enum InvalidReason { UNKNOWN_RULE, PART_MISMATCH, MULTIPLE_CORES, POSITION_OVERFLOW }
-    public enum DeferredReason { UNLOADED, CALL_BUDGET, SERVER_TICK_BUDGET }
+    public enum DeferredReason { UNLOADED, CALL_BUDGET, SERVER_TICK_BUDGET, WORLD_CHANGED }
 
-    /** Per-request continuation; it contains no world reference or position-indexed cache. */
+    /** Shared admission for all structure inspections belonging to one server. */
     public static final class ServerBudget {
         private final TickQuota quota = new TickQuota(CELLS_PER_SERVER_TICK);
         public Budget request(long serverTick) { return new Budget(quota, serverTick); }
@@ -94,6 +100,13 @@ public final class Structure {
         private int inspected;
         private int cores;
         private Inspection terminal;
+        private Long revision;
+
+        private void reset(long currentRevision) {
+            revision = currentRevision;
+            cursor = inspected = cores = 0;
+            terminal = null;
+        }
 
         private Budget(TickQuota shared, long serverTick) {
             this.shared = Objects.requireNonNull(shared, "shared");
@@ -176,7 +189,13 @@ public final class Structure {
         }
     }
 
+    /**
+     * Server-thread view. Its monotonic revision must change before any relevant cell state,
+     * core identity or loaded status changes. A world-wide revision is conservative and valid.
+     * Calls are synchronous: the view must not mutate during one inspection invocation.
+     */
     public interface LoadedView {
+        long revision();
         boolean isLoaded(CellPos pos);
         Cell read(CellPos pos);
     }

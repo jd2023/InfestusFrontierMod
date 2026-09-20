@@ -3,10 +3,19 @@ package org.jd.infestusfrontier.construction.api;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Finite planting-stock store. One item of each type is retained for replanting. */
+/** Finite planting-stock store. A player-selected reserve applies to each stored type. */
 public final class SeedPouch {
     public static final int TYPE_CAPACITY = 4;
     public static final int COUNT_CAPACITY = 64;
+    private int reserve = 1;
+
+    public int reserve() { return reserve; }
+    public boolean setReserve(int amount) {
+        if (amount < 0 || amount > COUNT_CAPACITY) return false;
+        reserve = amount;
+        return true;
+    }
+
     private final LinkedHashMap<String, Integer> counts = new LinkedHashMap<>();
 
     public InsertResult insert(String resource, int requested) {
@@ -24,8 +33,9 @@ public final class SeedPouch {
     public int takeSurplus(String resource, int requested) {
         if (!valid(resource) || requested < 1) return 0;
         int present = counts.getOrDefault(resource, 0);
-        int taken = Math.min(requested, Math.max(0, present - 1));
-        if (taken > 0) counts.put(resource, present - taken);
+        int taken = Math.min(requested, Math.max(0, present - reserve));
+        if (taken == present) counts.remove(resource);
+        else if (taken > 0) counts.put(resource, present - taken);
         return taken;
     }
 

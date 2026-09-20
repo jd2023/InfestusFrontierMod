@@ -3,7 +3,6 @@ package org.jd.infestusfrontier.construction;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -59,8 +58,8 @@ final class ConstructionContent {
                 BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(0.8F).sound(SoundType.WART_BLOCK)));
         var skinCovering = blocks.register(LIVING_SKIN_COVERING, () -> new LivingSkinCoveringBlock(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_RED).strength(0.2F).sound(SoundType.WART_BLOCK).noOcclusion()));
-        var ribs = blocks.register(RIB_FRAME, () -> new RotatedPillarBlock(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.SAND).strength(1.5F).sound(SoundType.BONE_BLOCK)));
+        var ribs = blocks.register(RIB_FRAME, () -> new RibFrameBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.SAND).strength(1.5F).sound(SoundType.BONE_BLOCK).noOcclusion()));
         var window = blocks.register(MEMBRANE_WINDOW, () -> new MembraneWindowBlock(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_LIGHT_BLUE).strength(0.5F).sound(SoundType.GLASS)
                 .noOcclusion().isViewBlocking((state, level, pos) -> false)));
@@ -86,7 +85,16 @@ final class ConstructionContent {
                 (pos, state) -> new SeedPouchEntity(pos, state, seedPouchEntity), seedPouch.get()).build(null);
     }
 
+    private void allowPouchReserveControl(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+        var level = event.getLevel();
+        if (event.getItemStack().is(net.minecraft.world.item.Items.STICK) && level.hasChunkAt(event.getPos())
+                && level.getBlockState(event.getPos()).is(seedPouch.get())) {
+            event.setUseBlock(net.neoforged.neoforge.common.util.TriState.TRUE);
+        }
+    }
+
     void register(IEventBus modBus) {
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(this::allowPouchReserveControl);
         blocks.register(modBus);
         items.register(modBus);
         entities.register(modBus);

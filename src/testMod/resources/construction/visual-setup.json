@@ -2,13 +2,23 @@
   "requires": "infestusfrontier_tests:construction.organ_bud.obtain",
   "commands": [
     "tp FixturePlayer 0.5 -60 0.5 0 15",
-    "setblock -3 -60 4 infestusfrontier:construction/living_skin",
-    "setblock -2 -60 4 infestusfrontier:construction/rib_frame[axis=y]",
-    "fill -1 -60 4 1 -60 4 infestusfrontier:construction/membrane_window",
-    "setblock 2 -60 4 infestusfrontier:construction/seed_pouch",
-    "setblock 2 -61 4 infestusfrontier:ecology/living_substrate[stage=mature]",
-    "setblock 3 -60 4 infestusfrontier:ecology/living_substrate[stage=mature,function=lumen,framework=bone_ribbed]",
+    "setblock -5 -60 5 infestusfrontier:construction/living_skin",
+    "setblock -3 -60 5 infestusfrontier:construction/rib_frame[axis=y]",
+    "fill -1 -60 5 1 -59 5 infestusfrontier:construction/membrane_window",
+    "setblock 2 -60 5 infestusfrontier:construction/seed_pouch",
+    "setblock 2 -61 5 infestusfrontier:ecology/living_substrate[stage=mature]",
+    "setblock 3 -60 5 infestusfrontier:ecology/living_substrate[stage=mature,function=lumen,framework=bone_ribbed]",
     "item replace entity FixturePlayer weapon.mainhand with infestusfrontier:construction/spore_culture",
-    "item replace entity FixturePlayer weapon.offhand with infestusfrontier:construction/organ_bud"
+    "item replace entity FixturePlayer weapon.offhand with infestusfrontier:construction/organ_bud",
+    "setblock -5 -60 3 infestusfrontier:construction/living_skin_slab",
+    "setblock -4 -60 5 infestusfrontier:construction/living_skin_stairs[facing=west]",
+    "setblock -5 -60 4 infestusfrontier:construction/living_skin_covering[south=true]",
+    "setblock -3 -59 5 infestusfrontier:construction/rib_frame[axis=x]"
+  ],
+  "captures": [
+    "construction-shell-front.png",
+    "construction-shell-back.png",
+    "construction-guide-navigation.png",
+    "construction-pouch-guide.png"
   ]
 }

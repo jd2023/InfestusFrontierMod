@@ -49,11 +49,22 @@ final class SeedPouchBlock extends BaseEntityBlock {
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level,
             BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof SeedPouchEntity pouch)) return ItemInteractionResult.FAIL;
-        if (stack.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (stack.isEmpty()) return player.getOffhandItem().isEmpty()
+                ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                : ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+        if (stack.is(net.minecraft.world.item.Items.STICK)) {
+            if (!level.isClientSide && !refuseRejected(pouch, player)) {
+                pouch.adjustReserve(player.isShiftKeyDown());
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                        "message.infestusfrontier.seed_pouch.reserve", pouch.reserve()), true);
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
         if (!stack.is(ConstructionTags.SEED_STOCK) || !stack.getComponentsPatch().isEmpty()) {
-            return ItemInteractionResult.FAIL;
+            return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         }
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+        if (refuseRejected(pouch, player)) return ItemInteractionResult.FAIL;
         int inserted = pouch.insert(stack);
         if (inserted == 0) return ItemInteractionResult.FAIL;
         stack.consume(inserted, player);
@@ -62,12 +73,33 @@ final class SeedPouchBlock extends BaseEntityBlock {
 
     @Override protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level,
             BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.getOffhandItem().isEmpty()) return net.minecraft.world.InteractionResult.PASS;
         if (!(level.getBlockEntity(pos) instanceof SeedPouchEntity pouch)) return net.minecraft.world.InteractionResult.PASS;
         if (level.isClientSide) return net.minecraft.world.InteractionResult.SUCCESS;
+        if (refuseRejected(pouch, player)) return net.minecraft.world.InteractionResult.FAIL;
         ItemStack taken = pouch.take(player.isShiftKeyDown());
         if (taken.isEmpty()) return net.minecraft.world.InteractionResult.PASS;
         if (!player.addItem(taken)) player.drop(taken, false);
         return net.minecraft.world.InteractionResult.CONSUME;
+    }
+
+    private static boolean refuseRejected(SeedPouchEntity pouch, Player player) {
+        if (!pouch.rejected()) return false;
+        player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                "message.infestusfrontier.seed_pouch.invalid_save"), true);
+        return true;
+    }
+
+    @Override protected java.util.List<ItemStack> getDrops(BlockState state,
+            net.minecraft.world.level.storage.loot.LootParams.Builder params) {
+        if (params.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY)
+                instanceof SeedPouchEntity pouch && pouch.rejected()) {
+            var stack = new ItemStack(this);
+            stack.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA,
+                    net.minecraft.world.item.component.CustomData.of(pouch.saveWithId(params.getLevel().registryAccess())));
+            return java.util.List.of(stack);
+        }
+        return super.getDrops(state, params);
     }
 
     @Override protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState replacement, boolean moved) {

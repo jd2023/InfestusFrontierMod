@@ -22,11 +22,11 @@ public final class InfestusFrontier {
         var discovery = new DiscoveryModule();
         discovery.register();
         var observer = discovery.observer();
-        new org.jd.infestusfrontier.processing.ProcessingModule(observer).register(modBus);
         new InteractionModule(observer).register(modBus);
         var ecology = new EcologyModule(observer);
         ecology.register(modBus);
         var construction = new ConstructionModule(ecology::applyCulture);
+        new org.jd.infestusfrontier.processing.ProcessingModule(observer, construction.budRecipes()).register(modBus);
         new org.jd.infestusfrontier.processing.digestion.DigestionModule(construction.budRecipes(), observer).register(modBus);
         construction.register(modBus);
     }

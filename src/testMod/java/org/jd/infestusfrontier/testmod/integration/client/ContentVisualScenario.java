@@ -15,6 +15,8 @@ public interface ContentVisualScenario {
         return true;
     }
 
+    default void finishView(Minecraft minecraft, View view) {}
+
     default List<UiView> uiViews() {
         return List.of();
     }

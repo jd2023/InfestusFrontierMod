@@ -34,8 +34,11 @@ public final class ProcessingModule {
             () -> IMenuTypeExtension.create((id, inventory, buffer) -> new CultureBowlMenu(id, inventory,
                     buffer.readBlockPos(), org.jd.infestusfrontier.processing.menu.CultureBowlMenuSnapshot.CODEC.decode(buffer))));
 
-    public ProcessingModule(DiscoveryObserver discovery) {
+    public ProcessingModule(DiscoveryObserver discovery, org.jd.infestusfrontier.construction.api.BudRecipeRegistrar construction) {
         this.discovery = discovery;
+        construction.register(new org.jd.infestusfrontier.construction.api.BudConstructionRecipe(
+                "infestusfrontier:bone_loom", "minecraft:bone", "infestusfrontier:processing/bone_loom",
+                java.util.Map.of("minecraft:bone", 2, "minecraft:stick", 2)));
         bowl = blocks.register("processing/culture_bowl", this::createBowl);
         bowlEntity = entities.register("processing/culture_bowl", this::createBowlEntityType);
         membraneRack = blocks.register("processing/membrane_rack", this::createMembraneRack);

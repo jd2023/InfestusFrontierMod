@@ -238,6 +238,192 @@ public final class ConstructionGameTests {
         helper.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void loomBudRoutePaysExactlyOnceAndRefusesIncompletePayment(GameTestHelper helper) {
+        var pos = helper.absolutePos(new BlockPos(1, 1, 1));
+        helper.getLevel().setBlockAndUpdate(pos.below(), block(SUBSTRATE).defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(pos, block(BUD).defaultBlockState());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.getInventory().setItem(1, new ItemStack(Items.STICK));
+        useBlock(helper, pos, player, new ItemStack(Items.BONE, 3));
+        helper.assertTrue(helper.getLevel().getBlockState(pos).is(block(BUD))
+                && player.getMainHandItem().getCount() == 3 && player.getInventory().getItem(1).getCount() == 1,
+                "Incomplete Loom graft must preserve Bud and all inputs");
+        player.getInventory().setItem(1, new ItemStack(Items.STICK, 3));
+        useBlock(helper, pos, player, new ItemStack(Items.BONE, 3));
+        helper.assertTrue(helper.getLevel().getBlockState(pos).is(block(id("processing/bone_loom")))
+                && player.getMainHandItem().getCount() == 1 && player.getInventory().getItem(1).getCount() == 1,
+                "Loom Bud route must consume exactly two bones and two sticks");
+        var entity = helper.getLevel().getBlockEntity(pos);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BONE, 3));
+        player.getInventory().setItem(1, new ItemStack(Items.STICK, 3));
+        var staleResult = block(BUD).defaultBlockState().useItemOn(player.getMainHandItem(), helper.getLevel(),
+                player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false));
+        helper.assertTrue(staleResult == ItemInteractionResult.FAIL && helper.getLevel().getBlockEntity(pos) == entity
+                && player.getMainHandItem().getCount() == 3 && player.getInventory().getItem(1).getCount() == 3,
+                "A repeated stale Bud trigger with sufficient stock must not replace the core or spend twice");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void pouchRejectsCorruptSavesWithoutDestroyingRecoveryData(GameTestHelper helper) {
+        var pos = helper.absolutePos(new BlockPos(1, 1, 1));
+        helper.getLevel().setBlockAndUpdate(pos.below(), block(SUBSTRATE).defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(pos, block(SEED_POUCH).defaultBlockState());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        useBlock(helper, pos, player, new ItemStack(Items.WHEAT_SEEDS, 12));
+        var entity = helper.getLevel().getBlockEntity(pos);
+        var registries = helper.getLevel().registryAccess();
+        var valid = entity.saveWithoutMetadata(registries);
+        for (int corruption = 0; corruption < 8; corruption++) {
+            var bad = valid.copy();
+            var stocks = bad.getList("stocks", 10);
+            if (corruption == 0) bad.putInt("schema", 99);
+            if (corruption == 1) for (int n = 0; n < 4; n++) stocks.add(stocks.getCompound(0).copy());
+            if (corruption == 2) stocks.getCompound(0).putInt("count", 65);
+            if (corruption == 3) stocks.getCompound(0).putString("resource", "missing:seed");
+            if (corruption == 4) stocks.add(stocks.getCompound(0).copy());
+            if (corruption == 5) bad.putString("stocks", "wrong type");
+            if (corruption == 6) stocks.getCompound(0).putString("resource", "wheat_seeds");
+            if (corruption == 7) bad.putInt("reserve", 65);
+            entity.loadWithComponents(bad, registries);
+            useBlock(helper, pos, player, new ItemStack(Items.CARROT));
+            helper.assertTrue(player.getMainHandItem().getCount() == 1 && bad.equals(entity.saveWithoutMetadata(registries)),
+                    "Rejected pouch save must refuse insertion and preserve exact data: " + corruption);
+            useBlock(helper, pos, player, ItemStack.EMPTY);
+            helper.assertTrue(bad.equals(entity.saveWithoutMetadata(registries)), "Rejected data must survive withdrawal");
+            var drops = Block.getDrops(helper.getLevel().getBlockState(pos), helper.getLevel(), pos, entity);
+            helper.assertTrue(drops.size() == 1 && drops.getFirst().is(item(SEED_POUCH)), "One recoverable pouch");
+            var data = drops.getFirst().get(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA);
+            helper.assertTrue(data != null, "Rejected pouch must carry original data when dismantled");
+            helper.getLevel().removeBlock(pos, false);
+            player.setItemInHand(InteractionHand.MAIN_HAND, drops.getFirst());
+            item(SEED_POUCH).useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
+                    new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
+            entity = helper.getLevel().getBlockEntity(pos);
+            helper.assertTrue(entity != null && bad.equals(entity.saveWithoutMetadata(registries)),
+                    "Actual block-item replacement must preserve rejected data");
+        }
+        entity.loadWithComponents(valid, registries);
+        helper.getLevel().removeBlock(pos, false);
+        helper.getLevel().setBlockAndUpdate(pos, block(SEED_POUCH).defaultBlockState());
+        entity = helper.getLevel().getBlockEntity(pos);
+        entity.loadWithComponents(valid, registries);
+        helper.assertTrue(valid.equals(entity.saveWithoutMetadata(registries)), "Valid stock survives actual entity reload");
+        useBlock(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(entity.saveWithoutMetadata(registries).getList("stocks", 10).getCompound(0).getInt("count") == 1,
+                "Recovered valid stock is available without duplication");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void pouchReserveSelectionAndAllOrdinaryPlantingStock(GameTestHelper helper) {
+        var pos = helper.absolutePos(new BlockPos(1, 1, 1));
+        helper.getLevel().setBlockAndUpdate(pos.below(), block(SUBSTRATE).defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(pos, block(SEED_POUCH).defaultBlockState());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        for (var seed : List.of(Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS, Items.MELON_SEEDS,
+                Items.PUMPKIN_SEEDS, Items.TORCHFLOWER_SEEDS, Items.PITCHER_POD, Items.CARROT, Items.POTATO,
+                Items.OAK_SAPLING, Items.MANGROVE_PROPAGULE)) {
+            player.setShiftKeyDown(false);
+            useBlock(helper, pos, player, new ItemStack(seed, 20));
+            helper.assertTrue(player.getMainHandItem().isEmpty(), "Pouch admits planting stock: " + seed);
+            player.setShiftKeyDown(true);
+            useBlock(helper, pos, player, ItemStack.EMPTY);
+        }
+        player.setShiftKeyDown(false);
+        useBlock(helper, pos, player, new ItemStack(Items.WHEAT_SEEDS, 20));
+        var controller = new net.neoforged.neoforge.common.util.FakePlayer(helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "PouchReserve"));
+        controller.setGameMode(GameType.SURVIVAL);
+        controller.setPos(Vec3.atCenterOf(pos).add(0, 0, -2));
+        controller.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STICK));
+        var hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);
+        for (boolean sneak : List.of(false, true, false)) {
+            controller.setShiftKeyDown(sneak);
+            controller.gameMode.useItemOn(controller, helper.getLevel(), controller.getMainHandItem(), InteractionHand.MAIN_HAND, hit);
+        }
+        var entity = helper.getLevel().getBlockEntity(pos);
+        var saved = entity.saveWithoutMetadata(helper.getLevel().registryAccess());
+        helper.assertTrue(saved.getInt("reserve") == 2 && controller.getMainHandItem().is(Items.STICK),
+                "Reserve selection is reusable and player controlled");
+        entity.loadWithComponents(saved, helper.getLevel().registryAccess());
+        useBlock(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(entity.saveWithoutMetadata(helper.getLevel().registryAccess()).getList("stocks", 10)
+                .getCompound(0).getInt("count") == 2, "Selected reserve persists and governs surplus withdrawal");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void pouchPassesOffhandBuildingThroughPlayerDispatch(GameTestHelper helper) {
+        var player = new net.neoforged.neoforge.common.util.FakePlayer(helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "PouchBuilder"));
+        player.setGameMode(GameType.SURVIVAL);
+        var pos = helper.absolutePos(new BlockPos(1, 1, 1));
+        helper.getLevel().setBlockAndUpdate(pos.below(), block(SUBSTRATE).defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(pos, block(SEED_POUCH).defaultBlockState());
+        useBlock(helper, pos, player, new ItemStack(Items.WHEAT_SEEDS, 8));
+        player.setPos(Vec3.atCenterOf(pos).add(0, 0, -2));
+        var before = helper.getLevel().getBlockEntity(pos).saveWithoutMetadata(helper.getLevel().registryAccess());
+        for (var hand : InteractionHand.values()) {
+            player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            player.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+            player.setItemInHand(hand, new ItemStack(Items.COBBLESTONE));
+            var hit = new BlockHitResult(Vec3.atCenterOf(pos).add(0, .5, 0), Direction.UP, pos, false);
+            var result = player.gameMode.useItemOn(player, helper.getLevel(), player.getMainHandItem(), InteractionHand.MAIN_HAND, hit);
+            if (hand == InteractionHand.OFF_HAND) {
+                helper.assertTrue(!result.consumesAction(), "Pouch must pass empty-main-hand dispatch through");
+                result = player.gameMode.useItemOn(player, helper.getLevel(), player.getOffhandItem(), hand, hit);
+            }
+            helper.assertTrue(result.consumesAction() && helper.getLevel().getBlockState(pos.above()).is(Blocks.COBBLESTONE)
+                    && before.equals(helper.getLevel().getBlockEntity(pos).saveWithoutMetadata(helper.getLevel().registryAccess())),
+                    "Pouch must permit placement without withdrawing stock");
+            helper.getLevel().removeBlock(pos.above(), false);
+        }
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void windowsJoinVerticallyAndLumenPropagatesIntoRealAir(GameTestHelper helper) {
+        var pos = helper.absolutePos(new BlockPos(1, 1, 1));
+        for (int x = 0; x < 3; x++) for (int y = 0; y < 2; y++) {
+            helper.getLevel().setBlockAndUpdate(pos.offset(x, y, 0), block(MEMBRANE_WINDOW).defaultBlockState());
+        }
+        helper.assertTrue(helper.getLevel().getBlockState(pos.east()).toString().contains("up=true")
+                && helper.getLevel().getBlockState(pos.east().above()).toString().contains("down=true"),
+                "Stacked windows must omit the shared horizontal rib on both blocks");
+        var light = helper.absolutePos(new BlockPos(4, 1, 4));
+        helper.getLevel().setBlockAndUpdate(light, block(SUBSTRATE).defaultBlockState());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        useBlock(helper, light, player, new ItemStack(Items.BONE_MEAL));
+        useBlock(helper, light, player, new ItemStack(Items.BONE_MEAL));
+        useBlock(helper, light, player, new ItemStack(item(id("processing/lumen_secretion"))));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(helper.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, light.above()) >= 11,
+                    "Lumen must illuminate adjacent real air through the light engine");
+            helper.assertTrue(helper.getLevel().getBrightness(net.minecraft.world.level.LightLayer.BLOCK, light.above(2)) >= 10,
+                    "Lumen must propagate beyond its own emission property");
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void ribCollisionFollowsTheRotatedArchOpening(GameTestHelper helper) {
+        var pos = helper.absolutePos(new BlockPos(1, 1, 1));
+        double[][] solid = {{15, 8, 8}, {8, 15, 8}, {8, 8, 1}};
+        double[][] open = {{2, 8, 8}, {8, 2, 8}, {8, 8, 14}};
+        for (var axis : Direction.Axis.values()) {
+            var state = block(RIB_FRAME).defaultBlockState().setValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS, axis);
+            var shape = state.getCollisionShape(helper.getLevel(), pos);
+            var support = solid[axis.ordinal()];
+            var opening = open[axis.ordinal()];
+            helper.assertTrue(shape.toAabbs().stream().anyMatch(box -> box.contains(support[0]/16, support[1]/16, support[2]/16)),
+                    "Rotated arch must collide at its visible crown: " + axis);
+            helper.assertTrue(shape.toAabbs().stream().noneMatch(box -> box.contains(opening[0]/16, opening[1]/16, opening[2]/16)),
+                    "Rotated arch must leave its visible opening clear: " + axis);
+        }
+        helper.succeed();
+    }
+
     private static void useBlock(GameTestHelper helper, BlockPos pos, net.minecraft.world.entity.player.Player player, ItemStack stack) {
         player.setItemInHand(InteractionHand.MAIN_HAND, stack);
         var hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);

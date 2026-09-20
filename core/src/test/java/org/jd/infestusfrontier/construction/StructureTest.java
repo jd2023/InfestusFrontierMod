@@ -96,7 +96,58 @@ final class StructureTest {
         assertInstanceOf(Structure.Valid.class, structure.inspect(ZERO, "ceiling", request.atTick(12)));
     }
 
+    @Test
+    void continuationAndCachedSuccessAreInvalidatedByChangesAndUnload() {
+        var plan = java.util.stream.IntStream.range(0, 65)
+                .mapToObj(x -> Structure.Expectation.part(new Structure.CellPos(x, 0, 0), "wall")).toList();
+        var cells = new HashMap<Structure.CellPos, Structure.Cell>();
+        plan.forEach(e -> cells.put(e.offset(), Structure.Cell.part("wall")));
+        var loaded = new java.util.ArrayList<>(cells.keySet());
+        var view = new RecordingView(cells, loaded);
+        var structure = new Structure(List.of(new Structure.Rule("room", plan)), view);
+        var request = new Structure.ServerBudget().request(1);
+        assertInstanceOf(Structure.Deferred.class, structure.inspect(ZERO, "room", request));
+        cells.remove(ZERO);
+        view.revision++;
+        assertInstanceOf(Structure.Deferred.class, structure.inspect(ZERO, "room", request));
+        assertInstanceOf(Structure.Invalid.class, structure.inspect(ZERO, "room", request));
+        cells.put(ZERO, Structure.Cell.part("wall"));
+        view.revision++;
+        assertInstanceOf(Structure.Deferred.class, structure.inspect(ZERO, "room", request.atTick(2)));
+        assertInstanceOf(Structure.Deferred.class, structure.inspect(ZERO, "room", request));
+        assertInstanceOf(Structure.Valid.class, structure.inspect(ZERO, "room", request));
+        loaded.remove(ZERO);
+        view.revision++;
+        assertInstanceOf(Structure.Deferred.class, structure.inspect(ZERO, "room", request));
+        assertEquals(Structure.DeferredReason.UNLOADED,
+                assertInstanceOf(Structure.Deferred.class, structure.inspect(ZERO, "room", request)).reason());
+        assertEquals(130, view.reads.size());
+    }
+
+    @Test
+    void maximumPlanFinishesAndIndependentRequestsShareTheSameServerQuota() {
+        var plan = java.util.stream.IntStream.range(0, 4096)
+                .mapToObj(x -> Structure.Expectation.any(new Structure.CellPos(x, 0, 0))).toList();
+        var view = new RecordingView(Map.of(), plan.stream().map(Structure.Expectation::offset).toList());
+        var structure = new Structure(List.of(new Structure.Rule("maximum", plan)), view);
+        var shared = new Structure.ServerBudget();
+        var request = shared.request(0);
+        Structure.Inspection result = null;
+        for (int tick = 0; tick < 16; tick++) {
+            for (int call = 0; call < 4; call++) result = structure.inspect(ZERO, "maximum", request.atTick(tick));
+            int readCount = view.reads.size();
+            assertEquals(Structure.DeferredReason.SERVER_TICK_BUDGET,
+                    assertInstanceOf(Structure.Deferred.class,
+                            structure.inspect(ZERO, "maximum", shared.request(tick))).reason());
+            assertEquals(readCount, view.reads.size());
+        }
+        assertEquals(4096, assertInstanceOf(Structure.Valid.class, result).inspectedCells());
+        assertEquals(4096, view.reads.size());
+    }
+
     private static final class RecordingView implements Structure.LoadedView {
+        private long revision;
+        public long revision() { return revision; }
         private final Map<Structure.CellPos, Structure.Cell> cells;
         private final List<Structure.CellPos> loaded;
         private final java.util.ArrayList<Structure.CellPos> loadedChecks = new java.util.ArrayList<>();

@@ -7,6 +7,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class SeedPouchTest {
     @Test
+    void chosenReserveBoundsWithdrawalAndRefusesInvalidChanges() {
+        var pouch = new SeedPouch();
+        pouch.insert("minecraft:wheat_seeds", 64);
+        org.junit.jupiter.api.Assertions.assertTrue(pouch.setReserve(16));
+        assertEquals(48, pouch.takeSurplus("minecraft:wheat_seeds", 64));
+        org.junit.jupiter.api.Assertions.assertFalse(pouch.setReserve(65));
+        org.junit.jupiter.api.Assertions.assertFalse(pouch.setReserve(-1));
+        assertEquals(16, pouch.reserve());
+        pouch.setReserve(0);
+        assertEquals(16, pouch.takeSurplus("minecraft:wheat_seeds", 64));
+        assertEquals(0, pouch.snapshot().size());
+        pouch.setReserve(64);
+        pouch.insert("minecraft:carrot", 10);
+        assertEquals(0, pouch.takeSurplus("minecraft:carrot", 64));
+        assertEquals(10, pouch.takeAll("minecraft:carrot"));
+    }
+
+    @Test
     void retainsOnePlantingStockAndBoundsTypesAndCounts() {
         var pouch = new SeedPouch();
         assertEquals(64, pouch.insert("minecraft:wheat_seeds", 80).accepted());
