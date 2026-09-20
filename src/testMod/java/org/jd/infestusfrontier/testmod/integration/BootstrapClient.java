@@ -35,6 +35,9 @@ public final class BootstrapClient {
     private final List<ContentVisualScenario> visuals = ServiceLoader.load(ContentVisualScenario.class)
             .stream().map(ServiceLoader.Provider::get).toList();
 
+    private List<ContentVisualScenario.View> detailViews = List.of();
+    private int detailIndex;
+
     public BootstrapClient() {
         NeoForge.EVENT_BUS.addListener(this::tick);
         NeoForge.EVENT_BUS.addListener(this::worldRendered);
@@ -54,7 +57,25 @@ public final class BootstrapClient {
                 case CONNECT -> connect(minecraft);
                 case WORLD -> captureWorld(minecraft);
                 case WORLD_SETUP -> {
-                    if (visuals.stream().allMatch(scene -> scene.ready(minecraft))) stage = Stage.WORLD_RENDER;
+                    if (visuals.stream().allMatch(scene -> scene.ready(minecraft))) {
+                        detailViews = visuals.stream().flatMap(scene -> scene.detailViews().stream()).toList();
+                        if (detailViews.size() > 16 || detailViews.stream().map(ContentVisualScenario.View::filename)
+                                .distinct().count() != detailViews.size()) {
+                            throw new IllegalStateException("Excessive or duplicate detail captures");
+                        }
+                        stage = Stage.WORLD_RENDER;
+                    }
+                }
+                case DETAILS -> {
+                    if (detailIndex == detailViews.size()) stage = Stage.GUIDES;
+                    else {
+                        var view = detailViews.get(detailIndex);
+                        minecraft.player.setYRot(view.yaw());
+                        minecraft.player.setXRot(view.pitch());
+                        minecraft.player.yRotO = view.yaw();
+                        minecraft.player.xRotO = view.pitch();
+                        stage = Stage.DETAIL_RENDER;
+                    }
                 }
                 case GUIDES -> {
                     if (guideScenarios == null) guideScenarios = new GuideScenarios();
@@ -62,7 +83,7 @@ public final class BootstrapClient {
                 }
                 case DISCONNECT -> disconnect(minecraft);
                 case STOP -> stop(minecraft);
-                case TITLE, WAIT, WORLD_RENDER, DONE -> { }
+                case TITLE, WAIT, WORLD_RENDER, DETAIL_RENDER, DONE -> { }
             }
         } catch (Exception exception) {
             LOGGER.error("INFESTUS_CLIENT_FAILURE stage={}", stage, exception);
@@ -112,11 +133,14 @@ public final class BootstrapClient {
     }
 
     private void worldRendered(RenderLevelStageEvent event) {
-        if (stage == Stage.WORLD_RENDER && event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL
+        boolean detail = stage == Stage.DETAIL_RENDER;
+        float yaw = detail ? detailViews.get(detailIndex).yaw() : 0;
+        float pitch = detail ? detailViews.get(detailIndex).pitch() : 15;
+        if ((stage == Stage.WORLD_RENDER || detail) && event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL
                 && worldReady(Minecraft.getInstance())
                 && event.getLevelRenderer().countRenderedSections() > 0
                 && event.getLevelRenderer().hasRenderedAllSections()
-                && event.getCamera().getYRot() == 0 && event.getCamera().getXRot() == 15) {
+                && event.getCamera().getYRot() == yaw && event.getCamera().getXRot() == pitch) {
             worldRendered = true;
         }
     }
@@ -139,7 +163,17 @@ public final class BootstrapClient {
             if (stage == Stage.WORLD_RENDER && worldRendered && minecraft.screen == null) {
                 LOGGER.info("INFESTUS_CLIENT_CAMERA_RENDERED yaw=0.0 pitch=15.0");
                 stage = Stage.WAIT;
-                grab(minecraft, "bootstrap-world.png", () -> stage = Stage.GUIDES);
+                grab(minecraft, "bootstrap-world.png", () -> stage = Stage.DETAILS);
+            }
+            if (stage == Stage.DETAIL_RENDER && worldRendered && minecraft.screen == null) {
+                var view = detailViews.get(detailIndex);
+                LOGGER.info("INFESTUS_CLIENT_DETAIL_RENDERED name={} yaw={} pitch={}",
+                        view.filename(), view.yaw(), view.pitch());
+                stage = Stage.WAIT;
+                grab(minecraft, view.filename(), () -> {
+                    detailIndex++;
+                    stage = Stage.DETAILS;
+                });
             }
         } catch (Exception exception) {
             LOGGER.error("INFESTUS_CLIENT_FAILURE render", exception);
@@ -175,5 +209,5 @@ public final class BootstrapClient {
         });
     }
 
-    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_SETUP, WORLD_RENDER, GUIDES, DISCONNECT, STOP, DONE }
+    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_SETUP, WORLD_RENDER, DETAILS, DETAIL_RENDER, GUIDES, DISCONNECT, STOP, DONE }
 }

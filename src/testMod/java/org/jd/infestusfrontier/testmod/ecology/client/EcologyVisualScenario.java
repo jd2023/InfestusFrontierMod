@@ -24,7 +24,8 @@ public final class EcologyVisualScenario implements ContentVisualScenario {
             verifyTextures(minecraft);
             texturesChecked = true;
         }
-        if (minecraft.level == null) return false;
+        if (minecraft.level == null || minecraft.player == null
+                || minecraft.player.position().distanceToSqr(new net.minecraft.world.phys.Vec3(0.5, -60, 0.5)) > 0.01) return false;
         boolean ready = true;
         String[] stages = {"basic", "young", "mature"};
         for (int index = 0; index < stages.length; index++) {
@@ -35,15 +36,22 @@ public final class EcologyVisualScenario implements ContentVisualScenario {
             for (int offset = 0; offset < 2; offset++) {
                 ready &= stage(minecraft, new BlockPos(2 + index, -60 + offset, 7), property);
             }
-            for (int offset = 0; offset < 6; offset++) {
-                BlockPos underside = new BlockPos(-1 + index, -57, 8 + offset);
-                ready &= stage(minecraft, underside, property) && stage(minecraft, underside, "pigment=white");
+            for (int offset = 0; offset < 4; offset++) {
+                BlockPos underside = new BlockPos(-1 + index, -55, offset);
+                ready &= stage(minecraft, underside, property) && stage(minecraft, underside, "pigment=white")
+                        && minecraft.level.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, underside.below()) == 15;
             }
         }
         ready &= stage(minecraft, new BlockPos(5, -60, 7), "pigment=cyan")
                 && stage(minecraft, new BlockPos(5, -59, 7), "pigment=cyan");
         settledTicks = ready ? Math.min(6, settledTicks + 1) : 0;
         return settledTicks == 6;
+    }
+
+    @Override
+    public List<View> detailViews() {
+        return BuiltInRegistries.BLOCK.containsKey(SUBSTRATE)
+                ? List.of(new View("ecology-underside.png", 0, -65)) : List.of();
     }
 
     private static boolean stage(Minecraft minecraft, BlockPos pos, String property) {

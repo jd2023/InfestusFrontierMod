@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SupportType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.foundation.TickQuota;
 
@@ -39,7 +38,7 @@ final class CultureConversion {
         var target = level.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4);
         if (target == null) return InteractionResult.FAIL;
         BlockState original = target.getBlockState(pos);
-        if (!eligible(original) || !visible(level, pos, face)) {
+        if (!eligible(original) || !SelectedGroundVisibility.visible(context)) {
             return InteractionResult.FAIL;
         }
         if (level.isClientSide) return InteractionResult.SUCCESS;
@@ -68,11 +67,4 @@ final class CultureConversion {
         return !state.is(substrate.get()) && state.is(EcologyTags.CULTURE_ELIGIBLE);
     }
 
-    private static boolean visible(Level level, BlockPos pos, Direction face) {
-        BlockPos neighborPos = pos.relative(face);
-        var neighborChunk = level.getChunkSource().getChunkNow(neighborPos.getX() >> 4, neighborPos.getZ() >> 4);
-        if (neighborChunk == null) return false;
-        BlockState neighbor = neighborChunk.getBlockState(neighborPos);
-        return !neighbor.isFaceSturdy(level, neighborPos, face.getOpposite(), SupportType.FULL);
-    }
 }

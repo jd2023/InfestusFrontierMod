@@ -188,22 +188,20 @@ public final class EcologyGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 20)
+    @GameTest(batch = "ecology_quota", templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 20)
     public static void sharedTickAdmissionStopsTheSeventeenthConversion(GameTestHelper helper) {
-        helper.runAfterDelay(5, () -> {
-            var player = helper.makeMockPlayer(GameType.SURVIVAL);
-            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE), 17));
-            int admitted = 0;
-            for (int index = 0; index < 17; index++) {
-                BlockPos pos = helper.absolutePos(new BlockPos(index % 5, 0, index / 5));
-                helper.getLevel().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
-                if (useHeldOn(player, pos, Direction.UP).consumesAction()) admitted++;
-            }
-            helper.assertTrue(admitted == 16, "Shared ecology quota must admit exactly 16 conversions per server tick");
-            helper.assertTrue(player.getMainHandItem().getCount() == 1,
-                    "A quota refusal must preserve the seventeenth Culture payment");
-            helper.succeed();
-        });
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE), 17));
+        int admitted = 0;
+        for (int index = 0; index < 17; index++) {
+            BlockPos pos = helper.absolutePos(new BlockPos(index % 5, 0, index / 5));
+            helper.getLevel().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+            if (useHeldOn(player, pos, Direction.UP).consumesAction()) admitted++;
+        }
+        helper.assertTrue(admitted == 16, "Shared ecology quota must admit exactly 16 conversions per server tick");
+        helper.assertTrue(player.getMainHandItem().getCount() == 1,
+                "A quota refusal must preserve the seventeenth Culture payment");
+        helper.succeed();
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
@@ -252,8 +250,78 @@ public final class EcologyGameTests {
         helper.succeed();
     }
 
+    @GameTest(batch = "ecology_visibility", templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void occludedSelectionCannotConvertThroughAnInterveningWall(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(new BlockPos(4, 2, 2));
+        var level = helper.getLevel();
+        level.setBlockAndUpdate(target, Blocks.DIRT.defaultBlockState());
+        level.setBlockAndUpdate(target.west(), Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(target.west(2), Blocks.STONE.defaultBlockState());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Vec3 eyes = Vec3.atCenterOf(target).add(-3, 0, 0);
+        player.setPos(eyes.x, eyes.y - player.getEyeHeight(), eyes.z);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE), 2));
+        var result = player.getMainHandItem().useOn(context(player, target, Direction.WEST));
+        helper.assertTrue(!result.consumesAction() && level.getBlockState(target).is(Blocks.DIRT)
+                        && player.getMainHandItem().getCount() == 2,
+                "An exposed face behind a wall must refuse without changing terrain or payment");
+        level.setBlockAndUpdate(target.west(2), Blocks.AIR.defaultBlockState());
+        helper.assertTrue(player.getMainHandItem().useOn(context(player, target, Direction.WEST)).consumesAction(),
+                "The same selected face must convert once its line of sight is clear");
+        helper.succeed();
+    }
+
+    @GameTest(batch = "ecology_visibility", templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void forgedFaceHitAndExcessReachPreserveTargetAndPayment(GameTestHelper helper) {
+        BlockPos pos = helper.absolutePos(new BlockPos(2, 1, 2));
+        var level = helper.getLevel();
+        level.setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Vec3 eyes = Vec3.atCenterOf(pos).add(0, 2, 0);
+        player.setPos(eyes.x, eyes.y - player.getEyeHeight(), eyes.z);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE), 3));
+        for (BlockHitResult hit : new BlockHitResult[]{
+                hit(pos, Direction.DOWN),
+                new BlockHitResult(Vec3.atCenterOf(pos.east()), Direction.UP, pos, false),
+                new BlockHitResult(new Vec3(Double.NaN, 0, 0), Direction.UP, pos, false)}) {
+            helper.assertTrue(!player.getMainHandItem().useOn(new UseOnContext(
+                    player, InteractionHand.MAIN_HAND, hit)).consumesAction(), "Forged selection must refuse");
+        }
+        player.setPos(eyes.x, eyes.y + 20, eyes.z);
+        helper.assertTrue(!player.getMainHandItem().useOn(context(player, pos, Direction.UP)).consumesAction(),
+                "Excess reach must refuse before ray traversal");
+        helper.assertTrue(level.getBlockState(pos).is(Blocks.DIRT) && player.getMainHandItem().getCount() == 3,
+                "Invalid selection must preserve ground and payment");
+        helper.succeed();
+    }
+
+    @GameTest(batch = "ecology_visibility", templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void unloadedRayBetweenLoadedEndpointsRefusesWithoutLoading(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var source = level.getChunkSource();
+        int chunkX = (helper.absolutePos(BlockPos.ZERO).getX() >> 4) + 512;
+        int chunkZ = helper.absolutePos(BlockPos.ZERO).getZ() >> 4;
+        level.getChunk(chunkX, chunkZ);
+        level.getChunk(chunkX + 1, chunkZ + 1);
+        BlockPos target = new BlockPos(chunkX * 16 + 17, 32, chunkZ * 16 + 18);
+        level.setBlock(target, Blocks.DIRT.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+        helper.assertTrue(source.getChunkNow(chunkX, chunkZ + 1) == null, "Ray gap must start unloaded");
+        int loaded = source.getLoadedChunksCount();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setPos(chunkX * 16 + 14.5, 32.5 - player.getEyeHeight(), chunkZ * 16 + 14.5);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(CULTURE)));
+        helper.assertTrue(!player.getMainHandItem().useOn(context(player, target, Direction.WEST)).consumesAction(),
+                "A ray through an unloaded chunk must refuse even with both endpoints loaded");
+        helper.assertTrue(source.getChunkNow(chunkX, chunkZ + 1) == null && source.getLoadedChunksCount() == loaded
+                        && level.getBlockState(target).is(Blocks.DIRT) && player.getMainHandItem().getCount() == 1,
+                "Ray refusal must preserve chunks, target and inventory");
+        helper.succeed();
+    }
+
     private static net.minecraft.world.InteractionResult useHeldOn(
             net.minecraft.world.entity.player.Player player, BlockPos pos, Direction face) {
+        Vec3 eyes = Vec3.atCenterOf(pos).add(Vec3.atLowerCornerOf(face.getNormal()).scale(2));
+        player.setPos(eyes.x, eyes.y - player.getEyeHeight(), eyes.z);
         return player.getMainHandItem().getItem().useOn(context(player, pos, face));
     }
 
@@ -262,7 +330,7 @@ public final class EcologyGameTests {
     }
 
     private static BlockHitResult hit(BlockPos pos, Direction face) {
-        return new BlockHitResult(Vec3.atCenterOf(pos), face, pos, false);
+        return new BlockHitResult(Vec3.atCenterOf(pos).add(Vec3.atLowerCornerOf(face.getNormal()).scale(0.5)), face, pos, false);
     }
 
     private static Item item(ResourceLocation id) {

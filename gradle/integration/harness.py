@@ -440,6 +440,7 @@ class ResultEvaluator:
         required_files = {f"{role}.log" for role in child_roles}
         if command != "profileSmoke" or require_captures:
             required_files.update(CAPTURES)
+            required_files.update(result.get("requiredCaptures", []))
         if not required_files.issubset(artifacts) or set(artifacts) != set(digests):
             raise HarnessFailure("missing capture/log artifacts or digests")
         started = result.get("runStartedNs")
@@ -521,7 +522,7 @@ def _read_spec(path):
     return spec["command"]
 
 
-def _clear_output(output):
+def _clear_output(output, captures=()):
     output.mkdir(parents=True, exist_ok=True)
     for name in (
         "result.json",
@@ -529,7 +530,7 @@ def _clear_output(output):
         "client.log",
         "installer.log",
         "success.receipt",
-    ) + CAPTURES:
+    ) + CAPTURES + tuple(captures):
         (output / name).unlink(missing_ok=True)
 
 
@@ -545,6 +546,7 @@ def _base_result(
     omission=None,
     release=None,
     fixture=False,
+    captures=(),
 ):
     runtime, artifacts, digests = {}, {}, {}
     for role, child in supervisor.children.items():
@@ -559,7 +561,7 @@ def _base_result(
                 str(child.log_path.resolve()),
                 _sha256(child.log_path),
             )
-    for name in CAPTURES:
+    for name in CAPTURES + tuple(captures):
         if (output / name).is_file():
             artifacts[name], digests[name] = (
                 str((output / name).resolve()),
@@ -601,6 +603,7 @@ def _base_result(
         phaseDurationsSeconds=supervisor.durations,
         artifacts=artifacts,
         artifactDigests=digests,
+        requiredCaptures=list(captures),
         failure="; ".join(
             str(item) for item in (failure, supervisor.cleanup_failure) if item
         )
@@ -695,26 +698,45 @@ def _prepare_server(s, staged, output):
     return server_dir, client_dir, releases[0], port
 
 
-def visual_setup_commands(root, requirements):
+def _visual_setup(root, requirements):
     """Bounded owner fixtures run only on this harness's disposable server."""
-    commands = []
+    commands, captures = [], []
     active = set((requirements or {}).get("gameTest", []))
     for path in sorted((root / "src/testMod/resources").glob("*/visual-setup.json")):
         if path.stat().st_size > 8192:
             raise HarnessFailure(f"oversized visual setup: {path}")
         fixture = json.loads(path.read_text())
         batch = fixture.get("commands")
-        if (set(fixture) != {"requires", "commands"}
+        if (set(fixture) not in ({"requires", "commands"}, {"requires", "commands", "captures"})
                 or not isinstance(fixture["requires"], str)
                 or not isinstance(batch, list) or not 1 <= len(batch) <= 16
                 or any(not isinstance(line, str) or not 1 <= len(line) <= 256
                        or "\n" in line or "\r" in line for line in batch)):
             raise HarnessFailure(f"invalid visual setup: {path}")
+        images = fixture.get("captures", [])
+        if (not isinstance(images, list) or len(images) > 16
+                or any(not isinstance(name, str) or not re.fullmatch(r"[a-z][a-z0-9-]{0,63}\.png", name)
+                       or name in CAPTURES for name in images)
+                or len(set(images)) != len(images)):
+            raise HarnessFailure(f"invalid visual setup captures: {path}")
         if fixture["requires"] in active:
             commands.extend(batch)
+            captures.extend(images)
+        if len(captures) > 16 or len(set(captures)) != len(captures):
+            raise HarnessFailure("excessive or duplicate visual setup captures")
         if len(commands) > 64:
             raise HarnessFailure("excessive visual setup commands")
-    return commands
+    return commands, captures
+
+
+def visual_setup_commands(root, requirements):
+    """Bounded commands for active owner fixtures."""
+    return _visual_setup(root, requirements)[0]
+
+
+def visual_setup_captures(root, requirements):
+    """Additional required images from the same disposable client and deadline."""
+    return _visual_setup(root, requirements)[1]
 
 
 def _client_lifecycle(
@@ -819,6 +841,7 @@ def run_client_scenario(
     limits = limits or DEFAULT_DEADLINES
     command = "captureClient" if capture else "packagedServerSmoke"
     started, failure, release, port = time.time_ns(), None, None, None
+    captures = []
     s = Supervisor(root, f"{command}-{uuid.uuid4()}", limits, limits["clientScenario"])
 
     def finish(failure):
@@ -833,13 +856,15 @@ def run_client_scenario(
             _client_assertions(s, port, release, content_requirements),
             release=release,
             fixture=bool(fixture),
+            captures=captures,
         )
         return publish_result(output, result)
 
     s.on_finished = finish
     try:
         with s:
-            _clear_output(output)
+            captures = [] if fixture else visual_setup_captures(root, content_requirements)
+            _clear_output(output, captures)
             if fixture:
                 server_dir = client_dir = s.run_dir
                 release = s.run_dir / "release.jar"

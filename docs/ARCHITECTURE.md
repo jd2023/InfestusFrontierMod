@@ -134,8 +134,13 @@ appearance and ownership adapters. Construction injects culture use through its
 an environment resolved by the server adapter. The current playable registration
 is ordinary substrate; later native content must supply its actual environment.
 
-One culture use probes only the selected FULL chunk and the clicked face's adjacent
-FULL chunk, both without loading. One server-wide quota admits 16 conversions/tick.
+One culture use validates the selected face against a ray from the server-observed
+player eye position. Reach is capped at eight blocks and the player's interaction
+range plus vanilla's one-block tolerance. The ray and shape callbacks share a
+loaded-only view capped at 64 block-state probes (including the face neighbor);
+missing chunks, invalid hit coordinates, occlusion or unavailable shape data
+refuse before payment. No chunk tickets or block-entity lookups are permitted.
+One server-wide quota admits 16 conversions/tick.
 Replacement sends client state without recursive neighbor notifications. Static
 cells have no ticker or block entity; finite stage/pigment block states and seeded
 weighted models carry appearance. Vanilla soil tag membership supports vegetation;
@@ -143,11 +148,15 @@ already-living cells explicitly refuse culture conversion.
 
 Ownership uses a schema-1 per-dimension `SavedData` map capped at 65,536 cells.
 Validate the schema, list bound and every position/UUID before accepting the map.
-Unsupported or malformed records yield a non-dirty rejected state that refuses
-claims and mutations, logs the reason once and never rewrites the original file.
+An absent storage entry creates fresh ownership only when the dimension's file
+is confirmed absent. Disk/decompression/NBT failures swallowed by Minecraft's
+loader, inaccessible files, unsupported schemas and malformed records all cache
+a non-dirty rejected state that refuses claims and mutations, logs the reason once
+and never rewrites the original file.
 Do not throw from the deserializer: Minecraft catches exceptions and may create
 empty replacement data. Tests exercise the real storage loader and serialized
-round trips, alongside conversion, vegetation updates and shared-quota GameTests.
+round trips, truncated-file byte preservation, occluded/forged selection and
+unloaded ray paths, alongside vegetation updates and shared-quota GameTests.
 
 ## Bud construction adapter
 
@@ -238,7 +247,12 @@ join. Each names an active GameTest assertion and at most 16 single-line command
 of 256 characters; all active fixtures together admit at most 64 commands. The
 client's development-only `ContentVisualScenario` providers wait for the resulting
 world/inventory packets before rendering/capture, under the existing capture
-deadline. The setup never modifies an ordinary world or fabricates client state.
+deadline. Owners may additionally declare up to 16 unique detail capture names
+across all active fixtures. Client contributors supply matching bounded camera
+angles; the shared capture adapter renders and saves these after the unchanged
+overview, within the existing disconnect deadline. Each required image must be a
+fresh 1280x720 PNG under the same 4 MiB/digest checks; missing detail captures fail
+acceptance. The setup never modifies an ordinary world or fabricates client state.
 Bind the server to loopback on an allocated port, allow only the fixture player, and disable online-account
 authentication solely in this owned disposable server. The client runs with an
 isolated game directory and deterministic fixture identity; no personal account,

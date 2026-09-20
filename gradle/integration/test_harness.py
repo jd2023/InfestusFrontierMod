@@ -46,6 +46,24 @@ class VisualSetupTest(unittest.TestCase):
             self.assertEqual(["give FixturePlayer minecraft:stone"],
                              harness.visual_setup_commands(root, {"gameTest": ["bud.obtain"]}))
 
+    def test_owner_detail_captures_are_bounded_and_activation_scoped(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            path = root / "src/testMod/resources/ecology/visual-setup.json"
+            path.parent.mkdir(parents=True)
+            fixture = {"requires": "substrate.use", "commands": ["say fixture"],
+                       "captures": ["ecology-underside.png"]}
+            path.write_text(json.dumps(fixture))
+            self.assertEqual([], harness.visual_setup_captures(root, {"gameTest": []}))
+            self.assertEqual(["ecology-underside.png"],
+                             harness.visual_setup_captures(root, {"gameTest": ["substrate.use"]}))
+            for names in (["../escape.png"], ["bootstrap-world.png"], ["same.png"] * 2,
+                          [f"view-{i}.png" for i in range(17)]):
+                fixture["captures"] = names
+                path.write_text(json.dumps(fixture))
+                with self.assertRaisesRegex(harness.HarnessFailure, "visual setup"):
+                    harness.visual_setup_captures(root, {"gameTest": ["substrate.use"]})
+
     def test_rejects_excessive_or_multiline_commands(self):
         for commands in (["say one\nsay two"], ["say test"] * 17):
             with self.subTest(commands=commands), tempfile.TemporaryDirectory() as raw:
@@ -139,6 +157,28 @@ class EvaluatorTest(EvidenceCase):
                     )
                 with self.assertRaisesRegex(harness.HarnessFailure, "capture"):
                     harness.ResultEvaluator().evaluate(result, require_captures=True)
+
+    def test_required_detail_capture_cannot_be_missing_or_invalid(self):
+        for mutation in ("missing", "empty", "truncated", "stale"):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as raw:
+                result = self.result()
+                result["requiredCaptures"] = ["ecology-underside.png"]
+                path = Path(raw) / "ecology-underside.png"
+                if mutation != "missing":
+                    contents = Path(result["artifacts"]["bootstrap-world.png"]).read_bytes()
+                    path.write_bytes(b"" if mutation == "empty" else contents[:30]
+                                     if mutation == "truncated" else contents)
+                    if mutation == "stale":
+                        os.utime(path, ns=(result["runStartedNs"] - 1, result["runStartedNs"] - 1))
+                    result["artifacts"][path.name] = str(path)
+                    result["artifactDigests"][path.name] = harness._sha256(path)
+                with self.assertRaises(harness.HarnessFailure):
+                    harness.ResultEvaluator().evaluate(result)
+        result = self.result()
+        result["requiredCaptures"] = ["ecology-underside.png"]
+        result["artifacts"]["ecology-underside.png"] = result["artifacts"]["bootstrap-world.png"]
+        result["artifactDigests"]["ecology-underside.png"] = result["artifactDigests"]["bootstrap-world.png"]
+        harness.ResultEvaluator().evaluate(result)
 
     def test_valid_evidence_is_accepted(self):
         harness.ResultEvaluator().evaluate(self.result())

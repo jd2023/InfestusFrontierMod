@@ -29,11 +29,11 @@ public final class OwnershipGameTests {
     public static void ownershipSurvivesSaveAndReload(GameTestHelper helper) throws Exception {
         Path directory = Files.createTempDirectory("infestus-ownership-");
         try {
-            SavedData original = storage(helper, directory).computeIfAbsent(factory(), NAME);
+            SavedData original = load(storage(helper, directory), directory);
             helper.assertTrue(invoke(original, "claim", OWNER), "Fresh ownership must allow a claim");
             CompoundTag serialized = original.save(new CompoundTag(), helper.getLevel().registryAccess());
             write(directory, serialized);
-            SavedData reloaded = storage(helper, directory).computeIfAbsent(factory(), NAME);
+            SavedData reloaded = load(storage(helper, directory), directory);
             helper.assertTrue(invoke(reloaded, "permits", OWNER) && !invoke(reloaded, "permits", OTHER),
                     "Reload must preserve the owner and refuse another player");
             helper.assertTrue(serialized.equals(reloaded.save(new CompoundTag(), helper.getLevel().registryAccess())),
@@ -79,27 +79,48 @@ public final class OwnershipGameTests {
         helper.succeed();
     }
 
-    private static void assertRejected(GameTestHelper helper, CompoundTag data) throws Exception {
-        Path directory = Files.createTempDirectory("infestus-invalid-ownership-");
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void truncatedOwnershipRefusesEditsAndPreservesDiskBytes(GameTestHelper helper) throws Exception {
+        Path directory = Files.createTempDirectory("infestus-truncated-ownership-");
         try {
-            write(directory, data);
+            write(directory, validData());
             Path file = directory.resolve(NAME + ".dat");
-            byte[] before = Files.readAllBytes(file);
-            var storage = storage(helper, directory);
-            SavedData rejected = storage.computeIfAbsent(factory(), NAME);
-            helper.assertTrue(!invoke(rejected, "permits", OTHER) && !invoke(rejected, "claim", OTHER),
-                    "Rejected ownership data must block edits instead of creating unprotected cells");
-            var remove = rejected.getClass().getDeclaredMethod("remove", BlockPos.class);
-            remove.setAccessible(true);
-            remove.invoke(rejected, CELL);
-            helper.assertTrue(!rejected.isDirty(), "Rejected ownership data must never schedule replacement of the save");
-            storage.save();
-            helper.assertTrue(Arrays.equals(before, Files.readAllBytes(file)),
-                    "Rejected ownership data must remain byte-for-byte intact on disk");
+            byte[] bytes = Files.readAllBytes(file);
+            Files.write(file, Arrays.copyOf(bytes, bytes.length / 2));
+            assertRejectedFile(helper, directory);
+            helper.succeed();
         } finally {
             Files.deleteIfExists(directory.resolve(NAME + ".dat"));
             Files.deleteIfExists(directory);
         }
+    }
+
+    private static void assertRejected(GameTestHelper helper, CompoundTag data) throws Exception {
+        Path directory = Files.createTempDirectory("infestus-invalid-ownership-");
+        try {
+            write(directory, data);
+            assertRejectedFile(helper, directory);
+        } finally {
+            Files.deleteIfExists(directory.resolve(NAME + ".dat"));
+            Files.deleteIfExists(directory);
+        }
+    }
+
+    private static void assertRejectedFile(GameTestHelper helper, Path directory) throws Exception {
+        Path file = directory.resolve(NAME + ".dat");
+        byte[] before = Files.readAllBytes(file);
+        var storage = storage(helper, directory);
+        SavedData rejected = load(storage, directory);
+        helper.assertTrue(!invoke(rejected, "permits", OTHER) && !invoke(rejected, "claim", OTHER),
+                "Rejected ownership data must block edits instead of creating unprotected cells");
+        var remove = rejected.getClass().getDeclaredMethod("remove", BlockPos.class);
+        remove.setAccessible(true);
+        remove.invoke(rejected, CELL);
+        helper.assertTrue(!rejected.isDirty(), "Rejected ownership data must never schedule replacement of the save");
+        storage.save();
+        helper.assertTrue(Arrays.equals(before, Files.readAllBytes(file)),
+                "Rejected ownership data must remain byte-for-byte intact on disk");
+        helper.assertTrue(load(storage, directory) == rejected, "Rejected load must remain cached");
     }
 
     private static CompoundTag validData() {
@@ -126,10 +147,11 @@ public final class OwnershipGameTests {
     }
 
     // Test modules cannot share production packages; reflection keeps this save adapter internal.
-    private static SavedData.Factory<?> factory() throws Exception {
-        var field = Class.forName("org.jd.infestusfrontier.ecology.SubstrateOwnership").getDeclaredField("FACTORY");
-        field.setAccessible(true);
-        return (SavedData.Factory<?>) field.get(null);
+    private static SavedData load(DimensionDataStorage storage, Path directory) throws Exception {
+        var method = Class.forName("org.jd.infestusfrontier.ecology.SubstrateOwnership")
+                .getDeclaredMethod("get", DimensionDataStorage.class, Path.class);
+        method.setAccessible(true);
+        return (SavedData) method.invoke(null, storage, directory.resolve(NAME + ".dat"));
     }
 
     private static boolean invoke(SavedData data, String name, UUID player) throws Exception {

@@ -1,5 +1,7 @@
 package org.jd.infestusfrontier.ecology;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +13,9 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.LevelResource;
 
 final class SubstrateOwnership extends SavedData {
     private static final String DATA_NAME = "infestusfrontier_ecology_cells";
@@ -23,7 +28,19 @@ final class SubstrateOwnership extends SavedData {
     private boolean rejected;
 
     static SubstrateOwnership get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(FACTORY, DATA_NAME);
+        return get(level.getDataStorage(), DimensionType.getStorageFolder(
+                level.dimension(), level.getServer().getWorldPath(LevelResource.ROOT))
+                .resolve("data").resolve(DATA_NAME + ".dat"));
+    }
+
+    private static SubstrateOwnership get(DimensionDataStorage storage, Path file) {
+        SubstrateOwnership data = storage.get(FACTORY, DATA_NAME);
+        if (data != null) return data;
+        // The vanilla loader conflates a missing file with a failed read, before our deserializer runs.
+        data = new SubstrateOwnership();
+        if (!Files.notExists(file)) data.reject("ownership file exists or cannot be inspected after failed load");
+        storage.set(DATA_NAME, data);
+        return data;
     }
 
     boolean canClaim(BlockPos pos) {
