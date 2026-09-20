@@ -182,18 +182,17 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(message, self.git('show', '-s', '--format=%B', state['commit']))
         self.assertEqual(state, flow.delivery.finish(self.root, intent, flow.git))
 
-    def test_supervisor_resumes_pre_intent_push_failure(self):
-        import ktask_supervisor as supervisor
+    def test_accept_hook_resumes_pre_intent_push_failure(self):
         self.evidence()
         with patch.object(flow, 'publish', side_effect=OSError('offline')):
             with self.assertRaises(OSError):
                 self.accept()
         (self.session / 'delivery-intent.json').unlink()
-        with patch.object(flow, 'load_project', return_value=([self.task], self.policy)), \
-                patch.object(flow, 'validate'), patch.object(supervisor, 'reconcile', side_effect=lambda *args: supervisor.accepted_prefix(self.root, [self.task])), \
-                patch.object(supervisor, 'decision') as model:
-            self.assertEqual(0, supervisor.supervise(self.root, self.policy))
+        with patch.object(flow, 'review_candidate') as model, patch.object(flow, 'run_gate') as gate:
+            saved = json.loads((self.session / 'active.json').read_text())
+            self.assertEqual(self.git('rev-parse', 'HEAD'), flow.accept(self.root, self.task, saved, self.policy))
             model.assert_not_called()
+            gate.assert_not_called()
 
     def test_reconstruction_rejects_false_candidate_attestation(self):
         self.git('add', 'owned.txt')
@@ -385,9 +384,6 @@ class DeliveryTests(unittest.TestCase):
         self.task['body'] = 'IF-001 Change owned behavior'
         (self.root / '.ktask/config.toml').write_text('timeout = 10860\nlimit_max_wait_seconds = 3600\n')
         flow.save(self.session / 'active.json', self.state)
-        diagnosis = self.session / 'planning/IF-001/reason.txt'
-        diagnosis.parent.mkdir(parents=True)
-        diagnosis.write_text('Keep the correction inside this packet.')
         for repair in (False, True):
             with self.subTest(repair=repair):
                 prompt = '[Orchestrator context] Task 1 of 1 (attempt 1).\n' + self.task['body']
@@ -401,8 +397,6 @@ class DeliveryTests(unittest.TestCase):
                 self.assertTrue(submitted.startswith(prompt))
                 self.assertIn('[Project execution boundary]', submitted)
                 boundary = submitted.split('[Project execution boundary]', 1)[1]
-                self.assertGreater(submitted.index('[Project execution boundary]'),
-                                   submitted.index('Coordinator diagnosis:'))
                 lines = boundary.strip().splitlines()
                 self.assertEqual(self.task['scope'], json.loads(lines[0].removeprefix('Allowed path patterns: ')))
                 self.assertEqual(list(CONTROL), json.loads(lines[1].removeprefix('Forbidden path prefixes: ')))

@@ -39,7 +39,7 @@ machinery. Do not expand a task because adjacent code could be improved.
 
 ## Evidence
 
-Capture actual commands with the launcher, never write execution receipts yourself:
+Capture actual commands with the evidence recorder, never write execution receipts yourself:
 
     python3 scripts/ktask_workflow.py record red -- <focused test command>
     python3 scripts/ktask_workflow.py record green -- <focused test command>

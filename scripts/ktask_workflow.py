@@ -15,8 +15,9 @@ from ktask_process import run, codex_args
 from ktask_evidence import record, validate_runs
 from ktask_guardian import invoke as run_model
 import ktask_delivery as delivery
-from ktask_timeouts import budgets
+from ktask_timeouts import worker_timeout
 from ktask_plan import validate_plan, bind_contracts
+from ktask_queue import QUEUE, packet_text, queue_digest, implementation_paths, check_dispatch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -46,7 +47,10 @@ def save(path, value):
 
 
 def tracked_clean(root):
-    return not git(root, "status", "--porcelain", "--untracked-files=no")
+    paths = set(git(root, 'diff', '--name-only', '-z', 'HEAD').split('\0')) - {''}
+    staged = set(git(root, 'diff', '--cached', '--name-only', '-z').split('\0')) - {''}
+    return not (implementation_paths(root, paths, 'HEAD', git)
+                or implementation_paths(root, staged, 'HEAD', git, commit=''))
 
 
 def untracked(root):
@@ -70,7 +74,8 @@ def begin(root, task, policy):
     if git(root, "branch", "--show-current") != policy["branch"] or not tracked_clean(root):
         raise ValueError("A clean checkpoint on the authorized feature branch is required")
     return dict(task=task["id"], packet=task["digest"], baseline=git(root, "rev-parse", "HEAD"),
-                branch=policy["branch"], protected=file_digest(root, untracked(root)), token=uuid.uuid4().hex)
+                branch=policy["branch"], protected=file_digest(root, untracked(root)),
+                queue=queue_digest(root), token=uuid.uuid4().hex)
 
 
 def candidate_state(root, task, state, policy, committed=False, allowed_controls=()):
@@ -80,8 +85,15 @@ def candidate_state(root, task, state, policy, committed=False, allowed_controls
         raise ValueError("Task, branch or checkpoint changed outside delivery")
     if file_digest(root, state["protected"]) != state["protected"]:
         raise ValueError("Pre-existing untracked user files changed")
+    if 'queue' in state and state['queue'] != queue_digest(root):
+        raise ValueError('Native queue changed during this attempt')
     paths = set(git(root, "diff", "--no-renames", "--name-only", "-z", state["baseline"]).split("\0")) - {""}
     paths |= untracked(root) - state["protected"].keys()
+    paths = implementation_paths(root, paths, state['baseline'], git)
+    staged = set(git(root, 'diff', '--cached', '--name-only', '-z').split('\0')) - {''}
+    staged = implementation_paths(root, staged, 'HEAD', git, commit='')
+    if staged - paths:
+        raise ValueError('Index contains changes outside the current candidate')
     check_scope(task, paths, allowed_controls)
     if not paths:
         raise ValueError("No implementation change to accept")
@@ -210,6 +222,8 @@ def accept(root, task, state, policy):
     to_stage = [name for name in paths if name in indexed or os.path.lexists(root / name)]
     if to_stage:
         git(root, "add", "--", *to_stage)
+    if (root / QUEUE).exists():
+        git(root, 'add', '--', QUEUE)
     if candidate_state(root, task, state, policy)[1] != candidate:
         raise ValueError("Candidate changed while staging")
     message = (f"{task['id']}: {task['title']}\n\n"
@@ -236,30 +250,48 @@ def load_project(root):
 def plan_digest(root):
     paths = [".ktask/" + name for name in
              ("config.toml", "policy.toml", "context.md", "prompt.md", "tasks.md",
-              "review.md", "autoresolve.md", "readiness.md", "coordinator.md", "content-plan.json")]
+              "review.md", "autoresolve.md", "content-plan.json")]
     paths += [str(path.relative_to(root)) for path in sorted((root / 'scripts').glob('ktask_*.py'))]
     paths += ["AGENTS.md", "VISION.md", ".ktask/verify.sh"]
     paths += [str(path.relative_to(root)) for path in sorted((root / "docs").glob("*.md"))]
-    return hashlib.sha256(json.dumps(file_digest(root, paths), sort_keys=True).encode()).hexdigest()
+    digests = file_digest(root, paths)
+    if (root / QUEUE).exists():
+        digests[QUEUE] = hashlib.sha256(packet_text((root / QUEUE).read_text()).encode()).hexdigest()
+    return hashlib.sha256(json.dumps(digests, sort_keys=True).encode()).hexdigest()
 
 
 def require_session(root):
     expected = root / ".ktask/session/plan.json"
     if not expected.exists() or json.loads(expected.read_text())["digest"] != plan_digest(root):
-        raise ValueError("No matching prepared session; use the project launcher")
+        raise ValueError("Attempt contract changed; do not edit process controls during execution")
     return json.loads(expected.read_text())
 
 
 def executor(root, tasks, policy, argv):
-    plan = require_session(root)
     prompt = sys.stdin.read()
+    try:
+        execute_attempt(root, tasks, policy, argv, prompt)
+    except (ValueError, OSError, subprocess.SubprocessError) as error:
+        header = re.search(r'\[Orchestrator context\] Task (\d+) of (\d+)', prompt)
+        if header and 1 <= int(header[1]) <= len(tasks):
+            report = root / f'.ktask/queue/report-{header[1]}.md'
+            report.parent.mkdir(parents=True, exist_ok=True)
+            reason = ' '.join(str(error).split())[:500]
+            report.write_text(f'KTASK_RESULT: FAILED\nSummary: Executor failed.\nReason: {reason}\n')
+        raise
+
+
+def execute_attempt(root, tasks, policy, argv, prompt):
     header = re.search(r"\[Orchestrator context\] Task (\d+) of (\d+)", prompt)
-    total = len(plan['task_ids']) if isinstance(plan, dict) else len(tasks)
+    total = len(tasks)
     if not header or int(header[2]) != total or not 1 <= int(header[1]) <= total:
         raise ValueError("Unrecognized ktask executor context")
     task = tasks[int(header[1]) - 1]
     if task["body"] not in prompt:
         raise ValueError("Runtime packet differs from the canonical task")
+    check_dispatch(root, tasks, int(header[1]) - 1, git)
+    save(root / '.ktask/session/plan.json',
+         dict(digest=plan_digest(root), task_ids=[entry['id'] for entry in tasks]))
     active = root / ".ktask/session/active.json"
     state = json.loads(active.read_text()) if active.exists() else None
     if not state or state["task"] != task["id"]:
@@ -273,8 +305,14 @@ def executor(root, tasks, policy, argv):
     if state["packet"] != task["digest"]:
         raise ValueError("Active task packet changed")
     if "commit" in state:
-        report = root / f".ktask/session/.ktask/queue/report-{header[1]}.md"
+        report = root / f".ktask/queue/report-{header[1]}.md"
+        report.parent.mkdir(parents=True, exist_ok=True)
         report.write_text("KTASK_RESULT: DONE\nReviewed commit awaits remote confirmation.\n")
+        return
+    if (root / '.ktask/session/delivery-intent.json').exists():
+        report = root / f'.ktask/queue/report-{header[1]}.md'
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text('KTASK_RESULT: DONE\nSummary: Resume prepared delivery; no implementation needed.\n')
         return
     if git(root, "rev-parse", "HEAD") != state["baseline"]:
         raise ValueError("Worker checkpoint moved without acceptance")
@@ -284,9 +322,8 @@ def executor(root, tasks, policy, argv):
     argv = codex_args(model, effort, writable=True, cache=policy.get('gradle_cache')) + ['-']
     prompt += "\nThe delivery adapter owns commits and pushes. Do not perform either.\n"
     prompt += f"Baseline: {state['baseline']}\nEvidence directory: .ktask/session/evidence/{task['id']}\n"
-    diagnosis = root / '.ktask/session/planning' / task['id'] / 'reason.txt'
-    if diagnosis.exists():
-        prompt += '\nCoordinator diagnosis:\n' + diagnosis.read_text()
+    if state.get('recovery'):
+        prompt += '\nPreserved attempt: ' + state['recovery'] + '\n'
     prompt += ('\n[Project execution boundary]\n'
                f'Allowed path patterns: {json.dumps(task["scope"])}\n'
                f'Forbidden path prefixes: {json.dumps(CONTROL)}\n'
@@ -297,7 +334,7 @@ def executor(root, tasks, policy, argv):
                'report FAILED for coordinator correction; do not make that edit. '
                'The prescribed ignored report and evidence outputs remain required.\n')
     config = tomllib.loads((root / '.ktask/config.toml').read_text())
-    run_model(argv, root, budgets(task['id'], config, policy)[0], prompt, check=True)
+    run_model(argv, root, worker_timeout(task['id'], config, policy), prompt, check=True)
 
 
 def validate(root, tasks):
@@ -320,17 +357,24 @@ def validate(root, tasks):
     if set(policy.get('task_timeouts', {})) - {task['id'] for task in tasks}:
         raise ValueError('Task timeout references unknown task')
     for task in tasks:
-        budgets(task['id'], config, policy)
+        worker_timeout(task['id'], config, policy)
     print(f"{len(tasks)} ordered tasks; {len(blocks)} in-scope block entries owned once.", flush=True)
 
 
 def main():
     command, *arguments = sys.argv[1:]
-    if command in ("run", "resume", "retry", "status", "reconcile", "restore-receipts"):
-        os.execv(sys.executable, [sys.executable, str(ROOT / 'scripts/ktask_supervisor.py'), command, *arguments])
+    if command in ('run', 'resume', 'retry', 'status'):
+        raise ValueError(f'Use ktask {command}; project scripts never launch the orchestrator')
     tasks, policy = load_project(ROOT)
     if command == "validate":
         validate(ROOT, tasks)
+    elif command == 'restore-receipts':
+        receipts = delivery.published_receipts(ROOT, tasks, policy, git)
+        for identity, receipt in receipts.items():
+            path = ROOT / '.ktask/session/accepted' / f'{identity}.json'
+            if not path.exists():
+                save(path, receipt)
+        print(f'{len(receipts)} published task receipts verified; queue unchanged')
     elif command == "scope":
         task = next(task for task in tasks if task["id"] == arguments[0])
         print(json.dumps(task["scope"], indent=2))
@@ -363,7 +407,7 @@ def main():
         record(ROOT / '.ktask/session/evidence' / task['id'], evidence_binding(state),
                candidate, phase, argv, ROOT, 7200 if phase == 'soak' else 1800, options.artifact)
     else:
-        raise ValueError("Use validate, status, run, resume, retry or check-evidence")
+        raise ValueError("Use validate, scope, executor, accept, record or check-evidence")
 
 
 if __name__ == "__main__":

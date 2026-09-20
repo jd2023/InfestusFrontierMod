@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import PurePosixPath
 import re
+from ktask_queue import MARKER, packet_text
 
 FIELDS = {"Milestone", "Owner", "Depends", "Spec", "Blocks", "Scope", "Contract",
           "Red", "Accept", "Bounds", "Evidence"}
@@ -46,12 +47,15 @@ def module_scope(owner):
 
 
 def parse_tasks(content):
-    """Read canonical, ordered packets; runtime status markers are not specifications."""
+    """Read the native queue; status markers do not change a packet's identity."""
     tasks, known = [], set()
     for block in re.split(r"^---\s*$", content, flags=re.M):
         lines = [line for line in block.splitlines() if line.strip() and not line.startswith("#")]
         if not lines:
             continue
+        marker = MARKER.match(lines[0])
+        status = marker[1] if marker else 'TODO'
+        lines[0] = packet_text(lines[0])
         match = re.fullmatch(r"(IF-\d{3}) (.+)", lines[0])
         if not match or match[1] in known:
             raise ValueError("Invalid or duplicate task ID")
@@ -81,7 +85,7 @@ def parse_tasks(content):
                 expanded.append(rule)
         if not set(fields["Evidence"].split(", ")) <= {"rules", "game", "visual", "integration", "soak"}:
             raise ValueError(f"{match[1]} unknown evidence type")
-        tasks.append(dict(fields, id=match[1], title=match[2], scope=expanded,
+        tasks.append(dict(fields, id=match[1], title=match[2], scope=expanded, status=status,
                           dependencies=dependencies, body="\n".join(lines),
                           digest=hashlib.sha256("\n".join(lines).encode()).hexdigest()))
         known.add(match[1])

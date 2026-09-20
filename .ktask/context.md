@@ -21,4 +21,4 @@ Routine engineering failures return to the stronger resolver, not the user.
 Gate: bash .ktask/verify.sh.
 Evidence: .ktask/session/evidence/<task-id>/.
 Report: exact path in the orchestrator header, not a guessed queue path.
-Status: python3 scripts/ktask_workflow.py status.
+Status: ktask status.

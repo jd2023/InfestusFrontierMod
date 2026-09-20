@@ -16,7 +16,7 @@ enforce hard bounds, back-pressure and loaded-chunk-only behavior.
 Start from a clean committed Git checkpoint. Scope edits narrowly; add meaningful
 red-first tests, adjacent regressions and run `./.ktask/verify.sh`. Inspect the
 complete diff, then commit one coherent scope. Never weaken checks or replace
-visual goldens to obtain a pass. Use the project ktask launcher for authorized
+visual goldens to obtain a pass. Use native `ktask run/resume/retry` for authorized
 execution; workers do not commit/push or edit acceptance machinery. Accepted task
 changes are committed and pushed by the adapter to the configured feature branch.
 No public release, main merge, new remote or prototype copy is authorized.

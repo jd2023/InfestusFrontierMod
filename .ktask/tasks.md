@@ -1,8 +1,8 @@
 # Implementation queue — M0–M10
 # Contract format and shared requirements: docs/TASK_TEMPLATE.md.
-# Each packet is one accepted checkpoint; runtime statuses are generated separately.
+# ktask owns status markers; packet identities exclude those markers.
 
-IF-094 Bounded progression graph validation
+[DONE] IF-094 Bounded progression graph validation
 Milestone: M0
 Owner: integration
 Depends: none

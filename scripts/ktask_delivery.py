@@ -6,6 +6,7 @@ import hashlib
 import subprocess
 
 from ktask_contracts import check_scope
+from ktask_queue import implementation_paths
 
 
 def fingerprint(contents, modes):
@@ -14,7 +15,7 @@ def fingerprint(contents, modes):
 
 def committed_candidate(root, task, parent, commit, git):
     paths = git(root, 'diff', '--no-renames', '--name-only', '-z', parent, commit).split('\0')
-    paths = sorted(set(paths) - {''})
+    paths = sorted(implementation_paths(root, set(paths) - {''}, parent, git, commit))
     check_scope(task, paths)
     if not paths:
         raise ValueError('Published task has no candidate changes')

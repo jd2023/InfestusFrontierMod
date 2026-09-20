@@ -23,7 +23,7 @@ def run(argv, root, timeout, prompt=None, *, log=None, check=True, graceful=Fals
             os.killpg(group, signal.SIGKILL)
         raise KeyboardInterrupt
     previous = {sig: signal.signal(sig, stop) for sig in (signal.SIGTERM, signal.SIGINT)}
-    deadline, heartbeat = time.monotonic() + timeout, time.monotonic() + 30
+    deadline = time.monotonic() + timeout
     selector = selectors.DefaultSelector()
     pending = memoryview(prompt.encode()) if prompt is not None else None
     if child.stdin:
@@ -59,9 +59,6 @@ def run(argv, root, timeout, prompt=None, *, log=None, check=True, graceful=Fals
                             raise ValueError('Captured log exceeded 16 MiB')
             if child.poll() is not None and not selector.get_map():
                 break
-            if time.monotonic() >= heartbeat:
-                print('Task process still running within its deadline.', flush=True)
-                heartbeat = time.monotonic() + 30
     except (subprocess.TimeoutExpired, KeyboardInterrupt, ValueError):
         if graceful:
             for sig in previous:

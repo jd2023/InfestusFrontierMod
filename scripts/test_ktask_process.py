@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 from ktask_process import run
 
@@ -16,6 +16,15 @@ class ProcessTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
+
+    def test_silent_child_does_not_emit_wrapper_heartbeat(self):
+        child = Mock(returncode=0, stdin=None, stdout=None)
+        child.poll.side_effect = [None, 0]
+        with patch('ktask_process.subprocess.Popen', return_value=child), \
+                patch('ktask_process.time.monotonic', side_effect=range(0, 1000, 31)), \
+                patch('builtins.print') as output:
+            run(['fake-child'], self.root, 1000)
+        output.assert_not_called()
 
     def test_noisy_child_cannot_write_past_capture_limit(self):
         log = self.root / 'noise.log'

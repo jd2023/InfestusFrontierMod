@@ -31,9 +31,13 @@ Evidence: rules
         with self.assertRaises(ValueError):
             parse_tasks(self.packet().replace("Contract: process one reserved batch\n", ""))
 
-    def test_queue_markers_are_runtime_only(self):
-        with self.assertRaises(ValueError):
-            parse_tasks("[DONE] " + self.packet())
+    def test_native_status_markers_do_not_change_packet_identity(self):
+        original = parse_tasks(self.packet())[0]
+        for marker in ('DONE', 'FAIL', 'INPUT'):
+            parsed = parse_tasks(f'[{marker}] ' + self.packet())[0]
+            self.assertEqual(original['digest'], parsed['digest'])
+            self.assertEqual(original['body'], parsed['body'])
+            self.assertEqual(marker, parsed['status'])
 
     def test_scope_rejects_gate_changes_and_neighbor_feature(self):
         task = parse_tasks(self.packet())[0]

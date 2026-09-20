@@ -1,8 +1,8 @@
-"""Admission of task execution and enclosing runner time budgets."""
+"""Validate a hook's deadline against native ktask limits."""
 
 
-def budgets(task_id, config, policy):
-    """Return worker/runner seconds; reserve outer shutdown and verification time."""
+def worker_timeout(task_id, config, policy):
+    """Return one attempt's deadline, leaving ktask room for child cleanup."""
     worker = policy.get('task_timeouts', {}).get(task_id, policy.get('worker_timeout', 7200))
     outer = config.get('timeout', 14400)
     verification = config.get('verification_timeout', 900)
@@ -16,9 +16,4 @@ def budgets(task_id, config, policy):
             or (config.get('limit_auto_wait', True) and wait == 0)
             or any(type(value) is not int or not 0 <= value <= 7200 for value in (verification, wait))):
         raise ValueError('Invalid execution budget or missing outer shutdown margin')
-    retries, remediation, autoresolve = attempts
-    repair_limit = autoresolve or max(1, remediation, max(0, retries - 1))
-    runner = (1 + repair_limit) * (outer + verification + wait + 60) + 60
-    if runner > 86400:
-        raise ValueError('Enclosing runner budget exceeds24 hours')
-    return worker, runner
+    return worker
