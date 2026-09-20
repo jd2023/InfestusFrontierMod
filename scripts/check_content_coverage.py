@@ -24,6 +24,10 @@ RESOURCE_ID = re.compile(r"[a-z0-9_.-]+:[a-z0-9_./-]+\Z")
 MAX_IDENTIFIERS = 4096
 MAX_EDGES = 16384
 MAX_INPUT_BYTES = 1024 * 1024
+HARNESS_ASSERTIONS = {
+    "gameTest": ("infestusfrontier_tests:integration.server_state",),
+    "client": ("infestusfrontier_client:integration.world",),
+}
 KNOWN_ALIASES = {frozenset(("I001", "T0-16")): "I001/T0-16"}
 
 
@@ -155,7 +159,7 @@ def _plan(path: Path, tasks: dict[str, Task]) -> tuple[dict[str, str], dict[str,
 
 
 def _resource(value: Any, label: str) -> str:
-    if not isinstance(value, str) or not RESOURCE_ID.fullmatch(value):
+    if not isinstance(value, str) or len(value) > 256 or not RESOURCE_ID.fullmatch(value):
         raise CoverageError(f"{label}: expected namespaced identifier")
     return value
 
@@ -172,6 +176,24 @@ def _string_list(value: Any, label: str, pattern: re.Pattern[str]) -> list[str]:
     return value
 
 
+def _guide_data(owner_path: Path, relative: Any, assertion: str, label: str) -> dict:
+    if not isinstance(relative, str) or not re.fullmatch(r"guide/[a-z0-9_-]+\.json", relative):
+        raise CoverageError(f"{label}: guide must use owner-local guide/<name>.json")
+    path = owner_path / relative
+    if not path.resolve().is_relative_to(owner_path.resolve()) or path.is_symlink():
+        raise CoverageError(f"{label}: guide must stay inside its owner")
+    guide = _load_json(path, f"{label} guide")
+    _keys(guide, {"schema", "entry", "title", "obtain", "use", "assertion"}, f"{label} guide")
+    if guide["schema"] != 1 or guide["assertion"] != assertion:
+        raise CoverageError(f"{label}: guide schema/assertion does not match {assertion}")
+    _resource(guide["entry"], f"{label} guide entry")
+    for field in ("title", "obtain", "use"):
+        text = guide[field]
+        if not isinstance(text, str) or not text.strip() or len(text) > 4096:
+            raise CoverageError(f"{label}: guide {field} must contain 1..4096 characters")
+    return guide
+
+
 def _read_contributors(
     root: Path,
     task_by_id: dict[str, Task],
@@ -183,9 +205,13 @@ def _read_contributors(
     resources = root / "src/testMod/resources"
     paths = sorted(resources.rglob("coverage.json")) if resources.is_dir() else []
     representations: dict[str, dict[str, Any]] = {}
-    assertion_owners: dict[str, str] = {}
+    probe_names = {name for names in HARNESS_ASSERTIONS.values() for name in names}
+    assertion_owners = {name: "integration harness" for name in probe_names}
+    guide_entries: set[str] = set()
     contribution_tasks: dict[str, str] = {}
-    identifiers = set(ownership) | set(task_by_id)
+    identifiers = set(ownership) | set(task_by_id) | probe_names
+    if len(identifiers) > MAX_IDENTIFIERS:
+        raise CoverageError(f"content plan exceeds {MAX_IDENTIFIERS} identifiers")
     edge_count = base_edges
 
     for path in paths:
@@ -221,7 +247,7 @@ def _read_contributors(
                     catalog_hint = "/".join(map(str, entry["catalog"]))
                 _keys(
                     entry,
-                    {"catalog", "registry", "producer", "assertions"},
+                    {"catalog", "registry", "producer", "assertions", "guide"},
                     catalog_hint,
                 )
                 catalogs = _string_list(entry["catalog"], catalog_hint, CATALOG_ID)
@@ -234,6 +260,11 @@ def _read_contributors(
                     role: _resource(assertions[role], f"{catalog_hint} {role} assertion")
                     for role in ("obtain", "use", "guide")
                 }
+                guide = _guide_data(path.parent, entry["guide"], normalized_assertions["guide"], catalog_hint)
+                if guide["entry"] in guide_entries:
+                    raise CoverageError(f"{catalog_hint}: duplicate guide entry {guide['entry']}")
+                guide_entries.add(guide["entry"])
+                identifiers.add(guide["entry"])
                 identifiers.update(registries)
                 identifiers.add(producer)
                 identifiers.update(normalized_assertions.values())
@@ -241,7 +272,7 @@ def _read_contributors(
                     raise CoverageError(
                         f"{catalog_hint}: coverage exceeds {MAX_IDENTIFIERS} identifiers"
                     )
-                edge_count += len(catalogs) + len(registries) + 4
+                edge_count += len(catalogs) + len(registries) + 5
                 if edge_count > MAX_EDGES:
                     raise CoverageError(
                         f"{catalog_hint}: coverage exceeds {MAX_EDGES} edges"
@@ -268,6 +299,7 @@ def _read_contributors(
                     "registry": registries,
                     "producer": producer,
                     "assertions": normalized_assertions,
+                    "guide": f"{path_owner}/{entry['guide']}",
                 }
                 for catalog in catalogs:
                     representations[catalog] = normalized
@@ -367,11 +399,13 @@ def validate(root: Path = ROOT, through: str | None = None) -> dict[str, Any]:
         "trackedThrough": tracked_through,
         "guideMode": "execute" if guide_active else "staged",
         "representations": unique_representations,
+        "emptyRegistry": not unique_representations,
         "assertions": {
             "gameTest": game_tests,
             "client": guides if guide_active else [],
             "stagedGuide": [] if guide_active else guides,
         },
+        "harnessAssertions": {role: list(names) for role, names in HARNESS_ASSERTIONS.items()},
         "limits": {"identifiers": MAX_IDENTIFIERS, "edges": MAX_EDGES},
     }
 

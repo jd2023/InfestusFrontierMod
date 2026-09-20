@@ -139,6 +139,19 @@ class EvaluatorTest(EvidenceCase):
             )["content:infestusfrontier_tests:fixture.obtain"]
         )
 
+    def test_guide_requirement_is_not_satisfied_by_server_or_partial_marker(self):
+        name = "infestusfrontier_client:fixture.guide"
+        for log in ("", f"INFESTUS_CONTENT_ASSERTION name={name}\n",
+                    f"INFESTUS_GUIDE_ASSERTION name={name}_other\n"):
+            result = self.result()
+            result["assertions"].update(harness._named_assertions(log, [name], harness.GUIDE_MARKER))
+            with self.assertRaisesRegex(harness.HarnessFailure, name):
+                harness.ResultEvaluator().evaluate(result)
+        result = self.result()
+        result["assertions"].update(harness._named_assertions(
+            f"INFESTUS_GUIDE_ASSERTION name={name}\n", [name], harness.GUIDE_MARKER))
+        harness.ResultEvaluator().evaluate(result)
+
     def test_content_requirements_file_is_bounded_and_typed(self):
         with tempfile.TemporaryDirectory() as raw:
             path = Path(raw) / "requirements.json"
@@ -160,6 +173,12 @@ class EvaluatorTest(EvidenceCase):
                 json.dumps({"assertions": {"gameTest": [], "client": [7]}})
             )
             with self.assertRaisesRegex(harness.HarnessFailure, "client"):
+                harness.load_content_requirements(path)
+            path.write_text(json.dumps({"assertions": [], "harnessAssertions": []}))
+            with self.assertRaisesRegex(harness.HarnessFailure, "content assertion"):
+                harness.load_content_requirements(path)
+            path.write_text(" " * (1024 * 1024 + 1))
+            with self.assertRaisesRegex(harness.HarnessFailure, "1 MiB"):
                 harness.load_content_requirements(path)
 
 

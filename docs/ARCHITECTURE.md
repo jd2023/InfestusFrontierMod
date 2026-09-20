@@ -253,6 +253,7 @@ has exactly these fields:
   "catalog": ["I001", "T0-16"],
   "registry": ["infestusfrontier:construction/organ_bud"],
   "producer": "infestusfrontier:construction/organ_bud",
+  "guide": "guide/organ_bud.json",
   "assertions": {
     "obtain": "infestusfrontier_tests:construction.organ_bud.obtain",
     "use": "infestusfrontier_tests:construction.organ_bud.use",
@@ -265,10 +266,25 @@ has exactly these fields:
 authorize another registration. Families may list their finite actual registry
 IDs. `producer` names the real recipe, mutation or construction operation. Obtain
 and use assertions are GameTests and call `ContentAssertion.passGameTest` only
-after their behavior succeeds. Guide assertions call `ContentAssertion.passGuide`
-after the client has observed the named page/recipe behavior. Their exact markers
-are required by the integration harness, so a registration without the behavior
-test is insufficient. Guide assertions are schema-checked and staged before
+after their behavior succeeds. Owner client contributors live under
+`src/testMod/java/org/jd/infestusfrontier/testmod/<owner>/client/`, implement
+`ContentGuideScenario`, and are explicitly listed in the testMod resource
+`META-INF/services/org.jd.infestusfrontier.testmod.integration.client.ContentGuideScenario`.
+The client runner calls one scenario per tick after the world capture; returning
+true certifies the observed page/recipe behavior and emits `ContentAssertion.passGuide`.
+A scenario may retain bounded state across ticks to open and inspect UI; all
+scenarios together must finish within the existing 30-second disconnect phase.
+Missing or duplicate providers fail by assertion name. Staged providers are not
+executed. Client contributors and guide records are included in the disposable
+client artifact. Client classes are excluded from the dedicated GameTest source
+set and release JAR. Their exact markers are required by the integration harness,
+so a registration without the behavior test is insufficient. The owner-local `guide/<name>.json` is required even before
+IF-004. It contains exactly `schema: 1`, a namespaced `entry`, nonblank `title`,
+`obtain` and `use` teaching text (at most 4096 characters each), and `assertion`
+matching the coverage guide assertion. Entry IDs are unique across representations;
+aliases share the same record. Missing, malformed or mismatched staged data fails
+by catalog ID. The `guide` field is a relative path within the owner's directory,
+not an ignored receipt. Guide assertions and records are schema-checked before
 IF-004; at and after IF-004 the emitted client requirement includes every eligible
 staged and new assertion.
 
@@ -278,14 +294,20 @@ misowned or duplicate catalog IDs, missing producers/assertions and incomplete
 accepted tasks fail by exact identifier. The checker admits at most 4096 distinct
 identifiers, 16384 mapping/dependency edges and 1 MiB per JSON input. It performs
 no game/world scan. The isolated IF-108 GameTest separately proves the bootstrap
-has no production item or block registrations; later checkpoints replace that
-empty-state expectation with their named contributors.
+has no production item or block registrations. The generated requirements carry
+`emptyRegistry`, derived from accepted representations, to both test runtimes;
+contributed content replaces that empty-state expectation with named assertions.
+A separate always-required harness GameTest and multi-tick client UI scenario
+prove the marker and contributor execution paths without registering gameplay.
+The checker output is a generated input to both test resource sets, so advancing
+an uncommitted checkpoint also changes the packaged runtime requirements.
 
-`verifyAll` adds integrationHarnessTest and required-profile
-smoke without removing its existing core, distribution or GameTest checks. Its
-smoke always uses required, independent of a caller's profile selection; reuse the
-existing required GameTest run where possible. Full profile captures and packaged
-server runs are recorded task evidence, not four extra copies of the full gate.
+`verifyAll` adds integrationHarnessTest, required-profile smoke and one serial
+`captureClient` run without removing its existing core, distribution or GameTest
+checks. Its smoke always uses required, independent of a caller's profile selection;
+reuse the existing required GameTest run where possible. The default client run executes all
+eligible guide assertions, including staged predecessors after IF-004. Full profile
+captures and packaged server runs are recorded task evidence, not four extra copies of the full gate.
 IF-127 runs four times (180+420+420) seconds at most: 4080 seconds runtime, plus
 600 seconds preparation inside a 4800-second matrix deadline. Reserve 1200 seconds
 for the existing gate within the unchanged 7200-second worker budget. Qualification

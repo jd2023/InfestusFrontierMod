@@ -53,6 +53,7 @@ def entry(*catalog: str, stem: str | None = None) -> dict:
         "catalog": list(catalog),
         "registry": [f"infestusfrontier:fixture/{stem}"],
         "producer": f"infestusfrontier:fixture/{stem}",
+        "guide": f"guide/{stem}.json",
         "assertions": {
             "obtain": f"infestusfrontier_tests:fixture.{stem}.obtain",
             "use": f"infestusfrontier_tests:fixture.{stem}.use",
@@ -94,6 +95,18 @@ class Fixture:
         path = self.root / "src/testMod/resources" / owner / "coverage.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value), encoding="utf-8")
+        for contribution in value["contributions"]:
+            for representation in contribution["entries"]:
+                guide = path.parent / representation["guide"]
+                guide.parent.mkdir(exist_ok=True)
+                guide.write_text(json.dumps({
+                    "schema": 1,
+                    "entry": representation["registry"][0],
+                    "title": "Fixture entry",
+                    "obtain": "Obtain the fixture through its producer.",
+                    "use": "Use the fixture in its consumer.",
+                    "assertion": representation["assertions"].get("guide", "missing:guide"),
+                }))
         return path
 
     def close(self) -> None:
@@ -116,6 +129,7 @@ class CoverageTests(unittest.TestCase):
         self.fixture.checkpoint("IF-108")
         result = coverage.validate(self.fixture.root)
         self.assertEqual(result["representations"], [])
+        self.assertTrue(result["emptyRegistry"])
         self.assertEqual(result["assertions"]["gameTest"], [])
         self.fixture.checkpoint("IF-095")
         self.assert_rejected("I000", lambda: coverage.validate(self.fixture.root))
@@ -124,8 +138,20 @@ class CoverageTests(unittest.TestCase):
         self.fixture.checkpoint("IF-095")
         path = self.fixture.contributor(CONSTRUCTION)
         self.assertEqual(coverage.validate(self.fixture.root)["through"], "IF-095")
+        self.assertFalse(coverage.validate(self.fixture.root)["emptyRegistry"])
         path.unlink()
         self.assert_rejected("I000", lambda: coverage.validate(self.fixture.root))
+
+    def test_default_requires_latest_contributor_when_an_earlier_one_remains(self):
+        self.fixture.checkpoint("IF-005")
+        self.fixture.contributor(CONSTRUCTION)
+        latest = self.fixture.contributor({
+            "schema": 1, "owner": "ecology", "contributions": [
+                {"task": "IF-005", "entries": [entry("T0-01", stem="substrate")]}],
+        })
+        self.assertEqual(coverage.validate(self.fixture.root)["through"], "IF-005")
+        latest.unlink()
+        self.assert_rejected("T0-01", lambda: coverage.validate(self.fixture.root))
 
     def test_missing_item_rank_assertion_and_producer_name_exact_identifier(self):
         self.fixture.checkpoint("IF-095")
@@ -226,6 +252,39 @@ class CoverageTests(unittest.TestCase):
         self.assertEqual(active["guideMode"], "execute")
         self.assertEqual(len(active["assertions"]["client"]), 3)
         self.assertEqual(active["assertions"]["stagedGuide"], [])
+
+    def test_staged_guide_data_is_required_and_schema_checked(self):
+        self.fixture.checkpoint("IF-095")
+        self.fixture.contributor(CONSTRUCTION)
+        path = self.fixture.root / "src/testMod/resources/construction/guide/i000.json"
+        original = json.loads(path.read_text())
+        path.unlink()
+        self.assert_rejected("I000", lambda: coverage.validate(self.fixture.root))
+        for change in ({"schema": 2}, {"title": ""}, {"obtain": []},
+                       {"use": " "}, {"entry": "invalid"},
+                       {"assertion": "fixture:wrong"}):
+            with self.subTest(change=change):
+                path.write_text(json.dumps(original | change))
+                self.assert_rejected("I000", lambda: coverage.validate(self.fixture.root))
+        path.write_text(json.dumps(original))
+        self.assertEqual(coverage.validate(self.fixture.root)["guideMode"], "staged")
+
+    def test_guide_paths_cannot_escape_owner(self):
+        self.fixture.checkpoint("IF-095")
+        path = self.fixture.contributor(CONSTRUCTION)
+        broken = copy.deepcopy(CONSTRUCTION)
+        broken["contributions"][0]["entries"][0]["guide"] = "../construction/guide/i000.json"
+        path.write_text(json.dumps(broken))
+        self.assert_rejected("I000", lambda: coverage.validate(self.fixture.root))
+
+    def test_duplicate_staged_guide_entry_is_rejected(self):
+        self.fixture.checkpoint("IF-095")
+        self.fixture.contributor(CONSTRUCTION)
+        path = self.fixture.root / "src/testMod/resources/construction/guide/organ_bud.json"
+        guide = json.loads(path.read_text())
+        guide["entry"] = "infestusfrontier:fixture/i000"
+        path.write_text(json.dumps(guide))
+        self.assert_rejected("I001/T0-16", lambda: coverage.validate(self.fixture.root))
 
     def test_identifier_and_edge_bounds_fail_before_expansion(self):
         self.fixture.checkpoint("IF-108")

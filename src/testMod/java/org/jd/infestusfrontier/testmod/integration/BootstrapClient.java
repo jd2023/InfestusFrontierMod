@@ -18,6 +18,7 @@ import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
+import org.jd.infestusfrontier.testmod.integration.client.GuideScenarios;
 
 /** Disposable-client automation used only by the integration harness. */
 @Mod(value = "infestusfrontier_client", dist = Dist.CLIENT)
@@ -27,6 +28,7 @@ public final class BootstrapClient {
     private final String address = environment("INFESTUS_SERVER", "127.0.0.1:25565");
     private Stage stage = Stage.TITLE_LOAD;
     private boolean worldRendered;
+    private GuideScenarios guideScenarios;
 
     public BootstrapClient() {
         NeoForge.EVENT_BUS.addListener(this::tick);
@@ -46,6 +48,10 @@ public final class BootstrapClient {
                 case TITLE_LOAD -> prepareTitle(minecraft);
                 case CONNECT -> connect(minecraft);
                 case WORLD -> captureWorld(minecraft);
+                case GUIDES -> {
+                    if (guideScenarios == null) guideScenarios = new GuideScenarios();
+                    if (guideScenarios.tick(minecraft)) stage = Stage.DISCONNECT;
+                }
                 case DISCONNECT -> disconnect(minecraft);
                 case STOP -> stop(minecraft);
                 case TITLE, WAIT, WORLD_RENDER, DONE -> { }
@@ -125,7 +131,7 @@ public final class BootstrapClient {
             if (stage == Stage.WORLD_RENDER && worldRendered && minecraft.screen == null) {
                 LOGGER.info("INFESTUS_CLIENT_CAMERA_RENDERED yaw=0.0 pitch=15.0");
                 stage = Stage.WAIT;
-                grab(minecraft, "bootstrap-world.png", () -> stage = Stage.DISCONNECT);
+                grab(minecraft, "bootstrap-world.png", () -> stage = Stage.GUIDES);
             }
         } catch (Exception exception) {
             LOGGER.error("INFESTUS_CLIENT_FAILURE render", exception);
@@ -161,5 +167,5 @@ public final class BootstrapClient {
         });
     }
 
-    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_RENDER, DISCONNECT, STOP, DONE }
+    private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_RENDER, GUIDES, DISCONNECT, STOP, DONE }
 }

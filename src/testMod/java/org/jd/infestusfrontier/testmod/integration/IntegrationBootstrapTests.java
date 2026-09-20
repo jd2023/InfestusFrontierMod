@@ -19,6 +19,6 @@ public final class IntegrationBootstrapTests {
         helper.assertTrue(helper.getLevel().hasChunkAt(helper.absolutePos(BlockPos.ZERO)), "GameTest chunk must be loaded");
         LOGGER.info("INFESTUS_INTEGRATION_GAME_STATE dimension={} gameTime={} loaded=true",
                 helper.getLevel().dimension().location(), gameTime);
-        helper.succeed();
+        ContentAssertion.passGameTest(helper, "infestusfrontier_tests:integration.server_state");
     }
 }

@@ -146,22 +146,32 @@ def load_content_requirements(path: Path | None) -> dict[str, list[str]]:
     if path is None:
         return empty
     try:
+        if path.stat().st_size > 1024 * 1024:
+            raise HarnessFailure("content requirements exceed 1 MiB")
         value = json.loads(path.read_text(encoding="utf-8"))
         assertions = value["assertions"]
     except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
         raise HarnessFailure(f"invalid content requirements: {exc}") from exc
+    probes_by_role = value.get("harnessAssertions", {})
+    if not isinstance(assertions, dict) or not isinstance(probes_by_role, dict):
+        raise HarnessFailure("invalid content assertion requirements")
     result = {}
     for role in empty:
         names = assertions.get(role)
+        probes = probes_by_role.get(role, [])
+        if isinstance(names, list) and isinstance(probes, list):
+            names = names + probes
+        else:
+            raise HarnessFailure(f"invalid {role} content assertion requirements")
         if (
             not isinstance(names, list)
             or len(names) > 4096
-            or len(names) != len(set(names))
             or any(
                 not isinstance(name, str)
                 or not re.fullmatch(r"[a-z0-9_.-]+:[a-z0-9_./-]+", name)
                 for name in names
             )
+            or len(names) != len(set(names))
         ):
             raise HarnessFailure(f"invalid {role} content assertion requirements")
         result[role] = names

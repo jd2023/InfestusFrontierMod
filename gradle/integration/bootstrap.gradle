@@ -88,10 +88,16 @@ abstract class VerifyClientAutomation extends DefaultTask {
             def classes = jar.entries().findAll { it.name.endsWith('.class') }.collect { it.name }
             if (!classes.contains('org/jd/infestusfrontier/testmod/integration/BootstrapClient.class') ||
                     !classes.contains('org/jd/infestusfrontier/testmod/integration/ContentAssertion.class') ||
+                    !classes.contains('org/jd/infestusfrontier/testmod/integration/client/BootstrapGuideScenario.class') ||
                     classes.any { !(it.startsWith('org/jd/infestusfrontier/testmod/integration/BootstrapClient') ||
-                            it == 'org/jd/infestusfrontier/testmod/integration/ContentAssertion.class') }) {
+                            it == 'org/jd/infestusfrontier/testmod/integration/ContentAssertion.class' ||
+                            it == 'org/jd/infestusfrontier/testmod/integration/ContentRequirements.class' ||
+                            it ==~ 'org/jd/infestusfrontier/testmod/[^/]+/client/.+\\.class') }) {
                 throw new GradleException("Client automation contains missing hooks or unrelated fixtures: ${classes}")
             }
+            if (jar.getEntry('content-requirements.json') == null ||
+                    jar.getEntry('META-INF/services/org.jd.infestusfrontier.testmod.integration.client.ContentGuideScenario') == null)
+                throw new GradleException('Client content requirements or scenario providers missing')
             if (jar.getEntry('META-INF/neoforge.mods.toml') == null)
                 throw new GradleException('Client automation metadata missing')
         }
@@ -177,5 +183,8 @@ tasks.register('profileSmoke', Exec) {
 }
 
 tasks.named('verifyAll') {
-    dependsOn tasks.named('integrationHarnessTest'), verifyClientAutomation, tasks.named('profileSmoke')
+    dependsOn tasks.named('integrationHarnessTest'), verifyClientAutomation, tasks.named('profileSmoke'), tasks.named('captureClient')
 }
+
+// Keep the disposable server/client scenario after the GameTest server has been reaped.
+tasks.named('captureClient') { mustRunAfter tasks.named('profileSmoke') }

@@ -49,12 +49,16 @@ repositories {
 sourceSets {
     testMod {
         java.exclude 'org/jd/infestusfrontier/testmod/integration/BootstrapClient.java'
+        java.exclude '**/client/**'
         resources.exclude 'integration/client/**'
+        resources.exclude 'META-INF/services/org.jd.infestusfrontier.testmod.integration.client.ContentGuideScenario'
     }
     integrationClient {
         java.srcDir 'src/testMod/java'
         java.include 'org/jd/infestusfrontier/testmod/integration/BootstrapClient.java'
         java.include 'org/jd/infestusfrontier/testmod/integration/ContentAssertion.java'
+        java.include 'org/jd/infestusfrontier/testmod/integration/ContentRequirements.java'
+        java.include 'org/jd/infestusfrontier/testmod/*/client/**'
         resources.srcDir 'src/testMod/resources/integration/client'
     }
 }
@@ -72,6 +76,7 @@ configurations {
 dependencies {
     implementation project(':core')
     testModImplementation sourceSets.main.output
+    integrationClientImplementation sourceSets.main.output
     if (omittedRequired != 'modonomicon') {
         runtimeOnly 'com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4'
     }
@@ -196,13 +201,22 @@ def checkContentCoverage = tasks.register('checkContentCoverage', Exec) {
     inputs.file '.ktask/content-plan.json'
     inputs.file 'scripts/check_content_coverage.py'
     inputs.file 'src/testMod/resources/content-checkpoint.json'
-    inputs.files(fileTree('src/testMod/resources') { include '*/coverage.json' })
+    inputs.files(fileTree('src/testMod/resources') { include '**/coverage.json', '*/guide/*.json' })
     inputs.property 'contentThrough', requestedContentThrough ?: ''
     outputs.file contentCoverageOutput
     def command = ['python3', file('scripts/check_content_coverage.py').absolutePath,
                    '--output', contentCoverageOutput.get().asFile.absolutePath]
     if (requestedContentThrough) command += ['--through', requestedContentThrough]
     commandLine command
+}
+tasks.named('processTestModResources') {
+    dependsOn checkContentCoverage
+    from(contentCoverageOutput) { rename { 'content-requirements.json' } }
+}
+tasks.named('processIntegrationClientResources') {
+    dependsOn checkContentCoverage
+    from(contentCoverageOutput) { rename { 'content-requirements.json' } }
+    from('src/testMod/resources') { include 'META-INF/services/**', '*/guide/*.json' }
 }
 tasks.register('verifyAll') {
     group = 'verification'
