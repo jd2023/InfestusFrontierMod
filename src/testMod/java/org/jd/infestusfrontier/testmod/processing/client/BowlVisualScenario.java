@@ -12,6 +12,7 @@ public final class BowlVisualScenario implements ContentVisualScenario {
     private int settled;
     private boolean started;
     private boolean opening;
+    private int openTicks;
     @Override public boolean ready(Minecraft game) {
         if (game.level == null || game.player == null) return false;
         var bowl = BuiltInRegistries.BLOCK.get(id("culture_bowl"));
@@ -26,8 +27,20 @@ public final class BowlVisualScenario implements ContentVisualScenario {
                 throw new IllegalStateException("Missing Bowl product model: " + name);
             }
         }
+        for (String name : List.of("membrane_sheet", "bone_plate")) {
+            var stack = new net.minecraft.world.item.ItemStack(BuiltInRegistries.ITEM.get(id(name)));
+            String texture = game.getItemRenderer().getModel(stack, game.level, game.player, 0)
+                    .getParticleIcon().contents().name().toString();
+            if (texture.equals("minecraft:missingno")) throw new IllegalStateException("Missing preparation item model: " + name);
+        }
+        var rackState = game.level.getBlockState(new BlockPos(-4, -60, 8));
+        var loomState = game.level.getBlockState(new BlockPos(-2, -60, 8));
+        ready &= rackState.is(BuiltInRegistries.BLOCK.get(id("membrane_rack")))
+                && loomState.is(BuiltInRegistries.BLOCK.get(id("bone_loom")));
+        ready &= game.player.getInventory().getItem(6).is(BuiltInRegistries.ITEM.get(
+                ResourceLocation.parse("infestusfrontier:interaction/synaptic_probe")));
         if (ready && !started) {
-            if (!opening) {
+            if (!opening || ++openTicks == 10) {
                 var pos = new BlockPos(-2, -60, 3);
                 game.player.getInventory().selected = 6;
                 game.gameMode.useItemOn(game.player, net.minecraft.world.InteractionHand.MAIN_HAND,
@@ -40,12 +53,14 @@ public final class BowlVisualScenario implements ContentVisualScenario {
                 game.player.getInventory().selected = 0;
                 started = true;
             }
+            if (openTicks > 40) throw new IllegalStateException("Probe did not open the prepared Bowl menu");
             return false;
         }
         ready &= started && game.level.getBlockState(new BlockPos(-2, -60, 3)).toString().contains("active=true");
         settled = ready ? Math.min(8, settled + 1) : 0;
         return settled == 8;
     }
-    @Override public List<View> detailViews() { return List.of(new View("processing-bowls.png", 32, 24)); }
+    @Override public List<View> detailViews() { return List.of(new View("processing-bowls.png", 32, 24),
+            new View("processing-preparation.png", 25, 22)); }
     private static ResourceLocation id(String name) { return ResourceLocation.parse("infestusfrontier:processing/" + name); }
 }

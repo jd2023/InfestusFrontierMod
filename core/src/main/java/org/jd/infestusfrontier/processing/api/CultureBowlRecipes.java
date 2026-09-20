@@ -12,6 +12,12 @@ public final class CultureBowlRecipes {
     public static final int BASE_WORK_UNITS = 20 * 60;
     public static final int BIOMASS_BU = 0;
     private static final Map<String, Recipe> RECIPES = createRecipes();
+    private static final BatchRecipeCatalog CATALOG = (recipeId, history) -> find(recipeId)
+            .map(recipe -> recipe.itemInputAlternatives().stream().map(inputs ->
+                    new BatchRecipeCatalog.ResolvedRecipe(
+                            inputs, adjustedFluids(recipe.fluidInputs(), history), recipe.outputs(),
+                            recipe.returnedContainers(), adjustedWork(recipe.baseWorkUnits(), history))).toList())
+            .orElseGet(List::of);
 
     private CultureBowlRecipes() {}
 
@@ -27,6 +33,24 @@ public final class CultureBowlRecipes {
         var recipe = RECIPES.get(catalogId);
         if (recipe == null) throw new IllegalArgumentException("Unknown Culture Bowl recipe: " + catalogId);
         return recipe;
+    }
+
+    public static BatchRecipeCatalog catalog() { return CATALOG; }
+
+    private static Map<String, Integer> adjustedFluids(Map<String, Integer> base, org.jd.infestusfrontier.organ.api.OrganHistory.Snapshot history) {
+        int choices = history.choiceCount(org.jd.infestusfrontier.organ.api.OrganHistory.GrowthChoice.WATER_ECONOMY);
+        if (choices == 0 || !base.containsKey("water")) return base;
+        var adjusted = new LinkedHashMap<>(base);
+        adjusted.put("water", economy(base.get("water"), choices));
+        return Map.copyOf(adjusted);
+    }
+
+    private static int adjustedWork(int base, org.jd.infestusfrontier.organ.api.OrganHistory.Snapshot history) {
+        return economy(base, history.choiceCount(org.jd.infestusfrontier.organ.api.OrganHistory.GrowthChoice.INCUBATION));
+    }
+
+    private static int economy(int base, int choices) {
+        return Math.max(1, Math.multiplyExact(base, 10 - choices) / 10);
     }
 
     private static Map<String, Recipe> createRecipes() {

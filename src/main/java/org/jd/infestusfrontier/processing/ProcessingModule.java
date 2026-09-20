@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.processing;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -24,6 +25,10 @@ public final class ProcessingModule {
     private static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, "infestusfrontier");
     private final java.util.function.Supplier<CultureBowlBlock> bowl;
     private final java.util.function.Supplier<BlockEntityType<CultureBowlEntity>> bowlEntity;
+    private final java.util.function.Supplier<PreparationBlock> membraneRack;
+    private final java.util.function.Supplier<PreparationBlock> boneLoom;
+    private final java.util.function.Supplier<BlockEntityType<PreparationBlockEntity>> membraneRackEntity;
+    private final java.util.function.Supplier<BlockEntityType<PreparationBlockEntity>> boneLoomEntity;
     private final DiscoveryObserver discovery;
     public static final java.util.function.Supplier<MenuType<CultureBowlMenu>> BOWL_MENU = MENUS.register("processing/culture_bowl",
             () -> IMenuTypeExtension.create((id, inventory, buffer) -> new CultureBowlMenu(id, inventory,
@@ -33,6 +38,10 @@ public final class ProcessingModule {
         this.discovery = discovery;
         bowl = blocks.register("processing/culture_bowl", this::createBowl);
         bowlEntity = entities.register("processing/culture_bowl", this::createBowlEntityType);
+        membraneRack = blocks.register("processing/membrane_rack", this::createMembraneRack);
+        boneLoom = blocks.register("processing/bone_loom", this::createBoneLoom);
+        membraneRackEntity = entities.register("processing/membrane_rack", this::createMembraneRackEntity);
+        boneLoomEntity = entities.register("processing/bone_loom", this::createBoneLoomEntity);
     }
 
     private CultureBowlBlock createBowl() {
@@ -45,8 +54,41 @@ public final class ProcessingModule {
                 (pos, state) -> new CultureBowlEntity(pos, state, bowlEntity, discovery), bowl.get()).build(null);
     }
 
+    private PreparationBlock createPreparation(PreparationOrgan organ,
+            java.util.function.Supplier<BlockEntityType<PreparationBlockEntity>> entityType) {
+        return new PreparationBlock(BlockBehaviour.Properties.of().strength(1.0F).noOcclusion()
+                .sound(SoundType.BONE_BLOCK).pushReaction(PushReaction.BLOCK), entityType, organ);
+    }
+
+    private PreparationBlock createMembraneRack() {
+        return createPreparation(PreparationOrgan.MEMBRANE_RACK, membraneRackEntity);
+    }
+
+    private PreparationBlock createBoneLoom() {
+        return createPreparation(PreparationOrgan.BONE_LOOM, boneLoomEntity);
+    }
+
+    private BlockEntityType<PreparationBlockEntity> createMembraneRackEntity() {
+        return createPreparationEntity(membraneRack, PreparationOrgan.MEMBRANE_RACK, membraneRackEntity);
+    }
+
+    private BlockEntityType<PreparationBlockEntity> createBoneLoomEntity() {
+        return createPreparationEntity(boneLoom, PreparationOrgan.BONE_LOOM, boneLoomEntity);
+    }
+
+    private BlockEntityType<PreparationBlockEntity> createPreparationEntity(
+            java.util.function.Supplier<PreparationBlock> block, PreparationOrgan organ,
+            java.util.function.Supplier<BlockEntityType<PreparationBlockEntity>> entityType) {
+        return BlockEntityType.Builder.of(
+                (pos, state) -> new PreparationBlockEntity(pos, state, entityType, organ), block.get()).build(null);
+    }
+
     public void register(IEventBus bus) {
         items.register("processing/culture_bowl", () -> new CultureBowlItem(bowl.get(), new Item.Properties().stacksTo(1)));
+        items.register("processing/membrane_rack", () -> new BlockItem(membraneRack.get(), new Item.Properties().stacksTo(1)));
+        items.register("processing/bone_loom", () -> new BlockItem(boneLoom.get(), new Item.Properties().stacksTo(1)));
+        items.register("processing/membrane_sheet", () -> new Item(new Item.Properties()));
+        items.register("processing/bone_plate", () -> new Item(new Item.Properties()));
         for (String name : new String[] {"elastic_gel", "nutrient_mash", "honey_culture", "rooting_gel"}) {
             items.register("processing/" + name, () -> new Item(new Item.Properties()));
         }

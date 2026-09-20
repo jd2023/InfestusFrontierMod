@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/membrane_rack",
+  "title": "Membrane Rack",
+  "obtain": "Craft two sticks, two bones and one Spore Culture into one Rack; place it on Living Substrate.",
+  "use": "Load string, one flesh source and water. Rotten flesh takes 20 loaded seconds; leather takes 40. Both retain exactly one Sheet. Full output or missing water refuses unchanged.",
+  "assertion": "infestusfrontier_client:processing.membrane_rack.guide"
+}

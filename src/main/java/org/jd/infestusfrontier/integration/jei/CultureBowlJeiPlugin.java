@@ -26,13 +26,19 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluids;
 import org.jd.infestusfrontier.processing.BowlResources;
+import org.jd.infestusfrontier.processing.PreparationResources;
 import org.jd.infestusfrontier.processing.api.CultureBowlRecipes;
+import org.jd.infestusfrontier.processing.api.PreparationRecipes;
 
 /** Optional JEI projection of the processing-owned finite recipe catalog. */
 @JeiPlugin
 public final class CultureBowlJeiPlugin implements IModPlugin {
     static final RecipeType<BowlDisplayRecipe> TYPE = RecipeType.create(
             "infestusfrontier", "culture_bowl", BowlDisplayRecipe.class);
+    static final RecipeType<PreparationDisplayRecipe> RACK_TYPE = RecipeType.create(
+            "infestusfrontier", "membrane_rack", PreparationDisplayRecipe.class);
+    static final RecipeType<PreparationDisplayRecipe> LOOM_TYPE = RecipeType.create(
+            "infestusfrontier", "bone_loom", PreparationDisplayRecipe.class);
     private static final ResourceLocation UID = id("jei/culture_bowl");
 
     @Override
@@ -42,17 +48,65 @@ public final class CultureBowlJeiPlugin implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
-        registration.addRecipeCategories(new BowlCategory(registration.getJeiHelpers().getGuiHelper()));
+        var gui = registration.getJeiHelpers().getGuiHelper();
+        registration.addRecipeCategories(new BowlCategory(gui),
+                new PreparationCategory(gui, RACK_TYPE, "membrane_rack"),
+                new PreparationCategory(gui, LOOM_TYPE, "bone_loom"));
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registration.addRecipes(TYPE, BowlDisplayRecipe.all());
+        registration.addRecipes(RACK_TYPE, PreparationDisplayRecipe.all("I002"));
+        registration.addRecipes(LOOM_TYPE, PreparationDisplayRecipe.all("I003"));
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addRecipeCatalyst(BuiltInRegistries.ITEM.get(id("processing/culture_bowl")), TYPE);
+        registration.addRecipeCatalyst(BuiltInRegistries.ITEM.get(id("processing/membrane_rack")), RACK_TYPE);
+        registration.addRecipeCatalyst(BuiltInRegistries.ITEM.get(id("processing/bone_loom")), LOOM_TYPE);
+    }
+
+    static final class PreparationCategory implements IRecipeCategory<PreparationDisplayRecipe> {
+        private final RecipeType<PreparationDisplayRecipe> type;
+        private final String organ;
+        private final IDrawable icon;
+
+        PreparationCategory(IGuiHelper gui, RecipeType<PreparationDisplayRecipe> type, String organ) {
+            this.type = type;
+            this.organ = organ;
+            icon = gui.createDrawableItemStack(new ItemStack(BuiltInRegistries.ITEM.get(id("processing/" + organ))));
+        }
+        @Override public RecipeType<PreparationDisplayRecipe> getRecipeType() { return type; }
+        @Override public Component getTitle() { return Component.translatable("jei.infestusfrontier." + organ); }
+        @Override public int getWidth() { return 150; }
+        @Override public int getHeight() { return 58; }
+        @Override public IDrawable getIcon() { return icon; }
+        @Override public void setRecipe(IRecipeLayoutBuilder builder, PreparationDisplayRecipe recipe, IFocusGroup focuses) {
+            int slot = 0;
+            for (var input : recipe.itemInputs().entrySet()) {
+                builder.addInputSlot(slot++ * 20, 0).addItemStack(
+                        new ItemStack(PreparationResources.item(input.getKey()), input.getValue()));
+            }
+            if (recipe.waterMb() > 0) builder.addInputSlot(62, 0).setFluidRenderer(1000, false, 16, 16)
+                    .addFluidStack(Fluids.WATER, recipe.waterMb());
+            var output = recipe.outputs().entrySet().iterator().next();
+            builder.addOutputSlot(112, 0).addItemStack(
+                    new ItemStack(PreparationResources.item(output.getKey()), output.getValue()));
+        }
+        @Override public void draw(PreparationDisplayRecipe recipe, IRecipeSlotsView slots, GuiGraphics graphics,
+                double mouseX, double mouseY) {
+            var font = Minecraft.getInstance().font;
+            graphics.drawString(font, Component.translatable("jei.infestusfrontier.duration", recipe.durationSeconds()),
+                    0, 36, 0x3B342A, false);
+            graphics.drawString(font, Component.translatable("jei.infestusfrontier.biomass", recipe.biomassBu()),
+                    0, 47, 0x3B342A, false);
+        }
+        @Override public ResourceLocation getRegistryName(PreparationDisplayRecipe recipe) {
+            return id("jei/" + organ + "/" + recipe.catalogId().toLowerCase(java.util.Locale.ROOT)
+                    + "_" + recipe.route());
+        }
     }
 
     static final class BowlCategory implements IRecipeCategory<BowlDisplayRecipe> {
@@ -132,6 +186,22 @@ public final class CultureBowlJeiPlugin implements IModPlugin {
             values.entrySet().stream().sorted(Map.Entry.comparingByKey(Comparator.naturalOrder()))
                     .forEach(entry -> result.put(entry.getKey(), entry.getValue()));
             return java.util.Collections.unmodifiableMap(result);
+        }
+    }
+
+    record PreparationDisplayRecipe(String catalogId, int route, Map<String, Integer> itemInputs,
+            int waterMb, int biomassBu, Map<String, Integer> outputs, int durationSeconds) {
+        static List<PreparationDisplayRecipe> all(String catalogId) {
+            var recipe = PreparationRecipes.recipe(catalogId);
+            var result = new ArrayList<PreparationDisplayRecipe>();
+            for (int route = 0; route < recipe.routes().size(); route++) {
+                var selected = recipe.routes().get(route);
+                result.add(new PreparationDisplayRecipe(catalogId, route, BowlDisplayRecipe.sorted(selected.itemInputs()),
+                        recipe.fluidInputs().getOrDefault("water", 0),
+                        recipe.fluidInputs().getOrDefault("biomass", 0), BowlDisplayRecipe.sorted(recipe.outputs()),
+                        selected.workUnits() / PreparationRecipes.TICKS_PER_SECOND));
+            }
+            return List.copyOf(result);
         }
     }
 

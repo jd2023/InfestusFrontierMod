@@ -1,19 +1,25 @@
 {
   "requires": "infestusfrontier_tests:processing.culture_bowl.use",
   "commands": [
-    "setblock -2 -61 3 infestusfrontier:ecology/living_substrate",
-    "setblock -2 -60 3 infestusfrontier:processing/culture_bowl",
-    "setblock -2 -61 4 infestusfrontier:ecology/living_substrate",
-    "setblock -2 -60 4 infestusfrontier:processing/culture_bowl",
+    "fill -2 -61 3 -2 -61 4 infestusfrontier:ecology/living_substrate",
+    "fill -2 -60 3 -2 -60 4 infestusfrontier:processing/culture_bowl",
     "item replace entity @a hotbar.1 with infestusfrontier:processing/elastic_gel 2",
     "item replace entity @a hotbar.2 with infestusfrontier:processing/nutrient_mash 2",
     "item replace entity @a hotbar.3 with infestusfrontier:processing/honey_culture 2",
     "item replace entity @a hotbar.4 with infestusfrontier:processing/rooting_gel 2",
     "data modify block -2 -60 3 bowl.selected set value \"I030\"",
     "data modify block -2 -60 3 bowl.items[0] set value {resource:\"honey_bottle\",count:1,capacity:16}",
-    "data modify block -2 -60 3 bowl.items[1] set value {resource:\"spore_culture\",count:1,capacity:64}"
+    "data modify block -2 -60 3 bowl.items[1] set value {resource:\"spore_culture\",count:1,capacity:64}",
+    "fill -4 -61 8 -2 -61 8 infestusfrontier:ecology/living_substrate",
+    "setblock -4 -60 8 infestusfrontier:processing/membrane_rack",
+    "setblock -2 -60 8 infestusfrontier:processing/bone_loom",
+    "item replace entity @a inventory.0 with infestusfrontier:processing/membrane_rack",
+    "item replace entity @a inventory.1 with infestusfrontier:processing/membrane_sheet",
+    "item replace entity @a inventory.2 with infestusfrontier:processing/bone_loom",
+    "item replace entity @a inventory.3 with infestusfrontier:processing/bone_plate"
   ],
   "captures": [
-    "processing-bowls.png"
+    "processing-bowls.png",
+    "processing-preparation.png"
   ]
 }

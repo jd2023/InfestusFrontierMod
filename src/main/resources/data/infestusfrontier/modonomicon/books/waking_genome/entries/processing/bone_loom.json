@@ -1,0 +1,17 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.bone_loom.name",
+  "description": "book.infestusfrontier.entry.bone_loom.description",
+  "icon": "infestusfrontier:processing/bone_loom",
+  "x": 10,
+  "y": 10,
+  "parents": [{ "entry": "infestusfrontier:construction/organ_bud" }],
+  "condition": { "type": "modonomicon:or", "children": [
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/organ_bud" },
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/acquired/bone_loom" }
+  ] },
+  "pages": [
+    { "type": "modonomicon:crafting_recipe", "recipe_id_1": "infestusfrontier:processing/bone_loom", "text": "book.infestusfrontier.entry.bone_loom.controls.text" },
+    { "type": "infestusfrontier:preparation_recipe", "recipe": "I003", "route": 0 }
+  ]
+}

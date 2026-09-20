@@ -24,6 +24,8 @@ public final class JeiDiscoveryScenario implements IModPlugin {
         if (runtime.getRecipeManager().createRecipeLookup(type).get().count() != expected)
             throw new IllegalStateException("JEI must expose every Bowl alternative");
         verifyIngredients(type);
+        verifyPreparation("membrane_rack", "I002");
+        verifyPreparation("bone_loom", "I003");
         if (opened) {
             if (game.screen == null || !game.screen.getClass().getName().contains("RecipesGui"))
                 throw new IllegalStateException("JEI recipe browser did not open");
@@ -41,6 +43,41 @@ public final class JeiDiscoveryScenario implements IModPlugin {
         runtime.getRecipesGui().showTypes(List.of(type));
         opened = true;
         return false;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void verifyPreparation(String typePath, String catalogId) {
+        var type = runtime.getRecipeManager().getRecipeType(
+                ResourceLocation.parse("infestusfrontier:" + typePath)).orElseThrow();
+        var recipe = org.jd.infestusfrontier.processing.api.PreparationRecipes.recipe(catalogId);
+        var displays = runtime.getRecipeManager().createRecipeLookup(type).get().toList();
+        if (displays.size() != recipe.routes().size()) throw new IllegalStateException("JEI route count differs for " + catalogId);
+        var category = runtime.getRecipeManager().getRecipeCategory(type);
+        for (int route = 0; route < displays.size(); route++) {
+            var ingredients = runtime.getRecipeManager().getRecipeIngredients(
+                    (mezz.jei.api.recipe.category.IRecipeCategory) category, displays.get(route));
+            checkPreparationItems(ingredients.getIngredients(mezz.jei.api.recipe.RecipeIngredientRole.INPUT),
+                    recipe.routes().get(route).itemInputs());
+            checkPreparationItems(ingredients.getIngredients(mezz.jei.api.recipe.RecipeIngredientRole.OUTPUT), recipe.outputs());
+            int water = 0;
+            for (var ingredient : ingredients.getIngredients(mezz.jei.api.recipe.RecipeIngredientRole.INPUT)) {
+                if (ingredient.getIngredient() instanceof net.neoforged.neoforge.fluids.FluidStack fluid) water += fluid.getAmount();
+            }
+            if (water != recipe.fluidInputs().getOrDefault("water", 0)) {
+                throw new IllegalStateException("JEI preparation water differs for " + catalogId);
+            }
+        }
+    }
+
+    private static void checkPreparationItems(java.util.List<mezz.jei.api.ingredients.ITypedIngredient<?>> ingredients,
+            java.util.Map<String, Integer> quantities) {
+        var expected = new java.util.HashMap<net.minecraft.world.item.Item, Integer>();
+        quantities.forEach((key, amount) -> expected.put(
+                org.jd.infestusfrontier.processing.PreparationResources.item(key), amount));
+        var actual = new java.util.HashMap<net.minecraft.world.item.Item, Integer>();
+        ingredients.forEach(ingredient -> ingredient.getItemStack().ifPresent(
+                stack -> actual.merge(stack.getItem(), stack.getCount(), Integer::sum)));
+        if (!actual.equals(expected)) throw new IllegalStateException("JEI preparation items disagree: " + actual);
     }
     private static <T> void verifyIngredients(mezz.jei.api.recipe.RecipeType<T> type) {
         var manager = runtime.getRecipeManager();

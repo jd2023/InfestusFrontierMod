@@ -1,0 +1,7 @@
+{
+  "parent": "infestusfrontier:discovery/root",
+  "criteria": { "has_culture": { "trigger": "minecraft:inventory_changed", "conditions": { "items": [{ "items": "infestusfrontier:construction/spore_culture" }] } } },
+  "rewards": { "recipes": ["infestusfrontier:processing/membrane_rack"] },
+  "requirements": [["has_culture"]],
+  "sends_telemetry_event": false
+}

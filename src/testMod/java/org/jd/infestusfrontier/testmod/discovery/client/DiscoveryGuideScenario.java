@@ -98,7 +98,10 @@ public final class DiscoveryGuideScenario implements ContentGuideScenario, Conte
         return false;
     }
     private static void verifyRecipes(com.klikli_dev.modonomicon.book.entries.BookEntry entry) {
-        if (!entry.getId().getPath().equals("processing/culture_bowl")) return;
+        if (!entry.getId().getPath().equals("processing/culture_bowl")) {
+            verifyPreparationRecipes(entry);
+            return;
+        }
         int page = 2;
         for (var recipe : org.jd.infestusfrontier.processing.api.CultureBowlRecipes.all().values()) {
             var text = ((com.klikli_dev.modonomicon.book.page.BookTextPage) entry.getPages().get(page++)).getText().getString();
@@ -112,6 +115,39 @@ public final class DiscoveryGuideScenario implements ContentGuideScenario, Conte
             if (!text.contains(recipe.fluidInputs().getOrDefault("water", 0) + " mB")
                     || !text.contains(recipe.baseWorkUnits() / 20 + " loaded seconds") || !text.contains("0 BU"))
                 throw new IllegalStateException("Guide recipe costs differ from processing " + recipe.catalogId());
+        }
+    }
+
+    private static void verifyPreparationRecipes(com.klikli_dev.modonomicon.book.entries.BookEntry entry) {
+        String catalogId = switch (entry.getId().getPath()) {
+            case "processing/membrane_rack", "processing/membrane_sheet" -> "I002";
+            case "processing/bone_loom", "processing/bone_plate" -> "I003";
+            default -> "";
+        };
+        if (catalogId.isEmpty()) return;
+        var recipe = org.jd.infestusfrontier.processing.api.PreparationRecipes.recipe(catalogId);
+        String text = entry.getPages().stream()
+                .filter(com.klikli_dev.modonomicon.book.page.BookTextPage.class::isInstance)
+                .map(com.klikli_dev.modonomicon.book.page.BookTextPage.class::cast)
+                .map(page -> page.getText().getString()).collect(java.util.stream.Collectors.joining("\n"));
+        for (var route : recipe.routes()) {
+            for (var item : route.itemInputs().entrySet()) {
+                String expected = item.getValue() + " × "
+                        + org.jd.infestusfrontier.processing.PreparationResources.item(item.getKey()).getDescription().getString();
+                if (!text.contains(expected)) throw new IllegalStateException("Guide lacks " + expected);
+            }
+            String duration = route.workUnits() / org.jd.infestusfrontier.processing.api.PreparationRecipes.TICKS_PER_SECOND
+                    + " loaded seconds";
+            if (!text.contains(duration)) throw new IllegalStateException("Guide lacks " + duration);
+        }
+        for (var output : recipe.outputs().entrySet()) {
+            String expected = output.getValue() + " × "
+                    + org.jd.infestusfrontier.processing.PreparationResources.item(output.getKey()).getDescription().getString();
+            if (!text.contains(expected)) throw new IllegalStateException("Guide lacks " + expected);
+        }
+        int fluid = recipe.fluidInputs().values().stream().findFirst().orElse(0);
+        if (!text.contains(fluid + (catalogId.equals("I002") ? " mB" : " BU"))) {
+            throw new IllegalStateException("Guide fluid cost differs from processing " + catalogId);
         }
     }
 

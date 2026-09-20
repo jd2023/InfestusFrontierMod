@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.processing.api;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.jd.infestusfrontier.organ.api.OrganHistory;
@@ -11,6 +12,7 @@ public final class BatchWork {
     public static final int SNAPSHOT_SCHEMA = 1;
 
     private final CompletionAdmission completionAdmission;
+    private final BatchRecipeCatalog recipes;
     private final QuantityStore quantities;
     private final OrganHistory history;
     private long revision;
@@ -23,22 +25,37 @@ public final class BatchWork {
             ActiveBatch activeBatch,
             QuantityStore quantities,
             OrganHistory history,
+            BatchRecipeCatalog recipes,
             CompletionAdmission completionAdmission) {
         this.revision = revision;
         this.nextBatchId = nextBatchId;
         this.activeBatch = activeBatch;
         this.quantities = quantities;
         this.history = history;
+        this.recipes = Objects.requireNonNull(recipes, "recipes");
         this.completionAdmission = Objects.requireNonNull(completionAdmission, "completionAdmission");
     }
 
     public static BatchWork create(QuantityStore initialQuantities, CompletionAdmission completionAdmission) {
-        return create(initialQuantities, new OrganHistory().snapshot(), completionAdmission);
+        return create(initialQuantities, CultureBowlRecipes.catalog(), completionAdmission);
+    }
+
+    public static BatchWork create(QuantityStore initialQuantities, BatchRecipeCatalog recipes,
+            CompletionAdmission completionAdmission) {
+        return create(initialQuantities, new OrganHistory().snapshot(), recipes, completionAdmission);
     }
 
     public static BatchWork create(
             QuantityStore initialQuantities,
             OrganHistory.Snapshot initialHistory,
+            CompletionAdmission completionAdmission) {
+        return create(initialQuantities, initialHistory, CultureBowlRecipes.catalog(), completionAdmission);
+    }
+
+    public static BatchWork create(
+            QuantityStore initialQuantities,
+            OrganHistory.Snapshot initialHistory,
+            BatchRecipeCatalog recipes,
             CompletionAdmission completionAdmission) {
         Objects.requireNonNull(initialQuantities, "initialQuantities");
         Objects.requireNonNull(initialHistory, "initialHistory");
@@ -52,10 +69,15 @@ public final class BatchWork {
                 null,
                 QuantityStore.restore(initialQuantities.snapshot()),
                 OrganHistory.restore(initialHistory),
+                recipes,
                 completionAdmission);
     }
 
     public static BatchWork restore(State state, CompletionAdmission completionAdmission) {
+        return restore(state, CultureBowlRecipes.catalog(), completionAdmission);
+    }
+
+    public static BatchWork restore(State state, BatchRecipeCatalog recipes, CompletionAdmission completionAdmission) {
         Objects.requireNonNull(state, "state");
         if (state.schema() != SNAPSHOT_SCHEMA) throw new IllegalArgumentException("Unsupported BatchWork schema");
         if (state.revision() < 0 || state.revision() == Long.MAX_VALUE || state.nextBatchId() < 1) {
@@ -72,7 +94,7 @@ public final class BatchWork {
                 throw new IllegalArgumentException("Next Bowl batch identifier is stale");
             }
         } else {
-            if (CultureBowlRecipes.find(active.recipeId()).isEmpty()) {
+            if (recipes.alternatives(active.recipeId(), history.snapshot()).isEmpty()) {
                 throw new IllegalArgumentException("Active Bowl recipe is unsupported");
             }
             if (active.batchId() >= state.nextBatchId() || active.batchId() <= history.snapshot().lastCompletedBatchId()) {
@@ -89,13 +111,12 @@ public final class BatchWork {
             }
         }
         var restored = new BatchWork(
-                state.revision(), state.nextBatchId(), active, quantities, history, completionAdmission);
+                state.revision(), state.nextBatchId(), active, quantities, history, recipes, completionAdmission);
         if (active != null) restored.validateActiveRecipe();
         return restored;
     }
 
     private void validateActiveRecipe() {
-        var recipe = CultureBowlRecipes.recipe(activeBatch.recipeId());
         var reservation = quantities.snapshot().reservations().getFirst();
         var inputs = new LinkedHashMap<String, Integer>();
         var fluids = new LinkedHashMap<String, Integer>();
@@ -105,9 +126,11 @@ public final class BatchWork {
         reservation.inputFluids().forEach(a -> fluids.merge(a.resource(), a.amount(), Math::addExact));
         reservation.itemOutputs().forEach(a -> outputs.merge(a.resource(), a.amount(), Math::addExact));
         reservation.returnedContainers().forEach(a -> returned.merge(a.resource(), a.amount(), Math::addExact));
-        if (!recipe.itemInputAlternatives().contains(inputs) || !adjustedFluids(recipe.fluidInputs()).equals(fluids)
-                || !recipe.outputs().equals(outputs) || !recipe.returnedContainers().equals(returned)
-                || activeBatch.requiredWorkUnits() != adjustedWork(recipe.baseWorkUnits())) {
+        boolean matches = recipes.alternatives(activeBatch.recipeId(), history.snapshot()).stream().anyMatch(recipe ->
+                recipe.itemInputs().equals(inputs) && recipe.fluidInputs().equals(fluids)
+                        && recipe.outputs().equals(outputs) && recipe.returnedContainers().equals(returned)
+                        && recipe.workUnits() == activeBatch.requiredWorkUnits());
+        if (!matches) {
             throw new IllegalArgumentException("Active reservation does not match its earned recipe");
         }
     }
@@ -119,7 +142,11 @@ public final class BatchWork {
     }
 
     public boolean insertWater(int amount, long expectedRevision) {
-        if (!canTransfer(expectedRevision) || !quantities.insertFluid("water", amount)) return false;
+        return insertFluid("water", amount, expectedRevision);
+    }
+
+    public boolean insertFluid(String resource, int amount, long expectedRevision) {
+        if (!canTransfer(expectedRevision) || !quantities.insertFluid(resource, amount)) return false;
         incrementRevision();
         return true;
     }
@@ -159,19 +186,18 @@ public final class BatchWork {
         if (expectedRevision != revision) return new Refused(StartRefusal.STALE_REVISION, state());
         if (activeBatch != null) return new Refused(StartRefusal.ACTIVE_BATCH, state());
         if (revision == Long.MAX_VALUE - 1) return new Refused(StartRefusal.REVISION_EXHAUSTED, state());
-        var recipe = CultureBowlRecipes.find(request.recipeId()).orElse(null);
-        if (recipe == null) return new Refused(StartRefusal.UNKNOWN_RECIPE, state());
+        var alternatives = recipes.alternatives(request.recipeId(), history.snapshot());
+        if (alternatives.isEmpty()) return new Refused(StartRefusal.UNKNOWN_RECIPE, state());
+        var recipe = selectRecipe(alternatives);
         // Reserve the start, every work tick and a separate completion after quota refusal.
-        if (revision > Long.MAX_VALUE - 3L - adjustedWork(recipe.baseWorkUnits())) {
+        if (revision > Long.MAX_VALUE - 3L - recipe.workUnits()) {
             return new Refused(StartRefusal.REVISION_EXHAUSTED, state());
         }
         if (nextBatchId == Long.MAX_VALUE) return new Refused(StartRefusal.IDENTIFIER_EXHAUSTED, state());
 
-        var itemInputs = selectInputs(recipe);
-        var fluidInputs = adjustedFluids(recipe.fluidInputs());
         var reserved = quantities.reserve(
                 new QuantityStore.ReservationRequest(
-                        itemInputs, fluidInputs, recipe.outputs(), recipe.returnedContainers()),
+                        recipe.itemInputs(), recipe.fluidInputs(), recipe.outputs(), recipe.returnedContainers()),
                 quantities.revision());
         if (reserved instanceof QuantityStore.ReservationRefused refused) {
             return new Refused(mapRefusal(refused.reason()), state());
@@ -181,10 +207,10 @@ public final class BatchWork {
         long batchId = nextBatchId++;
         activeBatch = new ActiveBatch(
                 batchId,
-                recipe.catalogId(),
+                request.recipeId(),
                 reservation.reservationId(),
                 0,
-                adjustedWork(recipe.baseWorkUnits()));
+                recipe.workUnits());
         incrementRevision();
         return new Started(batchId, state());
     }
@@ -255,10 +281,10 @@ public final class BatchWork {
         };
     }
 
-    private Map<String, Integer> selectInputs(CultureBowlRecipes.Recipe recipe) {
-        for (var alternative : recipe.itemInputAlternatives()) {
+    private BatchRecipeCatalog.ResolvedRecipe selectRecipe(List<BatchRecipeCatalog.ResolvedRecipe> alternatives) {
+        for (var alternative : alternatives) {
             boolean available = true;
-            for (var input : alternative.entrySet()) {
+            for (var input : alternative.itemInputs().entrySet()) {
                 if (quantities.availableItem(input.getKey()) < input.getValue()) {
                     available = false;
                     break;
@@ -266,24 +292,7 @@ public final class BatchWork {
             }
             if (available) return alternative;
         }
-        return recipe.itemInputAlternatives().getFirst();
-    }
-
-    private Map<String, Integer> adjustedFluids(Map<String, Integer> base) {
-        int waterChoices = history.snapshot().choiceCount(OrganHistory.GrowthChoice.WATER_ECONOMY);
-        if (waterChoices == 0 || !base.containsKey("water")) return base;
-        var adjusted = new LinkedHashMap<>(base);
-        adjusted.put("water", applyEconomy(base.get("water"), waterChoices));
-        return Map.copyOf(adjusted);
-    }
-
-    private int adjustedWork(int baseWork) {
-        int speedChoices = history.snapshot().choiceCount(OrganHistory.GrowthChoice.INCUBATION);
-        return applyEconomy(baseWork, speedChoices);
-    }
-
-    private static int applyEconomy(int base, int choices) {
-        return Math.max(1, Math.multiplyExact(base, 10 - choices) / 10);
+        return alternatives.getFirst();
     }
 
     private static StartRefusal mapRefusal(QuantityStore.ReserveRefusal refusal) {

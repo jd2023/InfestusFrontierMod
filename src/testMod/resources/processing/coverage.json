@@ -81,6 +81,55 @@
           }
         }
       ]
+    },
+    {
+      "task": "IF-007",
+      "entries": [
+        {
+          "catalog": ["T0-05"],
+          "registry": ["infestusfrontier:processing/membrane_rack"],
+          "producer": "infestusfrontier:processing/membrane_rack",
+          "guide": "guide/membrane_rack.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.membrane_rack.obtain",
+            "use": "infestusfrontier_tests:processing.membrane_rack.use",
+            "guide": "infestusfrontier_client:processing.membrane_rack.guide"
+          }
+        },
+        {
+          "catalog": ["I002"],
+          "registry": ["infestusfrontier:processing/membrane_sheet"],
+          "producer": "infestusfrontier:processing/membrane_rack",
+          "guide": "guide/membrane_sheet.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.membrane_sheet.obtain",
+            "use": "infestusfrontier_tests:processing.membrane_sheet.use",
+            "guide": "infestusfrontier_client:processing.membrane_sheet.guide"
+          }
+        },
+        {
+          "catalog": ["T0-06"],
+          "registry": ["infestusfrontier:processing/bone_loom"],
+          "producer": "infestusfrontier:processing/bone_loom",
+          "guide": "guide/bone_loom.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.bone_loom.obtain",
+            "use": "infestusfrontier_tests:processing.bone_loom.use",
+            "guide": "infestusfrontier_client:processing.bone_loom.guide"
+          }
+        },
+        {
+          "catalog": ["I003"],
+          "registry": ["infestusfrontier:processing/bone_plate"],
+          "producer": "infestusfrontier:processing/bone_loom",
+          "guide": "guide/bone_plate.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.bone_plate.obtain",
+            "use": "infestusfrontier_tests:processing.bone_plate.use",
+            "guide": "infestusfrontier_client:processing.bone_plate.guide"
+          }
+        }
+      ]
     }
   ]
 }

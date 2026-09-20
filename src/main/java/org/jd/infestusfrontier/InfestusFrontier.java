@@ -15,8 +15,10 @@ public final class InfestusFrontier {
 
     public InfestusFrontier(IEventBus modBus) {
         RuntimeIdentity.install();
-        modBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event) ->
-                event.enqueueWork(org.jd.infestusfrontier.integration.modonomicon.BowlGuidePages::register));
+        modBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event) -> event.enqueueWork(() -> {
+            org.jd.infestusfrontier.integration.modonomicon.BowlGuidePages.register();
+            org.jd.infestusfrontier.integration.modonomicon.PreparationGuidePages.register();
+        }));
         var discovery = new DiscoveryModule();
         discovery.register();
         var observer = discovery.observer();
