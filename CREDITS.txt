@@ -1,1 +1,5 @@
-TODO
+Infestus Frontier original assets
+
+Spore Culture and Organ Bud textures: generated specifically for this project
+with OpenAI's image-generation tool, then selected and downsampled for the game
+by the project team (2026-09-20). No prototype or third-party art was used.

@@ -1,1 +1,3 @@
 org.jd.infestusfrontier.testmod.integration.client.BootstrapGuideScenario
+org.jd.infestusfrontier.testmod.construction.client.SporeCultureGuideScenario
+org.jd.infestusfrontier.testmod.construction.client.OrganBudGuideScenario

@@ -1,14 +1,17 @@
 package org.jd.infestusfrontier;
 
 import net.neoforged.fml.common.Mod;
+import net.neoforged.bus.api.IEventBus;
+import org.jd.infestusfrontier.construction.ConstructionModule;
 import org.jd.infestusfrontier.integration.RuntimeIdentity;
 
-/** Production composition root. No prototype content is registered here. */
+/** Production composition root. */
 @Mod(InfestusFrontier.MOD_ID)
 public final class InfestusFrontier {
     public static final String MOD_ID = "infestusfrontier";
 
-    public InfestusFrontier() {
+    public InfestusFrontier(IEventBus modBus) {
         RuntimeIdentity.install();
+        new ConstructionModule().register(modBus);
     }
 }

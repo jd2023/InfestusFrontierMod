@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:construction/spore_culture",
+  "title": "Spore Culture",
+  "obtain": "Craft one rotten flesh, one red mushroom and one wheat seed into exactly one Spore Culture.",
+  "use": "Pay one Spore Culture with two rotten flesh and one bone meal to craft an Organ Bud.",
+  "assertion": "infestusfrontier_client:construction.spore_culture.guide"
+}

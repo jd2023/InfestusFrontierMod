@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "owner": "construction",
+  "contributions": [
+    {
+      "task": "IF-095",
+      "entries": [
+        {
+          "catalog": ["I000"],
+          "registry": ["infestusfrontier:construction/spore_culture"],
+          "producer": "infestusfrontier:construction/spore_culture",
+          "guide": "guide/spore_culture.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:construction.spore_culture.obtain",
+            "use": "infestusfrontier_tests:construction.spore_culture.use",
+            "guide": "infestusfrontier_client:construction.spore_culture.guide"
+          }
+        },
+        {
+          "catalog": ["I001", "T0-16"],
+          "registry": ["infestusfrontier:construction/organ_bud"],
+          "producer": "infestusfrontier:construction/organ_bud",
+          "guide": "guide/organ_bud.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:construction.organ_bud.obtain",
+            "use": "infestusfrontier_tests:construction.organ_bud.use",
+            "guide": "infestusfrontier_client:construction.organ_bud.guide"
+          }
+        }
+      ]
+    }
+  ]
+}

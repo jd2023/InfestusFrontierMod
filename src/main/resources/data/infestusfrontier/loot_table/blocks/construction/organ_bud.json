@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        { "condition": "minecraft:survives_explosion" }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "infestusfrontier:construction/organ_bud"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "infestusfrontier:blocks/construction/organ_bud"
+}
