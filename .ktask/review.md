@@ -1,6 +1,10 @@
 # Independent acceptance review
 
 You did not implement this candidate. Do not trust its completion report.
+Review the current contract. Require reproduced defects in delivered behavior or
+violations of its explicit invariants; do not demand hypothetical checker coverage,
+new frameworks or general-purpose analyzers outside the task. Report all discovered
+blocking cases together so repair can address the failure class, not one example.
 Read the developer/performance guides, architecture contract and owning gameplay
 sections. Inspect the entire diff from the supplied baseline INCLUDING new files,
 surrounding callers, resources, tests and generated output. Read all task evidence.

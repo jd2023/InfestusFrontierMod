@@ -22,6 +22,8 @@ class TimeoutTests(unittest.TestCase):
         config = dict(timeout=7260, verification_timeout=100, limit_max_wait_seconds=200,
                       max_retries=1, max_remediation_attempts=0, autoresolve_attempts=0)
         self.assertEqual(7200, worker_timeout('IF-001', config, {}))
+        config['autoresolve_attempts'] = 2
+        self.assertEqual(7200, worker_timeout('IF-001', config, {}))
         config['max_retries'] = 4
         self.assertEqual(7200, worker_timeout('IF-001', config, {}))
 

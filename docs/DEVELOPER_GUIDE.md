@@ -82,6 +82,13 @@ exercise contention. Do not expand a module boundary just to make a test conveni
 
 ## Feedback loop
 
+Acceptance checks must exercise a defined behavior and reliably distinguish success
+from failure. Do not build general-purpose source analyzers as prerequisites for
+gameplay. Use compiler/classpath boundaries, focused tests and actual client/server
+runs; review owns architecture properties those checks cannot prove. Removing or
+replacing a faulty gate requires an explicit contract correction, not a worker
+silently suppressing its failure.
+
 Pure tests cover rules and limits. Contract tests cover commands and invariants.
 Platform tests cover registry/data/save/network boundaries. GameTests exercise real
 Minecraft state. Client fixtures verify resource loading and visible behavior.

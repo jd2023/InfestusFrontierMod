@@ -137,7 +137,7 @@ There are no recipe, item, armor-rank or gameplay registrations in either packet
 `gradle/integration/harness.py` owns launch/readiness/connection/capture/shutdown
 and result validation; `gradle/integration/test_harness.py` owns fast fixtures.
 Fixture child programs/data live under `gradle/integration/fixtures/**`.
-`scripts/check_boundaries.py` owns static boundary checks and its `--self-test`.
+`:core:verifyBoundary` checks the domain module's empty production classpath.
 Development Java hooks live only in
 `src/testMod/java/org/jd/infestusfrontier/testmod/integration/**`; shared fixture
 resources live in `src/testMod/resources/integration/**`. Client automation is
@@ -183,7 +183,7 @@ mod as success.
 
 | Command | Observable result |
 |---|---|
-| `./gradlew checkBoundaries` | Check production core imports/classpath and transitive server-bootstrap references, then run checker fixtures. |
+| `./gradlew :core:verifyBoundary :core:compileJava` | Reject external dependencies in the domain module and compile it without Minecraft or optional-library classes. |
 | `./gradlew integrationHarnessTest` | Run the fast supervisor/evaluator fixtures without launching Minecraft. |
 | `./gradlew profileSmoke -PmodProfile=<p>` | Start an isolated development GameTest server in that profile, collect actual loader identities, execute at least one real world/server-state assertion (including the existing required GameTest), see the required-test success summary, then stop cleanly. Dependency resolution or a socket opening alone is insufficient. |
 | `./gradlew captureClient -PmodProfile=<p> -Pscenario=bootstrap -PcaptureDir=<dir>` | Launch a packaged server and disposable client; after resources load capture `bootstrap-title.png`, join the server and capture `bootstrap-world.png` with the HUD/world visible. Both are fresh readable 1280x720 PNGs; report their digests and loaded client/server identities in result.json. Missing-texture/resource-load errors fail; review inspects actual images. |
@@ -227,15 +227,14 @@ the entire fixture suite has a 60-second deadline. No Minecraft/downloads in it.
 result through the production evaluator and must fail nonzero at the mod ID;
 the ordinary fast suite asserts this rejection as a passing regression.
 
-Boundary fixtures include a pure core success case, a rejected core third-party
-type (including fully qualified references), direct and indirect server-to-client
-reference failures with the reference path in diagnostics, and a valid client-only
-adapter unreachable from server roots. Dist-scoped client registration is allowed;
-server bootstrap/common initialization must not resolve client implementations.
-Check all production server entry points and registration roots, not just imports
-in the entry-point file. Rejection of every client import is not a valid checker.
+Core isolation is enforced by its empty production classpath and Java compilation.
+Server/client separation is checked by reviewing actual registration and dependency
+paths and exercising the implemented features on a dedicated server. These runtime
+tests cover exercised paths; they do not prove every hypothetical class-load path.
+No custom Java source analyzer or static transitive-reachability checker is required.
+Client-only registrations remain valid; common initialization must not load them.
 
-`verifyAll` adds checker self-tests, integrationHarnessTest and required-profile
+`verifyAll` adds integrationHarnessTest and required-profile
 smoke without removing its existing core, distribution or GameTest checks. Its
 smoke always uses required, independent of a caller's profile selection; reuse the
 existing required GameTest run where possible. Full profile captures and packaged
@@ -249,10 +248,10 @@ performance claims.
 
 ## Enforcement and growth
 
-The first production task adds import/package checks, including a deliberately
-invalid fixture proving rejection. Additional Gradle projects are justified by
-compile-time isolation, not one project per noun. Check API references and cycles
-in the full gate; package naming alone is not enforcement.
+Additional Gradle projects are justified by compile-time isolation, not one project
+per noun. Review API references and dependency cycles; package naming alone is not
+enforcement. Add executable boundary checks only for a concrete rule that the
+chosen compiler, classpath or runtime fixture can establish reliably.
 
 Registry IDs use `infestusfrontier:<owner>/<name>`. Owner recipes, models, loot and
 advancements use that path consistently. Shared translation/vanilla-tag edits add

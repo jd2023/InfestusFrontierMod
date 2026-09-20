@@ -15,7 +15,7 @@ from ktask_process import run, codex_args
 from ktask_evidence import record, validate_runs
 from ktask_guardian import invoke as run_model
 import ktask_delivery as delivery
-from ktask_timeouts import worker_timeout
+from ktask_timeouts import worker_timeout, evidence_timeout
 from ktask_plan import validate_plan, bind_contracts
 from ktask_queue import QUEUE, packet_text, queue_digest, implementation_paths, check_dispatch
 
@@ -404,8 +404,10 @@ def main():
         options = parser.parse_args(arguments[:split])
         phase, argv = options.phase, arguments[split + 1:]
         candidate = candidate_state(ROOT, task, state, policy)[1]
+        config = tomllib.loads((ROOT / '.ktask/config.toml').read_text())
         record(ROOT / '.ktask/session/evidence' / task['id'], evidence_binding(state),
-               candidate, phase, argv, ROOT, 7200 if phase == 'soak' else 1800, options.artifact)
+               candidate, phase, argv, ROOT,
+               evidence_timeout(phase, task['id'], config, policy), options.artifact)
     else:
         raise ValueError("Use validate, scope, executor, accept, record or check-evidence")
 

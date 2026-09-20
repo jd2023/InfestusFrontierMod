@@ -17,3 +17,9 @@ def worker_timeout(task_id, config, policy):
             or any(type(value) is not int or not 0 <= value <= 7200 for value in (verification, wait))):
         raise ValueError('Invalid execution budget or missing outer shutdown margin')
     return worker
+
+
+def evidence_timeout(phase, task_id, config, policy):
+    """Qualification shares the worker deadline; focused tests retain a shorter cap."""
+    worker = worker_timeout(task_id, config, policy)
+    return min(worker, 1800) if phase in ('red', 'green') else worker

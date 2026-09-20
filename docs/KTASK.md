@@ -47,6 +47,8 @@ python3 scripts/ktask_workflow.py check-evidence
 ```
 
 The recorder captures exit codes, bounded logs and generated artifact hashes.
+Qualification commands share the configured worker deadline; red/green commands
+are additionally capped at 1800 seconds. Task-specific scenario limits still apply.
 Red binds to the task/checkpoint; green and qualification bind to the exact
 candidate. `check-evidence` is read-only and never invokes a model or delivers code.
 The prompt specifies evidence.json and required game/visual/integration/soak kinds.

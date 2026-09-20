@@ -16,5 +16,8 @@ Do not commit/push. The delivery adapter owns those actions.
 
 Routine uncertainty is not NEEDS_INPUT. If the packet needs revision outside its
 allowed scope, report FAILED with the exact correction for the planning coordinator.
-Only product scope or external authority needs a human. Two repair attempts are
-a bounded engineering stop, not permission to loop forever or claim success.
+Only product scope or external authority needs a human. The configured budget is
+two repair attempts. Compare current findings with earlier attempts; preserve
+resolved cases and correct the underlying assumption when related defects recur.
+Do not spend an attempt repeating an unchanged implementation or merely rerunning
+the same failing check. A repair budget is not permission to claim success.

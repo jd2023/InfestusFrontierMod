@@ -93,6 +93,28 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(candidate, flow.candidate_state(self.root, self.task, self.state, self.policy)[1])
         self.assertFalse((self.session / 'accepted/IF-001.json').exists())
 
+    def test_qualification_recording_uses_worker_budget_without_starting_delivery(self):
+        (self.root / '.ktask/config.toml').write_text(
+            'timeout = 10860\nlimit_max_wait_seconds = 3600\n')
+        self.git('add', '.ktask/config.toml')
+        self.git('commit', '-m', 'Configure fixture budget')
+        self.state['baseline'] = self.git('rev-parse', 'HEAD')
+        flow.save(self.session / 'active.json', self.state)
+        for worker in (600, 7200, 10800):
+            self.policy['worker_timeout'] = worker
+            for phase in ('red', 'green', 'game', 'visual', 'integration', 'soak'):
+                with self.subTest(worker=worker, phase=phase), \
+                        patch.object(flow, 'ROOT', self.root), \
+                        patch.object(flow, 'load_project', return_value=([self.task], self.policy)), \
+                        patch.object(flow, 'require_session'), \
+                        patch.object(flow.sys, 'argv', ['ktask_workflow.py', 'record', phase, '--', 'fixture']), \
+                        patch.object(flow, 'record') as record, \
+                        patch.object(flow, 'accept') as accept:
+                    flow.main()
+                    expected = min(worker, 1800) if phase in ('red', 'green') else worker
+                    self.assertEqual(expected, record.call_args.args[6])
+                    accept.assert_not_called()
+
     def test_evidence_preflight_identifies_superseded_capture_before_handoff(self):
         self.evidence()
         folder = self.session / 'evidence/IF-001'
