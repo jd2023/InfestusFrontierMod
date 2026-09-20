@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+import select
 import subprocess
 import sys
 import tempfile
@@ -45,12 +46,62 @@ class ProcessTests(unittest.TestCase):
         program = (f'import os,sys; sys.path.insert(0,{scripts!r}); from ktask_process import run; '
                    f'from pathlib import Path; Path("parent").write_text(str(os.getpgrp())); '
                    f'run([sys.executable,"-c",{payload!r}],Path.cwd(),30)')
-        with patch.dict(os.environ, {}, clear=False):
-            os.environ.pop('INFESTUS_TASK_GROUP', None)
-            with self.assertRaises(subprocess.TimeoutExpired):
-                run([sys.executable, '-c', program], self.root, 2, log=self.root / 'nested.log')
+        launcher = (f'import sys; sys.path.insert(0,{scripts!r}); from ktask_process import run; '
+                    f'from pathlib import Path; run([sys.executable,"-c",{program!r}],'
+                    f'Path.cwd(),2,log=Path("nested.log"))')
+        result = subprocess.run([sys.executable, '-c', launcher], cwd=self.root,
+                                env=dict(os.environ, INFESTUS_TASK_GROUP='1'),
+                                start_new_session=True, capture_output=True, timeout=15)
+        self.assertEqual(-9, result.returncode)
         pid, group = (self.root / 'child').read_text().split()
         self.assertEqual(group, (self.root / 'parent').read_text())
-        status = Path(f'/proc/{pid}/stat')
-        if status.exists():
-            self.assertEqual('Z', status.read_text().split()[2], 'Descendant must not remain running')
+        self.assert_descendant_stopped(int(pid))
+
+    def assert_descendant_stopped(self, pid):
+        try:
+            descriptor = os.pidfd_open(pid)
+        except ProcessLookupError:
+            return
+        try:
+            poller = select.poll()
+            poller.register(descriptor, select.POLLIN)
+            self.assertTrue(any(events & select.POLLIN for _, events in poller.poll(2000)),
+                            'Descendant must not remain running')
+        finally:
+            os.close(descriptor)
+
+    def test_already_reaped_descendant_is_stopped(self):
+        with patch('os.pidfd_open', side_effect=ProcessLookupError), patch('select.poll') as poller:
+            self.assert_descendant_stopped(123)
+        poller.assert_not_called()
+
+    def test_live_process_is_not_accepted(self):
+        with self.assertRaisesRegex(AssertionError, 'Descendant must not remain running'):
+            self.assert_descendant_stopped(os.getpid())
+
+    def test_exit_notification_required_and_descriptor_always_closed(self):
+        for events in ([(99, select.POLLIN)], [(99, select.POLLIN | select.POLLHUP)],
+                       [], [(99, select.POLLERR)], [(99, select.POLLNVAL)]):
+            with self.subTest(events=events), patch('os.pidfd_open', return_value=99), \
+                    patch('select.poll') as poll, patch('os.close') as close:
+                poll.return_value.poll.return_value = events
+                if events and events[0][1] & select.POLLIN:
+                    self.assert_descendant_stopped(123)
+                else:
+                    with self.assertRaisesRegex(AssertionError, 'Descendant must not remain running'):
+                        self.assert_descendant_stopped(123)
+                poll.return_value.register.assert_called_once_with(99, select.POLLIN)
+                poll.return_value.poll.assert_called_once_with(2000)
+                close.assert_called_once_with(99)
+
+    def test_unrelated_process_observation_errors_propagate(self):
+        for error in (PermissionError, OSError):
+            with self.subTest(error=error.__name__), patch('os.pidfd_open', side_effect=error):
+                with self.assertRaises(error):
+                    self.assert_descendant_stopped(123)
+        with patch('os.pidfd_open', return_value=99), patch('select.poll') as poll, \
+                patch('os.close') as close:
+            poll.return_value.poll.side_effect = OSError('poll failed')
+            with self.assertRaises(OSError):
+                self.assert_descendant_stopped(123)
+            close.assert_called_once_with(99)
