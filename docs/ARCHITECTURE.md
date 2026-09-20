@@ -84,6 +84,25 @@ condition and leaves uncommitted resources unchanged.
 - Optional adapters load only when their library is present. Core retains an empty
   external dependency classpath. testMod/campaign code never enters release JARs.
 
+## Discovery adapters
+
+Discovery owns one persisted tri-state claim Boolean per player. Delivery examines
+at most the 36 main inventory slots and inserts only into a real free slot, including
+Creative; pending delivery retries on player ticks without drops or a delivery queue.
+Vanilla inventory-change advancement criteria recognize Culture acquisition and
+retain one instruction-reveal bit per implemented item. Reveal conditions are
+separate from successful-operation milestones; Creative possession cannot complete
+an operation. Vanilla advancement data owns earned player progress and its sync.
+
+The Bowl retains two pending milestone bits beside its existing owner UUID. They
+survive serialization and the single recovery item. A completed loaded Bowl resolves
+the current online player once per 20 ticks, or on that owner's interaction; it
+never retains a player object, scans chunks or loads an offline Bowl. Bud completion
+is recorded only after its batch commits. Repeated batches coalesce the same bits.
+The Modonomicon loader renders each Bowl recipe from `CultureBowlRecipes` into a
+standard synchronized text page with localized components. JEI projects that same
+finite catalog; optional JEI classes are absent from common initialization.
+
 ## Culture Bowl adapter
 
 Processing owns the Bowl block entity, finite registry translation and strict schema-1
@@ -104,7 +123,8 @@ and retain their original data on save/recovery. Breaking produces one block ite
 carrying that state; placement consumes it. There is no second contents drop.
 
 Only active loaded block entities advance one work unit/tick; idle tick callbacks
-return without snapshots or probes. Active work probes only the loaded supporting
+return without snapshots or block probes. Pending discovery credit uses the bounded
+online-player lookup described above. Active work probes only the loaded supporting
 cell, never requests a ticket, and never reads wall time. Every dimension shares
 one server-identity `SharedRecipeCompletionAdmission` (16 completions/tick); excess
 completed work retains its reservation until admitted. There is no pending queue.
@@ -341,7 +361,15 @@ opens the real menu and records received snapshots. Actual screen clicks start a
 cancel work, the owner closes/reopens, and the observer checks ownership refusal.
 The evaluator compares revision, recipe work requirement, slots, water, state and
 progress within the 10-tick snapshot cadence. Missing/mismatched observations,
-identity, mod lists, clean disconnect or process cleanup fail acceptance. Each
+identity, mod lists, clean disconnect or process cleanup fail acceptance.
+When discovery is active, a fresh Survival phase before scene setup supplies ordinary starter
+materials from its owner-local `survival-setup.json` (the same schema and combined
+64-command ceiling as visual setup) and uses actual inventory clicks and block-use packets to craft Culture,
+convert ground, craft/place a Bowl, renew Culture and recraft a lost book. It observes
+synchronized prerequisites and advancements, and exercises a rebound guide key.
+This phase admits 100 seconds (including the 60-second base batch) within the same
+420-second scenario ceiling. Every contributed guide spread is then inspected;
+additional captures show all Bowl recipes and the optional JEI recipe browser. Each
 additional action phase is bounded by 30 seconds within the existing 420-second
 scenario ceiling. Shared admission and snapshot cadence/idle silence have focused
 rule tests, while the game fixtures cover reopening and offhand placement.

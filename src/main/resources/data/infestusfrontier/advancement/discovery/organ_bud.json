@@ -1,6 +1,22 @@
 {
   "parent": "infestusfrontier:discovery/spore_culture",
   "criteria": {
-    "observed": { "trigger": "minecraft:impossible" }
+    "observed": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:construction/organ_bud"
+    },
+    "title": {
+      "translate": "book.infestusfrontier.entry.organ_bud.name"
+    },
+    "description": {
+      "translate": "book.infestusfrontier.entry.organ_bud.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
   }
 }

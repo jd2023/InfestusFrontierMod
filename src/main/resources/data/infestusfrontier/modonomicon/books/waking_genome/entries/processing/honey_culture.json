@@ -5,7 +5,33 @@
   "icon": "infestusfrontier:processing/honey_culture",
   "x": 1,
   "y": 8,
-  "parents": [{ "entry": "infestusfrontier:processing/culture_bowl" }],
-  "condition": { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/living_substrate" },
-  "pages": [{ "type": "modonomicon:text", "title": "book.infestusfrontier.entry.honey_culture.name", "text": "book.infestusfrontier.entry.honey_culture.page.text" }]
+  "parents": [
+    {
+      "entry": "infestusfrontier:processing/culture_bowl"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/living_substrate"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/acquired/honey_culture"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "book.infestusfrontier.entry.honey_culture.name",
+      "text": "book.infestusfrontier.entry.honey_culture.page.text"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I030"
+    }
+  ]
 }

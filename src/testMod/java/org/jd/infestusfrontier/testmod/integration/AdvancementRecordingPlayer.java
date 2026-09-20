@@ -18,11 +18,13 @@ public final class AdvancementRecordingPlayer extends FakePlayer {
     public AdvancementRecordingPlayer(ServerLevel level, GameProfile profile) {
         super(level, profile);
         var server = level.getServer();
-        advancements = new FakePlayerAdvancements(server.getFixerUpper(), server.getPlayerList(),
-                server.getAdvancements(), Path.of("advancement-recording-player.dat"), this) {
+        advancements = new PlayerAdvancements(server.getFixerUpper(), server.getPlayerList(),
+                server.getAdvancements(), Path.of("build", "test-players", java.util.UUID.randomUUID() + ".json"), this) {
             @Override
             public boolean award(AdvancementHolder advancement, String criterion) {
-                return "observed".equals(criterion) && awards.add(advancement.id());
+                boolean changed = super.award(advancement, criterion);
+                if (changed) awards.add(advancement.id());
+                return changed;
             }
         };
     }

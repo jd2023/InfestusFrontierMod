@@ -5,7 +5,33 @@
   "icon": "infestusfrontier:processing/elastic_gel",
   "x": -3,
   "y": 8,
-  "parents": [{ "entry": "infestusfrontier:processing/culture_bowl" }],
-  "condition": { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/living_substrate" },
-  "pages": [{ "type": "modonomicon:text", "title": "book.infestusfrontier.entry.elastic_gel.name", "text": "book.infestusfrontier.entry.elastic_gel.page.text" }]
+  "parents": [
+    {
+      "entry": "infestusfrontier:processing/culture_bowl"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/living_substrate"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/acquired/elastic_gel"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "book.infestusfrontier.entry.elastic_gel.name",
+      "text": "book.infestusfrontier.entry.elastic_gel.page.text"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I005"
+    }
+  ]
 }

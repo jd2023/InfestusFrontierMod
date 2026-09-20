@@ -1,5 +1,22 @@
 {
   "criteria": {
-    "observed": { "trigger": "minecraft:impossible" }
+    "observed": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:construction/spore_culture"
+    },
+    "title": {
+      "translate": "book.infestusfrontier.waking_genome.contact.name"
+    },
+    "description": {
+      "translate": "book.infestusfrontier.waking_genome.contact.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:textures/block/stone.png"
   }
 }

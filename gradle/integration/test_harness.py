@@ -46,6 +46,19 @@ class VisualSetupTest(unittest.TestCase):
             self.assertEqual(["give FixturePlayer minecraft:stone"],
                              harness.visual_setup_commands(root, {"gameTest": ["bud.obtain"]}))
 
+    def test_survival_setup_is_owner_scoped_and_shares_the_combined_bound(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            fixture = root / "src/testMod/resources/discovery/survival-setup.json"
+            fixture.parent.mkdir(parents=True)
+            fixture.write_text(json.dumps({"requires": "guide.use", "commands": ["give FixturePlayer minecraft:book"]}))
+            self.assertEqual(([], []), harness._visual_setup(root, {"gameTest": []}, "survival-setup.json"))
+            self.assertEqual((["give FixturePlayer minecraft:book"], []),
+                             harness._visual_setup(root, {"gameTest": ["guide.use"]}, "survival-setup.json"))
+            with self.assertRaisesRegex(harness.HarnessFailure, "combined setup"):
+                harness._client_lifecycle(None, None, None, None, None, root, None,
+                                         setup_commands=["say visual"] * 64, discovery_setup=["say survival"])
+
     def test_owner_detail_captures_are_bounded_and_activation_scoped(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)

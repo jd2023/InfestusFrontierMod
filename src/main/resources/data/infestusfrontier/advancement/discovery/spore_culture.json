@@ -1,6 +1,38 @@
 {
   "parent": "infestusfrontier:discovery/root",
   "criteria": {
-    "observed": { "trigger": "minecraft:impossible" }
+    "observed": {
+      "trigger": "minecraft:impossible"
+    },
+    "acquired": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "infestusfrontier:construction/spore_culture"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "observed",
+      "acquired"
+    ]
+  ],
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:construction/spore_culture"
+    },
+    "title": {
+      "translate": "book.infestusfrontier.entry.spore_culture.name"
+    },
+    "description": {
+      "translate": "book.infestusfrontier.entry.spore_culture.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
   }
 }

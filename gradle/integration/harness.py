@@ -679,7 +679,7 @@ def _prepare_server(s, staged, output, multiplayer=False):
                 "difficulty=peaceful",
                 "enable-command-block=false",
                 "enforce-whitelist=true",
-                "gamemode=creative",
+                "gamemode=survival",
                 "generate-structures=false",
                 'generator-settings={"layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"biome":"minecraft:plains"}',
                 "level-name=world",
@@ -709,11 +709,11 @@ def _prepare_server(s, staged, output, multiplayer=False):
     return server_dir, client_dir, releases[0], port
 
 
-def _visual_setup(root, requirements):
+def _visual_setup(root, requirements, filename="visual-setup.json"):
     """Bounded owner fixtures run only on this harness's disposable server."""
     commands, captures = [], []
     active = set((requirements or {}).get("gameTest", []))
-    for path in sorted((root / "src/testMod/resources").glob("*/visual-setup.json")):
+    for path in sorted((root / "src/testMod/resources").glob("*/" + filename)):
         if path.stat().st_size > 8192:
             raise HarnessFailure(f"oversized visual setup: {path}")
         fixture = json.loads(path.read_text())
@@ -751,8 +751,10 @@ def visual_setup_captures(root, requirements):
 
 
 def _client_lifecycle(
-    s, server_command, client_command, server_dir, client_dir, output, port, setup_commands=(), observer_command=None
+    s, server_command, client_command, server_dir, client_dir, output, port, setup_commands=(), observer_command=None, discovery=False, discovery_setup=()
 ):
+    if len(setup_commands) + len(discovery_setup) > 64:
+        raise HarnessFailure("excessive combined setup commands")
     server = s.start("server", server_command, server_dir, output / "server.log")
     s.markers("readiness", s.limits["readiness"], [(server, "Done (")])
     env = os.environ | {
@@ -800,6 +802,9 @@ def _client_lifecycle(
         s.markers("observerJoin", s.limits["join"], [
             (server, f"INFESTUS_INTEGRATION_PLAYER_JOIN name=FixtureObserver uuid={_offline_uuid('FixtureObserver')}"),
             (observer, "INFESTUS_PROBE_READY role=observer")])
+    if discovery:
+        _discovery_actions(s, server, client, output, discovery_setup)
+        server.send("gamemode creative @a")
     for command in setup_commands:
         server.send(command)
     if observer:
@@ -819,6 +824,15 @@ def _client_lifecycle(
             (server, f"INFESTUS_INTEGRATION_PLAYER_LEAVE {identity}"),
         ],
     )
+
+
+def _discovery_actions(s, server, client, output, setup_commands):
+    s.markers("discovery-ready", 30, [(client, "INFESTUS_DISCOVERY_READY")])
+    for command in setup_commands:
+        server.send(command)
+    (output / "discovery-stage").write_text("run")
+    s.markers("discovery-survival", 100, [(client, "INFESTUS_DISCOVERY_KEY_WITHOUT_BOOK"),
+        (client, "INFESTUS_DISCOVERY_SURVIVAL_RENEWED"), (client, "INFESTUS_DISCOVERY_SURVIVAL_COMPLETE")])
 
 
 def _observer_command(command, run_dir):
@@ -978,6 +992,7 @@ def run_client_scenario(
         with s:
             captures = [] if fixture else visual_setup_captures(root, content_requirements)
             _clear_output(output, captures)
+            (output / "discovery-stage").unlink(missing_ok=True)
             observer_command = None
             if fixture:
                 server_dir = client_dir = s.run_dir
@@ -1031,6 +1046,9 @@ def run_client_scenario(
             _client_lifecycle(
                 s, server_command, client_command, server_dir, client_dir, output, port,
                 () if fixture else visual_setup_commands(root, content_requirements), observer_command,
+                discovery=not fixture and "infestusfrontier_client:discovery.waking_genome.guide"
+                    in (content_requirements or {}).get("client", []),
+                discovery_setup=() if fixture else _visual_setup(root, content_requirements, "survival-setup.json")[0],
             )
     except Exception as exc:
         failure = str(exc)

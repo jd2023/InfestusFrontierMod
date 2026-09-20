@@ -5,10 +5,23 @@
   "icon": "infestusfrontier:ecology/living_substrate",
   "x": 0,
   "y": 4,
-  "parents": [{ "entry": "infestusfrontier:construction/spore_culture" }],
+  "parents": [
+    {
+      "entry": "infestusfrontier:construction/spore_culture"
+    }
+  ],
   "condition": {
-    "type": "modonomicon:advancement",
-    "advancement_id": "infestusfrontier:discovery/spore_culture"
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/spore_culture"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/acquired/living_substrate"
+      }
+    ]
   },
   "pages": [
     {

@@ -24,7 +24,10 @@ final class FirstJoinClaim {
         var data = player.getPersistentData();
         if (!data.contains(PENDING, Tag.TAG_BYTE) || !data.getBoolean(PENDING)) return;
         var guide = GuideAccess.wakingGenome();
-        if (!player.getInventory().add(guide)) return;
+        // Inventory.add discards overflow in Creative; claim delivery requires a real slot.
+        int slot = player.getInventory().getFreeSlot();
+        if (slot < 0) return;
+        player.getInventory().setItem(slot, guide);
         data.putBoolean(PENDING, false);
         discovery.complete(player, DiscoveryObserver.Milestone.FIRST_COPY);
     }

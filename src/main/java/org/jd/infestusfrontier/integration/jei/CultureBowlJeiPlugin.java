@@ -121,7 +121,7 @@ public final class CultureBowlJeiPlugin implements IModPlugin {
                 for (var inputs : recipe.itemInputAlternatives()) {
                     result.add(new BowlDisplayRecipe(recipe.catalogId(), alternative++, sorted(inputs),
                             recipe.fluidInputs().getOrDefault("water", 0), sorted(recipe.outputs()),
-                            sorted(recipe.returnedContainers()), recipe.baseWorkUnits() / 20, 0));
+                            sorted(recipe.returnedContainers()), recipe.baseWorkUnits() / 20, CultureBowlRecipes.BIOMASS_BU));
                 }
             }
             return List.copyOf(result);
@@ -131,7 +131,7 @@ public final class CultureBowlJeiPlugin implements IModPlugin {
             var result = new LinkedHashMap<String, Integer>();
             values.entrySet().stream().sorted(Map.Entry.comparingByKey(Comparator.naturalOrder()))
                     .forEach(entry -> result.put(entry.getKey(), entry.getValue()));
-            return Map.copyOf(result);
+            return java.util.Collections.unmodifiableMap(result);
         }
     }
 

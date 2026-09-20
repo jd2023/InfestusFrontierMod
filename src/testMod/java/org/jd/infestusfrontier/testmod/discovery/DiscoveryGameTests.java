@@ -17,7 +17,6 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -68,13 +67,46 @@ public final class DiscoveryGameTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void creativeFullInventoryRetainsClaim(GameTestHelper helper) {
+        var player = player(helper, "CreativePendingGuide");
+        player.setGameMode(GameType.CREATIVE);
+        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+            player.getInventory().setItem(slot, new ItemStack(Items.COBBLESTONE, 64));
+        }
+        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
+        helper.assertTrue(countGuides(player) == 0, "Full Creative inventory receives no item");
+        player.getInventory().setItem(0, ItemStack.EMPTY);
+        NeoForge.EVENT_BUS.post(new PlayerTickEvent.Post(player));
+        helper.assertTrue(countGuides(player) == 1, "Creative overflow must retain the undelivered claim");
+        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(player));
+        helper.assertTrue(countGuides(player) == 1, "Creative claim is once only");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void pendingAndDeliveredClaimsSurvivePlayerClone(GameTestHelper helper) {
+        var original = player(helper, "CloneGuide");
+        for (int slot = 0; slot < 36; slot++) original.getInventory().setItem(slot, new ItemStack(Items.COBBLESTONE, 64));
+        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(original));
+        var replacement = player(helper, "CloneGuide");
+        NeoForge.EVENT_BUS.post(new PlayerEvent.Clone(replacement, original, true));
+        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(replacement));
+        helper.assertTrue(countGuides(replacement) == 1, "Pending claim survives respawn");
+        var third = player(helper, "CloneGuide");
+        NeoForge.EVENT_BUS.post(new PlayerEvent.Clone(third, replacement, true));
+        NeoForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedInEvent(third));
+        helper.assertTrue(countGuides(third) == 0, "Delivered claim cannot be repeated after death");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void creativeGiveDoesNotCompleteBowlOperation(GameTestHelper helper) {
         var player = player(helper, "CreativeBowl");
         player.setGameMode(GameType.CREATIVE);
         player.getInventory().add(new ItemStack(BuiltInRegistries.ITEM.get(BOWL)));
         var advancement = helper.getLevel().getServer().getAdvancements().get(BOWL_MILESTONE);
         helper.assertTrue(advancement != null, "Bowl completion advancement must exist");
-        helper.assertTrue(!player.getAdvancements().getOrStartProgress(advancement).isDone(),
+        helper.assertTrue(!player.wasAwarded(advancement.id()),
                 "Possessing a creative Bowl is not a completed rooted batch");
         helper.succeed();
     }
@@ -90,6 +122,24 @@ public final class DiscoveryGameTests {
                 "A real Culture craft completes the obtain milestone");
         helper.assertTrue(!player.wasAwarded(bowlMilestone.id()),
                 "Crafting an ingredient cannot complete the Bowl operation milestone");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void receivingCultureAndCreativeBowlRevealWithoutOperating(GameTestHelper helper) {
+        var player = player(helper, "ReceivedCulture");
+        var culture = stack("construction/spore_culture");
+        player.getInventory().setItem(0, culture);
+        net.minecraft.advancements.CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), culture);
+        helper.assertTrue(player.wasAwarded(id("discovery/spore_culture")),
+                "Received Culture earns the obtain milestone without a craft");
+        player.setGameMode(GameType.CREATIVE);
+        var bowl = stack("processing/culture_bowl");
+        player.getInventory().setItem(1, bowl);
+        net.minecraft.advancements.CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), bowl);
+        helper.assertTrue(player.wasAwarded(id("discovery/acquired/culture_bowl")),
+                "Possession reveals Bowl safety instructions");
+        helper.assertTrue(!player.wasAwarded(BOWL_MILESTONE), "Possession is not operation completion");
         helper.succeed();
     }
 

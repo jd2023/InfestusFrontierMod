@@ -103,6 +103,32 @@ public final class BowlGameTests {
             helper.assertTrue(before.equals(data(helper, pos)), "Midway serialized round trip preserves progress, reservation and counts");
         });
         helper.runAfterDelay(1220, () -> {
+            helper.assertTrue(!player.wasAwarded(id("discovery/culture_bowl_batch")),
+                    "Offline initiator must not receive awards through a stale player reference");
+            var reconnected = new AdvancementRecordingPlayer(helper.getLevel(), player.getGameProfile());
+            reconnected.setGameMode(GameType.SURVIVAL);
+            for (int i = 0; i < 6; i++) {
+                var pos = positions.get(i);
+                var receipt = data(helper, pos);
+                if (i == 1) {
+                    var drops = Block.getDrops(helper.getLevel().getBlockState(pos), helper.getLevel(), pos,
+                            helper.getLevel().getBlockEntity(pos));
+                    helper.assertTrue(drops.size() == 1, "Pending Bud credit has one recovery item");
+                    helper.getLevel().removeBlock(pos, false);
+                    reconnected.setItemInHand(InteractionHand.MAIN_HAND, drops.getFirst());
+                    drops.getFirst().getItem().useOn(new UseOnContext(reconnected, InteractionHand.MAIN_HAND,
+                            new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
+                } else {
+                    helper.getLevel().removeBlockEntity(pos);
+                    helper.getLevel().setBlockEntity(BlockEntity.loadStatic(pos, helper.getLevel().getBlockState(pos),
+                            receipt, helper.getLevel().registryAccess()));
+                }
+                use(helper, pos, reconnected, new ItemStack(Items.STICK), false);
+            }
+            helper.assertTrue(reconnected.wasAwarded(id("discovery/culture_bowl_batch")),
+                    "Reloaded completion evidence credits the current player after reconnect");
+            helper.assertTrue(reconnected.wasAwarded(id("discovery/organ_bud")),
+                    "Growing a Bud completes T0-16");
             for (int i = 0; i < 6; i++) {
                 var pos = positions.get(i); var saved = data(helper, pos).getCompound("bowl");
                 helper.assertTrue(!saved.contains("active") && saved.getLong("completed") == 1, "One completion, one count: " + outputs[i]);
@@ -130,7 +156,7 @@ public final class BowlGameTests {
             ContentAssertion.passGameTest(helper, "infestusfrontier_tests:processing.culture_bowl.use");
             var milestone = helper.getLevel().getServer().getAdvancements().get(
                     id("discovery/culture_bowl_batch"));
-            helper.assertTrue(player.wasAwarded(milestone.id()),
+            helper.assertTrue(reconnected.wasAwarded(milestone.id()),
                     "A completed rooted Bowl batch earns server-owned T0-02 progress");
             helper.succeed();
         });

@@ -5,7 +5,11 @@
   "icon": "infestusfrontier:construction/spore_culture",
   "x": 0,
   "y": 2,
-  "parents": [{ "entry": "infestusfrontier:discovery/waking_genome" }],
+  "parents": [
+    {
+      "entry": "infestusfrontier:discovery/waking_genome"
+    }
+  ],
   "condition": {
     "type": "modonomicon:advancement",
     "advancement_id": "infestusfrontier:discovery/root"
@@ -17,9 +21,8 @@
       "text": "book.infestusfrontier.entry.spore_culture.recipe.text"
     },
     {
-      "type": "modonomicon:text",
-      "title": "book.infestusfrontier.entry.spore_culture.renewal.title",
-      "text": "book.infestusfrontier.entry.spore_culture.renewal.text"
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I000"
     }
   ]
 }

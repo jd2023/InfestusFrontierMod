@@ -5,10 +5,23 @@
   "icon": "infestusfrontier:processing/culture_bowl",
   "x": 0,
   "y": 6,
-  "parents": [{ "entry": "infestusfrontier:ecology/living_substrate" }],
+  "parents": [
+    {
+      "entry": "infestusfrontier:ecology/living_substrate"
+    }
+  ],
   "condition": {
-    "type": "modonomicon:advancement",
-    "advancement_id": "infestusfrontier:discovery/living_substrate"
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/living_substrate"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/acquired/culture_bowl"
+      }
+    ]
   },
   "pages": [
     {
@@ -22,9 +35,28 @@
       "text": "book.infestusfrontier.entry.culture_bowl.controls.text"
     },
     {
-      "type": "modonomicon:text",
-      "title": "book.infestusfrontier.entry.culture_bowl.recipes.title",
-      "text": "book.infestusfrontier.entry.culture_bowl.recipes.text"
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I000"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I001"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I005"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I007"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I030"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I033"
     }
   ]
 }

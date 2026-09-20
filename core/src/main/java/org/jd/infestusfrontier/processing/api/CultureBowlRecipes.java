@@ -10,6 +10,7 @@ import java.util.Optional;
 /** The finite M0 Culture Bowl recipe catalog. Binder-dependent recipes are deliberately absent. */
 public final class CultureBowlRecipes {
     public static final int BASE_WORK_UNITS = 20 * 60;
+    public static final int BIOMASS_BU = 0;
     private static final Map<String, Recipe> RECIPES = createRecipes();
 
     private CultureBowlRecipes() {}
