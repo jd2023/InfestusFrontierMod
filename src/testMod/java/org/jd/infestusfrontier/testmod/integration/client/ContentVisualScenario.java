@@ -11,6 +11,10 @@ public interface ContentVisualScenario {
         return List.of();
     }
 
+    default boolean prepareView(Minecraft minecraft, View view) {
+        return true;
+    }
+
     default List<UiView> uiViews() {
         return List.of();
     }

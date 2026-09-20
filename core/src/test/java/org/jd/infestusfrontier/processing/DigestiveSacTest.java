@@ -2,11 +2,32 @@ package org.jd.infestusfrontier.processing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.jd.infestusfrontier.processing.digestion.api.DigestiveSac;
 import org.junit.jupiter.api.Test;
 
 final class DigestiveSacTest {
+    @Test
+    void staleIdleBatchCounterIsRejectedBeforeAnotherFeedCanCommit() {
+        var sac = DigestiveSac.create(1_000, () -> true);
+        sac.feed("wheat");
+        sac.advance(40);
+        sac.feed("wheat");
+        sac.advance(40);
+        var saved = sac.snapshot();
+        for (long stale : new long[] {1, saved.history().lastCompletedBatchId()}) {
+            var corrupt = new DigestiveSac.State(saved.schema(), saved.revision(), stale,
+                    null, saved.quantities(), saved.history());
+            assertThrows(IllegalArgumentException.class, () -> DigestiveSac.restore(corrupt, () -> true));
+        }
+        var restored = DigestiveSac.restore(saved, () -> true);
+        assertInstanceOf(DigestiveSac.Fed.class, restored.feed("rotten_flesh"));
+        restored.advance(160);
+        assertEquals(250, restored.snapshot().biomass());
+        assertEquals(3, restored.snapshot().history().completedBatches());
+    }
+
     @Test
     void rottenFleshStartsOnlyWhenItsCompleteOutputFits() {
         var sac = DigestiveSac.create(1_000, () -> true);

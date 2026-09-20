@@ -55,6 +55,10 @@ final class BiomassBladderBlock extends BaseEntityBlock {
     }
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
             Player player, InteractionHand hand, BlockHitResult hit) {
+        if (stack.isEmpty()) return player.getOffhandItem().isEmpty()
+                ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                : ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+        if (!BiomassInteractions.isBucket(stack, biomassBucket.get())) return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
         if (level.getBlockEntity(pos) instanceof BiomassBladderEntity bladder
                 && bladder.interact(player, hand, biomassBucket.get())) return ItemInteractionResult.CONSUME;
@@ -62,6 +66,7 @@ final class BiomassBladderBlock extends BaseEntityBlock {
     }
     @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
             Player player, BlockHitResult hit) {
+        if (!player.getOffhandItem().isEmpty()) return InteractionResult.PASS;
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof BiomassBladderEntity bladder) {
             var snapshot = bladder.snapshot();
             BiomassInteractions.status(player, snapshot.fluidAmount("biomass"), BiomassBladderEntity.CAPACITY);

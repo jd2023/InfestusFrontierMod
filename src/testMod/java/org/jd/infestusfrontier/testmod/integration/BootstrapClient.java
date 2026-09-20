@@ -40,7 +40,7 @@ public final class BootstrapClient {
     private final List<ContentVisualScenario> visuals = ServiceLoader.load(ContentVisualScenario.class)
             .stream().map(ServiceLoader.Provider::get).toList();
 
-    private List<ContentVisualScenario.View> detailViews = List.of();
+    private List<DetailCapture> detailViews = List.of();
     private int detailIndex;
     private List<UiCapture> uiCaptures = List.of();
     private int uiIndex;
@@ -67,10 +67,11 @@ public final class BootstrapClient {
                     boolean ready = true;
                     for (var scene : visuals) ready &= scene.ready(minecraft);
                     if (ready) {
-                        detailViews = visuals.stream().flatMap(scene -> scene.detailViews().stream()).toList();
+                        detailViews = visuals.stream().flatMap(scene -> scene.detailViews().stream()
+                                .map(view -> new DetailCapture(scene, view))).toList();
                         uiCaptures = visuals.stream().flatMap(scene -> scene.uiViews().stream()
                                 .map(view -> new UiCapture(scene, view))).toList();
-                        var names = java.util.stream.Stream.concat(detailViews.stream().map(ContentVisualScenario.View::filename),
+                        var names = java.util.stream.Stream.concat(detailViews.stream().map(capture -> capture.view().filename()),
                                 uiCaptures.stream().map(capture -> capture.view().filename())).toList();
                         if (names.size() > 16 || names.stream().distinct().count() != names.size()) {
                             throw new IllegalStateException("Excessive or duplicate detail captures");
@@ -81,7 +82,9 @@ public final class BootstrapClient {
                 case DETAILS -> {
                     if (detailIndex == detailViews.size()) stage = Stage.UI_SETUP;
                     else {
-                        var view = detailViews.get(detailIndex);
+                        var capture = detailViews.get(detailIndex);
+                        if (!capture.scenario().prepareView(minecraft, capture.view())) break;
+                        var view = capture.view();
                         minecraft.player.setYRot(view.yaw());
                         minecraft.player.setXRot(view.pitch());
                         minecraft.player.yRotO = view.yaw();
@@ -152,8 +155,8 @@ public final class BootstrapClient {
 
     private void worldRendered(RenderLevelStageEvent event) {
         boolean detail = stage == Stage.DETAIL_RENDER;
-        float yaw = detail ? detailViews.get(detailIndex).yaw() : 0;
-        float pitch = detail ? detailViews.get(detailIndex).pitch() : 15;
+        float yaw = detail ? detailViews.get(detailIndex).view().yaw() : 0;
+        float pitch = detail ? detailViews.get(detailIndex).view().pitch() : 15;
         if ((stage == Stage.WORLD_RENDER || detail) && event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL
                 && worldReady(Minecraft.getInstance())
                 && event.getLevelRenderer().countRenderedSections() > 0
@@ -184,7 +187,7 @@ public final class BootstrapClient {
                 grab(minecraft, "bootstrap-world.png", () -> stage = Stage.DETAILS);
             }
             if (stage == Stage.DETAIL_RENDER && worldRendered && minecraft.screen == null) {
-                var view = detailViews.get(detailIndex);
+                var view = detailViews.get(detailIndex).view();
                 LOGGER.info("INFESTUS_CLIENT_DETAIL_RENDERED name={} yaw={} pitch={}",
                         view.filename(), view.yaw(), view.pitch());
                 stage = Stage.WAIT;
@@ -253,5 +256,6 @@ public final class BootstrapClient {
     }
 
     private record UiCapture(ContentVisualScenario scenario, ContentVisualScenario.UiView view) {}
+    private record DetailCapture(ContentVisualScenario scenario, ContentVisualScenario.View view) {}
     private enum Stage { TITLE_LOAD, TITLE, WAIT, CONNECT, WORLD, WORLD_SETUP, WORLD_RENDER, DETAILS, DETAIL_RENDER, UI_SETUP, UI_RENDER, MULTIPLAYER, GUIDES, DISCONNECT, STOP, DONE }
 }

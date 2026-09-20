@@ -11,6 +11,10 @@ import org.jd.infestusfrontier.storage.api.PortableTransferAdmission;
 import org.jd.infestusfrontier.storage.api.QuantityStore;
 
 final class BiomassInteractions {
+    static String feed(ItemStack stack) {
+        return stack.is(Items.WHEAT) ? "wheat" : stack.is(Items.ROTTEN_FLESH) ? "rotten_flesh" : "";
+    }
+
     static boolean isBucket(ItemStack stack, Item biomassBucket) {
         return (stack.is(Items.BUCKET) || stack.is(biomassBucket)) && stack.getComponentsPatch().isEmpty();
     }

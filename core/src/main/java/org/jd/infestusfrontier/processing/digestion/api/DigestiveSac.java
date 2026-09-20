@@ -102,7 +102,8 @@ public final class DigestiveSac {
             revision++;
         }
         if (completed < activeBatch.requiredWorkUnits() || !completionAdmission.take()) return snapshot();
-        if (quantities.commit(activeBatch.reservationId()) != QuantityStore.CommitResult.COMMITTED
+        if (!history.canComplete(activeBatch.batchId())
+                || quantities.commit(activeBatch.reservationId()) != QuantityStore.CommitResult.COMMITTED
                 || history.completeBatch(activeBatch.batchId()) != OrganHistory.CompletionResult.COMPLETED) {
             throw new IllegalStateException("Digestive Sac completion lost its reservation");
         }
@@ -121,6 +122,9 @@ public final class DigestiveSac {
     }
 
     private void validateState() {
+        if (nextBatchId <= history.snapshot().lastCompletedBatchId()) {
+            throw new IllegalArgumentException("Digestive Sac next batch must follow its completed history");
+        }
         var reservations = quantities.snapshot().reservations();
         if (activeBatch == null) {
             if (!reservations.isEmpty() || !quantities.snapshot().itemSlots().getFirst().isEmpty()) {

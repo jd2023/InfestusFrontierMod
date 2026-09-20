@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -48,7 +47,7 @@ final class DigestiveSacEntity extends BlockEntity {
         if (BiomassInteractions.transfer(sac.quantities(), player, hand, biomassBucket)) {
             setChanged();
         } else {
-            String feed = held.is(Items.WHEAT) ? "wheat" : held.is(Items.ROTTEN_FLESH) ? "rotten_flesh" : "";
+            String feed = BiomassInteractions.feed(held);
             if (feed.isEmpty()) return false;
             var result = sac.feed(feed);
             if (result instanceof DigestiveSac.Fed) {

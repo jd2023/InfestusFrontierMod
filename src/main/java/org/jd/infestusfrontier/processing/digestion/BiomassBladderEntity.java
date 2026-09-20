@@ -34,10 +34,7 @@ final class BiomassBladderEntity extends BlockEntity implements EquipmentFueling
             BiomassInteractions.status(player, store.fluidAmount("biomass"), CAPACITY);
             return true;
         }
-        var result = new EquipmentFuelPort(store).fill(EquipmentFuelPort.Target.incompatible());
-        player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
-                "message.infestusfrontier.biomass.equipment." + result.name().toLowerCase(java.util.Locale.ROOT)), false);
-        return true;
+        return false;
     }
 
     QuantityStore.Snapshot snapshot() { return store.snapshot(); }

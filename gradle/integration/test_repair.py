@@ -3,8 +3,24 @@
 import struct
 import sys
 import tempfile
+import tomllib
+import unittest
 from pathlib import Path
 from gradle.integration.test_harness import harness, EvidenceCase
+
+
+class DisposableClientConfigurationTest(unittest.TestCase):
+    def test_both_disposable_clients_disable_only_the_racy_loader_splash(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            for role in ("client", "observer"):
+                directory = root / role
+                directory.mkdir()
+                harness._prepare_client(directory)
+                config = tomllib.loads((directory / "config/fml.toml").read_text())
+                self.assertEqual({"earlyWindowControl": False}, config)
+                self.assertIn("renderDistance:4", (directory / "options.txt").read_text())
+            self.assertFalse((root / "config").exists())
 
 
 class AcceptanceRegressionTest(EvidenceCase):

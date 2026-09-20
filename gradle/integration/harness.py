@@ -703,10 +703,19 @@ def _prepare_server(s, staged, output, multiplayer=False):
                     for name in (["FixturePlayer", "FixtureObserver"] if multiplayer else ["FixturePlayer"])])
     )
     (server_dir / "user_jvm_args.txt").write_text("-Xms512M\n-Xmx1536M\n")
-    (client_dir / "options.txt").write_text(
+    _prepare_client(client_dir)
+    return server_dir, client_dir, releases[0], port
+
+
+def _prepare_client(directory):
+    (directory / "options.txt").write_text(
         "onboardAccessibility:false\npauseOnLostFocus:false\nrenderDistance:4\nsimulationDistance:5\ntutorialStep:none\n"
     )
-    return server_dir, client_dir, releases[0], port
+    # FML 4.0.44's optional splash races union-filesystem teardown during startup.
+    # The actual title/world renderer and resource-error checks remain enabled.
+    config = directory / "config"
+    config.mkdir(exist_ok=True)
+    (config / "fml.toml").write_text("earlyWindowControl=false\n")
 
 
 def _visual_setup(root, requirements, filename="visual-setup.json"):
@@ -775,7 +784,7 @@ def _client_lifecycle(
             raise HarnessFailure("observer: invalid display configuration")
         observer_dir = s.run_dir / "observer"
         observer_dir.mkdir()
-        shutil.copy2(client_dir / "options.txt", observer_dir / "options.txt")
+        _prepare_client(observer_dir)
         observer = s.start("observer", observer_command, observer_dir, output / "observer.log",
                            env | shared_display | {"INFESTUS_PROBE_ROLE": "observer", "INFESTUS_CAPTURE_DIR": str(output / "observer")})
     s.markers(

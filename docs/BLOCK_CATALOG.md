@@ -126,6 +126,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Input → output:** Item Catalog's starter/native feed recipes → biomass with their exact water costs. No mineral feed or unlisted fish/leaf recipe; future fibrous diets require explicit recipes.
 - **Create:** 1 Organ Bud + 2 rotten flesh + 1 bowl.
 - **Growth:** Choose processing speed or biomass recovery. Elastic Gel treatment accepts fibrous leaves; add Intake/Output Mouths for a continuous feed line. It stops accepting batches when output has no room.
+- **Hand controls:** Wheat, rotten flesh and biomass buckets operate the Sac. Other held items pass through to ordinary use/placement, including offhand placement with an empty main hand.
 - **Baseline:** The starter Sac retains up to 1,000 mB biomass and owns one batch. Hand-feeding atomically reserves one item and its complete output before work starts; loaded work pauses when uprooted and never catches up offline.
 
 ### T0-04 — Biomass Bladder
@@ -133,6 +134,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Input → output:** Biomass from buckets or an attached organ → stored biomass, then bucket or organ output. A manual UI service slot accepts one bio-equipment piece; **Fill** transfers only its missing fuel from the tank, without healing or mutation. This is the T0 refueling route. Other fluids are refused.
 - **Create:** 1 Organ Bud + 2 glass + 1 slime ball; an early leather replacement for the slime ball makes a smaller bladder.
 - **Growth:** Skeletal Graft treatment reinforces its capacity. It can later become a Biomass Reservoir Cell without discarding its stored feed.
+- **Hand controls:** Buckets transfer biomass; unrelated held items pass through to ordinary use/placement, including offhand placement with an empty main hand.
 - **Baseline:** The slime-built starter Bladder holds 4,000 mB. Full tanks refuse unchanged. Bucket and equipment-fill actions share 64 portable transfers per server tick and four per player in any 20-tick window; excess is refused without a queue or resource loss.
 
 ### T0-05 — Membrane Rack

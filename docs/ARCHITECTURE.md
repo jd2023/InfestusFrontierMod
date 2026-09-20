@@ -165,6 +165,20 @@ queue and weakly retains no stopped server. Idle Bladders have no ticker; idle S
 return before block probes. Neither organ scans neighbors, requests chunk tickets,
 spawns rejected output nor performs offline catch-up.
 
+Sac restoration rejects a next-batch identifier at or behind completed history;
+completion checks history eligibility before committing reserved quantities.
+Unsupported main/offhand interactions pass through on both logical sides; only
+catalog feeds and recognized buckets are consumed by the direct hand controls.
+
+Biomass uses static baked models: at most 11 cuboids per organ, nine for the
+bucket. The Bladder has one shared translucent membrane/frame model and four
+solid contents models selected by its finite fill state. Sac start/finish swaps
+its throat/band geometry; no renderer, particle loop or animation ticker is added.
+Original production organ and substrate art supplies the fleshy frame and tinted
+biomass; vanilla stained-glass and iron textures supply membrane and bucket metal.
+Connected-client fixtures require captures of all five fill states, active/idle
+Sacs and the distinct bucket, and exercise actual main/offhand building dispatch.
+
 ## Probe and organ-menu adapter
 
 Interaction owns the reusable Synaptic Probe item, server-observed target selection,

@@ -30,6 +30,53 @@ public final class BiomassGameTests {
     private static final ResourceLocation BLADDER = id("storage/biomass_bladder");
     private static final ResourceLocation BUCKET = id("storage/biomass_bucket");
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void staleSacSaveRefusesFeedAndPreservesOriginalData(GameTestHelper helper) {
+        var pos = placeBud(helper, new BlockPos(1, 1, 1));
+        helper.getLevel().setBlock(pos, block(SAC).defaultBlockState(), 2);
+        var corrupt = data(helper, pos);
+        corrupt.getCompound("sac").putLong("completed", 1);
+        corrupt.getCompound("sac").putLong("lastCompleted", 1);
+        helper.getLevel().getBlockEntity(pos).loadWithComponents(corrupt, helper.getLevel().registryAccess());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        use(helper, pos, player, new ItemStack(Items.WHEAT));
+        for (int tick = 0; tick < 40; tick++) tick(helper.getLevel().getBlockEntity(pos));
+        helper.assertTrue(player.getMainHandItem().is(Items.WHEAT) && corrupt.equals(data(helper, pos)),
+                "Rejected stale Sac save must retain its original data and refuse wheat without completion");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void organsPassBuildingAndOffhandActionsThroughNormalDispatch(GameTestHelper helper) {
+        var player = new net.neoforged.neoforge.common.util.FakePlayer(helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "BiomassBuilder"));
+        player.setGameMode(GameType.SURVIVAL);
+        for (var organ : java.util.List.of(SAC, BLADDER)) {
+            var pos = placeBud(helper, new BlockPos(1, 1, 1));
+            helper.getLevel().setBlock(pos, block(organ).defaultBlockState(), 2);
+            player.setPos(Vec3.atCenterOf(pos).add(0, 0, -2));
+            var hit = new BlockHitResult(Vec3.atCenterOf(pos).add(0, .5, 0), Direction.UP, pos, false);
+            var before = data(helper, pos);
+            for (var hand : InteractionHand.values()) {
+                player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                player.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+                player.setItemInHand(hand, new ItemStack(Items.COBBLESTONE));
+                var result = player.gameMode.useItemOn(player, helper.getLevel(), player.getMainHandItem(),
+                        InteractionHand.MAIN_HAND, hit);
+                if (hand == InteractionHand.OFF_HAND) {
+                    helper.assertTrue(!result.consumesAction(), "Empty main hand must permit offhand dispatch: " + organ);
+                    result = player.gameMode.useItemOn(player, helper.getLevel(), player.getOffhandItem(), hand, hit);
+                }
+                helper.assertTrue(result.consumesAction()
+                                && helper.getLevel().getBlockState(pos.above()).is(net.minecraft.world.level.block.Blocks.COBBLESTONE)
+                                && player.getItemInHand(hand).isEmpty() && data(helper, pos).equals(before),
+                        "Normal " + hand + " placement must retain organ state: " + organ);
+                helper.getLevel().removeBlock(pos.above(), false);
+            }
+        }
+        helper.succeed();
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
     public static void constructsDigestsAndTransfersExactBuckets(GameTestHelper helper) {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -81,8 +128,11 @@ public final class BiomassGameTests {
                         && helper.getLevel().getBlockState(bladderPos).toString().contains("fill=1"),
                 "I019 empties exactly into the Bladder");
         var beforeEquipment = data(helper, bladderPos);
-        use(helper, bladderPos, player, new ItemStack(Items.STICK));
-        helper.assertTrue(beforeEquipment.equals(data(helper, bladderPos)) && player.getMainHandItem().is(Items.STICK),
+        var fueling = (org.jd.infestusfrontier.storage.api.EquipmentFueling) helper.getLevel().getBlockEntity(bladderPos);
+        var refused = fueling.fillEquipment(java.util.UUID.randomUUID(),
+                org.jd.infestusfrontier.storage.api.EquipmentFuelPort.Target.incompatible());
+        helper.assertTrue(refused == org.jd.infestusfrontier.storage.api.EquipmentFuelPort.Result.INCOMPATIBLE
+                        && beforeEquipment.equals(data(helper, bladderPos)),
                 "The fueling port refuses non-equipment without inventing or consuming armor");
 
         use(helper, bladderPos, player, new ItemStack(Items.BUCKET, 2));
