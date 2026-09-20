@@ -72,7 +72,7 @@ final class ConstructionContent {
         items.registerSimpleBlockItem(skinStairs, new Item.Properties());
         items.registerSimpleBlockItem(skinCovering, new Item.Properties());
         items.registerSimpleBlockItem(ribs, new Item.Properties());
-        items.registerSimpleBlockItem(window, new Item.Properties());
+        items.register(MEMBRANE_WINDOW, () -> new MembraneWindowItem(window.get(), new Item.Properties()));
     }
 
     private SeedPouchBlock createSeedPouch() {

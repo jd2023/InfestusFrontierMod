@@ -346,7 +346,19 @@ payment and duplicate use without installing production placeholder recipes.
 Construction shell blocks are ordinary static blocks. Living Skin full blocks,
 slabs, cornering stairs and multi-face coverings, Rib Frames and Membrane Windows
 have no block entity or ticker; window connection properties own
-only visible joins and the thin pane model supplies both faces. The Seed Pouch is
+only visible joins and the thin pane model supplies both faces. Window placement
+checks its one-cell horizontal halo (at most four non-loading chunk predicates)
+before vanilla connection reads. Its block item installs with known shape and
+zero recursion, then updates at most six adjacent panes/walls with the same flags.
+It does not dispatch arbitrary neighbor cascades. Item component properties apply
+in that same installation so the later vanilla component step cannot restart a
+cascade. Refusal preserves the item; horizontal and vertical reciprocal joins
+remain live. Disconnected windows use a cached full-width membrane/rib shape for
+both collision and targeting, including either visible face. GameTests exercise
+missing side/diagonal chunks, an unloaded second ring beyond an updated join,
+item components, payment and isolated-panel rays.
+
+The Seed Pouch is
 the single stateful shell part: it admits at most four registry item types and one
 stack per type, retains the player-selected per-type planting reserve during
 ordinary withdrawal and has no ticker. Explicit player recovery may take that
@@ -446,11 +458,11 @@ mod as success.
 Bootstrap uses seed 11, a default superflat disposable Overworld and a camera at
 yaw 0, pitch 15 for the world image. Owner `visual-setup.json` fixtures may prepare
 the disposable player's inventory and scene through server console commands after
-join. Each names an active GameTest assertion and at most 16 single-line commands
-of 256 characters; all active fixtures together admit at most 72 commands. The
+join. Each names an active GameTest assertion and at most 17 single-line commands
+of 256 characters; all active fixtures together admit at most 73 commands. The
 client's development-only `ContentVisualScenario` providers wait for the resulting
 world/inventory packets before rendering/capture, under the existing capture
-deadline. Owners may additionally declare up to 28 unique detail capture names
+deadline. Owners may additionally declare up to 29 unique detail capture names
 across all active fixtures. Client contributors supply matching bounded camera
 angles; the shared capture adapter renders and saves these after the unchanged
 overview, within the existing disconnect deadline. A reverse-view contributor
@@ -458,6 +470,15 @@ may temporarily install one unregistered client camera entity and must restore
 the original camera through `finishView`; it never moves the actual player. Each required image must be a
 fresh 1280x720 PNG under the same 4 MiB/digest checks; missing detail captures fail
 acceptance. The setup never modifies an ordinary world or fabricates client state.
+Construction's fixed 20×8×20 profiling fixture contains 456 connected transparent
+windows, 400 skin floor blocks and 400 rib roof blocks; no block entities or
+animation. A shared development-only frame sampler retains exactly 120 raw
+frame intervals after 30 warmup frames for the small front view and dense view.
+It runs after the renderer has finished visible sections, records graphics/device
+settings and model geometry before culling, saves timing JSON beside the required
+captures, and restores frame-limit/vsync settings. The existing 30-second detail
+phase bounds slow sampling; failure to finish fails capture. Inter-frame timing
+includes client ticks and presentation, not an isolated GPU-time claim.
 Bind the server to loopback on an allocated port, allow only the fixture identities, and disable online-account
 authentication solely in this owned disposable server. The client runs with an
 isolated game directory and deterministic fixture identity; no personal account,
@@ -474,7 +495,7 @@ progress within the 10-tick snapshot cadence. Missing/mismatched observations,
 identity, mod lists, clean disconnect or process cleanup fail acceptance.
 When discovery is active, a fresh Survival phase before scene setup supplies ordinary starter
 materials from its owner-local `survival-setup.json` (the same schema and combined
-72-command ceiling as visual setup) and uses actual inventory clicks and block-use packets to craft Culture,
+73-command ceiling as visual setup) and uses actual inventory clicks and block-use packets to craft Culture,
 convert ground, craft/place a Bowl, renew Culture and recraft a lost book. It observes
 synchronized prerequisites and advancements, and exercises a rebound guide key.
 This phase admits 100 seconds (including the 60-second base batch) within the same

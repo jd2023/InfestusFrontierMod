@@ -13,11 +13,16 @@
     "setblock -5 -60 3 infestusfrontier:construction/living_skin_slab",
     "setblock -4 -60 5 infestusfrontier:construction/living_skin_stairs[facing=west]",
     "setblock -5 -60 4 infestusfrontier:construction/living_skin_covering[south=true]",
-    "setblock -3 -59 5 infestusfrontier:construction/rib_frame[axis=x]"
+    "setblock -3 -59 5 infestusfrontier:construction/rib_frame[axis=x]",
+    "fill -10 -60 -40 9 -53 -21 infestusfrontier:construction/membrane_window hollow",
+    "fill -10 -60 -40 9 -60 -21 infestusfrontier:construction/living_skin",
+    "fill -10 -53 -40 9 -53 -21 infestusfrontier:construction/rib_frame[axis=y]",
+    "setblock -4 -60 3 infestusfrontier:construction/membrane_window"
   ],
   "captures": [
     "construction-shell-front.png",
     "construction-shell-back.png",
+    "construction-dense-shell.png",
     "construction-guide-navigation.png",
     "construction-pouch-guide.png"
   ]

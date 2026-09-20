@@ -729,12 +729,12 @@ def _visual_setup(root, requirements, filename="visual-setup.json"):
         batch = fixture.get("commands")
         if (set(fixture) not in ({"requires", "commands"}, {"requires", "commands", "captures"})
                 or not isinstance(fixture["requires"], str)
-                or not isinstance(batch, list) or not 1 <= len(batch) <= 16
+                or not isinstance(batch, list) or not 1 <= len(batch) <= 17
                 or any(not isinstance(line, str) or not 1 <= len(line) <= 256
                        or "\n" in line or "\r" in line for line in batch)):
             raise HarnessFailure(f"invalid visual setup: {path}")
         images = fixture.get("captures", [])
-        if (not isinstance(images, list) or len(images) > 28
+        if (not isinstance(images, list) or len(images) > 29
                 or any(not isinstance(name, str) or not re.fullmatch(r"[a-z][a-z0-9-]{0,63}\.png", name)
                        or name in CAPTURES for name in images)
                 or len(set(images)) != len(images)):
@@ -742,9 +742,9 @@ def _visual_setup(root, requirements, filename="visual-setup.json"):
         if fixture["requires"] in active:
             commands.extend(batch)
             captures.extend(images)
-        if len(captures) > 28 or len(set(captures)) != len(captures):
+        if len(captures) > 29 or len(set(captures)) != len(captures):
             raise HarnessFailure("excessive or duplicate visual setup captures")
-        if len(commands) > 72:
+        if len(commands) > 73:
             raise HarnessFailure("excessive visual setup commands")
     return commands, captures
 
@@ -762,7 +762,7 @@ def visual_setup_captures(root, requirements):
 def _client_lifecycle(
     s, server_command, client_command, server_dir, client_dir, output, port, setup_commands=(), observer_command=None, discovery=False, discovery_setup=()
 ):
-    if len(setup_commands) + len(discovery_setup) > 72:
+    if len(setup_commands) + len(discovery_setup) > 73:
         raise HarnessFailure("excessive combined setup commands")
     server = s.start("server", server_command, server_dir, output / "server.log")
     s.markers("readiness", s.limits["readiness"], [(server, "Done (")])

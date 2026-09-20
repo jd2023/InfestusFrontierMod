@@ -15,6 +15,9 @@ public interface ContentVisualScenario {
         return true;
     }
 
+    /** Called after a fully rendered detail frame; false retains the view for bounded measurement. */
+    default boolean renderedFrame(Minecraft minecraft, View view, java.nio.file.Path output) { return true; }
+
     default void finishView(Minecraft minecraft, View view) {}
 
     default List<UiView> uiViews() {

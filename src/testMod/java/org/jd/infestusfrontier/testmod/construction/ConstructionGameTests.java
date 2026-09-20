@@ -424,6 +424,100 @@ public final class ConstructionGameTests {
         helper.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void windowPlacementRefusesUnloadedHaloWithoutPayment(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var source = level.getChunkSource();
+        var origin = helper.absolutePos(BlockPos.ZERO);
+        int chunkX = (origin.getX() >> 4) + 192;
+        int chunkZ = origin.getZ() >> 4;
+        level.getChunk(chunkX, chunkZ);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        // Exercise both a face boundary and a diagonal update boundary.
+        for (int z : new int[] {8, 15}) {
+            var pos = new BlockPos(chunkX * 16 + 15, origin.getY() + 4, chunkZ * 16 + z);
+            level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+            int missingZ = chunkZ;
+            if (z == 15) {
+                level.getChunk(chunkX + 1, chunkZ);
+                level.getChunk(chunkX, chunkZ + 1);
+                missingZ++;
+            }
+            helper.assertTrue(source.getChunkNow(chunkX + 1, missingZ) == null, "Fixture boundary chunk must be absent");
+            int loaded = source.getLoadedChunksCount();
+            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(MEMBRANE_WINDOW), 2));
+            var context = new net.minecraft.world.item.context.BlockPlaceContext(new UseOnContext(player,
+                    InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
+            var result = ((BlockItem) item(MEMBRANE_WINDOW)).place(context);
+            helper.assertTrue(source.getLoadedChunksCount() == loaded && source.getChunkNow(chunkX + 1, missingZ) == null,
+                    "Window placement must not request an unloaded neighbor chunk");
+            helper.assertTrue(!result.consumesAction() && level.getBlockState(pos).isAir()
+                            && player.getMainHandItem().getCount() == 2,
+                    "Unavailable window update halo must refuse without placement or payment");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void isolatedWindowCollisionAndTargetingCoverVisibleMembrane(GameTestHelper helper) {
+        var pos = helper.absolutePos(new BlockPos(1, 2, 1));
+        var state = block(MEMBRANE_WINDOW).defaultBlockState();
+        helper.getLevel().setBlock(pos, state, Block.UPDATE_KNOWN_SHAPE, 0);
+        for (var shape : List.of(state.getShape(helper.getLevel(), pos), state.getCollisionShape(helper.getLevel(), pos))) {
+            for (double x : new double[] {2, 8, 14}) {
+                helper.assertTrue(shape.toAabbs().stream().anyMatch(box -> box.contains(x / 16, .5, .5)),
+                        "Isolated membrane must collide and target across its full visible width at x=" + x);
+                for (int side : new int[] {-1, 1}) {
+                    var start = Vec3.atLowerCornerOf(pos).add(x / 16, .5, .5 + side);
+                    var end = Vec3.atLowerCornerOf(pos).add(x / 16, .5, .5 - side);
+                    helper.assertTrue(shape.clip(start, end, pos) != null, "Both visible membrane faces must be targetable");
+                }
+            }
+            helper.assertTrue(shape.toAabbs().stream().noneMatch(box -> box.contains(.125, .5, .25)),
+                    "Empty space beside the isolated panel must remain open");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void windowPlacementUpdatesJoinsWithoutRecursingAcrossChunkEdge(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var source = level.getChunkSource();
+        var origin = helper.absolutePos(BlockPos.ZERO);
+        int chunkX = (origin.getX() >> 4) + 208;
+        int chunkZ = origin.getZ() >> 4;
+        level.getChunk(chunkX, chunkZ);
+        var pos = new BlockPos(chunkX * 16 + 14, origin.getY() + 4, chunkZ * 16 + 8);
+        level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+        level.setBlock(pos.east(), block(MEMBRANE_WINDOW).defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+        level.setBlock(pos.above(), block(MEMBRANE_WINDOW).defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+        level.setBlock(pos.west(), Blocks.COBBLESTONE_WALL.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+        level.setBlock(pos.south(), Blocks.GLASS_PANE.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+        int loaded = source.getLoadedChunksCount();
+        helper.assertTrue(source.getChunkNow(chunkX + 1, chunkZ) == null, "Fixture second ring must be unloaded");
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(MEMBRANE_WINDOW), 2));
+        player.getMainHandItem().set(net.minecraft.core.component.DataComponents.BLOCK_STATE,
+                new net.minecraft.world.item.component.BlockItemStateProperties(java.util.Map.of("post", "false")));
+        var context = new net.minecraft.world.item.context.BlockPlaceContext(new UseOnContext(player,
+                InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
+        var result = ((BlockItem) item(MEMBRANE_WINDOW)).place(context);
+        helper.assertTrue(source.getLoadedChunksCount() == loaded && source.getChunkNow(chunkX + 1, chunkZ) == null,
+                "Reciprocal join updates must not read the unloaded second ring");
+        helper.assertTrue(result.consumesAction() && player.getMainHandItem().getCount() == 1,
+                "Loaded immediate halo must permit exactly one paid window");
+        helper.assertTrue(level.getBlockState(pos).toString().contains("east=true")
+                        && level.getBlockState(pos.east()).toString().contains("west=true")
+                        && level.getBlockState(pos).toString().contains("up=true")
+                        && level.getBlockState(pos.above()).toString().contains("down=true"),
+                "Bounded placement must retain reciprocal horizontal and vertical joins");
+        helper.assertTrue(level.getBlockState(pos.south()).getValue(net.minecraft.world.level.block.IronBarsBlock.NORTH)
+                        && level.getBlockState(pos.west()).getValue(net.minecraft.world.level.block.WallBlock.EAST_WALL)
+                                != net.minecraft.world.level.block.state.properties.WallSide.NONE,
+                "Bounded placement must retain vanilla pane and wall joins");
+        helper.succeed();
+    }
+
     private static void useBlock(GameTestHelper helper, BlockPos pos, net.minecraft.world.entity.player.Player player, ItemStack stack) {
         player.setItemInHand(InteractionHand.MAIN_HAND, stack);
         var hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);

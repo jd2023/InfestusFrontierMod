@@ -12,10 +12,14 @@ public final class ConstructionVisualScenario implements ContentVisualScenario {
     private int settledTicks;
     private net.minecraft.world.entity.Entity originalCamera;
     private boolean originalHideGui;
+    private final org.jd.infestusfrontier.testmod.integration.client.FrameTimeCapture frameTimes =
+            new org.jd.infestusfrontier.testmod.integration.client.FrameTimeCapture();
+    private com.google.gson.JsonObject measuredScene;
 
     @Override public List<View> detailViews() {
         return List.of(new View("construction-shell-front.png", 15, 20),
-                new View("construction-shell-back.png", 165, 20));
+                new View("construction-shell-back.png", 165, 20),
+                new View("construction-dense-shell.png", 180, 12));
     }
 
     @Override public boolean prepareView(Minecraft game, View view) {
@@ -23,20 +27,71 @@ public final class ConstructionVisualScenario implements ContentVisualScenario {
         originalHideGui = game.options.hideGui;
         game.options.hideGui = true;
         boolean back = view.filename().equals("construction-shell-back.png");
-        var camera = new net.minecraft.world.entity.decoration.ArmorStand(game.level, .5, -59, back ? 10.5 : .5);
-        camera.moveTo(.5, -59, back ? 10.5 : .5, view.yaw(), view.pitch());
+        boolean dense = view.filename().equals("construction-dense-shell.png");
+        double y = dense ? -52 : -59;
+        double z = dense ? -10 : back ? 10.5 : .5;
+        var camera = new net.minecraft.world.entity.decoration.ArmorStand(game.level, .5, y, z);
+        camera.moveTo(.5, y, z, view.yaw(), view.pitch());
         camera.setYHeadRot(view.yaw());
         camera.yHeadRotO = view.yaw();
         game.setCameraEntity(camera);
+        if (!back) {
+            measuredScene = dense ? describeDenseScene(game) : new com.google.gson.JsonObject();
+            measuredScene.addProperty("view", view.filename());
+            measuredScene.addProperty("camera", ".5," + y + "," + z);
+            measuredScene.addProperty("yaw", view.yaw());
+            measuredScene.addProperty("pitch", view.pitch());
+            frameTimes.begin(game);
+        }
         game.gui.getChat().clearMessages(false);
         game.gui.setOverlayMessage(net.minecraft.network.chat.Component.empty(), false);
         return true;
     }
 
+    @Override public boolean renderedFrame(Minecraft game, View view, java.nio.file.Path output) {
+        return view.filename().equals("construction-shell-back.png")
+                || frameTimes.renderedFrame(game, output, view.filename().replace(".png", "-timing"), measuredScene);
+    }
+
     @Override public void finishView(Minecraft game, View view) {
+        if (!view.filename().equals("construction-shell-back.png")) frameTimes.finish(game);
         game.setCameraEntity(originalCamera);
         game.options.hideGui = originalHideGui;
         originalCamera = null;
+    }
+
+    private static com.google.gson.JsonObject describeDenseScene(Minecraft game) {
+        var counts = new java.util.TreeMap<String, Integer>();
+        int quads = 0;
+        var random = net.minecraft.util.RandomSource.create(0);
+        // Fixed 20 x 8 x 20 fixture, loaded client blocks only. Count submitted model
+        // geometry before engine occlusion/frustum culling, not GPU draw calls.
+        for (var pos : BlockPos.betweenClosed(-10, -60, -40, 9, -53, -21)) {
+            if (!game.level.hasChunkAt(pos)) throw new IllegalStateException("Dense shell fixture is unloaded");
+            var state = game.level.getBlockState(pos);
+            if (state.isAir()) continue;
+            String id = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
+            if (!id.startsWith("infestusfrontier:construction/")) throw new IllegalStateException("Unexpected dense scene block: " + id);
+            counts.merge(id, 1, Integer::sum);
+            var model = game.getBlockRenderer().getBlockModel(state);
+            quads += model.getQuads(state, null, random).size();
+            for (var face : net.minecraft.core.Direction.values()) quads += model.getQuads(state, face, random).size();
+        }
+        if (counts.getOrDefault("infestusfrontier:construction/membrane_window", 0) != 456
+                || counts.getOrDefault("infestusfrontier:construction/living_skin", 0) != 400
+                || counts.getOrDefault("infestusfrontier:construction/rib_frame", 0) != 400) {
+            throw new IllegalStateException("Dense scene is incomplete: " + counts);
+        }
+        var result = new com.google.gson.JsonObject();
+        var blocks = new com.google.gson.JsonObject();
+        counts.forEach(blocks::addProperty);
+        result.add("blocks", blocks);
+        result.addProperty("bounds", "[-10,-60,-40]..[9,-53,-21]");
+        result.addProperty("modelQuadsBeforeCulling", quads);
+        result.addProperty("blockEntities", 0);
+        result.addProperty("animatedModels", 0);
+        result.addProperty("materialPixels", "32x32 membrane and rib; 64x64 skin");
+        return result;
     }
 
     @Override public List<UiView> uiViews() {
@@ -103,6 +158,12 @@ public final class ConstructionVisualScenario implements ContentVisualScenario {
         var lumen = minecraft.level.getBlockState(new BlockPos(3, -60, 5));
         ready &= middle.toString().contains("east=true") && middle.toString().contains("west=true")
                 && lumen.toString().contains("function=lumen") && lumen.getLightEmission() == 12;
+        var isolated = minecraft.level.getBlockState(new BlockPos(-4, -60, 3));
+        ready &= isolated.is(BuiltInRegistries.BLOCK.get(ResourceLocation.parse("infestusfrontier:construction/membrane_window")))
+                && isolated.toString().contains("north=false") && isolated.toString().contains("east=false")
+                && isolated.toString().contains("south=false") && isolated.toString().contains("west=false");
+        ready &= minecraft.level.getBlockState(new BlockPos(9, -53, -21)).is(BuiltInRegistries.BLOCK.get(
+                ResourceLocation.parse("infestusfrontier:construction/rib_frame")));
         // Observe stable inventory for the bounded vanilla hand-equip animation before capture.
         settledTicks = ready ? Math.min(12, settledTicks + 1) : 0;
         if (settledTicks < 12) return false;

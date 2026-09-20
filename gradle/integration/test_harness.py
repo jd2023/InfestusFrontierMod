@@ -57,7 +57,7 @@ class VisualSetupTest(unittest.TestCase):
                              harness._visual_setup(root, {"gameTest": ["guide.use"]}, "survival-setup.json"))
             with self.assertRaisesRegex(harness.HarnessFailure, "combined setup"):
                 harness._client_lifecycle(None, None, None, None, None, root, None,
-                                         setup_commands=["say visual"] * 72, discovery_setup=["say survival"])
+                                         setup_commands=["say visual"] * 73, discovery_setup=["say survival"])
 
     def test_owner_detail_captures_are_bounded_and_activation_scoped(self):
         with tempfile.TemporaryDirectory() as raw:
@@ -70,12 +70,12 @@ class VisualSetupTest(unittest.TestCase):
             self.assertEqual([], harness.visual_setup_captures(root, {"gameTest": []}))
             self.assertEqual(["ecology-underside.png"],
                              harness.visual_setup_captures(root, {"gameTest": ["substrate.use"]}))
-            fixture["captures"] = [f"view-{i}.png" for i in range(28)]
+            fixture["captures"] = [f"view-{i}.png" for i in range(29)]
             path.write_text(json.dumps(fixture))
             self.assertEqual(fixture["captures"],
                              harness.visual_setup_captures(root, {"gameTest": ["substrate.use"]}))
             for names in (["../escape.png"], ["bootstrap-world.png"], ["same.png"] * 2,
-                          [f"view-{i}.png" for i in range(29)]):
+                          [f"view-{i}.png" for i in range(30)]):
                 fixture["captures"] = names
                 path.write_text(json.dumps(fixture))
                 with self.assertRaisesRegex(harness.HarnessFailure, "visual setup"):
@@ -88,17 +88,26 @@ class VisualSetupTest(unittest.TestCase):
                 path = root / f"src/testMod/resources/{owner}/visual-setup.json"
                 path.parent.mkdir(parents=True)
                 fixture = {"requires": f"{owner}.use", "commands": ["say fixture"],
-                           "captures": [f"{owner}-{i}.png" for i in range(14)]}
+                           "captures": [f"{owner}-{i}.png" for i in range(15 if owner == "processing" else 14)]}
                 path.write_text(json.dumps(fixture))
             requirements = {"gameTest": ["ecology.use", "processing.use"]}
-            self.assertEqual(28, len(harness.visual_setup_captures(root, requirements)))
+            self.assertEqual(29, len(harness.visual_setup_captures(root, requirements)))
             fixture["captures"].append("processing-extra.png")
             path.write_text(json.dumps(fixture))
             with self.assertRaisesRegex(harness.HarnessFailure, "excessive.*captures"):
                 harness.visual_setup_captures(root, requirements)
 
+    def test_profile_fixture_admits_seventeen_bounded_commands(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            path = root / "src/testMod/resources/construction/visual-setup.json"
+            path.parent.mkdir(parents=True)
+            commands = ["say bounded"] * 17
+            path.write_text(json.dumps({"requires": "shell.use", "commands": commands}))
+            self.assertEqual(commands, harness.visual_setup_commands(root, {"gameTest": ["shell.use"]}))
+
     def test_rejects_excessive_or_multiline_commands(self):
-        for commands in (["say one\nsay two"], ["say test"] * 17):
+        for commands in (["say one\nsay two"], ["say test"] * 18):
             with self.subTest(commands=commands), tempfile.TemporaryDirectory() as raw:
                 root = Path(raw)
                 fixture = root / "src/testMod/resources/construction/visual-setup.json"

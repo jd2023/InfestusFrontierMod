@@ -73,7 +73,7 @@ public final class BootstrapClient {
                                 .map(view -> new UiCapture(scene, view))).toList();
                         var names = java.util.stream.Stream.concat(detailViews.stream().map(capture -> capture.view().filename()),
                                 uiCaptures.stream().map(capture -> capture.view().filename())).toList();
-                        if (names.size() > 28 || names.stream().distinct().count() != names.size()) {
+                        if (names.size() > 29 || names.stream().distinct().count() != names.size()) {
                             throw new IllegalStateException("Excessive or duplicate detail captures");
                         }
                         stage = Stage.WORLD_RENDER;
@@ -188,6 +188,10 @@ public final class BootstrapClient {
             }
             if (stage == Stage.DETAIL_RENDER && worldRendered && minecraft.screen == null) {
                 var view = detailViews.get(detailIndex).view();
+                if (!detailViews.get(detailIndex).scenario().renderedFrame(minecraft, view, captureDirectory)) {
+                    worldRendered = false;
+                    return;
+                }
                 LOGGER.info("INFESTUS_CLIENT_DETAIL_RENDERED name={} yaw={} pitch={}",
                         view.filename(), view.yaw(), view.pitch());
                 stage = Stage.WAIT;
