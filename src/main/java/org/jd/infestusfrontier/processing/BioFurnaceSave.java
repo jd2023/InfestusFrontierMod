@@ -99,6 +99,11 @@ final class BioFurnaceSave {
     }
 
     private static QuantityStore.ReservationSnapshot reservation(CompoundTag tag) {
+        // Smelting consumes biomass and never reserves fluid output.
+        require(tag, "fluidOutputs", Tag.TAG_LIST);
+        if (!((ListTag) tag.get("fluidOutputs")).isEmpty()) {
+            throw new IllegalArgumentException("Bio-Furnace cannot produce fluid");
+        }
         return new QuantityStore.ReservationSnapshot(number(tag, "id"),
                 itemAllocations(tag, "inputs"), fluidAllocations(tag, "fluids"), itemAllocations(tag, "outputs"),
                 itemAllocations(tag, "returns"), fluidAllocations(tag, "fluidOutputs"));

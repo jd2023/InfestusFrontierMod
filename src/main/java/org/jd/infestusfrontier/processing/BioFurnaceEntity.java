@@ -34,6 +34,8 @@ final class BioFurnaceEntity extends BlockEntity {
     private static final int BIOMASS_CAPACITY = 2_000;
     private BatchWork work;
     private final DiscoveryObserver discovery;
+    // Opaque save payloads are retained by reference and never mutated here.
+    // Cloning before validation would allocate in proportion to corrupt input.
     private Tag rejected;
     private CompoundTag pending;
 
@@ -70,7 +72,7 @@ final class BioFurnaceEntity extends BlockEntity {
 
     boolean interact(Player player, InteractionHand hand) {
         if (rejected != null) {
-            message(player, "refused.rejected_save");
+            player.displayClientMessage(Component.translatable("message.infestusfrontier.preparation.invalid_save"), false);
             return true;
         }
         var stack = player.getItemInHand(hand);
@@ -149,8 +151,8 @@ final class BioFurnaceEntity extends BlockEntity {
     }
 
     @Override protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (rejected != null) tag.put("furnace", rejected.copy());
-        else if (pending != null) tag.put("furnace", pending.copy());
+        if (rejected != null) tag.put("furnace", rejected);
+        else if (pending != null) tag.put("furnace", pending);
         else tag.put("furnace", BioFurnaceSave.write(work.state(), this));
     }
 
@@ -160,9 +162,9 @@ final class BioFurnaceEntity extends BlockEntity {
         if (!tag.contains("furnace")) return;
         Tag saved = tag.get("furnace");
         if (!(saved instanceof CompoundTag furnace)) {
-            rejected = saved.copy();
+            rejected = saved;
         } else if (level == null) {
-            pending = furnace.copy();
+            pending = furnace;
         } else {
             restore(furnace);
         }
@@ -173,7 +175,7 @@ final class BioFurnaceEntity extends BlockEntity {
             var restored = BioFurnaceSave.read(saved, this);
             work = BatchWork.restore(restored, BioFurnaceRecipes.catalog(this::resultOf), this::admit);
         } catch (RuntimeException exception) {
-            rejected = saved.copy();
+            rejected = saved;
         }
     }
 }

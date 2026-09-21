@@ -274,12 +274,167 @@ public final class BioFurnaceGameTests {
         use(helper, pos, player, ItemStack.EMPTY);
         for (CompoundTag hostile : new CompoundTag[] {unsupportedSchema(helper, relative), oversizedItems(helper, relative), wrongBatchOutput(helper, relative)}) {
             SaveReload.assertRetainsRejectedData(helper, relative, hostile);
-            var before = SaveReload.save(helper, relative);
-            use(helper, pos, player, new ItemStack(Items.RAW_IRON));
-            helper.assertTrue(player.getMainHandItem().is(Items.RAW_IRON) && before.equals(SaveReload.save(helper, relative)),
-                    "A rejected furnace refuses every hand control without changing its retained data");
+            assertLockedControls(helper, relative);
         }
         helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void unearnedFluidOutputIsRetainedAndLocked(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = place(helper, relative);
+        var player = player(helper);
+        use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+        var hostile = SaveReload.save(helper, relative);
+        var reservation = hostile.getCompound("furnace").getList("reservations", Tag.TAG_COMPOUND).getCompound(0);
+        var output = new CompoundTag();
+        output.putInt("index", 0);
+        output.putString("resource", "biomass");
+        output.putInt("count", 1_000);
+        reservation.getList("fluidOutputs", Tag.TAG_COMPOUND).add(output);
+        SaveReload.assertRetainsRejectedData(helper, relative, hostile);
+        var before = work(helper, pos).state();
+        tick(helper, pos, 320);
+        helper.assertTrue(before.equals(work(helper, pos).state()),
+                "Unearned fluid output must lock the batch instead of producing biomass and an ingot");
+        helper.assertTrue(hostile.equals(SaveReload.save(helper, relative)), "Forged reservation is retained unchanged");
+        assertLockedControls(helper, relative);
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void pendingAndRejectedDataIsNeverCloned(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = place(helper, relative);
+        var oversized = oversizedItems(helper, relative).getCompound("furnace");
+        var probe = new CopyProbeTag();
+        for (var key : oversized.getAllKeys()) probe.put(key, oversized.get(key));
+        var wrongType = new net.minecraft.nbt.ListTag();
+        wrongType.add(probe);
+        for (Tag raw : new Tag[] {probe, wrongType}) {
+            var saved = SaveReload.save(helper, relative);
+            saved.put("furnace", raw);
+            var originalBytes = nbtBytes(saved);
+            var level = helper.getLevel();
+            // Vanilla loads entities before attaching their level. Saving in that
+            // interval must preserve opaque data without cloning its payload.
+            var reloaded = BlockEntity.loadStatic(pos, level.getBlockState(pos), saved, level.registryAccess());
+            helper.assertTrue(reloaded != null && reloaded.getLevel() == null, "Exercise level-less reload");
+            helper.assertTrue(probe.copies == 0, "Pending/rejected load must not clone unbounded raw data");
+            var pendingSave = reloaded.saveWithFullMetadata(level.registryAccess());
+            helper.assertTrue(probe.copies == 0 && java.util.Arrays.equals(originalBytes, nbtBytes(pendingSave)),
+                    "Level-less save preserves original bytes without cloning");
+            level.removeBlockEntity(pos);
+            level.setBlockEntity(reloaded);
+            var before = work(helper, pos).state();
+            tick(helper, pos, 320);
+            var rejectedSave = SaveReload.save(helper, relative);
+            helper.assertTrue(probe.copies == 0 && java.util.Arrays.equals(originalBytes, nbtBytes(rejectedSave))
+                            && before.equals(work(helper, pos).state()),
+                    "Attaching and saving rejected data must retain bytes and never clone or advance it");
+            SaveReload.assertRetainsRejectedData(helper, relative, saved);
+            helper.assertTrue(probe.copies == 0, "Level-attached rejection and save must not clone raw data");
+        }
+        helper.succeed();
+    }
+
+    private static byte[] nbtBytes(CompoundTag tag) {
+        try {
+            var bytes = new java.io.ByteArrayOutputStream();
+            net.minecraft.nbt.NbtIo.write(tag, new java.io.DataOutputStream(bytes));
+            return bytes.toByteArray();
+        } catch (java.io.IOException exception) {
+            throw new AssertionError("Cannot serialize test NBT", exception);
+        }
+    }
+
+    private static final class CopyProbeTag extends CompoundTag {
+        private int copies;
+        @Override public CompoundTag copy() {
+            copies++;
+            return super.copy();
+        }
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void rejectedControlsPreserveReadyAndCompletedState(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        for (int fixture = 0; fixture < 3; fixture++) {
+            helper.getLevel().removeBlock(helper.absolutePos(relative), false);
+            var pos = place(helper, relative);
+            var player = player(helper);
+            if (fixture > 0) {
+                use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+                use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+            }
+            if (fixture == 2) {
+                use(helper, pos, player, ItemStack.EMPTY);
+                tick(helper, pos, 320);
+            }
+            var valid = SaveReload.save(helper, relative);
+            for (var hostile : new CompoundTag[] {unsupportedSchema(helper, relative), oversizedItems(helper, relative)}) {
+                helper.getLevel().getBlockEntity(pos).loadWithComponents(valid, helper.getLevel().registryAccess());
+                SaveReload.assertRetainsRejectedData(helper, relative, hostile);
+                assertLockedControls(helper, relative);
+            }
+        }
+        helper.succeed();
+    }
+
+    private static void assertLockedControls(GameTestHelper helper, BlockPos relative) {
+        var pos = helper.absolutePos(relative);
+        var messages = new java.util.ArrayList<net.minecraft.network.chat.Component>();
+        var player = new net.neoforged.neoforge.common.util.FakePlayer(helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "RejectedFurnaceTest")) {
+            @Override public void displayClientMessage(net.minecraft.network.chat.Component message, boolean overlay) {
+                messages.add(message);
+            }
+        };
+        player.setGameMode(GameType.SURVIVAL);
+        var beforeWork = work(helper, pos).state();
+        var beforeBytes = nbtBytes(SaveReload.save(helper, relative));
+        var refusals = new java.util.ArrayList<net.minecraft.network.chat.Component>();
+        // Insertion, bucket transfer, start, collection. Each fixture keeps the
+        // underlying valid state, so ordinary empty/active refusals cannot mask edits.
+        var stacks = new ItemStack[] {new ItemStack(Items.RAW_IRON), new ItemStack(item(BIOMASS_BUCKET)),
+                ItemStack.EMPTY, ItemStack.EMPTY};
+        for (int control = 0; control < stacks.length; control++) {
+            messages.clear();
+            player.setShiftKeyDown(control == 3);
+            player.setItemInHand(InteractionHand.MAIN_HAND, stacks[control]);
+            var held = stacks[control].copy();
+            var inventory = player.getInventory().save(new net.minecraft.nbt.ListTag());
+            use(helper, pos, player, stacks[control]);
+            helper.assertTrue(ItemStack.matches(held, player.getMainHandItem())
+                            && inventory.equals(player.getInventory().save(new net.minecraft.nbt.ListTag()))
+                            && beforeWork.equals(work(helper, pos).state())
+                            && java.util.Arrays.equals(beforeBytes, nbtBytes(SaveReload.save(helper, relative))),
+                    "Rejected control " + control + " must retain held items, inventory, work and original NBT bytes");
+            helper.assertTrue(messages.size() == 1, "Each rejected control must send exactly one refusal");
+            refusals.add(messages.getFirst());
+        }
+        tick(helper, pos, 320);
+        helper.assertTrue(beforeWork.equals(work(helper, pos).state()), "Rejected work never advances");
+        helper.assertTrue(refusals.stream().allMatch(refusals.getFirst()::equals),
+                "All rejected controls must use the same refusal");
+        var contents = refusals.getFirst().getContents();
+        helper.assertTrue(contents instanceof net.minecraft.network.chat.contents.TranslatableContents,
+                "The refusal must be localized");
+        var key = ((net.minecraft.network.chat.contents.TranslatableContents) contents).getKey();
+        try (var stream = helper.getLevel().getBlockEntity(pos).getClass()
+                .getResourceAsStream("/assets/infestusfrontier/lang/en_us.json")) {
+            helper.assertTrue(stream != null, "Packaged English translations must be available");
+            var translations = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(
+                    stream, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+            helper.assertTrue(translations.has(key)
+                            && translations.get(key).getAsString().equals(
+                                    "This organ retained invalid data and is locked for safe recovery."),
+                    "Rejected controls must send a readable recovery refusal, not a raw translation key: " + key);
+        } catch (java.io.IOException exception) {
+            throw new AssertionError("Cannot read packaged translations", exception);
+        }
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
