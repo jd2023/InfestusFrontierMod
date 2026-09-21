@@ -518,6 +518,66 @@ public final class ConstructionGameTests {
         helper.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void shellPartsRefuseAtUnloadedChunkEdgeWithoutLoading(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var source = level.getChunkSource();
+        var origin = helper.absolutePos(BlockPos.ZERO);
+        int chunkX = (origin.getX() >> 4) + 208;
+        int chunkZ = origin.getZ() >> 4;
+        level.getChunk(chunkX, chunkZ);
+        var pos = new BlockPos(chunkX * 16 + 15, origin.getY() + 4, chunkZ * 16 + 8);
+        level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+        helper.assertTrue(source.getChunkNow(chunkX + 1, chunkZ) == null, "Fixture eastern chunk must be absent");
+        int loaded = source.getLoadedChunksCount();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+
+        for (var id : List.of(LIVING_SKIN, LIVING_SKIN_SLAB, LIVING_SKIN_STAIRS, LIVING_SKIN_COVERING, RIB_FRAME)) {
+            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(id), 2));
+            var context = new net.minecraft.world.item.context.BlockPlaceContext(new UseOnContext(player,
+                    InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
+            var result = ((BlockItem) item(id)).place(context);
+
+            helper.assertTrue(!result.consumesAction() && level.getBlockState(pos).isAir()
+                            && player.getMainHandItem().getCount() == 2,
+                    "Shell part must refuse an unloaded placement halo without payment: " + id);
+            helper.assertTrue(source.getLoadedChunksCount() == loaded && source.getChunkNow(chunkX + 1, chunkZ) == null,
+                    "Shell part must not load the eastern chunk: " + id);
+        }
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void shellPartsStillPlaceInsideLoadedArea(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var origin = helper.absolutePos(BlockPos.ZERO);
+        int chunkX = (origin.getX() >> 4) + 208;
+        int chunkZ = origin.getZ() >> 4;
+        level.getChunk(chunkX, chunkZ);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setYRot(0.0F);
+
+        int z = 8;
+        for (var id : List.of(LIVING_SKIN, LIVING_SKIN_SLAB, LIVING_SKIN_STAIRS, LIVING_SKIN_COVERING, RIB_FRAME)) {
+            var pos = new BlockPos(chunkX * 16 + 13, origin.getY() + 4, chunkZ * 16 + z++);
+            level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(id), 2));
+            var context = new net.minecraft.world.item.context.BlockPlaceContext(new UseOnContext(player,
+                    InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
+            var result = ((BlockItem) item(id)).place(context);
+
+            helper.assertTrue(result.consumesAction() && level.getBlockState(pos).is(block(id))
+                            && player.getMainHandItem().getCount() == 1,
+                    "Shell part must place normally inside a loaded area: " + id);
+            if (id.equals(LIVING_SKIN_STAIRS)) {
+                helper.assertTrue(level.getBlockState(pos).getValue(net.minecraft.world.level.block.StairBlock.FACING)
+                                == player.getDirection(),
+                        "Stairs must retain the facing from normal placement");
+            }
+        }
+        helper.succeed();
+    }
+
     private static void useBlock(GameTestHelper helper, BlockPos pos, net.minecraft.world.entity.player.Player player, ItemStack stack) {
         player.setItemInHand(InteractionHand.MAIN_HAND, stack);
         var hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);

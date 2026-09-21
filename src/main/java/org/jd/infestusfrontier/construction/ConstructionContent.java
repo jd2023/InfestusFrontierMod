@@ -67,11 +67,11 @@ final class ConstructionContent {
                 () -> new SporeCultureItem(new Item.Properties(), cultureUse));
         organBudItem = items.registerSimpleBlockItem(organBud, new Item.Properties());
         items.register(SEED_POUCH, () -> new BlockItem(seedPouch.get(), new Item.Properties().stacksTo(1)));
-        items.registerSimpleBlockItem(skin, new Item.Properties());
-        items.registerSimpleBlockItem(skinSlab, new Item.Properties());
-        items.registerSimpleBlockItem(skinStairs, new Item.Properties());
-        items.registerSimpleBlockItem(skinCovering, new Item.Properties());
-        items.registerSimpleBlockItem(ribs, new Item.Properties());
+        items.register(LIVING_SKIN, () -> new LoadedAreaBlockItem(skin.get(), new Item.Properties()));
+        items.register(LIVING_SKIN_SLAB, () -> new LoadedAreaBlockItem(skinSlab.get(), new Item.Properties()));
+        items.register(LIVING_SKIN_STAIRS, () -> new LoadedAreaBlockItem(skinStairs.get(), new Item.Properties()));
+        items.register(LIVING_SKIN_COVERING, () -> new LoadedAreaBlockItem(skinCovering.get(), new Item.Properties()));
+        items.register(RIB_FRAME, () -> new LoadedAreaBlockItem(ribs.get(), new Item.Properties()));
         items.register(MEMBRANE_WINDOW, () -> new MembraneWindowItem(window.get(), new Item.Properties()));
     }
 
