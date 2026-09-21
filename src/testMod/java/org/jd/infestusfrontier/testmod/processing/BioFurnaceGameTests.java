@@ -21,11 +21,50 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.processing.api.BatchWork;
 import org.jd.infestusfrontier.testmod.kit.OffhandUse;
 
+@net.neoforged.fml.common.EventBusSubscriber(modid = "infestusfrontier_tests", bus = net.neoforged.fml.common.EventBusSubscriber.Bus.MOD)
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class BioFurnaceGameTests {
     private static final ResourceLocation FURNACE = id("processing/bio_furnace");
     private static final ResourceLocation BIOMASS_BUCKET = id("storage/biomass_bucket");
+
+    private static final ResourceLocation NEIGHBOR_PROBE = ResourceLocation.fromNamespaceAndPath(
+            "infestusfrontier_tests", "bio_furnace_neighbor_probe");
+    private static int neighborProbes;
+
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void registerNeighborProbe(net.neoforged.neoforge.registries.RegisterEvent event) {
+        event.register(net.minecraft.core.registries.Registries.BLOCK, NEIGHBOR_PROBE,
+                () -> new Block(net.minecraft.world.level.block.state.BlockBehaviour.Properties.of()) {
+                    @Override public void onNeighborChange(net.minecraft.world.level.block.state.BlockState state,
+                            net.minecraft.world.level.LevelReader level, BlockPos pos, BlockPos neighbor) {
+                        neighborProbes++;
+                    }
+                });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void updatesNeitherProbeNeighborsNorLoadChunks(GameTestHelper helper) {
+        var edge = org.jd.infestusfrontier.testmod.kit.ChunkEdge.prepare(helper);
+        var pos = edge.edge().west();
+        var level = helper.getLevel();
+        int flags = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+        level.setBlock(pos, BuiltInRegistries.BLOCK.get(FURNACE).defaultBlockState(), flags);
+        level.setBlock(edge.edge(), BuiltInRegistries.BLOCK.get(NEIGHBOR_PROBE).defaultBlockState(), flags);
+        org.jd.infestusfrontier.testmod.kit.ChunkEdge.assertNothingLoaded(helper, edge);
+        neighborProbes = 0;
+        var player = player(helper);
+        use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+        tick(helper, pos, 320);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.getMainHandItem().is(Items.IRON_INGOT), "Edge furnace completes and collects its batch");
+        helper.assertTrue(neighborProbes == 0, "Transfers and active ticks must never probe neighbors; observed " + neighborProbes);
+        org.jd.infestusfrontier.testmod.kit.ChunkEdge.assertNothingLoaded(helper, edge);
+        helper.succeed();
+    }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void smeltsRawIronInSixteenSecondsForFortyBiomass(GameTestHelper helper) {
@@ -110,6 +149,98 @@ public final class BioFurnaceGameTests {
         player.setShiftKeyDown(true);
         use(helper, pos, player, ItemStack.EMPTY);
         helper.assertTrue(player.getMainHandItem().is(Items.RAW_IRON), "An idle furnace never advances an unstarted batch");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void mainHandPlacementPassesThrough(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        var player = player(helper);
+        player.setPos(Vec3.atCenterOf(pos).add(0, 0, -2));
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIRT, 2));
+        var before = work(helper, pos).state();
+        var result = player.gameMode.useItemOn(player, helper.getLevel(), player.getMainHandItem(),
+                InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false));
+        helper.assertTrue(result.consumesAction() && helper.getLevel().getBlockState(pos.above()).is(Blocks.DIRT)
+                        && player.getMainHandItem().getCount() == 1,
+                "Non-smeltable main-hand block must reach ordinary placement");
+        helper.assertTrue(before.equals(work(helper, pos).state()), "Ordinary placement leaves furnace unchanged");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void fullInputNeverSpillsIntoOutput(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        var player = player(helper);
+        for (int count = 0; count < 64; count++) use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+        var full = work(helper, pos).state();
+        var excess = new ItemStack(Items.RAW_IRON);
+        use(helper, pos, player, excess);
+        helper.assertTrue(excess.getCount() == 1 && full.equals(work(helper, pos).state())
+                        && full.quantities().itemSlots().get(1).isEmpty(),
+                "The 65th raw iron must remain held and leave the output slot empty");
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+        tick(helper, pos, 320);
+        var slots = work(helper, pos).state().quantities().itemSlots();
+        helper.assertTrue(slots.get(0).count() == 63 && slots.get(1).resource().equals("minecraft:iron_ingot")
+                        && slots.get(1).count() == 1, "A full input stack can still smelt into its separate output slot");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void matchingOutputCannotReceiveHandFedInput(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        var player = player(helper);
+        use(helper, pos, player, new ItemStack(Items.COBBLESTONE));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+        tick(helper, pos, 320);
+        var before = work(helper, pos).state();
+        helper.assertTrue(before.quantities().itemSlots().get(0).isEmpty()
+                        && before.quantities().itemSlots().get(1).resource().equals("minecraft:stone"),
+                "Fixture has finished stone in output and an empty input slot");
+        var stone = new ItemStack(Items.STONE);
+        use(helper, pos, player, stone);
+        helper.assertTrue(stone.getCount() == 1 && before.equals(work(helper, pos).state()),
+                "A transfer that would target matching output must refuse without consuming input");
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.getMainHandItem().is(Items.STONE) && player.getMainHandItem().getCount() == 1,
+                "Finished output remains separately collectible");
+        player.setShiftKeyDown(false);
+        use(helper, pos, player, stone);
+        helper.assertTrue(stone.isEmpty() && work(helper, pos).state().quantities().itemSlots().get(0)
+                .resource().equals("minecraft:stone"), "Collecting output allows the next hand-fed input");
+        use(helper, pos, player, ItemStack.EMPTY);
+        tick(helper, pos, 320);
+        helper.assertTrue(work(helper, pos).state().quantities().itemCount("minecraft:smooth_stone") == 1,
+                "Refused input remains usable for its next recipe");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void componentBearingInputIsRefusedUnchanged(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        var player = player(helper);
+        var named = new ItemStack(Items.RAW_IRON, 2);
+        named.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,
+                net.minecraft.network.chat.Component.literal("Keep my name"));
+        var damaged = new ItemStack(Items.IRON_PICKAXE);
+        damaged.setDamageValue(17);
+        for (var stack : new ItemStack[] {named, damaged}) {
+            var original = stack.copy();
+            var before = work(helper, pos).state();
+            var result = useResult(helper, pos, player, stack);
+            helper.assertTrue(result == net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                            && ItemStack.matches(original, player.getMainHandItem())
+                            && before.equals(work(helper, pos).state()),
+                    "Component-bearing smeltable input must retain count, components and furnace state");
+            player.setShiftKeyDown(true);
+            use(helper, pos, player, ItemStack.EMPTY);
+            helper.assertTrue(player.getMainHandItem().isEmpty(), "Refused input creates no stripped duplicate");
+            player.setShiftKeyDown(false);
+        }
         helper.succeed();
     }
 

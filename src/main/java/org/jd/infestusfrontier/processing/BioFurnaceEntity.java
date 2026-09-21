@@ -49,6 +49,10 @@ final class BioFurnaceEntity extends BlockEntity {
         setChanged();
     }
 
+    @Override public void setChanged() {
+        if (level != null && !level.isClientSide) level.blockEntityChanged(worldPosition);
+    }
+
     boolean interact(Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
         long before = work.revision();
@@ -61,7 +65,8 @@ final class BioFurnaceEntity extends BlockEntity {
                     discovery);
         } else {
             var input = BioFurnaceResources.key(stack.getItem());
-            if (input.isEmpty() || !canSmelt(input) || !inputSlotAccepts(input)
+            if (!stack.getComponentsPatch().isEmpty() || input.isEmpty() || !canSmelt(input)
+                    || !inputSlotAccepts(input, stack.getMaxStackSize())
                     || !work.insertItem(input, 1, stack.getMaxStackSize(), work.revision())) return false;
             stack.shrink(1);
         }
@@ -69,9 +74,16 @@ final class BioFurnaceEntity extends BlockEntity {
         return true;
     }
 
-    private boolean inputSlotAccepts(String resource) {
-        var slot = work.state().quantities().itemSlots().get(INPUT_SLOT);
-        return slot.isEmpty() || slot.resource().equals(resource);
+    private boolean inputSlotAccepts(String resource, int capacity) {
+        var slots = work.state().quantities().itemSlots();
+        var input = slots.get(INPUT_SLOT);
+        if ((!input.isEmpty() && !input.resource().equals(resource))
+                || input.count() >= Math.min(input.capacity(), capacity)) return false;
+        // Generic insertion prefers matching stacks. Refuse until output is collected
+        // if it would receive this item instead of the designated input slot.
+        var output = slots.get(OUTPUT_SLOT);
+        return !input.isEmpty() || !output.resource().equals(resource)
+                || output.count() >= Math.min(output.capacity(), capacity);
     }
 
     private void start(Player player) {
