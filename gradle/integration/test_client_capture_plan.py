@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ClientCapturePlanTest(unittest.TestCase):
-    def test_client_enforces_exact_manifest_without_a_second_global_budget(self):
+    def test_client_enforces_exact_manifest_and_existing_aggregate_budget(self):
         source = (ROOT / 'src/testMod/java/org/jd/infestusfrontier/testmod/integration/BootstrapClient.java').read_text()
         start = source.index('                        var names =')
         end = source.index('                        stage = Stage.WORLD_RENDER;', start)
@@ -41,7 +41,14 @@ public class CapturePlanRegression {
         throw new AssertionError("Accepted missing, duplicate or undeclared capture: " + requested);
     }
     public static void main(String[] args) {
-        var expected = List.of(args);
+        var completePlan = List.of(args);
+        if (completePlan.size() <= 29) throw new AssertionError("Fixture no longer exercises the budget conflict");
+        manifest = String.join(",", completePlan);
+        reject(completePlan);
+        var overBudget = completePlan.subList(0, 30);
+        manifest = String.join(",", overBudget);
+        reject(overBudget);
+        var expected = completePlan.subList(0, 29);
         manifest = String.join(",", expected);
         check(expected);
         var reverse = new ArrayList<>(expected);

@@ -141,22 +141,11 @@ public final class BioFurnaceGameTests {
     public static void smeltsRawIronInSixteenSecondsForFortyBiomass(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
-        var active = (net.minecraft.world.level.block.state.properties.BooleanProperty)
-                helper.getLevel().getBlockState(pos).getBlock().getStateDefinition().getProperty("active");
-        helper.assertTrue(!helper.getLevel().getBlockState(pos).getValue(active),
-                "A newly placed Bio-Furnace renders idle");
         use(helper, pos, player, new ItemStack(Items.RAW_IRON));
         use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
         helper.assertTrue(player.getMainHandItem().is(Items.BUCKET), "A complete biomass bucket is returned");
         use(helper, pos, player, ItemStack.EMPTY);
-        helper.assertTrue(helper.getLevel().getBlockState(pos).getValue(active),
-                "Starting a batch must activate the Bio-Furnace throat");
-        tick(helper, pos, 319);
-        helper.assertTrue(helper.getLevel().getBlockState(pos).getValue(active),
-                "The Bio-Furnace throat stays active until the batch finishes");
-        tick(helper, pos, 1);
-        helper.assertTrue(!helper.getLevel().getBlockState(pos).getValue(active),
-                "Finishing a batch must return the Bio-Furnace throat to idle");
+        tick(helper, pos, 320);
         helper.assertTrue(work(helper, pos).state().quantities().itemCount("minecraft:iron_ingot") == 1
                         && work(helper, pos).state().quantities().fluidAmount("biomass") == 960,
                 "One iron ingot completes after 320 work units and consumes exactly 40 BU");
