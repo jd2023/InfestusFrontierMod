@@ -12,3 +12,5 @@ Fusion Binder, Lumen Secretion, Char Gland Feed and Skeletal Graft textures:
 generated specifically for this project with OpenAI's image-generation tool,
 then selected and downsampled to 32 px by the project team (2026-09-20). No
 prototype or third-party art was used.
+
+Lumen Tissue surface texture: generated specifically for this project with OpenAI's image-generation tool, then selected and downsampled to 16 px by the project team (2026-09-20). No prototype or third-party art was used.
