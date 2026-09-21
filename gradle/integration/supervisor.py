@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ctypes
 import fcntl
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,37 @@ import threading
 import time
 
 MAX_LOG = 8 * 1024 * 1024
+
+
+
+def disposable_runs(base, memory=Path("/dev/shm")):
+    """Keep disposable worlds in memory when possible.
+
+    Minecraft fsyncs every region file on shutdown. On disk that cost grows with
+    each test that touches a new region and approaches the shutdown deadline;
+    these worlds are deleted after the run, so durability buys nothing.
+    Call after earlier owned runs were removed: a directory that still holds one
+    stays on disk.
+    """
+    runs = base / "runs"
+    if runs.is_symlink():
+        Path(os.readlink(runs)).mkdir(parents=True, exist_ok=True)
+        return runs
+    runs.mkdir(exist_ok=True)
+    if (not memory.is_dir() or not os.access(memory, os.W_OK)
+            or any((entry / "owner.json").exists() for entry in runs.iterdir())):
+        return runs
+    digest = hashlib.sha256(str(base.resolve()).encode()).hexdigest()[:16]
+    target = memory / f"infestus-runs-{os.getuid()}-{digest}"
+    target.mkdir(mode=0o700, exist_ok=True)
+    for entry in runs.iterdir():  # Launcher-created directories such as client/.
+        if not (target / entry.name).exists():
+            shutil.move(str(entry), str(target / entry.name))
+        else:
+            shutil.rmtree(entry)
+    runs.rmdir()
+    runs.symlink_to(target, target_is_directory=True)
+    return runs
 
 
 class HarnessFailure(RuntimeError):
@@ -177,6 +209,7 @@ class Supervisor:
                 if old.is_symlink() or old.parent != runs:
                     raise HarnessFailure("ownership: invalid run directory")
                 shutil.rmtree(old)
+            disposable_runs(base)
             self.run_dir.mkdir()
             self._save_owner()
             for sig in (signal.SIGINT, signal.SIGTERM):

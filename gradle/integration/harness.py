@@ -718,23 +718,34 @@ def _prepare_client(directory):
     (config / "fml.toml").write_text("earlyWindowControl=false\n")
 
 
+# Fixed per-owner budgets. An owner fixture that needs more must be split into
+# smaller scenes; feature tasks never edit these numbers. The combined ceiling
+# is derived, so adding an owner cannot exhaust another owner's allowance.
+OWNER_SETUP_COMMANDS = 32
+OWNER_SETUP_CAPTURES = 32
+MAX_SETUP_OWNERS = 32
+
+
 def _visual_setup(root, requirements, filename="visual-setup.json"):
     """Bounded owner fixtures run only on this harness's disposable server."""
     commands, captures = [], []
     active = set((requirements or {}).get("gameTest", []))
-    for path in sorted((root / "src/testMod/resources").glob("*/" + filename)):
+    paths = sorted((root / "src/testMod/resources").glob("*/" + filename))
+    if len(paths) > MAX_SETUP_OWNERS:
+        raise HarnessFailure("excessive visual setup owners")
+    for path in paths:
         if path.stat().st_size > 8192:
             raise HarnessFailure(f"oversized visual setup: {path}")
         fixture = json.loads(path.read_text())
         batch = fixture.get("commands")
         if (set(fixture) not in ({"requires", "commands"}, {"requires", "commands", "captures"})
                 or not isinstance(fixture["requires"], str)
-                or not isinstance(batch, list) or not 1 <= len(batch) <= 17
+                or not isinstance(batch, list) or not 1 <= len(batch) <= OWNER_SETUP_COMMANDS
                 or any(not isinstance(line, str) or not 1 <= len(line) <= 256
                        or "\n" in line or "\r" in line for line in batch)):
             raise HarnessFailure(f"invalid visual setup: {path}")
         images = fixture.get("captures", [])
-        if (not isinstance(images, list) or len(images) > 29
+        if (not isinstance(images, list) or len(images) > OWNER_SETUP_CAPTURES
                 or any(not isinstance(name, str) or not re.fullmatch(r"[a-z][a-z0-9-]{0,63}\.png", name)
                        or name in CAPTURES for name in images)
                 or len(set(images)) != len(images)):
@@ -742,10 +753,8 @@ def _visual_setup(root, requirements, filename="visual-setup.json"):
         if fixture["requires"] in active:
             commands.extend(batch)
             captures.extend(images)
-        if len(captures) > 29 or len(set(captures)) != len(captures):
-            raise HarnessFailure("excessive or duplicate visual setup captures")
-        if len(commands) > 73:
-            raise HarnessFailure("excessive visual setup commands")
+        if len(set(captures)) != len(captures):
+            raise HarnessFailure("duplicate visual setup captures")
     return commands, captures
 
 
@@ -762,7 +771,7 @@ def visual_setup_captures(root, requirements):
 def _client_lifecycle(
     s, server_command, client_command, server_dir, client_dir, output, port, setup_commands=(), observer_command=None, discovery=False, discovery_setup=()
 ):
-    if len(setup_commands) + len(discovery_setup) > 73:
+    if len(setup_commands) + len(discovery_setup) > 2 * MAX_SETUP_OWNERS * OWNER_SETUP_COMMANDS:
         raise HarnessFailure("excessive combined setup commands")
     server = s.start("server", server_command, server_dir, output / "server.log")
     s.markers("readiness", s.limits["readiness"], [(server, "Done (")])
