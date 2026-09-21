@@ -336,6 +336,21 @@ public final class BioFurnaceGameTests {
                     "Attaching and saving rejected data must retain bytes and never clone or advance it");
             SaveReload.assertRetainsRejectedData(helper, relative, saved);
             helper.assertTrue(probe.copies == 0, "Level-attached rejection and save must not clone raw data");
+            var drops = Block.getDrops(level.getBlockState(pos), level, pos, level.getBlockEntity(pos));
+            helper.assertTrue(drops.size() == 1 && drops.getFirst().is(item(FURNACE))
+                            && drops.getFirst().getCount() == 1,
+                    "Rejected furnace recovery drops exactly one core and no separate contents");
+            helper.assertTrue(probe.copies == 0, "Breaking rejected data must not clone its unbounded payload");
+            var core = drops.getFirst();
+            helper.assertTrue(core.has(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA),
+                    "Rejected recovery core retains block-entity data");
+            replace(helper, pos, player(helper), core);
+            helper.assertTrue(core.isEmpty(), "Survival placement consumes the single recovery core");
+            helper.assertTrue(probe.copies == 0, "Placing rejected data must not clone its unbounded payload");
+            helper.assertTrue(java.util.Arrays.equals(originalBytes, nbtBytes(SaveReload.save(helper, relative))),
+                    "Actual drop and placement preserve the original rejected bytes");
+            assertLockedControls(helper, relative);
+            helper.assertTrue(probe.copies == 0, "Recovered rejected controls never clone the payload");
         }
         helper.succeed();
     }
