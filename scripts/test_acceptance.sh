@@ -51,7 +51,10 @@ reject 'missing fresh review, despite an earlier verdict'
 export TEST_MODEL_MODE=fail
 reject 'reviewer execution failure'
 export TEST_MODEL_MODE=approve
+printf 'fixture ruling text\n' > "$state/IF-900/ruling.md"
 run_hook
+grep -q 'Binding planner ruling' "$TEST_PROMPT_COPY"
+grep -q 'fixture ruling text' "$TEST_PROMPT_COPY"
 grep -q 'Round: 2.' "$TEST_PROMPT_COPY"
 grep -q 'first-round defect' "$TEST_PROMPT_COPY"
 grep -qx APPROVED "$fixture/.ktask/logs/review.md"
