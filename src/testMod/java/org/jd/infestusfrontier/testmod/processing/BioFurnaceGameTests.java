@@ -599,6 +599,51 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_growth")
+    public static void sneakClockChoosesGrowthThroughPlayerInteraction(GameTestHelper helper) {
+        assertGrowthThroughPlayerInteraction(helper, Items.CLOCK,
+                org.jd.infestusfrontier.organ.api.OrganHistory.GrowthChoice.INCUBATION);
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_growth")
+    public static void sneakBottleChoosesGrowthThroughPlayerInteraction(GameTestHelper helper) {
+        assertGrowthThroughPlayerInteraction(helper, Items.GLASS_BOTTLE,
+                org.jd.infestusfrontier.organ.api.OrganHistory.GrowthChoice.WATER_ECONOMY);
+    }
+
+    private static void assertGrowthThroughPlayerInteraction(GameTestHelper helper, net.minecraft.world.item.Item selector,
+            org.jd.infestusfrontier.organ.api.OrganHistory.GrowthChoice choice) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        restoreHistory(helper, pos, 32);
+        var messages = new java.util.ArrayList<net.minecraft.network.chat.Component>();
+        var player = new net.neoforged.neoforge.common.util.FakePlayer(helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "FurnaceGrowthTest")) {
+            @Override public void displayClientMessage(net.minecraft.network.chat.Component message, boolean overlay) {
+                messages.add(message);
+            }
+        };
+        player.setGameMode(GameType.SURVIVAL);
+        player.setPos(Vec3.atCenterOf(pos).add(0, 0, -2));
+        player.setShiftKeyDown(true);
+        var held = new ItemStack(selector, 3);
+        player.setItemInHand(InteractionHand.MAIN_HAND, held.copy());
+        var hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);
+        for (String result : new String[] {"chosen", "level_choice_already_used"}) {
+            messages.clear();
+            var interaction = player.gameMode.useItemOn(player, helper.getLevel(), player.getMainHandItem(),
+                    InteractionHand.MAIN_HAND, hit);
+            helper.assertTrue(work(helper, pos).state().history().choices().equals(java.util.List.of(choice)),
+                    "Sneak-use through the player dispatcher must apply exactly one " + choice + " choice");
+            helper.assertTrue(interaction.consumesAction(), "The furnace must handle the growth interaction");
+            helper.assertTrue(ItemStack.matches(held, player.getMainHandItem()),
+                    "Growth selection and repeated selection must preserve the entire held stack");
+            helper.assertTrue(messages.size() == 1 && messages.getFirst().equals(net.minecraft.network.chat.Component
+                            .translatable("message.infestusfrontier.processing.bio_furnace.growth." + result)),
+                    "The player must receive the translated growth result: " + result);
+        }
+        helper.succeed();
+    }
+
     private static void restoreHistory(GameTestHelper helper, BlockPos pos, long completedBatches) {
         var saved = helper.getLevel().getBlockEntity(pos).saveWithFullMetadata(helper.getLevel().registryAccess());
         var furnace = saved.getCompound("furnace");

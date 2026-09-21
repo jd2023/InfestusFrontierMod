@@ -29,6 +29,18 @@ final class BioFurnaceBlock extends BaseEntityBlock {
     BioFurnaceBlock(Properties properties, Supplier<BlockEntityType<BioFurnaceEntity>> entityType) {
         super(properties);
         this.entityType = entityType;
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(this::allowGrowthControls);
+    }
+
+    private void allowGrowthControls(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+        // Both interaction dispatchers otherwise skip blocks when sneaking with an item.
+        var stack = event.getItemStack();
+        if (event.getHand() == InteractionHand.MAIN_HAND && event.getEntity().isShiftKeyDown()
+                && (stack.is(Items.CLOCK) || stack.is(Items.GLASS_BOTTLE))
+                && event.getLevel().hasChunkAt(event.getPos())
+                && event.getLevel().getBlockState(event.getPos()).is(this)) {
+            event.setUseBlock(net.neoforged.neoforge.common.util.TriState.TRUE);
+        }
     }
 
     @Override protected MapCodec<? extends BaseEntityBlock> codec() { return MapCodec.unit(this); }
