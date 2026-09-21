@@ -61,16 +61,23 @@ class BioFurnaceRecipesTest {
 
     @Test
     void unknownInputHasNoAlternative() {
-        var catalog = BioFurnaceRecipes.catalog(input -> Optional.empty());
+        var catalog = smeltingCatalog();
 
         assertEquals(List.of(), catalog.alternatives("minecraft:stone", history()));
     }
 
     @Test
     void outputIsAlwaysExactlyOneResult() {
-        var recipe = resolved("minecraft:raw_iron", "minecraft:iron_ingot", history());
+        var catalog = smeltingCatalog();
 
-        assertEquals(Map.of("minecraft:iron_ingot", 1), recipe.outputs());
+        assertEquals(List.of(new BatchRecipeCatalog.ResolvedRecipe(
+                        Map.of("minecraft:raw_iron", 1), Map.of("biomass", 40),
+                        Map.of("minecraft:iron_ingot", 1), Map.of(), 320)),
+                catalog.alternatives("minecraft:raw_iron", history()));
+        assertEquals(List.of(new BatchRecipeCatalog.ResolvedRecipe(
+                        Map.of("minecraft:raw_gold", 1), Map.of("biomass", 40),
+                        Map.of("minecraft:gold_ingot", 1), Map.of(), 320)),
+                catalog.alternatives("minecraft:raw_gold", history()));
     }
 
     @Test
@@ -85,9 +92,18 @@ class BioFurnaceRecipesTest {
 
     private static BatchRecipeCatalog.ResolvedRecipe resolved(
             String input, String output, OrganHistory.Snapshot history) {
-        return BioFurnaceRecipes.catalog(candidate -> Optional.of(output))
-                .alternatives(input, history)
-                .getFirst();
+        var alternatives = BioFurnaceRecipes.catalog(candidate ->
+                        input.equals(candidate) ? Optional.of(output) : Optional.empty())
+                .alternatives(input, history);
+        assertEquals(1, alternatives.size());
+        return alternatives.getFirst();
+    }
+
+    private static BatchRecipeCatalog smeltingCatalog() {
+        var results = Map.of(
+                "minecraft:raw_iron", "minecraft:iron_ingot",
+                "minecraft:raw_gold", "minecraft:gold_ingot");
+        return BioFurnaceRecipes.catalog(input -> Optional.ofNullable(results.get(input)));
     }
 
     private static OrganHistory.Snapshot history(OrganHistory.GrowthChoice... choices) {
