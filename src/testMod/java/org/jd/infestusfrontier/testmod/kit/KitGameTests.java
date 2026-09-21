@@ -5,10 +5,12 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -70,6 +72,38 @@ public final class KitGameTests {
         InteractionResult result = OffhandUse.useWithOffhand(helper, relative, new ItemStack(Items.COBBLESTONE));
         helper.assertTrue(result.consumesAction(), "Offhand use consumes placement against vanilla stone");
         OffhandUse.assertPlacedBeside(helper, relative, Blocks.COBBLESTONE);
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void offhandPlacementStopsWhenMainHandConsumes(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = helper.absolutePos(relative);
+        helper.getLevel().setBlockAndUpdate(pos, Blocks.CHEST.defaultBlockState());
+        var offhand = new ItemStack(Items.COBBLESTONE);
+        InteractionResult result = OffhandUse.useWithOffhand(helper, relative, offhand);
+        helper.assertTrue(helper.getLevel().getBlockState(pos.east()).isAir(),
+                "Chest consumes the main-hand click before offhand placement");
+        helper.assertTrue(offhand.getCount() == 1, "Consumed main-hand click preserves the offhand item");
+        helper.assertTrue(result == InteractionResult.CONSUME, "Returns the chest's main-hand result");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void offhandFixtureLeavesSharedPlayerUntouched(GameTestHelper helper) {
+        var shared = FakePlayerFactory.getMinecraft(helper.getLevel());
+        var mainBefore = shared.getMainHandItem();
+        var offhandBefore = shared.getOffhandItem();
+        var relative = new BlockPos(1, 1, 1);
+        helper.getLevel().setBlockAndUpdate(helper.absolutePos(relative), Blocks.CHEST.defaultBlockState());
+        try {
+            OffhandUse.useWithOffhand(helper, relative, new ItemStack(Items.COBBLESTONE));
+            helper.assertTrue(shared.getMainHandItem() == mainBefore && shared.getOffhandItem() == offhandBefore,
+                    "Offhand fixture must not change another test's shared player hands");
+        } finally {
+            shared.setItemInHand(InteractionHand.MAIN_HAND, mainBefore);
+            shared.setItemInHand(InteractionHand.OFF_HAND, offhandBefore);
+        }
         helper.succeed();
     }
 }
