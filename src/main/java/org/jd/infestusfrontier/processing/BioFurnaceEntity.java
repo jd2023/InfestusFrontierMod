@@ -20,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jd.infestusfrontier.organ.api.OrganHistory;
 import org.jd.infestusfrontier.processing.api.BatchWork;
 import org.jd.infestusfrontier.processing.api.BioFurnaceRecipes;
 import org.jd.infestusfrontier.processing.digestion.BiomassBucketTransfer;
@@ -77,7 +78,12 @@ final class BioFurnaceEntity extends BlockEntity {
         }
         var stack = player.getItemInHand(hand);
         long before = work.revision();
-        if (stack.isEmpty()) {
+        if (player.isShiftKeyDown() && (stack.is(Items.CLOCK) || stack.is(Items.GLASS_BOTTLE))) {
+            var choice = stack.is(Items.CLOCK)
+                    ? OrganHistory.GrowthChoice.INCUBATION
+                    : OrganHistory.GrowthChoice.WATER_ECONOMY;
+            message(player, "growth." + work.choose(choice, work.revision()).name().toLowerCase(java.util.Locale.ROOT));
+        } else if (stack.isEmpty()) {
             if (player.isShiftKeyDown()) collect(player, hand);
             else start(player);
         } else if (stack.is(BioFurnaceResources.item("infestusfrontier:storage/biomass_bucket"))) {

@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -41,7 +42,8 @@ final class BioFurnaceBlock extends BaseEntityBlock {
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
             Player player, InteractionHand hand, BlockHitResult hit) {
         if (hand == InteractionHand.OFF_HAND || stack.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        if (level.isClientSide) return stack.is(BioFurnaceResources.item("infestusfrontier:storage/biomass_bucket"))
+        if (level.isClientSide) return (stack.is(BioFurnaceResources.item("infestusfrontier:storage/biomass_bucket"))
+                || stack.is(Items.CLOCK) || stack.is(Items.GLASS_BOTTLE))
                 ? ItemInteractionResult.SUCCESS : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if (level.getBlockEntity(pos) instanceof BioFurnaceEntity furnace && furnace.interact(player, hand)) {
             return ItemInteractionResult.CONSUME;

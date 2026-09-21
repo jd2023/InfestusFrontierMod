@@ -496,6 +496,113 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void thirtySecondBatchOffersExactlyOneChoice(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        restoreHistory(helper, pos, 31);
+        var player = player(helper);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 320);
+        var work = work(helper, pos);
+        helper.assertTrue(work.state().history().completedBatches() == 32,
+                "The thirty-second completed batch earns the first L1 choice");
+        helper.assertTrue(work.choose(org.jd.infestusfrontier.organ.api.OrganHistory.GrowthChoice.INCUBATION,
+                        work.revision()) == BatchWork.GrowthResult.CHOSEN,
+                "The first earned choice must succeed");
+        helper.assertTrue(work.choose(org.jd.infestusfrontier.organ.api.OrganHistory.GrowthChoice.WATER_ECONOMY,
+                        work.revision()) == BatchWork.GrowthResult.LEVEL_CHOICE_ALREADY_USED,
+                "L1 must allow exactly one choice");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void choiceCannotBeEarnedTwiceByReopeningBreakingOrReloading(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = place(helper, relative);
+        restoreHistory(helper, pos, 31);
+        var player = player(helper);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 320);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, new ItemStack(Items.CLOCK));
+        helper.assertTrue(work(helper, pos).state().history().choices().size() == 1,
+                "The earned clock choice is retained before recovery");
+        SaveReload.reload(helper, relative);
+        var drops = Block.getDrops(helper.getLevel().getBlockState(pos), helper.getLevel(), pos,
+                helper.getLevel().getBlockEntity(pos));
+        replace(helper, pos, player, drops.getFirst());
+        var work = work(helper, pos);
+        helper.assertTrue(work.choose(org.jd.infestusfrontier.organ.api.OrganHistory.GrowthChoice.WATER_ECONOMY,
+                        work.revision()) == BatchWork.GrowthResult.LEVEL_CHOICE_ALREADY_USED,
+                "Reloading and replacing one core must not earn another L1 choice");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void speedChoiceShortensNextBatchToTwoHundredEightyEightTicks(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        restoreHistory(helper, pos, 31);
+        var player = player(helper);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 320);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, new ItemStack(Items.CLOCK));
+        helper.assertTrue(player.getMainHandItem().is(Items.CLOCK), "A choice clock is not consumed");
+        player.setShiftKeyDown(false);
+        startIronBatch(helper, pos, player);
+        helper.assertTrue(work(helper, pos).state().activeBatch().requiredWorkUnits() == 288,
+                "One incubation choice reduces the next batch to 288 ticks");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void economyChoiceCostsThirtySixBiomass(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        restoreHistory(helper, pos, 31);
+        var player = player(helper);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 320);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, new ItemStack(Items.GLASS_BOTTLE));
+        helper.assertTrue(player.getMainHandItem().is(Items.GLASS_BOTTLE), "A choice bottle is not consumed");
+        player.setShiftKeyDown(false);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 320);
+        helper.assertTrue(work(helper, pos).state().quantities().fluidAmount("biomass") == 1_924,
+                "One water-economy choice makes the second batch consume exactly 36 biomass");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void cancelledBatchEarnsNoHistory(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        var player = player(helper);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 100);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, new ItemStack(Items.STICK));
+        helper.assertTrue(work(helper, pos).state().history().completedBatches() == 0,
+                "Cancelling an in-progress batch cannot earn history");
+        helper.succeed();
+    }
+
+    private static void restoreHistory(GameTestHelper helper, BlockPos pos, long completedBatches) {
+        var saved = helper.getLevel().getBlockEntity(pos).saveWithFullMetadata(helper.getLevel().registryAccess());
+        var furnace = saved.getCompound("furnace");
+        furnace.putLong("completed", completedBatches);
+        furnace.putLong("lastCompleted", completedBatches);
+        furnace.putLong("nextBatch", completedBatches + 1);
+        saved.put("furnace", furnace);
+        helper.getLevel().getBlockEntity(pos).loadWithComponents(saved, helper.getLevel().registryAccess());
+    }
+
+    private static void startIronBatch(GameTestHelper helper, BlockPos pos, net.minecraft.server.level.ServerPlayer player) {
+        player.setShiftKeyDown(false);
+        use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+    }
+
     private static CompoundTag unsupportedSchema(GameTestHelper helper, BlockPos relative) {
         var hostile = SaveReload.save(helper, relative).copy();
         var furnace = hostile.getCompound("furnace");
