@@ -1,38 +1,27 @@
-# Scoped implementation contract
-
-Read the repository instructions and the task's owning specification first.
-The task is the scope, not permission to resolve open product decisions. Stop
-with NEEDS_INPUT if required choices, authority or external prerequisites are missing.
-
-## Task
+# Implement the task
 
 {{TASK}}
 
-## Required process
+1. Inspect existing work and requirements. In build/evidence/<task-id>/notes.md,
+   record the starting Git commit once; preserve that baseline across retries.
+2. Write meaningful failing tests, implement, run focused and adjacent checks.
+   Repair relevant code, tests, harnesses and configuration wherever needed.
+   Scope paths are navigation hints, not permission boundaries.
+3. Inspect the full diff: correctness, ownership, simplicity, isolation, test
+   quality, performance and comments. Refactor and retest. Save normal logs,
+   captures and measurements; summarize commands and results in the evidence note.
+4. Commit the task's changes on the configured feature branch and push. Preserve
+   unrelated user files. Use separate repair commits after a rejected attempt;
+   do not reset the baseline or rewrite published history.
+5. Write the native report at its supplied path, including the evidence-note path
+   and commit. DONE means ready for ktask's independent tests and review.
 
-Start at a clean committed checkpoint on the authorized task branch. State the
-owning module, outcome, allowed files, non-goals and adjacent risks. Add the
-narrowest meaningful failing test before implementing. Keep rules inward, hide
-internals and explain any public API growth. Discuss material performance costs
-and enforce hard limits; test overload and safe refusal rather than dropping work.
+ktask runs the full gate and a separate reviewer after handoff. Fix their concrete
+findings in the same task; do not stop for file permissions or technical choices.
+Do not fabricate results, suppress genuine failures, waive required gameplay,
+change queue progress, launch another orchestrator or approve your own work.
+Human input is only for new product decisions or external authority.
 
-Run focused checks, the interaction/adjacent regression sweep, then
-`./.ktask/verify.sh` and any required client, compatibility or performance gates.
-Do not treat logs without assertions, a screenshot alone or a successful build as
-proof of gameplay. Never weaken verification, rerun until lucky, acknowledge a
-HUMAN gate or replace goldens. Review the complete staged diff; commit one coherent
-scope only after required gates pass. No push/merge/release without authorization.
-
-## Final structured report
-
-Start with exactly one result line:
-
-KTASK_RESULT: DONE
-KTASK_RESULT: FAILED
-KTASK_RESULT: NEEDS_INPUT
-
-Choose one, not all three. Follow it with outcome, scope, API/boundary changes,
-red/green evidence, full-gate result, adjacent checks, performance bounds, visual
-evidence/human approvals where relevant, commit and branch, skipped checks and
-remaining risk. NEEDS_INPUT includes one focused question and why it blocks work.
-DONE is not allowed if required verification or approval is missing.
+For HTTPS push authentication, use the existing login if needed:
+`git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push origin HEAD:docs/progression-tree-armor-symbiosis`.
+No global Git configuration changes, force pushes, main merges or releases.

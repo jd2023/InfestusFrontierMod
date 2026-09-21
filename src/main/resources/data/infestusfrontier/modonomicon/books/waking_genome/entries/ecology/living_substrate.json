@@ -1,0 +1,33 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.living_substrate.name",
+  "description": "book.infestusfrontier.entry.living_substrate.description",
+  "icon": "infestusfrontier:ecology/living_substrate",
+  "x": 0,
+  "y": 4,
+  "parents": [
+    {
+      "entry": "infestusfrontier:construction/spore_culture"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/spore_culture"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/acquired/living_substrate"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:ecology/living_substrate",
+      "text": "book.infestusfrontier.entry.living_substrate.page.text"
+    }
+  ]
+}

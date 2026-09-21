@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "infestusfrontier:construction/spore_culture" },
+    { "item": "minecraft:rotten_flesh" },
+    { "item": "minecraft:rotten_flesh" },
+    { "item": "minecraft:bone_meal" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "infestusfrontier:construction/organ_bud"
+  }
+}

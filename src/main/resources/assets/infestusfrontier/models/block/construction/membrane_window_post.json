@@ -1,0 +1,41 @@
+{
+  "textures": {
+    "particle": "infestusfrontier:block/construction/rib",
+    "rib": "infestusfrontier:block/construction/rib",
+    "pane": "infestusfrontier:block/construction/membrane"
+  },
+  "elements": [
+    {
+      "from": [
+        7.25,
+        0,
+        7.25
+      ],
+      "to": [
+        8.75,
+        16,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rib"
+        },
+        "south": {
+          "texture": "#rib"
+        },
+        "east": {
+          "texture": "#rib"
+        },
+        "west": {
+          "texture": "#rib"
+        },
+        "up": {
+          "texture": "#rib"
+        },
+        "down": {
+          "texture": "#rib"
+        }
+      }
+    }
+  ]
+}

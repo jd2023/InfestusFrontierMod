@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "owner": "storage",
+  "contributions": [
+    {
+      "task": "IF-006",
+      "entries": [
+        {
+          "catalog": ["T0-03"],
+          "registry": ["infestusfrontier:processing/digestive_sac"],
+          "producer": "infestusfrontier:processing/digestive_sac",
+          "guide": "guide/digestive_sac.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:storage.digestive_sac.obtain",
+            "use": "infestusfrontier_tests:storage.digestive_sac.use",
+            "guide": "infestusfrontier_client:storage.digestive_sac.guide"
+          }
+        },
+        {
+          "catalog": ["T0-04"],
+          "registry": ["infestusfrontier:storage/biomass_bladder"],
+          "producer": "infestusfrontier:storage/biomass_bladder",
+          "guide": "guide/biomass_bladder.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:storage.biomass_bladder.obtain",
+            "use": "infestusfrontier_tests:storage.biomass_bladder.use",
+            "guide": "infestusfrontier_client:storage.biomass_bladder.guide"
+          }
+        },
+        {
+          "catalog": ["I019"],
+          "registry": ["infestusfrontier:storage/biomass_bucket"],
+          "producer": "infestusfrontier:storage/biomass_bladder",
+          "guide": "guide/biomass_bucket.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:storage.biomass_bucket.obtain",
+            "use": "infestusfrontier_tests:storage.biomass_bucket.use",
+            "guide": "infestusfrontier_client:storage.biomass_bucket.guide"
+          }
+        }
+      ]
+    }
+  ]
+}

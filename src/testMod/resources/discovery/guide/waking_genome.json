@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:discovery/waking_genome",
+  "title": "The Waking Genome",
+  "obtain": "Receive one copy on first join when inventory space is available, or craft one ordinary book with one Spore Culture.",
+  "use": "Open the guide item or its rebindable guide key. Recrafting a lost copy does not reset server-owned progression.",
+  "assertion": "infestusfrontier_client:discovery.waking_genome.guide"
+}

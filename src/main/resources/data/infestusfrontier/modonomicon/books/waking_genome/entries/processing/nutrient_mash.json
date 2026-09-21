@@ -1,0 +1,37 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.nutrient_mash.name",
+  "description": "book.infestusfrontier.entry.nutrient_mash.description",
+  "icon": "infestusfrontier:processing/nutrient_mash",
+  "x": -1,
+  "y": 8,
+  "parents": [
+    {
+      "entry": "infestusfrontier:processing/culture_bowl"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/living_substrate"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/acquired/nutrient_mash"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "book.infestusfrontier.entry.nutrient_mash.name",
+      "text": "book.infestusfrontier.entry.nutrient_mash.page.text"
+    },
+    {
+      "type": "infestusfrontier:bowl_recipe",
+      "recipe": "I007"
+    }
+  ]
+}

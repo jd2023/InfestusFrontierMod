@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:storage/biomass_bladder",
+  "title": "Biomass Bladder",
+  "obtain": "Use one slime ball on a rooted Organ Bud while carrying two glass.",
+  "use": "The starter Bladder stores 4000 mB biomass. Empty or fill Biomass Buckets at it. Its equipment Fill port refuses anything except compatible fueled equipment.",
+  "assertion": "infestusfrontier_client:storage.biomass_bladder.guide"
+}

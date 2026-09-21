@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:storage/biomass_bucket",
+  "title": "Biomass Bucket",
+  "obtain": "Use an empty vanilla bucket on a compatible tank holding at least 1000 mB biomass.",
+  "use": "Transfer exactly 1000 mB between compatible tanks. World placement stays unavailable until finite containment exists.",
+  "assertion": "infestusfrontier_client:storage.biomass_bucket.guide"
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:stick" },
+    { "item": "minecraft:stick" },
+    { "item": "minecraft:bone" },
+    { "item": "minecraft:bone" },
+    { "item": "infestusfrontier:construction/spore_culture" }
+  ],
+  "result": { "id": "infestusfrontier:processing/membrane_rack", "count": 1 }
+}

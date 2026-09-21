@@ -1,0 +1,1 @@
+{ "schema":1, "entry":"infestusfrontier:construction/membrane_window", "title":"Membrane Window", "obtain":"Craft glass, one Sheet and one bone into two windows.", "use":"Join adjacent windows to remove interior ribs while preserving both visible faces.", "assertion":"infestusfrontier_client:construction.membrane_window.guide" }

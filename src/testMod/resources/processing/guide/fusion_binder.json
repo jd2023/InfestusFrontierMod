@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/fusion_binder",
+  "title": "Fusion Binder",
+  "obtain": "In a Bowl, consume one Membrane Sheet, one Spore Culture and 100 BU over 60 loaded seconds to grow four portions.",
+  "use": "Binder is a biological carrier for named preparations and never replaces their signature ingredients.",
+  "assertion": "infestusfrontier_client:processing.fusion_binder.guide"
+}

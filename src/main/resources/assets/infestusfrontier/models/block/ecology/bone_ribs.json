@@ -1,0 +1,9 @@
+{
+  "textures": { "rib": "minecraft:block/bone_block_side", "particle": "minecraft:block/bone_block_side" },
+  "elements": [
+    { "from": [0,15.5,0], "to": [16,16,2], "faces": { "up":{"texture":"#rib"}, "north":{"texture":"#rib"}, "south":{"texture":"#rib"} } },
+    { "from": [0,15.5,14], "to": [16,16,16], "faces": { "up":{"texture":"#rib"}, "north":{"texture":"#rib"}, "south":{"texture":"#rib"} } },
+    { "from": [0,15.5,2], "to": [2,16,14], "faces": { "up":{"texture":"#rib"}, "east":{"texture":"#rib"}, "west":{"texture":"#rib"} } },
+    { "from": [14,15.5,2], "to": [16,16,14], "faces": { "up":{"texture":"#rib"}, "east":{"texture":"#rib"}, "west":{"texture":"#rib"} } }
+  ]
+}

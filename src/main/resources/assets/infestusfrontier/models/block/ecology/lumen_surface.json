@@ -1,0 +1,8 @@
+{
+  "ambientocclusion": false,
+  "textures": { "lumen": "infestusfrontier:block/ecology/lumen_surface", "particle": "infestusfrontier:block/ecology/lumen_surface" },
+  "elements": [
+    { "from": [0,16,0], "to": [16,16.02,16], "shade": false,
+      "faces": { "up": { "texture": "#lumen" } } }
+  ]
+}

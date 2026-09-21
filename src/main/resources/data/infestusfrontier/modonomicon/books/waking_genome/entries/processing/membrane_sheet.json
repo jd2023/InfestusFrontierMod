@@ -1,0 +1,17 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "item.infestusfrontier.processing.membrane_sheet",
+  "description": "book.infestusfrontier.entry.membrane_rack.description",
+  "icon": "infestusfrontier:processing/membrane_sheet",
+  "x": 12,
+  "y": 6,
+  "parents": [{ "entry": "infestusfrontier:processing/membrane_rack" }],
+  "condition": { "type": "modonomicon:or", "children": [
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/organ_bud" },
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/acquired/membrane_sheet" }
+  ] },
+  "pages": [
+    { "type": "infestusfrontier:preparation_recipe", "recipe": "I002", "route": 0 },
+    { "type": "infestusfrontier:preparation_recipe", "recipe": "I002", "route": 1 }
+  ]
+}

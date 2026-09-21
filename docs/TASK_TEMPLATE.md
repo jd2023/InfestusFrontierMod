@@ -1,20 +1,56 @@
-# Task: <one concrete outcome>
+# Implementation packet contract
 
-Status: proposed / owner-approved. Owning specification: <path/decision>.
+Expensive models plan; a cheap model implements. A packet is ready only when a
+worker can finish it without making a design decision or reading a whole catalog.
 
-- Outcome:
-- Owning module and public contract:
-- Allowed files/subsystems:
-- Explicit non-goals:
-- Dependencies and decisions required before starting:
-- Red-first test and expected failure:
-- Acceptance criteria observable in-game or through the public API:
-- Adjacent behavior and regression checks:
-- Work, memory, entity, packet, geometry and unloaded-chunk bounds:
-- Save/reload, interruption, full-output and malformed-input cases:
-- Required client captures / human approval:
-- Completion gate: `./.ktask/verify.sh` plus <task-specific checks>.
-- Branch/commit expectations and authorized remote actions:
+## Size
 
-Stop conditions: missing scope, missing product decision, boundary violation,
-unavailable required verification or a need for broader authority. Do not guess.
+One packet is one Kind and one outcome: at most about 12 files and 400 changed
+lines. If the title needs "and", split it. A content feature is a chain:
+
+| Kind | Contains | Evidence |
+|---|---|---|
+| rules | Pure `:core` types and JUnit tests; no Minecraft types | rules |
+| platform | Block, item, block entity, codec, menu wiring; GameTests; placeholder model allowed | game |
+| data | Recipes, tags, loot, translations and their GameTests | game |
+| art | Models, textures, blockstates, render type; the owner's `visual-setup.json` scene | visual |
+| complete | Guide entry, advancement or discovery step, `coverage.json` contribution and checkpoint advance | game, visual |
+| qualify | A scripted route or soak over accepted content; no new behavior | game |
+| repair | One reviewer finding or follow-up with its regression test | as needed |
+
+Only the `complete` packet owns the catalog IDs in `Blocks` and
+`.ktask/content-plan.json`, and advances `content-checkpoint.json` to its ID.
+Earlier packets of the chain use `Blocks: none`.
+
+## Fields
+
+| Field | Meaning |
+|---|---|
+| IF-nnn title | One observable outcome |
+| Milestone, Owner, Depends | As in ARCHITECTURE; Depends lists accepted packet IDs |
+| Blocks | Catalog block IDs completed here, or `none` |
+| Kind | One row of the table above |
+| Read | At most five exact files or catalog entries the worker needs |
+| Files | Exact files to create or modify, tests included. This is an allowlist |
+| Do | Numbered steps with exact type names, signatures, IDs and numbers |
+| Tests | Named tests written first, each with the assertion it makes |
+| Done | Exact commands that must pass |
+| Not | Adjacent behavior that belongs to another packet |
+| Bounds | Hard work and state limits |
+| Evidence | rules, game, visual, integration or soak |
+
+The planner decides every name, number and interface before the packet enters
+the queue, reading the existing code so that `Do` matches real signatures. It
+consults `docs/REVIEW_CHECKLIST.md` and writes each applicable item as a `Tests`
+line. Common invariants (save/reload, break/replace, refusal leaves state
+unchanged) are written into the packet that owns them, not inherited silently.
+
+## Milestones
+
+Packets are executable only down to the next `HUMAN:` gate. Entries below it in
+the old Contract/Red/Accept format are milestone outlines: inputs for the next
+planning session, never handed to a worker. At each gate the human playtests, a
+planning session triages `.ktask/logs/follow-ups.md`, expands the next milestone
+into packets, keeps `.ktask/content-plan.json` consistent, leaves `.ktask/`
+uncommitted, runs
+`bash .ktask/accept.sh --checkpoint`, and the human runs `ktask ack`.

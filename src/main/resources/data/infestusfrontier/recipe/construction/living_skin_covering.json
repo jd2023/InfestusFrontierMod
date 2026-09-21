@@ -1,0 +1,5 @@
+{
+  "type":"minecraft:crafting_shapeless", "category":"building",
+  "ingredients":[{"item":"infestusfrontier:construction/living_skin"}],
+  "result":{"count":4,"id":"infestusfrontier:construction/living_skin_covering"}
+}

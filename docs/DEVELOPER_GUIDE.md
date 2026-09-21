@@ -2,13 +2,38 @@
 
 ## Authority and scope
 
-The owner defines product direction. Explicit commitments in `VISION.md` and
-accepted entries in `DECISIONS.md` constrain every implementation. A draft idea,
+Explicit requirements and `VISION.md` constrain every implementation. A draft idea,
 prototype behavior, or unchecked backlog item is not a ratified requirement.
 Ask when a decision changes scope, progression, player risk, dependencies or saves.
 
-The bootstrap establishes build/test infrastructure only. It does not begin the
-content roadmap. Do not promote prototype implementations wholesale.
+Design ownership: `PROGRESSION_MAP.md` owns end-to-end player projects;
+`ITEM_CATALOG.md` owns items/preparation; `BLOCK_CATALOG.md` owns organs/construction;
+`LIVING_SUBSTRATE_MUTATIONS.md` owns cell anatomy; `ARMOR_EVOLUTION.md` owns equipment;
+`GUIDE_PROGRESSION_TREE.md` owns teaching dependencies. `OPEN_QUESTIONS.md` is the
+product-decision register. It contains only questions about intended gameplay,
+scope or policy that require product direction—not balancing or implementation work.
+
+Before adding a document, identify a responsibility not already owned. Prefer a
+section in the existing owner. No parallel notebooks, reviews or prerequisite
+checklists that repeat gameplay. Keep technical contracts separate from gameplay.
+
+Use defined terms, exact conditions and observable results. Research comparable
+systems, propose initial recipes, numbers and progression, and validate them with
+calculations, experiments and playtesting. This is design/development work; do not
+ask the player to supply tuning values or technical solutions. Keep baseline values
+in the feature specification, with brief supporting evidence and tuning targets.
+Distinguish calculated results from measured gameplay. An unfinished calculation
+does not become a product question.
+
+Ask only when alternatives change intended experience, scope or policy. Include
+a recommendation and its tradeoff when discussing that choice; keep the question
+register itself questions-only. Put resolved rules in their specifications and
+remove the questions. State rules directly, without attribution or change history.
+Implementation follows the scoped M0–M10 task queue. The planning coordinator
+owns initial research, design, numerical baselines and module interfaces.
+Workers resolve technical gaps and repair necessary prerequisite implementations,
+tests, harnesses and project configuration without requesting file permissions.
+Do not promote prototype implementations wholesale.
 
 ## Deep modularity: mandatory
 
@@ -39,14 +64,23 @@ failure diagnostics, performance bounds and tests. Follow `ARCHITECTURE.md`.
 ## Change and validation discipline
 
 1. Read instructions and owning specification; inspect clean Git state/checkpoint.
-2. State the outcome, owning module, allowed files, non-goals and adjacent risks.
+2. State the outcome, owning module, starting files, non-goals and adjacent risks.
 3. Discuss material server/client costs under `PERFORMANCE.md`.
 4. Write the smallest meaningful failing test; prove it detects the missing behavior.
-5. Implement behind the module boundary; do not expand scope opportunistically.
-6. Run focused tests, then adjacent regressions and `./.ktask/verify.sh`.
+5. Implement in the behavior's owning module, within the packet's `Files`. Work
+   that needs other files is a planning gap: report it instead of widening the task.
+6. Run focused tests and adjacent regressions. The acceptance hook runs
+   `./.ktask/verify.sh`; workers may run it earlier for diagnosis, but need not
+   duplicate a full-gate run solely for handoff.
 7. Run the required client/visual/integration/performance checks for affected features.
-8. Review the entire staged diff, including generated outputs and assets.
-9. Commit the coherent scope and report evidence, omissions and remaining risk.
+8. Review the entire diff, including generated outputs and assets: correctness,
+   placement, simplicity, scope, abstractions, isolation, test quality, comments
+   and performance. Refactor and repeat tests until no acceptance defects remain.
+9. Commit and push the coherent task scope to the authorized feature branch.
+   ktask checks remote synchronization, runs the full gate and obtains a fresh
+   independent smart-model review. Fix rejection findings with repair commits;
+   ktask advances only after acceptance. Outside ktask, obtain independent review
+   before delivery.
 
 Dirty unrelated work belongs to the user; preserve it. A failed or flaky test is
 evidence to investigate, not a reason to delete assertions, skip a check or retry
@@ -55,15 +89,25 @@ exercise contention. Do not expand a module boundary just to make a test conveni
 
 ## Feedback loop
 
+Acceptance checks must exercise a defined behavior and reliably distinguish success
+from failure. Do not build general-purpose source analyzers as prerequisites for
+gameplay. Use compiler/classpath boundaries, focused tests and actual client/server
+runs; review owns architecture properties those checks cannot prove. A faulty
+gate is corrected by a repairer or a dedicated integration packet: demonstrate the
+defect with a regression test and preserve the intended acceptance outcome.
+Never suppress a genuine failure, raise a limit or weaken requirements to get green.
+
 Pure tests cover rules and limits. Contract tests cover commands and invariants.
 Platform tests cover registry/data/save/network boundaries. GameTests exercise real
 Minecraft state. Client fixtures verify resource loading and visible behavior.
-Human review judges appearance, readability, feel and approved screenshot goldens.
-Automated comparison is regression evidence, not proof of artistic quality.
+The smart reviewer inspects actual client captures for appearance, readability,
+geometry and state transitions. Human feedback is an exception for product/feel
+decisions or genuinely unavailable observation, not the normal completion gate.
+Automated pixel comparison is regression evidence, not proof of artistic quality.
 
 Test mods and fixtures are development-only and must not enter the shipped JAR.
 Use isolated disposable worlds; no copying, deleting or rebuilding ordinary saves.
-No gameplay feature is done without automation or an explicit owner-approved
+No gameplay feature is done without automation or an explicitly approved
 human-only exception with a documented partial automated check.
 
 ## Content and integration
@@ -72,8 +116,9 @@ Names and IDs come from an approved catalog. Recipes, tags, translations,
 advancements and the guide must explain how players discover and use the feature.
 Use original biological art with provenance, deliberate UVs and readable silhouettes.
 Items for blocks should render their block models. Preserve vanilla relevance;
-bio-armor enchantment support is an open owner decision (see D012), not permission
-to remove enchantments or change ordinary vanilla equipment. Cross-mod behavior
+bio-equipment enchantments follow Armor Evolution. If supporting them introduces
+material complexity, bring evidence before deferring support. Do not change
+ordinary vanilla equipment. Cross-mod behavior
 belongs in optional adapters.
 
 FTB Quests is outside the mod's responsibility. Advancements remain required.
@@ -82,6 +127,14 @@ an explicit required/optional decision. See `DEPENDENCIES.md`.
 
 ## Delivery
 
-No automatic remote creation, pushes, releases, license grants or migration promises.
-The local authoritative gate is the same entry point future CI/ktask must call.
-Workers may not acknowledge human gates or turn proposals into approved decisions.
+Workers commit and push task changes to the configured feature branch. Independent
+acceptance follows; rejected candidates receive repair commits. No force pushes, merges
+to main, remote creation, public releases, license grants or migration promises.
+The authoritative gate is the same entry point CI/ktask call. Routine failures
+receive bounded strong-model repair and fresh review; exhausted engineering work
+reports the remaining defect honestly. Only new product choices, external
+authority and milestone gates require human input.
+
+Low-value comments are defects. Keep useful API/function/type contracts; remove
+narration, obsolete discussion and comments compensating for confusing code.
+Make the structure self-evident. Unrelated cleanup remains outside a task's scope.

@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/membrane_sheet",
+  "title": "Membrane Sheet",
+  "obtain": "Complete either cataloged Membrane Rack route with output space reserved.",
+  "use": "A Sheet is the retained flexible construction material. The leather route changes time, never output quantity.",
+  "assertion": "infestusfrontier_client:processing.membrane_sheet.guide"
+}

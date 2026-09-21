@@ -1,0 +1,3 @@
+{
+  "criteria": { "acquired": { "trigger": "minecraft:inventory_changed", "conditions": { "items": [{ "items": "infestusfrontier:processing/bone_loom" }] } } }
+}

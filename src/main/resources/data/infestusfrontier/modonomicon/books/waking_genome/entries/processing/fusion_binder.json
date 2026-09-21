@@ -1,0 +1,17 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.fusion_binder.name",
+  "description": "book.infestusfrontier.entry.fusion_binder.description",
+  "icon": "infestusfrontier:processing/fusion_binder",
+  "x": 2,
+  "y": 10,
+  "parents": [{ "entry": "infestusfrontier:processing/culture_bowl" }],
+  "condition": { "type": "modonomicon:or", "children": [
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/culture_bowl_batch" },
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/acquired/fusion_binder" }
+  ] },
+  "pages": [
+    { "type": "modonomicon:text", "title": "book.infestusfrontier.entry.fusion_binder.name", "text": "book.infestusfrontier.entry.fusion_binder.page.text" },
+    { "type": "infestusfrontier:bowl_recipe", "recipe": "I004" }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "item.infestusfrontier.processing.bone_plate",
+  "description": "book.infestusfrontier.entry.bone_loom.description",
+  "icon": "infestusfrontier:processing/bone_plate",
+  "x": 12,
+  "y": 10,
+  "parents": [{ "entry": "infestusfrontier:processing/bone_loom" }],
+  "condition": { "type": "modonomicon:or", "children": [
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/organ_bud" },
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/acquired/bone_plate" }
+  ] },
+  "pages": [{ "type": "infestusfrontier:preparation_recipe", "recipe": "I003", "route": 0 }]
+}

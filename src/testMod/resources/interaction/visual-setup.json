@@ -1,0 +1,11 @@
+{
+  "requires": "infestusfrontier_tests:interaction.synaptic_probe.use",
+  "commands": [
+    "item replace entity @a hotbar.6 with infestusfrontier:interaction/synaptic_probe"
+  ],
+  "captures": [
+    "culture-bowl-gui-scale-2.png",
+    "culture-bowl-gui-scale-3.png",
+    "culture-bowl-gui-scale-4.png"
+  ]
+}

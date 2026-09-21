@@ -1,0 +1,139 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "post": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_post"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "east": "false",
+        "south": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_single"
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_side",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_top",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_bottom",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_side",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_top",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_bottom",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_side",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_top",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_bottom",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_side",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_top",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/construction/membrane_window_bottom",
+        "y": 270
+      }
+    }
+  ]
+}
