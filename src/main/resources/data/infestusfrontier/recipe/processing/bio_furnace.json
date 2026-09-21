@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:furnace" },
+    { "item": "infestusfrontier:construction/organ_bud" },
+    { "item": "infestusfrontier:processing/membrane_sheet" },
+    { "item": "infestusfrontier:processing/membrane_sheet" }
+  ],
+  "result": { "id": "infestusfrontier:processing/bio_furnace", "count": 1 }
+}

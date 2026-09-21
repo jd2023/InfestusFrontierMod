@@ -33,10 +33,31 @@ import org.jd.infestusfrontier.testmod.kit.SaveReload;
 public final class BioFurnaceGameTests {
     private static final ResourceLocation FURNACE = id("processing/bio_furnace");
     private static final ResourceLocation BIOMASS_BUCKET = id("storage/biomass_bucket");
+    private static final ResourceLocation ORGAN_BUD = id("construction/organ_bud");
+    private static final ResourceLocation MEMBRANE_SHEET = id("processing/membrane_sheet");
 
     private static final ResourceLocation NEIGHBOR_PROBE = ResourceLocation.fromNamespaceAndPath(
             "infestusfrontier_tests", "bio_furnace_neighbor_probe");
     private static int neighborProbes;
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void exactRecipeCraftsOneBioFurnace(GameTestHelper helper) {
+        var output = craft(helper, FURNACE, java.util.List.of(new ItemStack(Items.FURNACE),
+                new ItemStack(item(ORGAN_BUD)), new ItemStack(item(MEMBRANE_SHEET), 2)));
+        helper.assertTrue(output.is(item(FURNACE)) && output.getCount() == 1,
+                "Bio-Furnace recipe produces exactly one Bio-Furnace");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void recipeWithOneSheetCraftsNothing(GameTestHelper helper) {
+        var recipe = craftingRecipe(helper, FURNACE);
+        var input = craftingInput(java.util.List.of(new ItemStack(Items.FURNACE), new ItemStack(item(ORGAN_BUD)),
+                new ItemStack(item(MEMBRANE_SHEET))));
+        helper.assertTrue(!recipe.matches(input, helper.getLevel()),
+                "Bio-Furnace recipe rejects a crafting grid with only one Membrane Sheet");
+        helper.succeed();
+    }
 
     @net.neoforged.bus.api.SubscribeEvent
     public static void registerNeighborProbe(net.neoforged.neoforge.registries.RegisterEvent event) {
@@ -892,6 +913,29 @@ public final class BioFurnaceGameTests {
         var ticker = entity.getBlockState().getTicker(entity.getLevel(), entity.getType());
         for (int tick = 0; tick < ticks; tick++) ((net.minecraft.world.level.block.entity.BlockEntityTicker) ticker)
                 .tick(entity.getLevel(), entity.getBlockPos(), entity.getBlockState(), entity);
+    }
+
+    private static ItemStack craft(GameTestHelper helper, ResourceLocation id, java.util.List<ItemStack> ingredients) {
+        var recipe = craftingRecipe(helper, id);
+        var input = craftingInput(ingredients);
+        helper.assertTrue(recipe.matches(input, helper.getLevel()), "Exact ingredients must match " + id);
+        return recipe.assemble(input, helper.getLevel().registryAccess());
+    }
+
+    private static net.minecraft.world.item.crafting.CraftingRecipe craftingRecipe(GameTestHelper helper, ResourceLocation id) {
+        var holder = helper.getLevel().getRecipeManager().byKey(id).orElseThrow();
+        helper.assertTrue(holder.value() instanceof net.minecraft.world.item.crafting.CraftingRecipe,
+                "Expected crafting recipe " + id);
+        return (net.minecraft.world.item.crafting.CraftingRecipe) holder.value();
+    }
+
+    private static net.minecraft.world.item.crafting.CraftingInput craftingInput(java.util.List<ItemStack> ingredients) {
+        var slots = new java.util.ArrayList<ItemStack>();
+        ingredients.forEach(stack -> {
+            for (int count = 0; count < stack.getCount(); count++) slots.add(stack.copyWithCount(1));
+        });
+        while (slots.size() < 9) slots.add(ItemStack.EMPTY);
+        return net.minecraft.world.item.crafting.CraftingInput.of(3, 3, slots);
     }
 
     private static net.minecraft.world.item.Item item(ResourceLocation id) {

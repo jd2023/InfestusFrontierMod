@@ -1,0 +1,7 @@
+{
+  "parent": "infestusfrontier:discovery/root",
+  "criteria": { "has_bud": { "trigger": "minecraft:inventory_changed", "conditions": { "items": [{ "items": "infestusfrontier:construction/organ_bud" }] } } },
+  "rewards": { "recipes": ["infestusfrontier:processing/bio_furnace"] },
+  "requirements": [["has_bud"]],
+  "sends_telemetry_event": false
+}
