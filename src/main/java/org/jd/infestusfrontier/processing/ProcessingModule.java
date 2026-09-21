@@ -27,8 +27,10 @@ public final class ProcessingModule {
     private final java.util.function.Supplier<BlockEntityType<CultureBowlEntity>> bowlEntity;
     private final java.util.function.Supplier<PreparationBlock> membraneRack;
     private final java.util.function.Supplier<PreparationBlock> boneLoom;
+    private final java.util.function.Supplier<BioFurnaceBlock> bioFurnace;
     private final java.util.function.Supplier<BlockEntityType<PreparationBlockEntity>> membraneRackEntity;
     private final java.util.function.Supplier<BlockEntityType<PreparationBlockEntity>> boneLoomEntity;
+    private final java.util.function.Supplier<BlockEntityType<BioFurnaceEntity>> bioFurnaceEntity;
     private final DiscoveryObserver discovery;
     public static final java.util.function.Supplier<MenuType<CultureBowlMenu>> BOWL_MENU = MENUS.register("processing/culture_bowl",
             () -> IMenuTypeExtension.create((id, inventory, buffer) -> new CultureBowlMenu(id, inventory,
@@ -43,8 +45,10 @@ public final class ProcessingModule {
         bowlEntity = entities.register("processing/culture_bowl", this::createBowlEntityType);
         membraneRack = blocks.register("processing/membrane_rack", this::createMembraneRack);
         boneLoom = blocks.register("processing/bone_loom", this::createBoneLoom);
+        bioFurnace = blocks.register("processing/bio_furnace", this::createBioFurnace);
         membraneRackEntity = entities.register("processing/membrane_rack", this::createMembraneRackEntity);
         boneLoomEntity = entities.register("processing/bone_loom", this::createBoneLoomEntity);
+        bioFurnaceEntity = entities.register("processing/bio_furnace", this::createBioFurnaceEntity);
     }
 
     private CultureBowlBlock createBowl() {
@@ -71,12 +75,22 @@ public final class ProcessingModule {
         return createPreparation(PreparationOrgan.BONE_LOOM, boneLoomEntity);
     }
 
+    private BioFurnaceBlock createBioFurnace() {
+        return new BioFurnaceBlock(BlockBehaviour.Properties.of().strength(1.0F).noOcclusion()
+                .sound(SoundType.BONE_BLOCK).pushReaction(PushReaction.BLOCK), bioFurnaceEntity);
+    }
+
     private BlockEntityType<PreparationBlockEntity> createMembraneRackEntity() {
         return createPreparationEntity(membraneRack, PreparationOrgan.MEMBRANE_RACK, membraneRackEntity);
     }
 
     private BlockEntityType<PreparationBlockEntity> createBoneLoomEntity() {
         return createPreparationEntity(boneLoom, PreparationOrgan.BONE_LOOM, boneLoomEntity);
+    }
+
+    private BlockEntityType<BioFurnaceEntity> createBioFurnaceEntity() {
+        return BlockEntityType.Builder.of(
+                (pos, state) -> new BioFurnaceEntity(pos, state, bioFurnaceEntity, discovery), bioFurnace.get()).build(null);
     }
 
     private BlockEntityType<PreparationBlockEntity> createPreparationEntity(
@@ -90,6 +104,7 @@ public final class ProcessingModule {
         items.register("processing/culture_bowl", () -> new CultureBowlItem(bowl.get(), new Item.Properties().stacksTo(1)));
         items.register("processing/membrane_rack", () -> new BlockItem(membraneRack.get(), new Item.Properties().stacksTo(1)));
         items.register("processing/bone_loom", () -> new BlockItem(boneLoom.get(), new Item.Properties().stacksTo(1)));
+        items.register("processing/bio_furnace", () -> new BlockItem(bioFurnace.get(), new Item.Properties().stacksTo(1)));
         items.register("processing/membrane_sheet", () -> new Item(new Item.Properties()));
         items.register("processing/bone_plate", () -> new Item(new Item.Properties()));
         for (String name : new String[] {"fusion_binder", "elastic_gel", "lumen_secretion", "nutrient_mash",
