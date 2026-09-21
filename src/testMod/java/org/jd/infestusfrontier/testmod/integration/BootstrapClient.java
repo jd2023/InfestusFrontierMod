@@ -219,6 +219,9 @@ public final class BootstrapClient {
     }
 
     private void disconnect(Minecraft minecraft) {
+        // Match PauseScreen: close and drain the transport before NeoForge resets
+        // registries during world teardown, while block updates may still arrive.
+        if (minecraft.level != null) minecraft.level.disconnect();
         minecraft.disconnect(new TitleScreen());
         LOGGER.info("INFESTUS_CLIENT_PLAY_EXIT");
         stage = Stage.STOP;
