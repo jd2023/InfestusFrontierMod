@@ -531,11 +531,14 @@ public final class ConstructionGameTests {
         helper.assertTrue(source.getChunkNow(chunkX + 1, chunkZ) == null, "Fixture eastern chunk must be absent");
         int loaded = source.getLoadedChunksCount();
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setYRot(-90.0F);
 
         for (var id : List.of(LIVING_SKIN, LIVING_SKIN_SLAB, LIVING_SKIN_STAIRS, LIVING_SKIN_COVERING, RIB_FRAME)) {
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(id), 2));
             var context = new net.minecraft.world.item.context.BlockPlaceContext(new UseOnContext(player,
                     InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
+            helper.assertTrue(context.getHorizontalDirection() == Direction.EAST,
+                    "Edge placement context must face the unloaded eastern chunk");
             var result = ((BlockItem) item(id)).place(context);
 
             helper.assertTrue(!result.consumesAction() && level.getBlockState(pos).isAir()
@@ -555,7 +558,7 @@ public final class ConstructionGameTests {
         int chunkZ = origin.getZ() >> 4;
         level.getChunk(chunkX, chunkZ);
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        player.setYRot(0.0F);
+        player.setYRot(-90.0F);
 
         int z = 8;
         for (var id : List.of(LIVING_SKIN, LIVING_SKIN_SLAB, LIVING_SKIN_STAIRS, LIVING_SKIN_COVERING, RIB_FRAME)) {
@@ -575,6 +578,38 @@ public final class ConstructionGameTests {
                         "Stairs must retain the facing from normal placement");
             }
         }
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void shellBlockStateComponentsDoNotRecurseAcrossChunkEdge(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var source = level.getChunkSource();
+        var origin = helper.absolutePos(BlockPos.ZERO);
+        int chunkX = (origin.getX() >> 4) + 240;
+        int chunkZ = origin.getZ() >> 4;
+        level.getChunk(chunkX, chunkZ);
+        var pos = new BlockPos(chunkX * 16 + 14, origin.getY() + 4, chunkZ * 16 + 8);
+        level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE, 0);
+        level.setBlock(pos.east(), block(LIVING_SKIN_STAIRS).defaultBlockState()
+                .setValue(net.minecraft.world.level.block.StairBlock.FACING, Direction.EAST), Block.UPDATE_KNOWN_SHAPE, 0);
+        helper.assertTrue(source.getChunkNow(chunkX + 1, chunkZ) == null, "Fixture eastern chunk must be absent");
+        int loaded = source.getLoadedChunksCount();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item(LIVING_SKIN_SLAB), 2));
+        player.getMainHandItem().set(net.minecraft.core.component.DataComponents.BLOCK_STATE,
+                new net.minecraft.world.item.component.BlockItemStateProperties(java.util.Map.of("type", "top")));
+        var context = new net.minecraft.world.item.context.BlockPlaceContext(new UseOnContext(player,
+                InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
+        var result = ((BlockItem) item(LIVING_SKIN_SLAB)).place(context);
+
+        helper.assertTrue(source.getLoadedChunksCount() == loaded && source.getChunkNow(chunkX + 1, chunkZ) == null,
+                "Shell block-state components must not recurse into the unloaded eastern chunk");
+        helper.assertTrue(result.consumesAction() && player.getMainHandItem().getCount() == 1
+                        && level.getBlockState(pos).is(block(LIVING_SKIN_SLAB))
+                        && level.getBlockState(pos).getValue(net.minecraft.world.level.block.SlabBlock.TYPE)
+                                == net.minecraft.world.level.block.state.properties.SlabType.TOP,
+                "Component placement must apply the top slab state and pay exactly one item");
         helper.succeed();
     }
 
