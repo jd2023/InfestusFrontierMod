@@ -61,11 +61,7 @@ final class BioFurnaceBlock extends BaseEntityBlock {
     @Override protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         var stack = new ItemStack(this);
         if (params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof BioFurnaceEntity furnace) {
-            var saved = furnace.saveWithId(params.getLevel().registryAccess());
-            // Copy only the fresh outer envelope. Opaque rejected data belongs to
-            // the recovery core and must never be cloned or mutated here.
-            stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY.update(tag ->
-                    saved.getAllKeys().forEach(key -> tag.put(key, saved.get(key)))));
+            stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(furnace.saveWithId(params.getLevel().registryAccess())));
         }
         return List.of(stack);
     }
