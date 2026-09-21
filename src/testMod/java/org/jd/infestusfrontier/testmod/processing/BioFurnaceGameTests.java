@@ -335,6 +335,73 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_experience_save")
+    public static void legacySaveWithoutExperienceRemainsUsable(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = place(helper, relative);
+        var player = player(helper);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 100);
+        var before = work(helper, pos).state();
+        var legacy = SaveReload.save(helper, relative);
+        legacy.getCompound("furnace").remove("experience");
+        var level = helper.getLevel();
+        level.removeBlockEntity(pos);
+        var reloaded = BlockEntity.loadStatic(pos, level.getBlockState(pos), legacy, level.registryAccess());
+        helper.assertTrue(reloaded != null, "Legacy save reloads a Bio-Furnace");
+        level.setBlockEntity(reloaded);
+        helper.assertTrue(before.equals(work(helper, pos).state()),
+                "Legacy save without experience restores its active batch and contents");
+        helper.assertTrue(experience(helper, pos) == 0, "Legacy experience starts at zero");
+        tick(helper, pos, 220);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.getMainHandItem().is(Items.IRON_INGOT)
+                        && player.getMainHandItem().getCount() == 1 && player.totalExperience == 0
+                        && experience(helper, pos) == 70,
+                "Legacy batch completes and its output can be collected with new fractional credit");
+        SaveReload.reload(helper, relative);
+        helper.assertTrue(experience(helper, pos) == 70, "Migrated experience survives another reload");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_experience_save")
+    public static void negativeExperienceIsRetainedAndLocksControls(GameTestHelper helper) {
+        assertInvalidExperienceIsRetainedAndLocked(helper, -1);
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_experience_save")
+    public static void overCapExperienceIsRetainedAndLocksControls(GameTestHelper helper) {
+        assertInvalidExperienceIsRetainedAndLocked(helper, 100_001);
+    }
+
+    private static void assertInvalidExperienceIsRetainedAndLocked(GameTestHelper helper, int invalid) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = place(helper, relative);
+        var player = player(helper);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 320);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 100);
+        helper.assertTrue(work(helper, pos).isActive()
+                        && work(helper, pos).state().quantities().itemSlots().get(1).count() == 1,
+                "Invalid XP fixture has collectible output and active work");
+        var hostile = SaveReload.save(helper, relative);
+        hostile.getCompound("furnace").putInt("experience", invalid);
+        var bytes = nbtBytes(hostile);
+        SaveReload.assertRetainsRejectedData(helper, relative, hostile);
+        assertLockedControls(helper, relative);
+        SaveReload.reload(helper, relative);
+        assertLockedControls(helper, relative);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.totalExperience == 0 && player.getMainHandItem().isEmpty(),
+                "Rejected experience never awards XP or output");
+        helper.assertTrue(java.util.Arrays.equals(bytes, nbtBytes(SaveReload.save(helper, relative))),
+                "Invalid experience bytes survive controls, ticks and reload unchanged");
+        helper.succeed();
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void rejectedSaveIsRetainedAndLocksControls(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
@@ -504,6 +571,7 @@ public final class BioFurnaceGameTests {
             var inventory = player.getInventory().save(new net.minecraft.nbt.ListTag());
             use(helper, pos, player, stacks[control]);
             helper.assertTrue(ItemStack.matches(held, player.getMainHandItem())
+                            && player.totalExperience == 0
                             && inventory.equals(player.getInventory().save(new net.minecraft.nbt.ListTag()))
                             && beforeWork.equals(work(helper, pos).state())
                             && java.util.Arrays.equals(beforeBytes, nbtBytes(SaveReload.save(helper, relative))),

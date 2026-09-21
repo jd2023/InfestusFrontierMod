@@ -85,6 +85,8 @@ final class BioFurnaceSave {
     }
 
     static int experience(CompoundTag tag) {
+        // Earlier schema-1 saves predate stored experience.
+        if (!tag.contains("experience")) return 0;
         int experience = integer(tag, "experience");
         if (experience < 0 || experience > EXPERIENCE_CAPACITY) {
             throw new IllegalArgumentException("Invalid Bio-Furnace experience");
