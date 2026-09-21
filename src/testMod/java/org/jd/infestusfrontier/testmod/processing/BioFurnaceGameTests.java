@@ -5,11 +5,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -20,6 +23,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.processing.api.BatchWork;
 import org.jd.infestusfrontier.testmod.kit.OffhandUse;
+import org.jd.infestusfrontier.testmod.kit.SaveReload;
 
 @net.neoforged.fml.common.EventBusSubscriber(modid = "infestusfrontier_tests", bus = net.neoforged.fml.common.EventBusSubscriber.Bus.MOD)
 @GameTestHolder("infestusfrontier_tests")
@@ -242,6 +246,108 @@ public final class BioFurnaceGameTests {
             player.setShiftKeyDown(false);
         }
         helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void activeBatchSurvivesReloadAndFinishes(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = place(helper, relative);
+        var player = player(helper);
+        use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+        tick(helper, pos, 100);
+        SaveReload.reload(helper, relative);
+        tick(helper, pos, 220);
+        helper.assertTrue(work(helper, pos).state().quantities().itemCount("minecraft:iron_ingot") == 1,
+                "A batch reloaded at tick 100 must finish at tick 320 total");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void rejectedSaveIsRetainedAndLocksControls(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = place(helper, relative);
+        var player = player(helper);
+        use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+        for (CompoundTag hostile : new CompoundTag[] {unsupportedSchema(helper, relative), oversizedItems(helper, relative), wrongBatchOutput(helper, relative)}) {
+            SaveReload.assertRetainsRejectedData(helper, relative, hostile);
+            var before = SaveReload.save(helper, relative);
+            use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+            helper.assertTrue(player.getMainHandItem().is(Items.RAW_IRON) && before.equals(SaveReload.save(helper, relative)),
+                    "A rejected furnace refuses every hand control without changing its retained data");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void breakAndReplaceCarriesOneCoreWithContents(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        var player = player(helper);
+        use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        var drops = Block.getDrops(helper.getLevel().getBlockState(pos), helper.getLevel(), pos,
+                helper.getLevel().getBlockEntity(pos));
+        helper.assertTrue(drops.size() == 1 && drops.getFirst().is(item(FURNACE))
+                        && drops.getFirst().has(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA),
+                "Breaking a furnace drops exactly one core carrying its block-entity data");
+        replace(helper, pos, player, drops.getFirst());
+        helper.assertTrue(work(helper, pos).state().quantities().itemCount("minecraft:raw_iron") == 1
+                        && work(helper, pos).state().quantities().fluidAmount("biomass") == 1_000,
+                "Replacing the single core restores both stored input and biomass");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void historySurvivesItemPlacement(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        var player = player(helper);
+        use(helper, pos, player, new ItemStack(Items.RAW_IRON));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+        tick(helper, pos, 320);
+        var drops = Block.getDrops(helper.getLevel().getBlockState(pos), helper.getLevel(), pos,
+                helper.getLevel().getBlockEntity(pos));
+        replace(helper, pos, player, drops.getFirst());
+        helper.assertTrue(work(helper, pos).state().history().completedBatches() == 1,
+                "Completed-batch history survives actual block-item placement");
+        helper.succeed();
+    }
+
+    private static CompoundTag unsupportedSchema(GameTestHelper helper, BlockPos relative) {
+        var hostile = SaveReload.save(helper, relative).copy();
+        var furnace = hostile.getCompound("furnace");
+        furnace.putInt("schema", 99);
+        hostile.put("furnace", furnace);
+        return hostile;
+    }
+
+    private static CompoundTag oversizedItems(GameTestHelper helper, BlockPos relative) {
+        var hostile = SaveReload.save(helper, relative).copy();
+        var furnace = hostile.getCompound("furnace");
+        var items = furnace.getList("items", Tag.TAG_COMPOUND);
+        items.add(new CompoundTag());
+        hostile.put("furnace", furnace);
+        return hostile;
+    }
+
+    private static CompoundTag wrongBatchOutput(GameTestHelper helper, BlockPos relative) {
+        var hostile = SaveReload.save(helper, relative).copy();
+        var furnace = hostile.getCompound("furnace");
+        var active = furnace.getCompound("active");
+        active.putString("output", "minecraft:diamond");
+        furnace.put("active", active);
+        hostile.put("furnace", furnace);
+        return hostile;
+    }
+
+    private static void replace(GameTestHelper helper, BlockPos pos, net.minecraft.server.level.ServerPlayer player, ItemStack core) {
+        helper.getLevel().removeBlock(pos, false);
+        player.setItemInHand(InteractionHand.MAIN_HAND, core);
+        item(FURNACE).useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
+                new BlockHitResult(Vec3.atCenterOf(pos.below()), Direction.UP, pos.below(), false)));
     }
 
     private static BatchWork fillOutputSlot(GameTestHelper helper, BlockPos pos) {

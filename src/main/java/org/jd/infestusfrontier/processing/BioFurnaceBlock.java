@@ -1,13 +1,16 @@
 package org.jd.infestusfrontier.processing;
 
 import com.mojang.serialization.MapCodec;
+import java.util.List;
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -15,6 +18,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 
 final class BioFurnaceBlock extends BaseEntityBlock {
@@ -51,5 +56,14 @@ final class BioFurnaceBlock extends BaseEntityBlock {
             furnace.interact(player, InteractionHand.MAIN_HAND);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        var stack = new ItemStack(this);
+        if (params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof BioFurnaceEntity furnace) {
+            stack.set(DataComponents.BLOCK_ENTITY_DATA,
+                    CustomData.of(furnace.saveWithId(params.getLevel().registryAccess())));
+        }
+        return List.of(stack);
     }
 }
