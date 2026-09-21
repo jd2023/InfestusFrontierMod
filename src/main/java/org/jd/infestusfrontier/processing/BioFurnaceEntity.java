@@ -17,6 +17,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -58,7 +59,10 @@ final class BioFurnaceEntity extends BlockEntity {
         if (level == null || level.isClientSide || rejected != null || !work.isActive()) return;
         var active = work.state().activeBatch();
         work.advance(1);
-        if (active != null && !work.isActive()) addExperience(experienceOf(active.recipeId()));
+        if (active != null && !work.isActive()) {
+            addExperience(experienceOf(active.recipeId()));
+            updateAppearance(false);
+        }
         setChanged();
     }
 
@@ -126,7 +130,17 @@ final class BioFurnaceEntity extends BlockEntity {
         var result = work.start(new BatchWork.StartRequest(input.resource()), work.revision());
         if (result instanceof BatchWork.Refused refused) message(player,
                 "refused." + refused.reason().name().toLowerCase(java.util.Locale.ROOT));
-        else message(player, "started");
+        else {
+            updateAppearance(true);
+            message(player, "started");
+        }
+    }
+
+    private void updateAppearance(boolean active) {
+        if (level != null && !level.isClientSide && getBlockState().getValue(BioFurnaceBlock.ACTIVE) != active) {
+            level.setBlock(worldPosition, getBlockState().setValue(BioFurnaceBlock.ACTIVE, active),
+                    Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE, 0);
+        }
     }
 
     private void collect(Player player, InteractionHand hand) {

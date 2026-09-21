@@ -1,0 +1,6 @@
+{
+  "parent": "infestusfrontier:block/processing/bio_furnace",
+  "textures": {
+    "front": "infestusfrontier:block/processing/bio_furnace_front_active"
+  }
+}

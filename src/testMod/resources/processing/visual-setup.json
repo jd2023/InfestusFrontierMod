@@ -13,14 +13,16 @@
     "fill 1 -61 2 3 -61 2 infestusfrontier:ecology/living_substrate",
     "setblock 1 -60 2 infestusfrontier:processing/membrane_rack",
     "setblock 3 -60 2 infestusfrontier:processing/bone_loom",
+    "fill 4 -61 4 6 -61 4 infestusfrontier:ecology/living_substrate",
+    "setblock 4 -60 4 infestusfrontier:processing/bio_furnace[facing=south,active=false]",
+    "setblock 6 -60 4 infestusfrontier:processing/bio_furnace[facing=south,active=true]",
+    "op FixturePlayer",
     "item replace entity @a inventory.1 with infestusfrontier:processing/membrane_sheet",
     "item replace entity @a inventory.3 with infestusfrontier:processing/bone_plate",
     "item replace entity @a inventory.6 with infestusfrontier:processing/char_gland_feed",
     "item replace entity @a inventory.7 with infestusfrontier:processing/skeletal_graft"
   ],
   "captures": [
-    "processing-bowls.png",
-    "processing-preparation.png",
     "preparation-items.png",
     "rack-guide-flesh.png",
     "rack-guide-leather.png",

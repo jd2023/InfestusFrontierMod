@@ -1,5 +1,12 @@
 {
   "variants": {
-    "": { "model": "infestusfrontier:block/processing/bio_furnace" }
+    "active=false,facing=north": { "model": "infestusfrontier:block/processing/bio_furnace" },
+    "active=false,facing=east": { "model": "infestusfrontier:block/processing/bio_furnace", "y": 90 },
+    "active=false,facing=south": { "model": "infestusfrontier:block/processing/bio_furnace", "y": 180 },
+    "active=false,facing=west": { "model": "infestusfrontier:block/processing/bio_furnace", "y": 270 },
+    "active=true,facing=north": { "model": "infestusfrontier:block/processing/bio_furnace_active" },
+    "active=true,facing=east": { "model": "infestusfrontier:block/processing/bio_furnace_active", "y": 90 },
+    "active=true,facing=south": { "model": "infestusfrontier:block/processing/bio_furnace_active", "y": 180 },
+    "active=true,facing=west": { "model": "infestusfrontier:block/processing/bio_furnace_active", "y": 270 }
   }
 }
