@@ -97,12 +97,14 @@ public final class BowlVisualScenario implements ContentVisualScenario {
             return false;
         }
         if (++cameraTicks < 8) return false;
+        game.options.hideGui = true;
         game.gui.getChat().clearMessages(false);
         game.gui.setOverlayMessage(net.minecraft.network.chat.Component.empty(), false);
         return true;
     }
     @Override public void finishView(Minecraft game, View view) {
         if (view.filename().equals("processing-bio-furnace-back.png")) {
+            game.options.hideGui = false;
             game.player.connection.sendUnsignedCommand("tp @s 0.5 -60 0.5");
         }
     }

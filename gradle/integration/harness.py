@@ -769,7 +769,7 @@ def visual_setup_captures(root, requirements):
 
 
 def _client_lifecycle(
-    s, server_command, client_command, server_dir, client_dir, output, port, setup_commands=(), observer_command=None, discovery=False, discovery_setup=()
+    s, server_command, client_command, server_dir, client_dir, output, port, setup_commands=(), observer_command=None, discovery=False, discovery_setup=(), captures=()
 ):
     if len(setup_commands) + len(discovery_setup) > 2 * MAX_SETUP_OWNERS * OWNER_SETUP_COMMANDS:
         raise HarnessFailure("excessive combined setup commands")
@@ -781,6 +781,7 @@ def _client_lifecycle(
     scratch.mkdir(exist_ok=True)
     env = os.environ | {
         "INFESTUS_CAPTURE_DIR": str(output),
+        "INFESTUS_CAPTURE_PLAN": ",".join(captures),
         "INFESTUS_SERVER": f"127.0.0.1:{port}",
         "TMPDIR": str(scratch),
     }
@@ -1072,6 +1073,7 @@ def run_client_scenario(
                 discovery=not fixture and "infestusfrontier_client:discovery.waking_genome.guide"
                     in (content_requirements or {}).get("client", []),
                 discovery_setup=() if fixture else _visual_setup(root, content_requirements, "survival-setup.json")[0],
+                captures=captures,
             )
     except Exception as exc:
         failure = str(exc)

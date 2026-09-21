@@ -73,8 +73,14 @@ public final class BootstrapClient {
                                 .map(view -> new UiCapture(scene, view))).toList();
                         var names = java.util.stream.Stream.concat(detailViews.stream().map(capture -> capture.view().filename()),
                                 uiCaptures.stream().map(capture -> capture.view().filename())).toList();
-                        if (names.size() > 29 || names.stream().distinct().count() != names.size()) {
-                            throw new IllegalStateException("Excessive or duplicate detail captures");
+                        // The harness validates fixed per-owner budgets before launch.
+                        // Require that exact plan here instead of a conflicting global allowance.
+                        String plan = environment("INFESTUS_CAPTURE_PLAN", "");
+                        var expected = plan.isEmpty() ? List.<String>of() : List.of(plan.split(","));
+                        if (names.stream().distinct().count() != names.size()
+                                || expected.stream().distinct().count() != expected.size()
+                                || names.size() != expected.size() || !names.containsAll(expected)) {
+                            throw new IllegalStateException("Missing, undeclared or duplicate detail captures");
                         }
                         stage = Stage.WORLD_RENDER;
                     }
