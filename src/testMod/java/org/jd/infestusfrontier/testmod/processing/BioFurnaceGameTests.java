@@ -40,6 +40,20 @@ public final class BioFurnaceGameTests {
             "infestusfrontier_tests", "bio_furnace_neighbor_probe");
     private static int neighborProbes;
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_scheduling")
+    public static void furnaceWorkTestsDoNotShareOtherOrgansCompletionBudget(GameTestHelper helper) {
+        // Manual work ticks do not advance the real server tick that owns the
+        // completion quota. Only crafting tests are safe in the shared batch.
+        for (var method : BioFurnaceGameTests.class.getDeclaredMethods()) {
+            var test = method.getAnnotation(GameTest.class);
+            if (test == null || method.getName().equals("exactRecipeCraftsOneBioFurnace")
+                    || method.getName().equals("recipeWithOneSheetCraftsNothing")) continue;
+            helper.assertTrue(test.batch().startsWith("bio_furnace_"),
+                    "Manual furnace fixtures must be isolated from other organs' completion budget: " + method.getName());
+        }
+        helper.succeed();
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void exactRecipeCraftsOneBioFurnace(GameTestHelper helper) {
         var output = craft(helper, FURNACE, java.util.List.of(new ItemStack(Items.FURNACE),
@@ -70,7 +84,9 @@ public final class BioFurnaceGameTests {
                 });
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    // These fixtures perform at most 13 completions in one real server tick,
+    // below the shared limit of 16, without competing with other organs.
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void updatesNeitherProbeNeighborsNorLoadChunks(GameTestHelper helper) {
         var edge = org.jd.infestusfrontier.testmod.kit.ChunkEdge.prepare(helper);
         var pos = edge.edge().west();
@@ -93,7 +109,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void smeltsRawIronInSixteenSecondsForFortyBiomass(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -114,7 +130,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void refusesNonSmeltableAndPassesItThrough(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -126,7 +142,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void refusalLeavesInputAndBiomassUnchanged(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -139,7 +155,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void bucketReturnsOnlyWhenAllThousandFits(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -154,7 +170,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void offhandPlacementPassesThrough(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
         place(helper, relative);
@@ -164,7 +180,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void idleFurnaceDoesNoWork(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -179,7 +195,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void mainHandPlacementPassesThrough(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -195,7 +211,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void fullInputNeverSpillsIntoOutput(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -215,7 +231,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void matchingOutputCannotReceiveHandFedInput(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -246,7 +262,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void componentBearingInputIsRefusedUnchanged(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -271,7 +287,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void activeBatchSurvivesReloadAndFinishes(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
         var pos = place(helper, relative);
@@ -287,7 +303,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void collectingAwardsStoredExperienceOnce(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -303,7 +319,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void fractionalExperienceCarriesOver(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -321,7 +337,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void experienceIsCappedAndNeverSpawnsOrbs(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
         var pos = place(helper, relative);
@@ -340,7 +356,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void experienceSurvivesReload(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
         var pos = place(helper, relative);
@@ -423,7 +439,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void rejectedSaveIsRetainedAndLocksControls(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
         var pos = place(helper, relative);
@@ -438,7 +454,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void unearnedFluidOutputIsRetainedAndLocked(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
         var pos = place(helper, relative);
@@ -463,7 +479,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void pendingAndRejectedDataIsNeverCloned(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
         var pos = place(helper, relative);
@@ -542,7 +558,7 @@ public final class BioFurnaceGameTests {
         }
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void rejectedControlsPreserveReadyAndCompletedState(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
         for (int fixture = 0; fixture < 3; fixture++) {
@@ -622,7 +638,7 @@ public final class BioFurnaceGameTests {
         }
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void breakAndReplaceCarriesOneCoreWithContents(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
@@ -640,7 +656,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_work")
     public static void historySurvivesItemPlacement(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
