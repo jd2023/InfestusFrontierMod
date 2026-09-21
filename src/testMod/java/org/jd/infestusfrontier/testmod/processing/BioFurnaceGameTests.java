@@ -496,7 +496,9 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    // Manual work ticks share one real server tick. Isolate these six completions
+    // from other recipe tests so the server-wide admission budget remains meaningful.
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_growth")
     public static void thirtySecondBatchOffersExactlyOneChoice(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         restoreHistory(helper, pos, 31);
@@ -515,7 +517,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_growth")
     public static void choiceCannotBeEarnedTwiceByReopeningBreakingOrReloading(GameTestHelper helper) {
         var relative = new BlockPos(1, 1, 1);
         var pos = place(helper, relative);
@@ -538,7 +540,7 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_growth")
     public static void speedChoiceShortensNextBatchToTwoHundredEightyEightTicks(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         restoreHistory(helper, pos, 31);
@@ -552,10 +554,18 @@ public final class BioFurnaceGameTests {
         startIronBatch(helper, pos, player);
         helper.assertTrue(work(helper, pos).state().activeBatch().requiredWorkUnits() == 288,
                 "One incubation choice reduces the next batch to 288 ticks");
+        tick(helper, pos, 287);
+        helper.assertTrue(work(helper, pos).isActive()
+                        && work(helper, pos).state().history().completedBatches() == 32,
+                "The speed-adjusted batch cannot complete before tick 288");
+        tick(helper, pos, 1);
+        helper.assertTrue(!work(helper, pos).isActive()
+                        && work(helper, pos).state().history().completedBatches() == 33,
+                "The speed-adjusted batch completes exactly once at tick 288");
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_growth")
     public static void economyChoiceCostsThirtySixBiomass(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         restoreHistory(helper, pos, 31);
@@ -573,14 +583,17 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_growth")
     public static void cancelledBatchEarnsNoHistory(GameTestHelper helper) {
         var pos = place(helper, new BlockPos(1, 1, 1));
         var player = player(helper);
         startIronBatch(helper, pos, player);
         tick(helper, pos, 100);
-        player.setShiftKeyDown(true);
-        use(helper, pos, player, new ItemStack(Items.STICK));
+        var work = work(helper, pos);
+        helper.assertTrue(work.cancel(work.revision()) == BatchWork.CancelResult.CANCELLED,
+                "Cancel the active batch through its work owner");
+        helper.assertTrue(!work(helper, pos).isActive(), "The batch must actually be cancelled");
+        tick(helper, pos, 320);
         helper.assertTrue(work(helper, pos).state().history().completedBatches() == 0,
                 "Cancelling an in-progress batch cannot earn history");
         helper.succeed();
