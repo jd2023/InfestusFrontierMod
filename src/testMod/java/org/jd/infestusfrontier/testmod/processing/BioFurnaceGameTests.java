@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -261,6 +263,75 @@ public final class BioFurnaceGameTests {
         tick(helper, pos, 220);
         helper.assertTrue(work(helper, pos).state().quantities().itemCount("minecraft:iron_ingot") == 1,
                 "A batch reloaded at tick 100 must finish at tick 320 total");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void collectingAwardsStoredExperienceOnce(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        var player = player(helper);
+        use(helper, pos, player, new ItemStack(Items.RAW_GOLD));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+        tick(helper, pos, 320);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.totalExperience == 1, "Collecting one gold ingot awards its one stored experience point");
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.totalExperience == 1, "Collecting an empty furnace cannot award stored experience twice");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void fractionalExperienceCarriesOver(GameTestHelper helper) {
+        var pos = place(helper, new BlockPos(1, 1, 1));
+        var player = player(helper);
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 320);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.totalExperience == 0, "One iron ingot's 0.7 experience remains stored as a fraction");
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 320);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.totalExperience == 1 && experience(helper, pos) == 40,
+                "Two iron ingots award one point and retain 40 hundredths");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void experienceIsCappedAndNeverSpawnsOrbs(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = place(helper, relative);
+        var player = player(helper);
+        var saved = SaveReload.save(helper, relative);
+        saved.getCompound("furnace").putInt("experience", 99_990);
+        helper.getLevel().getBlockEntity(pos).loadWithComponents(saved, helper.getLevel().registryAccess());
+        startIronBatch(helper, pos, player);
+        tick(helper, pos, 320);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.totalExperience == 1_000 && experience(helper, pos) == 0,
+                "Experience credit caps at 1000 points and is fully awarded on collection");
+        helper.assertTrue(helper.getLevel().getEntitiesOfClass(ExperienceOrb.class,
+                new AABB(pos).inflate(16)).isEmpty(), "Bio-Furnace collection never spawns experience orbs");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void experienceSurvivesReload(GameTestHelper helper) {
+        var relative = new BlockPos(1, 1, 1);
+        var pos = place(helper, relative);
+        var player = player(helper);
+        use(helper, pos, player, new ItemStack(Items.RAW_GOLD));
+        use(helper, pos, player, new ItemStack(item(BIOMASS_BUCKET)));
+        use(helper, pos, player, ItemStack.EMPTY);
+        tick(helper, pos, 320);
+        SaveReload.reload(helper, relative);
+        player.setShiftKeyDown(true);
+        use(helper, pos, player, ItemStack.EMPTY);
+        helper.assertTrue(player.totalExperience == 1, "Stored Bio-Furnace experience survives reload before collection");
         helper.succeed();
     }
 
@@ -711,6 +782,10 @@ public final class BioFurnaceGameTests {
         } catch (ReflectiveOperationException exception) {
             throw new AssertionError("Bio-Furnace work store is unavailable", exception);
         }
+    }
+
+    private static int experience(GameTestHelper helper, BlockPos pos) {
+        return SaveReload.save(helper, pos.subtract(helper.absolutePos(BlockPos.ZERO))).getCompound("furnace").getInt("experience");
     }
 
     private static BlockPos place(GameTestHelper helper, BlockPos relative) {

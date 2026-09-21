@@ -15,10 +15,12 @@ import org.jd.infestusfrontier.storage.api.QuantityStore;
 final class BioFurnaceSave {
     private static final int ITEM_SLOTS = 2;
     private static final int BIOMASS_CAPACITY = 2_000;
+    private static final int EXPERIENCE_CAPACITY = 100_000;
 
     static CompoundTag write(BatchWork.State state, BioFurnaceEntity furnace) {
         var tag = new CompoundTag();
         tag.putInt("schema", state.schema());
+        tag.putInt("experience", furnace.storedExperience());
         tag.putLong("revision", state.revision());
         tag.putLong("nextBatch", state.nextBatchId());
         var store = state.quantities();
@@ -51,6 +53,7 @@ final class BioFurnaceSave {
 
     static BatchWork.State read(CompoundTag tag, BioFurnaceEntity furnace) {
         if (integer(tag, "schema") != BatchWork.SNAPSHOT_SCHEMA) throw new IllegalArgumentException("Unsupported Bio-Furnace schema");
+        experience(tag);
         var items = readList(tag, "items", ITEM_SLOTS, saved -> itemStack(saved));
         var tanks = readList(tag, "fluids", 1, BioFurnaceSave::tank);
         if (items.size() != ITEM_SLOTS || tanks.size() != 1 || tanks.getFirst().capacity() != BIOMASS_CAPACITY
@@ -79,6 +82,14 @@ final class BioFurnaceSave {
                 active, store, history);
         BatchWork.restore(state, BioFurnaceRecipes.catalog(furnace::resultOf), furnace::admit);
         return state;
+    }
+
+    static int experience(CompoundTag tag) {
+        int experience = integer(tag, "experience");
+        if (experience < 0 || experience > EXPERIENCE_CAPACITY) {
+            throw new IllegalArgumentException("Invalid Bio-Furnace experience");
+        }
+        return experience;
     }
 
     private static QuantityStore.ItemSlot itemStack(CompoundTag tag) {

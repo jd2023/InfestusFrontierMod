@@ -33,7 +33,9 @@ final class BioFurnaceEntity extends BlockEntity {
     private static final int OUTPUT_SLOT = 1;
     private static final int ITEM_CAPACITY = 64;
     private static final int BIOMASS_CAPACITY = 2_000;
+    private static final int EXPERIENCE_CAPACITY = 100_000;
     private BatchWork work;
+    private int storedExperience;
     private final DiscoveryObserver discovery;
     // Opaque save payloads are retained by reference and never mutated here.
     // Cloning before validation would allocate in proportion to corrupt input.
@@ -54,7 +56,9 @@ final class BioFurnaceEntity extends BlockEntity {
 
     void tick() {
         if (level == null || level.isClientSide || rejected != null || !work.isActive()) return;
+        var active = work.state().activeBatch();
         work.advance(1);
+        if (active != null && !work.isActive()) addExperience(experienceOf(active.recipeId()));
         setChanged();
     }
 
@@ -131,6 +135,7 @@ final class BioFurnaceEntity extends BlockEntity {
             if (held.isEmpty()) continue;
             if (work.extractItemSlot(slot, work.revision())) {
                 player.setItemInHand(hand, new ItemStack(BioFurnaceResources.item(held.resource()), held.count()));
+                if (slot == OUTPUT_SLOT) awardExperience(player);
                 return;
             }
         }
@@ -151,6 +156,31 @@ final class BioFurnaceEntity extends BlockEntity {
                 .filter(result -> !result.isEmpty())
                 .map(result -> BuiltInRegistries.ITEM.getKey(result.getItem()).toString());
     }
+
+    private int experienceOf(String inputItemId) {
+        if (level == null || level.isClientSide) return 0;
+        var inputId = ResourceLocation.tryParse(inputItemId);
+        if (inputId == null) return 0;
+        var inputItem = BuiltInRegistries.ITEM.getOptional(inputId);
+        if (inputItem.isEmpty()) return 0;
+        var single = new SingleRecipeInput(new ItemStack(inputItem.get()));
+        return level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, single, level)
+                .map(holder -> (int) Math.min(EXPERIENCE_CAPACITY,
+                        Math.max(0L, Math.round(holder.value().getExperience() * 100.0F))))
+                .orElse(0);
+    }
+
+    private void addExperience(int experience) {
+        storedExperience = Math.min(EXPERIENCE_CAPACITY, storedExperience + experience);
+    }
+
+    private void awardExperience(Player player) {
+        int awarded = storedExperience / 100;
+        storedExperience %= 100;
+        if (awarded > 0) player.giveExperiencePoints(awarded);
+    }
+
+    int storedExperience() { return storedExperience; }
 
     private void message(Player player, String key) {
         player.displayClientMessage(Component.translatable("message.infestusfrontier.processing.bio_furnace." + key), false);
@@ -180,6 +210,7 @@ final class BioFurnaceEntity extends BlockEntity {
         try {
             var restored = BioFurnaceSave.read(saved, this);
             work = BatchWork.restore(restored, BioFurnaceRecipes.catalog(this::resultOf), this::admit);
+            storedExperience = BioFurnaceSave.experience(saved);
         } catch (RuntimeException exception) {
             rejected = saved;
         }
