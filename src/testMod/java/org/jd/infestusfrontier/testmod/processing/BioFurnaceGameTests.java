@@ -73,6 +73,34 @@ public final class BioFurnaceGameTests {
         helper.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "bio_furnace_unlock")
+    public static void holdingOrganBudUnlocksBioFurnaceRecipe(GameTestHelper helper) {
+        var player = new org.jd.infestusfrontier.testmod.integration.AdvancementRecordingPlayer(helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "BioFurnaceUnlock"));
+        player.setGameMode(GameType.SURVIVAL);
+        var advancement = id("recipes/processing/bio_furnace");
+        try {
+            helper.assertTrue(!player.getRecipeBook().contains(FURNACE),
+                    "A fresh player must not already know the Bio-Furnace recipe");
+            var sheet = new ItemStack(item(MEMBRANE_SHEET));
+            player.getInventory().setItem(0, sheet);
+            net.minecraft.advancements.CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), sheet);
+            helper.assertTrue(!player.wasAwarded(advancement) && !player.getRecipeBook().contains(FURNACE),
+                    "Holding a Membrane Sheet alone must not unlock the Bio-Furnace recipe");
+
+            var bud = new ItemStack(item(ORGAN_BUD));
+            player.setItemInHand(InteractionHand.MAIN_HAND, bud);
+            net.minecraft.advancements.CriteriaTriggers.INVENTORY_CHANGED.trigger(player, player.getInventory(), bud);
+            helper.assertTrue(player.wasAwarded(advancement),
+                    "Holding an Organ Bud must complete the Bio-Furnace inventory advancement");
+            helper.assertTrue(player.getRecipeBook().contains(FURNACE),
+                    "The Organ Bud advancement must reward the Bio-Furnace recipe");
+        } finally {
+            player.getAdvancements().stopListening();
+        }
+        helper.succeed();
+    }
+
     @net.neoforged.bus.api.SubscribeEvent
     public static void registerNeighborProbe(net.neoforged.neoforge.registries.RegisterEvent event) {
         event.register(net.minecraft.core.registries.Registries.BLOCK, NEIGHBOR_PROBE,
