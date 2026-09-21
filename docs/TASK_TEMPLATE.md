@@ -1,68 +1,56 @@
 # Implementation packet contract
 
-One packet is one reviewable behavior at one committed dependency checkpoint.
-Tasks are ordered; Depends lists accepted prerequisite IDs, not permission to
-reach into their internals. No research, architecture selection or human interview
-is an implementation task.
+Expensive models plan; a cheap model implements. A packet is ready only when a
+worker can finish it without making a design decision or reading a whole catalog.
 
-Required fields in `.ktask/tasks.md`:
+## Size
+
+One packet is one Kind and one outcome: at most about 12 files and 400 changed
+lines. If the title needs "and", split it. A content feature is a chain:
+
+| Kind | Contains | Evidence |
+|---|---|---|
+| rules | Pure `:core` types and JUnit tests; no Minecraft types | rules |
+| platform | Block, item, block entity, codec, menu wiring; GameTests; placeholder model allowed | game |
+| data | Recipes, tags, loot, translations and their GameTests | game |
+| art | Models, textures, blockstates, render type; the owner's `visual-setup.json` scene | visual |
+| complete | Guide entry, advancement or discovery step, `coverage.json` contribution and checkpoint advance | game, visual |
+| qualify | A scripted route or soak over accepted content; no new behavior | game |
+| repair | One reviewer finding or follow-up with its regression test | as needed |
+
+Only the `complete` packet owns the catalog IDs in `Blocks` and
+`.ktask/content-plan.json`, and advances `content-checkpoint.json` to its ID.
+Earlier packets of the chain use `Blocks: none`.
+
+## Fields
 
 | Field | Meaning |
 |---|---|
-| IF-nnn title | One observable implementation outcome |
-| Milestone | Playable checkpoint M0–M10, not a player tier |
-| Owner | Architecture module responsible for policy and state |
-| Depends | Earlier accepted packets; none only for the first task |
-| Spec | Existing authoritative files; Contract identifies the relevant entries |
-| Blocks | Primary ownership of catalog blocks; each in-scope entry occurs once |
-| Scope | Suggested starting paths/globs, not editing permissions |
-| Contract | Commands, state transitions, inputs/outputs and refusal behavior |
-| Red | Behavioral assertion that fails before implementation |
-| Accept | Observable success and adjacent regression outcomes |
-| Bounds | Hard work/state limits and overload behavior |
-| Evidence | Required kinds: rules, game, visual, integration, soak |
+| IF-nnn title | One observable outcome |
+| Milestone, Owner, Depends | As in ARCHITECTURE; Depends lists accepted packet IDs |
+| Blocks | Catalog block IDs completed here, or `none` |
+| Kind | One row of the table above |
+| Read | At most five exact files or catalog entries the worker needs |
+| Files | Exact files to create or modify, tests included. This is an allowlist |
+| Do | Numbered steps with exact type names, signatures, IDs and numbers |
+| Tests | Named tests written first, each with the assertion it makes |
+| Done | Exact commands that must pass |
+| Not | Adjacent behavior that belongs to another packet |
+| Bounds | Hard work and state limits |
+| Evidence | rules, game, visual, integration or soak |
 
-`.ktask/content-plan.json` assigns each in-scope item family and armor family/rank
-to one completing task; block ownership remains in Blocks. Requires names actual
-input IDs or named services and must resolve to the task or an accepted dependency.
-This file contains ownership and dependency edges, never recipe costs or prose.
-Keep it synchronized when splitting/reordering tasks. Planning and review check
-missing/duplicate obligations, unknown inputs and consumers preceding producers,
-including each recipe's real ingredients and installed services.
+The planner decides every name, number and interface before the packet enters
+the queue, reading the existing code so that `Do` matches real signatures. It
+consults `docs/REVIEW_CHECKLIST.md` and writes each applicable item as a `Tests`
+line. Common invariants (save/reload, break/replace, refusal leaves state
+unchanged) are written into the packet that owns them, not inherited silently.
 
-Scope hint `@module:name` means that module's core, platform, client, tests,
-data/assets and composition bridge. Campaign and qualification tasks may repair
-the production behavior or harness they exercise. Necessary code, test, harness,
-build, documentation and project-configuration repairs need no separate permission.
+## Milestones
 
-For each content packet, include its recipes/tags/translations, original readable
-assets, guide/advancement entries and discovery tests for the content actually
-introduced. Never register an empty placeholder to satisfy catalog coverage.
-Advance the shared tracked content-checkpoint.json to this packet's ID whenever
-it introduces content; never lower it or remove existing obligations.
-Extend the incremental coverage contributor created by IF-108 for every introduced
-entry: actual registry representation, obtainable recipe, useful operation and
-guide assertion. Before IF-004, owner guide data and assertions are staged and
-schema-checked; IF-004 activates actual client checks for all prior content.
-Obtain/use assertions run immediately. Catalog aliases and transaction-state rows map to their existing
-representation; they must not become duplicate items. Pure future-rank rule tests
-do not prove Survival obtainability; the producer task must add its real recipe
-and exercise the assembled route when its materials become available.
-Common requirements are inherited, not repeated as identical paragraphs per task:
-versioned save/reload, break/replacement, ownership/concurrency, full outputs,
-unloaded endpoints and invalid network input must preserve stated invariants.
-
-Tests cover public behavior and one meaningful negative case, then adjacent
-regressions. The authoritative gate is always `bash .ktask/verify.sh`; a task may
-repair faulty checks with regression evidence while preserving their intended
-acceptance outcomes. Client-visible changes require inspected captures;
-resource/process changes require conservation assertions; scalable work requires
-shared-budget contention and measured performance.
-Multi-behavior packets need independent success and refusal assertions for every
-behavior. Split them when those outcomes can be delivered separately. A stronger
-reviewer cannot compensate for an undefined implementation contract.
-
-Planning owns packet readiness, numerical baselines and initial design. Workers
-resolve engineering gaps and repair prerequisites within the current task.
-Reviewers require concrete corrections, not a separate permission round trip.
-Neither role may waive missing behavior or rewrite live queue progress.
+Packets are executable only down to the next `HUMAN:` gate. Entries below it in
+the old Contract/Red/Accept format are milestone outlines: inputs for the next
+planning session, never handed to a worker. At each gate the human playtests, a
+planning session triages `.ktask/logs/follow-ups.md`, expands the next milestone
+into packets, keeps `.ktask/content-plan.json` consistent, leaves `.ktask/`
+uncommitted, runs
+`bash .ktask/accept.sh --checkpoint`, and the human runs `ktask ack`.

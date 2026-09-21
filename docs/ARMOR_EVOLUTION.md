@@ -160,6 +160,9 @@ Protection and durability columns list helmet / chest / leggings / boots.
 | Netherite mesh | G4 | 2 / 6 / 5 / 2 | 330 / 480 / 450 / 390 | 1 | 13 |
 | Spatial weave | G4 | 2 / 5 / 4 / 2 | 264 / 384 / 360 / 312 | 0.5 | 14 |
 
+Every G1 piece starts with a 40 BU base fuel reserve, the same base the chest's C1
+Reservoir extends. Dormant pieces hold none. This is a proposed tuning value.
+
 Frame effects: Obsidian Scutes reduce blast knockback
 by 10% and grounded movement speed by 2% per piece (set limits 40% and 8%).
 Netherite Lamellae reduce hostile knockback by 5% per piece (20% per set).

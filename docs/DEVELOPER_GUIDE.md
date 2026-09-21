@@ -67,8 +67,8 @@ failure diagnostics, performance bounds and tests. Follow `ARCHITECTURE.md`.
 2. State the outcome, owning module, starting files, non-goals and adjacent risks.
 3. Discuss material server/client costs under `PERFORMANCE.md`.
 4. Write the smallest meaningful failing test; prove it detects the missing behavior.
-5. Implement and repair in each behavior's owning module. Scope paths are starting
-   points, not an allowlist; necessary cross-module repairs are part of the task.
+5. Implement in the behavior's owning module, within the packet's `Files`. Work
+   that needs other files is a planning gap: report it instead of widening the task.
 6. Run focused tests and adjacent regressions. The acceptance hook runs
    `./.ktask/verify.sh`; workers may run it earlier for diagnosis, but need not
    duplicate a full-gate run solely for handoff.
@@ -92,10 +92,10 @@ exercise contention. Do not expand a module boundary just to make a test conveni
 Acceptance checks must exercise a defined behavior and reliably distinguish success
 from failure. Do not build general-purpose source analyzers as prerequisites for
 gameplay. Use compiler/classpath boundaries, focused tests and actual client/server
-runs; review owns architecture properties those checks cannot prove. Removing or
-replacing a faulty gate is authorized engineering work: demonstrate its defect,
-preserve the intended acceptance outcome and review the correction independently.
-Never suppress a genuine failure or weaken requirements to get green.
+runs; review owns architecture properties those checks cannot prove. A faulty
+gate is corrected by a repairer or a dedicated integration packet: demonstrate the
+defect with a regression test and preserve the intended acceptance outcome.
+Never suppress a genuine failure, raise a limit or weaken requirements to get green.
 
 Pure tests cover rules and limits. Contract tests cover commands and invariants.
 Platform tests cover registry/data/save/network boundaries. GameTests exercise real
@@ -132,9 +132,8 @@ acceptance follows; rejected candidates receive repair commits. No force pushes,
 to main, remote creation, public releases, license grants or migration promises.
 The authoritative gate is the same entry point CI/ktask call. Routine failures
 receive bounded strong-model repair and fresh review; exhausted engineering work
-reports the remaining defect honestly. File boundaries and faulty infrastructure
-are not reasons to request coordinator permission or human intervention.
-Only new product choices or external authority require human input.
+reports the remaining defect honestly. Only new product choices, external
+authority and milestone gates require human input.
 
 Low-value comments are defects. Keep useful API/function/type contracts; remove
 narration, obsolete discussion and comments compensating for confusing code.

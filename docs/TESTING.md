@@ -8,8 +8,9 @@ reinterpret arbitrary log words as failures.
 Current layers:
 
 - `bash scripts/test_acceptance.sh`: isolated acceptance-hook checks with a stub
-  reviewer: approval, rejection, test failure, missing output and reviewer failure.
-  Run when changing the hook; it does not launch models or the project queue.
+  reviewer: approval, rejection, test failure, missing output, reviewer failure,
+  harness-owned baseline, earlier findings reaching the next round and follow-up
+  collection. Part of the gate; it does not launch models or the project queue.
 
 - `python3 scripts/check_design_docs.py --self-test` and its normal invocation:
   prerequisite grammar, unknown references/cycles, block and armor-family guide
@@ -33,6 +34,11 @@ Current layers:
   mod; checks the core contract across actual server ticks. Requires one test.
 - `runClient` / `runServer`: isolated normal development launch configurations.
   They do not silently copy saves, accept EULAs or alter the prototype.
+
+Disposable integration worlds live under `build/integration/runs`, a link into
+`/dev/shm` when it is writable. Minecraft fsyncs every region file at shutdown; on
+disk that reached 29 s of the 30 s shutdown limit at 76 GameTests, in memory 1 s.
+Never raise harness deadlines to absorb such growth: find the cost.
 
 ## Not established yet
 
