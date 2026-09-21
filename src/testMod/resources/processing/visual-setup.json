@@ -23,6 +23,10 @@
     "item replace entity @a inventory.7 with infestusfrontier:processing/skeletal_graft"
   ],
   "captures": [
+    "processing-bowls.png",
+    "processing-preparation.png",
+    "processing-bio-furnace-front.png",
+    "processing-bio-furnace-back.png",
     "preparation-items.png",
     "rack-guide-flesh.png",
     "rack-guide-leather.png",

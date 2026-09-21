@@ -76,9 +76,18 @@ public final class BowlVisualScenario implements ContentVisualScenario {
         settled = ready ? Math.min(8, settled + 1) : 0;
         return settled == 8;
     }
-    @Override public List<View> detailViews() { return List.of(new View("processing-bio-furnace-front.png", 180, 20),
+    @Override public List<View> detailViews() { return List.of(new View("processing-bowls.png", 32, 24),
+            new View("processing-preparation.png", -45, 24),
+            new View("processing-bio-furnace-front.png", 180, 20),
             new View("processing-bio-furnace-back.png", 0, 20)); }
     @Override public boolean prepareView(Minecraft game, View view) {
+        if (view.filename().equals("processing-bowls.png")) return true;
+        if (view.filename().equals("processing-preparation.png")) {
+            game.player.getInventory().selected = 6;
+            game.gui.getChat().clearMessages(false);
+            game.gui.setOverlayMessage(net.minecraft.network.chat.Component.empty(), false);
+            return true;
+        }
         double x = 5.5;
         double z = view.filename().equals("processing-bio-furnace-front.png") ? 7.5 : 0.5;
         if (!view.filename().equals(cameraView)) {
