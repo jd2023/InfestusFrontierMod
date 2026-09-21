@@ -18,7 +18,13 @@ MAX_LOG = 8 * 1024 * 1024
 
 
 
-def disposable_runs(base, memory=Path("/dev/shm")):
+def memory_root():
+    """INFESTUS_RUNS_MEMORY overrides the in-memory root; empty keeps runs on disk."""
+    configured = os.environ.get("INFESTUS_RUNS_MEMORY", "/dev/shm")
+    return Path(configured) if configured else None
+
+
+def disposable_runs(base, memory=None):
     """Keep disposable worlds in memory when possible.
 
     Minecraft fsyncs every region file on shutdown. On disk that cost grows with
@@ -32,7 +38,8 @@ def disposable_runs(base, memory=Path("/dev/shm")):
         Path(os.readlink(runs)).mkdir(parents=True, exist_ok=True)
         return runs
     runs.mkdir(exist_ok=True)
-    if (not memory.is_dir() or not os.access(memory, os.W_OK)
+    memory = memory_root() if memory is None else memory
+    if (memory is None or not memory.is_dir() or not os.access(memory, os.W_OK)
             or any((entry / "owner.json").exists() for entry in runs.iterdir())):
         return runs
     digest = hashlib.sha256(str(base.resolve()).encode()).hexdigest()[:16]
@@ -357,6 +364,10 @@ class Supervisor:
                 self.result_code = self.on_finished(
                     str(exc) if exc is not None else None
                 )
+            # Evidence was copied to the output directory; a reaped run leaves no
+            # world behind. An unreaped one keeps owner.json for the next invocation.
+            if self.cleanup_ok:
+                shutil.rmtree(self.run_dir, ignore_errors=True)
         finally:
             for sig, handler in self.old_handlers.items():
                 signal.signal(sig, handler)

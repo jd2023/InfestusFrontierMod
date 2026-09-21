@@ -9,6 +9,9 @@ import unittest
 from pathlib import Path
 from gradle.integration import harness
 
+# Unit tests use throwaway roots; keep their runs there so nothing outlives them.
+os.environ["INFESTUS_RUNS_MEMORY"] = ""
+
 
 class EvidenceCase(unittest.TestCase):
     @classmethod

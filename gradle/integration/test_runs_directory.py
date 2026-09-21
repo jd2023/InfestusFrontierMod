@@ -42,6 +42,13 @@ class DisposableRunsTest(unittest.TestCase):
             runs = disposable_runs(base, Path(raw) / "absent")
             self.assertTrue(runs.is_dir() and not runs.is_symlink())
 
+    def test_a_reaped_run_leaves_no_world_behind(self):
+        from gradle.integration.test_harness import harness
+        with tempfile.TemporaryDirectory() as raw:
+            output = Path(raw)
+            self.assertEqual(0, harness.run_fixture_scenario("positive", output))
+            self.assertEqual([], list((output / "build/integration/runs").iterdir()))
+
 
 if __name__ == "__main__":
     unittest.main()

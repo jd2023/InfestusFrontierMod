@@ -775,9 +775,14 @@ def _client_lifecycle(
         raise HarnessFailure("excessive combined setup commands")
     server = s.start("server", server_command, server_dir, output / "server.log")
     s.markers("readiness", s.limits["readiness"], [(server, "Done (")])
+    # xvfb-run cannot remove its temporary directory when it is killed on a
+    # deadline; keeping it inside the disposable run removes it with the run.
+    scratch = s.run_dir / "tmp"
+    scratch.mkdir(exist_ok=True)
     env = os.environ | {
         "INFESTUS_CAPTURE_DIR": str(output),
         "INFESTUS_SERVER": f"127.0.0.1:{port}",
+        "TMPDIR": str(scratch),
     }
     if observer_command:
         env.update(INFESTUS_PROBE_ROLE="owner", INFESTUS_COORDINATION=str(output))
