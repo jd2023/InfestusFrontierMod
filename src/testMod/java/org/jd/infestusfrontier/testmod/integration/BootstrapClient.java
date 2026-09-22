@@ -26,6 +26,8 @@ import org.jd.infestusfrontier.testmod.integration.client.ContentVisualScenario;
 /** Disposable-client automation used only by the integration harness. */
 @Mod(value = "infestusfrontier_client", dist = Dist.CLIENT)
 public final class BootstrapClient {
+    /** Derived from the harness budget: 32 captures for each of at most 32 owners. */
+    private static final int MAX_PLANNED_CAPTURES = 32 * 32;
     private static final Logger LOGGER = LogUtils.getLogger();
     private final Path captureDirectory = Path.of(environment("INFESTUS_CAPTURE_DIR", "build/integration/capture"));
     private final String address = environment("INFESTUS_SERVER", "127.0.0.1:25565");
@@ -73,10 +75,11 @@ public final class BootstrapClient {
                                 .map(view -> new UiCapture(scene, view))).toList();
                         var names = java.util.stream.Stream.concat(detailViews.stream().map(capture -> capture.view().filename()),
                                 uiCaptures.stream().map(capture -> capture.view().filename())).toList();
-                        // Match the harness plan without bypassing the client's aggregate budget.
+                        // The harness validates the plan against fixed per-owner budgets
+                        // (OWNER_SETUP_CAPTURES x MAX_SETUP_OWNERS); this ceiling mirrors it.
                         String plan = environment("INFESTUS_CAPTURE_PLAN", "");
                         var expected = plan.isEmpty() ? List.<String>of() : List.of(plan.split(","));
-                        if (names.size() > 29 || names.stream().distinct().count() != names.size()
+                        if (names.size() > MAX_PLANNED_CAPTURES || names.stream().distinct().count() != names.size()
                                 || expected.stream().distinct().count() != expected.size()
                                 || names.size() != expected.size() || !names.containsAll(expected)) {
                             throw new IllegalStateException("Excessive, missing, undeclared or duplicate detail captures");
