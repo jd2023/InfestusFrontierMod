@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ClientCapturePlanTest(unittest.TestCase):
-    def test_client_enforces_exact_manifest_and_existing_aggregate_budget(self):
+    def test_client_enforces_exact_manifest_and_derived_ceiling(self):
         source = (ROOT / 'src/testMod/java/org/jd/infestusfrontier/testmod/integration/BootstrapClient.java').read_text()
         start = source.index('                        var names =')
         end = source.index('                        stage = Stage.WORLD_RENDER;', start)
@@ -18,9 +18,12 @@ class ClientCapturePlanTest(unittest.TestCase):
         fixtures = [json.loads(path.read_text()) for path in
                     (ROOT / 'src/testMod/resources').glob('*/visual-setup.json')]
         expected = harness.visual_setup_captures(ROOT, {'gameTest': [f['requires'] for f in fixtures]})
+        ceiling = harness.OWNER_SETUP_CAPTURES * harness.MAX_SETUP_OWNERS
+        self.assertIn('MAX_PLANNED_CAPTURES = %d * %d;' % (harness.OWNER_SETUP_CAPTURES, harness.MAX_SETUP_OWNERS), source)
         program = '''
 import java.util.*;
 public class CapturePlanRegression {
+    static final int MAX_PLANNED_CAPTURES = CEILING;
     record View(String filename) {}
     record Capture(View view) {}
     static String manifest;
@@ -41,16 +44,14 @@ public class CapturePlanRegression {
         throw new AssertionError("Accepted missing, duplicate or undeclared capture: " + requested);
     }
     public static void main(String[] args) {
-        var completePlan = List.of(args);
-        if (completePlan.size() <= 29) throw new AssertionError("Fixture no longer exercises the budget conflict");
-        manifest = String.join(",", completePlan);
-        reject(completePlan);
-        var overBudget = completePlan.subList(0, 30);
-        manifest = String.join(",", overBudget);
-        reject(overBudget);
-        var expected = completePlan.subList(0, 29);
+        var expected = List.of(args);
         manifest = String.join(",", expected);
         check(expected);
+        var overCeiling = new ArrayList<String>();
+        for (int i = 0; i <= MAX_PLANNED_CAPTURES; i++) overCeiling.add("view-" + i + ".png");
+        manifest = String.join(",", overCeiling);
+        reject(overCeiling);
+        manifest = String.join(",", expected);
         var reverse = new ArrayList<>(expected);
         Collections.reverse(reverse);
         check(reverse);
@@ -69,7 +70,7 @@ public class CapturePlanRegression {
 '''
         with tempfile.TemporaryDirectory() as raw:
             path = Path(raw) / 'CapturePlanRegression.java'
-            path.write_text(program)
+            path.write_text(program.replace('CEILING', str(ceiling)))
             result = subprocess.run(['java', str(path), *expected], capture_output=True, text=True, timeout=15)
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
