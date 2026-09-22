@@ -11,12 +11,17 @@ lines. If the title needs "and", split it. A content feature is a chain:
 | Kind | Contains | Evidence |
 |---|---|---|
 | rules | Pure `:core` types and JUnit tests; no Minecraft types | rules |
-| platform | Block, item, block entity, codec, menu wiring; GameTests; placeholder model allowed | game |
+| platform | Block, item, block entity, codec, menu wiring, blockstate properties, capture scene code and `visual-setup.json`; GameTests; placeholder assets allowed | game |
 | data | Recipes, tags, loot, translations and their GameTests | game |
-| art | Models, textures, blockstates, render type; the owner's `visual-setup.json` scene | visual |
+| art | Textures, models, blockstates, item icons, CREDITS provenance. Assets only, never Java; made by the visual model | visual |
 | complete | Guide entry, advancement or discovery step, `coverage.json` contribution and checkpoint advance | game, visual |
 | qualify | A scripted route or soak over accepted content; no new behavior | game |
 | repair | One reviewer finding or follow-up with its regression test | as needed |
+
+Visual assets are a separate craft. The scene that photographs a feature is a
+platform packet and comes first, with placeholder assets; the art packet then
+replaces the assets and its review inspects the fresh captures. `.ktask/codex-by-kind`
+routes art packets to the visual model.
 
 Only the `complete` packet owns the catalog IDs in `Blocks` and
 `.ktask/content-plan.json`, and advances `content-checkpoint.json` to its ID.
