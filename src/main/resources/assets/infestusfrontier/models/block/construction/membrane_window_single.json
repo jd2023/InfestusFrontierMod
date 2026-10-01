@@ -1,0 +1,105 @@
+{
+  "textures": {
+    "particle": "infestusfrontier:block/construction/rib",
+    "rib": "infestusfrontier:block/construction/rib",
+    "pane": "infestusfrontier:block/construction/membrane"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        7.75
+      ],
+      "to": [
+        16,
+        16,
+        8.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pane"
+        },
+        "south": {
+          "texture": "#pane"
+        },
+        "east": {
+          "texture": "#pane"
+        },
+        "west": {
+          "texture": "#pane"
+        },
+        "up": {
+          "texture": "#pane"
+        },
+        "down": {
+          "texture": "#pane"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        7.25
+      ],
+      "to": [
+        0.75,
+        16,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rib"
+        },
+        "south": {
+          "texture": "#rib"
+        },
+        "east": {
+          "texture": "#rib"
+        },
+        "west": {
+          "texture": "#rib"
+        },
+        "up": {
+          "texture": "#rib"
+        },
+        "down": {
+          "texture": "#rib"
+        }
+      }
+    },
+    {
+      "from": [
+        15.25,
+        0,
+        7.25
+      ],
+      "to": [
+        16,
+        16,
+        8.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rib"
+        },
+        "south": {
+          "texture": "#rib"
+        },
+        "east": {
+          "texture": "#rib"
+        },
+        "west": {
+          "texture": "#rib"
+        },
+        "up": {
+          "texture": "#rib"
+        },
+        "down": {
+          "texture": "#rib"
+        }
+      }
+    }
+  ]
+}

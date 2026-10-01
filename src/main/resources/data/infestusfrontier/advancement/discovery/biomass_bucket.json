@@ -1,0 +1,22 @@
+{
+  "parent": "infestusfrontier:discovery/digestive_sac",
+  "criteria": {
+    "observed": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:storage/biomass_bucket"
+    },
+    "title": {
+      "translate": "book.infestusfrontier.entry.biomass_bucket.name"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.biomass_bucket.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.biomass_bladder.name",
+  "description": "book.infestusfrontier.entry.biomass_bladder.description",
+  "icon": "infestusfrontier:storage/biomass_bladder",
+  "x": 8,
+  "y": 5,
+  "parents": [
+    {
+      "entry": "infestusfrontier:construction/organ_bud"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/organ_bud"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/acquired/biomass_bladder"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "book.infestusfrontier.entry.biomass_bladder.name",
+      "text": "book.infestusfrontier.entry.biomass_bladder.page.text"
+    }
+  ]
+}

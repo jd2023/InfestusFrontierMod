@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/digestive_sac",
+  "title": "Digestive Sac",
+  "obtain": "Use one bowl on a rooted Organ Bud while carrying two rotten flesh.",
+  "use": "Feed one wheat or rotten flesh at a time. Wheat yields 100 BU in 2 loaded seconds; rotten flesh yields 50 BU in 8 loaded seconds. A batch starts only when all output fits.",
+  "assertion": "infestusfrontier_client:storage.digestive_sac.guide"
+}

@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/char_gland_feed",
+  "title": "Char Gland Feed",
+  "obtain": "In a Bowl, combine one charcoal, one Binder and 25 BU over 60 loaded seconds for one treatment.",
+  "use": "The treatment unlocks solid-fuel feeding on an eligible Bio-Furnace; operating fuel remains separate.",
+  "assertion": "infestusfrontier_client:processing.char_gland_feed.guide"
+}

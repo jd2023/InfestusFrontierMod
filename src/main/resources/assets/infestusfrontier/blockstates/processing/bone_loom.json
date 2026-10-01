@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "active=false": { "model": "infestusfrontier:block/processing/bone_loom" },
+    "active=true": { "model": "infestusfrontier:block/processing/bone_loom_active" }
+  }
+}

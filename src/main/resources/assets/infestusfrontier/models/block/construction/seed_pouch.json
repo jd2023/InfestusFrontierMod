@@ -1,0 +1,7 @@
+{
+  "textures": { "skin": "infestusfrontier:block/ecology/living_substrate_mature_0", "rib": "infestusfrontier:block/construction/rib", "particle": "infestusfrontier:block/ecology/living_substrate_mature_0" },
+  "elements": [
+    { "from": [2,0,2], "to": [14,9,14], "faces": { "north":{"texture":"#skin"}, "south":{"texture":"#skin"}, "east":{"texture":"#skin"}, "west":{"texture":"#skin"}, "up":{"texture":"#skin"}, "down":{"texture":"#skin"} } },
+    { "from": [1,8,1], "to": [15,11,15], "faces": { "north":{"texture":"#rib"}, "south":{"texture":"#rib"}, "east":{"texture":"#rib"}, "west":{"texture":"#rib"}, "up":{"texture":"#rib"}, "down":{"texture":"#rib"} } }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:construction/organ_bud",
+  "title": "Organ Bud",
+  "obtain": "Craft one Spore Culture, two rotten flesh and one bone meal into one placeable Organ Bud.",
+  "use": "Plant the dormant bud. A complete registered organ recipe can replace it in one paid use; incomplete or unavailable recipes change nothing.",
+  "assertion": "infestusfrontier_client:construction.organ_bud.guide"
+}

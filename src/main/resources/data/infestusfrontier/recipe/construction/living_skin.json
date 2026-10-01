@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    { "item": "infestusfrontier:processing/membrane_sheet" },
+    { "item": "minecraft:dirt" },
+    { "item": "infestusfrontier:construction/spore_culture" }
+  ],
+  "result": { "count": 4, "id": "infestusfrontier:construction/living_skin" }
+}

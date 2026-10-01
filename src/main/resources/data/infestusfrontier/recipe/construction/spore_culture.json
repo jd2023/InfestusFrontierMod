@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:rotten_flesh" },
+    { "item": "minecraft:red_mushroom" },
+    { "item": "minecraft:wheat_seeds" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "infestusfrontier:construction/spore_culture"
+  }
+}

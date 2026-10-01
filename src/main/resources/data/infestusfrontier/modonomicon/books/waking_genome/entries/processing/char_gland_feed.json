@@ -1,0 +1,17 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.char_gland_feed.name",
+  "description": "book.infestusfrontier.entry.char_gland_feed.description",
+  "icon": "infestusfrontier:processing/char_gland_feed",
+  "x": 6,
+  "y": 10,
+  "parents": [{ "entry": "infestusfrontier:processing/fusion_binder" }],
+  "condition": { "type": "modonomicon:or", "children": [
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/culture_bowl_batch" },
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/acquired/char_gland_feed" }
+  ] },
+  "pages": [
+    { "type": "modonomicon:text", "title": "book.infestusfrontier.entry.char_gland_feed.name", "text": "book.infestusfrontier.entry.char_gland_feed.page.text" },
+    { "type": "infestusfrontier:bowl_recipe", "recipe": "I029" }
+  ]
+}

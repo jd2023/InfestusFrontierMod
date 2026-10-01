@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "active=false": {"model": "infestusfrontier:block/processing/digestive_sac"},
+    "active=true": {"model": "infestusfrontier:block/processing/digestive_sac_active"}
+  }
+}

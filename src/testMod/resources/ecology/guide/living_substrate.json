@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:ecology/living_substrate",
+  "title": "Living Substrate",
+  "obtain": "Apply one Spore Culture to the visible face of a selected eligible dirt or Overworld host-stone block. The culture converts only that cell. One dirt and one Spore Culture can also craft a basic cell.",
+  "use": "Apply bone meal to the selected owned cell to grow it from basic to young, then mature. Dye changes its tissue pigment without changing maturity or ownership. Mature cells support later functional grafts.",
+  "assertion": "infestusfrontier_client:ecology.living_substrate.guide"
+}

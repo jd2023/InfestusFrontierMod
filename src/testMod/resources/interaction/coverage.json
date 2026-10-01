@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "owner": "interaction",
+  "contributions": [
+    {
+      "task": "IF-003",
+      "entries": [
+        {
+          "catalog": ["I010"],
+          "registry": ["infestusfrontier:interaction/synaptic_probe"],
+          "producer": "infestusfrontier:interaction/synaptic_probe",
+          "guide": "guide/synaptic_probe.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:interaction.synaptic_probe.obtain",
+            "use": "infestusfrontier_tests:interaction.synaptic_probe.use",
+            "guide": "infestusfrontier_client:interaction.synaptic_probe.guide"
+          }
+        }
+      ]
+    }
+  ]
+}

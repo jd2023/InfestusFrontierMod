@@ -1,0 +1,1 @@
+{ "parent":"minecraft:block/outer_stairs", "textures":{"bottom":"infestusfrontier:block/ecology/living_substrate_mature_0","top":"infestusfrontier:block/ecology/living_substrate_mature_0","side":"infestusfrontier:block/ecology/living_substrate_mature_0"} }

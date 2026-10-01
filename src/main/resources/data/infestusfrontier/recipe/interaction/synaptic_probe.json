@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "tools",
+  "ingredients": [
+    { "item": "minecraft:bone" },
+    { "item": "minecraft:slime_ball" },
+    { "item": "infestusfrontier:construction/spore_culture" }
+  ],
+  "result": {
+    "id": "infestusfrontier:interaction/synaptic_probe",
+    "count": 1
+  }
+}

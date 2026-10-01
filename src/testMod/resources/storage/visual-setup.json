@@ -1,0 +1,24 @@
+{
+  "requires": "infestusfrontier_tests:storage.biomass_bladder.use",
+  "commands": [
+    "fill -2 -61 -4 2 -61 -2 infestusfrontier:ecology/living_substrate",
+    "setblock -2 -60 -4 infestusfrontier:storage/biomass_bladder[fill=0]{bladder:{revision:0L,nextReservation:1L,items:[],tanks:[{resource:\"\",count:0,capacity:4000}],reservations:[]}}",
+    "setblock -1 -60 -4 infestusfrontier:storage/biomass_bladder[fill=1]{bladder:{revision:0L,nextReservation:1L,items:[],tanks:[{resource:\"biomass\",count:1000,capacity:4000}],reservations:[]}}",
+    "setblock 0 -60 -4 infestusfrontier:storage/biomass_bladder[fill=2]{bladder:{revision:0L,nextReservation:1L,items:[],tanks:[{resource:\"biomass\",count:2000,capacity:4000}],reservations:[]}}",
+    "setblock 1 -60 -4 infestusfrontier:storage/biomass_bladder[fill=3]{bladder:{revision:0L,nextReservation:1L,items:[],tanks:[{resource:\"biomass\",count:3000,capacity:4000}],reservations:[]}}",
+    "setblock 2 -60 -4 infestusfrontier:storage/biomass_bladder[fill=4]{bladder:{revision:0L,nextReservation:1L,items:[],tanks:[{resource:\"biomass\",count:4000,capacity:4000}],reservations:[]}}",
+    "setblock -1 -60 -2 infestusfrontier:processing/digestive_sac",
+    "setblock 1 -60 -2 infestusfrontier:processing/digestive_sac",
+    "item replace entity @a hotbar.7 with minecraft:rotten_flesh",
+    "item replace entity @a hotbar.8 with infestusfrontier:storage/biomass_bucket",
+    "fill 3 -61 0 3 -61 1 infestusfrontier:ecology/living_substrate",
+    "setblock 3 -60 0 infestusfrontier:processing/digestive_sac",
+    "setblock 3 -60 1 infestusfrontier:storage/biomass_bladder",
+    "item replace entity @a hotbar.5 with minecraft:cobblestone 4"
+  ],
+  "captures": [
+    "biomass-bladder-fill-levels.png",
+    "biomass-sac-active-and-bucket.png",
+    "biomass-building-interactions.png"
+  ]
+}

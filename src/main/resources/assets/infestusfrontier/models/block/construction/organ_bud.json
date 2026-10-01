@@ -1,0 +1,22 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "all": "infestusfrontier:block/organ_bud",
+    "particle": "infestusfrontier:block/organ_bud"
+  },
+  "elements": [
+    {
+      "from": [2, 0, 2],
+      "to": [14, 13, 14],
+      "faces": {
+        "down": { "texture": "#all", "cullface": "down" },
+        "up": { "texture": "#all" },
+        "north": { "texture": "#all" },
+        "south": { "texture": "#all" },
+        "west": { "texture": "#all" },
+        "east": { "texture": "#all" }
+      }
+    }
+  ]
+}

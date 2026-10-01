@@ -1,0 +1,11 @@
+{
+  "name": "book.infestusfrontier.waking_genome.name",
+  "description": "book.infestusfrontier.waking_genome.description",
+  "tooltip": "book.infestusfrontier.waking_genome.tooltip",
+  "display_mode": "node",
+  "generate_book_item": true,
+  "model": "modonomicon:modonomicon_green",
+  "auto_add_read_conditions": false,
+  "default_title_color": 5389346,
+  "default_text_color": 2105376
+}

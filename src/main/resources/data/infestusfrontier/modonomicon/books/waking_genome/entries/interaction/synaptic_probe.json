@@ -1,0 +1,33 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.synaptic_probe.name",
+  "description": "book.infestusfrontier.entry.synaptic_probe.description",
+  "icon": "infestusfrontier:interaction/synaptic_probe",
+  "x": -2,
+  "y": 4,
+  "parents": [
+    {
+      "entry": "infestusfrontier:construction/spore_culture"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/spore_culture"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:discovery/acquired/synaptic_probe"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:interaction/synaptic_probe",
+      "text": "book.infestusfrontier.entry.synaptic_probe.page.text"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.waking_genome.name",
+  "description": "book.infestusfrontier.entry.waking_genome.description",
+  "icon": "minecraft:book",
+  "x": 0,
+  "y": 0,
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "book.infestusfrontier.entry.waking_genome.page.title",
+      "text": "book.infestusfrontier.entry.waking_genome.page.text"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:discovery/waking_genome",
+      "text": "book.infestusfrontier.entry.waking_genome.recipe.text"
+    }
+  ]
+}

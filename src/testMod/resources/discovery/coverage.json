@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "owner": "discovery",
+  "contributions": [
+    {
+      "task": "IF-004",
+      "entries": [
+        {
+          "catalog": ["I009"],
+          "registry": ["modonomicon:modonomicon"],
+          "producer": "infestusfrontier:discovery/waking_genome",
+          "guide": "guide/waking_genome.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:discovery.waking_genome.obtain",
+            "use": "infestusfrontier_tests:discovery.waking_genome.use",
+            "guide": "infestusfrontier_client:discovery.waking_genome.guide"
+          }
+        }
+      ]
+    }
+  ]
+}

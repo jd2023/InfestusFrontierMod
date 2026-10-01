@@ -1,0 +1,6 @@
+{
+  "category":"infestusfrontier:contact", "name":"book.infestusfrontier.entry.rib_frame.name",
+  "description":"book.infestusfrontier.entry.rib_frame.description", "icon":"infestusfrontier:construction/rib_frame",
+  "x":5, "y":5, "parents":[{"entry":"infestusfrontier:construction/organ_bud"}],
+  "pages":[{"type":"modonomicon:crafting_recipe", "recipe_id_1":"infestusfrontier:construction/rib_frame", "text":"book.infestusfrontier.entry.rib_frame.page.text"}]
+}

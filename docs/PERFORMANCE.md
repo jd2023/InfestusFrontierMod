@@ -1,8 +1,7 @@
 # Performance and server safety
 
-Performance is correctness. Before scalable work is implemented, discuss its
-cost and worst-case failure with the owner. No production budget is inherited
-automatically from a successful small prototype.
+Performance is correctness. Discuss scalable systems' costs and worst-case
+failures before implementation.
 
 Every system must declare its work unit, admission scope (dimension/team/network),
 hard per-tick bound, loaded-block probes, maximum entities/geometry, persistent
@@ -15,8 +14,11 @@ stress/soak acceptance criteria. Distinguish tested bounds from measured TPS/FPS
   defense or refused insertion. Insert into bounded storage, retain a capped
   buffer and pause. Explicit player harvesting may return bounded stacks.
 - No implicit chunk loading for spread, routes, drones or dimension lookups.
-  Cross-dimensional endpoints and any explicit chunk loader need separate approval,
-  ownership, hard limits, upkeep, expiry and restart/removal tests.
+  Explicit Sail Roost loading follows the Block Catalog's paid-loading contract;
+  implement ownership, shared quotas, upkeep, expiry and restart/removal tests.
+  Cross-dimensional lookups do not inherit permission to create tickets. Measure
+  engine-loaded neighboring chunks as well as the requested ticking chunk; include
+  their memory/work costs in loader admission and soak tests.
 - No recursive flood fills, whole-world scans, position-keyed unbounded caches,
   ever-growing queues, unlimited inventories or attacker-sized NBT allocations.
 - Use shared admission budgets with bounded per-operation work. Rate limiting
@@ -30,7 +32,53 @@ stress/soak acceptance criteria. Distinguish tested bounds from measured TPS/FPS
 - Keep authoritative gameplay on the server. Clients cannot mint resources,
   select arbitrary targets, bypass ownership or supply trusted mutation results.
 
+## Sample collection and equipment recovery
+
+Sample collection is a death-event hook, not an ambient mob/item scan. Each death
+can offer one sample to one selected destination. At most 64 collection attempts
+per server tick; excess offers are discarded without extra drops. Containers use
+the finite species/quality counters in Items; never store a persistent kill log.
+Collector links are one explicit killer and one destination; revalidate loaded
+endpoints without discovering neighbors or requesting tickets. Core normal loot
+processing is unchanged. Deduplication is part of the one-death transaction, not
+an ever-growing UUID cache.
+
+Sample UI pages contain at most 16 species rows and 48 quality counts; send at
+most two changed pages per second per open viewer. Server validates filters and
+counts. At most four portable-supply transactions per wearer per second, subject
+to a server-wide 64-transaction/tick budget; defer excess, preserve source contents.
+Container schema/entry limits are validated before allocation, including malformed
+saves and client requests.
+
+Preservation examines at most four worn pieces on final death. Recall performs
+one loaded-endpoint lookup per piece, never a retry queue or chunk ticket.
+Death Bond retains at most one pending piece per equipment position per player.
+No counterpart remains in drops, a grave, equipped armor or a recall berth.
+Concurrent logout/respawn/server-stop paths must commit one authoritative outcome.
+
+Native factory calculations are resource budgets only. Implement shared loaded-
+cell/recipe admission and measure dense multi-dimension bases before claiming
+their production rates are attainable at server limits.
+
 ## Required adversarial cases
+
+Counter reduction, fusion and rescue must not duplicate points, items or charges
+across interruption, swapping, concurrent users or reload. Sleep may recharge
+rescue but must not erase learning; reducing counters must not undo symbiosis.
+
+Spill budgets include neighbor updates, organ destruction and secondary fluid
+release, not just the first fluid placement. Test multiple ruptures at admission
+limits, full catchments, seal removal, chunk boundaries and reload. No recursive
+failure cascade, item storm or offline damage catch-up.
+Automatic feeding/refueling checks only configured slots on a bounded cadence.
+Hunger damage needs one wearer cadence, not four independent damage timers.
+Test the one-heart floor with four hungry pieces, fractional health and simultaneous
+external damage; armor hunger cannot kill or heal, but external damage remains lethal.
+XP deposits and ritual withdrawals share one reserved balance. Test concurrent use,
+full stores, cancellation, player disconnect and cell removal without XP duplication.
+Mnemonic Vessels process explicit transfers only, with no ambient orb scans or drops.
+No item-wide decay ticker,
+recursive portable inventory, or flight-induced chunk loading is authorized.
 
 Full outputs; broken/split/merged structures; cycles; unloaded endpoints; restart
 with in-flight resources; corrupted/versioned saves; simultaneous players;

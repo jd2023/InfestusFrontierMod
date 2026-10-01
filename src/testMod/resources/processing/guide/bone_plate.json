@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/bone_plate",
+  "title": "Bone Plate",
+  "obtain": "Complete a Bone Loom batch with one bone, 50 BU and reserved output space.",
+  "use": "One batch retains exactly one structural Plate. Combine that Plate with Fusion Binder in the same Loom to grow a Skeletal Graft.",
+  "assertion": "infestusfrontier_client:processing.bone_plate.guide"
+}

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=bottom": {"model":"infestusfrontier:block/construction/living_skin_slab"},
+    "type=top": {"model":"infestusfrontier:block/construction/living_skin_slab_top"},
+    "type=double": {"model":"infestusfrontier:block/construction/living_skin"}
+  }
+}

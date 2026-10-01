@@ -1,0 +1,6 @@
+{
+  "category":"infestusfrontier:contact", "name":"book.infestusfrontier.entry.living_skin.name",
+  "description":"book.infestusfrontier.entry.living_skin.description", "icon":"infestusfrontier:construction/living_skin",
+  "x":4, "y":5, "parents":[{"entry":"infestusfrontier:construction/organ_bud"}],
+  "pages":[{"type":"modonomicon:crafting_recipe", "recipe_id_1":"infestusfrontier:construction/living_skin", "text":"book.infestusfrontier.entry.living_skin.page.text"}]
+}

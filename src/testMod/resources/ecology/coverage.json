@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "owner": "ecology",
+  "contributions": [
+    {
+      "task": "IF-005",
+      "entries": [
+        {
+          "catalog": ["T0-01"],
+          "registry": ["infestusfrontier:ecology/living_substrate"],
+          "producer": "infestusfrontier:ecology/living_substrate",
+          "guide": "guide/living_substrate.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:ecology.living_substrate.obtain",
+            "use": "infestusfrontier_tests:ecology.living_substrate.use",
+            "guide": "infestusfrontier_client:ecology.living_substrate.guide"
+          }
+        }
+      ]
+    }
+  ]
+}

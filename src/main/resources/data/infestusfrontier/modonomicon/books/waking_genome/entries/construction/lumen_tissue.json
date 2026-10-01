@@ -1,0 +1,6 @@
+{
+  "category":"infestusfrontier:contact", "name":"book.infestusfrontier.entry.lumen_tissue.name",
+  "description":"book.infestusfrontier.entry.lumen_tissue.description", "icon":"infestusfrontier:processing/lumen_secretion",
+  "x":7, "y":5, "parents":[{"entry":"infestusfrontier:ecology/living_substrate"}],
+  "pages":[{"type":"modonomicon:text", "title":"book.infestusfrontier.entry.lumen_tissue.name", "text":"book.infestusfrontier.entry.lumen_tissue.page.text"}]
+}

@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/nutrient_mash",
+  "title": "Nutrient Mash",
+  "obtain": "In a Bowl, incubate one wheat and one carrot with 100 mB water for two portions.",
+  "use": "Sneak-use an empty hand on the idle Bowl to collect a stored stack. This material is a preparation, not edible player food. It can be retained and retrieved without losing doses; further treatments unlock with their implemented organs.",
+  "assertion": "infestusfrontier_client:processing.nutrient_mash.guide"
+}

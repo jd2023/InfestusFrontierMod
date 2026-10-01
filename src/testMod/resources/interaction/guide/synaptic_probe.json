@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:interaction/synaptic_probe",
+  "title": "Synaptic Probe",
+  "obtain": "Craft one bone, one slime ball and one Spore Culture into a reusable Synaptic Probe.",
+  "use": "Use the Probe on your reachable Culture Bowl to inspect its slots, water, progress and refusal state. Choose a recipe, start or cancel it, and collect retained slots. The server owns every change.",
+  "assertion": "infestusfrontier_client:interaction.synaptic_probe.guide"
+}

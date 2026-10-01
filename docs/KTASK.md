@@ -1,33 +1,26 @@
-# ktask setup
+# Task execution
 
-Stable context, task prompt, configuration and HUMAN gates live in `.ktask/` and
-are version-controlled. Logs, queue artifacts and locks are ignored. The scaffold
-uses the local framework at `/home/etf/Projects/ktask`; it is not vendored or modified.
-Examples in axiotask/axiomd informed the workflow; their project-specific mandates
-(such as automatic pushes or licensing choices) are not imported here.
+Run `ktask resume`. ktask launches one worker per packet, in strict order, and
+owns the queue, reports, retries and timeouts. Configuration: `.ktask/config.toml`.
 
-Read-only inspection:
+1. Worker (cheap model) implements the packet from `.ktask/prompt.md`.
+2. `bash .ktask/accept.sh` runs the mod gate (`.ktask/verify.sh`, which also
+   replays every module's capture scene) and asks a read-only strong-model
+   reviewer using `.ktask/review.md`.
+3. On rejection the repairer (strong model, `.ktask/autoresolve.md`) fixes each
+   finding with a regression test. Up to six repair rounds follow.
 
-```bash
-/home/etf/Projects/ktask/ktask status
-```
+The reviewer has memory: `.ktask/logs/review-state/<task-id>/` keeps the baseline
+commit and every round's findings, and each new review receives them. Round two
+onward verifies earlier findings first and may not reopen unchanged code except
+for severe defects. Non-blocking remarks collect in `.ktask/logs/follow-ups.md`.
 
-No workers have been launched and no gate has been acknowledged. The queue starts
-with design review and then automation/first-slice approval. The configured executor
-is the runner's default, not an approved model choice or a cost recommendation.
-After approval, choose models according to risk and demonstrated gate strength.
+The baseline is the previously accepted HEAD, recorded by accept.sh. After any
+commit made outside a packet run `bash .ktask/accept.sh --checkpoint` so it is
+not attributed to the next packet.
 
-Important limitation: the inspected ktask runner can require structured reports,
-issue closure and remote mainline agreement; its report verification alone does
-**not independently execute our project test script**. The prompt mandates the
-gate, but that is not a hard execution guarantee. Before unattended implementation,
-add and test a project completion adapter that runs `.ktask/verify.sh` independently
-and checks required evidence/branch state. Do not call this bootstrap a hardened
-autonomous pipeline. Remote-mainline verification is off because feature-branch
-work must not silently push to main.
-
-Only queue tasks with approved outcomes, module/file boundaries, regression risks,
-explicit tests, performance budgets and human approvals. Use `TASK_TEMPLATE.md`.
-Product questions belong in a HUMAN gate or NEEDS_INPUT report, not remediation.
-Keep bounded remediation project-local; never install host tools, troubleshoot
-providers, weaken checks or invent policy to force a completion result.
+`HUMAN:` entries in `.ktask/tasks.md` are milestone gates; see
+`docs/TASK_TEMPLATE.md`. Nothing under `.ktask/` is ever committed by planners,
+workers or repairers: the queue, its status markers, prompts, configuration and
+logs are local working state. Never stash them either; a stash hides progress
+from ktask. Old `.ktask/session` files are unused historical evidence.

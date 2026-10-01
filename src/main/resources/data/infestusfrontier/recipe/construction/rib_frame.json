@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    { "item": "infestusfrontier:processing/bone_plate" },
+    { "item": "infestusfrontier:processing/bone_plate" },
+    { "item": "infestusfrontier:processing/membrane_sheet" }
+  ],
+  "result": { "count": 2, "id": "infestusfrontier:construction/rib_frame" }
+}

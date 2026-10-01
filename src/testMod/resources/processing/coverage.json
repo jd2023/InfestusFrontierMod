@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "owner": "processing",
+  "contributions": [
+    {
+      "task": "IF-002",
+      "entries": [
+        {
+          "catalog": [
+            "T0-02"
+          ],
+          "registry": [
+            "infestusfrontier:processing/culture_bowl"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/culture_bowl.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.culture_bowl.obtain",
+            "use": "infestusfrontier_tests:processing.culture_bowl.use",
+            "guide": "infestusfrontier_client:processing.culture_bowl.guide"
+          }
+        },
+        {
+          "catalog": [
+            "I005"
+          ],
+          "registry": [
+            "infestusfrontier:processing/elastic_gel"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/elastic_gel.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.elastic_gel.obtain",
+            "use": "infestusfrontier_tests:processing.elastic_gel.use",
+            "guide": "infestusfrontier_client:processing.elastic_gel.guide"
+          }
+        },
+        {
+          "catalog": [
+            "I007"
+          ],
+          "registry": [
+            "infestusfrontier:processing/nutrient_mash"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/nutrient_mash.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.nutrient_mash.obtain",
+            "use": "infestusfrontier_tests:processing.nutrient_mash.use",
+            "guide": "infestusfrontier_client:processing.nutrient_mash.guide"
+          }
+        },
+        {
+          "catalog": [
+            "I030"
+          ],
+          "registry": [
+            "infestusfrontier:processing/honey_culture"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/honey_culture.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.honey_culture.obtain",
+            "use": "infestusfrontier_tests:processing.honey_culture.use",
+            "guide": "infestusfrontier_client:processing.honey_culture.guide"
+          }
+        },
+        {
+          "catalog": [
+            "I033"
+          ],
+          "registry": [
+            "infestusfrontier:processing/rooting_gel"
+          ],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/rooting_gel.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.rooting_gel.obtain",
+            "use": "infestusfrontier_tests:processing.rooting_gel.use",
+            "guide": "infestusfrontier_client:processing.rooting_gel.guide"
+          }
+        }
+      ]
+    },
+    {
+      "task": "IF-007",
+      "entries": [
+        {
+          "catalog": ["T0-05"],
+          "registry": ["infestusfrontier:processing/membrane_rack"],
+          "producer": "infestusfrontier:processing/membrane_rack",
+          "guide": "guide/membrane_rack.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.membrane_rack.obtain",
+            "use": "infestusfrontier_tests:processing.membrane_rack.use",
+            "guide": "infestusfrontier_client:processing.membrane_rack.guide"
+          }
+        },
+        {
+          "catalog": ["I002"],
+          "registry": ["infestusfrontier:processing/membrane_sheet"],
+          "producer": "infestusfrontier:processing/membrane_rack",
+          "guide": "guide/membrane_sheet.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.membrane_sheet.obtain",
+            "use": "infestusfrontier_tests:processing.membrane_sheet.use",
+            "guide": "infestusfrontier_client:processing.membrane_sheet.guide"
+          }
+        },
+        {
+          "catalog": ["T0-06"],
+          "registry": ["infestusfrontier:processing/bone_loom"],
+          "producer": "infestusfrontier:processing/bone_loom",
+          "guide": "guide/bone_loom.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.bone_loom.obtain",
+            "use": "infestusfrontier_tests:processing.bone_loom.use",
+            "guide": "infestusfrontier_client:processing.bone_loom.guide"
+          }
+        },
+        {
+          "catalog": ["I003"],
+          "registry": ["infestusfrontier:processing/bone_plate"],
+          "producer": "infestusfrontier:processing/bone_loom",
+          "guide": "guide/bone_plate.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.bone_plate.obtain",
+            "use": "infestusfrontier_tests:processing.bone_plate.use",
+            "guide": "infestusfrontier_client:processing.bone_plate.guide"
+          }
+        }
+      ]
+    },
+    {
+      "task": "IF-096",
+      "entries": [
+        {
+          "catalog": ["I004"],
+          "registry": ["infestusfrontier:processing/fusion_binder"],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/fusion_binder.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.fusion_binder.obtain",
+            "use": "infestusfrontier_tests:processing.fusion_binder.use",
+            "guide": "infestusfrontier_client:processing.fusion_binder.guide"
+          }
+        },
+        {
+          "catalog": ["I006"],
+          "registry": ["infestusfrontier:processing/lumen_secretion"],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/lumen_secretion.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.lumen_secretion.obtain",
+            "use": "infestusfrontier_tests:processing.lumen_secretion.use",
+            "guide": "infestusfrontier_client:processing.lumen_secretion.guide"
+          }
+        },
+        {
+          "catalog": ["I029"],
+          "registry": ["infestusfrontier:processing/char_gland_feed"],
+          "producer": "infestusfrontier:processing/culture_bowl",
+          "guide": "guide/char_gland_feed.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.char_gland_feed.obtain",
+            "use": "infestusfrontier_tests:processing.char_gland_feed.use",
+            "guide": "infestusfrontier_client:processing.char_gland_feed.guide"
+          }
+        },
+        {
+          "catalog": ["I050"],
+          "registry": ["infestusfrontier:processing/skeletal_graft"],
+          "producer": "infestusfrontier:processing/bone_loom",
+          "guide": "guide/skeletal_graft.json",
+          "assertions": {
+            "obtain": "infestusfrontier_tests:processing.skeletal_graft.obtain",
+            "use": "infestusfrontier_tests:processing.skeletal_graft.use",
+            "guide": "infestusfrontier_client:processing.skeletal_graft.guide"
+          }
+        }
+      ]
+    }
+  ]
+}

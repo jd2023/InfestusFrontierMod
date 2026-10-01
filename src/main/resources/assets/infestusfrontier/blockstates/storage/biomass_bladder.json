@@ -1,0 +1,41 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "infestusfrontier:block/storage/biomass_bladder"
+      }
+    },
+    {
+      "when": {
+        "fill": "1"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/storage/biomass_bladder_1"
+      }
+    },
+    {
+      "when": {
+        "fill": "2"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/storage/biomass_bladder_2"
+      }
+    },
+    {
+      "when": {
+        "fill": "3"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/storage/biomass_bladder_3"
+      }
+    },
+    {
+      "when": {
+        "fill": "4"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/storage/biomass_bladder_4"
+      }
+    }
+  ]
+}

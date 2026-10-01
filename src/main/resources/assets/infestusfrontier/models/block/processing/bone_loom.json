@@ -1,0 +1,13 @@
+{
+  "textures": {
+    "body": "infestusfrontier:block/organ_bud",
+    "bone": "minecraft:block/bone_block_side",
+    "particle": "infestusfrontier:block/organ_bud"
+  },
+  "elements": [
+    { "from": [2,0,2], "to": [14,4,14], "faces": { "north":{"texture":"#body"},"south":{"texture":"#body"},"east":{"texture":"#body"},"west":{"texture":"#body"},"up":{"texture":"#body"},"down":{"texture":"#body"} } },
+    { "from": [3,4,3], "to": [5,12,13], "faces": { "north":{"texture":"#bone"},"south":{"texture":"#bone"},"east":{"texture":"#bone"},"west":{"texture":"#bone"},"up":{"texture":"#bone"},"down":{"texture":"#bone"} } },
+    { "from": [7,4,3], "to": [9,13,13], "faces": { "north":{"texture":"#bone"},"south":{"texture":"#bone"},"east":{"texture":"#bone"},"west":{"texture":"#bone"},"up":{"texture":"#bone"},"down":{"texture":"#bone"} } },
+    { "from": [11,4,3], "to": [13,12,13], "faces": { "north":{"texture":"#bone"},"south":{"texture":"#bone"},"east":{"texture":"#bone"},"west":{"texture":"#bone"},"up":{"texture":"#bone"},"down":{"texture":"#bone"} } }
+  ]
+}

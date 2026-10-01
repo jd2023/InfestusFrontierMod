@@ -3,13 +3,12 @@
 Production foundation for a biological progression and construction mod.
 **No production gameplay content is implemented yet.** Start with [VISION.md](VISION.md).
 
-This branch rebuilds the foundation on the tested Minecraft **1.21.1**, NeoForge
-**21.1.249**, Java **21**, Gradle **9.2.1**, ModDevGradle **2.0.146** toolchain.
-These are deliberate inherited pins, not a claim to use the newest releases.
+Toolchain: Minecraft **1.21.1**, NeoForge **21.1.249**, Java **21**,
+Gradle **9.2.1**, ModDevGradle **2.0.146**.
 
 ## Development
 
-Install Java 21, Git, Bash and ripgrep; first Gradle use requires dependency access.
+Install Java 21, Git, Bash, Python 3 and ripgrep; first Gradle use requires dependency access.
 Import the root Gradle project in your IDE. From this directory:
 
 ```bash
@@ -29,26 +28,38 @@ pure core, but not the development test mod or archived Forge content.
 
 ## Project map
 
-- [Vision](VISION.md): user commitments, proposed pillars, open questions.
-- [Progression map](docs/PROGRESSION_MAP.md): conceptual player ranks, alternative
-  routes, dimensional economies, equipment tradeoffs and the long-term horizon.
+- [Vision](VISION.md): gameplay principles.
+- **Start reading gameplay:** [Progression](docs/PROGRESSION_MAP.md), from hand-fed organs through dimensional production and storage.
+- [Open questions](docs/OPEN_QUESTIONS.md): the single register of unresolved decisions.
+- [Block catalog](docs/BLOCK_CATALOG.md): organs, structures and construction.
+- [Item catalog](docs/ITEM_CATALOG.md): ingredients, biological preparation and consumables.
+- [Substrate mutations](docs/LIVING_SUBSTRATE_MUTATIONS.md): growth, functions and reinforcement.
+- [Armor evolution](docs/ARMOR_EVOLUTION.md): permanent per-piece branches, counters and metabolism.
+- [Guide tree](docs/GUIDE_PROGRESSION_TREE.md): proposed page prerequisites and observable unlocks.
 - [Developer guide](docs/DEVELOPER_GUIDE.md): mandatory deep modularity and workflow.
 - [Performance](docs/PERFORMANCE.md): bounds, back-pressure and adversarial cases.
 - [Architecture](docs/ARCHITECTURE.md): module ownership and test-mod isolation.
-- [Decisions](docs/DECISIONS.md): accepted setup choices versus unresolved design.
-- [Dependencies](docs/DEPENDENCIES.md): active pins and feature-library candidates.
-- [Planning](docs/PLANNING.md): interviews and milestone readiness checklist.
+- [Dependencies](docs/DEPENDENCIES.md): active toolchain and selected feature libraries.
 - [Testing](docs/TESTING.md): current evidence and gates still to build.
-- [ktask](docs/KTASK.md): staged task automation; no workers have been launched.
+- [ktask](docs/KTASK.md): implementation queue, independent review and gated delivery.
 
-## Provenance and history
+## Licensing
 
-Repository: `https://github.com/jd2023/InfestusFrontierMod`.
-Foundation branch: `feature/production-foundation-vision`, based on main commit
-`772c5cbfb304b54e75e1eea180711a3bea0c71b9`.
-The old Forge 1.19.2 project is preserved under `legacy/forge-1.19.2`, excluded
-from the active Gradle build. Its files and original Git history remain available.
-The sibling `InfestusFrontierModV3` is an experimental reference, not production.
+Recommendation, not yet approved: **LGPL-3.0-only for code; CC BY-SA 4.0 for original
+art and other assets**. In practice:
 
-`LICENSE.txt` and `CREDITS.txt` are preserved from the repository. The old license
-file and metadata disagree; resolving source/asset licensing is a release gate.
+- Others can contribute, distribute the mod and continue it as a fork, including
+  commercially. A distributed modified version must retain notices and provide
+  the covered source under the license's terms. Independent code using its
+  interfaces can retain another license subject to LGPL's linking conditions.
+  [LGPL v3](https://opensource.org/license/lgpl-3-0)
+- Others can reuse or modify the art, including commercially, but must credit it,
+  identify changes and share distributed adaptations under compatible terms.
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+- For releases, include license texts, copyright/credit notices, corresponding
+  source access and asset provenance. Keep third-party material under its own terms.
+  These licenses allow reuse; they do not prevent copying or enforce themselves.
+
+The choice remains unapproved pending the interview. `LICENSE.txt` currently says
+CC BY 4.0; legacy metadata says All Rights Reserved. Their scope and contributor
+permissions must be reconciled before publication. License files remain unchanged.

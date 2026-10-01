@@ -1,0 +1,6 @@
+{
+  "category":"infestusfrontier:contact", "name":"book.infestusfrontier.entry.seed_pouch.name",
+  "description":"book.infestusfrontier.entry.seed_pouch.description", "icon":"infestusfrontier:construction/seed_pouch",
+  "x":5, "y":4, "parents":[{"entry":"infestusfrontier:construction/organ_bud"}],
+  "pages":[{"type":"modonomicon:crafting_recipe", "recipe_id_1":"infestusfrontier:construction/seed_pouch", "text":"book.infestusfrontier.entry.seed_pouch.page.text"}]
+}

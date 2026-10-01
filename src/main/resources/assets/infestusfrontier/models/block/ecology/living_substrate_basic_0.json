@@ -1,0 +1,4 @@
+{
+  "parent": "infestusfrontier:block/ecology/tinted_cube_all",
+  "textures": { "all": "infestusfrontier:block/ecology/living_substrate_basic_0" }
+}

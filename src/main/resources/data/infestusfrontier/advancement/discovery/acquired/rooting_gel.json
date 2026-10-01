@@ -1,0 +1,14 @@
+{
+  "criteria": {
+    "acquired": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "infestusfrontier:processing/rooting_gel"
+          }
+        ]
+      }
+    }
+  }
+}

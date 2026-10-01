@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "success": true,
+  "profile": "required",
+  "runtimeMods": {
+    "server": {
+      "minecraft": "1.21.1",
+      "neoforge": "21.1.249",
+      "infestusfrontier": "0.1.0-dev.1",
+      "modonomicon": "1.120.4",
+      "geckolib": "4.9.1"
+    }
+  },
+  "assertions": {"gameTest": true},
+  "children": []
+}

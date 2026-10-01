@@ -9,14 +9,104 @@ group = mod_group_id
 base { archivesName = mod_id }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-sourceSets { testMod }
+def supportedProfiles = ['required', 'jei', 'curios', 'combined'] as Set
+def requestedTasks = gradle.startParameter.taskNames.collect { it.tokenize(':').last() }
+def requestedProfile = providers.gradleProperty('modProfile').orElse('required').get()
+if (!supportedProfiles.contains(requestedProfile)) {
+    throw new GradleException("Invalid modProfile '${requestedProfile}'; expected required|jei|curios|combined")
+}
+def selectedProfile = 'verifyAll' in requestedTasks ? 'required' : requestedProfile
+ext.selectedIntegrationProfile = selectedProfile
+def omittedRequired = providers.gradleProperty('omitRequired').orElse('').get()
+if (omittedRequired && !['modonomicon', 'geckolib'].contains(omittedRequired)) {
+    throw new GradleException("Invalid omitRequired '${omittedRequired}'; expected modonomicon|geckolib")
+}
+if (omittedRequired && selectedProfile != 'required') {
+    throw new GradleException('omitRequired is only valid with modProfile=required')
+}
+if (omittedRequired && requestedTasks.any { it != 'profileSmoke' }) {
+    throw new GradleException('omitRequired is only valid for the profileSmoke negative fixture')
+}
+if ('captureClient' in requestedTasks && !providers.gradleProperty('captureDir').isPresent()) {
+    throw new GradleException('captureClient requires -PcaptureDir=<owned output directory>')
+}
+def selectedScenario = providers.gradleProperty('scenario').orElse('bootstrap').get()
+if (selectedScenario != 'bootstrap') {
+    throw new GradleException("Invalid scenario '${selectedScenario}'; expected bootstrap")
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://maven.theillusivec4.top' }
+    maven {
+        url = 'https://dl.cloudsmith.io/public/klikli-dev/mods/maven/'
+        content { includeGroup 'com.klikli_dev' }
+    }
+    maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven' }
+}
+
+sourceSets {
+    // ModDev keys development mod folders by source-set name. Mirror the isolated
+    // UI output under a distinct dev-only name so native runs load it with the mod.
+    devUi {
+        java.setSrcDirs([project(':ui').file('src/main/java')])
+        resources.setSrcDirs([project(':ui').file('src/main/resources')])
+    }
+    testMod {
+        java.exclude 'org/jd/infestusfrontier/testmod/integration/BootstrapClient.java'
+        java.exclude '**/client/**'
+        resources.exclude 'integration/client/**'
+        resources.exclude 'META-INF/services/org.jd.infestusfrontier.testmod.integration.client.*'
+    }
+    integrationClient {
+        java.srcDir 'src/testMod/java'
+        java.include 'org/jd/infestusfrontier/testmod/integration/BootstrapClient.java'
+        java.include 'org/jd/infestusfrontier/testmod/integration/ContentAssertion.java'
+        java.include 'org/jd/infestusfrontier/testmod/integration/ContentRequirements.java'
+        java.include 'org/jd/infestusfrontier/testmod/*/client/**'
+        resources.srcDir 'src/testMod/resources/integration/client'
+    }
+}
 configurations {
+    integrationClientImplementation.extendsFrom implementation
+    integrationClientRuntimeOnly.extendsFrom runtimeOnly
     testModImplementation.extendsFrom implementation
     testModRuntimeOnly.extendsFrom runtimeOnly
+    integrationInstaller
+    integrationModonomicon
+    integrationGeckolib
+    integrationJei
+    integrationCurios
 }
 dependencies {
     implementation project(':core')
+    implementation project(':ui')
+    compileOnly 'com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4'
     testModImplementation sourceSets.main.output
+    integrationClientImplementation sourceSets.main.output
+    integrationClientImplementation 'com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4'
+    if (omittedRequired != 'modonomicon') {
+        runtimeOnly 'com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4'
+    }
+    if (omittedRequired != 'geckolib') {
+        runtimeOnly 'software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.2'
+    }
+    integrationClientCompileOnly 'mezz.jei:jei-1.21.1-common-api:19.56.0.438'
+    compileOnly 'mezz.jei:jei-1.21.1-common-api:19.56.0.438'
+    compileOnly 'mezz.jei:jei-1.21.1-neoforge-api:19.56.0.438'
+    compileOnly('top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1:api') { transitive = false }
+    if (selectedProfile in ['jei', 'combined']) {
+        runtimeOnly 'mezz.jei:jei-1.21.1-neoforge:19.56.0.438'
+    }
+    if (selectedProfile in ['curios', 'combined']) {
+        runtimeOnly 'top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1'
+    }
+    integrationInstaller "net.neoforged:neoforge:${neo_version}:installer"
+    integrationModonomicon('com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4') { transitive = false }
+    integrationGeckolib('software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.2') { transitive = false }
+    integrationJei('mezz.jei:jei-1.21.1-neoforge:19.56.0.438') { transitive = false }
+    integrationCurios('top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1') { transitive = false }
 }
 
 neoForge {
@@ -26,12 +116,15 @@ neoForge {
         mappingsVersion = '2024.11.17'
     }
     addModdingDependenciesTo sourceSets.testMod
+    addModdingDependenciesTo sourceSets.integrationClient
     mods {
         infestusfrontier {
             sourceSet sourceSets.main
             sourceSet project(':core').sourceSets.main
+            sourceSet sourceSets.devUi
         }
         infestusfrontier_tests { sourceSet sourceSets.testMod }
+        infestusfrontier_client { sourceSet sourceSets.integrationClient }
     }
     runs {
         client {
@@ -53,6 +146,13 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', 'infestusfrontier_tests'
             systemProperty 'neoforge.gameTestServer.forceExit', 'false'
         }
+        integrationClient {
+            client()
+            sourceSet = sourceSets.integrationClient
+            gameDirectory = project.layout.buildDirectory.dir('integration/runs/client').get().asFile
+            loadedMods = [mods.infestusfrontier, mods.infestusfrontier_client]
+            programArguments.addAll '--username', 'FixturePlayer', '--uuid', '11111111-1111-1111-1111-111111111111', '--width', '1280', '--height', '720'
+        }
     }
 }
 
@@ -67,6 +167,7 @@ neoForge.ideSyncTask metadata
 
 tasks.named('jar', Jar) {
     from project(':core').sourceSets.main.output
+    from project(':ui').sourceSets.main.output
     preserveFileTimestamps = false
     reproducibleFileOrder = true
 }
@@ -78,7 +179,8 @@ abstract class VerifyDistribution extends DefaultTask {
         new java.util.zip.ZipFile(artifact.get().asFile).withCloseable { jar ->
             for (String required : ['META-INF/neoforge.mods.toml',
                     'org/jd/infestusfrontier/InfestusFrontier.class',
-                    'org/jd/infestusfrontier/foundation/TickQuota.class']) {
+                    'org/jd/infestusfrontier/foundation/TickQuota.class',
+                    'org/jd/infestusfrontier/ui/OrganScreenLayout.class']) {
                 if (jar.getEntry(required) == null) throw new GradleException("Missing runtime entry: $required")
             }
             jar.entries().each { entry ->
@@ -103,8 +205,36 @@ def prepareGameTest = tasks.register('prepareGameTest', Copy) {
 }
 tasks.named('runGameTestServer') { dependsOn prepareGameTest }
 tasks.named('runGameTestServer') { mustRunAfter ':core:test', distribution }
+def contentCoverageOutput = layout.buildDirectory.file('content-coverage/requirements.json')
+def requestedContentThrough = providers.gradleProperty('contentThrough').orNull
+def checkContentCoverage = tasks.register('checkContentCoverage', Exec) {
+    group = 'verification'
+    description = 'Validates working-tree catalog coverage and emits runtime assertion requirements.'
+    inputs.file '.ktask/tasks.md'
+    inputs.file '.ktask/content-plan.json'
+    inputs.file 'scripts/check_content_coverage.py'
+    inputs.file 'src/testMod/resources/content-checkpoint.json'
+    inputs.files(fileTree('src/testMod/resources') { include '**/coverage.json', '*/guide/*.json' })
+    inputs.property 'contentThrough', requestedContentThrough ?: ''
+    outputs.file contentCoverageOutput
+    def command = ['python3', file('scripts/check_content_coverage.py').absolutePath,
+                   '--output', contentCoverageOutput.get().asFile.absolutePath]
+    if (requestedContentThrough) command += ['--through', requestedContentThrough]
+    commandLine command
+}
+tasks.named('processTestModResources') {
+    dependsOn checkContentCoverage
+    from(contentCoverageOutput) { rename { 'content-requirements.json' } }
+}
+tasks.named('processIntegrationClientResources') {
+    dependsOn checkContentCoverage
+    from(contentCoverageOutput) { rename { 'content-requirements.json' } }
+    from('src/testMod/resources') { include 'META-INF/services/**', '*/guide/*.json' }
+}
 tasks.register('verifyAll') {
     group = 'verification'
     description = 'Authoritative bootstrap gate: pure tests, production JAR contracts, isolated Minecraft GameTests.'
-    dependsOn ':core:check', tasks.named('build'), distribution, tasks.named('runGameTestServer')
+    dependsOn ':core:check', ':ui:check', tasks.named('build'), distribution, checkContentCoverage
 }
+
+apply from: 'gradle/integration/bootstrap.gradle'

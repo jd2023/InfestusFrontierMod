@@ -1,0 +1,7 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="Development-only automation; see repository LICENSE.txt"
+[[mods]]
+modId="infestusfrontier_client"
+version="1.0.0"
+displayName="Infestus Frontier disposable client"

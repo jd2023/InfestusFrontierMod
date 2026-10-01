@@ -1,0 +1,17 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.skeletal_graft.name",
+  "description": "book.infestusfrontier.entry.skeletal_graft.description",
+  "icon": "infestusfrontier:processing/skeletal_graft",
+  "x": 14,
+  "y": 10,
+  "parents": [{ "entry": "infestusfrontier:processing/bone_loom" }],
+  "condition": { "type": "modonomicon:or", "children": [
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/culture_bowl_batch" },
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/acquired/skeletal_graft" }
+  ] },
+  "pages": [
+    { "type": "modonomicon:text", "title": "book.infestusfrontier.entry.skeletal_graft.name", "text": "book.infestusfrontier.entry.skeletal_graft.page.text" },
+    { "type": "infestusfrontier:preparation_recipe", "recipe": "I050", "route": 0 }
+  ]
+}

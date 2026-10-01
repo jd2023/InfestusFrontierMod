@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/bone_loom",
+  "title": "Bone Loom",
+  "obtain": "Craft one Organ Bud, two bones and two sticks into one Loom; place it on Living Substrate.",
+  "use": "Load one bone and 50 BU, then start one 20-loaded-second batch. Bone blocks are not a recipe and never yield nine bones here.",
+  "assertion": "infestusfrontier_client:processing.bone_loom.guide"
+}

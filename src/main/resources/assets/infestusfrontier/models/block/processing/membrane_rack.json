@@ -1,0 +1,14 @@
+{
+  "textures": {
+    "bone": "minecraft:block/bone_block_side",
+    "membrane": "infestusfrontier:item/membrane_sheet",
+    "particle": "infestusfrontier:item/membrane_sheet"
+  },
+  "elements": [
+    { "from": [1,0,3], "to": [3,14,5], "faces": { "north":{"texture":"#bone"},"south":{"texture":"#bone"},"east":{"texture":"#bone"},"west":{"texture":"#bone"},"up":{"texture":"#bone"},"down":{"texture":"#bone"} } },
+    { "from": [13,0,3], "to": [15,14,5], "faces": { "north":{"texture":"#bone"},"south":{"texture":"#bone"},"east":{"texture":"#bone"},"west":{"texture":"#bone"},"up":{"texture":"#bone"},"down":{"texture":"#bone"} } },
+    { "from": [1,0,11], "to": [3,14,13], "faces": { "north":{"texture":"#bone"},"south":{"texture":"#bone"},"east":{"texture":"#bone"},"west":{"texture":"#bone"},"up":{"texture":"#bone"},"down":{"texture":"#bone"} } },
+    { "from": [13,0,11], "to": [15,14,13], "faces": { "north":{"texture":"#bone"},"south":{"texture":"#bone"},"east":{"texture":"#bone"},"west":{"texture":"#bone"},"up":{"texture":"#bone"},"down":{"texture":"#bone"} } },
+    { "from": [2,9,4], "to": [14,10,12], "faces": { "north":{"texture":"#membrane"},"south":{"texture":"#membrane"},"east":{"texture":"#membrane"},"west":{"texture":"#membrane"},"up":{"texture":"#membrane"},"down":{"texture":"#membrane"} } }
+  ]
+}

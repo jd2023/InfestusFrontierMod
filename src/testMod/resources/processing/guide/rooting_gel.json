@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entry": "infestusfrontier:processing/rooting_gel",
+  "title": "Rooting Gel",
+  "obtain": "In a Bowl, incubate one wheat seed and one Spore Culture with 50 mB water for two doses.",
+  "use": "Sneak-use an empty hand on the idle Bowl to collect a stored stack. This material is a preparation, not edible player food. It can be retained and retrieved without losing doses; further treatments unlock with their implemented organs.",
+  "assertion": "infestusfrontier_client:processing.rooting_gel.guide"
+}

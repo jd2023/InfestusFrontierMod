@@ -1,0 +1,5 @@
+{
+  "type":"minecraft:crafting_shaped", "category":"building",
+  "pattern":["SSS"], "key":{"S":{"item":"infestusfrontier:construction/living_skin"}},
+  "result":{"count":6,"id":"infestusfrontier:construction/living_skin_slab"}
+}

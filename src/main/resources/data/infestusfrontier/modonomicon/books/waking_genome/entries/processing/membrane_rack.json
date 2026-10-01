@@ -1,0 +1,18 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "book.infestusfrontier.entry.membrane_rack.name",
+  "description": "book.infestusfrontier.entry.membrane_rack.description",
+  "icon": "infestusfrontier:processing/membrane_rack",
+  "x": 10,
+  "y": 6,
+  "parents": [{ "entry": "infestusfrontier:construction/organ_bud" }],
+  "condition": { "type": "modonomicon:or", "children": [
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/organ_bud" },
+    { "type": "modonomicon:advancement", "advancement_id": "infestusfrontier:discovery/acquired/membrane_rack" }
+  ] },
+  "pages": [
+    { "type": "modonomicon:crafting_recipe", "recipe_id_1": "infestusfrontier:processing/membrane_rack", "text": "book.infestusfrontier.entry.membrane_rack.controls.text" },
+    { "type": "infestusfrontier:preparation_recipe", "recipe": "I002", "route": 0 },
+    { "type": "infestusfrontier:preparation_recipe", "recipe": "I002", "route": 1 }
+  ]
+}

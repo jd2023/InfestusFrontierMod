@@ -1,0 +1,16 @@
+{
+  "requires": "infestusfrontier_tests:discovery.waking_genome.use",
+  "commands": [
+    "gamemode survival FixturePlayer",
+    "clear FixturePlayer",
+    "fill 1 -61 2 3 -61 4 dirt",
+    "fill 1 -60 2 3 -58 4 air",
+    "tp FixturePlayer 2.5 -60 0.5 0 35",
+    "give FixturePlayer minecraft:rotten_flesh 2",
+    "give FixturePlayer minecraft:red_mushroom 3",
+    "give FixturePlayer minecraft:wheat_seeds 4",
+    "give FixturePlayer minecraft:flower_pot",
+    "give FixturePlayer minecraft:book",
+    "give FixturePlayer minecraft:water_bucket"
+  ]
+}

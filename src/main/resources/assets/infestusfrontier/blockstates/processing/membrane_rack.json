@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "active=false": { "model": "infestusfrontier:block/processing/membrane_rack" },
+    "active=true": { "model": "infestusfrontier:block/processing/membrane_rack_active" }
+  }
+}
