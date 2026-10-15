@@ -232,6 +232,8 @@ Sprint S01 is also the pilot. Before S02 is written, the planner records in the 
 
 Art is its own queue, `docs/sprints/ART.md`, with the same story template and kind `art`. It runs beside the code sprints. An art story depends only on the `platform` story that registers its content.
 
+Two kinds of art story. A texture story gives an image model the prompt, the size and the output path; the owner saves the result. A model story gives a strong model the GeckoLib `geo` and `animation` JSON to write, with bone names, dimensions and animation names fixed in the story. Never mix the two in one story.
+
 - A `platform` story ships placeholder assets: a flat 16x16 texture and a vanilla cube or item model. The game must run and the reviewer must see the block before any art exists.
 - Shipped assets live in `src/main/resources/assets/infestusfrontier/`. File name is the registry id. Textures are 16x16 for blocks and items unless the story says otherwise. Animated organs use GeckoLib models in `geo/` and `animations/`.
 - Masters, prompts and renders stay outside the repository. Only shipped files are committed.

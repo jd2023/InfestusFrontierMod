@@ -23,10 +23,10 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 
 - **Owner** (human): makes product decisions and plays the build at the end of each sprint. Nothing else goes to the owner. Tuning, API research and technical choices are engineering work.
 - **Planner** (strong model, with the owner): sets direction, code structure and checks. Writes the sprint file: stories with exact names, numbers and interfaces. Reads the real code first.
-- **Worker** (cheap model): implements one story exactly as written. Does not redesign, does not widen scope.
-- **Repairer** (cheap model): fixes reviewer findings, one regression test each. Does not redo accepted work.
+- **Worker** (cheap model, Sonnet): implements one story exactly as written. Does not redesign, does not widen scope.
+- **Repairer** (cheap model, Sonnet): fixes reviewer findings, one regression test each. Does not redo accepted work.
 - **Reviewer** (strong model, never the same run as the worker): reads the whole diff and the tests. Says `APPROVED` or `REJECTED` with numbered findings. Never edits.
-- **Artist** (separate track): delivers assets for `art` stories from `docs/sprints/ART.md`. Writes no Java.
+- **Artist** (separate track): delivers assets for `art` stories from `docs/sprints/ART.md`. Textures come from an image model (Astra). GeckoLib models and animations come from a strong model (Opus or Fable). Writes no Java.
 
 ## Running a story
 
@@ -40,7 +40,7 @@ Each role starts from one line. It reads the files the line names, in this order
 | Repairer | `Repair story IF-014 from docs/sprints/S01.md. Findings are below. Follow AGENTS.md.` |
 | Artist | `Do art story ART-003 from docs/sprints/ART.md. Follow AGENTS.md.` |
 
-The sprint file is the queue. Any runner, a person pasting these lines or a script, reads it. Runner state such as `.ktask/` stays local and is never committed.
+The sprint file is the queue. Today the owner pastes these lines by hand. An orchestration tool is being built on the side and will read the same file. Runner state such as `.ktask/` stays local and is never committed.
 
 ## Two rules that stop a story
 
