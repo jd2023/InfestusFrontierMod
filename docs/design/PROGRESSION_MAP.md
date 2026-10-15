@@ -293,47 +293,6 @@ research; complete reconstruction is an efficiency project, not a guaranteed
 first-victory reward. Once complete, culturing supplies additional Genetic Stock
 without producing trophies or ordinary boss loot.
 
-## 10. Implementation milestones
+## 10. Delivery
 
-The milestone list M0 to M11 lives in [BIG_PICTURE.md](../../BIG_PICTURE.md). Each ends in a
-playable build. Implement rules, recipes, discovery, UI, saves, original assets and
-diagnostics together; do not defer every visual or usability check to the last milestone.
-Players choose which branches to pursue; all are implemented across the sequence.
-Fold Gateway and all Fold-dependent recipes and grafts stay outside M0 to M11.
-JEI discovery is essential, advancements remain, FTB Quests is not shipped.
-Separate content mods and backpacks cannot be required for the core loop.
-
-### Acceptance at each checkpoint
-
-| Checkpoint | Required evidence beyond the authoritative full gate |
-|---|---|
-| M0 | Clean build; core and ui tests; one GameTest in a real server; `core` and `ui` have an empty classpath |
-| M1 | Spore Culture converts eligible exposed ground and bone meal matures it, in GameTests; recipes and guide pages exist; client captures of all three stages, front, back and inventory scale, pass the capture checks and are read by the reviewer; the owner repeats it by hand in a fresh world |
-| M2 | Fresh Survival acquisition and recipe reveal, empty/full inventory, insufficient biomass, break/reload preserving one organ history; client models render at all faces and inventory scale |
-| M3 | Three complete reference supply cycles with a positive measured surplus; seed/water/restart reserves retained; 3D branches/crossings and port direction inspected visually; full outputs and unloaded routes cannot spill or duplicate |
-| M4 | All sample qualities and capacities, last-slot contention, no-drop vanilla species, duplicate death callbacks, relocation across dimensions, copied-record merge, consumed sample never recreated; no ordinary-slot pollution or nested pack duplication |
-| M5 | Every activity has one owner, sum-cap clipping, partial clearing costs, permanent branch rejection, one-heart hunger floor, sleep/rescue persistence; ore conservation against direct mining/Fortune and retained dust |
-| M6 | Start with the declared finite kit, replace every recurring fuel/water input locally, manufacture/export lining, then restart without Overworld fuel; wrong dimension/bed/level/mutation each independently refuses unchanged |
-| M7 | Walk every excavation type including descent, turn, section continuation and light/access; cavities/fluids/protected blocks/output-full/chunk boundary stop safely; bounded spill containment tested under shared load |
-| M8 | First End materials need no shulker genome; first shulker genome needs no R3 service; local powered cultivation restarts from reserve; burrowing cannot fly or erase terrain, and wing fuel exhaustion leaves the specified fallback |
-| M9 | Concurrent freight, crash/restart mid-transfer, both endpoint unloads, changed ownership, unsafe destination and full stores; each preserved armor piece has exactly one owner after death/respawn; no unrequested chunk tickets |
-| M10 | Catalog-to-registry/recipe/guide coverage for every in-scope entry; helpers obey population/path budgets and release dead reservations; connected storage renders without internal seams; optional-mod and no-content-mod profiles |
-| M11 | Fresh-world playthrough plus a second materially different layout; packaged dedicated server with two clients; worst-case shared-budget soak at declared limits; restart/save recovery, dense-base TPS/FPS profiles and human appearance/usability review |
-
-Before implementing a milestone, split it into narrow stories using the existing
-story template. Each story names its owner, concrete inputs/outputs, finite work and
-state budgets, rollback/refusal behavior and failing acceptance tests. Checkpoint,
-test, review and commit each coherent scope; no whole-catalog code dump.
-
-The full gate grows with implementation: recipe/data checks, pure rules,
-GameTests, client fixtures and packaged compatibility profiles. A documentation
-calculation is not a gameplay test. Record measured throughput and resource
-consumption from reference builds, then tune owning recipe tables. Compare
-productivity, footprint and supply cost; do not improve all three for every route.
-
-### Expansion after the three-world campaign
-
-Fold development follows a separately playable foothold → native sustainable
-habitat → adaptive processing → Manyfold encounter → reconstructed boss stock
-sequence. Its first habitat cannot require boss loot. Attack waves, organ-eating
-hostiles and village transformation remain outside these milestones.
+Milestones and acceptance evidence are in [ROADMAP.md](../../ROADMAP.md).

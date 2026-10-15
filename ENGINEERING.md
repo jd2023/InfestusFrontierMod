@@ -192,7 +192,7 @@ Not covered yet: menu and screen captures, recipe tests through a crafting menu,
 
 A strong model plans. A cheap model implements. The owner plays at the end of each sprint.
 
-A sprint is one milestone from BIG_PICTURE.md, or one slice of it, and ends in a playable build. Its stories live in one file, `docs/sprints/S<nn>.md`: milestone, goal in one sentence, the acceptance line from PROGRESSION_MAP.md, then the stories in order. Only the current sprint is written at this depth. Later milestones stay at one line each in BIG_PICTURE.md.
+A sprint is one milestone from ROADMAP.md, or one slice of it, and ends in a playable build. Its stories live in one file, `docs/sprints/S<nn>.md`: milestone, goal in one sentence, the acceptance line from ROADMAP.md, then the stories in order. Only the current sprint is written at this depth. Later milestones stay at one line each in ROADMAP.md.
 
 A story is ready only when a worker can finish it without making a design decision or reading a whole catalog.
 
@@ -249,7 +249,7 @@ The planner decides every name, number and interface before the story enters the
 
 The sprint loop:
 
-1. The planner reads the real code and PROGRESSION_MAP.md and writes the sprint file: 5 to 12 stories, each with `Depends` on accepted or earlier stories only.
+1. The planner reads the real code and ROADMAP.md and writes the sprint file: 5 to 12 stories, each with `Depends` on accepted or earlier stories only.
 2. The worker takes the first `ready` story whose `Depends` are all `accepted`. One story per run.
 3. The reviewer gives the verdict. On `REJECTED` a repairer fixes the findings in one commit per round. Three rejected rounds block the story and send it back to the planner.
 4. When every story is `accepted`, the owner plays the build. What is broken becomes `repair` stories in this sprint. What is missing becomes stories in the next sprint.

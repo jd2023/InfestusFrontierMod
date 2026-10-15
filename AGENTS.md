@@ -4,7 +4,8 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 
 | Role | Reads |
 |---|---|
-| Coder (planner, worker, repairer) | [ENGINEERING.md](ENGINEERING.md) and the one design document the story names |
+| Planner | [ROADMAP.md](ROADMAP.md), [ENGINEERING.md](ENGINEERING.md) and the design documents the sprint needs |
+| Coder (worker, repairer) | [ENGINEERING.md](ENGINEERING.md) and the one design document the story names |
 | Reviewer | [REVIEW.md](REVIEW.md) |
 | Nobody | `docs/archive/`. It is history for the owner. |
 
