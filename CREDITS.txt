@@ -1,0 +1,5 @@
+Infestus Frontier original assets
+
+Every shipped texture, model, sound and name is original work made for this
+project. Add one line per asset family here: what it is, who made it, with what
+tool, on what date. No vanilla, prototype or third-party art is copied.

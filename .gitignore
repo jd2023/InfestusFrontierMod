@@ -1,0 +1,26 @@
+# build
+build/
+.gradle/
+out/
+bin/
+
+# ide
+.idea/
+*.iml
+*.ipr
+*.iws
+.settings/
+.classpath
+.project
+.vscode/
+
+# game runs and local agent state
+runs/
+run/
+.ktask/
+__pycache__/
+*.hprof
+hs_err_pid*
+.env
+.env.*
+!.env.example

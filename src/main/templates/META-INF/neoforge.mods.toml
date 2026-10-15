@@ -1,0 +1,38 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="See LICENSE.txt; production licensing decision pending"
+
+[[mods]]
+modId="infestusfrontier"
+version="${mod_version}"
+displayName="Infestus Frontier"
+authors="Illya Yalovyy"
+description='''A living colony you grow, feed and mutate across the Overworld, Nether and End.'''
+
+[[dependencies.infestusfrontier]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.249]"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.infestusfrontier]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.infestusfrontier]]
+modId="modonomicon"
+type="required"
+versionRange="[1.120.4]"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.infestusfrontier]]
+modId="geckolib"
+type="required"
+versionRange="[4.9.2]"
+ordering="AFTER"
+side="BOTH"

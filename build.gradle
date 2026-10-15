@@ -1,0 +1,151 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.146'
+}
+
+evaluationDependsOn(':core')
+evaluationDependsOn(':ui')
+version = mod_version
+group = mod_group_id
+base { archivesName = mod_id }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://maven.theillusivec4.top' }
+    maven {
+        url = 'https://dl.cloudsmith.io/public/klikli-dev/mods/maven/'
+        content { includeGroup 'com.klikli_dev' }
+    }
+    maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven' }
+}
+
+sourceSets {
+    // ModDevGradle keys development mod folders by source-set name. The ui
+    // module's own "main" would collide, so its sources are mirrored here.
+    devUi {
+        java.setSrcDirs([project(':ui').file('src/main/java')])
+        resources.setSrcDirs([project(':ui').file('src/main/resources')])
+    }
+    testMod
+}
+configurations {
+    testModImplementation.extendsFrom implementation
+    testModRuntimeOnly.extendsFrom runtimeOnly
+}
+
+// Optional runtime mods for manual play: ./gradlew runClient -PwithJei -PwithCurios
+def withJei = providers.gradleProperty('withJei').isPresent()
+def withCurios = providers.gradleProperty('withCurios').isPresent()
+
+dependencies {
+    implementation project(':core')
+    implementation project(':ui')
+    compileOnly "com.klikli_dev:modonomicon-1.21.1-neoforge:${modonomicon_version}"
+    runtimeOnly "com.klikli_dev:modonomicon-1.21.1-neoforge:${modonomicon_version}"
+    runtimeOnly "software.bernie.geckolib:geckolib-neoforge-1.21.1:${geckolib_version}"
+    compileOnly "mezz.jei:jei-1.21.1-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:${jei_version}"
+    compileOnly("top.theillusivec4.curios:curios-neoforge:${curios_version}:api") { transitive = false }
+    if (withJei) runtimeOnly "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
+    if (withCurios) runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+    testModImplementation sourceSets.main.output
+}
+
+neoForge {
+    version = project.neo_version
+    parchment {
+        minecraftVersion = project.parchment_minecraft_version
+        mappingsVersion = project.parchment_mappings_version
+    }
+    addModdingDependenciesTo sourceSets.testMod
+    mods {
+        infestusfrontier {
+            sourceSet sourceSets.main
+            sourceSet project(':core').sourceSets.main
+            sourceSet sourceSets.devUi
+        }
+        infestusfrontier_tests { sourceSet sourceSets.testMod }
+    }
+    runs {
+        client {
+            client()
+            gameDirectory = project.file('runs/client')
+            loadedMods = [mods.infestusfrontier]
+        }
+        server {
+            server()
+            programArgument '--nogui'
+            gameDirectory = project.file('runs/server')
+            loadedMods = [mods.infestusfrontier]
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            sourceSet = sourceSets.testMod
+            gameDirectory = project.file('runs/gametest')
+            loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'infestusfrontier_tests'
+            systemProperty 'neoforge.gameTestServer.forceExit', 'false'
+        }
+    }
+}
+
+def metadata = tasks.register('generateModMetadata', ProcessResources) {
+    inputs.property 'mod_version', project.version
+    expand mod_version: project.version
+    from 'src/main/templates'
+    into layout.buildDirectory.dir('generated/modMetadata')
+}
+sourceSets.main.resources.srcDir metadata
+neoForge.ideSyncTask metadata
+
+tasks.named('jar', Jar) {
+    from project(':core').sourceSets.main.output
+    from project(':ui').sourceSets.main.output
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+// The shipped JAR holds the mod, core and ui, and nothing from the test mod.
+abstract class VerifyDistribution extends DefaultTask {
+    @InputFile abstract RegularFileProperty getArtifact()
+    @TaskAction void verify() {
+        new java.util.zip.ZipFile(artifact.get().asFile).withCloseable { jar ->
+            for (String required : ['META-INF/neoforge.mods.toml',
+                    'org/jd/infestusfrontier/InfestusFrontier.class',
+                    'org/jd/infestusfrontier/foundation/TickQuota.class',
+                    'org/jd/infestusfrontier/ui/Bounds.class']) {
+                if (jar.getEntry(required) == null) throw new GradleException("Missing runtime entry: $required")
+            }
+            jar.entries().each { entry ->
+                if (entry.name.contains('/testmod/') || entry.name.contains('infestusfrontier_tests'))
+                    throw new GradleException("Development-only content shipped: ${entry.name}")
+            }
+            String metadata = jar.getInputStream(jar.getEntry('META-INF/neoforge.mods.toml')).getText('UTF-8')
+            if (metadata.contains('${')) throw new GradleException('Unexpanded mod metadata')
+        }
+    }
+}
+def distribution = tasks.register('verifyDistribution', VerifyDistribution) {
+    dependsOn tasks.named('jar')
+    artifact = tasks.named('jar', Jar).flatMap { it.archiveFile }
+}
+
+def gameTestProperties = layout.projectDirectory.file('runs/gametest/server.properties')
+def prepareGameTest = tasks.register('prepareGameTest', Copy) {
+    from 'src/testMod/server.properties'
+    into layout.projectDirectory.dir('runs/gametest')
+    onlyIf { !gameTestProperties.asFile.exists() }
+}
+tasks.named('runGameTestServer') {
+    dependsOn prepareGameTest
+    mustRunAfter ':core:test', ':ui:test', distribution
+}
+
+tasks.register('verifyAll') {
+    group = 'verification'
+    description = 'The gate: pure tests, boundaries, shipped JAR contents, GameTests in a real server.'
+    dependsOn ':core:check', ':ui:check', tasks.named('build'), distribution, tasks.named('runGameTestServer')
+}
