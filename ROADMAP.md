@@ -28,7 +28,7 @@ Each milestone needs this evidence beyond the full gate (`bash scripts/verify.sh
 | M | Evidence |
 |---|---|
 | M0 | Clean build; core and ui tests; one GameTest in a real server; `core` and `ui` have an empty classpath |
-| M1 | Spore Culture converts eligible exposed ground and bone meal matures it, in GameTests; recipes and guide pages exist; client captures of all three stages, front, back and inventory scale, pass the capture checks and are read by the reviewer; the owner repeats it by hand in a fresh world |
+| M1 | Spore Culture converts eligible exposed ground and bone meal matures it, in GameTests; recipes and guide pages exist; client captures of all three stages, front, back and inventory scale, pass the capture checks and are read by the reviewer; final textures accepted at the ART.md quality bar; the owner repeats it by hand in a fresh world |
 | M2 | Fresh Survival acquisition and recipe reveal, empty/full inventory, insufficient biomass, break/reload preserving one organ history; client models render at all faces and inventory scale |
 | M3 | Three complete reference supply cycles with a positive measured surplus; seed/water/restart reserves retained; 3D branches/crossings and port direction inspected visually; full outputs and unloaded routes cannot spill or duplicate |
 | M4 | All sample qualities and capacities, last-slot contention, no-drop vanilla species, duplicate death callbacks, relocation across dimensions, copied-record merge, consumed sample never recreated; no ordinary-slot pollution or nested pack duplication |

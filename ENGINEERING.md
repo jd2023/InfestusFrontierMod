@@ -273,9 +273,9 @@ Two kinds of art story. A texture story gives an image model the prompt, the siz
 
 - A `platform` story ships placeholder assets: a generated texture at the shipped size and a vanilla cube or item model. The game must run and the reviewer must see the block before any art exists.
 - Shipped assets live in `src/main/resources/assets/infestusfrontier/`. File name is the registry id. Block textures are 64x64 and item icons 32x32, exported from image-model sources with `scripts/texture.py`, unless the story says otherwise. Animated organs use GeckoLib models in `geo/` and `animations/`.
-- Masters, prompts and renders stay outside the repository. Only shipped files are committed.
+- Image masters and renders stay outside the repository; prompts live in the art story. Model sources (`.bbmodel`) are committed under `art/`, next to any generator that bakes them.
 - Every asset adds one line to `CREDITS.txt`: file, author, license.
-- An art story is accepted on a client capture judged against the catalog description, by the checklist in [REVIEW.md](REVIEW.md) "Visuals".
+- An art story is accepted on a client capture judged against the catalog description and the Quality bar in `docs/sprints/ART.md`, by the checklist in [REVIEW.md](REVIEW.md) "Visuals". Placeholders never reach the owner's build: a sprint is done only when its art stories are accepted.
 
 ## Dependencies
 
