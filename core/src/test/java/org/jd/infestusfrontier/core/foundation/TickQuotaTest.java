@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.foundation;
+package org.jd.infestusfrontier.core.foundation;
 
 import static org.junit.jupiter.api.Assertions.*;
 

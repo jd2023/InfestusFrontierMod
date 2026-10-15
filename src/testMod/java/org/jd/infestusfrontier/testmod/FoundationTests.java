@@ -6,7 +6,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import org.jd.infestusfrontier.foundation.TickQuota;
+import org.jd.infestusfrontier.core.foundation.TickQuota;
 import org.jd.infestusfrontier.ui.Bounds;
 
 @Mod("infestusfrontier_tests")

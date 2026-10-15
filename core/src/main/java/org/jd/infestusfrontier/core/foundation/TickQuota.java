@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.foundation;
+package org.jd.infestusfrontier.core.foundation;
 
 /** Constant-space admission for one owner on one thread. No queue, no world references. */
 public final class TickQuota {

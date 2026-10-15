@@ -131,7 +131,7 @@ abstract class VerifyDistribution extends DefaultTask {
         new java.util.zip.ZipFile(artifact.get().asFile).withCloseable { jar ->
             for (String required : ['META-INF/neoforge.mods.toml',
                     'org/jd/infestusfrontier/InfestusFrontier.class',
-                    'org/jd/infestusfrontier/foundation/TickQuota.class',
+                    'org/jd/infestusfrontier/core/foundation/TickQuota.class',
                     'org/jd/infestusfrontier/ui/Bounds.class']) {
                 if (jar.getEntry(required) == null) throw new GradleException("Missing runtime entry: $required")
             }

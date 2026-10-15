@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "stage=basic": { "model": "infestusfrontier:block/living_substrate_basic" },
+    "stage=young": { "model": "infestusfrontier:block/living_substrate_young" },
+    "stage=mature": { "model": "infestusfrontier:block/living_substrate_mature" }
+  }
+}
