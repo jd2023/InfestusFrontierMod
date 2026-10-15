@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.146'
+    id 'com.diffplug.spotless'
 }
 
 evaluationDependsOn(':core')
@@ -107,6 +108,21 @@ tasks.named('jar', Jar) {
     reproducibleFileOrder = true
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+// Formatting is part of the gate: `check` fails on unformatted code. Fix with ./gradlew spotlessApply
+spotless {
+    java {
+        target 'src/**/*.java'
+        palantirJavaFormat('2.102.0')
+        removeUnusedImports()
+        formatAnnotations()
+    }
+    format 'text', {
+        target '*.md', 'docs/**/*.md', '*.gradle', '*/build.gradle', 'scripts/*.sh', '.editorconfig', '.gitignore'
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
 
 // The shipped JAR holds the mod, core and ui, and nothing from the test mod.
 abstract class VerifyDistribution extends DefaultTask {

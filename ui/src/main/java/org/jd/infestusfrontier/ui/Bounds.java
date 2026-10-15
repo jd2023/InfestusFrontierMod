@@ -6,8 +6,13 @@ public record Bounds(int x, int y, int width, int height) {
         if (width < 0 || height < 0) throw new IllegalArgumentException("Negative size");
     }
 
-    public int right() { return x + width; }
-    public int bottom() { return y + height; }
+    public int right() {
+        return x + width;
+    }
+
+    public int bottom() {
+        return y + height;
+    }
 
     public boolean contains(int px, int py) {
         return px >= x && py >= y && px < right() && py < bottom();
