@@ -61,6 +61,17 @@ Each milestone ends in a playable build. We are at M0.
 
 ## Where the details are
 
-- [docs/design/README.md](docs/design/README.md): gameplay design, catalogs, progression, armor, guide tree.
-- [docs/process/ARCHITECTURE.md](docs/process/ARCHITECTURE.md): which module owns what.
-- [AGENTS.md](AGENTS.md): rules for anyone, human or agent, who changes this repository.
+| Document | Owns |
+|---|---|
+| [docs/design/VISION.md](docs/design/VISION.md) | Fixed principles (under review; may fold into this page) |
+| [docs/design/PROGRESSION_MAP.md](docs/design/PROGRESSION_MAP.md) | Player projects SR0 to SR9, milestones M0 to M10 and their acceptance |
+| [docs/design/GUIDE_PROGRESSION_TREE.md](docs/design/GUIDE_PROGRESSION_TREE.md) | Guide pages and advancements; species atlas in section 15; tools and weapons in section 17 |
+| [docs/design/BLOCK_CATALOG.md](docs/design/BLOCK_CATALOG.md) | Every organ, structure and construction block, by tier |
+| [docs/design/ITEM_CATALOG.md](docs/design/ITEM_CATALOG.md) | Every item, ingredient and preparation recipe |
+| [docs/design/ARMOR_EVOLUTION.md](docs/design/ARMOR_EVOLUTION.md) | The four armor pieces, their branches, fuel and recovery |
+| [docs/design/LIVING_SUBSTRATE_MUTATIONS.md](docs/design/LIVING_SUBSTRATE_MUTATIONS.md) | Substrate growth, function and reinforcement |
+| [ENGINEERING.md](ENGINEERING.md) | How we build: modules, limits, tests, tasks, pins |
+| [REVIEW.md](REVIEW.md) | How we accept work |
+| [AGENTS.md](AGENTS.md) | Rules for anyone who changes this repository |
+
+Numbers in the design documents are starting values until play testing confirms them.

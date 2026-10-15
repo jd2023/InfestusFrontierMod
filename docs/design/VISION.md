@@ -19,4 +19,4 @@ and interconnected production—not repetitive harvesting.
 - Attack waves, organ-seeking hostiles and village transformation are deferred. A separate backpack provides storage, not automatic armor abilities.
 
 Recipes, numerical balance and stage assignments in the gameplay catalogs are proposed design.
-Unresolved decisions belong in [Open questions](OPEN_QUESTIONS.md).
+Unresolved product decisions go to the owner.

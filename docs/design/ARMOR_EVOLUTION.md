@@ -588,13 +588,13 @@ Preparation and costs: Items.
 
 Learning uses a finite authored counter set and fixed-size event suppression,
 not a log of visited coordinates or lifetime attackers. Profile shared budgets
-under [Performance](../process/PERFORMANCE.md). Charge, ritual and fusion transactions
+under [Performance](../../ENGINEERING.md#performance-limits). Charge, ritual and fusion transactions
 must be tested across full outputs, simultaneous users, interruption and reload.
 
 Visual work limits: Burrowing checks a 3×3×3 body
 neighborhood; Stone Sense samples at most 64 positions per pulse and two pulses
 per second; lamp reach is at most 12 blocks without repeated world light-block
-placement. These still require profiling under [Performance](../process/PERFORMANCE.md).
+placement. These still require profiling under [Performance](../../ENGINEERING.md#performance-limits).
 No scan or movement force-loads chunks.
 
 C9/C12/C13 use selected slots only, at most three per function, with one shared
