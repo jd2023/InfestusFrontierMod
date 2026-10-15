@@ -3,3 +3,5 @@ Infestus Frontier original assets
 Every shipped texture, model, sound and name is original work made for this
 project. Add one line per asset family here: what it is, who made it, with what
 tool, on what date. No vanilla, prototype or third-party art is copied.
+
+Living Substrate basic/young/mature (64x64) and Spore Culture (32x32): procedural placeholders drawn by the planner with a Python script, 2026-10-15. Replaced by ART-001.

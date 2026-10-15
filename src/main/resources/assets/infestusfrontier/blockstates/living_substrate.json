@@ -1,7 +1,55 @@
 {
   "variants": {
-    "stage=basic": { "model": "infestusfrontier:block/living_substrate_basic" },
-    "stage=young": { "model": "infestusfrontier:block/living_substrate_young" },
-    "stage=mature": { "model": "infestusfrontier:block/living_substrate_mature" }
+    "stage=basic": [
+      {
+        "model": "infestusfrontier:block/living_substrate_basic"
+      },
+      {
+        "model": "infestusfrontier:block/living_substrate_basic",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/living_substrate_basic",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/living_substrate_basic",
+        "y": 270
+      }
+    ],
+    "stage=young": [
+      {
+        "model": "infestusfrontier:block/living_substrate_young"
+      },
+      {
+        "model": "infestusfrontier:block/living_substrate_young",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/living_substrate_young",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/living_substrate_young",
+        "y": 270
+      }
+    ],
+    "stage=mature": [
+      {
+        "model": "infestusfrontier:block/living_substrate_mature"
+      },
+      {
+        "model": "infestusfrontier:block/living_substrate_mature",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/living_substrate_mature",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/living_substrate_mature",
+        "y": 270
+      }
+    ]
   }
 }
