@@ -295,30 +295,11 @@ without producing trophies or ordinary boss loot.
 
 ## 10. Implementation milestones
 
-These are delivery checkpoints, not player tiers. Each ends in a playable build.
-Implement its rules, recipes, discovery, UI, saves, original assets and diagnostics
-together. Do not defer every visual or usability check to the final milestone.
-All listed branches are implemented across the sequence; players choose which
-ones to pursue. Fold Gateway and all Fold-dependent recipes/grafts remain outside
-M0–M10 regardless of their catalog grouping.
-
-| Milestone | Depends on | Playable result | Owning gameplay modules |
-|---|---|---|---|
-| M0 — First-slice foundation | Bootstrap | Reproducible client/server launch; approved library pins; one real organ screen driven by a tiny tested UI module and server-validated intents | UI foundation, platform adapters, bounded simulation |
-| M1 — Feed a living workshop | M0 | Start in Survival, discover culture, grow selected ground, digest feed, store biomass, prepare materials and awaken/feed one piece | Ecology, biological processing, storage, equipment, discovery |
-| M2 — Self-supplying Overworld | M1 | Crops/trees remain useful living scenery; separate growers, harvesters, collectors, veins and reserves supply water/biomass/starter power; refuel at mutated ground | Cultivation, logistics, control, equipment service |
-| M3 — First designed trait | M2 | Pouch → dock/archive → extractor → bank → cultured stock → multi-species graft; separate Carry Sac; choose combat or Dissector weapon | Genetics, portable storage, equipment evolution |
-| M4 — Specialist equipment and manual industry | M3 | Independent armor counters/caps, forward fusion, paid partial clearing, hunger/symbiosis, dye/trims/enchantments; manual leaching and separately controlled ore treatment/fracture/smelting | Equipment, mineral processing, excavation |
-| M5 — Nether industrial settlement | M4 | Native heat/crops/water, industrial power/cooling, thermal materials and local DNA/stock production support sustained exports; thermal armor provides bounded work windows | Native cultivation, thermal processing, genetics, equipment |
-| M6 — Precision and major excavation | M5 | Independent ore/smelting improvement paths, R2 sequencing, learned organ upgrades, shafts/descending tunnels/strips, controlled hazardous processes and recovery | Processing, excavation, process control, containment |
-| M7 — Independent End settlement | M6 | Local powered chorus cultivation supports native biomass/power, shulker research, spatial conditioning and R3 sequencing; late burrowing/flight branches become usable | Spatial processing, genetics, equipment movement |
-| M8 — One distributed colony | M7 | Passenger and real-cargo links join all three bases; storage indexing and workshop requests use actual organs; per-piece Cocoon/Recall/Death Bond function | Transit, logistics, storage indexing, equipment preservation |
-| M9 — Complete production choices | M8 | Remaining SR0–SR7 catalog branches: aquatic/husbandry/food/potion routes, helper professions, defensive organs, paid Sail loading, synthesis and finite reservoir districts | Existing feature owners; no catch-all endgame module |
-| M10 — Complete campaign gate | M9 | Fresh-world Survival route reaches three-world synthesis; alternate layouts and equipment lineages remain viable; remaining supported armor ranks and catalog recipes are verified | Integration and balance across existing modules |
-
-M0 integrates the selected libraries in DEPENDENCIES.md against the actual first
-screen and asset; it does not create unused frameworks. Required/optional profiles
-and exact artifact pins are validated before their feature is built.
+The milestone list M0 to M11 lives in [BIG_PICTURE.md](../../BIG_PICTURE.md). Each ends in a
+playable build. Implement rules, recipes, discovery, UI, saves, original assets and
+diagnostics together; do not defer every visual or usability check to the last milestone.
+Players choose which branches to pursue; all are implemented across the sequence.
+Fold Gateway and all Fold-dependent recipes and grafts stay outside M0 to M11.
 JEI discovery is essential, advancements remain, FTB Quests is not shipped.
 Separate content mods and backpacks cannot be required for the core loop.
 
@@ -326,17 +307,18 @@ Separate content mods and backpacks cannot be required for the core loop.
 
 | Checkpoint | Required evidence beyond the authoritative full gate |
 |---|---|
-| M0 | Client screen capture, headless dedicated-server launch, invalid/stale command rejection; UI internals cannot import gameplay policy |
-| M1 | Fresh Survival acquisition and recipe reveal, empty/full inventory, insufficient biomass, break/reload preserving one organ history; client models render at all faces and inventory scale |
-| M2 | Three complete reference supply cycles with a positive measured surplus; seed/water/restart reserves retained; 3D branches/crossings and port direction inspected visually; full outputs and unloaded routes cannot spill or duplicate |
-| M3 | All sample qualities and capacities, last-slot contention, no-drop vanilla species, duplicate death callbacks, relocation across dimensions, copied-record merge, consumed sample never recreated; no ordinary-slot pollution or nested pack duplication |
-| M4 | Every activity has one owner, sum-cap clipping, partial clearing costs, permanent branch rejection, one-heart hunger floor, sleep/rescue persistence; ore conservation against direct mining/Fortune and retained dust |
-| M5 | Start with the declared finite kit, replace every recurring fuel/water input locally, manufacture/export lining, then restart without Overworld fuel; wrong dimension/bed/level/mutation each independently refuses unchanged |
-| M6 | Walk every excavation type including descent, turn, section continuation and light/access; cavities/fluids/protected blocks/output-full/chunk boundary stop safely; bounded spill containment tested under shared load |
-| M7 | First End materials need no shulker genome; first shulker genome needs no R3 service; local powered cultivation restarts from reserve; burrowing cannot fly or erase terrain, and wing fuel exhaustion leaves the specified fallback |
-| M8 | Concurrent freight, crash/restart mid-transfer, both endpoint unloads, changed ownership, unsafe destination and full stores; each preserved armor piece has exactly one owner after death/respawn; no unrequested chunk tickets |
-| M9 | Catalog-to-registry/recipe/guide coverage for every in-scope entry; helpers obey population/path budgets and release dead reservations; connected storage renders without internal seams; optional-mod and no-content-mod profiles |
-| M10 | Fresh-world playthrough plus a second materially different layout; packaged dedicated server with two clients; worst-case shared-budget soak at declared limits; restart/save recovery, dense-base TPS/FPS profiles and human appearance/usability review |
+| M0 | Clean build; core and ui tests; one GameTest in a real server; `core` and `ui` have an empty classpath |
+| M1 | Spore Culture converts eligible exposed ground and bone meal matures it, in GameTests; recipes and guide pages exist; client captures of all three stages, front, back and inventory scale, pass the capture checks and are read by the reviewer; the owner repeats it by hand in a fresh world |
+| M2 | Fresh Survival acquisition and recipe reveal, empty/full inventory, insufficient biomass, break/reload preserving one organ history; client models render at all faces and inventory scale |
+| M3 | Three complete reference supply cycles with a positive measured surplus; seed/water/restart reserves retained; 3D branches/crossings and port direction inspected visually; full outputs and unloaded routes cannot spill or duplicate |
+| M4 | All sample qualities and capacities, last-slot contention, no-drop vanilla species, duplicate death callbacks, relocation across dimensions, copied-record merge, consumed sample never recreated; no ordinary-slot pollution or nested pack duplication |
+| M5 | Every activity has one owner, sum-cap clipping, partial clearing costs, permanent branch rejection, one-heart hunger floor, sleep/rescue persistence; ore conservation against direct mining/Fortune and retained dust |
+| M6 | Start with the declared finite kit, replace every recurring fuel/water input locally, manufacture/export lining, then restart without Overworld fuel; wrong dimension/bed/level/mutation each independently refuses unchanged |
+| M7 | Walk every excavation type including descent, turn, section continuation and light/access; cavities/fluids/protected blocks/output-full/chunk boundary stop safely; bounded spill containment tested under shared load |
+| M8 | First End materials need no shulker genome; first shulker genome needs no R3 service; local powered cultivation restarts from reserve; burrowing cannot fly or erase terrain, and wing fuel exhaustion leaves the specified fallback |
+| M9 | Concurrent freight, crash/restart mid-transfer, both endpoint unloads, changed ownership, unsafe destination and full stores; each preserved armor piece has exactly one owner after death/respawn; no unrequested chunk tickets |
+| M10 | Catalog-to-registry/recipe/guide coverage for every in-scope entry; helpers obey population/path budgets and release dead reservations; connected storage renders without internal seams; optional-mod and no-content-mod profiles |
+| M11 | Fresh-world playthrough plus a second materially different layout; packaged dedicated server with two clients; worst-case shared-budget soak at declared limits; restart/save recovery, dense-base TPS/FPS profiles and human appearance/usability review |
 
 Before implementing a milestone, split it into narrow stories using the existing
 story template. Each story names its owner, concrete inputs/outputs, finite work and

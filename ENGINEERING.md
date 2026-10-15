@@ -10,6 +10,7 @@ Minecraft 1.21.1, NeoForge 21.1.249, Java 21, Gradle 9.2.1, ModDevGradle 2.0.146
 ./gradlew spotlessApply                     # format everything; run before every commit
 ./gradlew :core:test :ui:test               # fast, no Minecraft
 bash scripts/verify.sh                      # the gate; log in build/verification/full-gate.log
+./gradlew verifyCaptures                    # client screenshots into build/captures, then pixel checks
 ./gradlew runClient                         # client in runs/client
 ./gradlew runClient -PwithJei -PwithCurios  # with the optional mods
 ./gradlew runServer                         # dedicated server in runs/server
@@ -19,11 +20,12 @@ Output: `build/libs/infestusfrontier-0.1.0-dev.1.jar`. It holds the mod, `core` 
 
 | Path | Holds |
 |---|---|
-| `core/` | Pure rules. Plain Java, JUnit. No Minecraft. |
+| `core/` | Pure rules in `org.jd.infestusfrontier.core.<owner>`. Plain Java, JUnit. No Minecraft. |
 | `ui/` | Screen geometry and palette. Plain Java, JUnit. |
 | `src/main/java/org/jd/infestusfrontier/` | The NeoForge mod: entry point, one folder per owner module. |
 | `src/main/templates/` | `neoforge.mods.toml` with the version expanded at build time. |
-| `src/testMod/` | Development-only GameTests, mod id `infestusfrontier_tests`. |
+| `src/testMod/` | Development-only GameTests and the capture client, mod id `infestusfrontier_tests`. |
+| `src/testMod/resources/captures/` | One JSON per capture scenario; `golden/` holds approved screenshots. |
 | `docs/design/` | Gameplay design. One owner document per subject. |
 | `docs/sprints/` | One file per sprint (`S01.md`, ...) and the art queue `ART.md`. |
 | `scripts/verify.sh` | The gate. |
@@ -41,7 +43,9 @@ ui/                                      geometry and palette, used by screens o
 - Arrows point inward only. No cycles. `core` and `ui` import only the JDK; the build fails otherwise.
 - One behavior has one owner module. One folder per owner. No global `block/`, `item/`, `menu/` buckets.
 - Each owner registers its own content. The entry point calls one `register` per module.
-- Public types live in `<owner>/api`. Everything else is package-private.
+- Public types live in `<owner>/api`, plus one `<Owner>Module` class with `register(IEventBus)` and the module's registry handles. Everything else is package-private.
+- Registry ids are flat `infestusfrontier:<snake_case>`, the catalog name in snake case: `living_substrate`, `spore_culture`. Block state property names are nouns: `stage`, `facing`.
+- Recipes, tags, loot tables, models, blockstates, advancements and guide pages are JSON written by hand under `src/main/resources`. No data generators until a story shows more than 50 files of one kind.
 - A feature that needs another feature declares a small port interface in its own `api`. The composition root connects it.
 - Commands return success or a refusal. A refusal names the unmet condition and changes nothing.
 - Queries return immutable snapshots, never a live collection.
@@ -149,7 +153,7 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 | Boundaries | `:core:verifyBoundary`, `:ui:verifyBoundary` | Those modules have an empty classpath |
 | Distribution | `verifyDistribution` | The JAR holds the entry point, `core`, `ui`, expanded metadata, and no test mod |
 | GameTests | `runGameTestServer` | Server-side behavior across real ticks, in `runs/gametest` |
-| Client captures | per feature story | What the player sees. A reviewer looks at the image |
+| Client captures | `./gradlew verifyCaptures` | Real client screenshots in `build/captures/<scenario>/<view>.png`. Checked for missing textures and blank frames, compared with goldens when present. The reviewer opens the images |
 | Manual play | `runClient`, `runServer` | Feel and usability. Owner only, at milestone gates |
 
 - Every behavior gets a test that fails without it. Write the test first.
@@ -158,9 +162,31 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 - Shared-budget tests isolate one fixture, then test contention separately.
 - A flaky test is a defect to investigate. Never rerun until green. Never delete the assertion. Never raise a limit or replace a golden image to get green.
 - Fixtures and the test mod stay in `src/testMod`. Use disposable worlds under `runs/`. Never touch a personal save.
-- Run graphical and headless runs as separate Gradle invocations.
+- Run graphical and headless runs as separate Gradle invocations. `scripts/verify.sh` runs `verifyAll` and then `verifyCaptures`.
 
-Not covered yet: client screenshots, recipe and menu tests, optional-mod profiles, multiplayer soak, crash recovery, measured TPS and FPS on a dense base. Each arrives with the feature that needs it.
+### Captures
+
+The capture client is part of the test mod. `./gradlew verifyCaptures` starts the real client, creates a fresh flat Creative world in `runs/capture`, runs each scenario, writes the screenshots and exits. Then a Gradle task checks every expected image.
+
+A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`:
+
+```json
+{
+  "commands": ["setblock 0 -60 3 infestusfrontier:living_substrate[stage=basic]"],
+  "views": [
+    {"name": "front", "x": 0.5, "y": -60, "z": 0.5, "yaw": 0, "pitch": 20},
+    {"name": "hotbar", "x": 0.5, "y": -60, "z": 0.5, "yaw": 0, "pitch": 20, "gui": true}
+  ]
+}
+```
+
+- The harness sets noon, clear weather, frozen time and weather, no clouds, no view bobbing, an empty hand, and hides the GUI unless `gui` is true. `commands` run as the player, one per tick, before the views.
+- A view teleports the player to `x y z` with `yaw pitch`, waits until every chunk section around the player is rendered, and saves `build/captures/<scenario>/<view>.png`.
+- A capture fails when the image is missing, when more than 0.2% of its pixels are the missing-texture magenta, when the whole frame is one flat color, or when a golden exists in `src/testMod/resources/captures/golden/<scenario>/<view>.png` and more than 0.5% of pixels differ by more than 32 in a channel.
+- Goldens are added only after the owner accepts the art. A golden is replaced only in a story that says so.
+- The reviewer reads the PNG files. A passing check is not an accepted picture.
+
+Not covered yet: menu and screen captures, recipe tests through a crafting menu, optional-mod profiles, multiplayer soak, crash recovery, measured TPS and FPS on a dense base. Each arrives with the feature that needs it.
 
 ## Stories and sprints
 
@@ -181,6 +207,7 @@ One story, one kind, one outcome. About 12 files and 400 changed lines at most. 
 | complete | Guide entry, advancement or discovery step | game, visual |
 | qualify | A scripted route or soak over accepted content. No new behavior | game |
 | repair | One reviewer finding with its regression test | as needed |
+| harness | Build, test or capture tooling in Gradle, `scripts/` or `src/testMod`. No gameplay | gate |
 
 A content feature is a chain: platform with placeholder art, then art, then data, then complete.
 
@@ -217,6 +244,8 @@ How to do a story:
 6. Set `Status: review <commit>`. Commit, push to `origin/v4`, and report: what you did, what you did not do, what you measured.
 
 The planner decides every name, number and interface before the story enters the sprint, after reading the real code. Common invariants (save and reload, break and replace, refusal leaves state unchanged) are written into the story that owns them.
+
+`Evidence` names what the reviewer looks at: `rules` is JUnit output, `game` is the GameTest line in the gate log, `visual` is the capture PNGs, `gate` is the gate log itself.
 
 The sprint loop:
 

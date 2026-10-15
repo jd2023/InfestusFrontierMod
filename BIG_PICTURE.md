@@ -43,28 +43,29 @@ Attack waves. Hostiles that hunt organs. Village transformation. The Fold dimens
 
 ## Delivery order
 
-Each milestone ends in a playable build. We are at M0.
+Each milestone ends in a playable build. M0 is done. We are in M1.
 
 | M | Playable result |
 |---|---|
 | M0 | Clean build, one tested core rule, one tested ui primitive, one GameTest in a real server |
-| M1 | Feed a living workshop: culture, substrate, sac, bladder, one awakened armor piece |
-| M2 | Self-supplying Overworld: farms, veins, reservoirs, controls, refuel at base |
-| M3 | First designed trait: samples, extractor, DNA bank, graft, mutation chamber |
-| M4 | Specialist equipment and manual industry: armor branches, leaching, ore treatment |
-| M5 | Nether industrial base with local heat, power and DNA |
-| M6 | Precision processing and major excavation |
-| M7 | End base with local spatial production |
-| M8 | One distributed colony: passenger and freight links, storage index, armor recovery |
-| M9 | Remaining production branches: aquatic, husbandry, food, helpers, defense, synthesis |
-| M10 | Full campaign from a fresh world, two different layouts, dedicated server with two clients |
+| M1 | The feedback loop. Spore Culture and Living Substrate are in the game with recipes and guide pages. Every story is proven by tests and by screenshots from the real game, and an agent reads both without a human |
+| M2 | Feed a living workshop: culture bowl, sac, bladder, rack, loom, cradle, one awakened armor piece |
+| M3 | Self-supplying Overworld: farms, veins, reservoirs, controls, refuel at base |
+| M4 | First designed trait: samples, extractor, DNA bank, graft, mutation chamber |
+| M5 | Specialist equipment and manual industry: armor branches, leaching, ore treatment |
+| M6 | Nether industrial base with local heat, power and DNA |
+| M7 | Precision processing and major excavation |
+| M8 | End base with local spatial production |
+| M9 | One distributed colony: passenger and freight links, storage index, armor recovery |
+| M10 | Remaining production branches: aquatic, husbandry, food, helpers, defense, synthesis |
+| M11 | Full campaign from a fresh world, two different layouts, dedicated server with two clients |
 
 ## Where the details are
 
 | Document | Owns |
 |---|---|
 | [docs/design/VISION.md](docs/design/VISION.md) | Fixed principles (under review; may fold into this page) |
-| [docs/design/PROGRESSION_MAP.md](docs/design/PROGRESSION_MAP.md) | Player projects SR0 to SR9, milestones M0 to M10 and their acceptance |
+| [docs/design/PROGRESSION_MAP.md](docs/design/PROGRESSION_MAP.md) | Player projects SR0 to SR9 and the acceptance evidence per milestone |
 | [docs/design/GUIDE_PROGRESSION_TREE.md](docs/design/GUIDE_PROGRESSION_TREE.md) | Guide pages and advancements; species atlas in section 15; tools and weapons in section 17 |
 | [docs/design/BLOCK_CATALOG.md](docs/design/BLOCK_CATALOG.md) | Every organ, structure and construction block, by tier |
 | [docs/design/ITEM_CATALOG.md](docs/design/ITEM_CATALOG.md) | Every item, ingredient and preparation recipe |
