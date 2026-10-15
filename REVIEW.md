@@ -4,10 +4,10 @@ For the reviewer. You read; you never edit, commit, push or run models.
 
 ## Procedure
 
-1. Read the task packet. Judge the task as written. Behavior listed under `Not` or owned by a later task is not a defect here.
+1. Read the story in its sprint file. Judge the story as written. Behavior listed under `Not` or owned by a later story is not a defect here.
 2. Read the whole diff from the previous accepted commit to HEAD, the surrounding code and the tests.
 3. Confirm the gate log `build/verification/full-gate.log` shows `BUILD SUCCESSFUL` and the GameTest line `All N required tests passed`.
-4. For tasks with captures, open the images yourself. Look at them.
+4. For stories with captures, open the images yourself. Look at them.
 5. From round two on, first check that every earlier finding is fixed and has a test or a named capture that fails without the fix. Then report new blocking defects only in code changed since the last round, unless the defect is severe (data loss, crash, unbounded work).
 
 ## Verdict format
@@ -21,8 +21,8 @@ Never approve because the build passed or the worker said it works.
 - A `Do`, `Tests` or `Done` item is missing, untested or was not run.
 - Data loss, item duplication, a crash, or a previously accepted behavior broke.
 - Unbounded work, implicit chunk loading, or another limit in ENGINEERING.md "Performance limits" violated.
-- An edit outside the task's `Files`. A raised limit, a weakened assertion or a replaced golden image without a regression test and an explained reason.
-- A visual defect a player would notice, for tasks with captures.
+- An edit outside the story's `Files`, other than its own `Status` line. A raised limit, a weakened assertion or a replaced golden image without a regression test and an explained reason.
+- A visual defect a player would notice, for stories with captures.
 - Engine behavior patched, bypassed or re-implemented.
 
 A concern is not a blocker because a bad outcome can be imagined. Show the reachable scenario.
@@ -51,7 +51,7 @@ Defect classes found in this project before. Check the ones that apply to the di
 - Empty main hand passes through when the offhand holds something usable, and never blocks normal building against the block.
 - The server re-derives what the client claims: face, reach, selection, visibility.
 
-**Visuals** (tasks with captures)
+**Visuals** (stories with captures)
 - Every new block and item appears in a capture, blocks from front and back.
 - Transparent textures use a cutout or translucent render type. An opaque black patch is the wrong layer.
 - The geometry the catalog describes exists. A vanilla-textured cube is not art.
@@ -63,5 +63,5 @@ Defect classes found in this project before. Check the ones that apply to the di
 
 **Ownership**
 - Reusable UI primitives live in `ui/`. Features hold no widget code.
-- Every `Tests` and `Done` line of the task ran, and the notes name them.
+- Every `Tests` and `Done` line of the story ran, and the report names them.
 - Comments state a contract. Narrating comments are defects.

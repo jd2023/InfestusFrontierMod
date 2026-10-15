@@ -338,8 +338,8 @@ Separate content mods and backpacks cannot be required for the core loop.
 | M9 | Catalog-to-registry/recipe/guide coverage for every in-scope entry; helpers obey population/path budgets and release dead reservations; connected storage renders without internal seams; optional-mod and no-content-mod profiles |
 | M10 | Fresh-world playthrough plus a second materially different layout; packaged dedicated server with two clients; worst-case shared-budget soak at declared limits; restart/save recovery, dense-base TPS/FPS profiles and human appearance/usability review |
 
-Before implementing a milestone, split it into narrow tasks using the existing
-task template. Each task names its owner, concrete inputs/outputs, finite work and
+Before implementing a milestone, split it into narrow stories using the existing
+story template. Each story names its owner, concrete inputs/outputs, finite work and
 state budgets, rollback/refusal behavior and failing acceptance tests. Checkpoint,
 test, review and commit each coherent scope; no whole-catalog code dump.
 

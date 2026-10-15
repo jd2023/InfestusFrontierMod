@@ -7,6 +7,7 @@ For the coder: planner, worker and repairer. Rules about git and roles are in [A
 Minecraft 1.21.1, NeoForge 21.1.249, Java 21, Gradle 9.2.1, ModDevGradle 2.0.146, Parchment 2024.11.17. Exact pins: [Dependencies](#dependencies).
 
 ```bash
+./gradlew spotlessApply                     # format everything; run before every commit
 ./gradlew :core:test :ui:test               # fast, no Minecraft
 bash scripts/verify.sh                      # the gate; log in build/verification/full-gate.log
 ./gradlew runClient                         # client in runs/client
@@ -24,6 +25,7 @@ Output: `build/libs/infestusfrontier-0.1.0-dev.1.jar`. It holds the mod, `core` 
 | `src/main/templates/` | `neoforge.mods.toml` with the version expanded at build time. |
 | `src/testMod/` | Development-only GameTests, mod id `infestusfrontier_tests`. |
 | `docs/design/` | Gameplay design. One owner document per subject. |
+| `docs/sprints/` | One file per sprint (`S01.md`, ...) and the art queue `ART.md`. |
 | `scripts/verify.sh` | The gate. |
 
 ## Architecture
@@ -45,13 +47,29 @@ ui/                                      geometry and palette, used by screens o
 - Queries return immutable snapshots, never a live collection.
 - Screens read snapshots and send intents. Every decision runs on the server.
 - Rendering is client-only and never decides whether a resource moved.
-- Use vanilla and NeoForge behavior as it is. Never patch, bypass or re-implement engine rules. If a task seems to need that, stop and report.
+- Use vanilla and NeoForge behavior as it is. Never patch, bypass or re-implement engine rules. If a story seems to need that, stop and report.
 - Shared low-level code (UI primitives, serialization, packet validation, bounded simulation, discovery) lives in one module from its first use. Features compose it, never copy it. Do not build it before the first consumer.
 - Comments state a contract. Narrating comments are defects.
 
+## Code style
+
+The formatter decides layout. `./gradlew spotlessApply` formats. `check`, and so the gate, fails on unformatted code. Do not fight the formatter and do not add style exceptions.
+
+- Palantir Java Format: 4 spaces, 120 columns, no unused imports. `.editorconfig` tells editors the same.
+- `core` and `ui` compile with `-Xlint:all -Werror`. A warning is a build failure. Fix the cause, do not suppress it.
+- A class is `final` unless a story says it is extended. A field is `private final` unless it must change.
+- A value is a `record`. A result with several shapes is a `sealed` interface with record cases, read with a pattern `switch`, no `default` branch.
+- A command returns a result with one success case and one refusal case. The refusal names the unmet condition. The first story that needs it creates the type in `core`.
+- No `null` across a public boundary. Return `Optional` or an empty snapshot. Accept nothing nullable.
+- No static mutable state. No reflection, Mixins, access transformers or coremods.
+- `var` only when the type is written on the same line.
+- Names: registry ids `snake_case`; Java `UpperCamelCase` types, `lowerCamelCase` members, `UPPER_SNAKE_CASE` constants. Suffixes: `XxxBlock`, `XxxBlockEntity`, `XxxItem`, `XxxMenu`, `XxxScreen`, `XxxPayload`, `XxxRecipe`. GameTest classes: `<Owner>Tests`.
+- A test name states the behavior: `refusesWhenFull`, `restoresBatchAfterReload`. One behavior per test. No sleeps, no unseeded randomness, no shared mutable fixtures.
+- One logger per owner module. No logging inside tick methods.
+
 ### Owners
 
-Names are project contracts. Create a module with its first task, not earlier.
+Names are project contracts. Create a module with its first story, not earlier.
 
 | Owner | Owns |
 |---|---|
@@ -99,7 +117,7 @@ Names are project contracts. Create a module with its first task, not earlier.
 
 Performance is correctness. A feature that can stall a server is a broken feature.
 
-Before implementation, the task states: the work unit, who shares the budget (dimension, team, network), the hard per-tick bound, which blocks it reads, maximum entities and geometry, persistent state size, packet rate, behavior on overload, behavior on chunk unload and reload. Each has a test.
+Before implementation, the story states: the work unit, who shares the budget (dimension, team, network), the hard per-tick bound, which blocks it reads, maximum entities and geometry, persistent state size, packet rate, behavior on overload, behavior on chunk unload and reload. Each has a test.
 
 - No unbounded loose items, XP orbs or projectiles. Insert into bounded storage, keep a capped buffer, then pause. A player harvesting by hand may get bounded stacks.
 - No implicit chunk loading. No spread, route, helper or cross-dimension lookup creates a ticket. A paid loader (Sail Roost) has owner, quota, upkeep, expiry and restart tests, and counts the engine-loaded neighbors too.
@@ -131,7 +149,7 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 | Boundaries | `:core:verifyBoundary`, `:ui:verifyBoundary` | Those modules have an empty classpath |
 | Distribution | `verifyDistribution` | The JAR holds the entry point, `core`, `ui`, expanded metadata, and no test mod |
 | GameTests | `runGameTestServer` | Server-side behavior across real ticks, in `runs/gametest` |
-| Client captures | per feature task | What the player sees. A reviewer looks at the image |
+| Client captures | per feature story | What the player sees. A reviewer looks at the image |
 | Manual play | `runClient`, `runServer` | Feel and usability. Owner only, at milestone gates |
 
 - Every behavior gets a test that fails without it. Write the test first.
@@ -144,11 +162,15 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 
 Not covered yet: client screenshots, recipe and menu tests, optional-mod profiles, multiplayer soak, crash recovery, measured TPS and FPS on a dense base. Each arrives with the feature that needs it.
 
-## Tasks
+## Stories and sprints
 
-A strong model plans. A cheaper model implements. A task is ready only when a worker can finish it without making a design decision or reading a whole catalog.
+A strong model plans. A cheap model implements. The owner plays at the end of each sprint.
 
-One task, one kind, one outcome. About 12 files and 400 changed lines at most. If the title needs "and", split it.
+A sprint is one milestone from BIG_PICTURE.md, or one slice of it, and ends in a playable build. Its stories live in one file, `docs/sprints/S<nn>.md`: milestone, goal in one sentence, the acceptance line from PROGRESSION_MAP.md, then the stories in order. Only the current sprint is written at this depth. Later milestones stay at one line each in BIG_PICTURE.md.
+
+A story is ready only when a worker can finish it without making a design decision or reading a whole catalog.
+
+One story, one kind, one outcome. About 12 files and 400 changed lines at most. If the title needs "and", split it.
 
 | Kind | Contains | Evidence |
 |---|---|---|
@@ -164,10 +186,11 @@ A content feature is a chain: platform with placeholder art, then art, then data
 
 ```text
 IF-nnn  <one observable outcome>
+Status: ready                # ready | doing | review <commit> | accepted <commit> | blocked <reason>
 Milestone: M1
 Owner: processing            # a module from the Owners table
 Kind: platform
-Depends: IF-012              # accepted tasks only
+Depends: IF-012              # accepted stories only
 Read: docs/design/BLOCK_CATALOG.md#t0-03--digestive-sac, src/main/java/.../processing/   # at most five
 Files: src/main/java/.../processing/DigestiveSacBlock.java, ...   # exact allowlist, tests included
 Do:
@@ -177,27 +200,47 @@ Tests:
 Done:
   - ./gradlew :core:test
   - bash scripts/verify.sh
-Not: adjacent behavior that belongs to another task
+Not: adjacent behavior that belongs to another story
 Bounds: hard work and state limits, with numbers
 Evidence: rules | game | visual
 ```
 
-How to do a task:
+`Status` moves `ready`, `doing`, `review`, `accepted`. The worker writes `doing` and `review` with the commit hash. The planner writes `accepted` or `blocked`. The sprint file is the one file a story may edit beyond its `Files`, and only its own `Status` line.
 
-1. Read the task. If it cannot be done inside `Files`, stop and report which file or decision is missing.
+How to do a story:
+
+1. Read the story. If it cannot be done inside `Files`, stop and report which file or decision is missing. Otherwise set `Status: doing`.
 2. Write `Tests` first. Run them. See them fail for the stated reason.
 3. Implement in the owning module. Keep the public interface small.
-4. Run `Done`, then `bash scripts/verify.sh`.
+4. Run `./gradlew spotlessApply`, then `Done`, then `bash scripts/verify.sh`.
 5. Walk through the checklist in [REVIEW.md](REVIEW.md) against your diff.
-6. Commit, push to `origin/v4`, and report: what you did, what you did not do, what you measured.
+6. Set `Status: review <commit>`. Commit, push to `origin/v4`, and report: what you did, what you did not do, what you measured.
 
-The planner decides every name, number and interface before the task enters the queue, after reading the real code. Common invariants (save and reload, break and replace, refusal leaves state unchanged) are written into the task that owns them.
+The planner decides every name, number and interface before the story enters the sprint, after reading the real code. Common invariants (save and reload, break and replace, refusal leaves state unchanged) are written into the story that owns them.
 
-A `HUMAN:` line in the queue is a milestone gate. At the gate the owner plays the build, the planner triages follow-ups and writes the next milestone's tasks. Only the next milestone is planned in this detail. The queue can run under `ktask`; its folder `.ktask/` is local state and is never committed.
+The sprint loop:
+
+1. The planner reads the real code and PROGRESSION_MAP.md and writes the sprint file: 5 to 12 stories, each with `Depends` on accepted or earlier stories only.
+2. The worker takes the first `ready` story whose `Depends` are all `accepted`. One story per run.
+3. The reviewer gives the verdict. On `REJECTED` a repairer fixes the findings in one commit per round. Three rejected rounds block the story and send it back to the planner.
+4. When every story is `accepted`, the owner plays the build. What is broken becomes `repair` stories in this sprint. What is missing becomes stories in the next sprint.
+5. The planner writes the next sprint.
+
+Sprint S01 is also the pilot. Before S02 is written, the planner records in the S01 file: cost per story, review rounds per story, manual interventions, and what changed in the template because of them.
+
+### Art track
+
+Art is its own queue, `docs/sprints/ART.md`, with the same story template and kind `art`. It runs beside the code sprints. An art story depends only on the `platform` story that registers its content.
+
+- A `platform` story ships placeholder assets: a flat 16x16 texture and a vanilla cube or item model. The game must run and the reviewer must see the block before any art exists.
+- Shipped assets live in `src/main/resources/assets/infestusfrontier/`. File name is the registry id. Textures are 16x16 for blocks and items unless the story says otherwise. Animated organs use GeckoLib models in `geo/` and `animations/`.
+- Masters, prompts and renders stay outside the repository. Only shipped files are committed.
+- Every asset adds one line to `CREDITS.txt`: file, author, license.
+- An art story is accepted on a client capture judged against the catalog description, by the checklist in [REVIEW.md](REVIEW.md) "Visuals".
 
 ## Dependencies
 
-Change a pin only in its own task, with a cold build, a server run and a client run. No dynamic versions.
+Change a pin only in its own story, with a cold build, a server run and a client run. No dynamic versions.
 
 | Component | Pin |
 |---|---|

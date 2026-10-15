@@ -1,6 +1,6 @@
 # Infestus Frontier: the big picture
 
-One page. Read it first. When a task and this page disagree, this page wins until the owner changes it.
+One page. Read it first. When a story and this page disagree, this page wins until the owner changes it.
 
 ## What we are building
 
@@ -70,7 +70,7 @@ Each milestone ends in a playable build. We are at M0.
 | [docs/design/ITEM_CATALOG.md](docs/design/ITEM_CATALOG.md) | Every item, ingredient and preparation recipe |
 | [docs/design/ARMOR_EVOLUTION.md](docs/design/ARMOR_EVOLUTION.md) | The four armor pieces, their branches, fuel and recovery |
 | [docs/design/LIVING_SUBSTRATE_MUTATIONS.md](docs/design/LIVING_SUBSTRATE_MUTATIONS.md) | Substrate growth, function and reinforcement |
-| [ENGINEERING.md](ENGINEERING.md) | How we build: modules, limits, tests, tasks, pins |
+| [ENGINEERING.md](ENGINEERING.md) | How we build: modules, code style, limits, tests, stories, pins |
 | [REVIEW.md](REVIEW.md) | How we accept work |
 | [AGENTS.md](AGENTS.md) | Rules for anyone who changes this repository |
 
