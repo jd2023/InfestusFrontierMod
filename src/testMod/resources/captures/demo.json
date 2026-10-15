@@ -1,0 +1,25 @@
+{
+  "commands": [
+    "setblock 0 -60 -36 infestusfrontier:living_substrate[stage=basic]",
+    "setblock 2 -60 -36 infestusfrontier:living_substrate[stage=young]",
+    "setblock 4 -60 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 0 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Living Substrate\"','\"basic\"','\"\"','\"\"']}}",
+    "setblock 2 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Living Substrate\"','\"young\"','\"\"','\"\"']}}",
+    "setblock 4 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Living Substrate\"','\"mature\"','\"\"','\"\"']}}",
+    "fill -6 -61 -33 -4 -61 -31 dirt",
+    "fill -2 -61 -33 0 -61 -31 stone",
+    "fill 2 -61 -33 4 -61 -31 mud",
+    "fill 6 -61 -33 8 -61 -31 sand",
+    "setblock -5 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Dirt\"','\"host\"','\"use Spore Culture\"','\"\"']}}",
+    "setblock -1 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Stone\"','\"host\"','\"use Spore Culture\"','\"\"']}}",
+    "setblock 3 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mud\"','\"host\"','\"use Spore Culture\"','\"\"']}}",
+    "setblock 7 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Sand\"','\"not a host\"','\"nothing happens\"','\"\"']}}",
+    "give @s infestusfrontier:spore_culture 16",
+    "give @s infestusfrontier:living_substrate 16",
+    "give @s bone_meal 64"
+  ],
+  "views": [
+    {"name": "start", "x": 2.5, "y": -60, "z": -39.5, "yaw": 0, "pitch": 10, "gui": true},
+    {"name": "hosts", "x": 1.5, "y": -57, "z": -37.5, "yaw": 0, "pitch": 40}
+  ]
+}

@@ -31,5 +31,6 @@ Numbers in the design documents are starting values until play testing confirms 
 ```bash
 bash scripts/verify.sh       # the gate
 ./gradlew spotlessApply      # format
-./gradlew runClient          # play
+bash scripts/demo.sh         # play the demo world
+./gradlew runClient          # play your own world
 ```

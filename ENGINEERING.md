@@ -14,6 +14,7 @@ bash scripts/verify.sh                      # the gate; log in build/verificatio
 ./gradlew runClient                         # client in runs/client
 ./gradlew runClient -PwithJei -PwithCurios  # with the optional mods
 ./gradlew runServer                         # dedicated server in runs/server
+bash scripts/demo.sh                        # fresh demo world with every feature on show, in runs/demo
 ```
 
 Output: `build/libs/infestusfrontier-0.1.0-dev.1.jar`. It holds the mod, `core` and `ui`. It never holds the test mod.
@@ -154,6 +155,7 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 | Distribution | `verifyDistribution` | The JAR holds the entry point, `core`, `ui`, expanded metadata, and no test mod |
 | GameTests | `runGameTestServer` | Server-side behavior across real ticks, in `runs/gametest` |
 | Client captures | `./gradlew verifyCaptures` | Real client screenshots in `build/captures/<scenario>/<view>.png`. Checked for missing textures and blank frames, compared with goldens when present. The reviewer opens the images |
+| Demo world | `bash scripts/demo.sh` | Every shipped block, item and recipe in one fresh world, labeled. The owner plays it after each sprint |
 | Manual play | `runClient`, `runServer` | Feel and usability. Owner only, at milestone gates |
 
 - Every behavior gets a test that fails without it. Write the test first.
@@ -181,10 +183,16 @@ A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`:
 ```
 
 - The harness sets noon, clear weather, frozen time and weather, no clouds, no view bobbing, an empty hand, and hides the GUI unless `gui` is true. `commands` run as the player, one per tick, before the views.
-- A view teleports the player to `x y z` with `yaw pitch`, waits until every chunk section around the player is rendered, and saves `build/captures/<scenario>/<view>.png`.
+- A view teleports the player to `x y z` with `yaw pitch`. On the ground the player stands; in the air it flies and is pinned there. It waits until every chunk section around the player is rendered, and saves `build/captures/<scenario>/<view>.png`.
 - A capture fails when the image is missing, when more than 0.2% of its pixels are the missing-texture magenta, when the whole frame is one flat color, or when a golden exists in `src/testMod/resources/captures/golden/<scenario>/<view>.png` and more than 0.5% of pixels differ by more than 32 in a channel.
 - Goldens are added only after the owner accepts the art. A golden is replaced only in a story that says so.
 - The reviewer reads the PNG files. A passing check is not an accepted picture.
+
+### Demo world
+
+`bash scripts/demo.sh` builds the mod, deletes `runs/demo/saves/demo`, creates a fresh flat Creative world, runs the commands of the capture scenario `src/testMod/resources/captures/demo.json`, teleports the player to its first view and leaves the game open to play. The same scenario is photographed by `verifyCaptures`, so the gate sees the demo world too. Each exhibit is the blocks or items plus a waxed sign that names it.
+
+Every story that adds or changes a block, item, recipe, screen or guide entry adds its exhibit to `demo.json` and lists the file in `Files`. Exhibits stand north of spawn, from z=-37 to z=-31, so they never enter another scenario's view. The owner must be able to see and try every feature there without commands.
 
 Not covered yet: menu and screen captures, recipe tests through a crafting menu, optional-mod profiles, multiplayer soak, crash recovery, measured TPS and FPS on a dense base. Each arrives with the feature that needs it.
 

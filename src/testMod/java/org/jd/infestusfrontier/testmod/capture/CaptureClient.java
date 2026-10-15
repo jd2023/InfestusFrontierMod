@@ -16,16 +16,10 @@ import net.minecraft.client.CloudStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.LevelSettings;
-import net.minecraft.world.level.WorldDataConfiguration;
-import net.minecraft.world.level.levelgen.WorldOptions;
-import net.minecraft.world.level.levelgen.presets.WorldPresets;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.common.Mod;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -34,10 +28,9 @@ import org.slf4j.Logger;
 
 /**
  * Drives a disposable client through the capture scenarios: fresh flat world, commands, one screenshot per view,
- * then exit. Active only when {@code infestusfrontier.capture.dir} is set; a normal client run never sees it.
+ * then exit. Started by {@link TestClient} only when {@code infestusfrontier.capture.dir} is set.
  */
-@Mod(value = "infestusfrontier_tests", dist = Dist.CLIENT)
-public final class CaptureClient {
+final class CaptureClient {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String WORLD = "capture";
     private static final int WIDTH = 854;
@@ -45,6 +38,8 @@ public final class CaptureClient {
     private static final int STAGE_TIMEOUT_TICKS = 600;
     private static final int SETTLE_TICKS = 40;
     private static final int MOVE_TICKS = 10;
+    private static final int READY_RADIUS = 2; // chunks around the view that must have arrived from the server
+    private static final int READY_FRAMES = 10; // consecutive frames with nothing left to compile
     private static final List<String> BASELINE = List.of(
             "gamerule sendCommandFeedback false",
             "gamerule doDaylightCycle false",
@@ -63,23 +58,12 @@ public final class CaptureClient {
     private int scenarioIndex;
     private int viewIndex;
     private boolean frameReady;
+    private int readyFrames;
     private boolean resized;
 
-    public CaptureClient() {
-        String dir = System.getProperty("infestusfrontier.capture.dir");
-        if (dir == null) {
-            outputDir = null;
-            scenarios = List.of();
-            return;
-        }
-        outputDir = Path.of(dir);
-        List<Scenario> loaded;
-        try {
-            loaded = Scenario.loadAll(System.getProperty("infestusfrontier.capture.scenarios", ""));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-        scenarios = loaded;
+    CaptureClient(Path outputDir, List<Scenario> scenarios) {
+        this.outputDir = outputDir;
+        this.scenarios = scenarios;
         NeoForge.EVENT_BUS.addListener(this::onTick);
         NeoForge.EVENT_BUS.addListener(this::onLevelRendered);
         NeoForge.EVENT_BUS.addListener(this::onFrame);
@@ -89,7 +73,7 @@ public final class CaptureClient {
         Minecraft minecraft = Minecraft.getInstance();
         try {
             if (++ticksInStage > STAGE_TIMEOUT_TICKS && stage != Stage.DONE) {
-                throw new IllegalStateException("Timed out in stage " + stage);
+                throw new IllegalStateException("Timed out in stage " + stage + where(minecraft));
             }
             switch (stage) {
                 case TITLE -> createWorld(minecraft);
@@ -99,9 +83,10 @@ public final class CaptureClient {
                     if (ticksInStage >= SETTLE_TICKS) moveToView(minecraft);
                 }
                 case MOVE -> {
+                    holdInAir(minecraft);
                     if (ticksInStage >= MOVE_TICKS) enter(Stage.FRAME);
                 }
-                case FRAME, GRABBING -> {}
+                case FRAME, GRABBING -> holdInAir(minecraft);
                 case DISCONNECT -> disconnect(minecraft);
                 case STOP -> stop(minecraft);
                 case DONE -> {}
@@ -112,9 +97,7 @@ public final class CaptureClient {
     }
 
     private void createWorld(Minecraft minecraft) {
-        if (!minecraft.isGameLoadFinished()
-                || !(minecraft.screen instanceof TitleScreen)
-                || minecraft.getOverlay() != null) {
+        if (!FlatWorld.atTitle(minecraft)) {
             if (ticksInStage % 100 == 0) {
                 LOGGER.info(
                         "INFESTUS_CAPTURE_WAIT loaded={} screen={} overlay={}",
@@ -142,38 +125,13 @@ public final class CaptureClient {
         minecraft.options.bobView().set(false);
         minecraft.options.guiScale().set(2);
         minecraft.resizeDisplay();
-        LevelSettings settings = new LevelSettings(
-                WORLD,
-                GameType.CREATIVE,
-                false,
-                Difficulty.PEACEFUL,
-                true,
-                new GameRules(),
-                WorldDataConfiguration.DEFAULT);
-        WorldOptions options = new WorldOptions(0L, false, false);
         LOGGER.info("INFESTUS_CAPTURE_WORLD_CREATE scenarios={}", scenarios.size());
-        minecraft
-                .createWorldOpenFlows()
-                .createFreshLevel(
-                        WORLD,
-                        settings,
-                        options,
-                        registry -> registry.registryOrThrow(Registries.WORLD_PRESET)
-                                .getHolderOrThrow(WorldPresets.FLAT)
-                                .value()
-                                .createWorldDimensions(),
-                        new TitleScreen());
+        FlatWorld.create(minecraft, WORLD);
         enter(Stage.JOIN);
     }
 
     private void join(Minecraft minecraft) {
-        if (minecraft.level == null || minecraft.player == null || minecraft.screen != null) return;
-        var chunk = minecraft.player.chunkPosition();
-        for (int x = -2; x <= 2; x++) {
-            for (int z = -2; z <= 2; z++) {
-                if (!minecraft.level.hasChunk(chunk.x + x, chunk.z + z)) return;
-            }
-        }
+        if (!FlatWorld.joined(minecraft)) return;
         LOGGER.info("INFESTUS_CAPTURE_JOINED");
         commandQueue.addAll(BASELINE);
         commandQueue.addAll(scenarios.get(scenarioIndex).commands());
@@ -186,9 +144,7 @@ public final class CaptureClient {
             enter(Stage.SETTLE);
             return;
         }
-        if (!minecraft.player.connection.sendUnsignedCommand(command)) {
-            throw new IllegalStateException("Command rejected by the client parser: " + command);
-        }
+        FlatWorld.command(minecraft, command);
     }
 
     private void moveToView(Minecraft minecraft) {
@@ -196,11 +152,29 @@ public final class CaptureClient {
         Scenario.View view = scenario.views().get(viewIndex);
         String tp = String.format(
                 Locale.ROOT, "tp @s %.3f %.3f %.3f %.2f %.2f", view.x(), view.y(), view.z(), view.yaw(), view.pitch());
-        if (!minecraft.player.connection.sendUnsignedCommand(tp)) throw new IllegalStateException("Bad view: " + tp);
+        FlatWorld.command(minecraft, tp);
         minecraft.options.hideGui = !view.gui();
         minecraft.gui.getChat().clearMessages(true);
+        minecraft.getToasts().clear(); // "New recipes unlocked" after a give
         frameReady = false;
+        readyFrames = 0;
         enter(Stage.MOVE);
+    }
+
+    /**
+     * A Creative player stops flying the moment it stands on the ground and falls when it is in the air. So a view
+     * on the ground just stands, and a view in the air flies and is pinned to its exact position once the teleport
+     * has arrived.
+     */
+    private void holdInAir(Minecraft minecraft) {
+        var player = minecraft.player;
+        if (player == null || player.onGround()) return;
+        Scenario.View view = scenarios.get(scenarioIndex).views().get(viewIndex);
+        if (!player.getAbilities().flying) FlatWorld.fly(minecraft);
+        if (player.position().distanceToSqr(view.x(), view.y(), view.z()) < 1.0) {
+            player.setDeltaMovement(Vec3.ZERO);
+            player.setPos(view.x(), view.y(), view.z());
+        }
     }
 
     private void onLevelRendered(RenderLevelStageEvent event) {
@@ -212,9 +186,27 @@ public final class CaptureClient {
         boolean aimed = Math.abs(wrap(event.getCamera().getYRot() - view.yaw())) < 0.01f
                 && Math.abs(event.getCamera().getXRot() - view.pitch()) < 0.01f;
         var renderer = event.getLevelRenderer();
-        if (positioned && aimed && renderer.countRenderedSections() > 0 && renderer.hasRenderedAllSections()) {
-            frameReady = true;
+        // A newly arrived chunk is scheduled for compiling on a later frame, so the empty queue must hold for a while.
+        boolean ready = positioned
+                && aimed
+                && renderer.countRenderedSections() > 0
+                && renderer.hasRenderedAllSections()
+                && chunksArrived(minecraft, view)
+                && renderer.isSectionCompiled(BlockPos.containing(view.x(), view.y(), view.z()));
+        readyFrames = ready ? readyFrames + 1 : 0;
+        if (readyFrames >= READY_FRAMES) frameReady = true;
+    }
+
+    /** The chunks around the view have arrived from the server. Sections behind the camera are never compiled. */
+    private static boolean chunksArrived(Minecraft minecraft, Scenario.View view) {
+        int cx = SectionPos.blockToSectionCoord(Mth.floor(view.x()));
+        int cz = SectionPos.blockToSectionCoord(Mth.floor(view.z()));
+        for (int dx = -READY_RADIUS; dx <= READY_RADIUS; dx++) {
+            for (int dz = -READY_RADIUS; dz <= READY_RADIUS; dz++) {
+                if (!minecraft.level.hasChunk(cx + dx, cz + dz)) return false;
+            }
         }
+        return true;
     }
 
     private void onFrame(RenderFrameEvent.Post event) {
@@ -304,6 +296,25 @@ public final class CaptureClient {
         root.add("captures", report);
         if (failure != null) root.addProperty("failure", failure);
         Files.writeString(outputDir.resolve("report.json"), root.toString(), StandardCharsets.UTF_8);
+    }
+
+    /** Player position, camera angles and render state, for the timeout message. */
+    private static String where(Minecraft minecraft) {
+        if (minecraft.player == null || minecraft.level == null) return " (not in a world)";
+        var renderer = minecraft.levelRenderer;
+        var camera = minecraft.gameRenderer.getMainCamera();
+        return String.format(
+                Locale.ROOT,
+                " at %.3f %.3f %.3f yaw %.2f pitch %.2f flying=%s sections=%d all=%s screen=%s",
+                minecraft.player.getX(),
+                minecraft.player.getY(),
+                minecraft.player.getZ(),
+                camera.getYRot(),
+                camera.getXRot(),
+                minecraft.player.getAbilities().flying,
+                renderer.countRenderedSections(),
+                renderer.hasRenderedAllSections(),
+                minecraft.screen == null ? null : minecraft.screen.getClass().getSimpleName());
     }
 
     private void enter(Stage next) {

@@ -9,3 +9,5 @@ renderDistance:8
 particles:0
 showAutosaveIndicator:false
 narrator:0
+enableVsync:false
+maxFps:60

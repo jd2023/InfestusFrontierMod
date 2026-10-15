@@ -102,6 +102,14 @@ neoForge {
             systemProperty 'infestusfrontier.capture.dir', captureOutput.get().asFile.absolutePath
             systemProperty 'infestusfrontier.capture.scenarios', captureScenarios.join(',')
         }
+        // Playable client in a fresh world built from the capture scenario src/testMod/resources/captures/demo.json.
+        demo {
+            client()
+            sourceSet = sourceSets.testMod
+            gameDirectory = project.file('runs/demo')
+            loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
+            systemProperty 'infestusfrontier.demo.scene', 'demo'
+        }
     }
 }
 
@@ -257,6 +265,26 @@ def prepareCapture = tasks.register('prepareCapture') {
 tasks.named('runCapture') {
     dependsOn prepareCapture
     mustRunAfter tasks.named('runGameTestServer')
+    outputs.upToDateWhen { false }
+}
+// Fresh demo world each run. The client options are seeded once and then left to the owner.
+def prepareDemo = tasks.register('prepareDemo') {
+    def world = layout.projectDirectory.dir('runs/demo/saves/demo').asFile
+    def runDir = layout.projectDirectory.dir('runs/demo').asFile
+    def options = layout.projectDirectory.file('src/testMod/capture/options.txt').asFile
+    def fml = layout.projectDirectory.file('src/testMod/capture/fml.toml').asFile
+    inputs.files(options, fml)
+    outputs.upToDateWhen { false }
+    doLast {
+        world.deleteDir()
+        new File(runDir, 'config').mkdirs()
+        def seeded = new File(runDir, 'options.txt')
+        if (!seeded.exists()) seeded.text = options.text
+        new File(runDir, 'config/fml.toml').text = fml.text
+    }
+}
+tasks.named('runDemo') {
+    dependsOn prepareDemo
     outputs.upToDateWhen { false }
 }
 tasks.register('verifyCaptures', VerifyCaptures) {

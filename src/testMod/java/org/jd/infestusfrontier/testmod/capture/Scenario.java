@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/** One capture scenario from {@code captures/<name>.json}: commands to run, then views to photograph. */
+/** One scripted scene from {@code <folder>/<name>.json}: commands to run, then views to stand at. */
 record Scenario(String name, List<String> commands, List<View> views) {
     static final int MAX_VIEWS = 32;
     private static final String NAME = "[a-z][a-z0-9_]{0,63}";
@@ -21,18 +21,18 @@ record Scenario(String name, List<String> commands, List<View> views) {
     record View(String name, double x, double y, double z, float yaw, float pitch, boolean gui) {}
 
     /** Loads every scenario named in a comma separated list from the test mod resources. */
-    static List<Scenario> loadAll(String names) throws IOException {
+    static List<Scenario> loadAll(String folder, String names) throws IOException {
         List<Scenario> scenarios = new ArrayList<>();
         for (String name : names.split(",")) {
-            if (!name.isBlank()) scenarios.add(load(name.trim()));
+            if (!name.isBlank()) scenarios.add(load(folder, name.trim()));
         }
         if (scenarios.isEmpty()) throw new IOException("No capture scenarios named");
         return scenarios;
     }
 
-    static Scenario load(String name) throws IOException {
+    static Scenario load(String folder, String name) throws IOException {
         if (!name.matches(NAME)) throw new IOException("Bad scenario name: " + name);
-        String path = "/captures/" + name + ".json";
+        String path = "/" + folder + "/" + name + ".json";
         try (InputStream in = Scenario.class.getResourceAsStream(path)) {
             if (in == null) throw new IOException("Missing scenario resource " + path);
             JsonObject root = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8))
