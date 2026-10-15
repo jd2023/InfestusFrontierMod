@@ -1,0 +1,5 @@
+# Capture client only. The early loading window is skipped: its hand-off to the game window fails on some desktops.
+earlyWindowControl = false
+versionCheck = false
+disableOptimizedDFU = true
+dependencyOverrides = {}

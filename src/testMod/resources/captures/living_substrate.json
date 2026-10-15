@@ -1,0 +1,9 @@
+{
+  "commands": [
+    "setblock 0 -60 3 infestusfrontier:living_substrate[stage=basic]"
+  ],
+  "views": [
+    {"name": "front", "x": 0.5, "y": -60, "z": -0.5, "yaw": 0, "pitch": 20},
+    {"name": "back", "x": 0.5, "y": -60, "z": 7.5, "yaw": 180, "pitch": 20}
+  ]
+}

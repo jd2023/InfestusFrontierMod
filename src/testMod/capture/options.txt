@@ -1,0 +1,11 @@
+onboardAccessibility:false
+skipMultiplayerWarning:true
+tutorialStep:none
+pauseOnLostFocus:false
+renderClouds:false
+bobView:false
+guiScale:2
+renderDistance:8
+particles:0
+showAutosaveIndicator:false
+narrator:0

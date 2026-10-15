@@ -36,6 +36,10 @@ configurations {
     testModRuntimeOnly.extendsFrom runtimeOnly
 }
 
+def captureScenarioDir = layout.projectDirectory.dir('src/testMod/resources/captures')
+def captureScenarios = fileTree(captureScenarioDir) { include '*.json' }.files.collect { it.name - '.json' }.sort()
+def captureOutput = layout.buildDirectory.dir('captures')
+
 // Optional runtime mods for manual play: ./gradlew runClient -PwithJei -PwithCurios
 def withJei = providers.gradleProperty('withJei').isPresent()
 def withCurios = providers.gradleProperty('withCurios').isPresent()
@@ -88,6 +92,15 @@ neoForge {
             loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
             systemProperty 'neoforge.enabledGameTestNamespaces', 'infestusfrontier_tests'
             systemProperty 'neoforge.gameTestServer.forceExit', 'false'
+        }
+        // Disposable client that photographs every scenario in src/testMod/resources/captures.
+        capture {
+            client()
+            sourceSet = sourceSets.testMod
+            gameDirectory = project.file('runs/capture')
+            loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
+            systemProperty 'infestusfrontier.capture.dir', captureOutput.get().asFile.absolutePath
+            systemProperty 'infestusfrontier.capture.scenarios', captureScenarios.join(',')
         }
     }
 }
@@ -164,4 +177,94 @@ tasks.register('verifyAll') {
     group = 'verification'
     description = 'The gate: pure tests, boundaries, shipped JAR contents, GameTests in a real server.'
     dependsOn ':core:check', ':ui:check', tasks.named('build'), distribution, tasks.named('runGameTestServer')
+}
+
+// Every capture must exist, show no missing texture, not be a flat frame, and match its golden when one exists.
+abstract class VerifyCaptures extends DefaultTask {
+    @InputDirectory abstract DirectoryProperty getScenarios()
+    @InputDirectory @org.gradle.api.tasks.Optional abstract DirectoryProperty getGoldens()
+    @InputDirectory abstract DirectoryProperty getCaptures()
+    @TaskAction void verify() {
+        File root = captures.get().asFile
+        File reportFile = new File(root, 'report.json')
+        if (!reportFile.file) throw new GradleException("The capture client wrote no report at ${reportFile}")
+        def report = new groovy.json.JsonSlurper().parse(reportFile)
+        if (report.failure) throw new GradleException("Capture client failed: ${report.failure}")
+        List<String> problems = []
+        int checked = 0
+        scenarios.get().asFile.listFiles({ File f -> f.name.endsWith('.json') } as FileFilter).sort().each { File scenarioFile ->
+            String scenario = scenarioFile.name - '.json'
+            def spec = new groovy.json.JsonSlurper().parse(scenarioFile)
+            spec.views.each { view ->
+                File image = new File(root, "${scenario}/${view.name}.png")
+                String label = "${scenario}/${view.name}.png"
+                if (!image.file) { problems << "${label}: missing"; return }
+                java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(image)
+                if (img == null) { problems << "${label}: not a readable PNG"; return }
+                int w = img.width, h = img.height, n = w * h
+                long magenta = 0
+                double sum = 0, sumSq = 0
+                for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) {
+                    int rgb = img.getRGB(x, y)
+                    int r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = rgb & 0xff
+                    if (r > 200 && g < 60 && b > 200) magenta++
+                    double lum = 0.299 * r + 0.587 * g + 0.114 * b
+                    sum += lum; sumSq += lum * lum
+                }
+                double mean = sum / n
+                double stddev = Math.sqrt(Math.max(0, sumSq / n - mean * mean))
+                if (magenta * 1000 > n * 2) problems << "${label}: ${magenta} missing-texture pixels"
+                if (stddev < 4) problems << "${label}: flat frame (luminance stddev ${String.format('%.2f', stddev)})"
+                File golden = goldens.present ? new File(goldens.get().asFile, "${scenario}/${view.name}.png") : null
+                if (golden != null && golden.file) {
+                    java.awt.image.BufferedImage ref = javax.imageio.ImageIO.read(golden)
+                    if (ref.width != w || ref.height != h) problems << "${label}: size ${w}x${h} differs from golden ${ref.width}x${ref.height}"
+                    else {
+                        long differing = 0
+                        for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) {
+                            int a = img.getRGB(x, y), c = ref.getRGB(x, y)
+                            if (Math.abs(((a >> 16) & 0xff) - ((c >> 16) & 0xff)) > 32
+                                    || Math.abs(((a >> 8) & 0xff) - ((c >> 8) & 0xff)) > 32
+                                    || Math.abs((a & 0xff) - (c & 0xff)) > 32) differing++
+                        }
+                        if (differing * 1000 > n * 5) problems << "${label}: ${differing} pixels differ from the golden"
+                    }
+                }
+                checked++
+            }
+        }
+        if (problems) throw new GradleException("Capture checks failed:\n  " + problems.join('\n  '))
+        logger.lifecycle("Captures verified: ${checked} images under ${root}")
+    }
+}
+
+// Fresh world and output each run; fixed client options and FML config so the client never shows a first-run screen.
+def prepareCapture = tasks.register('prepareCapture') {
+    def world = layout.projectDirectory.dir('runs/capture/saves/capture').asFile
+    def output = captureOutput.get().asFile
+    def runDir = layout.projectDirectory.dir('runs/capture').asFile
+    def options = layout.projectDirectory.file('src/testMod/capture/options.txt').asFile
+    def fml = layout.projectDirectory.file('src/testMod/capture/fml.toml').asFile
+    inputs.files(options, fml)
+    outputs.upToDateWhen { false }
+    doLast {
+        [world, output].each { it.deleteDir() }
+        new File(runDir, 'config').mkdirs()
+        new File(runDir, 'options.txt').text = options.text
+        new File(runDir, 'config/fml.toml').text = fml.text
+    }
+}
+tasks.named('runCapture') {
+    dependsOn prepareCapture
+    mustRunAfter tasks.named('runGameTestServer')
+    outputs.upToDateWhen { false }
+}
+tasks.register('verifyCaptures', VerifyCaptures) {
+    group = 'verification'
+    description = 'Runs the capture client and checks every screenshot.'
+    dependsOn tasks.named('runCapture')
+    scenarios = captureScenarioDir
+    captures = captureOutput
+    def goldenDir = captureScenarioDir.dir('golden')
+    if (goldenDir.asFile.directory) goldens = goldenDir
 }
