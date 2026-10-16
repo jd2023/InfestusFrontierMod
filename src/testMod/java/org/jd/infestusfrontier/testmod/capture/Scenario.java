@@ -11,14 +11,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import net.minecraft.core.BlockPos;
 
 /** One scripted scene from {@code <folder>/<name>.json}: commands to run, then views to stand at. */
 record Scenario(String name, List<String> commands, List<View> views) {
     static final int MAX_VIEWS = 32;
     private static final String NAME = "[a-z][a-z0-9_]{0,63}";
 
-    record View(String name, double x, double y, double z, float yaw, float pitch, boolean gui) {}
+    /** {@code use} names a block the player right-clicks with an empty hand before the shot, to photograph its screen. */
+    record View(
+            String name, double x, double y, double z, float yaw, float pitch, boolean gui, Optional<BlockPos> use) {}
 
     /** Loads every scenario named in a comma separated list from the test mod resources. */
     static List<Scenario> loadAll(String folder, String names) throws IOException {
@@ -53,6 +57,15 @@ record Scenario(String name, List<String> commands, List<View> views) {
                 if (!viewName.matches(NAME) || !seen.add(viewName)) {
                     throw new IOException(name + ": bad or duplicate view name " + viewName);
                 }
+                Optional<BlockPos> use = Optional.empty();
+                if (v.has("use")) {
+                    JsonArray at = v.getAsJsonArray("use");
+                    if (at.size() != 3) throw new IOException(name + ": use needs [x, y, z] in view " + viewName);
+                    use = Optional.of(new BlockPos(
+                            at.get(0).getAsInt(),
+                            at.get(1).getAsInt(),
+                            at.get(2).getAsInt()));
+                }
                 views.add(new View(
                         viewName,
                         v.get("x").getAsDouble(),
@@ -60,7 +73,8 @@ record Scenario(String name, List<String> commands, List<View> views) {
                         v.get("z").getAsDouble(),
                         v.get("yaw").getAsFloat(),
                         v.get("pitch").getAsFloat(),
-                        v.has("gui") && v.get("gui").getAsBoolean()));
+                        v.has("gui") && v.get("gui").getAsBoolean(),
+                        use));
             }
             return new Scenario(name, List.copyOf(commands), List.copyOf(views));
         }

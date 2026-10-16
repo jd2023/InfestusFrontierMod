@@ -184,6 +184,7 @@ A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`:
 
 - The harness sets noon, clear weather, frozen time and weather, no clouds, no view bobbing, an empty hand, and hides the GUI unless `gui` is true. `commands` run as the player, one per tick, before the views.
 - A view teleports the player to `x y z` with `yaw pitch`. On the ground the player stands; in the air it flies and is pinned there. It waits until every chunk section around the player is rendered, and saves `build/captures/<scenario>/<view>.png`.
+- A view with `"use": [x, y, z]` and `"gui": true` right-clicks that block with an empty hand from where it stands and photographs the screen that opens. Every screen gets such a view in `demo.json`.
 - A capture fails when the image is missing, when more than 0.2% of its pixels are the missing-texture magenta, when the whole frame is one flat color, or when a golden exists in `src/testMod/resources/captures/golden/<scenario>/<view>.png` and more than 0.5% of pixels differ by more than 32 in a channel.
 - Goldens are added only after the owner accepts the art. A golden is replaced only in a story that says so.
 - The reviewer reads the PNG files. A passing check is not an accepted picture.
@@ -194,7 +195,7 @@ A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`:
 
 Every story that adds or changes a block, item, recipe, screen or guide entry adds its exhibit to `demo.json` and lists the file in `Files`. Exhibits stand north of spawn in three rows, so they never enter another scenario's view: row A at z=-36 with signs at z=-37 (blocks and organs, one per even x), row B at z=-33 to z=-31 with signs at z=-34 (ground plots), row C at z=-29 to z=-26 with signs at z=-30 (patches). The current sprint file lists the taken x positions. The owner must be able to see and try every feature there without commands.
 
-Not covered yet: menu and screen captures, recipe tests through a crafting menu, optional-mod profiles, multiplayer soak, crash recovery, measured TPS and FPS on a dense base. Each arrives with the feature that needs it.
+Not covered yet: recipe tests through a crafting menu, optional-mod profiles, multiplayer soak, crash recovery, measured TPS and FPS on a dense base. Each arrives with the feature that needs it.
 
 ## Stories and sprints
 

@@ -16,9 +16,15 @@ import net.minecraft.client.CloudStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
@@ -84,7 +90,10 @@ final class CaptureClient {
                 }
                 case MOVE -> {
                     holdInAir(minecraft);
-                    if (ticksInStage >= MOVE_TICKS) enter(Stage.FRAME);
+                    if (ticksInStage >= MOVE_TICKS) {
+                        currentView().use().ifPresent(block -> useBlock(minecraft, block));
+                        enter(Stage.FRAME);
+                    }
                 }
                 case FRAME, GRABBING -> holdInAir(minecraft);
                 case DISCONNECT -> disconnect(minecraft);
@@ -161,6 +170,26 @@ final class CaptureClient {
         enter(Stage.MOVE);
     }
 
+    private Scenario.View currentView() {
+        return scenarios.get(scenarioIndex).views().get(viewIndex);
+    }
+
+    /** Right-clicks {@code block} with an empty hotbar slot selected, the way a player opens an organ's screen. */
+    private static void useBlock(Minecraft minecraft, BlockPos block) {
+        var player = minecraft.player;
+        var inventory = player.getInventory();
+        int empty = -1;
+        for (int slot = 0; slot < Inventory.getSelectionSize() && empty < 0; slot++) {
+            if (inventory.getItem(slot).isEmpty()) empty = slot;
+        }
+        if (empty < 0) throw new IllegalStateException("No empty hotbar slot to use " + block + " with");
+        inventory.selected = empty;
+        player.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+        Vec3 hit = Vec3.atCenterOf(block).add(0, 0, -0.5);
+        minecraft.gameMode.useItemOn(
+                player, InteractionHand.MAIN_HAND, new BlockHitResult(hit, Direction.NORTH, block, false));
+    }
+
     /**
      * A Creative player stops flying the moment it stands on the ground and falls when it is in the air. So a view
      * on the ground just stands, and a view in the air flies and is pinned to its exact position once the teleport
@@ -212,9 +241,11 @@ final class CaptureClient {
     private void onFrame(RenderFrameEvent.Post event) {
         if (stage != Stage.FRAME || !frameReady) return;
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.screen != null) return;
         Scenario scenario = scenarios.get(scenarioIndex);
         Scenario.View view = scenario.views().get(viewIndex);
+        // A view that used a block waits for its container screen; every other view waits for no screen at all.
+        boolean screenOpen = minecraft.screen instanceof AbstractContainerScreen<?>;
+        if (view.use().isPresent() ? !screenOpen || ticksInStage < MOVE_TICKS : minecraft.screen != null) return;
         enter(Stage.GRABBING);
         try {
             Path scenarioDir = outputDir.resolve(scenario.name());
@@ -249,6 +280,8 @@ final class CaptureClient {
     }
 
     private void advance(Minecraft minecraft) {
+        if (minecraft.screen instanceof AbstractContainerScreen<?> && minecraft.player != null)
+            minecraft.player.closeContainer();
         viewIndex++;
         if (viewIndex < scenarios.get(scenarioIndex).views().size()) {
             moveToView(minecraft);

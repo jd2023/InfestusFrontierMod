@@ -9,6 +9,7 @@
   "fluid_type.infestusfrontier.biomass": "Biomass",
   "gui.infestusfrontier.biomass": "%s / %s BU",
   "gui.infestusfrontier.biomass_bladder.fill": "Fill",
+  "gui.infestusfrontier.biomass_bladder.piece": "Piece",
   "infestusfrontier.status.digestive_sac.idle": "Digestive Sac: idle, %2$s / %3$s BU",
   "infestusfrontier.status.digestive_sac.working": "Digestive Sac: working %1$s%%, %2$s / %3$s BU",
   "infestusfrontier.status.digestive_sac.paused": "Digestive Sac: paused, no Living Substrate below, %2$s / %3$s BU",
