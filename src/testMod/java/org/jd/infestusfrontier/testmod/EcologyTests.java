@@ -88,6 +88,114 @@ public final class EcologyTests {
         });
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    public static void boneMealMaturesOneStageEveryThirtyTicks(GameTestHelper h) {
+        h.setBlock(CELL, EcologyModule.LIVING_SUBSTRATE.get());
+        for (Direction side : Direction.Plane.HORIZONTAL) h.setBlock(CELL.relative(side), Blocks.OAK_PLANKS);
+        Player player = holding(h, GameType.SURVIVAL, Items.BONE_MEAL, 2);
+        use(h, player, CELL, Direction.UP);
+        h.assertValueEqual(player.getMainHandItem().getCount(), 1, "one bone meal used");
+        assertStage(h, CELL, SubstrateStage.BASIC);
+        int step = LivingSubstrateBlock.GROWTH_DELAY_TICKS;
+        h.runAfterDelay(step - 2, () -> assertStage(h, CELL, SubstrateStage.BASIC));
+        h.runAfterDelay(step + 2, () -> assertStage(h, CELL, SubstrateStage.YOUNG));
+        h.runAfterDelay(2 * step + 2, () -> assertStage(h, CELL, SubstrateStage.MATURE));
+        h.runAfterDelay(3 * step + 2, () -> {
+            assertVigor(h, CELL, 0);
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 800)
+    public static void oneBoneMealSpreadsAtMostFifteenCellsThenStops(GameTestHelper h) {
+        BlockPos center = new BlockPos(7, 1, 7);
+        for (int x = 2; x <= 12; x++) for (int z = 2; z <= 12; z++) h.setBlock(new BlockPos(x, 1, z), Blocks.DIRT);
+        h.setBlock(center, mature());
+        Player player = holding(h, GameType.SURVIVAL, Items.BONE_MEAL, 1);
+        use(h, player, center, Direction.UP);
+        h.assertValueEqual(player.getMainHandItem().getCount(), 0, "bone meal used on a mature cell with hosts");
+        int step = LivingSubstrateBlock.GROWTH_DELAY_TICKS;
+        h.runAfterDelay(step + 2, () -> {
+            h.assertValueEqual(countCells(h), 3, "the first wave converts exactly two hosts");
+            assertVigor(h, center, 0);
+        });
+        h.runAfterDelay(12 * step, () -> {
+            int settled = countCells(h);
+            h.assertTrue(settled >= 7 && settled <= 15, "the wave reached " + settled + " cells, expected 7 to 15");
+            h.assertTrue(countVigor(h) == 0, "every cell is dormant");
+            h.runAfterDelay(4 * step, () -> {
+                h.assertValueEqual(countCells(h), settled, "nothing grows after the wave");
+                h.succeed();
+            });
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void boneMealIsKeptOnAMatureCellWithNoExposedHost(GameTestHelper h) {
+        h.setBlock(CELL, mature());
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            h.setBlock(CELL.relative(side), Blocks.DIRT);
+            h.setBlock(CELL.relative(side).above(), Blocks.OAK_PLANKS);
+        }
+        Player player = holding(h, GameType.SURVIVAL, Items.BONE_MEAL, 2);
+        use(h, player, CELL, Direction.UP);
+        h.assertValueEqual(player.getMainHandItem().getCount(), 2, "bone meal kept");
+        assertVigor(h, CELL, 0);
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void spreadFollowsOneStepUpAndDown(GameTestHelper h) {
+        BlockPos cell = new BlockPos(4, 2, 4);
+        h.setBlock(cell, mature());
+        h.setBlock(cell.north(), Blocks.OAK_PLANKS);
+        h.setBlock(cell.south(), Blocks.OAK_PLANKS);
+        h.setBlock(cell.east(), Blocks.OAK_PLANKS); // planks are not hosts
+        h.setBlock(cell.east().above(), Blocks.DIRT);
+        h.setBlock(cell.west().below(), Blocks.DIRT);
+        Player player = holding(h, GameType.SURVIVAL, Items.BONE_MEAL, 1);
+        use(h, player, cell, Direction.UP);
+        h.runAfterDelay(LivingSubstrateBlock.GROWTH_DELAY_TICKS + 2, () -> {
+            assertStage(h, cell.east().above(), SubstrateStage.BASIC);
+            assertStage(h, cell.west().below(), SubstrateStage.BASIC);
+            assertVigor(h, cell.east().above(), 2);
+            h.assertBlockPresent(Blocks.OAK_PLANKS, cell.east());
+            h.succeed();
+        });
+    }
+
+    static BlockState mature() {
+        return EcologyModule.LIVING_SUBSTRATE
+                .get()
+                .defaultBlockState()
+                .setValue(LivingSubstrateBlock.STAGE, SubstrateStage.MATURE);
+    }
+
+    static int countCells(GameTestHelper h) {
+        int count = 0;
+        for (int x = 0; x < 16; x++)
+            for (int z = 0; z < 16; z++)
+                if (h.getBlockState(new BlockPos(x, 1, z)).is(EcologyModule.LIVING_SUBSTRATE.get())) count++;
+        return count;
+    }
+
+    static int countVigor(GameTestHelper h) {
+        int sum = 0;
+        for (int x = 0; x < 16; x++)
+            for (int z = 0; z < 16; z++) {
+                BlockState state = h.getBlockState(new BlockPos(x, 1, z));
+                if (state.is(EcologyModule.LIVING_SUBSTRATE.get())) sum += state.getValue(LivingSubstrateBlock.VIGOR);
+            }
+        return sum;
+    }
+
+    static void assertVigor(GameTestHelper h, BlockPos cell, int vigor) {
+        h.assertBlockState(
+                cell,
+                (BlockState s) -> s.getValue(LivingSubstrateBlock.VIGOR) == vigor,
+                () -> "expected vigor " + vigor);
+    }
+
     static Player holding(GameTestHelper h, GameType mode, Item item, int count) {
         Player player = h.makeMockPlayer(mode);
         // The mock player answers isCreative() but keeps survival abilities; items check the abilities like vanilla.

@@ -3,7 +3,7 @@ package org.jd.infestusfrontier.ecology;
 import java.util.Optional;
 import net.minecraft.util.StringRepresentable;
 
-/** Maturity of one Living Substrate cell. Grows one step per deliberate treatment, never on its own. */
+/** Maturity of one Living Substrate cell. Grows one step per growth tick while it has vigor, never on its own. */
 public enum SubstrateStage implements StringRepresentable {
     BASIC("basic"),
     YOUNG("young"),

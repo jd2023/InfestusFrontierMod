@@ -13,14 +13,14 @@ Proposed cell anatomy. Maturity, function, framework and lining are separate pro
 | Stage | How the player makes it | What it supports | Appearance |
 |---|---|---|---|
 | **Basic** | Craft dirt with Spore Culture, or apply culture to exposed eligible ground. | Culture Bowl, Digestive Sac and other starter organs. This must work before automated biomass production exists. | Sparse threads; much of the original ground remains visible. |
-| **Young** | Apply bone meal or feed a deliberate biomass dose. | Established starter organs and a denser living ground cover. | Joined veins, small pores and scattered soft growth. |
-| **Mature** | Feed another growth treatment to the selected young cell or marked patch. | Functional mutations and the foundations required by larger organs. | Interlocking tissue, deeper folds, varied pores and room for bushes and roots. |
+| **Young** | Bone meal on the cell, or a wave from a treated cell beside it. | Established starter organs and a denser living ground cover. | Joined veins, small pores and scattered soft growth. |
+| **Mature** | The same wave, 30 ticks later. | Functional mutations and the foundations required by larger organs. | Interlocking tissue, deeper folds, varied pores and room for bushes and roots. |
 
-Bone meal accelerates **maturity**, not expansion into unspecified neighboring land. The player selects the cells to grow. A later Foundation Cyst can treat a marked area using its packed stock and biomass; it stops at that boundary or when supplies run out.
+Bone meal starts one bounded wave. The treated cell gets 3 vigor and matures one stage every 30 ticks. A mature cell with vigor converts up to 2 exposed host blocks beside it (level, one up or one down) into basic cells with one vigor less, then goes dormant. One bone meal therefore reaches at most 15 cells (7 mature, 8 basic) and is over within 15 seconds. Bone meal on a dormant mature cell with no exposed host beside it is not used up. A later Foundation Cyst treats a marked area the same way from its packed stock.
 
 Maturity does not decay when the player leaves. An unfed active function pauses.
-A broken cell drops an item that keeps its stage. Placed again, it has the same stage.
-Cells have no block entity, never tick and never spread. Only a player action, or an organ the player built, changes a cell. A colony may hold hundreds of thousands of cells, so a cell costs the server nothing while idle.
+A broken cell drops an item that keeps its stage, not its vigor. Placed again, it has the same stage and is dormant.
+Cells have no block entity and no random ticks. A cell ticks only while it has vigor, through vanilla scheduled ticks, and goes dormant on its own. A colony may hold hundreds of thousands of cells, so a dormant cell costs the server nothing.
 Destructive contamination can kill tissue under [containment rules](BLOCK_CATALOG.md#containment-failures); ordinary lack of fuel cannot. Older-looking patterns are visual variants of mature tissue, not another mandatory progression level.
 
 ## 2. Give mature tissue a function

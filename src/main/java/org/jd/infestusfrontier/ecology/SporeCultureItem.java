@@ -1,9 +1,6 @@
 package org.jd.infestusfrontier.ecology;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -11,12 +8,9 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
-import org.jd.infestusfrontier.InfestusFrontier;
 
 /** Converts the one eligible, exposed ground block the player points at into basic Living Substrate. */
 final class SporeCultureItem extends Item {
-    static final TagKey<Block> SUBSTRATE_HOSTS = TagKey.create(
-            Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "substrate_hosts"));
     private static final int GROWTH_PARTICLES = 15;
 
     SporeCultureItem(Properties properties) {
@@ -27,7 +21,7 @@ final class SporeCultureItem extends Item {
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos target = context.getClickedPos();
-        if (!level.getBlockState(target).is(SUBSTRATE_HOSTS)) return InteractionResult.PASS;
+        if (!level.getBlockState(target).is(LivingSubstrateBlock.HOSTS)) return InteractionResult.PASS;
         BlockPos facing = target.relative(context.getClickedFace());
         if (!level.getBlockState(facing).getCollisionShape(level, facing).isEmpty()) return InteractionResult.PASS;
         if (level.isClientSide) return InteractionResult.SUCCESS;
