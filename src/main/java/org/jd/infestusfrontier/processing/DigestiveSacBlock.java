@@ -17,12 +17,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jd.infestusfrontier.organ.api.Organs;
-import org.jd.infestusfrontier.storage.api.BiomassBuckets;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Turns one hand-fed item at a time into biomass. Feed items start a batch, buckets take biomass out, empty hands
- * report the state, anything else passes through so the player can build against it.
+ * Turns one hand-fed item at a time into biomass. Feed items start a batch, empty buckets take biomass out, empty
+ * hands report the state, anything else passes through so the player can build against it.
  */
 public final class DigestiveSacBlock extends BaseEntityBlock {
     private static final MapCodec<DigestiveSacBlock> CODEC = simpleCodec(DigestiveSacBlock::new);
@@ -68,8 +68,8 @@ public final class DigestiveSacBlock extends BaseEntityBlock {
             Player player,
             InteractionHand hand,
             BlockHitResult hit) {
-        if (BiomassBuckets.isBucket(stack))
-            return BiomassBuckets.useOn(stack, level, pos, hit.getDirection(), player, hand);
+        ItemInteractionResult fluid = BiomassFluids.useOn(stack, level, pos, hit.getDirection(), player, hand);
+        if (fluid != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) return fluid;
         if (!(level.getBlockEntity(pos) instanceof DigestiveSacBlockEntity sac))
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         return sac.feed(player, hand, stack);

@@ -11,6 +11,11 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.foundation.Biomass;
@@ -18,8 +23,9 @@ import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.storage.BiomassBladderBlock;
 import org.jd.infestusfrontier.storage.BiomassBladderMenu;
 import org.jd.infestusfrontier.storage.StorageModule;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
 
-/** The Biomass Bladder: buckets in and out, the fill level, the transfer limit and the screen. */
+/** The Biomass Bladder: buckets in and out, the fill level, the fluid capability and the screen. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class StorageTests {
@@ -42,32 +48,48 @@ public final class StorageTests {
         h.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void fullBladderRefusesAFifthBucketUnchanged(GameTestHelper h) {
         placeBladder(h);
         Player player = EcologyTests.holding(h, GameType.CREATIVE, StorageModule.BIOMASS_BUCKET.get(), 1);
-        for (int i = 0; i < 4; i++) {
-            final int round = i;
-            h.runAfterDelay(round * 25L, () -> EcologyTests.use(h, player, BLADDER, Direction.UP));
-        }
-        h.runAfterDelay(100, () -> {
-            h.assertValueEqual(tank(h).stored(), Biomass.of(4000), "four buckets fill it");
-            assertFill(h, 4);
-            EcologyTests.use(h, player, BLADDER, Direction.UP);
-            h.assertValueEqual(tank(h).stored(), Biomass.of(4000), "fifth bucket refused");
-            h.succeed();
-        });
+        for (int i = 0; i < 4; i++) EcologyTests.use(h, player, BLADDER, Direction.UP);
+        h.assertValueEqual(tank(h).stored(), Biomass.of(4000), "four buckets fill it");
+        assertFill(h, 4);
+        EcologyTests.use(h, player, BLADDER, Direction.UP);
+        h.assertValueEqual(tank(h).stored(), Biomass.of(4000), "fifth bucket refused");
+        h.succeed();
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void onePlayerGetsFourTransfersPerSecond(GameTestHelper h) {
+    public static void waterBucketIsRefusedAndKept(GameTestHelper h) {
         placeBladder(h);
-        Player player = EcologyTests.holding(h, GameType.CREATIVE, StorageModule.BIOMASS_BUCKET.get(), 1);
-        for (int i = 0; i < 5; i++) EcologyTests.use(h, player, BLADDER, Direction.UP);
-        h.assertValueEqual(tank(h).stored(), Biomass.of(4000), "four of five admitted");
-        Player other = EcologyTests.holding(h, GameType.CREATIVE, Items.BUCKET, 1);
-        EcologyTests.use(h, other, BLADDER, Direction.UP);
-        h.assertValueEqual(tank(h).stored(), Biomass.of(3000), "another player is not limited by the first");
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.WATER_BUCKET, 1);
+        EcologyTests.use(h, player, BLADDER, Direction.UP);
+        h.assertTrue(player.getMainHandItem().is(Items.WATER_BUCKET), "water bucket kept");
+        h.assertValueEqual(tank(h).stored(), Biomass.ZERO, "nothing stored");
+        h.assertBlockPresent(Blocks.AIR, BLADDER.above());
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void fluidHandlersMovePartialAmountsLikePipes(GameTestHelper h) {
+        placeBladder(h);
+        BlockPos other = BLADDER.east();
+        h.setBlock(GROUND.east(), EcologyModule.LIVING_SUBSTRATE.get());
+        h.setBlock(other, StorageModule.BIOMASS_BLADDER.get());
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, StorageModule.BIOMASS_BUCKET.get(), 1);
+        EcologyTests.use(h, player, BLADDER, Direction.UP);
+        IFluidHandler source = fluidHandler(h, BLADDER);
+        IFluidHandler sink = fluidHandler(h, other);
+        h.assertTrue(BiomassFluids.isBiomass(source.getFluidInTank(0)), "the tank reports biomass");
+        h.assertValueEqual(source.getFluidInTank(0).getAmount(), 1000, "one bucket as fluid");
+        h.assertValueEqual(source.getTankCapacity(0), 4000, "capacity as fluid");
+        FluidStack moved = FluidUtil.tryFluidTransfer(sink, source, 250, true);
+        h.assertValueEqual(moved.getAmount(), 250, "a quarter bucket moved");
+        h.assertValueEqual(tank(h).stored(), Biomass.of(750), "source keeps the rest");
+        h.assertValueEqual(ProcessingTests.handler(h, other).tank().stored(), Biomass.of(250), "sink has it");
+        h.assertValueEqual(
+                sink.fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE), 0, "water refused");
         h.succeed();
     }
 
@@ -107,6 +129,12 @@ public final class StorageTests {
 
     static org.jd.infestusfrontier.core.storage.BiomassTank tank(GameTestHelper h) {
         return ProcessingTests.handler(h, BLADDER).tank();
+    }
+
+    static IFluidHandler fluidHandler(GameTestHelper h, BlockPos pos) {
+        IFluidHandler handler = h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(pos), null);
+        if (handler == null) h.fail("no fluid capability", pos);
+        return handler;
     }
 
     static void assertFill(GameTestHelper h, int level) {

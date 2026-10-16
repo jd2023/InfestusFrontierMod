@@ -43,18 +43,18 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
     }
 
     @Override
-    public Outcome<BiomassTank> insert(Biomass amount) {
-        return apply(tank.fill(amount));
+    public Outcome<BiomassTank> insert(Biomass amount, boolean simulate) {
+        return apply(tank.fill(amount), simulate);
     }
 
     @Override
-    public Outcome<BiomassTank> extract(Biomass amount) {
-        return apply(tank.drain(amount));
+    public Outcome<BiomassTank> extract(Biomass amount, boolean simulate) {
+        return apply(tank.drain(amount), simulate);
     }
 
-    private Outcome<BiomassTank> apply(Outcome<BiomassTank> change) {
+    private Outcome<BiomassTank> apply(Outcome<BiomassTank> change, boolean simulate) {
         if (unreadable.isPresent()) return Outcome.refused(Persistence.CORRUPT);
-        if (change instanceof Outcome.Done<BiomassTank> done) {
+        if (!simulate && change instanceof Outcome.Done<BiomassTank> done) {
             tank = done.value();
             setChanged();
             if (level != null) {

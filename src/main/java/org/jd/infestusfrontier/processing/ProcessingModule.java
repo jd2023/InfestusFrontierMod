@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -21,6 +22,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
 
 /** Owner of reserved batch execution. Ships the Digestive Sac and the digestion recipe type. */
@@ -70,7 +72,12 @@ public final class ProcessingModule {
         RECIPE_TYPES.register(modBus);
         RECIPE_SERIALIZERS.register(modBus);
         COMPONENTS.register(modBus);
-        modBus.addListener((RegisterCapabilitiesEvent event) ->
-                event.registerBlockEntity(BiomassCapabilities.BLOCK, DIGESTIVE_SAC_ENTITY.get(), (sac, side) -> sac));
+        modBus.addListener((RegisterCapabilitiesEvent event) -> {
+            event.registerBlockEntity(BiomassCapabilities.BLOCK, DIGESTIVE_SAC_ENTITY.get(), (sac, side) -> sac);
+            event.registerBlockEntity(
+                    Capabilities.FluidHandler.BLOCK,
+                    DIGESTIVE_SAC_ENTITY.get(),
+                    (sac, side) -> BiomassFluids.handler(sac));
+        });
     }
 }

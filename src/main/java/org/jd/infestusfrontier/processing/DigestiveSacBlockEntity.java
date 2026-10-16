@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +19,9 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.foundation.Refusal;
@@ -32,11 +36,13 @@ import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 
 /**
  * One batch at a time. Feeding reserves the whole yield in the 1000 BU tank before the item is taken, so completion
- * can never be refused. Work advances only while loaded and rooted on a foundation. Biomass leaves by bucket.
+ * can never be refused. Work advances only while loaded and rooted on a foundation. A finished batch flows into any
+ * fluid tank touching the Sac, such as a Biomass Bladder; the rest leaves by bucket.
  */
 final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandler {
     static final Biomass CAPACITY = Biomass.of(1000);
@@ -67,6 +73,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             sac.tank = sac.tank.commit(advanced.yield());
             sac.history = sac.history.completed();
             sac.batch = Optional.empty();
+            sac.pushToNeighbors(level, pos);
         } else {
             sac.batch = Optional.of(advanced);
         }
@@ -94,6 +101,19 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
         if (!player.getAbilities().instabuild) stack.shrink(1);
         setChanged();
         return ItemInteractionResult.CONSUME;
+    }
+
+    /** Offers the stored biomass to the six touching blocks, once, in a fixed order. Six capability reads at most. */
+    private void pushToNeighbors(Level level, BlockPos pos) {
+        IFluidHandler own = BiomassFluids.handler(this);
+        for (Direction side : Direction.values()) {
+            if (tank.stored().isZero()) return;
+            BlockPos next = pos.relative(side);
+            if (!level.hasChunkAt(next)) continue;
+            IFluidHandler neighbor = level.getCapability(Capabilities.FluidHandler.BLOCK, next, side.getOpposite());
+            if (neighbor != null)
+                FluidUtil.tryFluidTransfer(neighbor, own, tank.stored().units(), true);
+        }
     }
 
     private Optional<Refusal> refusalFor(Biomass yield) {
@@ -128,15 +148,15 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     }
 
     @Override
-    public Outcome<BiomassTank> insert(Biomass amount) {
+    public Outcome<BiomassTank> insert(Biomass amount, boolean simulate) {
         return Outcome.refused(NOT_ACCEPTED);
     }
 
     @Override
-    public Outcome<BiomassTank> extract(Biomass amount) {
+    public Outcome<BiomassTank> extract(Biomass amount, boolean simulate) {
         if (unreadable.isPresent()) return Outcome.refused(Persistence.CORRUPT);
         Outcome<BiomassTank> drained = tank.drain(amount);
-        if (drained instanceof Outcome.Done<BiomassTank> done) {
+        if (!simulate && drained instanceof Outcome.Done<BiomassTank> done) {
             tank = done.value();
             setChanged();
         }

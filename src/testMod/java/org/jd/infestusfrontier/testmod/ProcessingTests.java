@@ -23,7 +23,7 @@ import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 
-/** The Digestive Sac: feeding, reservation, pause, buckets and the state carried on its item. */
+/** The Digestive Sac: feeding, reservation, pause, buckets, output to a neighbor and the state carried on its item. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class ProcessingTests {
@@ -118,6 +118,21 @@ public final class ProcessingTests {
         h.assertTrue(carrier.getMainHandItem().is(StorageModule.BIOMASS_BUCKET.get()), "biomass kept");
         h.assertValueEqual(tank(h).stored(), Biomass.ZERO, "sac takes nothing in");
         h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    public static void finishedBatchFlowsIntoTheBladderBesideIt(GameTestHelper h) {
+        placeSac(h);
+        BlockPos bladder = SAC.east();
+        h.setBlock(GROUND.east(), EcologyModule.LIVING_SUBSTRATE.get());
+        h.setBlock(bladder, StorageModule.BIOMASS_BLADDER.get());
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.WHEAT, 1);
+        EcologyTests.use(h, player, SAC, Direction.UP);
+        h.runAfterDelay(WHEAT_TICKS + 2, () -> {
+            h.assertValueEqual(tank(h).stored(), Biomass.ZERO, "the sac handed its yield on");
+            h.assertValueEqual(handler(h, bladder).tank().stored(), Biomass.of(100), "the bladder holds it");
+            h.succeed();
+        });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 300)

@@ -135,7 +135,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Create:** 1 Organ Bud + 2 glass + 1 slime ball; an early leather replacement for the slime ball makes a smaller bladder.
 - **Growth:** Skeletal Graft treatment reinforces its capacity. It can later become a Biomass Reservoir Cell without discarding its stored feed.
 - **Hand controls:** Buckets transfer biomass; unrelated held items pass through to ordinary use/placement, including offhand placement with an empty main hand.
-- **Baseline:** The slime-built starter Bladder holds 4,000 mB. Full tanks refuse unchanged. Bucket and equipment-fill actions share 64 portable transfers per server tick and four per player in any 20-tick window; excess is refused without a queue or resource loss.
+- **Baseline:** The slime-built starter Bladder holds 4,000 mB. Full tanks refuse unchanged. Biomass is an ordinary fluid: vanilla buckets and any mod's pipes move it through the standard fluid capability. Equipment-fill actions are limited to four per player in any 20-tick window; excess is refused without a queue or resource loss.
 
 ### T0-05 — Membrane Rack
 - **Does:** Stretches cultivated skin over a bone rack to make the common flexible construction material.

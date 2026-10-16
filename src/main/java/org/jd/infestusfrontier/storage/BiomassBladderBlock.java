@@ -19,12 +19,12 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jd.infestusfrontier.organ.api.Organs;
-import org.jd.infestusfrontier.storage.api.BiomassBuckets;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A one-block biomass tank. {@code fill} shows the content in four steps. Buckets move biomass; empty hands open the
- * screen; anything else passes through so the player can build against it.
+ * A one-block biomass tank. {@code fill} shows the content in four steps. Buckets and other fluid containers move
+ * biomass; empty hands open the screen; anything else passes through so the player can build against it.
  */
 public final class BiomassBladderBlock extends BaseEntityBlock {
     public static final IntegerProperty FILL = IntegerProperty.create("fill", 0, 4);
@@ -69,7 +69,7 @@ public final class BiomassBladderBlock extends BaseEntityBlock {
             Player player,
             InteractionHand hand,
             BlockHitResult hit) {
-        return BiomassBuckets.useOn(stack, level, pos, hit.getDirection(), player, hand);
+        return BiomassFluids.useOn(stack, level, pos, hit.getDirection(), player, hand);
     }
 
     @Override
