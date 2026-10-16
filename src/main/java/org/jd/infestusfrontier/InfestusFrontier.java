@@ -2,7 +2,11 @@ package org.jd.infestusfrontier;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import org.jd.infestusfrontier.discovery.DiscoveryModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.organ.OrganModule;
+import org.jd.infestusfrontier.processing.ProcessingModule;
+import org.jd.infestusfrontier.storage.StorageModule;
 
 /** Composition root. Wires feature modules; owns no gameplay itself. */
 @Mod(InfestusFrontier.MOD_ID)
@@ -11,5 +15,9 @@ public final class InfestusFrontier {
 
     public InfestusFrontier(IEventBus modBus) {
         EcologyModule.register(modBus);
+        OrganModule.register(modBus);
+        StorageModule.register(modBus);
+        ProcessingModule.register(modBus);
+        DiscoveryModule.register(modBus);
     }
 }

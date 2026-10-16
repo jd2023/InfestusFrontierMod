@@ -1,0 +1,6 @@
+{
+  "type": "infestusfrontier:digestion",
+  "feed": { "item": "minecraft:wheat" },
+  "biomass": 100,
+  "ticks": 40
+}

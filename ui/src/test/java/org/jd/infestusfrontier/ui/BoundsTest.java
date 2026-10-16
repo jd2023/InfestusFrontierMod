@@ -36,4 +36,11 @@ class BoundsTest {
     void rejectsNegativeSize() {
         assertThrows(IllegalArgumentException.class, () -> new Bounds(0, 0, -1, 0));
     }
+
+    @Test
+    void bottomSliceKeepsTheBottomEdge() {
+        assertEquals(new Bounds(10, 62, 16, 10), new Bounds(10, 20, 16, 52).bottomSlice(10));
+        assertEquals(new Bounds(10, 72, 16, 0), new Bounds(10, 20, 16, 52).bottomSlice(0));
+        assertThrows(IllegalArgumentException.class, () -> new Bounds(10, 20, 16, 52).bottomSlice(53));
+    }
 }

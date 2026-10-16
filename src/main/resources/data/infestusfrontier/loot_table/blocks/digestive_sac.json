@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "infestusfrontier:digestive_sac",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "source": "block_entity",
+              "include": ["infestusfrontier:biomass_tank", "infestusfrontier:organ_history", "infestusfrontier:digestion_batch"]
+            }
+          ]
+        }
+      ],
+      "conditions": [{ "condition": "minecraft:survives_explosion" }]
+    }
+  ]
+}

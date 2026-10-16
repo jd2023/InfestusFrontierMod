@@ -1,0 +1,188 @@
+package org.jd.infestusfrontier.processing;
+
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
+import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jd.infestusfrontier.core.foundation.Biomass;
+import org.jd.infestusfrontier.core.foundation.Outcome;
+import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.core.organ.OrganHistory;
+import org.jd.infestusfrontier.core.processing.Batch;
+import org.jd.infestusfrontier.core.storage.BiomassTank;
+import org.jd.infestusfrontier.foundation.Persistence;
+import org.jd.infestusfrontier.foundation.Refusals;
+import org.jd.infestusfrontier.organ.OrganModule;
+import org.jd.infestusfrontier.organ.api.OrganCodecs;
+import org.jd.infestusfrontier.organ.api.Organs;
+import org.jd.infestusfrontier.processing.api.DigestionRecipe;
+import org.jd.infestusfrontier.storage.StorageModule;
+import org.jd.infestusfrontier.storage.api.BiomassCodecs;
+import org.jd.infestusfrontier.storage.api.BiomassHandler;
+
+/**
+ * One batch at a time. Feeding reserves the whole yield in the 1000 BU tank before the item is taken, so completion
+ * can never be refused. Work advances only while loaded and rooted on a foundation. Biomass leaves by bucket.
+ */
+final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandler {
+    static final Biomass CAPACITY = Biomass.of(1000);
+    static final Refusal BUSY = new Refusal("processing.busy");
+    static final Refusal NOT_ACCEPTED = new Refusal("processing.not_accepted");
+    private static final MapCodec<Saved> SAVED = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    BiomassCodecs.TANK.fieldOf("tank").forGetter(Saved::tank),
+                    OrganCodecs.HISTORY.fieldOf("history").forGetter(Saved::history),
+                    DigestionBatch.CODEC.optionalFieldOf("batch").forGetter(Saved::batch))
+            .apply(instance, Saved::new));
+
+    private BiomassTank tank = BiomassTank.empty(CAPACITY);
+    private OrganHistory history = OrganHistory.NONE;
+    private Optional<DigestionBatch> batch = Optional.empty();
+    private Optional<CompoundTag> unreadable = Optional.empty();
+
+    DigestiveSacBlockEntity(BlockPos pos, BlockState state) {
+        super(ProcessingModule.DIGESTIVE_SAC_ENTITY.get(), pos, state);
+    }
+
+    private record Saved(BiomassTank tank, OrganHistory history, Optional<DigestionBatch> batch) {}
+
+    static void serverTick(Level level, BlockPos pos, BlockState state, DigestiveSacBlockEntity sac) {
+        if (sac.batch.isEmpty() || sac.unreadable.isPresent()) return;
+        if (!Organs.hasFoundation(level, pos)) return;
+        DigestionBatch advanced = sac.batch.get().advance();
+        if (advanced.isDone()) {
+            sac.tank = sac.tank.commit(advanced.yield());
+            sac.history = sac.history.completed();
+            sac.batch = Optional.empty();
+        } else {
+            sac.batch = Optional.of(advanced);
+        }
+        sac.setChanged();
+    }
+
+    /** Starts a batch from the held item when the Sac is idle and the whole yield fits. Refusals change nothing. */
+    ItemInteractionResult feed(Player player, InteractionHand hand, ItemStack stack) {
+        if (level == null || stack.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        Optional<RecipeHolder<DigestionRecipe>> recipe = level.getRecipeManager()
+                .getRecipeFor(ProcessingModule.DIGESTION.get(), new SingleRecipeInput(stack), level);
+        if (recipe.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+        Optional<Refusal> refusal = refusalFor(recipe.get().value().biomass());
+        if (refusal.isPresent()) {
+            Refusals.show(player, refusal.get());
+            return ItemInteractionResult.FAIL;
+        }
+        DigestionRecipe value = recipe.get().value();
+        tank = ((Outcome.Done<BiomassTank>) tank.reserve(value.biomass())).value();
+        batch = Optional.of(new DigestionBatch(
+                Batch.start(recipe.get().id().toString(), value.ticks()),
+                value.biomass(),
+                Optional.of(player.getUUID())));
+        if (!player.getAbilities().instabuild) stack.shrink(1);
+        setChanged();
+        return ItemInteractionResult.CONSUME;
+    }
+
+    private Optional<Refusal> refusalFor(Biomass yield) {
+        if (unreadable.isPresent()) return Optional.of(Persistence.CORRUPT);
+        if (batch.isPresent()) return Optional.of(BUSY);
+        if (!tank.room().atLeast(yield)) return Optional.of(BiomassTank.FULL);
+        return Optional.empty();
+    }
+
+    /** Tells the player what the Sac is doing: idle, paused or working, and the balance. */
+    void report(Player player) {
+        String state = batch.isEmpty()
+                ? "idle"
+                : (level != null && Organs.hasFoundation(level, worldPosition) ? "working" : "paused");
+        int percent = batch.map(b -> b.batch().percent()).orElse(0);
+        player.displayClientMessage(
+                Component.translatable(
+                        "infestusfrontier.status.digestive_sac." + state,
+                        percent,
+                        tank.stored().units(),
+                        tank.capacity().units()),
+                true);
+    }
+
+    Optional<UUID> feeder() {
+        return batch.flatMap(DigestionBatch::feeder);
+    }
+
+    @Override
+    public BiomassTank tank() {
+        return tank;
+    }
+
+    @Override
+    public Outcome<BiomassTank> insert(Biomass amount) {
+        return Outcome.refused(NOT_ACCEPTED);
+    }
+
+    @Override
+    public Outcome<BiomassTank> extract(Biomass amount) {
+        if (unreadable.isPresent()) return Outcome.refused(Persistence.CORRUPT);
+        Outcome<BiomassTank> drained = tank.drain(amount);
+        if (drained instanceof Outcome.Done<BiomassTank> done) {
+            tank = done.value();
+            setChanged();
+        }
+        return drained;
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        Optional<Saved> read = Persistence.read(SAVED, tag, ProcessingModule.LOGGER, "Digestive Sac");
+        unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
+        read.ifPresent(saved -> {
+            tank = saved.tank();
+            history = saved.history();
+            batch = saved.batch();
+        });
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        if (unreadable.isPresent()) tag.merge(unreadable.get());
+        else Persistence.write(SAVED, new Saved(tank, history, batch), tag);
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        components.set(StorageModule.TANK.get(), tank);
+        components.set(OrganModule.HISTORY.get(), history);
+        batch.ifPresent(running -> components.set(ProcessingModule.DIGESTION_BATCH.get(), running));
+    }
+
+    @Override
+    protected void applyImplicitComponents(DataComponentInput input) {
+        super.applyImplicitComponents(input);
+        BiomassTank carried = input.getOrDefault(StorageModule.TANK.get(), tank);
+        if (carried.capacity().equals(CAPACITY)) tank = carried;
+        history = input.getOrDefault(OrganModule.HISTORY.get(), history);
+        batch = Optional.ofNullable(input.get(ProcessingModule.DIGESTION_BATCH.get()));
+    }
+
+    @Override
+    public void removeComponentsFromTag(CompoundTag tag) {
+        tag.remove("tank");
+        tag.remove("history");
+        tag.remove("batch");
+    }
+}

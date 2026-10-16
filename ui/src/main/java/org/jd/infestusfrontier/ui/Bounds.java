@@ -26,6 +26,12 @@ public record Bounds(int x, int y, int width, int height) {
         return x < other.right() && other.x < right() && y < other.bottom() && other.y < bottom();
     }
 
+    /** The lowest {@code height} pixels of this rectangle. */
+    public Bounds bottomSlice(int height) {
+        if (height < 0 || height > this.height) throw new IllegalArgumentException("Slice out of range");
+        return new Bounds(x, bottom() - height, width, height);
+    }
+
     /** This rectangle moved so that its center sits on the center of {@code area}. */
     public Bounds centeredIn(Bounds area) {
         return new Bounds(area.x + (area.width - width) / 2, area.y + (area.height - height) / 2, width, height);

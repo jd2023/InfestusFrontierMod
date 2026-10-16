@@ -1,0 +1,6 @@
+{
+  "type": "infestusfrontier:digestion",
+  "feed": { "item": "minecraft:rotten_flesh" },
+  "biomass": 50,
+  "ticks": 160
+}
