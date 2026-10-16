@@ -271,7 +271,7 @@ Art is its own queue, `docs/sprints/ART.md`, with the same story template and ki
 
 Two kinds of art story. A texture story gives an image model the prompt, the size and the output path; the owner saves the result. A model story gives a strong model the GeckoLib `geo` and `animation` JSON to write, with bone names, dimensions and animation names fixed in the story. Never mix the two in one story.
 
-- A `platform` story ships placeholder assets: a generated texture at the shipped size and a vanilla cube or item model. The game must run and the reviewer must see the block before any art exists.
+- A `platform` story ships placeholder assets: a flat two-tone texture at the shipped size and a vanilla cube or item model. The game must run and the reviewer must see the block before any art exists. Planners and coders never attempt final art. Final textures come only from the Artist track (Astra), final models only from the model story.
 - Shipped assets live in `src/main/resources/assets/infestusfrontier/`. File name is the registry id. Block textures are 64x64 and item icons 32x32, exported from image-model sources with `scripts/texture.py`, unless the story says otherwise. Animated organs use GeckoLib models in `geo/` and `animations/`.
 - Image masters and renders stay outside the repository; prompts live in the art story. Model sources (`.bbmodel`) are committed under `art/`, next to any generator that bakes them.
 - Every asset adds one line to `CREDITS.txt`: file, author, license.
