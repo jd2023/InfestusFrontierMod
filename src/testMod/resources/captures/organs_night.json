@@ -1,0 +1,8 @@
+{
+  "commands": [
+    "time set midnight"
+  ],
+  "views": [
+    {"name": "front", "x": 0.5, "y": -60, "z": -0.5, "yaw": 0, "pitch": 15}
+  ]
+}

@@ -13,11 +13,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.processing.DigestiveSacBlock;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
@@ -121,6 +123,20 @@ public final class ProcessingTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    public static void sacShowsWorkingOnlyWhileABatchExists(GameTestHelper h) {
+        placeSac(h);
+        assertWorking(h, false);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.WHEAT, 1);
+        EcologyTests.use(h, player, SAC, Direction.UP);
+        assertWorking(h, true);
+        h.runAfterDelay(WHEAT_TICKS + 2, () -> {
+            assertWorking(h, false);
+            h.assertValueEqual(tank(h).stored(), Biomass.of(100), "the batch still finished");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
     public static void finishedBatchFlowsIntoTheBladderBesideIt(GameTestHelper h) {
         placeSac(h);
         BlockPos bladder = SAC.east();
@@ -182,6 +198,13 @@ public final class ProcessingTests {
                 });
             });
         });
+    }
+
+    static void assertWorking(GameTestHelper h, boolean working) {
+        h.assertBlockState(
+                SAC,
+                (BlockState s) -> s.getValue(DigestiveSacBlock.WORKING) == working,
+                () -> "expected working " + working);
     }
 
     static void placeSac(GameTestHelper h) {

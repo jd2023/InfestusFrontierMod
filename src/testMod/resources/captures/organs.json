@@ -1,0 +1,17 @@
+{
+  "commands": [
+    "setblock -1 -61 3 infestusfrontier:living_substrate[stage=mature]",
+    "setblock -1 -60 3 infestusfrontier:digestive_sac[working=true]",
+    "setblock 2 -61 3 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 2 -60 3 infestusfrontier:biomass_bladder[fill=3]{tank:{stored:3000,reserved:0,capacity:4000}}",
+    "give @s infestusfrontier:digestive_sac 1",
+    "give @s infestusfrontier:biomass_bladder 1"
+  ],
+  "views": [
+    {"name": "front", "x": 0.5, "y": -60, "z": -0.5, "yaw": 0, "pitch": 15},
+    {"name": "back", "x": 0.5, "y": -60, "z": 7.5, "yaw": 180, "pitch": 15},
+    {"name": "side", "x": -4.5, "y": -60, "z": 3.5, "yaw": -90, "pitch": 15},
+    {"name": "above", "x": 0.5, "y": -57, "z": 3.5, "yaw": 0, "pitch": 80},
+    {"name": "hotbar", "x": 0.5, "y": -60, "z": -0.5, "yaw": 0, "pitch": 15, "gui": true}
+  ]
+}

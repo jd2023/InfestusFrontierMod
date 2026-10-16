@@ -272,7 +272,9 @@ Art is its own queue, `docs/sprints/ART.md`, with the same story template and ki
 
 Two kinds of art story. A texture story gives an image model the prompt, the size and the output path; the owner saves the result. A model story gives a strong model the GeckoLib `geo` and `animation` JSON to write, with bone names, dimensions and animation names fixed in the story. Never mix the two in one story.
 
-- A `platform` story ships placeholder assets: a flat two-tone texture at the shipped size and a vanilla cube or item model. The game must run and the reviewer must see the block before any art exists. Planners and coders never attempt final art. Final textures come only from the Artist track (Astra), final models only from the model story.
+- A `platform` story ships placeholder assets: a flat two-tone texture at the shipped size and a vanilla cube or item model. The game must run and the reviewer must see the block before any art exists. Workers never attempt final art.
+- Who makes finals: flat block tiles and item icons come from the image model (Astra) through a texture story. Organ models with their textures, animations and glowmasks, the GUI sheet and fluid textures come from the planner through a generator under `art/` (`art/organ_model.py` is the shared pipeline; `art/gen_<name>.py` is one model). The generator is the source; run it from the repository root and commit its output.
+- An animated organ: the block entity implements `GeoBlockEntity`, its item is an `integration.geckolib.OrganItem`, the module calls `OrganRenderers.register` on the client, the block returns `RenderShape.ENTITYBLOCK_ANIMATED` and its blockstate names only the break particle. Block state properties drive the animations; nothing extra is sent.
 - Shipped assets live in `src/main/resources/assets/infestusfrontier/`. File name is the registry id. Block textures are 64x64 and item icons 32x32, exported from image-model sources with `scripts/texture.py`, unless the story says otherwise. Animated organs use GeckoLib models in `geo/` and `animations/`.
 - Image masters and renders stay outside the repository; prompts live in the art story. Model sources (`.bbmodel`) are committed under `art/`, next to any generator that bakes them.
 - Every asset adds one line to `CREDITS.txt`: file, author, license.
@@ -295,7 +297,7 @@ Change a pin only in its own story, with a cold build, a server run and a client
 | Mod | Artifact | Status |
 |---|---|---|
 | Modonomicon | `com.klikli_dev:modonomicon-1.21.1-neoforge:1.120.4` | Required. Renders the guide. `discovery` owns prerequisites |
-| GeckoLib | `software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.2` | Required. Client animation only |
+| GeckoLib | `software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.2` | Required. Organ models and items; `integration/geckolib` is the only adapter |
 | JEI | `mezz.jei:jei-1.21.1-neoforge:19.56.0.438` | Optional. API on compile classpath. Runtime with `-PwithJei` |
 | Curios | `top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1` | Optional. API on compile classpath. Runtime with `-PwithCurios` |
 | Jade, FTB Quests | none | Not used. Probe and console give diagnostics. Pack authors own quests |

@@ -9,6 +9,7 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -18,6 +19,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 public final class BiomassBladderBlock extends BaseEntityBlock {
     public static final IntegerProperty FILL = IntegerProperty.create("fill", 0, 4);
     private static final MapCodec<BiomassBladderBlock> CODEC = simpleCodec(BiomassBladderBlock::new);
+    private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 16, 15);
 
     BiomassBladderBlock(Properties properties) {
         super(properties);
@@ -56,8 +60,14 @@ public final class BiomassBladderBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return SHAPE;
+    }
+
+    /** Drawn by the block entity's GeckoLib renderer; the blockstate file only names the break particle. */
+    @Override
     protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     @Override

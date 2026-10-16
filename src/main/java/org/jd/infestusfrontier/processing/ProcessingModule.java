@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
@@ -12,7 +12,9 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -20,6 +22,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.integration.geckolib.OrganItem;
+import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -45,8 +49,10 @@ public final class ProcessingModule {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PURPLE)
                     .strength(1.0F)
-                    .sound(SoundType.SLIME_BLOCK));
-    public static final DeferredItem<BlockItem> DIGESTIVE_SAC_ITEM = ITEMS.registerSimpleBlockItem(DIGESTIVE_SAC);
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion());
+    public static final DeferredItem<OrganItem> DIGESTIVE_SAC_ITEM =
+            ITEMS.register("digestive_sac", () -> new OrganItem(DIGESTIVE_SAC.get(), new Item.Properties(), "idle"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DigestiveSacBlockEntity>> DIGESTIVE_SAC_ENTITY =
             BLOCK_ENTITIES.register(
                     "digestive_sac",
@@ -72,6 +78,8 @@ public final class ProcessingModule {
         RECIPE_TYPES.register(modBus);
         RECIPE_SERIALIZERS.register(modBus);
         COMPONENTS.register(modBus);
+        if (FMLEnvironment.dist == Dist.CLIENT)
+            OrganRenderers.register(modBus, "digestive_sac", DIGESTIVE_SAC_ENTITY, DIGESTIVE_SAC_ITEM);
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerBlockEntity(BiomassCapabilities.BLOCK, DIGESTIVE_SAC_ENTITY.get(), (sac, side) -> sac);
             event.registerBlockEntity(

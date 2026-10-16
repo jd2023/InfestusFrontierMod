@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -38,13 +39,23 @@ import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
  * One batch at a time. Feeding reserves the whole yield in the 1000 BU tank before the item is taken, so completion
  * can never be refused. Work advances only while loaded and rooted on a foundation. A finished batch flows into any
  * fluid tank touching the Sac, such as a Biomass Bladder; the rest leaves by bucket.
  */
-final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandler {
+final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandler, GeoBlockEntity {
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
+    private static final int BLEND_TICKS = 5;
+    private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     static final Biomass CAPACITY = Biomass.of(1000);
     static final Refusal BUSY = new Refusal("processing.busy");
     static final Refusal NOT_ACCEPTED = new Refusal("processing.not_accepted");
@@ -65,6 +76,29 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
 
     private record Saved(BiomassTank tank, OrganHistory history, Optional<DigestionBatch> batch) {}
 
+    /** The client plays {@code working} while the block state says so; nothing else is sent for it. */
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(
+                this,
+                "state",
+                BLEND_TICKS,
+                state -> state.setAndContinue(
+                        state.getAnimatable().getBlockState().getValue(DigestiveSacBlock.WORKING) ? WORKING : IDLE)));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableCache;
+    }
+
+    /** Mirrors whether a batch exists into the block state, so every client can see the Sac work. */
+    private void showWorking(boolean working) {
+        if (level == null) return;
+        BlockState shown = getBlockState().setValue(DigestiveSacBlock.WORKING, working);
+        if (shown != getBlockState()) level.setBlock(worldPosition, shown, Block.UPDATE_CLIENTS);
+    }
+
     static void serverTick(Level level, BlockPos pos, BlockState state, DigestiveSacBlockEntity sac) {
         if (sac.batch.isEmpty() || sac.unreadable.isPresent()) return;
         if (!Organs.hasFoundation(level, pos)) return;
@@ -73,6 +107,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             sac.tank = sac.tank.commit(advanced.yield());
             sac.history = sac.history.completed();
             sac.batch = Optional.empty();
+            sac.showWorking(false);
             sac.pushToNeighbors(level, pos);
         } else {
             sac.batch = Optional.of(advanced);
@@ -99,6 +134,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
                 value.biomass(),
                 Optional.of(player.getUUID())));
         if (!player.getAbilities().instabuild) stack.shrink(1);
+        showWorking(true);
         setChanged();
         return ItemInteractionResult.CONSUME;
     }

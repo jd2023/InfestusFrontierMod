@@ -6,7 +6,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -37,6 +36,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
+import org.jd.infestusfrontier.integration.geckolib.OrganItem;
+import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -109,7 +110,8 @@ public final class StorageModule {
                     .strength(1.0F)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion());
-    public static final DeferredItem<BlockItem> BIOMASS_BLADDER_ITEM = ITEMS.registerSimpleBlockItem(BIOMASS_BLADDER);
+    public static final DeferredItem<OrganItem> BIOMASS_BLADDER_ITEM = ITEMS.register(
+            "biomass_bladder", () -> new OrganItem(BIOMASS_BLADDER.get(), new Item.Properties(), "idle", "fill_0"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BiomassBladderBlockEntity>> BIOMASS_BLADDER_ENTITY =
             BLOCK_ENTITIES.register(
                     "biomass_bladder",
@@ -151,6 +153,7 @@ public final class StorageModule {
                     (bladder, side) -> BiomassFluids.handler(bladder));
         });
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            OrganRenderers.register(modBus, "biomass_bladder", BIOMASS_BLADDER_ENTITY, BIOMASS_BLADDER_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) ->
                     event.register(BIOMASS_BLADDER_MENU.get(), BiomassBladderScreen::new));
             modBus.addListener((RegisterClientExtensionsEvent event) -> event.registerFluidType(

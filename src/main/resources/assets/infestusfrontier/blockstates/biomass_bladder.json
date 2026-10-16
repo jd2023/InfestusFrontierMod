@@ -1,9 +1,5 @@
 {
   "variants": {
-    "fill=0": { "model": "infestusfrontier:block/biomass_bladder_0" },
-    "fill=1": { "model": "infestusfrontier:block/biomass_bladder_1" },
-    "fill=2": { "model": "infestusfrontier:block/biomass_bladder_2" },
-    "fill=3": { "model": "infestusfrontier:block/biomass_bladder_3" },
-    "fill=4": { "model": "infestusfrontier:block/biomass_bladder_4" }
+    "": { "model": "infestusfrontier:block/biomass_bladder" }
   }
 }

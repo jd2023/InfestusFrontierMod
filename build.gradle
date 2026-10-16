@@ -49,7 +49,7 @@ dependencies {
     implementation project(':ui')
     compileOnly "com.klikli_dev:modonomicon-1.21.1-neoforge:${modonomicon_version}"
     runtimeOnly "com.klikli_dev:modonomicon-1.21.1-neoforge:${modonomicon_version}"
-    runtimeOnly "software.bernie.geckolib:geckolib-neoforge-1.21.1:${geckolib_version}"
+    implementation "software.bernie.geckolib:geckolib-neoforge-1.21.1:${geckolib_version}"
     compileOnly "mezz.jei:jei-1.21.1-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-1.21.1-neoforge-api:${jei_version}"
     compileOnly("top.theillusivec4.curios:curios-neoforge:${curios_version}:api") { transitive = false }

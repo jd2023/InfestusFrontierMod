@@ -1,0 +1,208 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.digestive_sac",
+        "texture_width": 128,
+        "texture_height": 128,
+        "visible_bounds_width": 2,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [0, 0.5, 0]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [0, 0, 0]
+        },
+        {
+          "name": "base",
+          "parent": "root",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            {
+              "origin": [-7, 0, -7],
+              "size": [14, 2, 14],
+              "uv": [0, 0]
+            },
+            {
+              "origin": [-6, 2, -6],
+              "size": [12, 2, 12],
+              "uv": [0, 17]
+            }
+          ]
+        },
+        {
+          "name": "roots",
+          "parent": "root",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            {
+              "origin": [4.5, 0.5, 3.0],
+              "size": [2, 2, 5],
+              "uv": [74, 32],
+              "pivot": [5.5, 1.5, 5.5],
+              "rotation": [0, 45, 0]
+            },
+            {
+              "origin": [4.5, 0.5, -8.0],
+              "size": [2, 2, 5],
+              "uv": [74, 32],
+              "pivot": [5.5, 1.5, -5.5],
+              "rotation": [0, -45, 0]
+            },
+            {
+              "origin": [-6.5, 0.5, 3.0],
+              "size": [2, 2, 5],
+              "uv": [74, 32],
+              "pivot": [-5.5, 1.5, 5.5],
+              "rotation": [0, -45, 0]
+            },
+            {
+              "origin": [-6.5, 0.5, -8.0],
+              "size": [2, 2, 5],
+              "uv": [74, 32],
+              "pivot": [-5.5, 1.5, -5.5],
+              "rotation": [0, 45, 0]
+            }
+          ]
+        },
+        {
+          "name": "belly_low",
+          "parent": "root",
+          "pivot": [0, 4, 0],
+          "cubes": [
+            {
+              "origin": [-6, 4, -6],
+              "size": [12, 3, 12],
+              "uv": [57, 0]
+            }
+          ]
+        },
+        {
+          "name": "gland",
+          "parent": "root",
+          "pivot": [0, 7, 0],
+          "cubes": [
+            {
+              "origin": [-5, 7, -5],
+              "size": [10, 1, 10],
+              "uv": [0, 32]
+            }
+          ]
+        },
+        {
+          "name": "belly_mid",
+          "parent": "root",
+          "pivot": [0, 8, 0],
+          "cubes": [
+            {
+              "origin": [-5, 8, -5],
+              "size": [10, 3, 10],
+              "uv": [49, 17]
+            },
+            {
+              "origin": [-3, 8.5, -6],
+              "size": [6, 2, 1],
+              "uv": [0, 44]
+            }
+          ]
+        },
+        {
+          "name": "belly_high",
+          "parent": "root",
+          "pivot": [0, 11, 0],
+          "cubes": [
+            {
+              "origin": [-4, 11, -4],
+              "size": [8, 2, 8],
+              "uv": [41, 32]
+            }
+          ]
+        },
+        {
+          "name": "mouth",
+          "parent": "root",
+          "pivot": [0, 13, 0],
+          "cubes": [
+            {
+              "origin": [-2, 13, -2],
+              "size": [4, 1, 4],
+              "uv": [89, 32]
+            }
+          ]
+        },
+        {
+          "name": "lip_north",
+          "parent": "mouth",
+          "pivot": [0, 13, -3],
+          "cubes": [
+            {
+              "origin": [-3, 13, -3],
+              "size": [6, 1, 1],
+              "uv": [15, 44]
+            }
+          ]
+        },
+        {
+          "name": "lip_south",
+          "parent": "mouth",
+          "pivot": [0, 13, 3],
+          "cubes": [
+            {
+              "origin": [-3, 13, 2],
+              "size": [6, 1, 1],
+              "uv": [15, 44]
+            }
+          ]
+        },
+        {
+          "name": "lip_west",
+          "parent": "mouth",
+          "pivot": [-3, 13, 0],
+          "cubes": [
+            {
+              "origin": [-3, 13, -2],
+              "size": [1, 1, 4],
+              "uv": [106, 32]
+            }
+          ]
+        },
+        {
+          "name": "lip_east",
+          "parent": "mouth",
+          "pivot": [3, 13, 0],
+          "cubes": [
+            {
+              "origin": [2, 13, -2],
+              "size": [1, 1, 4],
+              "uv": [106, 32]
+            }
+          ]
+        },
+        {
+          "name": "pustules",
+          "parent": "root",
+          "pivot": [0, 8, 0],
+          "cubes": [
+            {
+              "origin": [5, 9, -1],
+              "size": [2, 2, 2],
+              "uv": [117, 32]
+            },
+            {
+              "origin": [-8, 5, 1],
+              "size": [2, 2, 2],
+              "uv": [117, 32]
+            },
+            {
+              "origin": [-1, 9, 5],
+              "size": [2, 2, 2],
+              "uv": [117, 32]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

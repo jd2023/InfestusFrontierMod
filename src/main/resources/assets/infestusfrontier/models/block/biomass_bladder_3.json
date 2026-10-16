@@ -1,4 +1,0 @@
-{
-  "parent": "minecraft:block/cube_column",
-  "textures": { "end": "infestusfrontier:block/biomass_bladder_top", "side": "infestusfrontier:block/biomass_bladder_3" }
-}

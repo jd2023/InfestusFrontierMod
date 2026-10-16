@@ -2,7 +2,9 @@ package org.jd.infestusfrontier.storage;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
@@ -22,9 +24,21 @@ import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 /** The Bladder's balance. Holds 4000 BU; the block's {@code fill} follows the content. */
-final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHandler, MenuProvider {
+final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHandler, MenuProvider, GeoBlockEntity {
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    private static final List<RawAnimation> FILL = IntStream.rangeClosed(0, 4)
+            .mapToObj(level -> RawAnimation.begin().thenLoop("fill_" + level))
+            .toList();
+    private static final int BLEND_TICKS = 10;
+    private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     static final Biomass CAPACITY = Biomass.of(4000);
     private static final MapCodec<BiomassTank> SAVED = RecordCodecBuilder.mapCodec(
             instance -> instance.group(BiomassCodecs.TANK.fieldOf("tank").forGetter(tank -> tank))
@@ -35,6 +49,23 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
 
     BiomassBladderBlockEntity(BlockPos pos, BlockState state) {
         super(StorageModule.BIOMASS_BLADDER_ENTITY.get(), pos, state);
+    }
+
+    /** The membrane breathes; the biomass inside follows the block's {@code fill}. */
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "membrane", 0, state -> state.setAndContinue(IDLE)));
+        controllers.add(new AnimationController<>(
+                this,
+                "fluid",
+                BLEND_TICKS,
+                state -> state.setAndContinue(
+                        FILL.get(state.getAnimatable().getBlockState().getValue(BiomassBladderBlock.FILL)))));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableCache;
     }
 
     @Override
