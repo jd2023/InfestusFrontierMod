@@ -2,7 +2,7 @@
 
 Each milestone ends in a playable build. Only the current sprint is planned in detail, in `docs/sprints/`. Later milestones stay at one line each here.
 
-Now: M0 is done. M1 is in progress, sprint [S01](docs/sprints/S01.md).
+Now: M0 is done. M1 is in progress, sprint [S01](docs/sprints/S01.md). M2 is planned as [S02](docs/sprints/S02.md) and starts when S01 is accepted; its first three stories are already in the code.
 
 ## Milestones
 

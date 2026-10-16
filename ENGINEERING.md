@@ -192,7 +192,7 @@ A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`:
 
 `bash scripts/demo.sh` builds the mod, deletes `runs/demo/saves/demo`, creates a fresh flat Creative world, runs the commands of the capture scenario `src/testMod/resources/captures/demo.json`, teleports the player to its first view and leaves the game open to play. The same scenario is photographed by `verifyCaptures`, so the gate sees the demo world too. Each exhibit is the blocks or items plus a waxed sign that names it.
 
-Every story that adds or changes a block, item, recipe, screen or guide entry adds its exhibit to `demo.json` and lists the file in `Files`. Exhibits stand north of spawn, from z=-37 to z=-31, so they never enter another scenario's view. The owner must be able to see and try every feature there without commands.
+Every story that adds or changes a block, item, recipe, screen or guide entry adds its exhibit to `demo.json` and lists the file in `Files`. Exhibits stand north of spawn in three rows, so they never enter another scenario's view: row A at z=-36 with signs at z=-37 (blocks and organs, one per even x), row B at z=-33 to z=-31 with signs at z=-34 (ground plots), row C at z=-29 to z=-26 with signs at z=-30 (patches). The current sprint file lists the taken x positions. The owner must be able to see and try every feature there without commands.
 
 Not covered yet: menu and screen captures, recipe tests through a crafting menu, optional-mod profiles, multiplayer soak, crash recovery, measured TPS and FPS on a dense base. Each arrives with the feature that needs it.
 
