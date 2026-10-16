@@ -19,6 +19,8 @@ Proposed cell anatomy. Maturity, function, framework and lining are separate pro
 Bone meal accelerates **maturity**, not expansion into unspecified neighboring land. The player selects the cells to grow. A later Foundation Cyst can treat a marked area using its packed stock and biomass; it stops at that boundary or when supplies run out.
 
 Maturity does not decay when the player leaves. An unfed active function pauses.
+A broken cell drops an item that keeps its stage. Placed again, it has the same stage.
+Cells have no block entity, never tick and never spread. Only a player action, or an organ the player built, changes a cell. A colony may hold hundreds of thousands of cells, so a cell costs the server nothing while idle.
 Destructive contamination can kill tissue under [containment rules](BLOCK_CATALOG.md#containment-failures); ordinary lack of fuel cannot. Older-looking patterns are visual variants of mature tissue, not another mandatory progression level.
 
 ## 2. Give mature tissue a function
