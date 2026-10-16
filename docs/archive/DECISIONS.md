@@ -1,6 +1,6 @@
 # Owner decisions, September 2026
 
-For the owner. Distilled from the V3_dev decision log. Status: **fixed** = owner requirement, **open** = still to decide. Rules marked fixed are already written into BIG_PICTURE.md or the design documents.
+For the owner. Distilled from the V3_dev decision log. Status: **fixed** = owner requirement, **open** = still to decide. Rules marked fixed are already written into VISION.md or the design documents.
 
 | ID | Decision | Status |
 |---|---|---|

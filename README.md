@@ -1,10 +1,10 @@
 # Infestus Frontier V4
 
-NeoForge 1.21.1 mod. Start with [BIG_PICTURE.md](BIG_PICTURE.md).
+NeoForge 1.21.1 mod. Start with [VISION.md](VISION.md).
 
 | Reader | Read |
 |---|---|
-| Everyone | [BIG_PICTURE.md](BIG_PICTURE.md), then [AGENTS.md](AGENTS.md) |
+| Everyone | [VISION.md](VISION.md), then [AGENTS.md](AGENTS.md) |
 | Planner | [ROADMAP.md](ROADMAP.md), then [ENGINEERING.md](ENGINEERING.md) |
 | Coder | [ENGINEERING.md](ENGINEERING.md) and the one design document the story names |
 | Reviewer | [REVIEW.md](REVIEW.md) |
@@ -12,10 +12,9 @@ NeoForge 1.21.1 mod. Start with [BIG_PICTURE.md](BIG_PICTURE.md).
 
 | Document | Owns |
 |---|---|
-| [BIG_PICTURE.md](BIG_PICTURE.md) | What we are building. One page |
+| [VISION.md](VISION.md) | What we are building and the rules that do not change. The owner edits it |
 | [ROADMAP.md](ROADMAP.md) | Milestones and their acceptance evidence |
 | [docs/sprints/](docs/sprints/) | Stories of the current sprint and the art queue |
-| [docs/design/VISION.md](docs/design/VISION.md) | The owner's principles |
 | [docs/design/PROGRESSION_MAP.md](docs/design/PROGRESSION_MAP.md) | Player projects SR0 to SR9 |
 | [docs/design/GUIDE_PROGRESSION_TREE.md](docs/design/GUIDE_PROGRESSION_TREE.md) | Guide pages and advancements; species atlas in section 15; tools and weapons in section 17 |
 | [docs/design/BLOCK_CATALOG.md](docs/design/BLOCK_CATALOG.md) | Every organ, structure and construction block, by tier |

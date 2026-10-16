@@ -1,6 +1,6 @@
 # Rules for every agent
 
-These rules apply to any agent: Codex, Claude or another tool. Read this file, then [BIG_PICTURE.md](BIG_PICTURE.md). Then read only what your role and story need:
+These rules apply to any agent: Codex, Claude or another tool. Read this file, then [VISION.md](VISION.md). Then read only what your role and story need:
 
 | Role | Reads |
 |---|---|
@@ -31,7 +31,7 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 
 ## Running a story
 
-Each role starts from one line. It reads the files the line names, in this order: this file, BIG_PICTURE.md, then its role document. One story per run. When the story is done, the run ends with a report or a verdict and does not start the next story.
+Each role starts from one line. It reads the files the line names, in this order: this file, VISION.md, then its role document. One story per run. When the story is done, the run ends with a report or a verdict and does not start the next story.
 
 | Role | Start line |
 |---|---|
