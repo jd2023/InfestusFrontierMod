@@ -9,6 +9,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.StorageModule;
 
@@ -25,6 +26,7 @@ public final class DiscoveryModule {
                     .displayItems((parameters, output) -> {
                         output.accept(EcologyModule.SPORE_CULTURE.get());
                         output.accept(EcologyModule.LIVING_SUBSTRATE_ITEM.get());
+                        output.accept(OrganModule.ORGAN_BUD_ITEM.get());
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BLADDER_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BUCKET.get());

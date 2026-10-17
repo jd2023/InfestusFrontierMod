@@ -20,6 +20,9 @@
     "setblock 22 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 22 -60 -36 infestusfrontier:biomass_bladder[fill=2]{tank:{stored:2500,reserved:0,capacity:4000}}",
     "setblock 23 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Biomass Bladder\"','\"buckets in and out\"','\"empty hand opens\"','\"holds 4000\"']}}",
+    "setblock 24 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 24 -60 -36 infestusfrontier:organ_bud",
+    "setblock 24 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Organ Bud\"','\"grows into an organ\"','\"craft it with culture\"','\"\"']}}",
     "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
     "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",
     "fill 5 -61 -29 8 -61 -26 infestusfrontier:living_substrate[stage=young]",
@@ -31,7 +34,8 @@
     "give @s bone_meal 64",
     "give @s wheat 16",
     "give @s rotten_flesh 16",
-    "give @s bucket 4"
+    "give @s bucket 4",
+    "give @s infestusfrontier:organ_bud 4"
   ],
   "views": [
     {
