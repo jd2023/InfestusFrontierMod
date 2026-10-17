@@ -56,6 +56,7 @@ final class CultureBowlScreen extends OrganScreen<CultureBowlMenu> {
         add(new Trough(
                 Sheet.FIRST_PART_X,
                 TROUGH_Y,
+                Sheet.STATUS_GLYPH_X,
                 Sheet.RIGHT_EDGE,
                 WATER,
                 menu::water,
