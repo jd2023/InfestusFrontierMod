@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "infestusfrontier:living_substrate",
+          "functions": [
+            {
+              "function": "minecraft:copy_state",
+              "block": "infestusfrontier:living_substrate",
+              "properties": ["stage"]
+            }
+          ]
+        }
+      ],
+      "conditions": [{ "condition": "minecraft:survives_explosion" }]
+    }
+  ]
+}
