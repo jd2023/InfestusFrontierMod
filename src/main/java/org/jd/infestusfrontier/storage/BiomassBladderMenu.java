@@ -12,12 +12,14 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jd.infestusfrontier.foundation.screen.BiomassView;
+import org.jd.infestusfrontier.ui.Sheet;
 
 /**
  * The Bladder screen's server half: one service slot for a piece of living equipment, the Fill button, and the
  * balance as two synced ints. Nothing here decides a transfer; the block entity does.
  */
-public final class BiomassBladderMenu extends AbstractContainerMenu {
+public final class BiomassBladderMenu extends AbstractContainerMenu implements BiomassView {
     public static final int FILL_BUTTON = 0;
     static final int SERVICE_SLOT = 0;
     private static final int STORED = 0;
@@ -52,7 +54,7 @@ public final class BiomassBladderMenu extends AbstractContainerMenu {
         super(StorageModule.BIOMASS_BLADDER_MENU.get(), id);
         this.balance = balance;
         this.access = access;
-        addSlot(new Slot(service, 0, 44, 35) {
+        addSlot(new Slot(service, 0, Sheet.SLOT_X, Sheet.SLOT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
@@ -70,10 +72,12 @@ public final class BiomassBladderMenu extends AbstractContainerMenu {
         addDataSlots(balance);
     }
 
+    @Override
     public int stored() {
         return balance.get(STORED);
     }
 
+    @Override
     public int capacity() {
         return Math.max(1, balance.get(CAPACITY));
     }

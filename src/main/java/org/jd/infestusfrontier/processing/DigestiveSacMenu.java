@@ -13,16 +13,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
+import org.jd.infestusfrontier.foundation.screen.BiomassView;
+import org.jd.infestusfrontier.ui.Sheet;
 
 /**
  * The Sac screen's server half: the feed slot, backed by the block entity's own slot so items stay with the block,
  * and four synced ints: status, percent done, biomass stored and capacity. Nothing here starts a batch; the block
  * entity takes from the slot on its own tick.
  */
-public final class DigestiveSacMenu extends AbstractContainerMenu {
+public final class DigestiveSacMenu extends AbstractContainerMenu implements BiomassView {
     static final int FEED_SLOT = 0;
-    static final int SLOT_X = 44;
-    static final int SLOT_Y = 35;
     private static final int STATUS = 0;
     private static final int PERCENT = 1;
     private static final int STORED = 2;
@@ -59,7 +59,7 @@ public final class DigestiveSacMenu extends AbstractContainerMenu {
         super(ProcessingModule.DIGESTIVE_SAC_MENU.get(), id);
         this.data = data;
         this.access = access;
-        addSlot(new SlotItemHandler(feed, 0, SLOT_X, SLOT_Y));
+        addSlot(new SlotItemHandler(feed, 0, Sheet.SLOT_X, Sheet.SLOT_Y));
         for (int row = 0; row < 3; row++)
             for (int col = 0; col < 9; col++)
                 addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
@@ -76,10 +76,12 @@ public final class DigestiveSacMenu extends AbstractContainerMenu {
         return Math.clamp(data.get(PERCENT), 0, 100);
     }
 
+    @Override
     public int stored() {
         return data.get(STORED);
     }
 
+    @Override
     public int capacity() {
         return Math.max(1, data.get(CAPACITY));
     }

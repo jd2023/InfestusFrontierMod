@@ -1,17 +1,18 @@
 package org.jd.infestusfrontier.storage;
 
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import org.jd.infestusfrontier.core.foundation.Refusal;
-import org.jd.infestusfrontier.foundation.OrganScreen;
 import org.jd.infestusfrontier.foundation.Refusals;
-import org.jd.infestusfrontier.ui.Meter;
-import org.jd.infestusfrontier.ui.Sheet;
+import org.jd.infestusfrontier.foundation.screen.OrganScreen;
+import org.jd.infestusfrontier.foundation.screen.Status;
+import org.jd.infestusfrontier.foundation.screen.Well;
+import org.jd.infestusfrontier.ui.PartRow;
+import org.jd.infestusfrontier.ui.StatusKind;
 
-/** Client view of the Bladder: empty, holding or full, the service slot, the Fill button and the tank. */
+/** Client view of the Bladder: empty, holding or full, the service slot and the Fill button. */
 final class BiomassBladderScreen extends OrganScreen<BiomassBladderMenu> {
     private static final Component PIECE = Component.translatable("gui.infestusfrontier.biomass_bladder.piece");
     private static final Component FILL = Component.translatable("gui.infestusfrontier.biomass_bladder.fill");
@@ -19,9 +20,6 @@ final class BiomassBladderScreen extends OrganScreen<BiomassBladderMenu> {
     private static final Component HOLDING = Component.translatable("gui.infestusfrontier.biomass_bladder.holding");
     private static final Component FULL = Component.translatable("gui.infestusfrontier.biomass_bladder.full");
     private static final Component NOTHING_TO_FILL = Refusals.text(new Refusal("equipment.nothing_to_fill"));
-    static final int SLOT_X = Sheet.FIRST_PART_X;
-    static final int SLOT_Y = Sheet.PARTS_Y;
-    private static final int BUTTON_X = SLOT_X + 26;
     private Button fill;
 
     BiomassBladderScreen(BiomassBladderMenu menu, Inventory inventory, Component title) {
@@ -29,11 +27,17 @@ final class BiomassBladderScreen extends OrganScreen<BiomassBladderMenu> {
     }
 
     @Override
-    protected void init() {
-        super.init();
-        fill = sheetButton(
-                BUTTON_X,
-                SLOT_Y,
+    protected Status status() {
+        if (menu.stored() == 0) return new Status(StatusKind.IDLE, EMPTY);
+        if (menu.stored() >= menu.capacity()) return new Status(StatusKind.BLOCKED, FULL);
+        return new Status(StatusKind.ACTIVE, HOLDING);
+    }
+
+    @Override
+    protected void addParts(PartRow row) {
+        add(new Well(row, menu.getSlot(BiomassBladderMenu.SERVICE_SLOT), PIECE));
+        fill = button(
+                row,
                 FILL,
                 button -> minecraft.gameMode.handleInventoryButtonClick(
                         menu.containerId, BiomassBladderMenu.FILL_BUTTON));
@@ -43,41 +47,5 @@ final class BiomassBladderScreen extends OrganScreen<BiomassBladderMenu> {
     @Override
     protected void containerTick() {
         fill.active = menu.hasServiceItem();
-    }
-
-    @Override
-    protected int statusGlyph() {
-        return menu.stored() == 0 ? Sheet.RING : menu.stored() >= menu.capacity() ? Sheet.BARS : Sheet.ARROW;
-    }
-
-    @Override
-    protected Component statusText() {
-        return menu.stored() == 0 ? EMPTY : menu.stored() >= menu.capacity() ? FULL : HOLDING;
-    }
-
-    @Override
-    protected Meter biomass() {
-        return new Meter(Math.min(menu.stored(), menu.capacity()), menu.capacity());
-    }
-
-    @Override
-    protected Component biomassShort() {
-        return Component.translatable("gui.infestusfrontier.biomass_short", menu.stored());
-    }
-
-    @Override
-    protected Component biomassLong() {
-        return Component.translatable("gui.infestusfrontier.biomass", menu.stored(), menu.capacity());
-    }
-
-    @Override
-    protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY) {
-        well(graphics, SLOT_X, SLOT_Y);
-    }
-
-    @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        super.renderLabels(graphics, mouseX, mouseY);
-        slotLabel(graphics, PIECE, SLOT_X);
     }
 }

@@ -35,6 +35,14 @@ class SheetTest {
         assertTrue(top.contains(new Bounds(Sheet.STATUS_GLYPH_X, Sheet.STATUS_GLYPH_Y, 9, 9)));
         assertTrue(Sheet.TANK_VALUE_Y + 9 <= 72);
         assertTrue(Sheet.RIGHT_EDGE <= Sheet.TANK_X + Sheet.TANK_WELL.width());
+        assertTrue(Sheet.PARTS_Y + Sheet.SLOT.height() <= 72);
+    }
+
+    @Test
+    void statusWordsStopBeforeTheTankLabel() {
+        Bounds words = new Bounds(Sheet.STATUS_TEXT_X, Sheet.STATUS_TEXT_Y, Sheet.STATUS_TEXT_WIDTH, 9);
+        Bounds label = new Bounds(Sheet.RIGHT_EDGE - 40, Sheet.TANK_LABEL_Y, 40, 9);
+        assertFalse(words.overlaps(label));
     }
 
     @Test

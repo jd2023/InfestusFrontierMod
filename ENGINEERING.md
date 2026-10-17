@@ -22,7 +22,7 @@ Output: `build/libs/infestusfrontier-0.1.0-dev.1.jar`. It holds the mod, `core` 
 | Path | Holds |
 |---|---|
 | `core/` | Pure rules in `org.jd.infestusfrontier.core.<owner>`. Plain Java, JUnit. No Minecraft. |
-| `ui/` | Screen geometry and palette. Plain Java, JUnit. |
+| `ui/` | Screen layout grammar, sheet geometry, palette. Plain Java, JUnit. |
 | `src/main/java/org/jd/infestusfrontier/` | The NeoForge mod: entry point, one folder per owner module. |
 | `src/main/templates/` | `neoforge.mods.toml` with the version expanded at build time. |
 | `src/testMod/` | Development-only GameTests and the capture client, mod id `infestusfrontier_tests`. |
@@ -38,7 +38,8 @@ InfestusFrontier (composition root)      registers modules, owns no gameplay
   └── <owner>/                           NeoForge adapters: blocks, items, block entities, menus, packets, screens
         └── <owner>/api                  feature commands and immutable queries
               └── core/.../<owner>/      pure rules, JUnit tests
-ui/                                      geometry and palette, used by screens only
+foundation/screen/                       the screen kit: OrganScreen and its parts, the only code that draws
+ui/                                      layout grammar, sheet geometry and palette, used by the kit and by menus
 ```
 
 - Arrows point inward only. No cycles. `core` and `ui` import only the JDK; the build fails otherwise.
@@ -54,6 +55,7 @@ ui/                                      geometry and palette, used by screens o
 - Rendering is client-only and never decides whether a resource moved.
 - Use vanilla and NeoForge behavior as it is. Never patch, bypass or re-implement engine rules. If a story seems to need that, stop and report.
 - Shared low-level code (UI primitives, serialization, packet validation, bounded simulation, discovery) lives in one module from its first use. Features compose it, never copy it. Do not build it before the first consumer.
+- A feature screen extends `foundation.screen.OrganScreen`, names its state in `status()` and adds parts in `addParts(PartRow)`: `Well`, `Vein`, `Tank`, `button`. It never draws. A new kind of part goes into `foundation/screen` with its sprite in `ui.Sheet` and `art/gen_gui_sheet.py`, then every screen can use it. `verifyScreenKit` fails the build when a screen outside the kit touches `GuiGraphics`. Menus put their slots at `Sheet.SLOT_X, Sheet.SLOT_Y` and following row positions; a `Well` throws when the slot is off the row.
 - Comments state a contract. Narrating comments are defects.
 
 ## Code style
@@ -103,7 +105,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 | helpers | Nursery population, jobs, routes, paid Sail chunk tickets |
 | defense | Hostile targeting, firing, projectile limits |
 | synthesis | Sockets, lobes, idle profile switching |
-| ui (`ui/`) | Layout, widgets, focus, theme, tooltips |
+| ui (`ui/`, `foundation/screen`) | Layout grammar, parts, focus, theme, tooltips |
 | interaction | Probe targeting, reach and ownership checks, dispatch to feature intents |
 | discovery | Recipe reveal, advancements, guide prerequisites |
 | integration | Modonomicon, GeckoLib, JEI, Curios adapters; no domain state |

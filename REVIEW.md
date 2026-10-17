@@ -63,6 +63,6 @@ Defect classes found in this project before. Check the ones that apply to the di
 - Guide and JEI render recipes from the recipe data, never from copies.
 
 **Ownership**
-- Reusable UI primitives live in `ui/`. Features hold no widget code.
+- A feature `*Screen` only names its status and adds parts from `foundation/screen`. A draw call, a sprite coordinate or a colour in a feature screen is a defect; the fix is a new part in the kit, not a one-off.
 - Every `Tests` and `Done` line of the story ran, and the report names them.
 - Comments state a contract. Narrating comments are defects.

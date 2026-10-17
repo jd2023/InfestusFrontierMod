@@ -181,6 +181,19 @@ tasks.named('runGameTestServer') {
     mustRunAfter ':core:test', ':ui:test', distribution
 }
 
+// Feature screens declare parts; only the kit in foundation/screen draws.
+tasks.register('verifyScreenKit') {
+    def screens = fileTree('src/main/java') { include '**/*Screen.java'; exclude '**/foundation/screen/**' }
+    inputs.files(screens)
+    doLast {
+        def drawing = ['GuiGraphics', 'blit(', 'drawString(', 'renderBg', 'renderLabels', 'ResourceLocation']
+        def offenders = screens.files.findAll { file -> def text = file.text; drawing.any { text.contains(it) } }
+        if (!offenders.empty)
+            throw new GradleException("Screens compose parts from foundation/screen and never draw: ${offenders*.name}")
+    }
+}
+tasks.named('check') { dependsOn 'verifyScreenKit' }
+
 tasks.register('verifyAll') {
     group = 'verification'
     description = 'The gate: pure tests, boundaries, shipped JAR contents, GameTests in a real server.'

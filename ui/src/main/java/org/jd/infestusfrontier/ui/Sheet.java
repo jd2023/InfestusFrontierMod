@@ -46,12 +46,20 @@ public final class Sheet {
     public static final int STATUS_GLYPH_Y = 15;
     public static final int STATUS_TEXT_X = 20;
     public static final int STATUS_TEXT_Y = 16;
-    /** Labels sit on this row above the organ's slots and veins, which start at y 35. */
+    /** The status words may run this far; longer text wraps into the tooltip. Ends short of the tank label. */
+    public static final int STATUS_TEXT_WIDTH = 106;
+    /** Labels sit on this row above the organ's parts. */
     public static final int LABEL_Y = 26;
-
-    public static final int PARTS_Y = 35;
+    /** Top of the parts row: wells, veins and buttons are centered on this 18-pixel band. */
+    public static final int PARTS_Y = 34;
     /** The first organ part sits right of the bud ornament. */
-    public static final int FIRST_PART_X = 44;
+    public static final int FIRST_PART_X = 43;
+    /** Space between two parts on the row. */
+    public static final int GAP = 4;
+    /** A menu puts its first slot here, one pixel inside the first well. */
+    public static final int SLOT_X = FIRST_PART_X + 1;
+
+    public static final int SLOT_Y = PARTS_Y + 1;
     /** The biomass tank on the right, its label above and its amount below, both right-aligned to the edge. */
     public static final int TANK_X = 150;
 
@@ -59,8 +67,15 @@ public final class Sheet {
     public static final int TANK_LABEL_Y = 10;
     public static final int TANK_VALUE_Y = 62;
     public static final int RIGHT_EDGE = 168;
+    /** No part reaches this column; the tank starts one gap right of it. */
+    public static final int PARTS_END = TANK_X - GAP;
 
     private Sheet() {}
+
+    /** Top of a part {@code height} tall, centered on the parts row. */
+    public static int partY(int height) {
+        return PARTS_Y + (SLOT.height() - height) / 2;
+    }
 
     /** The status glyphs in order: ring, arrow, cross, bars. */
     public static Bounds glyph(int index) {
