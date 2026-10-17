@@ -5,6 +5,10 @@ Run from the repository root: python3 art/gen_biomass_fluid.py
 Deterministic: fixed seed, no timestamps. Writes
   src/main/resources/assets/infestusfrontier/textures/block/biomass_still.png  (+ .mcmeta)  32 x 32, 16 frames
   src/main/resources/assets/infestusfrontier/textures/block/biomass_flow.png   (+ .mcmeta)  64 x 64, 16 frames
+  src/main/resources/assets/infestusfrontier/textures/item/biomass_bucket.png  16 x 16, the fluid alone
+
+The bucket icon is vanilla's own bucket sprite with this fluid overlay on its open top, drawn as a second
+layer of the item model, so a Bucket of Biomass looks like every other bucket in the hotbar.
 
 Thick green biomass: a dark olive body, slow pale blobs under the surface, a few bright specks. Every frame
 tiles with its neighbours and the last frame leads back to the first. The flow sheet is the same material at
@@ -17,6 +21,13 @@ from pathlib import Path
 from PIL import Image
 
 OUT = Path('src/main/resources/assets/infestusfrontier/textures/block')
+ITEM_OUT = Path('src/main/resources/assets/infestusfrontier/textures/item/biomass_bucket.png')
+# The open top of vanilla's 16x16 bucket sprite: shade index per fluid pixel, dark 0 to light 4
+BUCKET_TOP = (2, [
+    '....01322110....',
+    '...0344324230...',
+    '.....023320.....',
+])
 FRAMES = 16
 # dark to light
 BODY = [(28, 52, 30), (38, 72, 38), (52, 96, 46), (74, 128, 56), (108, 168, 72), (160, 214, 110)]
@@ -72,9 +83,22 @@ def sheet(name, size, drift, seed, frametime):
     (OUT / (name + '.png.mcmeta')).write_text(json.dumps({'animation': {'frametime': frametime}}) + '\n')
 
 
+def bucket_overlay():
+    shades = [BODY[1], BODY[2], BODY[3], BODY[4], BODY[5]]
+    img = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    top, rows = BUCKET_TOP
+    for j, row in enumerate(rows):
+        for i, c in enumerate(row):
+            if c != '.':
+                img.putpixel((i, top + j), shades[int(c)] + (255,))
+    ITEM_OUT.parent.mkdir(parents=True, exist_ok=True)
+    img.save(ITEM_OUT, optimize=True)
+
+
 def main():
     sheet('biomass_still', 32, 0.0, 7, 4)
     sheet('biomass_flow', 64, 1.0, 7, 3)
+    bucket_overlay()
 
 
 if __name__ == '__main__':

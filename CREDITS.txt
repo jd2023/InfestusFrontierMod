@@ -4,4 +4,7 @@ Every shipped texture, model, sound and name is original work made for this
 project. Add one line per asset family here: what it is, who made it, with what
 tool, on what date. No vanilla, prototype or third-party art is copied.
 
-Living Substrate basic/young/mature (64x64) and Spore Culture (32x32): procedural placeholders drawn by the planner with a Python script, 2026-10-15. Replaced by ART-001.
+Spore Culture (32x32): procedural placeholder drawn by the planner with a Python script, 2026-10-15. Replacement pending in ART-002.
+Living Substrate basic/young/mature: original artwork generated for this project with OpenAI's built-in image generation tool, 2026-10-15; CC BY 4.0. Three 256x256 patterns exported as sixteen 64x64 tiles each with scripts/texture.py, wired to the block by position. V3 substrate and Astra evaluation tissue were style references.
+Synaptic Probe (textures/item/synaptic_probe.png, 32x32 RGBA): original artwork generated for this project with OpenAI's built-in image generation tool, 2026-10-16; CC BY 4.0. Exported with scripts/texture.py --size 32 --colors 0.
+Biomass fluid (textures/block/biomass_still.png, biomass_flow.png, item/biomass_bucket.png overlay on vanilla's bucket sprite), organ GUI sheet (textures/gui/organ.png), Digestive Sac and Biomass Bladder models, animations and model textures (geo/, animations/, textures/block_entity/): original work from the planner's Python generators under art/, 2026-10-16.
