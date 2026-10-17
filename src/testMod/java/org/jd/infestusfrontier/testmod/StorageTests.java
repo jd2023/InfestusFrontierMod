@@ -16,6 +16,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.foundation.Biomass;
@@ -142,5 +143,27 @@ public final class StorageTests {
                 BLADDER,
                 (BlockState s) -> s.getValue(BiomassBladderBlock.FILL) == level,
                 () -> "expected fill " + level);
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void joinedHandlerRoutesEachFluidToItsTank(GameTestHelper h) {
+        FluidTank water = new FluidTank(2000, stack -> stack.is(Fluids.WATER));
+        FluidTank biomass = new FluidTank(2000, BiomassFluids::isBiomass);
+        IFluidHandler joined = BiomassFluids.join(water, biomass);
+        h.assertValueEqual(joined.getTanks(), 2, "two tanks");
+        FluidStack bucketOfBiomass = BiomassFluids.of(Biomass.BUCKET);
+        h.assertValueEqual(joined.fill(bucketOfBiomass, IFluidHandler.FluidAction.EXECUTE), 1000, "biomass filled");
+        h.assertValueEqual(
+                joined.fill(new FluidStack(Fluids.WATER, 500), IFluidHandler.FluidAction.EXECUTE), 500, "water filled");
+        h.assertValueEqual(
+                joined.fill(new FluidStack(Fluids.LAVA, 1000), IFluidHandler.FluidAction.EXECUTE), 0, "lava refused");
+        h.assertValueEqual(water.getFluidAmount(), 500, "water in the water tank");
+        h.assertValueEqual(biomass.getFluidAmount(), 1000, "biomass in the biomass tank");
+        h.assertTrue(joined.getFluidInTank(1).is(StorageModule.BIOMASS.get()), "tank 1 is biomass");
+        FluidStack drained = joined.drain(bucketOfBiomass, IFluidHandler.FluidAction.EXECUTE);
+        h.assertValueEqual(drained.getAmount(), 1000, "biomass drained by kind");
+        h.assertValueEqual(
+                joined.drain(1000, IFluidHandler.FluidAction.SIMULATE).getAmount(), 500, "water is what is left");
+        h.succeed();
     }
 }
