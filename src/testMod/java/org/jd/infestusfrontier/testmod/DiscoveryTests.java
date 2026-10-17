@@ -91,6 +91,19 @@ public final class DiscoveryTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void workshopEntriesLoad(GameTestHelper h) {
+        var book = BookDataManager.get().getBook(BOOK);
+        h.assertTrue(book != null, "book known to BookDataManager");
+        var category = book.getCategory(id("contact"));
+        h.assertTrue(category != null, "category contact loaded");
+        for (String entry :
+                List.of("organ_bud", "digestive_sac", "biomass_bladder", "culture_bowl", "speak_to_an_organ")) {
+            h.assertTrue(category.getEntries().containsKey(id("contact/" + entry)), "entry " + entry + " loaded");
+        }
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void substrateAdvancementGrantedOnConversion(GameTestHelper h) {
         BlockPos ground = new BlockPos(1, 1, 1);
         h.setBlock(ground, Blocks.GRASS_BLOCK);

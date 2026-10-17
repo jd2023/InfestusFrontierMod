@@ -1,0 +1,24 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.digestive_sac.name",
+  "description": "entry.infestusfrontier.contact.digestive_sac.description",
+  "icon": "infestusfrontier:digestive_sac",
+  "x": 1,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/organ_bud"
+    }
+  ],
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.digestive_sac.name",
+      "text": "entry.infestusfrontier.contact.digestive_sac.text"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:digestive_sac"
+    }
+  ]
+}

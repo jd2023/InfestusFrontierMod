@@ -1,0 +1,24 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.organ_bud.name",
+  "description": "entry.infestusfrontier.contact.organ_bud.description",
+  "icon": "infestusfrontier:organ_bud",
+  "x": 1,
+  "y": 0,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/a_culture_in_your_hand"
+    }
+  ],
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.organ_bud.name",
+      "text": "entry.infestusfrontier.contact.organ_bud.text"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:organ_bud"
+    }
+  ]
+}

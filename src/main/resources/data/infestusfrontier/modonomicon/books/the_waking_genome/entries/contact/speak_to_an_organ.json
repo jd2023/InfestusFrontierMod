@@ -1,0 +1,24 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.speak_to_an_organ.name",
+  "description": "entry.infestusfrontier.contact.speak_to_an_organ.description",
+  "icon": "infestusfrontier:synaptic_probe",
+  "x": 2,
+  "y": 0,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/a_culture_in_your_hand"
+    }
+  ],
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.speak_to_an_organ.name",
+      "text": "entry.infestusfrontier.contact.speak_to_an_organ.text"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:synaptic_probe"
+    }
+  ]
+}
