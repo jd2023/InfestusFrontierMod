@@ -68,7 +68,8 @@ public final class M1RouteTests {
         });
     }
 
-    private static ItemStack craft(GameTestHelper h, List<ItemStack> inputs, Item result) {
+    /** The result of the crafting recipe that {@code inputs} match, assembled as a crafting table would. */
+    static ItemStack craft(GameTestHelper h, List<ItemStack> inputs, Item result) {
         CraftingInput input = CraftingInput.of(inputs.size(), 1, inputs);
         var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, h.getLevel());
         h.assertTrue(recipe.isPresent(), "recipe present for " + result);

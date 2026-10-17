@@ -12,8 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -39,26 +37,29 @@ public final class M2RouteTests {
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 1500)
     public static void m2Route(GameTestHelper h) {
-        ItemStack culture1 = craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
-        ItemStack culture2 = craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
-        ItemStack bud1 = craft(
+        ItemStack culture1 =
+                M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
+        ItemStack culture2 =
+                M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
+        ItemStack bud1 = M1RouteTests.craft(
                 h,
                 List.of(culture1, rotten(), rotten(), new ItemStack(Items.BONE_MEAL)),
                 OrganModule.ORGAN_BUD_ITEM.get());
-        ItemStack bud2 = craft(
+        ItemStack bud2 = M1RouteTests.craft(
                 h,
                 List.of(culture2, rotten(), rotten(), new ItemStack(Items.BONE_MEAL)),
                 OrganModule.ORGAN_BUD_ITEM.get());
-        ItemStack sac = craft(
+        ItemStack sac = M1RouteTests.craft(
                 h,
                 List.of(bud1, rotten(), rotten(), new ItemStack(Items.BOWL)),
                 ProcessingModule.DIGESTIVE_SAC_ITEM.get());
-        ItemStack bladder = craft(
+        ItemStack bladder = M1RouteTests.craft(
                 h,
                 List.of(bud2, new ItemStack(Items.GLASS), new ItemStack(Items.GLASS), new ItemStack(Items.SLIME_BALL)),
                 StorageModule.BIOMASS_BLADDER_ITEM.get());
-        ItemStack culture3 = craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
-        ItemStack bowl = craft(
+        ItemStack culture3 =
+                M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
+        ItemStack bowl = M1RouteTests.craft(
                 h,
                 List.of(new ItemStack(Items.FLOWER_POT), culture3, seeds()),
                 ProcessingModule.CULTURE_BOWL_ITEM.get());
@@ -131,14 +132,5 @@ public final class M2RouteTests {
                 h.getBlockEntity(BOWL).collectComponents().get(ProcessingModule.BOWL_CONTENTS.get());
         if (contents == null) h.fail("no bowl contents", BOWL);
         return contents;
-    }
-
-    private static ItemStack craft(GameTestHelper h, List<ItemStack> inputs, Item result) {
-        CraftingInput input = CraftingInput.of(inputs.size(), 1, inputs);
-        var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, h.getLevel());
-        h.assertTrue(recipe.isPresent(), "recipe present for " + result);
-        ItemStack out = recipe.get().value().assemble(input, h.getLevel().registryAccess());
-        h.assertTrue(out.is(result), "result is " + result);
-        return out;
     }
 }
