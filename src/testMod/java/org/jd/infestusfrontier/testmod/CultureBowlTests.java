@@ -178,13 +178,30 @@ public final class CultureBowlTests {
         placeBowl(h);
         loadCultureInputs(h, true);
         startBatch(h);
-        loadCultureInputs(h, false);
         h.runAfterDelay(20, () -> {
+            // A save from before insert waited can hold a batch and matching ingredients together.
+            CultureBowlContents running = contents(h, BOWL);
+            List<ItemStack> held =
+                    new ArrayList<>(List.of(new ItemStack(Items.RED_MUSHROOM), new ItemStack(Items.WHEAT_SEEDS)));
+            while (held.size() < 9) held.add(ItemStack.EMPTY);
+            CultureBowlContents mixed = new CultureBowlContents(
+                    held, running.output(), running.waterMb(), running.biomass(), running.history(), running.batch());
+            var registries = h.getLevel().registryAccess();
+            BlockEntity bowl = h.getBlockEntity(BOWL);
+            CompoundTag tag = bowl.saveWithoutMetadata(registries);
+            tag.put(
+                    "contents",
+                    CultureBowlContents.CODEC
+                            .encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, mixed)
+                            .getOrThrow());
+            bowl.loadWithComponents(tag, registries);
+            int done = contents(h, BOWL).batch().orElseThrow().batch().ticksDone();
             startBatch(h);
             CultureBowlContents after = contents(h, BOWL);
-            h.assertTrue(after.ingredients().stream().allMatch(ItemStack::isEmpty), "nothing was loaded meanwhile");
+            h.assertTrue(after.ingredients().get(0).is(Items.RED_MUSHROOM), "the mushroom is untouched");
+            h.assertTrue(after.ingredients().get(1).is(Items.WHEAT_SEEDS), "the seed is untouched");
             h.assertValueEqual(after.waterMb(), 900, "no second spend of water");
-            h.assertTrue(after.batch().orElseThrow().batch().ticksDone() >= 20, "the first batch kept its progress");
+            h.assertValueEqual(after.batch().orElseThrow().batch().ticksDone(), done, "the first batch is untouched");
             h.succeed();
         });
     }
