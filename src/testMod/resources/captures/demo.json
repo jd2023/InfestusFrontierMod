@@ -16,7 +16,7 @@
     "setblock 7 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Sand\"','\"not a host\"','\"nothing happens\"','\"\"']}}",
     "setblock 12 -60 -36 crafting_table",
     "setblock 14 -60 -36 chest[facing=south]{Items:[{Slot:0,id:\"minecraft:rotten_flesh\",count:8},{Slot:1,id:\"minecraft:red_mushroom\",count:8},{Slot:2,id:\"minecraft:wheat_seeds\",count:8},{Slot:3,id:\"minecraft:dirt\",count:8},{Slot:4,id:\"minecraft:bone_meal\",count:8},{Slot:5,id:\"minecraft:bowl\",count:4},{Slot:6,id:\"minecraft:glass\",count:8},{Slot:7,id:\"minecraft:slime_ball\",count:4}]}",
-    "setblock 13 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Craft\"','\"Spore Culture\"','\"Living Substrate\"','\"\"']}}",
+    "setblock 11 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Craft\"','\"Spore Culture\"','\"Living Substrate\"','\"and the organs\"']}}",
     "setblock 20 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 20 -60 -36 infestusfrontier:digestive_sac[working=true]{tank:{stored:300,reserved:100,capacity:1000},history:{completed_batches:3},batch:{batch:{recipe:\"infestusfrontier:digestion/wheat\",ticks_required:2400,ticks_done:700},yield:100},feed:{Size:1,Items:[{Slot:0,id:\"minecraft:wheat\",count:5}]}}",
     "setblock 19 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Digestive Sac\"','\"feed wheat or\"','\"rotten flesh\"','\"fills the bladder\"']}}",
@@ -89,7 +89,7 @@
     },
     {
       "name": "workshop",
-      "x": 21.5,
+      "x": 22.5,
       "y": -60,
       "z": -39.5,
       "yaw": 0,
