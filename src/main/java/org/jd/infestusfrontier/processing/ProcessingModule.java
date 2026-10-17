@@ -5,6 +5,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -63,6 +64,20 @@ public final class ProcessingModule {
                     "digestive_sac",
                     () -> BlockEntityType.Builder.of(DigestiveSacBlockEntity::new, DIGESTIVE_SAC.get())
                             .build(null));
+    public static final DeferredBlock<Block> CULTURE_BOWL = BLOCKS.registerBlock(
+            "culture_bowl",
+            CultureBowlBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_PINK)
+                    .strength(0.8F)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion());
+    public static final DeferredItem<BlockItem> CULTURE_BOWL_ITEM = ITEMS.registerSimpleBlockItem(CULTURE_BOWL);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CultureBowlBlockEntity>> CULTURE_BOWL_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "culture_bowl",
+                    () -> BlockEntityType.Builder.of(CultureBowlBlockEntity::new, CULTURE_BOWL.get())
+                            .build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
     public static final DeferredHolder<RecipeType<?>, RecipeType<DigestionRecipe>> DIGESTION = RECIPE_TYPES.register(
@@ -75,6 +90,11 @@ public final class ProcessingModule {
                     "digestion_batch",
                     builder ->
                             builder.persistent(DigestionBatch.CODEC).networkSynchronized(DigestionBatch.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CultureBowlBlockEntity.Contents>>
+            BOWL_CONTENTS = COMPONENTS.registerComponentType(
+                    "culture_bowl_contents",
+                    builder -> builder.persistent(CultureBowlBlockEntity.Contents.CODEC)
+                            .networkSynchronized(CultureBowlBlockEntity.Contents.STREAM_CODEC));
 
     private ProcessingModule() {}
 
@@ -99,6 +119,11 @@ public final class ProcessingModule {
                     Capabilities.FluidHandler.BLOCK,
                     DIGESTIVE_SAC_ENTITY.get(),
                     (sac, side) -> BiomassFluids.handler(sac));
+            event.registerBlockEntity(BiomassCapabilities.BLOCK, CULTURE_BOWL_ENTITY.get(), (bowl, side) -> bowl);
+            event.registerBlockEntity(
+                    Capabilities.FluidHandler.BLOCK,
+                    CULTURE_BOWL_ENTITY.get(),
+                    (bowl, side) -> BiomassFluids.join(bowl.water(), BiomassFluids.handler(bowl)));
         });
     }
 }

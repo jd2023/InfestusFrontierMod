@@ -26,6 +26,9 @@
     "setblock 24 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 24 -60 -36 infestusfrontier:organ_bud",
     "setblock 25 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Organ Bud\"','\"grows an organ\"','\"craft: culture\"','\"\"']}}",
+    "setblock 26 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 26 -60 -36 infestusfrontier:culture_bowl",
+    "setblock 27 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Culture Bowl\"','\"mushroom, seed\"','\"water bucket\"','\"hand starts\"']}}",
     "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
     "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",
     "fill 5 -61 -29 8 -61 -26 infestusfrontier:living_substrate[stage=young]",
@@ -41,6 +44,9 @@
     "give @s rotten_flesh 16",
     "give @s bucket 4",
     "give @s infestusfrontier:organ_bud 4",
+    "item replace entity @s inventory.0 with red_mushroom 8",
+    "item replace entity @s inventory.1 with wheat_seeds 8",
+    "item replace entity @s inventory.2 with water_bucket 2",
     "give @s modonomicon:modonomicon[modonomicon:book_id=\"infestusfrontier:the_waking_genome\"]"
   ],
   "views": [
