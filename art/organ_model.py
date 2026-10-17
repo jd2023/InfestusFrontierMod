@@ -291,6 +291,35 @@ def bbmodel(model, bones, uv, sheet, img, glow, anims):
     }
 
 
+def vanilla_model(bones, uv, sheet, texture):
+    """A static vanilla block model: every cube becomes an element with the same box-UV faces, in 16-space."""
+    k = 16 / sheet
+    elements = []
+    for _, _, _, cubes in bones:
+        for island, origin, size, turn in cubes:
+            assert turn is None, 'vanilla elements here are axis-aligned'
+            x, y, z = origin
+            w, h, d = size
+            element = {'from': [x + 8, y, z + 8], 'to': [x + 8 + w, y + h, z + 8 + d], 'faces': {}}
+            for face, (u, v, fw, fh) in faces(size, uv[island]).items():
+                element['faces'][face] = {'uv': [u * k, v * k, (u + fw) * k, (v + fh) * k], 'texture': '#skin'}
+            elements.append(element)
+    return {'textures': {'skin': texture, 'particle': texture}, 'elements': elements}
+
+
+def write_static(model, bones, sheet, painter, max_cubes=24):
+    """Writes a static organ: the vanilla block model and its one texture under textures/block."""
+    uv = pack(bones, sheet)
+    out = ASSETS / 'textures/block'
+    out.mkdir(parents=True, exist_ok=True)
+    painter.img.save(out / (model + '.png'), optimize=True)
+    (ASSETS / 'models/block').mkdir(parents=True, exist_ok=True)
+    texture = 'infestusfrontier:block/' + model
+    (ASSETS / 'models/block' / (model + '.json')).write_text(compact(vanilla_model(bones, uv, sheet, texture)), encoding='utf-8')
+    assert sum(len(bone[3]) for bone in bones) <= max_cubes
+    return uv
+
+
 def compact(value):
     """Indented JSON with each vector on one line."""
     text = json.dumps(value, indent=2)

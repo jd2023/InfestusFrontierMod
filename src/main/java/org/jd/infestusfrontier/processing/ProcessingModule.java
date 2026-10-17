@@ -5,7 +5,6 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -74,7 +73,8 @@ public final class ProcessingModule {
                     .strength(0.8F)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion());
-    public static final DeferredItem<BlockItem> CULTURE_BOWL_ITEM = ITEMS.registerSimpleBlockItem(CULTURE_BOWL);
+    public static final DeferredItem<OrganItem> CULTURE_BOWL_ITEM =
+            ITEMS.register("culture_bowl", () -> new OrganItem(CULTURE_BOWL.get(), new Item.Properties(), "idle"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CultureBowlBlockEntity>> CULTURE_BOWL_ENTITY =
             BLOCK_ENTITIES.register(
                     "culture_bowl",
@@ -117,6 +117,7 @@ public final class ProcessingModule {
         COMPONENTS.register(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             OrganRenderers.register(modBus, "digestive_sac", DIGESTIVE_SAC_ENTITY, DIGESTIVE_SAC_ITEM);
+            OrganRenderers.register(modBus, "culture_bowl", CULTURE_BOWL_ENTITY, CULTURE_BOWL_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(DIGESTIVE_SAC_MENU.get(), DigestiveSacScreen::new);
                 event.register(CULTURE_BOWL_MENU.get(), CultureBowlScreen::new);

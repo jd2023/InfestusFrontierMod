@@ -26,6 +26,7 @@ import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.processing.CultureBowlBlock;
 import org.jd.infestusfrontier.processing.CultureBowlMenu;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.CultureBowlContents;
@@ -423,5 +424,18 @@ public final class CultureBowlTests {
                 h.getBlockEntity(pos).collectComponents().get(ProcessingModule.BOWL_CONTENTS.get());
         if (contents == null) h.fail("no bowl contents", pos);
         return contents;
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 1300)
+    public static void bowlShowsWorkingWhileABatchRuns(GameTestHelper h) {
+        placeBowl(h);
+        h.assertBlockProperty(BOWL, CultureBowlBlock.WORKING, false);
+        loadCultureInputs(h, true);
+        startBatch(h);
+        h.runAfterDelay(2, () -> h.assertBlockProperty(BOWL, CultureBowlBlock.WORKING, true));
+        h.runAfterDelay(BATCH_TICKS + 4, () -> {
+            h.assertBlockProperty(BOWL, CultureBowlBlock.WORKING, false);
+            h.succeed();
+        });
     }
 }

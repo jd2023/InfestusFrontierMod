@@ -3,6 +3,13 @@
     "time set midnight"
   ],
   "views": [
-    {"name": "front", "x": 0.5, "y": -60, "z": -0.5, "yaw": 0, "pitch": 15}
+    {
+      "name": "front",
+      "x": 0.5,
+      "y": -60,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 15
+    }
   ]
 }

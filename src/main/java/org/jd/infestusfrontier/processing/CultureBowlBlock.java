@@ -19,6 +19,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -33,11 +35,25 @@ import org.jetbrains.annotations.Nullable;
  * hand takes them back, an empty hand starts a batch. Anything else passes through so the player can build against it.
  */
 public final class CultureBowlBlock extends BaseEntityBlock {
+    /** True while a batch runs; the client animates from it. */
+    public static final BooleanProperty WORKING = BooleanProperty.create("working");
+
     private static final MapCodec<CultureBowlBlock> CODEC = simpleCodec(CultureBowlBlock::new);
     private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 6, 15);
 
     CultureBowlBlock(Properties properties) {
         super(properties);
+        registerDefaultState(stateDefinition.any().setValue(WORKING, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(WORKING);
+    }
+
+    @Override
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     @Override
@@ -81,11 +97,6 @@ public final class CultureBowlBlock extends BaseEntityBlock {
             level.addFreshEntity(drop);
         }
         return super.playerWillDestroy(level, pos, state, player);
-    }
-
-    @Override
-    protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
     }
 
     @Override

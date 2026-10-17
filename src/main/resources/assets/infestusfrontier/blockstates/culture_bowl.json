@@ -1,5 +1,10 @@
 {
   "variants": {
-    "": { "model": "infestusfrontier:block/culture_bowl" }
+    "working=false": {
+      "model": "infestusfrontier:block/culture_bowl"
+    },
+    "working=true": {
+      "model": "infestusfrontier:block/culture_bowl"
+    }
   }
 }
