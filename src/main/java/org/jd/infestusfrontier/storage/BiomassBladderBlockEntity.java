@@ -108,7 +108,7 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        Optional<BiomassTank> read = Persistence.read(SAVED, tag, StorageModule.LOGGER, "Biomass Bladder");
+        Optional<BiomassTank> read = Persistence.read(SAVED, tag, registries, StorageModule.LOGGER, "Biomass Bladder");
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         read.ifPresent(saved -> tank = saved);
     }
@@ -117,7 +117,7 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (unreadable.isPresent()) tag.merge(unreadable.get());
-        else Persistence.write(SAVED, tank, tag);
+        else Persistence.write(SAVED, tank, registries, tag);
     }
 
     @Override

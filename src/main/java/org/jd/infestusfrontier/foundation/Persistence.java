@@ -1,8 +1,10 @@
 package org.jd.infestusfrontier.foundation;
 
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
 import java.util.Optional;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -18,15 +20,23 @@ public final class Persistence {
 
     private Persistence() {}
 
-    /** The decoded state, or empty when {@code tag} cannot be read. The caller then keeps {@code tag}. */
-    public static <T> Optional<T> read(MapCodec<T> codec, CompoundTag tag, Logger log, String owner) {
-        DataResult<T> result = codec.codec().parse(NbtOps.INSTANCE, tag);
+    /**
+     * The decoded state, or empty when {@code tag} cannot be read. The caller then keeps {@code tag}. {@code registries}
+     * is the provider the block entity's load gave; item stacks with registry-bound components need it.
+     */
+    public static <T> Optional<T> read(
+            MapCodec<T> codec, CompoundTag tag, HolderLookup.Provider registries, Logger log, String owner) {
+        DataResult<T> result = codec.codec().parse(ops(registries), tag);
         result.error().ifPresent(error -> log.warn("{} keeps unreadable saved data: {}", owner, error.message()));
         return result.result();
     }
 
-    public static <T> void write(MapCodec<T> codec, T value, CompoundTag into) {
-        Tag encoded = codec.codec().encodeStart(NbtOps.INSTANCE, value).getOrThrow();
+    public static <T> void write(MapCodec<T> codec, T value, HolderLookup.Provider registries, CompoundTag into) {
+        Tag encoded = codec.codec().encodeStart(ops(registries), value).getOrThrow();
         into.merge((CompoundTag) encoded);
+    }
+
+    private static DynamicOps<Tag> ops(HolderLookup.Provider registries) {
+        return registries.createSerializationContext(NbtOps.INSTANCE);
     }
 }

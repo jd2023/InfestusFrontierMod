@@ -200,7 +200,7 @@ public final class CultureBowlBlockEntity extends BlockEntity implements Biomass
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        Optional<Contents> read = Persistence.read(SAVED, tag, ProcessingModule.LOGGER, "Culture Bowl");
+        Optional<Contents> read = Persistence.read(SAVED, tag, registries, ProcessingModule.LOGGER, "Culture Bowl");
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         read.ifPresent(this::restore);
     }
@@ -209,7 +209,7 @@ public final class CultureBowlBlockEntity extends BlockEntity implements Biomass
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (unreadable.isPresent()) tag.merge(unreadable.get());
-        else Persistence.write(SAVED, contents(), tag);
+        else Persistence.write(SAVED, contents(), registries, tag);
     }
 
     @Override

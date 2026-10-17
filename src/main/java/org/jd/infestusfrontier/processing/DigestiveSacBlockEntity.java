@@ -274,7 +274,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        Optional<Saved> read = Persistence.read(SAVED, tag, ProcessingModule.LOGGER, "Digestive Sac");
+        Optional<Saved> read = Persistence.read(SAVED, tag, registries, ProcessingModule.LOGGER, "Digestive Sac");
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         read.ifPresent(saved -> {
             tank = saved.tank();
@@ -288,7 +288,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (unreadable.isPresent()) tag.merge(unreadable.get());
-        else Persistence.write(SAVED, new Saved(tank, history, batch), tag);
+        else Persistence.write(SAVED, new Saved(tank, history, batch), registries, tag);
         tag.put(FEED_TAG, feed.serializeNBT(registries));
     }
 

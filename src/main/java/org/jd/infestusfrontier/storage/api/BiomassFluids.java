@@ -47,7 +47,9 @@ public final class BiomassFluids {
 
     /**
      * Several handlers as one block capability, tanks numbered in order. A fill goes to the first part that takes
-     * the fluid; a drain comes from the first part that holds some. For organs that hold water and biomass.
+     * the fluid; a drain by kind comes from the first part holding that fluid; a drain by amount comes from the
+     * first part that can give the whole amount, else from the part holding most, so a bucket still takes biomass
+     * when less than a bucket of water is left. For organs that hold water and biomass.
      */
     public static IFluidHandler join(IFluidHandler... parts) {
         return new Joined(List.of(parts));
@@ -193,11 +195,17 @@ public final class BiomassFluids {
 
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
+            IFluidHandler fullest = null;
+            int most = 0;
             for (IFluidHandler part : parts) {
-                FluidStack drained = part.drain(maxDrain, action);
-                if (!drained.isEmpty()) return drained;
+                int available = part.drain(maxDrain, FluidAction.SIMULATE).getAmount();
+                if (available == maxDrain) return part.drain(maxDrain, action);
+                if (available > most) {
+                    most = available;
+                    fullest = part;
+                }
             }
-            return FluidStack.EMPTY;
+            return fullest == null ? FluidStack.EMPTY : fullest.drain(maxDrain, action);
         }
     }
 }

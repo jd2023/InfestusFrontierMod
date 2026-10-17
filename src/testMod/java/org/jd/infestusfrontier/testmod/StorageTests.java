@@ -160,6 +160,10 @@ public final class StorageTests {
         h.assertValueEqual(water.getFluidAmount(), 500, "water in the water tank");
         h.assertValueEqual(biomass.getFluidAmount(), 1000, "biomass in the biomass tank");
         h.assertTrue(joined.getFluidInTank(1).is(StorageModule.BIOMASS.get()), "tank 1 is biomass");
+        FluidStack bucketful = joined.drain(1000, IFluidHandler.FluidAction.SIMULATE);
+        h.assertTrue(
+                BiomassFluids.isBiomass(bucketful) && bucketful.getAmount() == 1000,
+                "a bucket takes the fluid that fills it, not the 500 mB of water in front");
         FluidStack drained = joined.drain(bucketOfBiomass, IFluidHandler.FluidAction.EXECUTE);
         h.assertValueEqual(drained.getAmount(), 1000, "biomass drained by kind");
         h.assertValueEqual(
