@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +52,11 @@ public final class BiomassBladderBlock extends BaseEntityBlock {
 
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
-        return Organs.hasFoundation(context.getLevel(), context.getClickedPos()) ? defaultBlockState() : null;
+        if (!Organs.hasFoundation(context.getLevel(), context.getClickedPos())) return null;
+        // A bladder placed back with its content shows that content from the first frame.
+        BiomassTank carried = context.getItemInHand().get(StorageModule.TANK.get());
+        int fill = carried == null ? 0 : BiomassBladderBlockEntity.fillLevel(carried);
+        return defaultBlockState().setValue(FILL, fill);
     }
 
     @Override

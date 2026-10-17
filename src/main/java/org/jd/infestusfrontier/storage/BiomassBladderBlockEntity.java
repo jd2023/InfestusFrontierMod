@@ -37,7 +37,6 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
     private static final List<RawAnimation> FILL = IntStream.rangeClosed(0, 4)
             .mapToObj(level -> RawAnimation.begin().thenLoop("fill_" + level))
             .toList();
-    private static final int BLEND_TICKS = 10;
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     static final Biomass CAPACITY = Biomass.of(4000);
     private static final MapCodec<BiomassTank> SAVED = RecordCodecBuilder.mapCodec(
@@ -51,14 +50,17 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
         super(StorageModule.BIOMASS_BLADDER_ENTITY.get(), pos, state);
     }
 
-    /** The membrane breathes; the biomass inside follows the block's {@code fill}. */
+    /**
+     * The membrane breathes; the biomass inside follows the block's {@code fill}. Both snap, with no blend: a blend
+     * would show the model's rest pose, a full bladder, draining to the real level on every placement and chunk load.
+     */
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "membrane", 0, state -> state.setAndContinue(IDLE)));
         controllers.add(new AnimationController<>(
                 this,
                 "fluid",
-                BLEND_TICKS,
+                0,
                 state -> state.setAndContinue(
                         FILL.get(state.getAnimatable().getBlockState().getValue(BiomassBladderBlock.FILL)))));
     }

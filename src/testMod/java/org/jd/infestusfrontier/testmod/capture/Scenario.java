@@ -20,9 +20,24 @@ record Scenario(String name, List<String> commands, List<View> views) {
     static final int MAX_VIEWS = 32;
     private static final String NAME = "[a-z][a-z0-9_]{0,63}";
 
-    /** {@code use} names a block the player right-clicks with an empty hand before the shot, to photograph its screen. */
+    /**
+     * {@code use} names a block the player right-clicks with an empty hand before the shot, to photograph its screen;
+     * {@code inventory} opens the player's own inventory instead. A view with either is shot at GUI scale 3.
+     */
     record View(
-            String name, double x, double y, double z, float yaw, float pitch, boolean gui, Optional<BlockPos> use) {}
+            String name,
+            double x,
+            double y,
+            double z,
+            float yaw,
+            float pitch,
+            boolean gui,
+            Optional<BlockPos> use,
+            boolean inventory) {
+        boolean opensScreen() {
+            return use.isPresent() || inventory;
+        }
+    }
 
     /** Loads every scenario named in a comma separated list from the test mod resources. */
     static List<Scenario> loadAll(String folder, String names) throws IOException {
@@ -74,7 +89,8 @@ record Scenario(String name, List<String> commands, List<View> views) {
                         v.get("yaw").getAsFloat(),
                         v.get("pitch").getAsFloat(),
                         v.has("gui") && v.get("gui").getAsBoolean(),
-                        use));
+                        use,
+                        v.has("inventory") && v.get("inventory").getAsBoolean()));
             }
             return new Scenario(name, List.copyOf(commands), List.copyOf(views));
         }

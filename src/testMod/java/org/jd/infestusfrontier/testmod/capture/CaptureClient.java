@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
@@ -39,11 +40,13 @@ import org.slf4j.Logger;
 final class CaptureClient {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String WORLD = "capture";
-    private static final int WIDTH = 854;
-    private static final int HEIGHT = 480;
+    private static final int WIDTH = 1280;
+    private static final int HEIGHT = 720;
     private static final int STAGE_TIMEOUT_TICKS = 600;
     private static final int SETTLE_TICKS = 40;
     private static final int MOVE_TICKS = 10;
+    private static final int WORLD_SCALE = 2; // the HUD stays small in a world shot
+    private static final int SCREEN_SCALE = 3; // a screen is shot the size a player sees it
     private static final int READY_RADIUS = 2; // chunks around the view that must have arrived from the server
     private static final int READY_FRAMES = 10; // consecutive frames with nothing left to compile
     private static final List<String> BASELINE = List.of(
@@ -92,6 +95,7 @@ final class CaptureClient {
                     holdInAir(minecraft);
                     if (ticksInStage >= MOVE_TICKS) {
                         currentView().use().ifPresent(block -> useBlock(minecraft, block));
+                        if (currentView().inventory()) minecraft.setScreen(new InventoryScreen(minecraft.player));
                         enter(Stage.FRAME);
                     }
                 }
@@ -132,8 +136,7 @@ final class CaptureClient {
                 minecraft.getWindow().getHeight());
         minecraft.options.cloudStatus().set(CloudStatus.OFF);
         minecraft.options.bobView().set(false);
-        minecraft.options.guiScale().set(2);
-        minecraft.resizeDisplay();
+        guiScale(minecraft, WORLD_SCALE);
         LOGGER.info("INFESTUS_CAPTURE_WORLD_CREATE scenarios={}", scenarios.size());
         FlatWorld.create(minecraft, WORLD);
         enter(Stage.JOIN);
@@ -163,11 +166,18 @@ final class CaptureClient {
                 Locale.ROOT, "tp @s %.3f %.3f %.3f %.2f %.2f", view.x(), view.y(), view.z(), view.yaw(), view.pitch());
         FlatWorld.command(minecraft, tp);
         minecraft.options.hideGui = !view.gui();
+        guiScale(minecraft, view.opensScreen() ? SCREEN_SCALE : WORLD_SCALE);
         minecraft.gui.getChat().clearMessages(true);
         minecraft.getToasts().clear(); // "New recipes unlocked" after a give
         frameReady = false;
         readyFrames = 0;
         enter(Stage.MOVE);
+    }
+
+    private static void guiScale(Minecraft minecraft, int scale) {
+        if (minecraft.options.guiScale().get() == scale) return;
+        minecraft.options.guiScale().set(scale);
+        minecraft.resizeDisplay();
     }
 
     private Scenario.View currentView() {
@@ -245,7 +255,7 @@ final class CaptureClient {
         Scenario.View view = scenario.views().get(viewIndex);
         // A view that used a block waits for its container screen; every other view waits for no screen at all.
         boolean screenOpen = minecraft.screen instanceof AbstractContainerScreen<?>;
-        if (view.use().isPresent() ? !screenOpen || ticksInStage < MOVE_TICKS : minecraft.screen != null) return;
+        if (view.opensScreen() ? !screenOpen || ticksInStage < MOVE_TICKS : minecraft.screen != null) return;
         enter(Stage.GRABBING);
         try {
             Path scenarioDir = outputDir.resolve(scenario.name());

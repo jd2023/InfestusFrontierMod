@@ -184,7 +184,7 @@ A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`:
 
 - The harness sets noon, clear weather, frozen time and weather, no clouds, no view bobbing, an empty hand, and hides the GUI unless `gui` is true. `commands` run as the player, one per tick, before the views.
 - A view teleports the player to `x y z` with `yaw pitch`. On the ground the player stands; in the air it flies and is pinned there. It waits until every chunk section around the player is rendered, and saves `build/captures/<scenario>/<view>.png`.
-- A view with `"use": [x, y, z]` and `"gui": true` right-clicks that block with an empty hand from where it stands and photographs the screen that opens. Every screen gets such a view in `demo.json`.
+- A view with `"use": [x, y, z]` and `"gui": true` right-clicks that block with an empty hand from where it stands and photographs the screen that opens. Every screen gets such a view in `demo.json`. A view with `"inventory": true` opens the player's inventory instead. The window is 1280x720; world views are shot at GUI scale 2, screen views at scale 3.
 - A capture fails when the image is missing, when more than 0.2% of its pixels are the missing-texture magenta, when the whole frame is one flat color, or when a golden exists in `src/testMod/resources/captures/golden/<scenario>/<view>.png` and more than 0.5% of pixels differ by more than 32 in a channel.
 - Goldens are added only after the owner accepts the art. A golden is replaced only in a story that says so.
 - The reviewer reads the PNG files. A passing check is not an accepted picture.
