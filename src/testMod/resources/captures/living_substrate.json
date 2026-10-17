@@ -1,9 +1,16 @@
 {
   "commands": [
-    "setblock 0 -60 3 infestusfrontier:living_substrate[stage=basic]"
+    "fill -3 -61 0 3 -61 6 minecraft:gray_concrete",
+    "setblock -1 -60 3 infestusfrontier:living_substrate[stage=basic]",
+    "setblock 0 -60 3 infestusfrontier:living_substrate[stage=young]",
+    "setblock 1 -60 3 infestusfrontier:living_substrate[stage=mature]",
+    "give @s infestusfrontier:spore_culture 1",
+    "give @s infestusfrontier:living_substrate 1"
   ],
   "views": [
     {"name": "front", "x": 0.5, "y": -60, "z": -0.5, "yaw": 0, "pitch": 20},
-    {"name": "back", "x": 0.5, "y": -60, "z": 7.5, "yaw": 180, "pitch": 20}
+    {"name": "back", "x": 0.5, "y": -60, "z": 7.5, "yaw": 180, "pitch": 20},
+    {"name": "above", "x": 0.5, "y": -56, "z": 3.5, "yaw": 0, "pitch": 90},
+    {"name": "hotbar", "x": 0.5, "y": -60, "z": -0.5, "yaw": 0, "pitch": 20, "gui": true}
   ]
 }
