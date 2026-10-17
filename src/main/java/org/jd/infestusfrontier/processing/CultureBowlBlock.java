@@ -1,10 +1,12 @@
 package org.jd.infestusfrontier.processing;
 
 import com.mojang.serialization.MapCodec;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -14,10 +16,13 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.foundation.Refusals;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -25,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * The hand-loaded culturing bowl. Buckets move water and biomass, ingredients go in one at a time, an empty sneaking
- * hand takes them back, an empty hand reports. Anything else passes through so the player can build against it.
+ * hand takes them back, an empty hand starts a batch. Anything else passes through so the player can build against it.
  */
 public final class CultureBowlBlock extends BaseEntityBlock {
     private static final MapCodec<CultureBowlBlock> CODEC = simpleCodec(CultureBowlBlock::new);
@@ -56,6 +61,29 @@ public final class CultureBowlBlock extends BaseEntityBlock {
     }
 
     @Override
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
+        if (level.isClientSide) return null;
+        return createTickerHelper(type, ProcessingModule.CULTURE_BOWL_ENTITY.get(), CultureBowlBlockEntity::serverTick);
+    }
+
+    /** A Creative player who breaks a loaded bowl still gets it back, as with a shulker box. */
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide
+                && player.isCreative()
+                && level.getBlockEntity(pos) instanceof CultureBowlBlockEntity bowl
+                && !bowl.isEmpty()) {
+            ItemStack stack = new ItemStack(this);
+            bowl.saveToItem(stack, level.registryAccess());
+            ItemEntity drop = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
+            drop.setDefaultPickUpDelay();
+            level.addFreshEntity(drop);
+        }
+        return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
@@ -71,7 +99,8 @@ public final class CultureBowlBlock extends BaseEntityBlock {
             BlockHitResult hit) {
         ItemInteractionResult fluid = BiomassFluids.useOn(stack, level, pos, hit.getDirection(), player, hand);
         if (fluid != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) return fluid;
-        if (!(level.getBlockEntity(pos) instanceof CultureBowlBlockEntity bowl) || !bowl.accepts(stack))
+        if (!(level.getBlockEntity(pos) instanceof CultureBowlBlockEntity bowl)
+                || !bowl.ingredients().isItemValid(0, stack))
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
         ItemStack offered = player.getAbilities().instabuild ? stack.copy() : stack;
@@ -89,8 +118,15 @@ public final class CultureBowlBlock extends BaseEntityBlock {
         if (!player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty()) return InteractionResult.PASS;
         if (level.isClientSide) return InteractionResult.SUCCESS;
         if (!(level.getBlockEntity(pos) instanceof CultureBowlBlockEntity bowl)) return InteractionResult.PASS;
-        if (player.isShiftKeyDown()) bowl.collect(player);
-        else bowl.report(player);
+        if (player.isShiftKeyDown()) {
+            Optional<Refusal> refusal = bowl.cancel(player);
+            if (refusal.isPresent()) Refusals.show(player, refusal.get());
+            else bowl.collect(player);
+        } else {
+            Optional<Refusal> refusal = bowl.start(player);
+            if (refusal.isPresent()) Refusals.show(player, refusal.get());
+            else bowl.report(player);
+        }
         return InteractionResult.CONSUME;
     }
 }

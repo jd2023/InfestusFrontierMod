@@ -28,7 +28,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
+import org.jd.infestusfrontier.processing.api.CultureBowlContents;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
+import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
@@ -90,11 +92,16 @@ public final class ProcessingModule {
                     "digestion_batch",
                     builder ->
                             builder.persistent(DigestionBatch.CODEC).networkSynchronized(DigestionBatch.STREAM_CODEC));
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CultureBowlBlockEntity.Contents>>
-            BOWL_CONTENTS = COMPONENTS.registerComponentType(
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CultureBowlContents>> BOWL_CONTENTS =
+            COMPONENTS.registerComponentType(
                     "culture_bowl_contents",
-                    builder -> builder.persistent(CultureBowlBlockEntity.Contents.CODEC)
-                            .networkSynchronized(CultureBowlBlockEntity.Contents.STREAM_CODEC));
+                    builder -> builder.persistent(CultureBowlContents.CODEC)
+                            .networkSynchronized(CultureBowlContents.STREAM_CODEC));
+    public static final DeferredHolder<RecipeType<?>, RecipeType<OrganBatchRecipe>> ORGAN_BATCH = RECIPE_TYPES.register(
+            "organ_batch",
+            () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "organ_batch")));
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<OrganBatchRecipe>> ORGAN_BATCH_SERIALIZER =
+            RECIPE_SERIALIZERS.register("organ_batch", OrganBatchRecipe.Serializer::new);
 
     private ProcessingModule() {}
 
