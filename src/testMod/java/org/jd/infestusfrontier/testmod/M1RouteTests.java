@@ -7,6 +7,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
@@ -31,8 +32,6 @@ public final class M1RouteTests {
         h.setBlock(stone, Blocks.STONE);
         h.setBlock(grass, Blocks.GRASS_BLOCK);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 1);
-
-        // Three cultures from the recipe, as the crafting grid would assemble them.
         ItemStack cultures = ItemStack.EMPTY;
         for (int i = 0; i < 3; i++) {
             ItemStack made = craft(
@@ -46,8 +45,6 @@ public final class M1RouteTests {
             else cultures.grow(made.getCount());
         }
         h.assertValueEqual(cultures.getCount(), 3, "cultures crafted");
-
-        // One culture goes into the substrate recipe with a dirt block.
         cultures.shrink(1);
         ItemStack substrate = craft(
                 h,
@@ -56,14 +53,10 @@ public final class M1RouteTests {
         player.setItemInHand(InteractionHand.MAIN_HAND, substrate);
         h.placeAt(player, substrate, stone, Direction.UP);
         EcologyTests.assertStage(h, placed, SubstrateStage.BASIC);
-
-        // One culture converts the grass.
         player.setItemInHand(InteractionHand.MAIN_HAND, cultures);
         EcologyTests.use(h, player, grass, Direction.UP);
         EcologyTests.assertStage(h, grass, SubstrateStage.BASIC);
         h.assertValueEqual(cultures.getCount(), 1, "cultures left after the route");
-
-        // One bone meal on each cell.
         for (BlockPos cell : new BlockPos[] {placed, grass}) {
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BONE_MEAL, 1));
             EcologyTests.use(h, player, cell, Direction.UP);
@@ -75,7 +68,7 @@ public final class M1RouteTests {
         });
     }
 
-    private static ItemStack craft(GameTestHelper h, List<ItemStack> inputs, net.minecraft.world.item.Item result) {
+    private static ItemStack craft(GameTestHelper h, List<ItemStack> inputs, Item result) {
         CraftingInput input = CraftingInput.of(inputs.size(), 1, inputs);
         var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, h.getLevel());
         h.assertTrue(recipe.isPresent(), "recipe present for " + result);
