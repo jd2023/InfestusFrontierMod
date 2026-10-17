@@ -150,10 +150,13 @@ public final class DiscoveryTests {
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
     public static void sacPostsCompletionForItsFeeder(GameTestHelper h) {
         ProcessingTests.placeSac(h);
-        List<OrganBatchCompletedEvent> seen = new ArrayList<>();
-        Consumer<OrganBatchCompletedEvent> listener = seen::add;
-        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OrganBatchCompletedEvent.class, listener);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.WHEAT, 1);
+        List<OrganBatchCompletedEvent> seen = new ArrayList<>();
+        // The bus is shared with every test running in the same ticks; only this player's events count.
+        Consumer<OrganBatchCompletedEvent> listener = event -> {
+            if (event.feeder().equals(player.getUUID())) seen.add(event);
+        };
+        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OrganBatchCompletedEvent.class, listener);
         EcologyTests.use(h, player, SAC, Direction.UP);
         h.runAfterDelay(42, () -> {
             NeoForge.EVENT_BUS.unregister(listener);
