@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "infestusfrontier:organ_bud" },
+    { "item": "minecraft:rotten_flesh" },
+    { "item": "minecraft:rotten_flesh" },
+    { "item": "minecraft:bowl" }
+  ],
+  "result": { "id": "infestusfrontier:digestive_sac", "count": 1 }
+}

@@ -1,0 +1,15 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_spore_culture": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [ { "items": "infestusfrontier:spore_culture" } ] }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": { "recipe": "infestusfrontier:organ_bud" }
+    }
+  },
+  "requirements": [ [ "has_spore_culture", "has_the_recipe" ] ],
+  "rewards": { "recipes": [ "infestusfrontier:organ_bud" ] }
+}

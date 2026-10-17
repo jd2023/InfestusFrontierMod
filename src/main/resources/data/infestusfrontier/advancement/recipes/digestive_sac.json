@@ -1,0 +1,15 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_organ_bud": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [ { "items": "infestusfrontier:organ_bud" } ] }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": { "recipe": "infestusfrontier:digestive_sac" }
+    }
+  },
+  "requirements": [ [ "has_organ_bud", "has_the_recipe" ] ],
+  "rewards": { "recipes": [ "infestusfrontier:digestive_sac" ] }
+}

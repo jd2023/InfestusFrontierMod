@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "infestusfrontier:organ_bud" },
+    { "item": "minecraft:glass" },
+    { "item": "minecraft:glass" },
+    { "item": "minecraft:slime_ball" }
+  ],
+  "result": { "id": "infestusfrontier:biomass_bladder", "count": 1 }
+}
