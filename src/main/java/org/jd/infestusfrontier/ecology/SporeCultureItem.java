@@ -26,13 +26,7 @@ final class SporeCultureItem extends Item {
         if (!level.getBlockState(facing).getCollisionShape(level, facing).isEmpty()) return InteractionResult.PASS;
         if (level.isClientSide) return InteractionResult.SUCCESS;
 
-        level.setBlock(
-                target,
-                EcologyModule.LIVING_SUBSTRATE
-                        .get()
-                        .defaultBlockState()
-                        .setValue(LivingSubstrateBlock.STAGE, SubstrateStage.BASIC),
-                Block.UPDATE_ALL);
+        level.setBlock(target, EcologyModule.LIVING_SUBSTRATE.get().cellAt(target), Block.UPDATE_ALL);
         level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target, GROWTH_PARTICLES);
         Player player = context.getPlayer();
         if (player == null || !player.getAbilities().instabuild)

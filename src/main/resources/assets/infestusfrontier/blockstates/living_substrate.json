@@ -1,55 +1,148 @@
 {
   "variants": {
-    "stage=basic": [
-      {
-        "model": "infestusfrontier:block/living_substrate_basic"
-      },
-      {
-        "model": "infestusfrontier:block/living_substrate_basic",
-        "y": 90
-      },
-      {
-        "model": "infestusfrontier:block/living_substrate_basic",
-        "y": 180
-      },
-      {
-        "model": "infestusfrontier:block/living_substrate_basic",
-        "y": 270
-      }
-    ],
-    "stage=young": [
-      {
-        "model": "infestusfrontier:block/living_substrate_young"
-      },
-      {
-        "model": "infestusfrontier:block/living_substrate_young",
-        "y": 90
-      },
-      {
-        "model": "infestusfrontier:block/living_substrate_young",
-        "y": 180
-      },
-      {
-        "model": "infestusfrontier:block/living_substrate_young",
-        "y": 270
-      }
-    ],
-    "stage=mature": [
-      {
-        "model": "infestusfrontier:block/living_substrate_mature"
-      },
-      {
-        "model": "infestusfrontier:block/living_substrate_mature",
-        "y": 90
-      },
-      {
-        "model": "infestusfrontier:block/living_substrate_mature",
-        "y": 180
-      },
-      {
-        "model": "infestusfrontier:block/living_substrate_mature",
-        "y": 270
-      }
-    ]
+    "stage=basic,tile=0": {
+      "model": "infestusfrontier:block/living_substrate_basic_0"
+    },
+    "stage=basic,tile=1": {
+      "model": "infestusfrontier:block/living_substrate_basic_1"
+    },
+    "stage=basic,tile=2": {
+      "model": "infestusfrontier:block/living_substrate_basic_2"
+    },
+    "stage=basic,tile=3": {
+      "model": "infestusfrontier:block/living_substrate_basic_3"
+    },
+    "stage=basic,tile=4": {
+      "model": "infestusfrontier:block/living_substrate_basic_4"
+    },
+    "stage=basic,tile=5": {
+      "model": "infestusfrontier:block/living_substrate_basic_5"
+    },
+    "stage=basic,tile=6": {
+      "model": "infestusfrontier:block/living_substrate_basic_6"
+    },
+    "stage=basic,tile=7": {
+      "model": "infestusfrontier:block/living_substrate_basic_7"
+    },
+    "stage=basic,tile=8": {
+      "model": "infestusfrontier:block/living_substrate_basic_8"
+    },
+    "stage=basic,tile=9": {
+      "model": "infestusfrontier:block/living_substrate_basic_9"
+    },
+    "stage=basic,tile=10": {
+      "model": "infestusfrontier:block/living_substrate_basic_10"
+    },
+    "stage=basic,tile=11": {
+      "model": "infestusfrontier:block/living_substrate_basic_11"
+    },
+    "stage=basic,tile=12": {
+      "model": "infestusfrontier:block/living_substrate_basic_12"
+    },
+    "stage=basic,tile=13": {
+      "model": "infestusfrontier:block/living_substrate_basic_13"
+    },
+    "stage=basic,tile=14": {
+      "model": "infestusfrontier:block/living_substrate_basic_14"
+    },
+    "stage=basic,tile=15": {
+      "model": "infestusfrontier:block/living_substrate_basic_15"
+    },
+    "stage=young,tile=0": {
+      "model": "infestusfrontier:block/living_substrate_young_0"
+    },
+    "stage=young,tile=1": {
+      "model": "infestusfrontier:block/living_substrate_young_1"
+    },
+    "stage=young,tile=2": {
+      "model": "infestusfrontier:block/living_substrate_young_2"
+    },
+    "stage=young,tile=3": {
+      "model": "infestusfrontier:block/living_substrate_young_3"
+    },
+    "stage=young,tile=4": {
+      "model": "infestusfrontier:block/living_substrate_young_4"
+    },
+    "stage=young,tile=5": {
+      "model": "infestusfrontier:block/living_substrate_young_5"
+    },
+    "stage=young,tile=6": {
+      "model": "infestusfrontier:block/living_substrate_young_6"
+    },
+    "stage=young,tile=7": {
+      "model": "infestusfrontier:block/living_substrate_young_7"
+    },
+    "stage=young,tile=8": {
+      "model": "infestusfrontier:block/living_substrate_young_8"
+    },
+    "stage=young,tile=9": {
+      "model": "infestusfrontier:block/living_substrate_young_9"
+    },
+    "stage=young,tile=10": {
+      "model": "infestusfrontier:block/living_substrate_young_10"
+    },
+    "stage=young,tile=11": {
+      "model": "infestusfrontier:block/living_substrate_young_11"
+    },
+    "stage=young,tile=12": {
+      "model": "infestusfrontier:block/living_substrate_young_12"
+    },
+    "stage=young,tile=13": {
+      "model": "infestusfrontier:block/living_substrate_young_13"
+    },
+    "stage=young,tile=14": {
+      "model": "infestusfrontier:block/living_substrate_young_14"
+    },
+    "stage=young,tile=15": {
+      "model": "infestusfrontier:block/living_substrate_young_15"
+    },
+    "stage=mature,tile=0": {
+      "model": "infestusfrontier:block/living_substrate_mature_0"
+    },
+    "stage=mature,tile=1": {
+      "model": "infestusfrontier:block/living_substrate_mature_1"
+    },
+    "stage=mature,tile=2": {
+      "model": "infestusfrontier:block/living_substrate_mature_2"
+    },
+    "stage=mature,tile=3": {
+      "model": "infestusfrontier:block/living_substrate_mature_3"
+    },
+    "stage=mature,tile=4": {
+      "model": "infestusfrontier:block/living_substrate_mature_4"
+    },
+    "stage=mature,tile=5": {
+      "model": "infestusfrontier:block/living_substrate_mature_5"
+    },
+    "stage=mature,tile=6": {
+      "model": "infestusfrontier:block/living_substrate_mature_6"
+    },
+    "stage=mature,tile=7": {
+      "model": "infestusfrontier:block/living_substrate_mature_7"
+    },
+    "stage=mature,tile=8": {
+      "model": "infestusfrontier:block/living_substrate_mature_8"
+    },
+    "stage=mature,tile=9": {
+      "model": "infestusfrontier:block/living_substrate_mature_9"
+    },
+    "stage=mature,tile=10": {
+      "model": "infestusfrontier:block/living_substrate_mature_10"
+    },
+    "stage=mature,tile=11": {
+      "model": "infestusfrontier:block/living_substrate_mature_11"
+    },
+    "stage=mature,tile=12": {
+      "model": "infestusfrontier:block/living_substrate_mature_12"
+    },
+    "stage=mature,tile=13": {
+      "model": "infestusfrontier:block/living_substrate_mature_13"
+    },
+    "stage=mature,tile=14": {
+      "model": "infestusfrontier:block/living_substrate_mature_14"
+    },
+    "stage=mature,tile=15": {
+      "model": "infestusfrontier:block/living_substrate_mature_15"
+    }
   }
 }

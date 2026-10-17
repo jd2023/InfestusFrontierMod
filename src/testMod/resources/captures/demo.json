@@ -20,6 +20,12 @@
     "setblock 22 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 22 -60 -36 infestusfrontier:biomass_bladder[fill=2]{tank:{stored:2500,reserved:0,capacity:4000}}",
     "setblock 23 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Biomass Bladder\"','\"buckets in and out\"','\"empty hand opens\"','\"holds 4000\"']}}",
+    "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
+    "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",
+    "fill 5 -61 -29 8 -61 -26 infestusfrontier:living_substrate[stage=young]",
+    "setblock 6 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"young\"','\"sixteen tiles\"','\"no repeat\"']}}",
+    "fill 10 -61 -29 13 -61 -26 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 11 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"mature\"','\"sixteen tiles\"','\"no repeat\"']}}",
     "give @s infestusfrontier:spore_culture 16",
     "give @s infestusfrontier:living_substrate 16",
     "give @s bone_meal 64",
@@ -47,6 +53,14 @@
       "pitch": 40
     },
     {
+      "name": "patches",
+      "x": 6.5,
+      "y": -56,
+      "z": -31.5,
+      "yaw": 0,
+      "pitch": 45
+    },
+    {
       "name": "workshop",
       "x": 21.5,
       "y": -60,
@@ -62,7 +76,11 @@
       "yaw": 0,
       "pitch": 10,
       "gui": true,
-      "use": [22, -60, -36]
+      "use": [
+        22,
+        -60,
+        -36
+      ]
     }
   ]
 }

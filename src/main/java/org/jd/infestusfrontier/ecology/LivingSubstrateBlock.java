@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -28,11 +29,16 @@ import org.jd.infestusfrontier.InfestusFrontier;
  * {@value #GROWTH_DELAY_TICKS} ticks the cell matures one stage; once mature it converts up to {@value #SPREAD_PER_CELL}
  * exposed host blocks beside it into basic cells with one vigor less, then goes dormant. Vigor 0 cells do nothing.
  * One bone meal therefore touches at most 15 cells and schedules at most 22 ticks, then everything is quiet again.
+ *
+ * <p>Each stage is drawn from sixteen 64x64 tiles cut out of one 4x4-block macro texture. {@link #TILE} follows the
+ * cell's position ({@link #tileAt}), so a patch shows the macro pattern without seams or repeats.
  */
 public final class LivingSubstrateBlock extends Block implements BonemealableBlock {
     public static final EnumProperty<SubstrateStage> STAGE = EnumProperty.create("stage", SubstrateStage.class);
     /** Growth left in this cell. 0 is dormant. Bone meal sets {@value #BONE_MEAL_VIGOR}; each spread hands on one less. */
     public static final IntegerProperty VIGOR = IntegerProperty.create("vigor", 0, 3);
+    /** Which of the sixteen macro tiles this cell draws. Always {@link #tileAt} of its position. */
+    public static final IntegerProperty TILE = IntegerProperty.create("tile", 0, 15);
     /** Ground that Spore Culture converts and a mature cell can spread onto. */
     public static final TagKey<Block> HOSTS = TagKey.create(
             Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "substrate_hosts"));
@@ -44,13 +50,38 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
 
     LivingSubstrateBlock(Properties properties) {
         super(properties);
-        registerDefaultState(
-                stateDefinition.any().setValue(STAGE, SubstrateStage.BASIC).setValue(VIGOR, 0));
+        registerDefaultState(stateDefinition
+                .any()
+                .setValue(STAGE, SubstrateStage.BASIC)
+                .setValue(VIGOR, 0)
+                .setValue(TILE, 0));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(STAGE, VIGOR);
+        builder.add(STAGE, VIGOR, TILE);
+    }
+
+    /** Column of the macro texture from x, row from z: tile 0 at (0, 0), tile 15 at (3, 3). */
+    public static int tileAt(BlockPos pos) {
+        return (pos.getX() & 3) + 4 * (pos.getZ() & 3);
+    }
+
+    /** A new basic, dormant cell drawing the tile for {@code pos}. */
+    public BlockState cellAt(BlockPos pos) {
+        return defaultBlockState().setValue(TILE, tileAt(pos));
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return cellAt(context.getClickedPos());
+    }
+
+    /** Commands and other mods may place any tile; one extra setBlock puts the right one. */
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        int tile = tileAt(pos);
+        if (state.getValue(TILE) != tile) level.setBlock(pos, state.setValue(TILE, tile), Block.UPDATE_CLIENTS);
     }
 
     @Override
@@ -84,7 +115,7 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
         List<BlockPos> targets = spreadTargets(level, pos);
         for (int n = 0; n < SPREAD_PER_CELL && !targets.isEmpty(); n++) {
             BlockPos target = targets.remove(random.nextInt(targets.size()));
-            level.setBlock(target, defaultBlockState().setValue(VIGOR, vigor - 1), Block.UPDATE_ALL);
+            level.setBlock(target, cellAt(target).setValue(VIGOR, vigor - 1), Block.UPDATE_ALL);
             level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target, STEP_PARTICLES);
             if (vigor - 1 > 0) level.scheduleTick(target, this, GROWTH_DELAY_TICKS);
         }

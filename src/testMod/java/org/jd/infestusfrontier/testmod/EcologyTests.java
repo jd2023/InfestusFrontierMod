@@ -189,6 +189,47 @@ public final class EcologyTests {
         return sum;
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void tileFollowsPosition(GameTestHelper h) {
+        Player player = holding(h, GameType.SURVIVAL, EcologyModule.SPORE_CULTURE.get(), 8);
+        BlockPos[] cells = {new BlockPos(1, 1, 1), new BlockPos(4, 1, 1), new BlockPos(1, 1, 4), new BlockPos(3, 1, 2)};
+        for (BlockPos cell : cells) {
+            h.setBlock(cell, Blocks.GRASS_BLOCK);
+            use(h, player, cell, Direction.UP);
+            assertTile(h, cell);
+        }
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void wrongTileIsCorrectedOnPlace(GameTestHelper h) {
+        int wrong = (LivingSubstrateBlock.tileAt(h.absolutePos(CELL)) + 1) % 16;
+        h.setBlock(
+                CELL,
+                EcologyModule.LIVING_SUBSTRATE.get().defaultBlockState().setValue(LivingSubstrateBlock.TILE, wrong));
+        assertTile(h, CELL);
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void tileSurvivesGrowth(GameTestHelper h) {
+        h.setBlock(CELL, EcologyModule.LIVING_SUBSTRATE.get());
+        for (Direction side : Direction.Plane.HORIZONTAL) h.setBlock(CELL.relative(side), Blocks.OAK_PLANKS);
+        Player player = holding(h, GameType.SURVIVAL, Items.BONE_MEAL, 1);
+        use(h, player, CELL, Direction.UP);
+        h.runAfterDelay(LivingSubstrateBlock.GROWTH_DELAY_TICKS + 2, () -> {
+            assertStage(h, CELL, SubstrateStage.YOUNG);
+            assertTile(h, CELL);
+            h.succeed();
+        });
+    }
+
+    static void assertTile(GameTestHelper h, BlockPos cell) {
+        int tile = LivingSubstrateBlock.tileAt(h.absolutePos(cell));
+        h.assertBlockState(
+                cell, (BlockState s) -> s.getValue(LivingSubstrateBlock.TILE) == tile, () -> "expected tile " + tile);
+    }
+
     static void assertVigor(GameTestHelper h, BlockPos cell, int vigor) {
         h.assertBlockState(
                 cell,

@@ -1,4 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": { "all": "infestusfrontier:block/living_substrate_young" }
-}
