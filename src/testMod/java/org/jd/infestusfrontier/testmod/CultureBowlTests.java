@@ -176,14 +176,16 @@ public final class CultureBowlTests {
         placeBowl(h);
         loadCultureInputs(h, true);
         startBatch(h);
-        Player extra = EcologyTests.holding(h, GameType.SURVIVAL, Items.RED_MUSHROOM, 1);
-        EcologyTests.use(h, extra, BOWL, Direction.UP);
-        startBatch(h);
-        CultureBowlContents after = contents(h, BOWL);
-        h.assertTrue(after.ingredients().get(0).is(Items.RED_MUSHROOM), "the added mushroom is untouched");
-        h.assertValueEqual(after.waterMb(), 900, "no second spend of water");
-        h.assertValueEqual(after.batch().orElseThrow().batch().ticksDone(), 0, "progress not reset");
-        h.succeed();
+        loadCultureInputs(h, false);
+        h.runAfterDelay(20, () -> {
+            startBatch(h);
+            CultureBowlContents after = contents(h, BOWL);
+            h.assertTrue(after.ingredients().get(0).is(Items.RED_MUSHROOM), "the mushroom is untouched");
+            h.assertTrue(after.ingredients().get(1).is(Items.WHEAT_SEEDS), "the seed is untouched");
+            h.assertValueEqual(after.waterMb(), 900, "no second spend of water");
+            h.assertTrue(after.batch().orElseThrow().batch().ticksDone() >= 20, "the first batch kept its progress");
+            h.succeed();
+        });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
