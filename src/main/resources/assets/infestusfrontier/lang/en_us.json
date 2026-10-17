@@ -70,5 +70,11 @@
   "advancement.infestusfrontier.contact.a_culture_in_your_hand.title": "A Culture in Your Hand",
   "advancement.infestusfrontier.contact.a_culture_in_your_hand.description": "Obtain a Spore Culture.",
   "advancement.infestusfrontier.contact.living_substrate.title": "Living Substrate",
-  "advancement.infestusfrontier.contact.living_substrate.description": "Use a Spore Culture on exposed ground."
+  "advancement.infestusfrontier.contact.living_substrate.description": "Use a Spore Culture on exposed ground.",
+  "advancement.infestusfrontier.contact.organ_bud.title": "A Bud in Your Hand",
+  "advancement.infestusfrontier.contact.organ_bud.description": "Craft or grow an Organ Bud, a blank that becomes an organ.",
+  "advancement.infestusfrontier.contact.digestive_sac.title": "First Biomass",
+  "advancement.infestusfrontier.contact.digestive_sac.description": "Digest a batch in a Digestive Sac for your first fuel; a full Sac pauses instead of spilling.",
+  "advancement.infestusfrontier.contact.biomass_bladder.title": "Fuel in Reserve",
+  "advancement.infestusfrontier.contact.biomass_bladder.description": "Pour a bucket of biomass into a Biomass Bladder to store it."
 }

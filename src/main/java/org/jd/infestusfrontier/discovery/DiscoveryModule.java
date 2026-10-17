@@ -1,10 +1,14 @@
 package org.jd.infestusfrontier.discovery;
 
+import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
@@ -12,12 +16,22 @@ import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
+import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
 import org.jd.infestusfrontier.storage.StorageModule;
+import org.jd.infestusfrontier.storage.api.BiomassBucketEvent;
 
 /** Owner of recipe reveal, advancements and guide prerequisites. Ships the creative tab. */
 public final class DiscoveryModule {
     private static final DeferredRegister<CreativeModeTab> TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, InfestusFrontier.MOD_ID);
+
+    private static final DeferredRegister<CriterionTrigger<?>> TRIGGERS =
+            DeferredRegister.create(Registries.TRIGGER_TYPE, InfestusFrontier.MOD_ID);
+
+    static final DeferredHolder<CriterionTrigger<?>, OrganTriggers.OrganBatchCompleted> ORGAN_BATCH_COMPLETED =
+            TRIGGERS.register("organ_batch_completed", OrganTriggers.OrganBatchCompleted::new);
+    static final DeferredHolder<CriterionTrigger<?>, OrganTriggers.BiomassBucket> BIOMASS_BUCKET =
+            TRIGGERS.register("biomass_bucket", OrganTriggers.BiomassBucket::new);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register(
             "main",
@@ -40,5 +54,26 @@ public final class DiscoveryModule {
 
     public static void register(IEventBus modBus) {
         TABS.register(modBus);
+        TRIGGERS.register(modBus);
+        NeoForge.EVENT_BUS.addListener(DiscoveryModule::onBatchCompleted);
+        NeoForge.EVENT_BUS.addListener(DiscoveryModule::onBucket);
+        NeoForge.EVENT_BUS.addListener(DiscoveryModule::onLogin);
+    }
+
+    /** Fires for an online feeder; an offline feeder's credit waits in {@link PendingCredits}. */
+    private static void onBatchCompleted(OrganBatchCompletedEvent event) {
+        ServerPlayer feeder = event.level().getServer().getPlayerList().getPlayer(event.feeder());
+        if (feeder != null) ORGAN_BATCH_COMPLETED.get().trigger(feeder, event.organ());
+        else PendingCredits.get(event.level()).remember(event.feeder(), event.organ());
+    }
+
+    private static void onBucket(BiomassBucketEvent event) {
+        if (event.player() instanceof ServerPlayer player)
+            BIOMASS_BUCKET.get().trigger(player, event.block(), event.inserted());
+    }
+
+    private static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player)
+            PendingCredits.get(player.serverLevel()).award(player);
     }
 }

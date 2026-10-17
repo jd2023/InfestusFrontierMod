@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/living_substrate",
+  "display": {
+    "icon": { "id": "infestusfrontier:organ_bud" },
+    "title": { "translate": "advancement.infestusfrontier.contact.organ_bud.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.organ_bud.description" },
+    "frame": "task"
+  },
+  "criteria": {
+    "has_bud": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [ { "items": "infestusfrontier:organ_bud" } ] }
+    }
+  }
+}

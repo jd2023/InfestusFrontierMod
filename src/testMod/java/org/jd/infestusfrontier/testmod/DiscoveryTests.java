@@ -3,8 +3,11 @@ package org.jd.infestusfrontier.testmod;
 import com.klikli_dev.modonomicon.data.BookDataManager;
 import com.klikli_dev.modonomicon.registry.DataComponentRegistry;
 import com.mojang.authlib.GameProfile;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,22 +18,32 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.jd.infestusfrontier.discovery.PendingCredits;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
+import org.jd.infestusfrontier.storage.StorageModule;
+import org.jd.infestusfrontier.storage.api.BiomassBucketEvent;
 
 /** The Waking Genome guide: its advancements, its recipe and its book data. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class DiscoveryTests {
     private static final ResourceLocation BOOK = id("the_waking_genome");
+
+    private static final BlockPos SAC = new BlockPos(1, 2, 1);
 
     private static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath("infestusfrontier", path);
@@ -96,6 +109,79 @@ public final class DiscoveryTests {
         h.assertTrue(h.getBlockState(ground).is(EcologyModule.LIVING_SUBSTRATE.get()), "cell converted");
         h.assertTrue(
                 player.getAdvancements().getOrStartProgress(holder).isDone(), "living_substrate advancement is done");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void advancementsLoadWithTriggers(GameTestHelper h) {
+        Map<String, String> expected = Map.of(
+                "contact/organ_bud", "minecraft:inventory_changed",
+                "contact/digestive_sac", "infestusfrontier:organ_batch_completed",
+                "contact/biomass_bladder", "infestusfrontier:biomass_bucket");
+        expected.forEach((path, trigger) -> {
+            AdvancementHolder holder =
+                    h.getLevel().getServer().getAdvancements().get(id(path));
+            h.assertTrue(holder != null, "advancement " + path + " loaded");
+            h.assertTrue(
+                    holder.value().criteria().values().stream()
+                            .map(c -> BuiltInRegistries.TRIGGER_TYPES
+                                    .getKey(c.trigger())
+                                    .toString())
+                            .toList()
+                            .equals(List.of(trigger)),
+                    path + " uses " + trigger);
+        });
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void sacPostsCompletionForItsFeeder(GameTestHelper h) {
+        ProcessingTests.placeSac(h);
+        List<OrganBatchCompletedEvent> seen = new ArrayList<>();
+        Consumer<OrganBatchCompletedEvent> listener = seen::add;
+        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OrganBatchCompletedEvent.class, listener);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.WHEAT, 1);
+        EcologyTests.use(h, player, SAC, Direction.UP);
+        h.runAfterDelay(42, () -> {
+            NeoForge.EVENT_BUS.unregister(listener);
+            h.assertValueEqual(seen.size(), 1, "one completion event");
+            h.assertValueEqual(seen.get(0).organ(), id("digestive_sac"), "organ");
+            h.assertValueEqual(seen.get(0).feeder(), player.getUUID(), "feeder");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void bucketPostsTransfer(GameTestHelper h) {
+        StorageTests.placeBladder(h);
+        List<BiomassBucketEvent> seen = new ArrayList<>();
+        Consumer<BiomassBucketEvent> listener = seen::add;
+        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BiomassBucketEvent.class, listener);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, StorageModule.BIOMASS_BUCKET.get(), 1);
+        EcologyTests.use(h, player, SAC, Direction.UP);
+        NeoForge.EVENT_BUS.unregister(listener);
+        h.assertValueEqual(seen.size(), 1, "one bucket event");
+        h.assertValueEqual(seen.get(0).block(), id("biomass_bladder"), "block");
+        h.assertTrue(seen.get(0).inserted(), "inserted");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void offlineCreditIsAwardedOnLogin(GameTestHelper h) {
+        UUID uuid = UUID.randomUUID();
+        PendingCredits credits = PendingCredits.get(h.getLevel());
+        credits.remember(uuid, id("digestive_sac"));
+        h.assertTrue(credits.holds(uuid, id("digestive_sac")), "credit remembered");
+        ServerPlayer player = new ServerPlayer(
+                h.getLevel().getServer(),
+                h.getLevel(),
+                new GameProfile(uuid, "credit-tester"),
+                ClientInformation.createDefault());
+        credits.award(player);
+        AdvancementHolder holder = h.getLevel().getServer().getAdvancements().get(id("contact/digestive_sac"));
+        h.assertTrue(holder != null, "advancement loaded");
+        h.assertTrue(player.getAdvancements().getOrStartProgress(holder).isDone(), "digestive_sac advancement is done");
+        h.assertTrue(!credits.holds(uuid, id("digestive_sac")), "credit forgotten");
         h.succeed();
     }
 }

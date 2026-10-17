@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/organ_bud",
+  "display": {
+    "icon": { "id": "infestusfrontier:digestive_sac" },
+    "title": { "translate": "advancement.infestusfrontier.contact.digestive_sac.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.digestive_sac.description" },
+    "frame": "task"
+  },
+  "criteria": {
+    "digested": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": { "organ": "infestusfrontier:digestive_sac" }
+    }
+  }
+}

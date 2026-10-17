@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/digestive_sac",
+  "display": {
+    "icon": { "id": "infestusfrontier:biomass_bladder" },
+    "title": { "translate": "advancement.infestusfrontier.contact.biomass_bladder.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.biomass_bladder.description" },
+    "frame": "task"
+  },
+  "criteria": {
+    "stored": {
+      "trigger": "infestusfrontier:biomass_bucket",
+      "conditions": { "block": "infestusfrontier:biomass_bladder", "inserted": true }
+    }
+  }
+}

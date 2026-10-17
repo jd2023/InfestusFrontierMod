@@ -3,12 +3,14 @@ package org.jd.infestusfrontier.storage.api;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -67,10 +69,27 @@ public final class BiomassFluids {
         IFluidHandler block = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, face);
         if (block == null) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
-        if (FluidUtil.interactWithFluidHandler(player, hand, level, pos, face)) return ItemInteractionResult.CONSUME;
+        int before = biomassIn(block);
+        if (FluidUtil.interactWithFluidHandler(player, hand, level, pos, face)) {
+            int after = biomassIn(block);
+            if (after != before)
+                NeoForge.EVENT_BUS.post(new BiomassBucketEvent(
+                        player,
+                        BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()),
+                        after > before));
+            return ItemInteractionResult.CONSUME;
+        }
         BiomassHandler store = level.getCapability(BiomassCapabilities.BLOCK, pos, face);
         Refusals.show(player, refusal(container.getFluidInTank(0), block, store));
         return ItemInteractionResult.FAIL;
+    }
+
+    private static int biomassIn(IFluidHandler block) {
+        int total = 0;
+        for (int tank = 0; tank < block.getTanks(); tank++)
+            if (isBiomass(block.getFluidInTank(tank)))
+                total += block.getFluidInTank(tank).getAmount();
+        return total;
     }
 
     /**

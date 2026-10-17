@@ -10,6 +10,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -41,6 +43,7 @@ import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.OrganCodecs;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
+import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -165,11 +168,21 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             sac.history = sac.history.completed();
             sac.batch = Optional.empty();
             sac.showWorking(false);
+            sac.batchCompleted(level, advanced);
             sac.pushToNeighbors(level, pos);
         } else {
             sac.batch = Optional.of(advanced);
         }
         sac.setChanged();
+    }
+
+    /** Posts the completion for the player who fed the batch. Batches fed from the slot have no feeder. */
+    private void batchCompleted(Level level, DigestionBatch finished) {
+        if (level instanceof ServerLevel server && finished.feeder().isPresent())
+            NeoForge.EVENT_BUS.post(new OrganBatchCompletedEvent(
+                    server,
+                    ProcessingModule.DIGESTIVE_SAC.getId(),
+                    finished.feeder().get()));
     }
 
     /** Starts a batch from the held item when the Sac is idle and the whole yield fits. Refusals change nothing. */
