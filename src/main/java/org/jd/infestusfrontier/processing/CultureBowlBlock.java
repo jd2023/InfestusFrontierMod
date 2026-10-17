@@ -99,8 +99,7 @@ public final class CultureBowlBlock extends BaseEntityBlock {
             BlockHitResult hit) {
         ItemInteractionResult fluid = BiomassFluids.useOn(stack, level, pos, hit.getDirection(), player, hand);
         if (fluid != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) return fluid;
-        if (!(level.getBlockEntity(pos) instanceof CultureBowlBlockEntity bowl)
-                || !bowl.ingredients().isItemValid(0, stack))
+        if (!(level.getBlockEntity(pos) instanceof CultureBowlBlockEntity bowl) || !bowl.accepts(stack))
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
         ItemStack offered = player.getAbilities().instabuild ? stack.copy() : stack;

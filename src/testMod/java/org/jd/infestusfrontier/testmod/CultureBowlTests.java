@@ -10,6 +10,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -25,6 +26,7 @@ import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.processing.CultureBowlMenu;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.CultureBowlContents;
 import org.jd.infestusfrontier.storage.StorageModule;
@@ -180,8 +182,7 @@ public final class CultureBowlTests {
         h.runAfterDelay(20, () -> {
             startBatch(h);
             CultureBowlContents after = contents(h, BOWL);
-            h.assertTrue(after.ingredients().get(0).is(Items.RED_MUSHROOM), "the mushroom is untouched");
-            h.assertTrue(after.ingredients().get(1).is(Items.WHEAT_SEEDS), "the seed is untouched");
+            h.assertTrue(after.ingredients().stream().allMatch(ItemStack::isEmpty), "nothing was loaded meanwhile");
             h.assertValueEqual(after.waterMb(), 900, "no second spend of water");
             h.assertTrue(after.batch().orElseThrow().batch().ticksDone() >= 20, "the first batch kept its progress");
             h.succeed();
@@ -298,6 +299,86 @@ public final class CultureBowlTests {
         h.assertValueEqual(after.waterMb(), 100, "water stays");
         h.assertValueEqual(after.output().getCount(), 64, "output untouched");
         h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    public static void menuReportsWaterBiomassAndProgress(GameTestHelper h) {
+        placeBowl(h);
+        loadCultureInputs(h, true);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        CultureBowlMenu idle = menu(h, player);
+        h.assertValueEqual(idle.water(), 1000, "water before the start");
+        h.assertValueEqual(idle.state(), CultureBowlMenu.IDLE, "idle before the start");
+        startBatch(h);
+        CultureBowlMenu menu = menu(h, player);
+        h.assertValueEqual(menu.water(), 900, "water after the start");
+        h.assertValueEqual(menu.stored(), 0, "no biomass");
+        h.assertValueEqual(menu.capacity(), 2000, "biomass capacity");
+        h.assertValueEqual(menu.state(), CultureBowlMenu.WORKING, "working");
+        h.runAfterDelay(120, () -> {
+            h.assertTrue(menu.percent() > 0, "progress grows");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void startButtonStartsABatch(GameTestHelper h) {
+        placeBowl(h);
+        loadCultureInputs(h, true);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        CultureBowlMenu menu = menu(h, player);
+        h.assertTrue(menu.clickMenuButton(player, CultureBowlMenu.START_BUTTON), "the click is handled");
+        h.assertTrue(contents(h, BOWL).batch().isPresent(), "a batch runs");
+        h.runAfterDelay(10, () -> {
+            int done = contents(h, BOWL).batch().orElseThrow().batch().ticksDone();
+            h.assertTrue(menu.clickMenuButton(player, CultureBowlMenu.START_BUTTON), "a second click is handled");
+            h.assertValueEqual(
+                    contents(h, BOWL).batch().orElseThrow().batch().ticksDone(), done, "the first batch stays");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 1300)
+    public static void insertWaitsDuringABatch(GameTestHelper h) {
+        placeBowl(h);
+        loadCultureInputs(h, true);
+        startBatch(h);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.RED_MUSHROOM, 1);
+        EcologyTests.use(h, player, BOWL, Direction.UP);
+        h.assertTrue(player.getMainHandItem().is(Items.RED_MUSHROOM), "the mushroom stays in the hand");
+        h.assertTrue(contents(h, BOWL).ingredients().stream().allMatch(ItemStack::isEmpty), "no slot filled");
+        h.runAtTickTime(BATCH_TICKS + 2, () -> {
+            EcologyTests.use(h, player, BOWL, Direction.UP);
+            h.assertTrue(player.getMainHandItem().isEmpty(), "the mushroom is accepted after the batch");
+            h.assertTrue(contents(h, BOWL).ingredients().get(0).is(Items.RED_MUSHROOM), "slot 0 holds it");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void reloadKeepsIngredients(GameTestHelper h) {
+        placeBowl(h);
+        load(h, Items.RED_MUSHROOM, 3);
+        load(h, Items.BONE_MEAL, 1);
+        var registries = h.getLevel().registryAccess();
+        CompoundTag tag = h.getBlockEntity(BOWL).saveWithoutMetadata(registries);
+        BlockEntity fresh = ((EntityBlock) ProcessingModule.CULTURE_BOWL.get())
+                .newBlockEntity(
+                        h.absolutePos(BOWL), ProcessingModule.CULTURE_BOWL.get().defaultBlockState());
+        fresh.loadWithComponents(tag, registries);
+        CultureBowlContents loaded = fresh.collectComponents().get(ProcessingModule.BOWL_CONTENTS.get());
+        h.assertTrue(loaded != null, "the fresh entity has contents");
+        h.assertValueEqual(loaded.ingredients().get(0).getCount(), 3, "slot 0 holds three mushrooms");
+        h.assertTrue(loaded.ingredients().get(0).is(Items.RED_MUSHROOM), "slot 0 holds mushrooms");
+        h.assertValueEqual(loaded.ingredients().get(1).getCount(), 1, "slot 1 holds one bone meal");
+        h.assertTrue(loaded.ingredients().get(1).is(Items.BONE_MEAL), "slot 1 holds bone meal");
+        h.succeed();
+    }
+
+    private static CultureBowlMenu menu(GameTestHelper h, Player player) {
+        // No GameTest player can receive a screen, so the menu is built the way the block entity builds it.
+        MenuProvider provider = (MenuProvider) h.getBlockEntity(BOWL);
+        return (CultureBowlMenu) provider.createMenu(1, player.getInventory(), player);
     }
 
     private static void load(GameTestHelper h, net.minecraft.world.item.Item item, int count) {

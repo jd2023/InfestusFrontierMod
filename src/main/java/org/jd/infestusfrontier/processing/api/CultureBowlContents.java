@@ -11,7 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.organ.api.OrganCodecs;
-import org.jd.infestusfrontier.processing.OrganBatch;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /** The saved and carried form of a Culture Bowl, including the batch it is running. */
@@ -23,9 +22,10 @@ public record CultureBowlContents(
         OrganHistory history,
         Optional<OrganBatch> batch) {
     public static final int WATER_CAPACITY = 2000;
+    public static final int INGREDIENT_SLOTS = 9;
     public static final Codec<CultureBowlContents> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                     ItemStack.OPTIONAL_CODEC
-                            .listOf()
+                            .listOf(0, INGREDIENT_SLOTS)
                             .fieldOf("ingredients")
                             .forGetter(CultureBowlContents::ingredients),
                     ItemStack.OPTIONAL_CODEC.fieldOf("output").forGetter(CultureBowlContents::output),

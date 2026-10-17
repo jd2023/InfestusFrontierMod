@@ -82,6 +82,8 @@ public final class ProcessingModule {
                             .build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<CultureBowlMenu>> CULTURE_BOWL_MENU =
+            MENUS.register("culture_bowl", () -> IMenuTypeExtension.create(CultureBowlMenu::new));
     public static final DeferredHolder<RecipeType<?>, RecipeType<DigestionRecipe>> DIGESTION = RECIPE_TYPES.register(
             "digestion",
             () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "digestion")));

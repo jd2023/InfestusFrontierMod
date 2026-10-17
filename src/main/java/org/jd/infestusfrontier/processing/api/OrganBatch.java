@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.processing;
+package org.jd.infestusfrontier.processing.api;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -26,11 +26,11 @@ public record OrganBatch(Batch batch, ItemStack result, Optional<UUID> starter) 
                     UUIDUtil.CODEC.optionalFieldOf("starter").forGetter(OrganBatch::starter))
             .apply(instance, OrganBatch::new));
 
-    OrganBatch advance() {
+    public OrganBatch advance() {
         return new OrganBatch(batch.advance(), result, starter);
     }
 
-    boolean isDone() {
+    public boolean isDone() {
         return batch.isDone();
     }
 

@@ -10,7 +10,10 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -31,16 +34,18 @@ import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.api.CultureBowlContents;
+import org.jd.infestusfrontier.processing.api.OrganBatch;
 import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * What the Culture Bowl holds: nine ingredient slots of 64, one output slot, 2000 mB of water and 2000 BU of biomass.
  * Loaded by hand, it runs one batch at a time. Starting consumes the inputs at once and the output slot is checked
  * first, so completion can never be refused. Work advances only while loaded and rooted on a foundation.
  */
-final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler {
-    static final int INGREDIENT_SLOTS = 9;
+final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler, MenuProvider {
+    static final int INGREDIENT_SLOTS = CultureBowlContents.INGREDIENT_SLOTS;
     static final Biomass CAPACITY = Biomass.of(2000);
     static final int WATER_CAPACITY = CultureBowlContents.WATER_CAPACITY;
     static final String ORGAN = "culture_bowl";
@@ -56,8 +61,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     private final ItemStackHandler ingredients = new ItemStackHandler(INGREDIENT_SLOTS) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return !stack.isEmpty()
-                    && recipes().anyMatch(recipe -> recipe.value().uses(stack));
+            return batch.isEmpty() && accepts(stack);
         }
 
         @Override
@@ -94,6 +98,21 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
         return ingredients;
     }
 
+    ItemStackHandler output() {
+        return output;
+    }
+
+    /** Whether some bowl recipe uses {@code stack}, running batch or not. */
+    boolean accepts(ItemStack stack) {
+        return !stack.isEmpty() && recipes().anyMatch(recipe -> recipe.value().uses(stack));
+    }
+
+    /** 0 idle, 1 working, 2 paused for want of a foundation. Matches the menu's state int. */
+    int state() {
+        if (batch.isEmpty()) return 0;
+        return level != null && Organs.hasFoundation(level, worldPosition) ? 1 : 2;
+    }
+
     /** The bowl's recipes. Called only on a player's action, never in a tick. */
     private Stream<RecipeHolder<OrganBatchRecipe>> recipes() {
         if (level == null) return Stream.empty();
@@ -119,7 +138,8 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
         if (bowl.batch.isEmpty() || bowl.unreadable.isPresent() || !Organs.hasFoundation(level, pos)) return;
         OrganBatch advanced = bowl.batch.get().advance();
         if (advanced.isDone()) {
-            if (!bowl.output.insertItem(0, advanced.result().copy(), false).isEmpty()) return;
+            if (!bowl.output.insertItem(0, advanced.result().copy(), true).isEmpty()) return;
+            bowl.output.insertItem(0, advanced.result().copy(), false);
             bowl.history = bowl.history.completed();
             bowl.batch = Optional.empty();
         } else {
@@ -175,6 +195,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     /** Moves one item from {@code stack} into the first slot that holds the same item and has room, else the first empty slot. */
     Optional<Refusal> insert(ItemStack stack) {
         if (unreadable.isPresent()) return Optional.of(Persistence.CORRUPT);
+        if (batch.isPresent()) return Optional.of(BUSY);
         ItemStack one = stack.copyWithCount(1);
         for (int pass = 0; pass < 2; pass++) {
             for (int slot = 0; slot < INGREDIENT_SLOTS; slot++) {
@@ -305,5 +326,15 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     @Override
     public void removeComponentsFromTag(CompoundTag tag) {
         tag.remove("contents");
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.infestusfrontier.culture_bowl");
+    }
+
+    @Override
+    public @Nullable AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new CultureBowlMenu(id, inventory, this);
     }
 }
