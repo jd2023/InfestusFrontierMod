@@ -72,6 +72,11 @@ public final class Sheet {
     public static final int SLOT_X = FIRST_PART_X + 1;
 
     public static final int SLOT_Y = PARTS_Y + 1;
+    /** A second row of parts on a tall panel: its labels and its wells sit one well and one label lower. */
+    public static final int ROW2_LABEL_Y = LABEL_Y + 28;
+
+    public static final int ROW2_Y = PARTS_Y + 28;
+    public static final int ROW2_SLOT_Y = ROW2_Y + 1;
     /** The biomass tank on the right, its label above and its amount below, both right-aligned to the edge. */
     public static final int TANK_X = 150;
 

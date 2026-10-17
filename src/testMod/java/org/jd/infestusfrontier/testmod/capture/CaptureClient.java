@@ -12,6 +12,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import net.minecraft.client.CloudStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
@@ -21,6 +22,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -95,7 +97,10 @@ final class CaptureClient {
                 case MOVE -> {
                     holdInAir(minecraft);
                     if (ticksInStage >= MOVE_TICKS) {
-                        currentView().use().ifPresent(block -> useBlock(minecraft, block));
+                        currentView()
+                                .use()
+                                .ifPresent(block ->
+                                        useBlock(minecraft, block, currentView().holding()));
                         if (currentView().inventory()) minecraft.setScreen(new InventoryScreen(minecraft.player));
                         enter(Stage.FRAME);
                     }
@@ -186,16 +191,25 @@ final class CaptureClient {
         return scenarios.get(scenarioIndex).views().get(viewIndex);
     }
 
-    /** Right-clicks {@code block} with an empty hotbar slot selected, the way a player opens an organ's screen. */
-    private static void useBlock(Minecraft minecraft, BlockPos block) {
+    /**
+     * Right-clicks {@code block} the way a player opens an organ's screen: with an empty hotbar slot selected, or
+     * with the hotbar slot holding the item {@code holding} names.
+     */
+    private static void useBlock(Minecraft minecraft, BlockPos block, Optional<String> holding) {
         var player = minecraft.player;
         var inventory = player.getInventory();
-        int empty = -1;
-        for (int slot = 0; slot < Inventory.getSelectionSize() && empty < 0; slot++) {
-            if (inventory.getItem(slot).isEmpty()) empty = slot;
+        int chosen = -1;
+        for (int slot = 0; slot < Inventory.getSelectionSize() && chosen < 0; slot++) {
+            ItemStack stack = inventory.getItem(slot);
+            boolean matches = holding.isPresent()
+                    ? BuiltInRegistries.ITEM.getKey(stack.getItem()).toString().equals(holding.get())
+                    : stack.isEmpty();
+            if (matches) chosen = slot;
         }
-        if (empty < 0) throw new IllegalStateException("No empty hotbar slot to use " + block + " with");
-        inventory.selected = empty;
+        if (chosen < 0)
+            throw new IllegalStateException("No hotbar slot "
+                    + holding.map(i -> "holding " + i).orElse("empty") + " to use " + block + " with");
+        inventory.selected = chosen;
         player.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
         Vec3 hit = Vec3.atCenterOf(block).add(0, 0, -0.5);
         minecraft.gameMode.useItemOn(

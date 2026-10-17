@@ -28,6 +28,7 @@ class SlotGridTest {
         assertEquals(new Bounds(43, 34, 54, 54), grid);
         assertTrue(grid.bottom() > Sheet.SPLIT_Y, "does not fit the standard panel");
         assertTrue(grid.bottom() + Sheet.GAP + Sheet.BUTTON.height() <= Sheet.SPLIT_Y + 3 * Sheet.BODY_STRIP.height());
+        assertEquals(Sheet.ROW2_Y, Sheet.PARTS_Y + Sheet.SLOT.height() + (Sheet.PARTS_Y - Sheet.LABEL_Y) + 2);
         assertEquals(138, Sheet.inventoryY(3));
         assertEquals(196, Sheet.hotbarY(3));
         assertEquals(220, Sheet.panelHeight(3));

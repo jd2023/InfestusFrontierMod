@@ -12,20 +12,25 @@ public final class Well extends Part {
     private final Component label;
 
     public Well(PartRow row, Slot slot, Component label) {
-        super(place(row, slot), label);
+        this(row.place(Sheet.SLOT.width()), Sheet.LABEL_Y, Sheet.PARTS_Y, slot, label);
+    }
+
+    /** A well off the parts row, for example on {@link Sheet#ROW2_Y}; the slot must sit one pixel inside it. */
+    public Well(int x, int labelY, int wellY, Slot slot, Component label) {
+        super(place(x, labelY, wellY, slot), label);
         this.label = label;
     }
 
-    private static Bounds place(PartRow row, Slot slot) {
-        int x = row.place(Sheet.SLOT.width());
-        if (slot.x != x + 1 || slot.y != Sheet.SLOT_Y)
-            throw new IllegalStateException("Slot at " + slot.x + "," + slot.y + " is off the parts row at " + x);
-        return new Bounds(x, Sheet.LABEL_Y, Sheet.SLOT.width(), Sheet.PARTS_Y + Sheet.SLOT.height() - Sheet.LABEL_Y);
+    private static Bounds place(int x, int labelY, int wellY, Slot slot) {
+        if (slot.x != x + 1 || slot.y != wellY + 1)
+            throw new IllegalStateException(
+                    "Slot at " + slot.x + "," + slot.y + " is off its well at " + x + "," + wellY);
+        return new Bounds(x, labelY, Sheet.SLOT.width(), wellY + Sheet.SLOT.height() - labelY);
     }
 
     @Override
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         Draw.centered(graphics, label, getX() + Sheet.SLOT.width() / 2, getY());
-        Draw.sprite(graphics, Sheet.SLOT, getX(), getY() + Sheet.PARTS_Y - Sheet.LABEL_Y);
+        Draw.sprite(graphics, Sheet.SLOT, getX(), getY() + getHeight() - Sheet.SLOT.height());
     }
 }

@@ -117,8 +117,10 @@ public final class ProcessingModule {
         COMPONENTS.register(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             OrganRenderers.register(modBus, "digestive_sac", DIGESTIVE_SAC_ENTITY, DIGESTIVE_SAC_ITEM);
-            modBus.addListener((RegisterMenuScreensEvent event) ->
-                    event.register(DIGESTIVE_SAC_MENU.get(), DigestiveSacScreen::new));
+            modBus.addListener((RegisterMenuScreensEvent event) -> {
+                event.register(DIGESTIVE_SAC_MENU.get(), DigestiveSacScreen::new);
+                event.register(CULTURE_BOWL_MENU.get(), CultureBowlScreen::new);
+            });
         }
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerBlockEntity(BiomassCapabilities.BLOCK, DIGESTIVE_SAC_ENTITY.get(), (sac, side) -> sac);

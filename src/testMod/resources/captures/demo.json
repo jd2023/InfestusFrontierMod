@@ -27,7 +27,7 @@
     "setblock 24 -60 -36 infestusfrontier:organ_bud",
     "setblock 25 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Organ Bud\"','\"grows an organ\"','\"craft: culture\"','\"\"']}}",
     "setblock 26 -61 -36 infestusfrontier:living_substrate[stage=mature]",
-    "setblock 26 -60 -36 infestusfrontier:culture_bowl",
+    "setblock 26 -60 -36 infestusfrontier:culture_bowl{contents:{ingredients:[{id:\"minecraft:red_mushroom\",count:3},{id:\"minecraft:wheat_seeds\",count:2},{id:\"minecraft:bone_meal\",count:1}],output:{id:\"infestusfrontier:spore_culture\",count:2},water:1300,biomass:{stored:450,reserved:0,capacity:2000},history:{completed_batches:2},batch:{batch:{recipe:\"infestusfrontier:culturing/spore_culture\",ticks_required:1200,ticks_done:480},result:{id:\"infestusfrontier:spore_culture\",count:1}}}}",
     "setblock 27 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Culture Bowl\"','\"mushroom, seed\"','\"water bucket\"','\"hand starts\"']}}",
     "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
     "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",

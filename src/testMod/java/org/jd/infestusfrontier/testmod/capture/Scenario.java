@@ -21,7 +21,8 @@ record Scenario(String name, List<String> commands, List<View> views) {
     private static final String NAME = "[a-z][a-z0-9_]{0,63}";
 
     /**
-     * {@code use} names a block the player right-clicks with an empty hand before the shot, to photograph its screen;
+     * {@code use} names a block the player right-clicks before the shot, to photograph its screen, with an empty hand
+     * or with the item {@code holding} names (given by the scenario's commands) selected in the hotbar;
      * {@code inventory} opens the player's own inventory instead. A view with either is shot at GUI scale 3.
      */
     record View(
@@ -33,6 +34,7 @@ record Scenario(String name, List<String> commands, List<View> views) {
             float pitch,
             boolean gui,
             Optional<BlockPos> use,
+            Optional<String> holding,
             boolean inventory) {
         boolean opensScreen() {
             return use.isPresent() || inventory;
@@ -90,6 +92,7 @@ record Scenario(String name, List<String> commands, List<View> views) {
                         v.get("pitch").getAsFloat(),
                         v.has("gui") && v.get("gui").getAsBoolean(),
                         use,
+                        v.has("holding") ? Optional.of(v.get("holding").getAsString()) : Optional.empty(),
                         v.has("inventory") && v.get("inventory").getAsBoolean()));
             }
             return new Scenario(name, List.copyOf(commands), List.copyOf(views));

@@ -26,11 +26,14 @@ import org.jd.infestusfrontier.ui.SlotGrid;
  */
 public final class CultureBowlMenu extends AbstractContainerMenu implements BiomassView {
     public static final int START_BUTTON = 0;
+    /** The water tank's size, for the client's gauge; the server never syncs it. */
+    public static final int WATER_CAPACITY = CultureBowlBlockEntity.WATER_CAPACITY;
+
     public static final int IDLE = 0;
     public static final int WORKING = 1;
     public static final int PAUSED = 2;
     static final int INGREDIENTS = CultureBowlBlockEntity.INGREDIENT_SLOTS;
-    static final int OUTPUT_SLOT = INGREDIENTS;
+    public static final int OUTPUT_SLOT = INGREDIENTS;
     private static final int WATER = 0;
     private static final int STORED = 1;
     private static final int CAPACITY = 2;
@@ -86,7 +89,7 @@ public final class CultureBowlMenu extends AbstractContainerMenu implements Biom
             Bounds cell = grid.cell(i);
             addSlot(new SlotItemHandler(ingredients, i, cell.x() + 1, cell.y() + 1));
         }
-        addSlot(new SlotItemHandler(output, 0, OUTPUT_X, Sheet.SLOT_Y) {
+        addSlot(new SlotItemHandler(output, 0, OUTPUT_X, Sheet.ROW2_SLOT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
