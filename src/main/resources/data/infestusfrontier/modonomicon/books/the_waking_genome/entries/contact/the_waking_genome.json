@@ -1,0 +1,15 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.the_waking_genome.name",
+  "description": "entry.infestusfrontier.contact.the_waking_genome.description",
+  "icon": "minecraft:book",
+  "x": 0,
+  "y": 0,
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.the_waking_genome.name",
+      "text": "entry.infestusfrontier.contact.the_waking_genome.text"
+    }
+  ]
+}

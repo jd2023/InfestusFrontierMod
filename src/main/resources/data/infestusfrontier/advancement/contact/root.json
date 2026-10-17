@@ -1,0 +1,12 @@
+{
+  "display": {
+    "icon": { "id": "infestusfrontier:spore_culture" },
+    "title": { "translate": "advancement.infestusfrontier.contact.root.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.root.description" },
+    "background": "minecraft:textures/block/dirt.png",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": true
+  },
+  "criteria": { "never": { "trigger": "minecraft:impossible" } }
+}

@@ -56,6 +56,7 @@ dependencies {
     if (withJei) runtimeOnly "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
     if (withCurios) runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
     testModImplementation sourceSets.main.output
+    testModCompileOnly "com.klikli_dev:modonomicon-1.21.1-neoforge:${modonomicon_version}"
 }
 
 neoForge {

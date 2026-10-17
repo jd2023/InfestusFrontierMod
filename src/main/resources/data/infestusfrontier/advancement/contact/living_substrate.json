@@ -1,0 +1,25 @@
+{
+  "parent": "infestusfrontier:contact/a_culture_in_your_hand",
+  "display": {
+    "icon": { "id": "infestusfrontier:living_substrate" },
+    "title": { "translate": "advancement.infestusfrontier.contact.living_substrate.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.living_substrate.description" }
+  },
+  "criteria": {
+    "converted": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": { "items": "infestusfrontier:spore_culture" }
+          },
+          {
+            "condition": "minecraft:location_check",
+            "predicate": { "block": { "tag": "infestusfrontier:substrate_hosts" } }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "parent": "infestusfrontier:contact/root",
+  "display": {
+    "icon": { "id": "infestusfrontier:spore_culture" },
+    "title": { "translate": "advancement.infestusfrontier.contact.a_culture_in_your_hand.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.a_culture_in_your_hand.description" }
+  },
+  "criteria": {
+    "has_culture": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [ { "items": "infestusfrontier:spore_culture" } ] }
+    }
+  }
+}

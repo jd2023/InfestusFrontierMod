@@ -1,0 +1,24 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.living_substrate.name",
+  "description": "entry.infestusfrontier.contact.living_substrate.description",
+  "icon": "infestusfrontier:living_substrate",
+  "x": 0,
+  "y": 2,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/a_culture_in_your_hand"
+    }
+  ],
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.living_substrate.name",
+      "text": "entry.infestusfrontier.contact.living_substrate.text"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:living_substrate"
+    }
+  ]
+}
