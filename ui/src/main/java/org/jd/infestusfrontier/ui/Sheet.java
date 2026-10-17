@@ -3,28 +3,29 @@ package org.jd.infestusfrontier.ui;
 import java.util.List;
 
 /**
- * Where each part of an organ screen sits on the shared 256x256 GUI sheet {@code textures/gui/organ.png}. The sheet
- * is drawn by {@code art/gen_gui_sheet.py}; the two files change together. Slots sit one pixel inside their well.
+ * Where each part of an organ screen sits on the shared 256x256 GUI sheet {@code textures/gui/organ.png}, and where
+ * every screen puts the parts all organs share. The sheet is drawn by {@code art/gen_gui_sheet.py}; the two files
+ * change together. Slots sit one pixel inside their well.
  */
 public final class Sheet {
     public static final int SIZE = 256;
-    /** The whole panel with the 36 player inventory wells baked in. */
+    /** The whole panel with the 36 player inventory wells and the bud ornament baked in. */
     public static final Bounds PANEL = new Bounds(0, 0, 176, 166);
     /** One well for an organ's own slot; place it at the slot's position minus one. */
     public static final Bounds SLOT = new Bounds(176, 0, 18, 18);
     /** The tank frame; the column goes inside it at {@code +2, +2}. */
-    public static final Bounds TANK_WELL = new Bounds(176, 20, 20, 56);
+    public static final Bounds TANK_WELL = new Bounds(176, 20, 20, 40);
 
-    public static final Bounds TANK_FILL = new Bounds(200, 22, 16, 52);
+    public static final Bounds TANK_FILL = new Bounds(200, 22, 16, 36);
     public static final Bounds TANK_SURFACE = new Bounds(220, 22, 16, 1);
-    public static final Bounds BUTTON = new Bounds(176, 80, 52, 16);
-    public static final Bounds BUTTON_HOVER = new Bounds(176, 96, 52, 16);
-    public static final Bounds BUTTON_OFF = new Bounds(176, 112, 52, 16);
-    public static final Bounds VEIN_EMPTY = new Bounds(176, 128, 44, 12);
-    public static final Bounds VEIN_FULL = new Bounds(176, 144, 44, 12);
+    public static final Bounds BUTTON = new Bounds(176, 64, 52, 16);
+    public static final Bounds BUTTON_HOVER = new Bounds(176, 80, 52, 16);
+    public static final Bounds BUTTON_OFF = new Bounds(176, 96, 52, 16);
+    public static final Bounds VEIN_EMPTY = new Bounds(176, 112, 44, 12);
+    public static final Bounds VEIN_FULL = new Bounds(176, 128, 44, 12);
     public static final int GLYPH_COUNT = 4;
     private static final int GLYPH_X = 176;
-    private static final int GLYPH_Y = 160;
+    private static final int GLYPH_Y = 144;
     private static final int GLYPH_SIZE = 9;
     private static final int GLYPH_PITCH = 10;
     /** Flesh-dark ink on the ivory membrane. */
@@ -32,9 +33,36 @@ public final class Sheet {
     /** Ivory text on a flesh button. */
     public static final int IVORY = 0xFFF2ECD8;
 
+    /** The glyphs by meaning. */
+    public static final int RING = 0;
+
+    public static final int ARROW = 1;
+    public static final int CROSS = 2;
+    public static final int BARS = 3;
+
+    /** The status line: a glyph under the title with its words to the right. */
+    public static final int STATUS_GLYPH_X = 8;
+
+    public static final int STATUS_GLYPH_Y = 15;
+    public static final int STATUS_TEXT_X = 20;
+    public static final int STATUS_TEXT_Y = 16;
+    /** Labels sit on this row above the organ's slots and veins, which start at y 35. */
+    public static final int LABEL_Y = 26;
+
+    public static final int PARTS_Y = 35;
+    /** The first organ part sits right of the bud ornament. */
+    public static final int FIRST_PART_X = 44;
+    /** The biomass tank on the right, its label above and its amount below, both right-aligned to the edge. */
+    public static final int TANK_X = 150;
+
+    public static final int TANK_Y = 20;
+    public static final int TANK_LABEL_Y = 10;
+    public static final int TANK_VALUE_Y = 62;
+    public static final int RIGHT_EDGE = 168;
+
     private Sheet() {}
 
-    /** The status glyphs in order: idle ring, working arrow, blocked cross, paused bars. */
+    /** The status glyphs in order: ring, arrow, cross, bars. */
     public static Bounds glyph(int index) {
         if (index < 0 || index >= GLYPH_COUNT) throw new IllegalArgumentException("No glyph " + index);
         return new Bounds(GLYPH_X + GLYPH_PITCH * index, GLYPH_Y, GLYPH_SIZE, GLYPH_SIZE);

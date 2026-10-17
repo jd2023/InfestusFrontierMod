@@ -10,9 +10,14 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -23,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.foundation.Refusal;
@@ -39,6 +45,7 @@ import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -50,8 +57,22 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * One batch at a time. Feeding reserves the whole yield in the 1000 BU tank before the item is taken, so completion
  * can never be refused. Work advances only while loaded and rooted on a foundation. A finished batch flows into any
  * fluid tank touching the Sac, such as a Biomass Bladder; the rest leaves by bucket.
+ *
+ * <p>The feed slot holds one stack of digestible items, filled by hand through the screen or by any item pipe or
+ * hopper through the item capability. Whenever the Sac is idle it takes one item from it. The slot's content stays
+ * with the block and drops when the Sac is broken; it is not carried on the item.
  */
-final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandler, GeoBlockEntity {
+final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandler, GeoBlockEntity, MenuProvider {
+    /** What the screen shows. Indices are the menu's status values. */
+    enum Status {
+        IDLE,
+        WORKING,
+        PAUSED,
+        FULL,
+        UNREADABLE
+    }
+
+    private static final String FEED_TAG = "feed";
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     private static final int BLEND_TICKS = 5;
@@ -69,9 +90,42 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     private OrganHistory history = OrganHistory.NONE;
     private Optional<DigestionBatch> batch = Optional.empty();
     private Optional<CompoundTag> unreadable = Optional.empty();
+    private final ItemStackHandler feed = new ItemStackHandler(1) {
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return recipeFor(stack).isPresent();
+        }
+
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+    };
 
     DigestiveSacBlockEntity(BlockPos pos, BlockState state) {
         super(ProcessingModule.DIGESTIVE_SAC_ENTITY.get(), pos, state);
+    }
+
+    /** The feed slot, for the screen, pipes and hoppers. */
+    ItemStackHandler feed() {
+        return feed;
+    }
+
+    Status status() {
+        if (unreadable.isPresent()) return Status.UNREADABLE;
+        if (batch.isPresent())
+            return level != null && Organs.hasFoundation(level, worldPosition) ? Status.WORKING : Status.PAUSED;
+        return tank.room().isZero() ? Status.FULL : Status.IDLE;
+    }
+
+    int percent() {
+        return batch.map(b -> b.batch().percent()).orElse(0);
+    }
+
+    private Optional<RecipeHolder<DigestionRecipe>> recipeFor(ItemStack stack) {
+        if (level == null || stack.isEmpty()) return Optional.empty();
+        return level.getRecipeManager()
+                .getRecipeFor(ProcessingModule.DIGESTION.get(), new SingleRecipeInput(stack), level);
     }
 
     private record Saved(BiomassTank tank, OrganHistory history, Optional<DigestionBatch> batch) {}
@@ -100,8 +154,11 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     }
 
     static void serverTick(Level level, BlockPos pos, BlockState state, DigestiveSacBlockEntity sac) {
-        if (sac.batch.isEmpty() || sac.unreadable.isPresent()) return;
-        if (!Organs.hasFoundation(level, pos)) return;
+        if (sac.unreadable.isPresent() || !Organs.hasFoundation(level, pos)) return;
+        if (sac.batch.isEmpty()) {
+            sac.takeFromFeedSlot();
+            return;
+        }
         DigestionBatch advanced = sac.batch.get().advance();
         if (advanced.isDone()) {
             sac.tank = sac.tank.commit(advanced.yield());
@@ -117,9 +174,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
 
     /** Starts a batch from the held item when the Sac is idle and the whole yield fits. Refusals change nothing. */
     ItemInteractionResult feed(Player player, InteractionHand hand, ItemStack stack) {
-        if (level == null || stack.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        Optional<RecipeHolder<DigestionRecipe>> recipe = level.getRecipeManager()
-                .getRecipeFor(ProcessingModule.DIGESTION.get(), new SingleRecipeInput(stack), level);
+        Optional<RecipeHolder<DigestionRecipe>> recipe = recipeFor(stack);
         if (recipe.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
         Optional<Refusal> refusal = refusalFor(recipe.get().value().biomass());
@@ -127,16 +182,33 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             Refusals.show(player, refusal.get());
             return ItemInteractionResult.FAIL;
         }
-        DigestionRecipe value = recipe.get().value();
-        tank = ((Outcome.Done<BiomassTank>) tank.reserve(value.biomass())).value();
-        batch = Optional.of(new DigestionBatch(
-                Batch.start(recipe.get().id().toString(), value.ticks()),
-                value.biomass(),
-                Optional.of(player.getUUID())));
+        start(recipe.get(), Optional.of(player.getUUID()));
         if (!player.getAbilities().instabuild) stack.shrink(1);
+        return ItemInteractionResult.CONSUME;
+    }
+
+    /** One item from the feed slot starts a batch when the Sac is idle and the yield fits; otherwise it waits. */
+    private void takeFromFeedSlot() {
+        ItemStack stack = feed.getStackInSlot(0);
+        Optional<RecipeHolder<DigestionRecipe>> recipe = recipeFor(stack);
+        if (recipe.isEmpty() || refusalFor(recipe.get().value().biomass()).isPresent()) return;
+        start(recipe.get(), Optional.empty());
+        feed.extractItem(0, 1, false);
+    }
+
+    private void start(RecipeHolder<DigestionRecipe> recipe, Optional<UUID> feeder) {
+        DigestionRecipe value = recipe.value();
+        tank = ((Outcome.Done<BiomassTank>) tank.reserve(value.biomass())).value();
+        batch = Optional.of(
+                new DigestionBatch(Batch.start(recipe.id().toString(), value.ticks()), value.biomass(), feeder));
         showWorking(true);
         setChanged();
-        return ItemInteractionResult.CONSUME;
+    }
+
+    /** Spills the feed slot when the Sac is broken. */
+    void dropFeed(Level level, BlockPos pos) {
+        Containers.dropContents(level, pos, new SimpleContainer(feed.getStackInSlot(0)));
+        feed.setStackInSlot(0, ItemStack.EMPTY);
     }
 
     /** Offers the stored biomass to the six touching blocks, once, in a fixed order. Six capability reads at most. */
@@ -209,6 +281,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             history = saved.history();
             batch = saved.batch();
         });
+        if (tag.contains(FEED_TAG)) feed.deserializeNBT(registries, tag.getCompound(FEED_TAG));
     }
 
     @Override
@@ -216,6 +289,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
         super.saveAdditional(tag, registries);
         if (unreadable.isPresent()) tag.merge(unreadable.get());
         else Persistence.write(SAVED, new Saved(tank, history, batch), tag);
+        tag.put(FEED_TAG, feed.serializeNBT(registries));
     }
 
     @Override
@@ -240,5 +314,15 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
         tag.remove("tank");
         tag.remove("history");
         tag.remove("batch");
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.infestusfrontier.digestive_sac");
+    }
+
+    @Override
+    public @Nullable AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+        return new DigestiveSacMenu(id, inventory, this);
     }
 }

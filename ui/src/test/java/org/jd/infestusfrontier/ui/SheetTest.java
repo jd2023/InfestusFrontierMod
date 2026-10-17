@@ -22,9 +22,19 @@ class SheetTest {
 
     @Test
     void tankColumnSitsInsideItsFrame() {
-        Bounds frame = new Bounds(78, 14, Sheet.TANK_WELL.width(), Sheet.TANK_WELL.height());
-        assertTrue(frame.contains(Sheet.tankColumn(78, 14)));
-        assertEquals(new Bounds(80, 16, 16, 52), Sheet.tankColumn(78, 14));
+        Bounds frame = new Bounds(Sheet.TANK_X, Sheet.TANK_Y, Sheet.TANK_WELL.width(), Sheet.TANK_WELL.height());
+        assertTrue(frame.contains(Sheet.tankColumn(Sheet.TANK_X, Sheet.TANK_Y)));
+        assertEquals(new Bounds(152, 22, 16, 36), Sheet.tankColumn(Sheet.TANK_X, Sheet.TANK_Y));
+    }
+
+    @Test
+    void sharedLayoutStaysInsideThePanelAboveTheInventory() {
+        Bounds top = new Bounds(0, 0, Sheet.PANEL.width(), 72);
+        assertTrue(top.contains(
+                new Bounds(Sheet.TANK_X, Sheet.TANK_Y, Sheet.TANK_WELL.width(), Sheet.TANK_WELL.height())));
+        assertTrue(top.contains(new Bounds(Sheet.STATUS_GLYPH_X, Sheet.STATUS_GLYPH_Y, 9, 9)));
+        assertTrue(Sheet.TANK_VALUE_Y + 9 <= 72);
+        assertTrue(Sheet.RIGHT_EDGE <= Sheet.TANK_X + Sheet.TANK_WELL.width());
     }
 
     @Test

@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.processing;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -102,7 +103,15 @@ public final class DigestiveSacBlock extends BaseEntityBlock {
             BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty()) return InteractionResult.PASS;
         if (level.isClientSide) return InteractionResult.SUCCESS;
-        if (level.getBlockEntity(pos) instanceof DigestiveSacBlockEntity sac) sac.report(player);
+        if (player instanceof ServerPlayer server && level.getBlockEntity(pos) instanceof DigestiveSacBlockEntity sac)
+            server.openMenu(sac, pos);
         return InteractionResult.CONSUME;
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof DigestiveSacBlockEntity sac)
+            sac.dropFeed(level, pos);
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 }

@@ -126,7 +126,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Input → output:** Item Catalog's starter/native feed recipes → biomass with their exact water costs. No mineral feed or unlisted fish/leaf recipe; future fibrous diets require explicit recipes.
 - **Create:** 1 Organ Bud + 2 rotten flesh + 1 bowl.
 - **Growth:** Choose processing speed or biomass recovery. Elastic Gel treatment accepts fibrous leaves; add Intake/Output Mouths for a continuous feed line. It stops accepting batches when output has no room.
-- **Hand controls:** Wheat, rotten flesh and biomass buckets operate the Sac. Other held items pass through to ordinary use/placement, including offhand placement with an empty main hand.
+- **Hand controls:** Wheat, rotten flesh and empty buckets operate the Sac. An empty hand opens its screen: status, a feed slot that holds one stack and is also reachable by hoppers and pipes, the progress vein and the tank. Other held items pass through to ordinary use/placement, including offhand placement with an empty main hand.
 - **Baseline:** The starter Sac retains up to 1,000 mB biomass and owns one batch. Hand-feeding atomically reserves one item and its complete output before work starts; loaded work pauses when uprooted and never catches up offline. If the feeder disconnects before completion, the Sac retains their achievement credit and pauses new feeds until they return; stored biomass remains transferable.
 
 ### T0-04 — Biomass Bladder

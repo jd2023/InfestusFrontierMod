@@ -14,8 +14,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.ecology.EcologyModule;
@@ -132,6 +134,43 @@ public final class ProcessingTests {
         h.runAfterDelay(WHEAT_TICKS + 2, () -> {
             assertWorking(h, false);
             h.assertValueEqual(tank(h).stored(), Biomass.of(100), "the batch still finished");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    public static void feedSlotStartsOneBatchAtATime(GameTestHelper h) {
+        placeSac(h);
+        IItemHandler feed = h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(SAC), null);
+        h.assertTrue(feed != null, "the sac exposes its feed slot");
+        h.assertTrue(feed.insertItem(0, new ItemStack(Items.STONE), true).getCount() == 1, "stone is refused");
+        ItemStack left = feed.insertItem(0, new ItemStack(Items.WHEAT, 2), false);
+        h.assertTrue(left.isEmpty(), "two wheat go in");
+        h.runAfterDelay(2, () -> {
+            assertWorking(h, true);
+            h.assertValueEqual(feed.getStackInSlot(0).getCount(), 1, "one wheat taken, one waits");
+        });
+        h.runAfterDelay(WHEAT_TICKS + 4, () -> {
+            assertWorking(h, true);
+            h.assertValueEqual(feed.getStackInSlot(0).getCount(), 0, "the second wheat started after the first");
+            h.assertValueEqual(tank(h).stored(), Biomass.of(100), "first batch stored");
+        });
+        h.runAfterDelay(2 * WHEAT_TICKS + 6, () -> {
+            assertWorking(h, false);
+            h.assertValueEqual(tank(h).stored(), Biomass.of(200), "both batches stored");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void brokenSacDropsItsFeedSlot(GameTestHelper h) {
+        placeSac(h);
+        IItemHandler feed = h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(SAC), null);
+        feed.insertItem(0, new ItemStack(Items.ROTTEN_FLESH, 3), false);
+        h.setBlock(GROUND, Blocks.STONE); // no foundation: the slot keeps all three
+        h.destroyBlock(SAC);
+        h.runAfterDelay(2, () -> {
+            h.assertItemEntityCountIs(Items.ROTTEN_FLESH, SAC, 1.5, 3);
             h.succeed();
         });
     }

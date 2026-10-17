@@ -9,17 +9,22 @@ The optional argument writes a 4x enlarged copy to look at.
 Every organ screen draws its panel from this sheet. The regions below are mirrored by
 ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
 
-  0,0     176x166  panel: ivory membrane, plum flesh rim, the 36 player inventory wells, studs and veins
+  0,0     176x166  panel: ivory membrane, plum flesh rim, the 36 player inventory wells, studs, veins and
+                   the bud ornament under the status line (x 8..40, y 30..66); organ parts start at x 44
   176,0   18x18    one slot well, for an organ's own slots
-  176,20  20x56    tank frame; the fill column goes inside it at +2,+2
-  200,22  16x52    biomass column, full (the screen draws its lower part)
+  176,20  20x40    tank frame; the fill column goes inside it at +2,+2
+  200,22  16x36    biomass column, full (the screen draws its lower part)
   220,22  16x1     biomass surface line
-  176,80  52x16    button
-  176,96  52x16    button, hovered or focused (ivory rim)
-  176,112 52x16    button, disabled (sunken, grey)
-  176,128 44x12    progress vein, empty
-  176,144 44x12    progress vein, full (the screen draws its left part)
-  176,160 4 x 9x9  status glyphs at a 10 px pitch: idle ring, working arrow, blocked cross, paused bars
+  176,64  52x16    button
+  176,80  52x16    button, hovered or focused (ivory rim)
+  176,96  52x16    button, disabled (sunken, grey)
+  176,112 44x12    progress vein, empty
+  176,128 44x12    progress vein, full (the screen draws its left part)
+  176,144 4 x 9x9  status glyphs at a 10 px pitch: idle ring, working arrow, blocked cross, paused bars
+
+Every screen writes its title at 8,6, a status glyph at 8,15 with words after it, labels at y 26 above
+its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
+x 168. Veins and pores keep out of those rows.
 """
 import math
 import random
@@ -41,18 +46,18 @@ PIT = (42, 24, 34)
 
 INVENTORY = [(8 + c * 18, 84 + r * 18) for r in range(3) for c in range(9)] + [(8 + c * 18, 142) for c in range(9)]
 SLOT = (176, 0)
-TANK_WELL = (176, 20, 20, 56)
-TANK_FILL = (200, 22, 16, 52)
+TANK_WELL = (176, 20, 20, 40)
+TANK_FILL = (200, 22, 16, 36)
 SURFACE = (220, 22)
-BUTTON = (176, 80)
-BUTTON_HOVER = (176, 96)
-BUTTON_OFF = (176, 112)
+BUTTON = (176, 64)
+BUTTON_HOVER = (176, 80)
+BUTTON_OFF = (176, 96)
 BUTTON_SIZE = (52, 16)
-VEIN_EMPTY = (176, 128, 44, 12)
-VEIN_FULL = (176, 144, 44, 12)
-GLYPHS = (176, 160)
-# where screens write and put their own parts; veins and pores keep out of these
-TEXT = [(6, 4, 164, 12), (6, 70, 164, 12)]
+VEIN_EMPTY = (176, 112, 44, 12)
+VEIN_FULL = (176, 128, 44, 12)
+GLYPHS = (176, 144)
+# where screens write: title, status line, slot labels, tank label and amount, inventory label
+TEXT = [(6, 4, 164, 12), (6, 14, 164, 12), (40, 24, 130, 10), (118, 8, 52, 10), (118, 60, 52, 10), (6, 70, 164, 12)]
 
 GLYPH_ROWS = [
     ["..#####..", ".#.....#.", "#.......#", "#.......#", "#.......#", "#.......#", "#.......#", ".#.....#.", "..#####.."],
@@ -137,10 +142,32 @@ def panel(img):
         x, y = rng.randrange(6, W - 6), rng.randrange(6, H - 6)
         if not in_rects(x, y, keep_out, 1):
             put(img, x, y, IVORY[1])
+    # the bare patch under the status line: a bud in a chitin collar with nodules around it
+    sac(img, 22, 47, 6)
+    for x, y, w, h in [(12, 34, 4, 3), (29, 36, 3, 3), (11, 58, 3, 3), (27, 59, 5, 3), (33, 48, 3, 4)]:
+        nodule(img, x, y, w, h)
     for x, y in [(3, 3), (W - 6, 3), (3, H - 6), (W - 6, H - 6)]:
         nodule(img, x, y, 3, 3)
     for n, (x, y) in enumerate(INVENTORY):
         well(img, x - 1, y - 1, 18, 18, WELL, 1100 + n)
+
+
+def sac(img, cx, cy, r):
+    """A flesh bud inside a chitin collar; not luminous, so it is not read as a status lamp."""
+    for y in range(cy - r - 2, cy + r + 3):
+        for x in range(cx - r - 2, cx + r + 3):
+            d = math.hypot(x - cx, y - cy)
+            if d > r + 1.6:
+                continue
+            if d > r + 0.6:
+                put(img, x, y, mix(OUTLINE, FLESH[1], 0.4))
+            elif d > r - 1.2:
+                put(img, x, y, IVORY[3] if x + y < cx + cy else IVORY[0])
+            elif d > r - 2.2:
+                put(img, x, y, FLESH[0])
+            else:
+                glow = max(0.0, 1 - math.hypot(x - cx + 1, y - cy + 1) / (r - 1.5))
+                put(img, x, y, mix(FLESH[2], FLESH[4], glow * glow) if glow > 0.25 else FLESH[2])
 
 
 def nodule(img, x, y, w, h):
@@ -212,15 +239,17 @@ def progress(img):
 
 
 def tank(img):
+    """A glass column in a chitin frame: ivory caps above and below, quarter ticks down the left side."""
     x0, y0, w, h = TANK_WELL
-    well(img, x0 + 1, y0 + 1, w - 2, h - 2, PIT)
-    for i in range(w):
-        put(img, x0 + i, y0, IVORY[3])
-        put(img, x0 + i, y0 + h - 1, IVORY[1])
+    rim = mix(OUTLINE, FLESH[1], 0.4)
     for j in range(h):
-        put(img, x0, y0 + j, mix(OUTLINE, FLESH[1], 0.4))
-        put(img, x0 + w - 1, y0 + j, mix(OUTLINE, FLESH[1], 0.4))
-    # ticks every quarter, inside the left edge of the frame
+        for i in range(w):
+            put(img, x0 + i, y0 + j, rim)
+    well(img, x0 + 1, y0 + 1, w - 2, h - 2, PIT)
+    for cap_y, pale, dark in ((y0, IVORY[3], IVORY[1]), (y0 + h - 2, IVORY[1], IVORY[0])):
+        for i in range(1, w - 1):
+            put(img, x0 + i, cap_y, pale)
+            put(img, x0 + i, cap_y + 1, dark)
     for quarter in range(1, 4):
         y = y0 + h - 2 - quarter * (h - 4) // 4
         put(img, x0 + 1, y, IVORY[3])

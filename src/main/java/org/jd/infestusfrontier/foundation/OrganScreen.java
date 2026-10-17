@@ -15,12 +15,14 @@ import org.jd.infestusfrontier.ui.Sheet;
 
 /**
  * Base of every organ screen: the panel, wells, tanks, veins, glyphs and buttons all come from the one GUI sheet
- * laid out by {@link Sheet}. A subclass draws its parts in {@link #renderContents} and reads its menu; it never
- * decides a transfer. Coordinates are panel-relative.
+ * laid out by {@link Sheet}, and every screen shares its grammar: title, a status line under it, labels above the
+ * organ's parts, the biomass tank on the right. A subclass draws its parts in {@link #renderContents} and reads its
+ * menu; it never decides a transfer. Coordinates are panel-relative.
  */
 public abstract class OrganScreen<M extends AbstractContainerMenu> extends AbstractContainerScreen<M> {
     private static final ResourceLocation SHEET =
             ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "textures/gui/organ.png");
+    private static final Component BIOMASS = Component.translatable("gui.infestusfrontier.biomass_label");
 
     protected OrganScreen(M menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -32,9 +34,26 @@ public abstract class OrganScreen<M extends AbstractContainerMenu> extends Abstr
     /** Draws the organ's own parts over the panel. The player inventory wells are already there. */
     protected abstract void renderContents(GuiGraphics graphics, int mouseX, int mouseY);
 
+    /** Which glyph the status line shows: {@link Sheet#RING}, {@link Sheet#ARROW}, {@link Sheet#CROSS} or {@link Sheet#BARS}. */
+    protected abstract int statusGlyph();
+
+    /** The words of the status line. */
+    protected abstract Component statusText();
+
+    /** The biomass held, drawn in the shared tank. */
+    protected abstract Meter biomass();
+
+    /** The amount under the tank, short. */
+    protected abstract Component biomassShort();
+
+    /** The amount against the capacity, for the tank's tooltip. */
+    protected abstract Component biomassLong();
+
     @Override
     protected final void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         sprite(graphics, Sheet.PANEL, 0, 0);
+        sprite(graphics, Sheet.glyph(statusGlyph()), Sheet.STATUS_GLYPH_X, Sheet.STATUS_GLYPH_Y);
+        tank(graphics, Sheet.TANK_X, Sheet.TANK_Y, biomass());
         renderContents(graphics, mouseX, mouseY);
     }
 
@@ -42,12 +61,17 @@ public abstract class OrganScreen<M extends AbstractContainerMenu> extends Abstr
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawString(font, title, titleLabelX, titleLabelY, Sheet.INK, false);
         graphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, Sheet.INK, false);
+        graphics.drawString(font, statusText(), Sheet.STATUS_TEXT_X, Sheet.STATUS_TEXT_Y, Sheet.INK, false);
+        rightAligned(graphics, BIOMASS, Sheet.RIGHT_EDGE, Sheet.TANK_LABEL_Y);
+        rightAligned(graphics, biomassShort(), Sheet.RIGHT_EDGE, Sheet.TANK_VALUE_Y);
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
         renderTooltip(graphics, mouseX, mouseY);
+        if (overTank(Sheet.TANK_X, Sheet.TANK_Y, mouseX, mouseY))
+            graphics.renderTooltip(font, biomassLong(), mouseX, mouseY);
     }
 
     /** Blits one sheet sprite with its top left corner at panel position {@code x, y}. */
@@ -102,6 +126,16 @@ public abstract class OrganScreen<M extends AbstractContainerMenu> extends Abstr
     /** Text centered on panel column {@code centerX}. */
     protected final void centered(GuiGraphics graphics, Component text, int centerX, int y) {
         graphics.drawString(font, text, centerX - font.width(text) / 2, y, Sheet.INK, false);
+    }
+
+    /** Text ending at panel column {@code rightX}. */
+    protected final void rightAligned(GuiGraphics graphics, Component text, int rightX, int y) {
+        graphics.drawString(font, text, rightX - font.width(text), y, Sheet.INK, false);
+    }
+
+    /** A label centered above the slot at {@code slotX}. */
+    protected final void slotLabel(GuiGraphics graphics, Component text, int slotX) {
+        centered(graphics, text, slotX + 8, Sheet.LABEL_Y);
     }
 
     /** A button drawn from the sheet at panel position {@code x, y}. */
