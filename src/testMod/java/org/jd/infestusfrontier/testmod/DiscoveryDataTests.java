@@ -1,5 +1,6 @@
 package org.jd.infestusfrontier.testmod;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.gametest.framework.GameTest;
@@ -26,7 +27,11 @@ public final class DiscoveryDataTests {
     }
 
     private static void resolves(GameTestHelper h, List<Item> inputs, Item expected) {
-        List<ItemStack> stacks = inputs.stream().map(ItemStack::new).toList();
+        List<ItemStack> stacks =
+                new ArrayList<>(inputs.stream().map(ItemStack::new).toList());
+        while (stacks.size() < 4) {
+            stacks.add(ItemStack.EMPTY);
+        }
         CraftingInput input = CraftingInput.of(2, 2, stacks);
         var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, h.getLevel());
         h.assertTrue(recipe.isPresent(), "recipe present for " + expected);
@@ -48,9 +53,18 @@ public final class DiscoveryDataTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void cultureBowlRecipeResolves(GameTestHelper h) {
+        resolves(
+                h,
+                List.of(Items.FLOWER_POT, EcologyModule.SPORE_CULTURE.get(), Items.WHEAT_SEEDS),
+                ProcessingModule.CULTURE_BOWL_ITEM.get());
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void recipeUnlockAdvancementsExist(GameTestHelper h) {
-        for (String path :
-                List.of("spore_culture", "living_substrate", "organ_bud", "digestive_sac", "biomass_bladder")) {
+        for (String path : List.of(
+                "spore_culture", "living_substrate", "organ_bud", "digestive_sac", "biomass_bladder", "culture_bowl")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));

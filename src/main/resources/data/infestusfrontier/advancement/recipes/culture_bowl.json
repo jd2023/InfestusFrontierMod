@@ -1,0 +1,15 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_culture": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [ { "items": "infestusfrontier:spore_culture" } ] }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": { "recipe": "infestusfrontier:culture_bowl" }
+    }
+  },
+  "requirements": [ [ "has_culture", "has_the_recipe" ] ],
+  "rewards": { "recipes": [ "infestusfrontier:culture_bowl" ] }
+}
