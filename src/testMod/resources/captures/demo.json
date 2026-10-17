@@ -28,7 +28,7 @@
     "setblock 25 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Organ Bud\"','\"grows an organ\"','\"craft: culture\"','\"\"']}}",
     "setblock 26 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 26 -60 -36 infestusfrontier:culture_bowl{contents:{ingredients:[{id:\"minecraft:red_mushroom\",count:3},{id:\"minecraft:wheat_seeds\",count:2},{id:\"minecraft:bone_meal\",count:1}],output:{id:\"infestusfrontier:spore_culture\",count:2},water:1300,biomass:{stored:450,reserved:0,capacity:2000},history:{completed_batches:2},batch:{batch:{recipe:\"infestusfrontier:culturing/spore_culture\",ticks_required:1200,ticks_done:480},result:{id:\"infestusfrontier:spore_culture\",count:1}}}}",
-    "setblock 27 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Culture Bowl\"','\"mushroom, seed\"','\"water bucket\"','\"hand starts\"']}}",
+    "setblock 27 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Culture Bowl\"','\"mushroom, seed\"','\"water bucket\"','\"probe opens screen\"']}}",
     "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
     "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",
     "fill 5 -61 -29 8 -61 -26 infestusfrontier:living_substrate[stage=young]",
@@ -40,13 +40,14 @@
     "give @s infestusfrontier:spore_culture 16",
     "give @s infestusfrontier:living_substrate 16",
     "give @s bone_meal 64",
-    "give @s wheat 16",
-    "give @s rotten_flesh 16",
+    "item replace entity @s inventory.3 with wheat 16",
+    "item replace entity @s inventory.4 with rotten_flesh 16",
     "give @s bucket 4",
     "give @s infestusfrontier:organ_bud 4",
     "item replace entity @s inventory.0 with red_mushroom 8",
     "item replace entity @s inventory.1 with wheat_seeds 8",
     "item replace entity @s inventory.2 with water_bucket 2",
+    "give @s infestusfrontier:synaptic_probe 1",
     "give @s modonomicon:modonomicon[modonomicon:book_id=\"infestusfrontier:the_waking_genome\"]"
   ],
   "views": [
@@ -136,6 +137,21 @@
         -60,
         -36
       ]
+    },
+    {
+      "name": "bowl_screen",
+      "x": 26.5,
+      "y": -60,
+      "z": -38.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        26,
+        -60,
+        -36
+      ],
+      "holding": "infestusfrontier:synaptic_probe"
     }
   ]
 }

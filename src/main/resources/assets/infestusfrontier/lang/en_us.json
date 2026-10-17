@@ -1,4 +1,5 @@
 {
+  "item.infestusfrontier.synaptic_probe": "Synaptic Probe",
   "itemGroup.infestusfrontier.main": "Infestus Frontier",
   "item.infestusfrontier.spore_culture": "Spore Culture",
   "block.infestusfrontier.living_substrate": "Living Substrate",
@@ -38,6 +39,7 @@
   "infestusfrontier.status.digestive_sac.paused": "Digestive Sac: paused, no Living Substrate below, %2$s / %3$s BU",
   "infestusfrontier.status.culture_bowl.idle": "Culture Bowl: %1$s ingredients, %2$s mB water, %3$s / %4$s BU",
   "infestusfrontier.status.culture_bowl.working": "Culture Bowl: growing %1$s%%",
+  "infestusfrontier.status.probe.biomass": "Biomass: %1$s / %2$s BU",
   "infestusfrontier.status.culture_bowl.paused": "Culture Bowl: paused at %1$s%%, needs a foundation",
   "infestusfrontier.refusal.processing.no_recipe": "No recipe matches these ingredients, water and biomass",
   "infestusfrontier.refusal.processing.output_full": "Collect the output first",

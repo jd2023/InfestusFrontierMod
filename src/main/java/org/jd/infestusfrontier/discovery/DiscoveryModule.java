@@ -9,6 +9,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.StorageModule;
@@ -31,6 +32,7 @@ public final class DiscoveryModule {
                         output.accept(StorageModule.BIOMASS_BLADDER_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BUCKET.get());
                         output.accept(ProcessingModule.CULTURE_BOWL_ITEM.get());
+                        output.accept(InteractionModule.SYNAPTIC_PROBE.get());
                     })
                     .build());
 
