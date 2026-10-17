@@ -16,7 +16,7 @@
           },
           {
             "condition": "minecraft:location_check",
-            "predicate": { "block": { "tag": "infestusfrontier:substrate_hosts" } }
+            "predicate": { "block": { "blocks": "infestusfrontier:living_substrate" } }
           }
         ]
       }
