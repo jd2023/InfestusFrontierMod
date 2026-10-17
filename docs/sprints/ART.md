@@ -48,7 +48,7 @@ Evidence: visual
 
 ```text
 ART-002  Spore Culture icon
-Status: review 2c8b169
+Status: accepted 2c8b169
 Milestone: M1
 Owner: ecology
 Kind: art
