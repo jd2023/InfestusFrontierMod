@@ -14,6 +14,8 @@
   "gui.infestusfrontier.biomass_bladder.piece": "Piece",
   "gui.infestusfrontier.biomass_label": "Biomass",
   "gui.infestusfrontier.biomass_short": "%s BU",
+  "gui.infestusfrontier.water": "%s / %s mB of water",
+  "gui.infestusfrontier.water_short": "%s mB",
   "gui.infestusfrontier.percent": "%s%%",
   "gui.infestusfrontier.biomass_bladder.empty": "Empty",
   "gui.infestusfrontier.biomass_bladder.holding": "Holding biomass",

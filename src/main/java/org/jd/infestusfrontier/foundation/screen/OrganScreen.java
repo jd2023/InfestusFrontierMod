@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import org.jd.infestusfrontier.ui.Bounds;
 import org.jd.infestusfrontier.ui.PartRow;
 import org.jd.infestusfrontier.ui.Sheet;
 
@@ -17,10 +18,18 @@ import org.jd.infestusfrontier.ui.Sheet;
 public abstract class OrganScreen<M extends AbstractContainerMenu & BiomassView> extends AbstractContainerScreen<M> {
     private static final Component BIOMASS = Component.translatable("gui.infestusfrontier.biomass_label");
 
+    private final int strips;
+
     protected OrganScreen(M menu, Inventory inventory, Component title) {
+        this(menu, inventory, title, 0);
+    }
+
+    /** A panel made taller by {@code strips} body strips under the parts row; the menu's inventory slots sit lower. */
+    protected OrganScreen(M menu, Inventory inventory, Component title, int strips) {
         super(menu, inventory, title);
+        this.strips = strips;
         imageWidth = Sheet.PANEL.width();
-        imageHeight = Sheet.PANEL.height();
+        imageHeight = Sheet.panelHeight(strips);
         inventoryLabelY = imageHeight - 94;
     }
 
@@ -46,14 +55,22 @@ public abstract class OrganScreen<M extends AbstractContainerMenu & BiomassView>
 
     /** A sheet button on the parts row. {@code onPress} sends an intent; the server decides. */
     protected final Button button(PartRow row, Component text, Button.OnPress onPress) {
-        int x = row.place(Sheet.BUTTON.width());
-        int y = Sheet.partY(Sheet.BUTTON.height());
+        return button(row.place(Sheet.BUTTON.width()), Sheet.partY(Sheet.BUTTON.height()), text, onPress);
+    }
+
+    /** A sheet button at panel position {@code x, y}. */
+    protected final Button button(int x, int y, Component text, Button.OnPress onPress) {
         return addRenderableWidget(new SheetButton(leftPos + x, topPos + y, text, onPress));
     }
 
     @Override
     protected final void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
-        Draw.sprite(graphics, Sheet.PANEL, leftPos, topPos);
+        Bounds panel = Sheet.PANEL;
+        Draw.sprite(graphics, panel, leftPos, topPos, 0, 0, panel.width(), Sheet.SPLIT_Y);
+        int y = topPos + Sheet.SPLIT_Y;
+        for (int n = 0; n < strips; n++, y += Sheet.BODY_STRIP.height())
+            Draw.sprite(graphics, Sheet.BODY_STRIP, leftPos, y);
+        Draw.sprite(graphics, panel, leftPos, y, 0, Sheet.SPLIT_Y, panel.width(), panel.height() - Sheet.SPLIT_Y);
     }
 
     @Override

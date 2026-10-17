@@ -23,6 +23,18 @@ public final class Sheet {
     public static final Bounds BUTTON_OFF = new Bounds(176, 96, 52, 16);
     public static final Bounds VEIN_EMPTY = new Bounds(176, 112, 44, 12);
     public static final Bounds VEIN_FULL = new Bounds(176, 128, 44, 12);
+    /** A low horizontal vessel, filled from the left: water in a bowl. */
+    public static final Bounds TROUGH_EMPTY = new Bounds(176, 160, 54, 8);
+
+    public static final Bounds TROUGH_FULL = new Bounds(176, 170, 54, 8);
+    /** Eighteen rows of panel body with both frame sides; stacked at {@link #SPLIT_Y} to make a taller panel. */
+    public static final Bounds BODY_STRIP = new Bounds(0, 168, 176, 18);
+    /** Where the panel splits: rows above hold the organ's parts, rows from here hold the player inventory. */
+    public static final int SPLIT_Y = 72;
+    /** A menu puts the player's inventory rows here on the standard panel; the hotbar is 58 lower. */
+    public static final int INVENTORY_Y = 84;
+
+    public static final int HOTBAR_Y = 142;
     public static final int GLYPH_COUNT = 4;
     private static final int GLYPH_X = 176;
     private static final int GLYPH_Y = 144;
@@ -77,6 +89,20 @@ public final class Sheet {
         return PARTS_Y + (SLOT.height() - height) / 2;
     }
 
+    /** Height of a panel with {@code strips} body strips under its parts. */
+    public static int panelHeight(int strips) {
+        return PANEL.height() + strips * BODY_STRIP.height();
+    }
+
+    /** Where a menu puts its first player inventory row on a panel with {@code strips} body strips. */
+    public static int inventoryY(int strips) {
+        return INVENTORY_Y + strips * BODY_STRIP.height();
+    }
+
+    public static int hotbarY(int strips) {
+        return HOTBAR_Y + strips * BODY_STRIP.height();
+    }
+
     /** The status glyphs in order: ring, arrow, cross, bars. */
     public static Bounds glyph(int index) {
         if (index < 0 || index >= GLYPH_COUNT) throw new IllegalArgumentException("No glyph " + index);
@@ -101,6 +127,9 @@ public final class Sheet {
                 BUTTON_OFF,
                 VEIN_EMPTY,
                 VEIN_FULL,
+                TROUGH_EMPTY,
+                TROUGH_FULL,
+                BODY_STRIP,
                 glyph(0),
                 glyph(1),
                 glyph(2),

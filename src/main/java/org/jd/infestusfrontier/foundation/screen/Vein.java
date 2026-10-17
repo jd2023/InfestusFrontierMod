@@ -14,12 +14,13 @@ public final class Vein extends Part {
     private final IntSupplier percent;
 
     public Vein(PartRow row, IntSupplier percent) {
+        this(row.place(Sheet.VEIN_EMPTY.width()), Sheet.LABEL_Y, percent);
+    }
+
+    /** A vein off the parts row: its percent label at {@code labelY}, the bar under it as on the row. */
+    public Vein(int x, int labelY, IntSupplier percent) {
         super(
-                new Bounds(
-                        row.place(Sheet.VEIN_EMPTY.width()),
-                        Sheet.LABEL_Y,
-                        Sheet.VEIN_EMPTY.width(),
-                        BAR_Y + Sheet.VEIN_EMPTY.height() - Sheet.LABEL_Y),
+                new Bounds(x, labelY, Sheet.VEIN_EMPTY.width(), BAR_Y + Sheet.VEIN_EMPTY.height() - Sheet.LABEL_Y),
                 Component.empty());
         this.percent = percent;
     }

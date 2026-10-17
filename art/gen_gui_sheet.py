@@ -56,6 +56,10 @@ BUTTON_SIZE = (52, 16)
 VEIN_EMPTY = (176, 112, 44, 12)
 VEIN_FULL = (176, 128, 44, 12)
 GLYPHS = (176, 144)
+BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
+TROUGH_EMPTY = (176, 160, 54, 8)
+TROUGH_FULL = (176, 170, 54, 8)
+WATER = [(28, 58, 118), (58, 118, 198), (120, 188, 240), (204, 236, 255)]
 # where screens write: title, status line, slot labels, tank label and amount, inventory label
 TEXT = [(6, 4, 164, 12), (6, 14, 164, 12), (40, 24, 130, 10), (118, 8, 52, 10), (118, 60, 52, 10), (6, 70, 164, 12)]
 
@@ -150,6 +154,53 @@ def panel(img):
         nodule(img, x, y, 3, 3)
     for n, (x, y) in enumerate(INVENTORY):
         well(img, x - 1, y - 1, 18, 18, WELL, 1100 + n)
+
+
+def strip(img):
+    """Eighteen rows of panel body with the frame on both sides, continuing the panel's noise below its split."""
+    x0, y0, w, h = BODY_STRIP
+    tone, grain, rim = noise(1002, W, H, 12), noise(1003, W, H, 3), noise(1004, W, H, 5)
+    rng = random.Random(1005)
+    for j in range(h):
+        y = 72 + j
+        for x in range(w):
+            d = min(x, w - 1 - x)
+            lit = x < w // 2
+            if d == 0:
+                put(img, x0 + x, y0 + j, OUTLINE)
+            elif d <= 3:
+                base = FLESH[2] if d == 2 else (FLESH[4] if lit else FLESH[0]) if d == 1 else (FLESH[1] if lit else FLESH[3])
+                put(img, x0 + x, y0 + j, mix(base, FLESH[1], 0.35 * rim(x, y)))
+            elif d == 4:
+                put(img, x0 + x, y0 + j, mix(IVORY[0], OUTLINE, 0.25))
+            else:
+                t = 0.55 * tone(x, y) + 0.45 * grain(x, y)
+                put(img, x0 + x, y0 + j, mix(IVORY[2], IVORY[3], (t - 0.5) * 1.2) if t > 0.5 else mix(IVORY[2], IVORY[1], (0.5 - t) * 0.5))
+    for _ in range(10):
+        put(img, x0 + rng.randrange(6, w - 6), y0 + rng.randrange(1, h - 1), IVORY[1])
+
+
+def trough(img):
+    """A low horizontal vessel for water: rounded ends, a dark empty bed and a lit blue fill."""
+    x0, y0, w, h = TROUGH_EMPTY
+    for j in range(-1, h + 1):
+        for i in range(-1, w + 1):
+            if vein_mask(i, j, w, h):
+                continue
+            if any(vein_mask(i + di, j + dj, w, h) for di in (-1, 0, 1) for dj in (-1, 0, 1)):
+                put(img, x0 + i, y0 + j, OUTLINE if j < h / 2 else IVORY[3])
+    for j in range(h):
+        for i in range(w):
+            if not vein_mask(i, j, w, h):
+                continue
+            put(img, x0 + i, y0 + j, mix(WELL, PIT, 0.6) if j < 2 else WELL)
+            shade = abs(j - (h - 1) / 2) / (h / 2)
+            full = mix(WATER[2], WATER[1], shade)
+            if j == 1:
+                full = WATER[3]
+            if j == h - 1:
+                full = WATER[0]
+            put(img, TROUGH_FULL[0] + i, TROUGH_FULL[1] + j, full)
 
 
 def sac(img, cx, cy, r):
@@ -301,6 +352,8 @@ def main():
     panel(img)
     well(img, SLOT[0], SLOT[1], 18, 18, WELL, 1099)
     progress(img)
+    trough(img)
+    strip(img)
     tank(img)
     glyphs(img)
     button(img, BUTTON, False)
