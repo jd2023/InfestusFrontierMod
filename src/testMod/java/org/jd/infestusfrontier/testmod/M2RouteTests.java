@@ -15,10 +15,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.GameType;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.ecology.EcologyModule;
@@ -83,17 +81,9 @@ public final class M2RouteTests {
         EcologyTests.use(h, EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0), BOWL, Direction.UP);
         h.assertTrue(bowlContents(h).batch().isPresent(), "the bowl batch runs at tick " + h.getTick());
 
-        // Fed through the item handler, so the batches have no feeder and post no completion event;
-        // DiscoveryTests.sacPostsCompletionForItsFeeder counts every such event on the shared bus.
-        IItemHandler feed = h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(SAC), null);
-        h.assertTrue(feed != null, "the sac exposes its feed slot");
-        for (int i = 0; i < 10; i++) {
-            final int round = i;
-            h.runAtTickTime((long) round * WHEAT_GAP, () -> {
-                feed.insertItem(0, new ItemStack(Items.WHEAT), false);
-            });
-        }
-        h.runAtTickTime(10L * WHEAT_GAP, () -> {
+        Player feeder = EcologyTests.holding(h, GameType.SURVIVAL, Items.WHEAT, 10);
+        ProcessingTests.feedRepeatedly(h, feeder, 10, WHEAT_GAP, () -> {
+            h.assertTrue(feeder.getMainHandItem().isEmpty(), "ten wheat consumed");
             h.assertValueEqual(ProcessingTests.tank(h).stored(), Biomass.of(1000), "ten wheat fill the sac");
             Player carrier = EcologyTests.holding(h, GameType.SURVIVAL, Items.BUCKET, 1);
             EcologyTests.use(h, carrier, SAC, Direction.UP);
