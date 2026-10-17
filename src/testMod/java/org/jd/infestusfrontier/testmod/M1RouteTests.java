@@ -1,0 +1,86 @@
+package org.jd.infestusfrontier.testmod;
+
+import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.ecology.LivingSubstrateBlock;
+import org.jd.infestusfrontier.ecology.SubstrateStage;
+
+/** The whole M1 route in one test: craft, place, convert, bone meal, mature. */
+@GameTestHolder("infestusfrontier_tests")
+@PrefixGameTestTemplate(false)
+public final class M1RouteTests {
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 150)
+    public static void m1Route(GameTestHelper h) {
+        BlockPos stone = new BlockPos(1, 1, 1);
+        BlockPos placed = stone.above();
+        BlockPos grass = new BlockPos(4, 1, 1);
+        h.setBlock(stone, Blocks.STONE);
+        h.setBlock(grass, Blocks.GRASS_BLOCK);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 1);
+
+        // Three cultures from the recipe, as the crafting grid would assemble them.
+        ItemStack cultures = ItemStack.EMPTY;
+        for (int i = 0; i < 3; i++) {
+            ItemStack made = craft(
+                    h,
+                    List.of(
+                            new ItemStack(Items.ROTTEN_FLESH),
+                            new ItemStack(Items.RED_MUSHROOM),
+                            new ItemStack(Items.WHEAT_SEEDS)),
+                    EcologyModule.SPORE_CULTURE.get());
+            if (cultures.isEmpty()) cultures = made;
+            else cultures.grow(made.getCount());
+        }
+        h.assertValueEqual(cultures.getCount(), 3, "cultures crafted");
+
+        // One culture goes into the substrate recipe with a dirt block.
+        cultures.shrink(1);
+        ItemStack substrate = craft(
+                h,
+                List.of(new ItemStack(Items.DIRT), new ItemStack(EcologyModule.SPORE_CULTURE.get())),
+                EcologyModule.LIVING_SUBSTRATE_ITEM.get());
+        player.setItemInHand(InteractionHand.MAIN_HAND, substrate);
+        h.placeAt(player, substrate, stone, Direction.UP);
+        EcologyTests.assertStage(h, placed, SubstrateStage.BASIC);
+
+        // One culture converts the grass.
+        player.setItemInHand(InteractionHand.MAIN_HAND, cultures);
+        EcologyTests.use(h, player, grass, Direction.UP);
+        EcologyTests.assertStage(h, grass, SubstrateStage.BASIC);
+        h.assertValueEqual(cultures.getCount(), 1, "cultures left after the route");
+
+        // One bone meal on each cell.
+        for (BlockPos cell : new BlockPos[] {placed, grass}) {
+            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BONE_MEAL, 1));
+            EcologyTests.use(h, player, cell, Direction.UP);
+        }
+        h.runAfterDelay(2 * LivingSubstrateBlock.GROWTH_DELAY_TICKS + 2, () -> {
+            EcologyTests.assertStage(h, placed, SubstrateStage.MATURE);
+            EcologyTests.assertStage(h, grass, SubstrateStage.MATURE);
+            h.succeed();
+        });
+    }
+
+    private static ItemStack craft(GameTestHelper h, List<ItemStack> inputs, net.minecraft.world.item.Item result) {
+        CraftingInput input = CraftingInput.of(inputs.size(), 1, inputs);
+        var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, h.getLevel());
+        h.assertTrue(recipe.isPresent(), "recipe present for " + result);
+        ItemStack out = recipe.get().value().assemble(input, h.getLevel().registryAccess());
+        h.assertTrue(out.is(result), "result is " + result);
+        return out;
+    }
+}
