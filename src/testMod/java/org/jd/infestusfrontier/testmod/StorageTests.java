@@ -109,7 +109,8 @@ public final class StorageTests {
         h.assertFalse(bladder.clickMenuButton(player, BiomassBladderMenu.FILL_BUTTON), "fill has nothing to do yet");
         Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.STONE, 1);
         EcologyTests.use(h, builder, BLADDER, Direction.UP);
-        h.assertBlockPresent(Blocks.STONE, BLADDER.above());
+        h.assertBlockPresent(Blocks.AIR, BLADDER.above());
+        h.assertValueEqual(builder.getMainHandItem().getCount(), 1, "a held item opens the screen instead of building");
         h.succeed();
     }
 

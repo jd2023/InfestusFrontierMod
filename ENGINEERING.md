@@ -119,6 +119,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 - `genetics` owns native-class predicates. Being in a dimension, owning a genome and having a native bed are three separate conditions.
 - Freight has one owner at every step and a bounded escrow.
 - Optional adapters load only when their mod is present. Test mod code never ships.
+- An organ opens its screen for any hand, like a chest, through `Organs.openScreen`. Only a fluid container, a feed item or an ingredient acts on the organ instead. Sneak to build against it.
 
 ## Performance limits
 

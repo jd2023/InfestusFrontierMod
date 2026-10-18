@@ -78,12 +78,13 @@ public final class ProcessingTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void sacPassesUnrelatedItemsThrough(GameTestHelper h) {
+    public static void sacOpensItsScreenForAnyHeldItem(GameTestHelper h) {
         placeSac(h);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.STONE, 2);
         EcologyTests.use(h, player, SAC, Direction.UP);
-        h.assertBlockPresent(Blocks.STONE, SAC.above());
-        h.assertValueEqual(player.getMainHandItem().getCount(), 1, "stone placed against the sac");
+        h.assertBlockPresent(Blocks.AIR, SAC.above());
+        h.assertValueEqual(
+                player.getMainHandItem().getCount(), 2, "the stone stays in hand: the use opened the screen");
         h.succeed();
     }
 

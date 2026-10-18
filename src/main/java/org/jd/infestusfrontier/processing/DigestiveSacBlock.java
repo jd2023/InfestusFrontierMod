@@ -2,7 +2,6 @@ package org.jd.infestusfrontier.processing;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -95,17 +94,15 @@ public final class DigestiveSacBlock extends BaseEntityBlock {
         if (fluid != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) return fluid;
         if (!(level.getBlockEntity(pos) instanceof DigestiveSacBlockEntity sac))
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        return sac.feed(player, hand, stack);
+        ItemInteractionResult fed = sac.feed(player, hand, stack);
+        if (fed != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) return fed;
+        return Organs.openScreen(stack, level, pos, player);
     }
 
     @Override
     protected InteractionResult useWithoutItem(
             BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty()) return InteractionResult.PASS;
-        if (level.isClientSide) return InteractionResult.SUCCESS;
-        if (player instanceof ServerPlayer server && level.getBlockEntity(pos) instanceof DigestiveSacBlockEntity sac)
-            server.openMenu(sac, pos);
-        return InteractionResult.CONSUME;
+        return Organs.openScreen(level, pos, player).result();
     }
 
     @Override

@@ -262,27 +262,6 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
         return true;
     }
 
-    /** Tells the player what the bowl holds. */
-    void report(Player player) {
-        if (batch.isPresent()) {
-            String state = Organs.hasFoundation(level, worldPosition) ? "working" : "paused";
-            player.displayClientMessage(
-                    Component.translatable("infestusfrontier.status.culture_bowl." + state, percent()), true);
-            return;
-        }
-        int items = 0;
-        for (int slot = 0; slot < INGREDIENT_SLOTS; slot++)
-            items += ingredients.getStackInSlot(slot).getCount();
-        player.displayClientMessage(
-                Component.translatable(
-                        "infestusfrontier.status.culture_bowl.idle",
-                        items,
-                        water.getFluidAmount(),
-                        biomass.stored().units(),
-                        biomass.capacity().units()),
-                true);
-    }
-
     @Override
     public BiomassTank tank() {
         return biomass;

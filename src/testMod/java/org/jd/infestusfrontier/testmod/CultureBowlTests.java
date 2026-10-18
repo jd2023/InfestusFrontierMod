@@ -64,11 +64,23 @@ public final class CultureBowlTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void unknownItemsPassThrough(GameTestHelper h) {
+    public static void heldItemOpensTheScreenInsteadOfBuilding(GameTestHelper h) {
         placeBowl(h);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.STONE, 1);
         EcologyTests.use(h, player, BOWL, Direction.UP);
-        h.assertBlockPresent(Blocks.STONE, BOWL.above());
+        h.assertBlockPresent(Blocks.AIR, BOWL.above());
+        h.assertValueEqual(player.getMainHandItem().getCount(), 1, "the stone stays in hand");
+        h.assertTrue(contents(h, BOWL).ingredients().get(0).isEmpty(), "nothing was inserted");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void emptyHandOpensTheScreenInsteadOfStarting(GameTestHelper h) {
+        placeBowl(h);
+        loadCultureInputs(h, true);
+        EcologyTests.use(h, EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0), BOWL, Direction.UP);
+        h.assertTrue(contents(h, BOWL).batch().isEmpty(), "no batch starts from a bare hand");
+        h.assertValueEqual(contents(h, BOWL).ingredients().get(0).getCount(), 1, "the mushroom stays");
         h.succeed();
     }
 
@@ -410,8 +422,15 @@ public final class CultureBowlTests {
         if (withWater) load(h, Items.WATER_BUCKET, 1);
     }
 
+    /** Presses Start on the Bowl's screen, the only way to start a batch. */
+    static void startBatch(GameTestHelper h, BlockPos bowl) {
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        MenuProvider provider = (MenuProvider) h.getBlockEntity(bowl);
+        provider.createMenu(1, player.getInventory(), player).clickMenuButton(player, CultureBowlMenu.START_BUTTON);
+    }
+
     private static void startBatch(GameTestHelper h) {
-        EcologyTests.use(h, EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0), BOWL, Direction.UP);
+        startBatch(h, BOWL);
     }
 
     private static void placeBowl(GameTestHelper h) {

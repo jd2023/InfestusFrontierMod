@@ -2,7 +2,6 @@ package org.jd.infestusfrontier.storage;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -84,16 +83,14 @@ public final class BiomassBladderBlock extends BaseEntityBlock {
             Player player,
             InteractionHand hand,
             BlockHitResult hit) {
-        return BiomassFluids.useOn(stack, level, pos, hit.getDirection(), player, hand);
+        ItemInteractionResult fluid = BiomassFluids.useOn(stack, level, pos, hit.getDirection(), player, hand);
+        if (fluid != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) return fluid;
+        return Organs.openScreen(stack, level, pos, player);
     }
 
     @Override
     protected InteractionResult useWithoutItem(
             BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty()) return InteractionResult.PASS;
-        if (level.isClientSide) return InteractionResult.SUCCESS;
-        if (player instanceof ServerPlayer server && level.getBlockEntity(pos) instanceof BiomassBladderBlockEntity be)
-            server.openMenu(be, pos);
-        return InteractionResult.CONSUME;
+        return Organs.openScreen(level, pos, player).result();
     }
 }

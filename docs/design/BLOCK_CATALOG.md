@@ -7,7 +7,7 @@ Proposed recipes and stage assignments. **Create** lists construction ingredient
 
 Normal dismantling of an organ preserves its counts, level, chosen improvements and mutations in the dropped block. In a multiblock, the core carries this history; breaking a wall does not copy it. Upgrading an existing core preserves its history. Passive walls, floors and conduits do not earn processing levels. Normal dismantling and invalid additions retain contents in recovered storage or remaining cells. Destructive failures follow the separate containment rules below.
 
-Free-standing organs root into Living Substrate or a named specialized bed. Attached parts root through their host. The same organ can be hand-fed first, mutated later and expanded with physical parts without crafting a replacement core. Port configuration uses a tool or deliberate UI action; empty-hand clicks do not obstruct building.
+Free-standing organs root into Living Substrate or a named specialized bed. Attached parts root through their host. The same organ can be hand-fed first, mutated later and expanded with physical parts without crafting a replacement core. Use with any hand opens an organ's screen, like a chest; a held bucket, feed or ingredient acts on the organ instead. Sneak to build against an organ.
 
 ## Building with operations
 
@@ -118,7 +118,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Input → output:** 1 mushroom + 1 wheat seed + 100 mB water → 1 Spore Culture; 1 Spore Culture + 2 rotten flesh + 1 bone meal → an Organ Bud. No biomass input is needed to start this supply chain.
 - **Create:** 1 flower pot + 1 Spore Culture + 1 wheat seed; place on substrate.
 - **Growth:** Choose shorter incubation or lower water use. A Honey Culture treatment accepts honey as an alternative nutrient; an Intake Mouth later automates supplies.
-- **Manual operation:** Use the reusable Synaptic Probe to open the Bowl screen, select one of its nine recipes, start/cancel work and collect a named occupied slot. The screen shows the server revision, stored water and biomass, retained slots, progress and clear refusal. Ingredients may still be inserted one at a time; water and measured biomass buckets deposit 1000 mB/BU and return their empty bucket. The original stick/empty-hand direct controls remain available when the offhand is empty. Sneak-use a clock or glass bottle to spend an earned choice on incubation or water economy respectively. An unrelated held block/item interaction, including offhand placement with an empty main hand, passes through so players can place beside the Bowl. All transfers pause during incubation; break and replace the Bowl to move its single saved core, owner, contents and history.
+- **Manual operation:** Open the Bowl screen with any hand, select one of its nine recipes, start/cancel work and collect a named occupied slot. The screen shows the server revision, stored water and biomass, retained slots, progress and clear refusal. Ingredients may still be inserted one at a time; water and measured biomass buckets deposit 1000 mB/BU and return their empty bucket. Sneak-use with an empty hand collects one stack while idle. Sneak-use a clock or glass bottle to spend an earned choice on incubation or water economy respectively. Sneak to place beside the Bowl. All transfers pause during incubation; break and replace the Bowl to move its single saved core, owner, contents and history.
 - **Baseline:** One batch requires 1200 loaded server ticks (60 seconds at 20 TPS). Each incubation or water choice reduces its base requirement by 10%, capped at 30% after three choices; round water down to whole mB. This gives pure L3 incubation 840 ticks or pure L3 water costs of 70/35 mB. These are calculated initial tuning values, not playtest timings. The Bowl holds nine item slots, one 2000 mB water tank and one 2000 BU biomass tank so whole buckets fit without discarding a remainder. It performs no export and pauses when its substrate is absent. Recipes and quantities are owned by Items.
 
 ### T0-03 — Digestive Sac
@@ -126,7 +126,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Input → output:** Item Catalog's starter/native feed recipes → biomass with their exact water costs. No mineral feed or unlisted fish/leaf recipe; future fibrous diets require explicit recipes.
 - **Create:** 1 Organ Bud + 2 rotten flesh + 1 bowl.
 - **Growth:** Choose processing speed or biomass recovery. Elastic Gel treatment accepts fibrous leaves; add Intake/Output Mouths for a continuous feed line. It stops accepting batches when output has no room.
-- **Hand controls:** Wheat, rotten flesh and empty buckets operate the Sac. An empty hand opens its screen: status, a feed slot that holds one stack and is also reachable by hoppers and pipes, the progress vein and the tank. Other held items pass through to ordinary use/placement, including offhand placement with an empty main hand.
+- **Hand controls:** Wheat, rotten flesh and empty buckets operate the Sac. Any other use opens its screen: status, a feed slot that holds one stack and is also reachable by hoppers and pipes, the progress vein and the tank. Sneak to build against it.
 - **Baseline:** The starter Sac retains up to 1,000 mB biomass and owns one batch. Hand-feeding atomically reserves one item and its complete output before work starts; loaded work pauses when uprooted and never catches up offline. If the feeder disconnects before completion, the Sac retains their achievement credit and pauses new feeds until they return; stored biomass remains transferable.
 
 ### T0-04 — Biomass Bladder
@@ -141,14 +141,14 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Does:** Stretches cultivated skin over a bone rack to make the common flexible construction material.
 - **Input → output:** Rotten flesh + string + water → Membrane Sheets; leather can replace flesh for a slower, low-biomass recipe.
 - **Create:** 2 sticks + 2 bones + 1 Spore Culture.
-- **Hand controls:** Load ingredients and water by hand; empty-hand use starts a batch. Sneak-use with an empty hand collects one stack while idle, taking finished output first and otherwise returning unused inputs.
+- **Hand controls:** Load ingredients and water by hand; any other use opens the screen, where Start begins a batch. Sneak-use with an empty hand collects one stack while idle, taking finished output first and otherwise returning unused inputs.
 - **Growth:** Choose batch speed or water economy. Add a Hearth Lung for faster drying; thermal membranes are a later, distinct Nether-grown material, not an automatic level reward.
 
 ### T0-06 — Bone Loom
 - **Does:** Grows curved plates and load-bearing ribs from existing calcium, rather than fabricating mineral mass from biomass.
 - **Input → output:** 1 bone + 50 BU → 1 Bone Plate. Bone blocks require a separately accounted calcium recipe, not an assumed unpacking into nine bones. A calcite recipe uses extra biomass to supply the organic binder.
 - **Create:** 1 Organ Bud + 2 bones + 2 sticks.
-- **Hand controls:** Load bones and biomass buckets by hand; empty-hand use starts a batch. Sneak-use with an empty hand collects one stack while idle, taking finished output first and otherwise returning unused inputs. Biomass buckets share the portable-transfer admission and successful-transfer discovery rules.
+- **Hand controls:** Load bones and biomass buckets by hand; any other use opens the screen, where Start begins a batch. Sneak-use with an empty hand collects one stack while idle, taking finished output first and otherwise returning unused inputs. Biomass buckets share the portable-transfer admission and successful-transfer discovery rules.
 - **Growth:** Choose speed or biomass economy. Ferrocyte Paste treatment produces reinforced plates using additional prepared iron; adding frame blocks increases batch size, not mineral yield.
 
 ### T0-07 — Bio-Furnace
@@ -167,7 +167,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Does:** A rooted, accessible store for seeds and planting stock; reserves a chosen amount for replanting before offering surplus to automation.
 - **Input → output:** Seeds, saplings, carrots or potatoes → the same stored items, supplied on request.
 - **Create:** 1 leather + 1 Membrane Sheet + 1 Spore Culture.
-- **Hand controls and bounds:** Each pouch holds four planting-stock types, up to 64 of each. Use a stick to raise the per-type planting reserve by one, or sneak-use a stick to lower it; selection cycles through 0–64 and starts at 1. Empty hands withdraw surplus from the first available type; sneak-empty hands recover a stored type including its reserve. A held building item in either hand passes through. Unsupported or malformed saves pause transfers and preserve the original data in the recovered pouch when dismantled.
+- **Hand controls and bounds:** Each pouch holds four planting-stock types, up to 64 of each. Use a stick to raise the per-type planting reserve by one, or sneak-use a stick to lower it; selection cycles through 0–64 and starts at 1. Empty hands withdraw surplus from the first available type; sneak-empty hands recover a stored type including its reserve. Sneak to build against it. Unsupported or malformed saves pause transfers and preserve the original data in the recovered pouch when dismantled.
 - **Growth:** Add neighboring pouches for more stock types. Contractile Fiber treatment adds named planting filters; it never changes one seed species into another.
 
 ### T0-10 — Living Skin

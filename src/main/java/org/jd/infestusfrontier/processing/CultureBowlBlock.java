@@ -110,8 +110,9 @@ public final class CultureBowlBlock extends BaseEntityBlock {
             BlockHitResult hit) {
         ItemInteractionResult fluid = BiomassFluids.useOn(stack, level, pos, hit.getDirection(), player, hand);
         if (fluid != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) return fluid;
-        if (!(level.getBlockEntity(pos) instanceof CultureBowlBlockEntity bowl) || !bowl.accepts(stack))
+        if (!(level.getBlockEntity(pos) instanceof CultureBowlBlockEntity bowl))
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (!bowl.accepts(stack)) return Organs.openScreen(stack, level, pos, player);
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
         ItemStack offered = player.getAbilities().instabuild ? stack.copy() : stack;
         var refusal = bowl.insert(offered);
@@ -125,18 +126,13 @@ public final class CultureBowlBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(
             BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty()) return InteractionResult.PASS;
+        if (!player.isShiftKeyDown())
+            return Organs.openScreen(level, pos, player).result();
         if (level.isClientSide) return InteractionResult.SUCCESS;
         if (!(level.getBlockEntity(pos) instanceof CultureBowlBlockEntity bowl)) return InteractionResult.PASS;
-        if (player.isShiftKeyDown()) {
-            Optional<Refusal> refusal = bowl.cancel(player);
-            if (refusal.isPresent()) Refusals.show(player, refusal.get());
-            else bowl.collect(player);
-        } else {
-            Optional<Refusal> refusal = bowl.start(player);
-            if (refusal.isPresent()) Refusals.show(player, refusal.get());
-            else bowl.report(player);
-        }
+        Optional<Refusal> refusal = bowl.cancel(player);
+        if (refusal.isPresent()) Refusals.show(player, refusal.get());
+        else bowl.collect(player);
         return InteractionResult.CONSUME;
     }
 }
