@@ -2,7 +2,6 @@ package org.jd.infestusfrontier.ecology;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -25,10 +24,12 @@ import org.jd.infestusfrontier.InfestusFrontier;
 /**
  * Living ground the player grows on purpose. No block entity, no random ticks, no spreading on its own.
  *
- * <p>Bone meal gives a cell {@value #BONE_MEAL_VIGOR} vigor and starts one bounded wave of scheduled ticks: every
- * {@value #GROWTH_DELAY_TICKS} ticks the cell matures one stage; once mature it converts up to {@value #SPREAD_PER_CELL}
- * exposed host blocks beside it into young cells with one vigor less, then goes dormant. Vigor 0 cells do nothing.
- * One bone meal therefore touches at most 15 cells and schedules at most 15 ticks, then everything is quiet again.
+ * <p>Bone meal gives a cell {@value #BONE_MEAL_VIGOR} vigor and starts one bounded wave of scheduled ticks, one every
+ * {@value #GROWTH_DELAY_TICKS} ticks. Young tissue is the growing edge: a basic cell becomes young and converts up to
+ * {@value #SPREAD_PER_CELL} exposed host blocks beside it into basic cells with one vigor less; a young cell with two
+ * or more vigor becomes mature; a mature cell that was fed converts hosts the same way. Then the cell goes dormant.
+ * Vigor 0 cells do nothing. One bone meal on basic ground therefore reaches at most 15 cells, 3 mature in the core,
+ * 4 young around them and 8 basic at the edge, schedules at most 10 ticks and is quiet after 90 ticks.
  *
  * <p>Each stage is drawn from sixteen 64x64 tiles cut out of one 4x4-block macro texture. {@link #TILE} follows the
  * cell's position ({@link #tileAt}), so a patch shows the macro pattern without seams or repeats.
@@ -105,24 +106,37 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         int vigor = state.getValue(VIGOR);
         if (vigor == 0) return;
-        Optional<SubstrateStage> next = state.getValue(STAGE).next();
-        if (next.isPresent()) {
-            level.setBlock(pos, state.setValue(STAGE, next.get()), Block.UPDATE_ALL);
-            level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, pos, STEP_PARTICLES);
-            level.scheduleTick(pos, this, GROWTH_DELAY_TICKS);
-            return;
+        switch (state.getValue(STAGE)) {
+            case BASIC -> {
+                boolean goesOn = vigor >= 2;
+                level.setBlock(
+                        pos,
+                        state.setValue(STAGE, SubstrateStage.YOUNG).setValue(VIGOR, goesOn ? vigor : 0),
+                        Block.UPDATE_ALL);
+                level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, pos, STEP_PARTICLES);
+                spread(level, pos, vigor - 1, random);
+                if (goesOn) level.scheduleTick(pos, this, GROWTH_DELAY_TICKS);
+            }
+            case YOUNG -> {
+                level.setBlock(pos, state.setValue(STAGE, SubstrateStage.MATURE).setValue(VIGOR, 0), Block.UPDATE_ALL);
+                level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, pos, STEP_PARTICLES);
+            }
+            case MATURE -> {
+                spread(level, pos, vigor - 1, random);
+                level.setBlock(pos, state.setValue(VIGOR, 0), Block.UPDATE_CLIENTS);
+            }
         }
+    }
+
+    /** Converts up to {@value #SPREAD_PER_CELL} exposed hosts beside {@code pos} into basic cells with {@code vigor}. */
+    private void spread(ServerLevel level, BlockPos pos, int vigor, RandomSource random) {
         List<BlockPos> targets = spreadTargets(level, pos);
         for (int n = 0; n < SPREAD_PER_CELL && !targets.isEmpty(); n++) {
             BlockPos target = targets.remove(random.nextInt(targets.size()));
-            level.setBlock(
-                    target,
-                    cellAt(target).setValue(STAGE, SubstrateStage.YOUNG).setValue(VIGOR, vigor - 1),
-                    Block.UPDATE_ALL);
+            level.setBlock(target, cellAt(target).setValue(VIGOR, vigor), Block.UPDATE_ALL);
             level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target, STEP_PARTICLES);
-            if (vigor - 1 > 0) level.scheduleTick(target, this, GROWTH_DELAY_TICKS);
+            if (vigor > 0) level.scheduleTick(target, this, GROWTH_DELAY_TICKS);
         }
-        level.setBlock(pos, state.setValue(VIGOR, 0), Block.UPDATE_CLIENTS);
     }
 
     /**

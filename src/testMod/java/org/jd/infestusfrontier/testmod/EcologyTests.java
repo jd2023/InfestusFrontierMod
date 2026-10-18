@@ -122,7 +122,10 @@ public final class EcologyTests {
         });
         h.runAfterDelay(12 * step, () -> {
             int settled = countCells(h);
-            h.assertTrue(settled >= 7 && settled <= 15, "the wave reached " + settled + " cells, expected 7 to 15");
+            h.assertTrue(settled >= 11 && settled <= 15, "the wave reached " + settled + " cells, expected 11 to 15");
+            h.assertValueEqual(countStage(h, SubstrateStage.MATURE), 3, "a mature core");
+            h.assertValueEqual(countStage(h, SubstrateStage.YOUNG), 4, "a young ring");
+            h.assertTrue(countStage(h, SubstrateStage.BASIC) >= 4, "a basic edge");
             h.assertTrue(countVigor(h) == 0, "every cell is dormant");
             h.runAfterDelay(4 * step, () -> {
                 h.assertValueEqual(countCells(h), settled, "nothing grows after the wave");
@@ -157,8 +160,8 @@ public final class EcologyTests {
         Player player = holding(h, GameType.SURVIVAL, Items.BONE_MEAL, 1);
         use(h, player, cell, Direction.UP);
         h.runAfterDelay(LivingSubstrateBlock.GROWTH_DELAY_TICKS + 2, () -> {
-            assertStage(h, cell.east().above(), SubstrateStage.YOUNG);
-            assertStage(h, cell.west().below(), SubstrateStage.YOUNG);
+            assertStage(h, cell.east().above(), SubstrateStage.BASIC);
+            assertStage(h, cell.west().below(), SubstrateStage.BASIC);
             assertVigor(h, cell.east().above(), 2);
             h.assertBlockPresent(Blocks.OAK_PLANKS, cell.east());
             h.succeed();
@@ -170,6 +173,17 @@ public final class EcologyTests {
                 .get()
                 .defaultBlockState()
                 .setValue(LivingSubstrateBlock.STAGE, SubstrateStage.MATURE);
+    }
+
+    static int countStage(GameTestHelper h, SubstrateStage stage) {
+        int count = 0;
+        for (int x = 0; x < 16; x++)
+            for (int z = 0; z < 16; z++) {
+                BlockState s = h.getBlockState(new BlockPos(x, 1, z));
+                if (s.is(EcologyModule.LIVING_SUBSTRATE.get()) && s.getValue(LivingSubstrateBlock.STAGE) == stage)
+                    count++;
+            }
+        return count;
     }
 
     static int countCells(GameTestHelper h) {
