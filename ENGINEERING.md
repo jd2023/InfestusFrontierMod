@@ -55,7 +55,7 @@ ui/                                      layout grammar, sheet geometry and pale
 - Rendering is client-only and never decides whether a resource moved.
 - Use vanilla and NeoForge behavior as it is. Never patch, bypass or re-implement engine rules. If a story seems to need that, stop and report.
 - Shared low-level code (UI primitives, serialization, packet validation, bounded simulation, discovery) lives in one module from its first use. Features compose it, never copy it. Do not build it before the first consumer.
-- A feature screen extends `foundation.screen.OrganScreen`, names its state in `status()` and adds parts in `addParts(PartRow)`: `Well`, `Vein`, `Tank`, `button`. It never draws. A new kind of part goes into `foundation/screen` with its sprite in `ui.Sheet` and `art/gen_gui_sheet.py`, then every screen can use it. `verifyScreenKit` fails the build when a screen outside the kit touches `GuiGraphics`. Menus put their slots at `Sheet.SLOT_X, Sheet.SLOT_Y` and following row positions; a `Well` throws when the slot is off the row.
+- A feature screen extends `foundation.screen.OrganScreen`, adds parts in `addParts(PartRow)`: `Emblem` (the organ's own mark, or none), `Well`, `Vein`, `Tank`, `button`. It never draws. A new kind of part goes into `foundation/screen` with its sprite in `ui.Sheet` and `art/gen_gui_sheet.py`, then every screen can use it. `verifyScreenKit` fails the build when a screen outside the kit touches `GuiGraphics`. Menus put their slots at `Sheet.SLOT_X, Sheet.SLOT_Y` and following row positions; a `Well` throws when the slot is off the row.
 - Comments state a contract. Narrating comments are defects.
 
 ## Code style

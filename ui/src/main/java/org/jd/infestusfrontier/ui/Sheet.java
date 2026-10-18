@@ -9,7 +9,7 @@ import java.util.List;
  */
 public final class Sheet {
     public static final int SIZE = 256;
-    /** The whole panel with the 36 player inventory wells and the bud ornament baked in. */
+    /** The whole panel with the 36 player inventory wells and an empty left column for the organ's emblem. */
     public static final Bounds PANEL = new Bounds(0, 0, 176, 166);
     /** One well for an organ's own slot; place it at the slot's position minus one. */
     public static final Bounds SLOT = new Bounds(176, 0, 18, 18);
@@ -35,36 +35,35 @@ public final class Sheet {
     public static final int INVENTORY_Y = 84;
 
     public static final int HOTBAR_Y = 142;
-    public static final int GLYPH_COUNT = 4;
-    private static final int GLYPH_X = 176;
-    private static final int GLYPH_Y = 144;
-    private static final int GLYPH_SIZE = 9;
-    private static final int GLYPH_PITCH = 10;
+    /** The organ emblems: 32x32, two per row under the troughs. */
+    public static final int EMBLEM_COUNT = 3;
+
+    private static final int EMBLEM_SHEET_X = 176;
+    private static final int EMBLEM_SHEET_Y = 184;
+    private static final int EMBLEM_SIZE = 32;
+    private static final int EMBLEM_PITCH = 34;
     /** Flesh-dark ink on the ivory membrane. */
     public static final int INK = 0xFF3E262C;
     /** Ivory text on a flesh button. */
     public static final int IVORY = 0xFFF2ECD8;
 
-    /** The glyphs by meaning. */
-    public static final int RING = 0;
+    /** The emblems by organ. */
+    public static final int SAC_EMBLEM = 0;
 
-    public static final int ARROW = 1;
-    public static final int CROSS = 2;
-    public static final int BARS = 3;
+    public static final int BLADDER_EMBLEM = 1;
+    public static final int BOWL_EMBLEM = 2;
 
-    /** The status line: a glyph under the title with its words to the right. */
-    public static final int STATUS_GLYPH_X = 8;
+    /** The panel's left margin; the emblem column starts here. */
+    public static final int LEFT_X = 8;
+    /** An organ's emblem sits in the left column, level with the parts row. */
+    public static final int EMBLEM_X = LEFT_X;
 
-    public static final int STATUS_GLYPH_Y = 15;
-    public static final int STATUS_TEXT_X = 20;
-    public static final int STATUS_TEXT_Y = 16;
-    /** The status words may run this far; longer text wraps into the tooltip. Ends short of the tank label. */
-    public static final int STATUS_TEXT_WIDTH = 106;
+    public static final int EMBLEM_Y = 27;
     /** Labels sit on this row above the organ's parts. */
     public static final int LABEL_Y = 26;
     /** Top of the parts row: wells, veins and buttons are centered on this 18-pixel band. */
     public static final int PARTS_Y = 34;
-    /** The first organ part sits right of the bud ornament. */
+    /** The first organ part sits right of the emblem column. */
     public static final int FIRST_PART_X = 43;
     /** Space between two parts on the row. */
     public static final int GAP = 4;
@@ -108,10 +107,14 @@ public final class Sheet {
         return HOTBAR_Y + strips * BODY_STRIP.height();
     }
 
-    /** The status glyphs in order: ring, arrow, cross, bars. */
-    public static Bounds glyph(int index) {
-        if (index < 0 || index >= GLYPH_COUNT) throw new IllegalArgumentException("No glyph " + index);
-        return new Bounds(GLYPH_X + GLYPH_PITCH * index, GLYPH_Y, GLYPH_SIZE, GLYPH_SIZE);
+    /** The emblem sprites in order: Sac, Bladder, Bowl. */
+    public static Bounds emblem(int index) {
+        if (index < 0 || index >= EMBLEM_COUNT) throw new IllegalArgumentException("No emblem " + index);
+        return new Bounds(
+                EMBLEM_SHEET_X + EMBLEM_PITCH * (index % 2),
+                EMBLEM_SHEET_Y + EMBLEM_PITCH * (index / 2),
+                EMBLEM_SIZE,
+                EMBLEM_SIZE);
     }
 
     /** The column inside a tank frame placed at {@code x, y}. */
@@ -135,9 +138,8 @@ public final class Sheet {
                 TROUGH_EMPTY,
                 TROUGH_FULL,
                 BODY_STRIP,
-                glyph(0),
-                glyph(1),
-                glyph(2),
-                glyph(3));
+                emblem(0),
+                emblem(1),
+                emblem(2));
     }
 }

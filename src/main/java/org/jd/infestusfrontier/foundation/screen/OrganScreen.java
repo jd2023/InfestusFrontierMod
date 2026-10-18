@@ -11,9 +11,9 @@ import org.jd.infestusfrontier.ui.PartRow;
 import org.jd.infestusfrontier.ui.Sheet;
 
 /**
- * Every organ screen: the panel, the title, a status line under it, the biomass tank on the right, and the organ's
- * own parts in one row between them. A subclass names its state in {@link #status} and adds its parts in
- * {@link #addParts}; it draws nothing itself and decides nothing. Parts are laid out in panel pixels.
+ * Every organ screen: the panel, the title, the biomass tank on the right, and the organ's own parts in one row
+ * between the emblem column and the tank. A subclass adds its parts in {@link #addParts}, its {@link Emblem} among
+ * them if it has one; it draws nothing itself and decides nothing. Parts are laid out in panel pixels.
  */
 public abstract class OrganScreen<M extends AbstractContainerMenu & BiomassView> extends AbstractContainerScreen<M> {
     private static final Component BIOMASS = Component.translatable("gui.infestusfrontier.biomass_label");
@@ -33,16 +33,12 @@ public abstract class OrganScreen<M extends AbstractContainerMenu & BiomassView>
         inventoryLabelY = imageHeight - 94;
     }
 
-    /** What the organ is doing now, read from the menu. Called every frame. */
-    protected abstract Status status();
-
     /** Adds the organ's own parts left to right along {@code row}. Called on open and on every resize. */
     protected abstract void addParts(PartRow row);
 
     @Override
     protected void init() {
         super.init();
-        add(new StatusLine(this::status));
         add(new Tank(Sheet.TANK_X, Sheet.TANK_Y, BIOMASS, menu::stored, menu::capacity, Unit.BIOMASS));
         addParts(PartRow.standard());
     }

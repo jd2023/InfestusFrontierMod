@@ -10,7 +10,7 @@ Every organ screen draws its panel from this sheet. The regions below are mirror
 ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
 
   0,0     176x166  panel: ivory membrane, plum flesh rim, the 36 player inventory wells, studs, veins and
-                   the bud ornament under the status line (x 8..40, y 30..66); organ parts start at x 44
+                   an empty column x 8..40 for the organ's emblem; organ parts start at x 43
   176,0   18x18    one slot well, for an organ's own slots
   176,20  20x40    tank frame; the fill column goes inside it at +2,+2
   200,22  16x36    biomass column, full (the screen draws its lower part)
@@ -20,9 +20,9 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   176,96  52x16    button, disabled (sunken, grey)
   176,112 44x12    progress vein, empty
   176,128 44x12    progress vein, full (the screen draws its left part)
-  176,144 4 x 9x9  status glyphs at a 10 px pitch: idle ring, working arrow, blocked cross, paused bars
+  176,184 3 x 32x32 organ emblems, two per row at a 34 px pitch: Sac, Bladder, Bowl
 
-Every screen writes its title at 8,6, a status glyph at 8,15 with words after it, labels at y 26 above
+Every screen writes its title at 8,6, its emblem at 8,27 if it has one, labels at y 26 above
 its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
 x 168. Veins and pores keep out of those rows.
 """
@@ -55,22 +55,15 @@ BUTTON_OFF = (176, 96)
 BUTTON_SIZE = (52, 16)
 VEIN_EMPTY = (176, 112, 44, 12)
 VEIN_FULL = (176, 128, 44, 12)
-GLYPHS = (176, 144)
+EMBLEMS = [(176, 184), (210, 184), (176, 218)]
+EMBLEM = 32
+POOL = [(168, 196, 150), (206, 224, 182), (236, 244, 220)]
 BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
 TROUGH_EMPTY = (176, 160, 54, 8)
 TROUGH_FULL = (176, 170, 54, 8)
 WATER = [(28, 58, 118), (58, 118, 198), (120, 188, 240), (204, 236, 255)]
-# where screens write: title, status line, slot labels, tank label and amount, inventory label
-TEXT = [(6, 4, 164, 12), (6, 14, 164, 12), (40, 24, 130, 10), (118, 8, 52, 10), (118, 60, 52, 10), (6, 70, 164, 12)]
-
-GLYPH_ROWS = [
-    ["..#####..", ".#.....#.", "#.......#", "#.......#", "#.......#", "#.......#", "#.......#", ".#.....#.", "..#####.."],
-    ["....#....", "....##...", "....###..", "########.", "#########", "########.", "....###..", "....##...", "....#...."],
-    ["##.....##", "###...###", ".###.###.", "..#####..", "...###...", "..#####..", ".###.###.", "###...###", "##.....##"],
-    [".###.###."] * 9,
-]
-
-
+# where screens write: title, slot labels, tank label and amount, inventory label; and the emblem column
+TEXT = [(6, 4, 164, 12), (40, 24, 130, 10), (118, 8, 52, 10), (118, 60, 52, 10), (6, 70, 164, 12), (6, 25, 36, 36)]
 def mix(a, b, t):
     return tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3))
 
@@ -146,10 +139,6 @@ def panel(img):
         x, y = rng.randrange(6, W - 6), rng.randrange(6, H - 6)
         if not in_rects(x, y, keep_out, 1):
             put(img, x, y, IVORY[1])
-    # the bare patch under the status line: a bud in a chitin collar with nodules around it
-    sac(img, 22, 47, 6)
-    for x, y, w, h in [(12, 34, 4, 3), (29, 36, 3, 3), (11, 58, 3, 3), (27, 59, 5, 3), (33, 48, 3, 4)]:
-        nodule(img, x, y, w, h)
     for x, y in [(3, 3), (W - 6, 3), (3, H - 6), (W - 6, H - 6)]:
         nodule(img, x, y, 3, 3)
     for n, (x, y) in enumerate(INVENTORY):
@@ -201,24 +190,6 @@ def trough(img):
             if j == h - 1:
                 full = WATER[0]
             put(img, TROUGH_FULL[0] + i, TROUGH_FULL[1] + j, full)
-
-
-def sac(img, cx, cy, r):
-    """A flesh bud inside a chitin collar; not luminous, so it is not read as a status lamp."""
-    for y in range(cy - r - 2, cy + r + 3):
-        for x in range(cx - r - 2, cx + r + 3):
-            d = math.hypot(x - cx, y - cy)
-            if d > r + 1.6:
-                continue
-            if d > r + 0.6:
-                put(img, x, y, mix(OUTLINE, FLESH[1], 0.4))
-            elif d > r - 1.2:
-                put(img, x, y, IVORY[3] if x + y < cx + cy else IVORY[0])
-            elif d > r - 2.2:
-                put(img, x, y, FLESH[0])
-            else:
-                glow = max(0.0, 1 - math.hypot(x - cx + 1, y - cy + 1) / (r - 1.5))
-                put(img, x, y, mix(FLESH[2], FLESH[4], glow * glow) if glow > 0.25 else FLESH[2])
 
 
 def nodule(img, x, y, w, h):
@@ -322,12 +293,91 @@ def tank(img):
         put(img, SURFACE[0] + i, SURFACE[1], GREEN[3] if 1 <= i < fw - 1 else GREEN[2])
 
 
-def glyphs(img):
-    for n, rows in enumerate(GLYPH_ROWS):
-        for j, row in enumerate(rows):
-            for i, c in enumerate(row):
-                if c == '#':
-                    put(img, GLYPHS[0] + n * 10 + i, GLYPHS[1] + j, OUTLINE)
+def emblem_sac(img, ox, oy):
+    """A flesh pouch with an ivory mouth collar and one fold across it."""
+    for y in range(EMBLEM):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 11.0, (y - 18) / 9.5
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            if d > 0.88:
+                colour = OUTLINE
+            elif d > 0.74:
+                colour = FLESH[0] if dx + dy > 0 else FLESH[2]
+            else:
+                light = max(0.0, 1 - math.hypot(dx + 0.35, dy + 0.4))
+                colour = mix(FLESH[2], FLESH[4], light * 0.8)
+            put(img, ox + x, oy + y, colour)
+    for x in range(9, 24):
+        put(img, ox + x, oy + 20 + round(2.5 * math.sin((x - 9) / 14 * math.pi)), FLESH[0])
+    for y in range(4, 13):
+        for x in range(8, 25):
+            dx, dy = (x - 16) / 6.0, (y - 8) / 2.5
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            colour = OUTLINE if d > 0.85 else (IVORY[3] if dy < 0 else IVORY[1]) if d > 0.5 else PIT
+            put(img, ox + x, oy + y, colour)
+
+
+def emblem_bladder(img, ox, oy):
+    """A round vessel with a membrane window; biomass stands at the lower half."""
+    for y in range(3, 8):
+        for x in range(13, 20):
+            put(img, ox + x, oy + y, OUTLINE if x in (13, 19) or y == 3 else (IVORY[3] if x < 16 else IVORY[1]))
+    for y in range(EMBLEM):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 11.5, (y - 18) / 11.0
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            light = max(0.0, 1 - math.hypot(dx + 0.3, dy + 0.35))
+            if d > 0.9:
+                colour = OUTLINE
+            elif d > 0.76:
+                colour = FLESH[1] if dx + dy > 0 else FLESH[3]
+            elif y == 16:
+                colour = GREEN[3]
+            elif y > 16:
+                colour = mix(GREEN[1], GREEN[2], light * 0.6)
+            else:
+                colour = mix(IVORY[2], IVORY[3], light)
+            put(img, ox + x, oy + y, colour)
+    for x, y in [(12, 20), (13, 21), (20, 24)]:
+        put(img, ox + x, oy + y, GREEN[3])
+
+
+def emblem_bowl(img, ox, oy):
+    """A shallow flesh dish with an ivory lip, a pale pool and two bubbles."""
+    for y in range(15, EMBLEM):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 13.0, (y - 15) / 12.0
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            colour = OUTLINE if d > 0.9 else FLESH[1] if dx > 0.25 else FLESH[2] if dx > -0.4 else FLESH[3]
+            put(img, ox + x, oy + y, colour)
+    for y in range(9, 22):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 13.0, (y - 15) / 4.5
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            if d > 0.86:
+                colour = OUTLINE
+            elif d > 0.66:
+                colour = IVORY[3] if dy < 0 else IVORY[1]
+            else:
+                colour = mix(POOL[0], POOL[1], max(0.0, 1 - math.hypot(dx + 0.3, dy + 0.5)))
+            put(img, ox + x, oy + y, colour)
+    for x, y in [(12, 14), (13, 14), (12, 15), (19, 16), (18, 13)]:
+        put(img, ox + x, oy + y, POOL[2])
+
+
+def emblems(img):
+    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl)):
+        draw(img, ox, oy)
 
 
 def button(img, origin, hovered, disabled=False):
@@ -355,7 +405,7 @@ def main():
     trough(img)
     strip(img)
     tank(img)
-    glyphs(img)
+    emblems(img)
     button(img, BUTTON, False)
     button(img, BUTTON_HOVER, True)
     button(img, BUTTON_OFF, False, True)

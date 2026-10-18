@@ -18,15 +18,14 @@ import org.jd.infestusfrontier.ui.Sheet;
 
 /**
  * The Sac screen's server half: the feed slot, backed by the block entity's own slot so items stay with the block,
- * and four synced ints: status, percent done, biomass stored and capacity. Nothing here starts a batch; the block
+ * and three synced ints: percent done, biomass stored and capacity. Nothing here starts a batch; the block
  * entity takes from the slot on its own tick.
  */
 public final class DigestiveSacMenu extends AbstractContainerMenu implements BiomassView {
     static final int FEED_SLOT = 0;
-    private static final int STATUS = 0;
-    private static final int PERCENT = 1;
-    private static final int STORED = 2;
-    private static final int CAPACITY = 3;
+    private static final int PERCENT = 0;
+    private static final int STORED = 1;
+    private static final int CAPACITY = 2;
     private static final int INVENTORY_START = 1;
     private static final int HOTBAR_START = INVENTORY_START + 27;
     private static final int SLOT_END = HOTBAR_START + 9;
@@ -50,7 +49,7 @@ public final class DigestiveSacMenu extends AbstractContainerMenu implements Bio
                 id,
                 inventory,
                 new ItemStackHandler(1),
-                new SimpleContainerData(4),
+                new SimpleContainerData(3),
                 ContainerLevelAccess.create(inventory.player.level(), extra.readBlockPos()));
     }
 
@@ -65,11 +64,6 @@ public final class DigestiveSacMenu extends AbstractContainerMenu implements Bio
                 addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
         for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, 8 + col * 18, 142));
         addDataSlots(data);
-    }
-
-    public DigestiveSacBlockEntity.Status status() {
-        DigestiveSacBlockEntity.Status[] all = DigestiveSacBlockEntity.Status.values();
-        return all[Math.clamp(data.get(STATUS), 0, all.length - 1)];
     }
 
     public int percent() {
@@ -119,7 +113,6 @@ public final class DigestiveSacMenu extends AbstractContainerMenu implements Bio
         @Override
         public int get(int index) {
             return switch (index) {
-                case STATUS -> sac.status().ordinal();
                 case PERCENT -> sac.percent();
                 case STORED -> sac.tank().stored().units();
                 default -> sac.tank().capacity().units();
@@ -131,7 +124,7 @@ public final class DigestiveSacMenu extends AbstractContainerMenu implements Bio
 
         @Override
         public int getCount() {
-            return 4;
+            return 3;
         }
     }
 

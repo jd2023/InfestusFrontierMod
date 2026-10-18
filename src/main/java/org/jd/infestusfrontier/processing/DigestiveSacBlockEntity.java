@@ -66,14 +66,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * with the block and drops when the Sac is broken; it is not carried on the item.
  */
 final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandler, GeoBlockEntity, MenuProvider {
-    /** What the screen shows. Indices are the menu's status values. */
-    enum Status {
-        IDLE,
-        WORKING,
-        PAUSED,
-        FULL,
-        UNREADABLE
-    }
 
     private static final String FEED_TAG = "feed";
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
@@ -112,13 +104,6 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     /** The feed slot, for the screen, pipes and hoppers. */
     ItemStackHandler feed() {
         return feed;
-    }
-
-    Status status() {
-        if (unreadable.isPresent()) return Status.UNREADABLE;
-        if (batch.isPresent())
-            return level != null && Organs.hasFoundation(level, worldPosition) ? Status.WORKING : Status.PAUSED;
-        return tank.room().isZero() ? Status.FULL : Status.IDLE;
     }
 
     int percent() {

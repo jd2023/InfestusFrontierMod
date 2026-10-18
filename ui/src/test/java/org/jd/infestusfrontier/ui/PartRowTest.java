@@ -38,14 +38,4 @@ class PartRowTest {
         assertEquals(Sheet.PARTS_Y + 3, Sheet.partY(Sheet.VEIN_EMPTY.height()));
         assertEquals(Sheet.PARTS_Y + 1, Sheet.partY(Sheet.BUTTON.height()));
     }
-
-    @Test
-    void everyStatusKindHasItsOwnGlyph() {
-        long distinct = java.util.Arrays.stream(StatusKind.values())
-                .mapToInt(StatusKind::glyph)
-                .distinct()
-                .count();
-        assertEquals(StatusKind.values().length, distinct);
-        assertEquals(Sheet.GLYPH_COUNT, StatusKind.values().length);
-    }
 }

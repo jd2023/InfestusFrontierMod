@@ -64,6 +64,6 @@ Defect classes found in this project before. Check the ones that apply to the di
 - Guide text describes what the build does today. A catalog promise that no accepted story ships yet is a defect.
 
 **Ownership**
-- A feature `*Screen` only names its status and adds parts from `foundation/screen`. A draw call, a sprite coordinate or a colour in a feature screen is a defect; the fix is a new part in the kit, not a one-off.
+- A feature `*Screen` only adds parts from `foundation/screen`. A draw call, a sprite coordinate or a colour in a feature screen is a defect; the fix is a new part in the kit, not a one-off.
 - Every `Tests` and `Done` line of the story ran, and the report names them.
 - Comments state a contract. Narrating comments are defects.
