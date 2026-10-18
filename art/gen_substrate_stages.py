@@ -47,7 +47,24 @@ def luminance(rgb):
     return rgb @ np.array([0.299, 0.587, 0.114])
 
 
+def seamless(a, band=8):
+    """Cross-fades each edge with the opposite edge, so the macro wraps with no line."""
+    a = a.copy()
+    for axis in (0, 1):
+        n = a.shape[axis]
+        for i in range(band):
+            w = 0.5 * (1 - i / band)
+            lo = [slice(None)] * a.ndim
+            hi = [slice(None)] * a.ndim
+            lo[axis], hi[axis] = i, n - 1 - i
+            first, last = a[tuple(lo)].copy(), a[tuple(hi)].copy()
+            a[tuple(lo)] = (1 - w) * first + w * last
+            a[tuple(hi)] = (1 - w) * last + w * first
+    return a
+
+
 def stages(master):
+    master = seamless(master)
     lum = luminance(master)
     vein = np.clip((lum - 0.42) / 0.25, 0, 1)
     trunk = np.clip((blur(vein, 2.5) - 0.25) / 0.3, 0, 1)
