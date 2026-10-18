@@ -18,6 +18,7 @@ bin/
 runs/
 run/
 .ktask/
+/.local/
 __pycache__/
 *.hprof
 hs_err_pid*
