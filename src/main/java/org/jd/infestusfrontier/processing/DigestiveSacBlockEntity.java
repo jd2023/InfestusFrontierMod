@@ -244,21 +244,6 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
         return Optional.empty();
     }
 
-    /** Tells the player what the Sac is doing: idle, paused or working, and the balance. */
-    void report(Player player) {
-        String state = batch.isEmpty()
-                ? "idle"
-                : (level != null && Organs.hasFoundation(level, worldPosition) ? "working" : "paused");
-        int percent = batch.map(b -> b.batch().percent()).orElse(0);
-        player.displayClientMessage(
-                Component.translatable(
-                        "infestusfrontier.status.digestive_sac." + state,
-                        percent,
-                        tank.stored().units(),
-                        tank.capacity().units()),
-                true);
-    }
-
     Optional<UUID> feeder() {
         return batch.flatMap(DigestionBatch::feeder);
     }

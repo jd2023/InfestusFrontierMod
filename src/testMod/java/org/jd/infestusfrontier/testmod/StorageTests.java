@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -95,7 +96,7 @@ public final class StorageTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void menuReadsTheLiveBalanceAndABlockInHandBuilds(GameTestHelper h) {
+    public static void menuReadsTheLiveBalanceAndAHeldBlockOpensIt(GameTestHelper h) {
         placeBladder(h);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, StorageModule.BIOMASS_BUCKET.get(), 1);
         EcologyTests.use(h, player, BLADDER, Direction.UP);
@@ -108,6 +109,10 @@ public final class StorageTests {
         h.assertValueEqual(bladder.capacity(), 4000, "menu reads the capacity");
         h.assertFalse(bladder.clickMenuButton(player, BiomassBladderMenu.FILL_BUTTON), "fill has nothing to do yet");
         Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.STONE, 1);
+        h.assertValueEqual(
+                EcologyTests.useHeld(h, builder, BLADDER, Direction.UP),
+                ItemInteractionResult.CONSUME,
+                "the bladder answers a held stone itself");
         EcologyTests.use(h, builder, BLADDER, Direction.UP);
         h.assertBlockPresent(Blocks.AIR, BLADDER.above());
         h.assertValueEqual(builder.getMainHandItem().getCount(), 1, "a held item opens the screen instead of building");

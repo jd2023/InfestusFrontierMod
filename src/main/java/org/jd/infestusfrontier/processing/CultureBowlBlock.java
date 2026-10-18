@@ -31,8 +31,8 @@ import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The hand-loaded culturing bowl. Buckets move water and biomass, ingredients go in one at a time, an empty sneaking
- * hand takes them back, an empty hand starts a batch. Anything else passes through so the player can build against it.
+ * The hand-loaded culturing bowl. Buckets move water and biomass, ingredients go in one at a time, sneaking with both
+ * hands empty takes them back, anything else opens the screen. Sneaking with an item builds against it.
  */
 public final class CultureBowlBlock extends BaseEntityBlock {
     /** True while a batch runs; the client animates from it. */

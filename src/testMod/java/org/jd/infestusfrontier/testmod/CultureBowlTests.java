@@ -10,6 +10,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -67,6 +68,10 @@ public final class CultureBowlTests {
     public static void heldItemOpensTheScreenInsteadOfBuilding(GameTestHelper h) {
         placeBowl(h);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.STONE, 1);
+        h.assertValueEqual(
+                EcologyTests.useHeld(h, player, BOWL, Direction.UP),
+                ItemInteractionResult.CONSUME,
+                "the bowl answers a held stone itself");
         EcologyTests.use(h, player, BOWL, Direction.UP);
         h.assertBlockPresent(Blocks.AIR, BOWL.above());
         h.assertValueEqual(player.getMainHandItem().getCount(), 1, "the stone stays in hand");

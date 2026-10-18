@@ -27,8 +27,8 @@ import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Turns one hand-fed item at a time into biomass. Feed items start a batch, empty buckets take biomass out, empty
- * hands report the state, anything else passes through so the player can build against it.
+ * Turns one hand-fed item at a time into biomass. Feed items start a batch, empty buckets take biomass out, anything
+ * else opens the screen. Sneaking with an item builds against it.
  */
 public final class DigestiveSacBlock extends BaseEntityBlock {
     /** True while a batch exists. Written by the block entity only; the client animates from it. */

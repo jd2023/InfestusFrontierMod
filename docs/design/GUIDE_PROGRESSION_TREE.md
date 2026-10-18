@@ -79,7 +79,7 @@ The initial book is offered once on first join, retained as a pending claim if i
 |---|---|---|---|
 | ST-00 — The Waking Genome | SR0 | Open the guide or receive its first copy. | Starting ingredients, controlled growth and how to read prerequisites. No gameplay capability depends on reading this page. |
 | ST-01 — A Culture in Your Hand | SR0 | Obtain Spore Culture; its recipe is rotten flesh + red mushroom + wheat seed. | Apply culture to exposed ground; replacement-book recipe. |
-| ST-02 — Speak to an Organ | ST-01 | Craft a Synaptic Probe (bone + slime ball + Spore Culture) and use it on a valid target. | Deliberate configuration; input/output/closed faces; status and safe pause. Empty hands remain available for building. |
+| ST-02 — Speak to an Organ | ST-01 | Craft a Synaptic Probe (bone + slime ball + Spore Culture) and use it on a valid target. | Reading an organ without opening it; later input/output/closed faces; status and safe pause. Any hand opens an organ's screen; sneak to build against it. |
 | T0-01 — Living Substrate | ST-01 | Convert one exposed eligible ground cell. | Basic → young → mature; selected cells only, no endless autonomous expansion. |
 | ST-03 — A Mature Foundation | T0-01 | Deliberately mature one selected cell through its two growth treatments. | Functional tissue grafts; variety does not require destroying its vegetation. |
 | T0-02 — Culture Bowl | T0-01 | Run one rooted culture batch. | Renewable construction cultures and the slow early Fusion Binder recipe. |

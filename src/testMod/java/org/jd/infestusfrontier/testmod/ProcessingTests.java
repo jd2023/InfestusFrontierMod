@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -81,6 +82,10 @@ public final class ProcessingTests {
     public static void sacOpensItsScreenForAnyHeldItem(GameTestHelper h) {
         placeSac(h);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.STONE, 2);
+        h.assertValueEqual(
+                EcologyTests.useHeld(h, player, SAC, Direction.UP),
+                ItemInteractionResult.CONSUME,
+                "the sac answers a held stone itself");
         EcologyTests.use(h, player, SAC, Direction.UP);
         h.assertBlockPresent(Blocks.AIR, SAC.above());
         h.assertValueEqual(

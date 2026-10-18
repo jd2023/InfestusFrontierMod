@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A one-block biomass tank. {@code fill} shows the content in four steps. Buckets and other fluid containers move
- * biomass; empty hands open the screen; anything else passes through so the player can build against it.
+ * biomass; anything else opens the screen. Sneaking with an item builds against it.
  */
 public final class BiomassBladderBlock extends BaseEntityBlock {
     public static final IntegerProperty FILL = IntegerProperty.create("fill", 0, 4);

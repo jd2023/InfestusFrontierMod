@@ -48,7 +48,7 @@ Defect classes found in this project before. Check the ones that apply to the di
 - An organ can never clog: every admitted input has an exit.
 
 **Player interaction**
-- Empty main hand passes through when the offhand holds something usable, and never blocks normal building against the block.
+- Any hand opens an organ's screen, like a chest, through `Organs.openScreen`. Only an item with a job on the organ (fluid container, feed, ingredient, reader) acts instead. Sneaking with an item builds against it.
 - The server re-derives what the client claims: face, reach, selection, visibility.
 
 **Visuals** (stories with captures)

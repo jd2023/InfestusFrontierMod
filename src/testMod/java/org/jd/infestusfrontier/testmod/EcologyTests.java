@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -243,6 +244,20 @@ public final class EcologyTests {
         player.getAbilities().instabuild = mode.isCreative();
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item, count));
         return player;
+    }
+
+    /** The block's own answer to the held item, before vanilla falls back to item use. */
+    static ItemInteractionResult useHeld(GameTestHelper h, Player player, BlockPos cell, Direction face) {
+        BlockPos absolute = h.absolutePos(cell);
+        Vec3 hit = Vec3.atCenterOf(absolute)
+                .add(Vec3.atLowerCornerOf(face.getNormal()).scale(0.5));
+        return h.getBlockState(cell)
+                .useItemOn(
+                        player.getMainHandItem(),
+                        h.getLevel(),
+                        player,
+                        InteractionHand.MAIN_HAND,
+                        new BlockHitResult(hit, face, absolute, false));
     }
 
     static void use(GameTestHelper h, Player player, BlockPos cell, Direction face) {

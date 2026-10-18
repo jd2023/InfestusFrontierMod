@@ -6,6 +6,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -20,7 +21,7 @@ import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 
-/** The Synaptic Probe: opens a screen where there is one, reports a balance where there is a tank, passes elsewhere. */
+/** The Synaptic Probe: reads a tank without opening the organ's screen, passes elsewhere. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class InteractionTests {
@@ -28,10 +29,21 @@ public final class InteractionTests {
     private static final BlockPos TARGET = GROUND.above();
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void probeOpensTheBowlMenu(GameTestHelper h) {
+    public static void organsStepAsideForTheProbe(GameTestHelper h) {
         h.setBlock(GROUND, EcologyModule.LIVING_SUBSTRATE.get());
         h.setBlock(TARGET, ProcessingModule.CULTURE_BOWL.get());
-        h.assertValueEqual(probe(h), InteractionResult.CONSUME, "the probe consumes the click on a bowl");
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, InteractionModule.SYNAPTIC_PROBE.get(), 1);
+        h.assertValueEqual(
+                EcologyTests.useHeld(h, player, TARGET, Direction.UP),
+                ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION,
+                "the bowl leaves the probe to its own use");
+        BlockPos absolute = h.absolutePos(TARGET);
+        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(absolute), Direction.UP, absolute, false);
+        h.assertValueEqual(
+                h.getBlockState(TARGET).useWithoutItem(h.getLevel(), player, hit),
+                InteractionResult.PASS,
+                "the bowl does not open for a probe hand");
+        h.assertValueEqual(probe(h), InteractionResult.CONSUME, "the probe reads the bowl");
         h.succeed();
     }
 
