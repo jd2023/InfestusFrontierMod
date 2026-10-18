@@ -15,7 +15,7 @@
     "children": [
       {
         "type": "modonomicon:advancement",
-        "advancement_id": "infestusfrontier:contact/living_substrate"
+        "advancement_id": "infestusfrontier:contact/a_culture_in_your_hand"
       },
       {
         "type": "modonomicon:advancement",

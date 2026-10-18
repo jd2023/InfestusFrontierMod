@@ -15,7 +15,9 @@ import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 public final class OrganBatchPageRenderer extends BookRecipePageRenderer<OrganBatchRecipe, OrganBatchPage> {
     private static final int SLOT = 18;
     private static final int PER_ROW = 4;
-    private static final int ROWS = 2;
+    /** Rows for {@link OrganBatchRecipe#MAX_INGREDIENTS} ingredients. */
+    private static final int ROWS = (OrganBatchRecipe.MAX_INGREDIENTS + PER_ROW - 1) / PER_ROW;
+
     private static final int ITEMS_Y = 14;
 
     public OrganBatchPageRenderer(OrganBatchPage page) {

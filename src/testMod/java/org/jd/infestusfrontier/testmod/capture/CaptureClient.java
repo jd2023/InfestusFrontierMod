@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.klikli_dev.modonomicon.book.Book;
 import com.klikli_dev.modonomicon.book.entries.BookEntry;
+import com.klikli_dev.modonomicon.bookstate.BookUnlockStateManager;
 import com.klikli_dev.modonomicon.client.gui.BookGuiManager;
 import com.klikli_dev.modonomicon.client.gui.book.BookAddress;
 import com.klikli_dev.modonomicon.data.BookDataManager;
@@ -201,10 +202,6 @@ final class CaptureClient {
         return scenarios.get(scenarioIndex).views().get(viewIndex);
     }
 
-    /**
-     * Right-clicks {@code block} the way a player opens an organ's screen: with an empty hotbar slot selected, or
-     * with the hotbar slot holding the item {@code holding} names.
-     */
     /** Opens the guide at {@code entry} (an entry id, or empty for the book's first screen) on page pair {@code page}. */
     private static void openBook(String entry, int page) {
         ResourceLocation bookId = ResourceLocation.fromNamespaceAndPath("infestusfrontier", "the_waking_genome");
@@ -220,10 +217,16 @@ final class CaptureClient {
                 .getEntries()
                 .get(entryId);
         if (bookEntry == null) throw new IllegalStateException("entry " + entry + " not in " + bookId);
+        if (!BookUnlockStateManager.get().isUnlockedFor(Minecraft.getInstance().player, bookEntry))
+            throw new IllegalStateException(entry + " is locked for the capture player");
         BookGuiManager.get()
                 .openEntry(bookEntry, BookAddress.of(bookId, bookEntry.getCategoryId(), bookEntry.getId(), page));
     }
 
+    /**
+     * Right-clicks {@code block} the way a player opens an organ's screen: with an empty hotbar slot selected, or
+     * with the hotbar slot holding the item {@code holding} names.
+     */
     private static void useBlock(Minecraft minecraft, BlockPos block, Optional<String> holding) {
         var player = minecraft.player;
         var inventory = player.getInventory();
