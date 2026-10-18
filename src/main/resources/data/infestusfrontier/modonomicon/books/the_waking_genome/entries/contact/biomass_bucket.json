@@ -1,0 +1,33 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.biomass_bucket.name",
+  "description": "entry.infestusfrontier.contact.biomass_bucket.description",
+  "icon": "infestusfrontier:biomass_bucket",
+  "x": 2,
+  "y": 2,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/digestive_sac"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/digestive_sac"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/biomass_bucket"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.biomass_bucket.use",
+      "title": "entry.infestusfrontier.contact.biomass_bucket.name"
+    }
+  ]
+}

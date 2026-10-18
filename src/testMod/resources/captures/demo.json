@@ -1,5 +1,6 @@
 {
   "commands": [
+    "advancement grant @s through infestusfrontier:contact/biomass_bladder",
     "setblock 0 -60 -36 infestusfrontier:living_substrate[stage=basic]",
     "setblock 2 -60 -36 infestusfrontier:living_substrate[stage=young]",
     "setblock 4 -60 -36 infestusfrontier:living_substrate[stage=mature]",
@@ -152,6 +153,37 @@
         -36
       ],
       "holding": "modonomicon:modonomicon"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_home",
+      "book": ""
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_bowl",
+      "book": "infestusfrontier:contact/culture_bowl"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_bowl_recipes",
+      "book": "infestusfrontier:contact/culture_bowl",
+      "page": 2
     }
   ]
 }

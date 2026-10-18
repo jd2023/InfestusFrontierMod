@@ -10,15 +10,28 @@
       "entry": "infestusfrontier:contact/a_culture_in_your_hand"
     }
   ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/a_culture_in_your_hand"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/synaptic_probe"
+      }
+    ]
+  },
   "pages": [
     {
-      "type": "modonomicon:text",
-      "title": "entry.infestusfrontier.contact.speak_to_an_organ.name",
-      "text": "entry.infestusfrontier.contact.speak_to_an_organ.text"
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:synaptic_probe",
+      "text": "entry.infestusfrontier.contact.speak_to_an_organ.craft"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:synaptic_probe"
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.speak_to_an_organ.use"
     }
   ]
 }

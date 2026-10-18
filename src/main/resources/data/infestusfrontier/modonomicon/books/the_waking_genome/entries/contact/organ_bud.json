@@ -10,15 +10,28 @@
       "entry": "infestusfrontier:contact/a_culture_in_your_hand"
     }
   ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/living_substrate"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/organ_bud"
+      }
+    ]
+  },
   "pages": [
     {
-      "type": "modonomicon:text",
-      "title": "entry.infestusfrontier.contact.organ_bud.name",
-      "text": "entry.infestusfrontier.contact.organ_bud.text"
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:organ_bud",
+      "text": "entry.infestusfrontier.contact.organ_bud.craft"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:organ_bud"
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.organ_bud.use"
     }
   ]
 }

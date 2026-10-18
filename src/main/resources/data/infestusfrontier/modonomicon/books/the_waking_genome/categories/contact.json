@@ -1,5 +1,7 @@
 {
   "name": "category.infestusfrontier.contact.name",
   "icon": "infestusfrontier:spore_culture",
-  "sort_number": 0
+  "sort_number": 0,
+  "max_scroll_x": 240,
+  "max_scroll_y": 220
 }

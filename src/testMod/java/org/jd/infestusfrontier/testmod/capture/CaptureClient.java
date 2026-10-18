@@ -2,6 +2,11 @@ package org.jd.infestusfrontier.testmod.capture;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.klikli_dev.modonomicon.book.Book;
+import com.klikli_dev.modonomicon.book.entries.BookEntry;
+import com.klikli_dev.modonomicon.client.gui.BookGuiManager;
+import com.klikli_dev.modonomicon.client.gui.book.BookAddress;
+import com.klikli_dev.modonomicon.data.BookDataManager;
 import com.mojang.logging.LogUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -102,6 +108,10 @@ final class CaptureClient {
                                 .ifPresent(block ->
                                         useBlock(minecraft, block, currentView().holding()));
                         if (currentView().inventory()) minecraft.setScreen(new InventoryScreen(minecraft.player));
+                        currentView()
+                                .book()
+                                .ifPresent(
+                                        entry -> openBook(entry, currentView().page()));
                         enter(Stage.FRAME);
                     }
                 }
@@ -195,6 +205,25 @@ final class CaptureClient {
      * Right-clicks {@code block} the way a player opens an organ's screen: with an empty hotbar slot selected, or
      * with the hotbar slot holding the item {@code holding} names.
      */
+    /** Opens the guide at {@code entry} (an entry id, or empty for the book's first screen) on page pair {@code page}. */
+    private static void openBook(String entry, int page) {
+        ResourceLocation bookId = ResourceLocation.fromNamespaceAndPath("infestusfrontier", "the_waking_genome");
+        Book book = BookDataManager.get().getBook(bookId);
+        if (book == null) throw new IllegalStateException("book " + bookId + " not loaded");
+        if (entry.isEmpty()) {
+            BookGuiManager.get().openBook(BookAddress.defaultFor(book));
+            return;
+        }
+        ResourceLocation entryId = ResourceLocation.parse(entry);
+        String category = entryId.getPath().substring(0, entryId.getPath().indexOf('/'));
+        BookEntry bookEntry = book.getCategory(ResourceLocation.fromNamespaceAndPath(entryId.getNamespace(), category))
+                .getEntries()
+                .get(entryId);
+        if (bookEntry == null) throw new IllegalStateException("entry " + entry + " not in " + bookId);
+        BookGuiManager.get()
+                .openEntry(bookEntry, BookAddress.of(bookId, bookEntry.getCategoryId(), bookEntry.getId(), page));
+    }
+
     private static void useBlock(Minecraft minecraft, BlockPos block, Optional<String> holding) {
         var player = minecraft.player;
         var inventory = player.getInventory();
@@ -270,7 +299,9 @@ final class CaptureClient {
         Scenario scenario = scenarios.get(scenarioIndex);
         Scenario.View view = scenario.views().get(viewIndex);
         // A view that used a block waits for its container screen; every other view waits for no screen at all.
-        boolean screenOpen = minecraft.screen instanceof AbstractContainerScreen<?>;
+        boolean screenOpen = view.book().isPresent()
+                ? minecraft.screen != null
+                : minecraft.screen instanceof AbstractContainerScreen<?>;
         if (view.opensScreen() ? !screenOpen || ticksInStage < MOVE_TICKS : minecraft.screen != null) return;
         enter(Stage.GRABBING);
         try {
@@ -308,6 +339,7 @@ final class CaptureClient {
     private void advance(Minecraft minecraft) {
         if (minecraft.screen instanceof AbstractContainerScreen<?> && minecraft.player != null)
             minecraft.player.closeContainer();
+        else if (minecraft.screen != null) minecraft.setScreen(null);
         viewIndex++;
         if (viewIndex < scenarios.get(scenarioIndex).views().size()) {
             moveToView(minecraft);

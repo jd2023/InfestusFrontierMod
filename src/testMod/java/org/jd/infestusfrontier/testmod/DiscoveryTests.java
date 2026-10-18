@@ -1,5 +1,6 @@
 package org.jd.infestusfrontier.testmod;
 
+import com.klikli_dev.modonomicon.book.conditions.BookOrCondition;
 import com.klikli_dev.modonomicon.data.BookDataManager;
 import com.klikli_dev.modonomicon.registry.DataComponentRegistry;
 import com.mojang.authlib.GameProfile;
@@ -33,6 +34,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.discovery.PendingCredits;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.integration.modonomicon.OrganBatchPage;
 import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassBucketEvent;
@@ -96,10 +98,63 @@ public final class DiscoveryTests {
         h.assertTrue(book != null, "book known to BookDataManager");
         var category = book.getCategory(id("contact"));
         h.assertTrue(category != null, "category contact loaded");
-        for (String entry :
-                List.of("organ_bud", "digestive_sac", "biomass_bladder", "culture_bowl", "speak_to_an_organ")) {
+        for (String entry : List.of(
+                "organ_bud",
+                "digestive_sac",
+                "biomass_bladder",
+                "biomass_bucket",
+                "culture_bowl",
+                "speak_to_an_organ")) {
             h.assertTrue(category.getEntries().containsKey(id("contact/" + entry)), "entry " + entry + " loaded");
         }
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void bowlEntryShowsItsBatchRecipes(GameTestHelper h) {
+        var entry = BookDataManager.get()
+                .getBook(BOOK)
+                .getCategory(id("contact"))
+                .getEntries()
+                .get(id("contact/culture_bowl"));
+        h.assertTrue(entry != null, "entry loaded");
+        List<ResourceLocation> recipes = entry.getPages().stream()
+                .filter(page -> page instanceof OrganBatchPage)
+                .map(page -> ((OrganBatchPage) page).getRecipeId1())
+                .toList();
+        h.assertValueEqual(
+                recipes,
+                List.of(id("culturing/spore_culture"), id("culturing/organ_bud")),
+                "one page per batch recipe");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void entriesUnlockByStepOrByItem(GameTestHelper h) {
+        var contact =
+                BookDataManager.get().getBook(BOOK).getCategory(id("contact")).getEntries();
+        for (String name : List.of(
+                "living_substrate",
+                "organ_bud",
+                "digestive_sac",
+                "biomass_bladder",
+                "biomass_bucket",
+                "culture_bowl",
+                "speak_to_an_organ")) {
+            var condition = contact.get(id("contact/" + name)).getCondition();
+            h.assertTrue(condition instanceof BookOrCondition, name + " unlocks by step or by item");
+        }
+        var advancements = h.getLevel().getServer().getAdvancements();
+        for (String item : List.of(
+                "spore_culture",
+                "living_substrate",
+                "organ_bud",
+                "digestive_sac",
+                "biomass_bladder",
+                "biomass_bucket",
+                "culture_bowl",
+                "synaptic_probe"))
+            h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");
         h.succeed();
     }
 

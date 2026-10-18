@@ -8,8 +8,8 @@
   "pages": [
     {
       "type": "modonomicon:text",
-      "title": "entry.infestusfrontier.contact.the_waking_genome.name",
-      "text": "entry.infestusfrontier.contact.the_waking_genome.text"
+      "text": "entry.infestusfrontier.contact.the_waking_genome.text",
+      "title": "entry.infestusfrontier.contact.the_waking_genome.name"
     }
   ]
 }

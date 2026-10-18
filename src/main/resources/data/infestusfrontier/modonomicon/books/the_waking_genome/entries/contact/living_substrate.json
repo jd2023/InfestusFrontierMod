@@ -10,15 +10,28 @@
       "entry": "infestusfrontier:contact/a_culture_in_your_hand"
     }
   ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/a_culture_in_your_hand"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/living_substrate"
+      }
+    ]
+  },
   "pages": [
     {
-      "type": "modonomicon:text",
-      "title": "entry.infestusfrontier.contact.living_substrate.name",
-      "text": "entry.infestusfrontier.contact.living_substrate.text"
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:living_substrate",
+      "text": "entry.infestusfrontier.contact.living_substrate.craft"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:living_substrate"
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.living_substrate.use"
     }
   ]
 }

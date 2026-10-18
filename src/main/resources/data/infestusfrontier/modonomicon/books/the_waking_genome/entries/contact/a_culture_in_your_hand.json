@@ -12,13 +12,13 @@
   ],
   "pages": [
     {
-      "type": "modonomicon:text",
-      "title": "entry.infestusfrontier.contact.a_culture_in_your_hand.name",
-      "text": "entry.infestusfrontier.contact.a_culture_in_your_hand.text"
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:spore_culture",
+      "text": "entry.infestusfrontier.contact.a_culture_in_your_hand.craft"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:spore_culture"
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.a_culture_in_your_hand.use"
     }
   ]
 }

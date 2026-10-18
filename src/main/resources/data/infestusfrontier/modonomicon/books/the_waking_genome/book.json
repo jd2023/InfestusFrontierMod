@@ -3,5 +3,9 @@
   "description": "book.infestusfrontier.the_waking_genome.description",
   "tooltip": "book.infestusfrontier.the_waking_genome.tooltip",
   "model": "modonomicon:modonomicon_green",
-  "creative_tab": "infestusfrontier:main"
+  "creative_tab": "infestusfrontier:main",
+  "display_mode": "node",
+  "auto_add_read_conditions": false,
+  "default_title_color": 5389346,
+  "default_text_color": 2105376
 }

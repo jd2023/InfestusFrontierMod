@@ -4,6 +4,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import org.jd.infestusfrontier.discovery.DiscoveryModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.integration.modonomicon.GuidePages;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
@@ -21,5 +22,6 @@ public final class InfestusFrontier {
         ProcessingModule.register(modBus);
         InteractionModule.register(modBus);
         DiscoveryModule.register(modBus);
+        GuidePages.register(modBus);
     }
 }

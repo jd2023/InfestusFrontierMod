@@ -10,15 +10,38 @@
       "entry": "infestusfrontier:contact/living_substrate"
     }
   ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/living_substrate"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/culture_bowl"
+      }
+    ]
+  },
   "pages": [
     {
-      "type": "modonomicon:text",
-      "title": "entry.infestusfrontier.contact.culture_bowl.name",
-      "text": "entry.infestusfrontier.contact.culture_bowl.text"
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:culture_bowl",
+      "text": "entry.infestusfrontier.contact.culture_bowl.craft"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:culture_bowl"
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.culture_bowl.use"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:culturing/spore_culture",
+      "title1": "item.infestusfrontier.spore_culture"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:culturing/organ_bud",
+      "title1": "block.infestusfrontier.organ_bud"
     }
   ]
 }

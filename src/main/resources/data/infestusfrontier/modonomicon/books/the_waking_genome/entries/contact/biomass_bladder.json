@@ -10,15 +10,28 @@
       "entry": "infestusfrontier:contact/digestive_sac"
     }
   ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/digestive_sac"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/biomass_bladder"
+      }
+    ]
+  },
   "pages": [
     {
-      "type": "modonomicon:text",
-      "title": "entry.infestusfrontier.contact.biomass_bladder.name",
-      "text": "entry.infestusfrontier.contact.biomass_bladder.text"
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:biomass_bladder",
+      "text": "entry.infestusfrontier.contact.biomass_bladder.craft"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:biomass_bladder"
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.biomass_bladder.use"
     }
   ]
 }

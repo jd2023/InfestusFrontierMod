@@ -10,15 +10,28 @@
       "entry": "infestusfrontier:contact/organ_bud"
     }
   ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/organ_bud"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/digestive_sac"
+      }
+    ]
+  },
   "pages": [
     {
-      "type": "modonomicon:text",
-      "title": "entry.infestusfrontier.contact.digestive_sac.name",
-      "text": "entry.infestusfrontier.contact.digestive_sac.text"
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:digestive_sac",
+      "text": "entry.infestusfrontier.contact.digestive_sac.craft"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:digestive_sac"
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.digestive_sac.use"
     }
   ]
 }
