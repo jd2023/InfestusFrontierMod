@@ -13,7 +13,7 @@ Fixed for every texture:
 Quality bar. The owner rejects anything below it, and a sprint is not done while its art story is open.
 
 - A texture reads as its material from four blocks away in a capture, without a sign: flesh, membrane, bone, soil. The bar is the V3 substrate and the Astra living tissue from the model evaluation; weaker than those is rejected.
-- Ground textures are a 4x4-block macro pattern, 256x256 source cut into sixteen 64x64 tiles, so a 4x4 patch shows no repeat and no seam. Other blocks get random rotation in the blockstate.
+- Ground textures are a 4x4-block macro pattern, 256x256 source cut into sixteen 64x64 tiles, so a 4x4 patch shows no repeat and no seam. The stages of one ground share one vein network and one ground tone, derived from one master by a generator under `art/`. Other blocks get random rotation in the blockstate.
 - One light direction, top-left, across every texture. Soft shading, no flat fills, no dithering noise, no outlines inside a block face.
 - An item icon is one object with a silhouette that reads at hotbar size, a thin dark outline, and a highlight on the lit side.
 - A model has one bone per moving part. At rest no cube of one bone sits inside a cube of another bone, except plates named as layered. Every loop closes: the last key equals the first pose, and a rotating channel ends at a multiple of 360. No channel moves faster than 720 degrees per second. Emissive parts have a glowmask. Model textures are 64x64 per model.
@@ -24,7 +24,7 @@ Quality bar. The owner rejects anything below it, and a sprint is not done while
 
 ```text
 ART-001  Textures for Spore Culture and the three Living Substrate stages
-Status: accepted 596db2a (tiles, bucket and probe icons); step 1 moved to ART-002
+Status: accepted 596db2a (tiles, bucket and probe icons); step 1 moved to ART-002; young and basic re-derived from the mature master by art/gen_substrate_stages.py on 2026-10-17 so the stages share one vein network
 Milestone: M1
 Owner: ecology
 Kind: art

@@ -156,8 +156,8 @@ public final class EcologyTests {
         Player player = holding(h, GameType.SURVIVAL, Items.BONE_MEAL, 1);
         use(h, player, cell, Direction.UP);
         h.runAfterDelay(LivingSubstrateBlock.GROWTH_DELAY_TICKS + 2, () -> {
-            assertStage(h, cell.east().above(), SubstrateStage.BASIC);
-            assertStage(h, cell.west().below(), SubstrateStage.BASIC);
+            assertStage(h, cell.east().above(), SubstrateStage.YOUNG);
+            assertStage(h, cell.west().below(), SubstrateStage.YOUNG);
             assertVigor(h, cell.east().above(), 2);
             h.assertBlockPresent(Blocks.OAK_PLANKS, cell.east());
             h.succeed();

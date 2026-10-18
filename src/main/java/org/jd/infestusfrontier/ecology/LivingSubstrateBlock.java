@@ -27,8 +27,8 @@ import org.jd.infestusfrontier.InfestusFrontier;
  *
  * <p>Bone meal gives a cell {@value #BONE_MEAL_VIGOR} vigor and starts one bounded wave of scheduled ticks: every
  * {@value #GROWTH_DELAY_TICKS} ticks the cell matures one stage; once mature it converts up to {@value #SPREAD_PER_CELL}
- * exposed host blocks beside it into basic cells with one vigor less, then goes dormant. Vigor 0 cells do nothing.
- * One bone meal therefore touches at most 15 cells and schedules at most 22 ticks, then everything is quiet again.
+ * exposed host blocks beside it into young cells with one vigor less, then goes dormant. Vigor 0 cells do nothing.
+ * One bone meal therefore touches at most 15 cells and schedules at most 15 ticks, then everything is quiet again.
  *
  * <p>Each stage is drawn from sixteen 64x64 tiles cut out of one 4x4-block macro texture. {@link #TILE} follows the
  * cell's position ({@link #tileAt}), so a patch shows the macro pattern without seams or repeats.
@@ -115,7 +115,10 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
         List<BlockPos> targets = spreadTargets(level, pos);
         for (int n = 0; n < SPREAD_PER_CELL && !targets.isEmpty(); n++) {
             BlockPos target = targets.remove(random.nextInt(targets.size()));
-            level.setBlock(target, cellAt(target).setValue(VIGOR, vigor - 1), Block.UPDATE_ALL);
+            level.setBlock(
+                    target,
+                    cellAt(target).setValue(STAGE, SubstrateStage.YOUNG).setValue(VIGOR, vigor - 1),
+                    Block.UPDATE_ALL);
             level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target, STEP_PARTICLES);
             if (vigor - 1 > 0) level.scheduleTick(target, this, GROWTH_DELAY_TICKS);
         }

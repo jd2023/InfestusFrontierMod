@@ -16,7 +16,7 @@ Proposed cell anatomy. Maturity, function, framework and lining are separate pro
 | **Young** | Bone meal on the cell, or a wave from a treated cell beside it. | Established starter organs and a denser living ground cover. | Joined veins, small pores and scattered soft growth. |
 | **Mature** | The same wave, 30 ticks later. | Functional mutations and the foundations required by larger organs. | Interlocking tissue, deeper folds, varied pores and room for bushes and roots. |
 
-Bone meal starts one bounded wave. The treated cell gets 3 vigor and matures one stage every 30 ticks. A mature cell with vigor converts up to 2 exposed host blocks beside it (level, one up or one down) into basic cells with one vigor less, then goes dormant. One bone meal therefore reaches at most 15 cells (7 mature, 8 basic) and is over within 15 seconds. Bone meal on a dormant mature cell with no exposed host beside it is not used up. A later Foundation Cyst treats a marked area the same way from its packed stock.
+Bone meal starts one bounded wave. The treated cell gets 3 vigor and matures one stage every 30 ticks. A mature cell with vigor converts up to 2 exposed host blocks beside it (level, one up or one down) into young cells with one vigor less, then goes dormant. One bone meal therefore reaches at most 15 cells (7 mature, 8 young) and is over within 11 seconds. Bone meal on a dormant mature cell with no exposed host beside it is not used up. A later Foundation Cyst treats a marked area the same way from its packed stock.
 
 Maturity does not decay when the player leaves. An unfed active function pauses.
 A broken cell drops an item that keeps its stage, not its vigor. Placed again, it has the same stage and is dormant.
