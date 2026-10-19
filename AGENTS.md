@@ -4,8 +4,8 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 
 | Role | Reads |
 |---|---|
-| Planner | [ROADMAP.md](ROADMAP.md), [ENGINEERING.md](ENGINEERING.md) and the design documents the sprint needs |
-| Coder (worker, repairer) | [ENGINEERING.md](ENGINEERING.md) and the one design document the story names |
+| Builder | [ROADMAP.md](ROADMAP.md), [ENGINEERING.md](ENGINEERING.md) and the design documents the work needs |
+| Worker | [ENGINEERING.md](ENGINEERING.md) and the one design document the task names |
 | Reviewer | [REVIEW.md](REVIEW.md) |
 | Nobody | `docs/archive/`. It is history for the owner. |
 
@@ -23,25 +23,14 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 ## Roles
 
 - **Owner** (human): makes product decisions and plays the build at the end of each sprint. Nothing else goes to the owner. Tuning, API research and technical choices are engineering work.
-- **Planner** (strong model, with the owner): sets direction, code structure and checks. Writes the sprint file: stories with exact names, numbers and interfaces. Reads the real code first.
-- **Worker** (cheap model, Sonnet): implements one story exactly as written. Does not redesign, does not widen scope.
-- **Repairer** (cheap model, Sonnet): fixes reviewer findings, one regression test each. Does not redo accepted work.
-- **Reviewer** (strong model, never the same run as the worker): reads the whole diff and the tests. Says `APPROVED` or `REJECTED` with numbered findings. Never edits.
+- **Builder** (strong model, with the owner): takes a goal, its constraints and one line of acceptance from the owner, says how in a few lines, then implements, gates, and hands the commits to a reviewer. Reads the real code first. Hands a cheap model only work a machine judges.
+- **Worker** (cheap model): a mechanical task from the builder: data files, a further copy of an existing pattern, renames, test ports. Never a framework API shape or a design decision.
+- **Reviewer** (strong model, a fresh run, never the builder's): reads the whole diff and the tests. Says `APPROVED` or `REJECTED` with numbered findings. Never edits. One review per feature; a repair goes back to the same reviewer.
 - **Artist** (separate track): delivers assets for `art` stories from `docs/sprints/ART.md`. Textures come from an image model (Astra). GeckoLib models and animations come from a strong model (Opus or Fable). Writes no Java.
 
-## Running a story
+## Running work
 
-Each role starts from one line. It reads the files the line names, in this order: this file, VISION.md, then its role document. One story per run. When the story is done, the run ends with a report or a verdict and does not start the next story.
-
-| Role | Start line |
-|---|---|
-| Planner | `Plan sprint S02 into docs/sprints/S02.md. Follow AGENTS.md and ENGINEERING.md, section Stories and sprints.` |
-| Worker | `Do story IF-014 from docs/sprints/S01.md. Follow AGENTS.md.` |
-| Reviewer | `Review story IF-014 from docs/sprints/S01.md, commits <from>..<to>. Follow REVIEW.md.` |
-| Repairer | `Repair story IF-014 from docs/sprints/S01.md. Findings are below. Follow AGENTS.md.` |
-| Artist | `Do art story ART-003 from docs/sprints/ART.md. Follow AGENTS.md.` |
-
-The sprint file is the queue. Today the owner pastes these lines by hand. An orchestration tool is being built on the side and will read the same file. Runner state such as `.ktask/` stays local and is never committed.
+The builder runs from one session: the owner states the goal; the builder implements in a git worktree, runs `bash scripts/verify.sh`, commits as the owner, spawns a fresh reviewer on the commits (`Review commits <from>..<to>. Follow REVIEW.md.`), repairs the findings, and pushes on `APPROVED`. The owner pastes nothing between runs and plays the build when a milestone's organs are in. A sprint file in `docs/sprints/` is written only when a milestone needs a plan the owner will read; a change needs no story. Art keeps its queue: `Do art story ART-004 from docs/sprints/ART.md. Follow AGENTS.md.`
 
 ## Two rules that stop a story
 

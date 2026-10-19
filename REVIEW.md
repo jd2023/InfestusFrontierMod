@@ -4,7 +4,7 @@ For the reviewer. You read; you never edit, commit, push or run models.
 
 ## Procedure
 
-1. Read the story in its sprint file. Judge the story as written. Behavior listed under `Not` or owned by a later story is not a defect here.
+1. Read what the commit message claims and the design document it rests on (the story, when a sprint file has one). Judge the change as claimed. Behavior a design document gives to another organ or a later milestone is not a defect here.
 2. Read the whole diff from the previous accepted commit to HEAD, the surrounding code and the tests.
 3. Confirm the gate log `build/verification/full-gate.log` shows `BUILD SUCCESSFUL` and the GameTest line `All N required tests passed`.
 4. For stories with captures, open the images yourself. Look at them.
@@ -21,7 +21,7 @@ Never approve because the build passed or the worker said it works.
 - A `Do`, `Tests` or `Done` item is missing, untested or was not run.
 - Data loss, item duplication, a crash, or a previously accepted behavior broke.
 - Unbounded work, implicit chunk loading, or another limit in ENGINEERING.md "Performance limits" violated.
-- An edit outside the story's `Files`, other than its own `Status` line. A raised limit, a weakened assertion or a replaced golden image without a regression test and an explained reason.
+- An unrelated edit riding in the commit (outside a story's `Files`, when there is a story). A raised limit, a weakened assertion or a replaced golden image without a regression test and an explained reason.
 - A visual defect a player would notice, for stories with captures.
 - Engine behavior patched, bypassed or re-implemented.
 
