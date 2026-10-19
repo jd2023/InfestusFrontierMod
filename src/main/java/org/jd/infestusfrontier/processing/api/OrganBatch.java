@@ -1,7 +1,6 @@
 package org.jd.infestusfrontier.processing.api;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,7 +14,7 @@ import org.jd.infestusfrontier.core.processing.Batch;
  * result is saved so a recipe that disappears cannot lose a batch whose inputs are already consumed. A value: the
  * result is copied in and out and compared item for item.
  */
-public record OrganBatch(Batch batch, ItemStack result, Optional<UUID> starter) {
+public record OrganBatch(Batch batch, ItemStack result, Optional<UUID> starter) implements RunningBatch<OrganBatch> {
     public OrganBatch {
         result = result.copy();
     }
@@ -38,37 +37,19 @@ public record OrganBatch(Batch batch, ItemStack result, Optional<UUID> starter) 
         return Objects.hash(batch, ItemStack.hashItemAndComponents(result), starter);
     }
 
-    private static final Codec<Batch> BATCH_CODEC = RecordCodecBuilder.<RawBatch>create(instance -> instance.group(
-                            Codec.STRING.fieldOf("recipe").forGetter(RawBatch::recipe),
-                            Codec.INT.fieldOf("ticks_required").forGetter(RawBatch::ticksRequired),
-                            Codec.INT.fieldOf("ticks_done").forGetter(RawBatch::ticksDone))
-                    .apply(instance, RawBatch::new))
-            .flatXmap(RawBatch::toBatch, batch -> DataResult.success(RawBatch.of(batch)));
     public static final Codec<OrganBatch> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    BATCH_CODEC.fieldOf("batch").forGetter(OrganBatch::batch),
+                    Batches.CODEC.fieldOf("batch").forGetter(OrganBatch::batch),
                     ItemStack.CODEC.fieldOf("result").forGetter(OrganBatch::result),
                     UUIDUtil.CODEC.optionalFieldOf("starter").forGetter(OrganBatch::starter))
             .apply(instance, OrganBatch::new));
 
+    @Override
     public OrganBatch advance() {
         return new OrganBatch(batch.advance(), result, starter);
     }
 
+    @Override
     public boolean isDone() {
         return batch.isDone();
-    }
-
-    private record RawBatch(String recipe, int ticksRequired, int ticksDone) {
-        static RawBatch of(Batch batch) {
-            return new RawBatch(batch.recipe(), batch.ticksRequired(), batch.ticksDone());
-        }
-
-        DataResult<Batch> toBatch() {
-            try {
-                return DataResult.success(new Batch(recipe, ticksRequired, ticksDone));
-            } catch (IllegalArgumentException e) {
-                return DataResult.error(e::getMessage);
-            }
-        }
     }
 }

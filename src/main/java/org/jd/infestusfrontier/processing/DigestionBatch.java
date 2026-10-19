@@ -10,45 +10,35 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.processing.Batch;
+import org.jd.infestusfrontier.processing.api.Batches;
+import org.jd.infestusfrontier.processing.api.RunningBatch;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /**
  * A running digestion: the batch, the biomass already promised to the tank, and who fed it. The promised yield is
  * saved so a recipe that disappears cannot lose reserved room.
  */
-record DigestionBatch(Batch batch, Biomass yield, Optional<UUID> feeder) {
-    private static final Codec<Batch> BATCH_CODEC = RecordCodecBuilder.<RawBatch>create(instance -> instance.group(
-                            Codec.STRING.fieldOf("recipe").forGetter(RawBatch::recipe),
-                            Codec.INT.fieldOf("ticks_required").forGetter(RawBatch::ticksRequired),
-                            Codec.INT.fieldOf("ticks_done").forGetter(RawBatch::ticksDone))
-                    .apply(instance, RawBatch::new))
-            .flatXmap(RawBatch::toBatch, batch -> com.mojang.serialization.DataResult.success(RawBatch.of(batch)));
+record DigestionBatch(Batch batch, Biomass yield, Optional<UUID> feeder) implements RunningBatch<DigestionBatch> {
     static final Codec<DigestionBatch> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    BATCH_CODEC.fieldOf("batch").forGetter(DigestionBatch::batch),
+                    Batches.CODEC.fieldOf("batch").forGetter(DigestionBatch::batch),
                     BiomassCodecs.BIOMASS.fieldOf("yield").forGetter(DigestionBatch::yield),
                     UUIDUtil.CODEC.optionalFieldOf("feeder").forGetter(DigestionBatch::feeder))
             .apply(instance, DigestionBatch::new));
     static final StreamCodec<ByteBuf, DigestionBatch> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC);
 
-    DigestionBatch advance() {
+    @Override
+    public DigestionBatch advance() {
         return new DigestionBatch(batch.advance(), yield, feeder);
     }
 
-    boolean isDone() {
+    @Override
+    public boolean isDone() {
         return batch.isDone();
     }
 
-    private record RawBatch(String recipe, int ticksRequired, int ticksDone) {
-        static RawBatch of(Batch batch) {
-            return new RawBatch(batch.recipe(), batch.ticksRequired(), batch.ticksDone());
-        }
-
-        com.mojang.serialization.DataResult<Batch> toBatch() {
-            try {
-                return com.mojang.serialization.DataResult.success(new Batch(recipe, ticksRequired, ticksDone));
-            } catch (IllegalArgumentException e) {
-                return com.mojang.serialization.DataResult.error(e::getMessage);
-            }
-        }
+    /** The player who fed it by hand; a batch from the slot has none. */
+    @Override
+    public Optional<UUID> starter() {
+        return feeder;
     }
 }

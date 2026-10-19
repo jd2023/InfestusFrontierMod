@@ -42,7 +42,7 @@ foundation/screen/                       the screen kit: OrganScreen and its par
 ui/                                      layout grammar, sheet geometry and palette, used by the kit and by menus
 ```
 
-- Arrows point inward only. No cycles. `core` and `ui` import only the JDK; the build fails otherwise.
+- Arrows point inward only. No cycles. `core` and `ui` import only the JDK; the build fails otherwise. `src/test` holds ArchUnit rules that `./gradlew test` runs: no cycles between feature packages, an `api` package reaches its module's implementation only through the `*Module` class, `net.minecraft.client` is used only by `foundation/screen`, `*Screen`, `*Module` and `integration`, and block entities stay package-private.
 - One behavior has one owner module. One folder per owner. No global `block/`, `item/`, `menu/` buckets.
 - Each owner registers its own content. The entry point calls one `register` per module.
 - Public types live in `<owner>/api`, plus one `<Owner>Module` class with `register(IEventBus)` and the module's registry handles. Everything else is package-private.
@@ -82,7 +82,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 |---|---|
 | foundation (`core`) | Shared work admission (`TickQuota`), checked quantities, bounded identifiers |
 | organ | Organ identity, completed-batch counts, earned choices |
-| processing | Bowl, digestion, rack, loom, furnace, activation: reserved batch execution |
+| processing | Bowl, digestion, rack, loom, furnace, activation: reserved batch execution; `OrganWork` is the one batch lifecycle |
 | storage | Item, fluid and biomass balances; reservoir cell accounting |
 | construction | Loaded-only structure validation, shell parts, paid placement, transplanting |
 | ecology | Substrate maturity, function, lining, reinforcement, dye, deliberate conversion |
@@ -105,7 +105,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 | helpers | Nursery population, jobs, routes, paid Sail chunk tickets |
 | defense | Hostile targeting, firing, projectile limits |
 | synthesis | Sockets, lobes, idle profile switching |
-| ui (`ui/`, `foundation/screen`) | Layout grammar, parts, focus, theme, tooltips |
+| ui (`ui/`, `foundation/screen`, `foundation/menu`) | Layout grammar, parts, focus, theme, tooltips; the shared organ menu |
 | interaction | Probe targeting, reach and ownership checks, dispatch to feature intents |
 | discovery | Recipe reveal, advancements, guide prerequisites |
 | integration | Modonomicon, GeckoLib, JEI, Curios adapters; no domain state |

@@ -4,17 +4,15 @@ import java.util.Optional;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jd.infestusfrontier.foundation.Refusals;
-import org.jd.infestusfrontier.foundation.screen.BiomassView;
+import org.jd.infestusfrontier.foundation.menu.OrganMenu;
 import org.jd.infestusfrontier.ui.Bounds;
 import org.jd.infestusfrontier.ui.Sheet;
 import org.jd.infestusfrontier.ui.SlotGrid;
@@ -24,7 +22,7 @@ import org.jd.infestusfrontier.ui.SlotGrid;
  * five synced ints (water, biomass, biomass capacity, progress percent, state) and the Start button. Nothing here
  * decides a batch; the block entity does.
  */
-public final class CultureBowlMenu extends AbstractContainerMenu implements BiomassView {
+public final class CultureBowlMenu extends OrganMenu {
     public static final int START_BUTTON = 0;
     /** The water tank's size, for the client's gauge; the server never syncs it. */
     public static final int WATER_CAPACITY = CultureBowlBlockEntity.WATER_CAPACITY;
@@ -40,12 +38,8 @@ public final class CultureBowlMenu extends AbstractContainerMenu implements Biom
     private static final int PERCENT = 3;
     private static final int STATE = 4;
     private static final int OUTPUT_X = Sheet.SLOT_X + 58;
-    private static final int INVENTORY_START = OUTPUT_SLOT + 1;
-    private static final int HOTBAR_START = INVENTORY_START + 27;
-    private static final int SLOT_END = HOTBAR_START + 9;
+    private static final int STRIPS = 3;
 
-    private final ContainerData data;
-    private final ContainerLevelAccess access;
     private final Optional<CultureBowlBlockEntity> bowl;
 
     /** Server side. */
@@ -55,8 +49,13 @@ public final class CultureBowlMenu extends AbstractContainerMenu implements Biom
                 inventory,
                 bowl.ingredients(),
                 bowl.output(),
-                new BowlData(bowl),
-                ContainerLevelAccess.create(bowl.getLevel(), bowl.getBlockPos()),
+                reading(
+                        () -> bowl.water().getFluidAmount(),
+                        () -> bowl.tank().stored().units(),
+                        () -> bowl.tank().capacity().units(),
+                        bowl::percent,
+                        bowl::state),
+                at(bowl),
                 Optional.of(bowl));
     }
 
@@ -68,7 +67,7 @@ public final class CultureBowlMenu extends AbstractContainerMenu implements Biom
                 new ItemStackHandler(INGREDIENTS),
                 new ItemStackHandler(1),
                 new SimpleContainerData(5),
-                ContainerLevelAccess.create(inventory.player.level(), extra.readBlockPos()),
+                at(inventory, extra),
                 Optional.empty());
     }
 
@@ -80,9 +79,7 @@ public final class CultureBowlMenu extends AbstractContainerMenu implements Biom
             ContainerData data,
             ContainerLevelAccess access,
             Optional<CultureBowlBlockEntity> bowl) {
-        super(ProcessingModule.CULTURE_BOWL_MENU.get(), id);
-        this.data = data;
-        this.access = access;
+        super(ProcessingModule.CULTURE_BOWL_MENU.get(), id, access, ProcessingModule.CULTURE_BOWL.get(), data);
         this.bowl = bowl;
         SlotGrid grid = SlotGrid.standard3x3();
         for (int i = 0; i < INGREDIENTS; i++) {
@@ -95,34 +92,30 @@ public final class CultureBowlMenu extends AbstractContainerMenu implements Biom
                 return false;
             }
         });
-        for (int row = 0; row < 3; row++)
-            for (int col = 0; col < 9; col++)
-                addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, Sheet.inventoryY(3) + 18 * row));
-        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, 8 + col * 18, Sheet.hotbarY(3)));
-        addDataSlots(data);
+        addPlayer(inventory, STRIPS);
     }
 
     public int water() {
-        return data.get(WATER);
+        return synced(WATER);
     }
 
     @Override
     public int stored() {
-        return data.get(STORED);
+        return synced(STORED);
     }
 
     @Override
     public int capacity() {
-        return Math.max(1, data.get(CAPACITY));
+        return Math.max(1, synced(CAPACITY));
     }
 
     public int percent() {
-        return Math.clamp(data.get(PERCENT), 0, 100);
+        return Math.clamp(synced(PERCENT), 0, 100);
     }
 
     /** One of {@link #IDLE}, {@link #WORKING}, {@link #PAUSED}. */
     public int state() {
-        return Math.clamp(data.get(STATE), IDLE, PAUSED);
+        return Math.clamp(synced(STATE), IDLE, PAUSED);
     }
 
     @Override
@@ -130,55 +123,5 @@ public final class CultureBowlMenu extends AbstractContainerMenu implements Biom
         if (id != START_BUTTON) return false;
         bowl.ifPresent(entity -> entity.start(player).ifPresent(refusal -> Refusals.show(player, refusal)));
         return true;
-    }
-
-    @Override
-    public ItemStack quickMoveStack(Player player, int index) {
-        Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = slot.getItem();
-        ItemStack before = stack.copy();
-        boolean moved;
-        if (index < INVENTORY_START) moved = moveItemStackTo(stack, INVENTORY_START, SLOT_END, true);
-        else if (slots.get(0).mayPlace(stack)) moved = moveItemStackTo(stack, 0, INGREDIENTS, false);
-        else if (index < HOTBAR_START) moved = moveItemStackTo(stack, HOTBAR_START, SLOT_END, false);
-        else moved = moveItemStackTo(stack, INVENTORY_START, HOTBAR_START, false);
-        if (!moved) return ItemStack.EMPTY;
-        if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
-        else slot.setChanged();
-        return before;
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return stillValid(access, player, ProcessingModule.CULTURE_BOWL.get());
-    }
-
-    /** Reads the live bowl on the server; vanilla syncs changed ints to the client. */
-    private static final class BowlData implements ContainerData {
-        private final CultureBowlBlockEntity bowl;
-
-        BowlData(CultureBowlBlockEntity bowl) {
-            this.bowl = bowl;
-        }
-
-        @Override
-        public int get(int index) {
-            return switch (index) {
-                case WATER -> bowl.water().getFluidAmount();
-                case STORED -> bowl.tank().stored().units();
-                case CAPACITY -> bowl.tank().capacity().units();
-                case PERCENT -> bowl.percent();
-                default -> bowl.state();
-            };
-        }
-
-        @Override
-        public void set(int index, int value) {}
-
-        @Override
-        public int getCount() {
-            return 5;
-        }
     }
 }
