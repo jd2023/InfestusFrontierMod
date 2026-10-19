@@ -25,13 +25,22 @@
   },
   "pages": [
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:digestive_sac",
-      "text": "entry.infestusfrontier.contact.digestive_sac.craft"
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.contact.digestive_sac.name",
+      "images": [
+        "infestusfrontier:textures/book/digestive_sac.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.contact.digestive_sac.description"
     },
     {
       "type": "modonomicon:text",
       "text": "entry.infestusfrontier.contact.digestive_sac.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:digestive_sac",
+      "text": "entry.infestusfrontier.contact.digestive_sac.craft"
     }
   ]
 }

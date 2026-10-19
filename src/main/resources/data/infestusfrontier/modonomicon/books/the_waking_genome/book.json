@@ -2,7 +2,7 @@
   "name": "book.infestusfrontier.the_waking_genome.name",
   "description": "book.infestusfrontier.the_waking_genome.description",
   "tooltip": "book.infestusfrontier.the_waking_genome.tooltip",
-  "model": "modonomicon:modonomicon_green",
+  "model": "infestusfrontier:the_waking_genome",
   "creative_tab": "infestusfrontier:main",
   "display_mode": "node",
   "auto_add_read_conditions": false,

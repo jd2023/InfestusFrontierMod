@@ -69,6 +69,85 @@ Bounds: 1 icon at 32x32; one CREDITS line.
 Evidence: visual
 ```
 
+## ART-003 — The Waking Genome artwork
+
+Status: ready for review; full gate passed (81 GameTests, 32 captures). Demo book opened from the hotbar; Bowl opening spread, batch recipes and crafting page inspected. Final capture rerun passed after removing duplicate headings.
+Scope: cover icon, one illustration for each of the nine Contact entries, native image-page wiring, and the client model registration needed by Modonomicon. Category icons wait until a second category exists.
+Files: textures/item/the_waking_genome.png, textures/book/*.png, models/item/the_waking_genome.json, the_waking_genome/book.json and entries/contact/*.json, integration/modonomicon/GuidePages.java, src/testMod/resources/captures/demo.json, CREDITS.txt.
+Tool: built-in image generation, 2026-10-18.
+Export: cover through scripts/texture.py --size 32 --colors 0. Illustrations retain generated alpha, trim to the alpha > 24 content bounds, fit proportionally within 192x104, and center on a transparent 200x200 canvas. Modonomicon 1.21.1 image pages render a square; the transparent padding preserves the roughly 200x100 artwork without stretching it.
+Layout: illustration and existing instructions open each entry. Existing batch recipes follow as a pair; crafting pages remain available afterward.
+Validation: run scripts/verify.sh; open the book from the demo hotbar and inspect the Bowl opening spread, batch recipes, and crafting page. Capture every entry's opening spread.
+Not: organ model changes, gameplay changes, custom page renderers, additional categories.
+
+### Cover prompt
+
+```text
+Use case: stylized-concept. Asset type: source for a 32x32 voxel-game hotbar item icon, The Waking Genome guide book. Subject: one closed thick flesh-bound tome seen in three-quarter view from slightly above, spine on the left, angled diagonally. Its cover is supple wine-red and muted rose living membrane, with two broad branching coral veins, a small ivory bone clasp on the right edge, and a clearly visible cream page block. It must immediately read as a BOOK at tiny hotbar size. Style: high-quality hand-painted fantasy game sprite, bold simple silhouette, thin dark plum outer outline, broad clean shading lit from upper left. Palette: burgundy and dusty crimson flesh, deep plum shadows, ivory pages and clasp. Composition: one centered object filling 82 percent of the square canvas with generous transparent margin. True alpha transparency. Constraints: original artwork, no text, no lettering, no symbols, no face, no eyes, no teeth, no background, no floor shadow, no border, no watermark, no particles, no halo, no photorealistic gore. Few large readable details that survive reduction to 32x32.
+```
+
+### Shared illustration prompt
+
+Append the entry-specific subject below to this prompt. Reference images supply the existing object shapes and the painted substrate material.
+
+```text
+Use case: stylized-concept. Asset type: an original painted field-guide illustration for a biological voxel-game mod, to be exported as a 200x200 transparent PNG with an approximately 200x100 horizontal vignette centered inside it. Composition: SQUARE transparent canvas; ALL artwork forms one WIDE shallow horizontal scene across the middle, about 90% canvas width and 45-50% canvas height. Leave generous true alpha space above and below. Three-quarter view unless specified. Broad readable hand-painted forms, soft upper-left light, rich burgundy and mulberry living flesh, coral raised vessels, ivory structural bone, olive/lime nutrients. Organic but retain the recognizable block-built silhouette of the reference game objects. No labels, no text, no signs, no frame, no arrows, no UI, no watermark, no humans, no photorealistic gore, no magical glow or floating particles. The reference screenshots show object shapes only: remove the signs, horizon and unrelated objects. Surface finish should match the lush, supple painted biological terrain reference, with quiet shapes and selective moist highlights; no noisy grain or black outlines inside surfaces. The scene ends in a clean organic vignette silhouette, no rectangular background.
+```
+
+### culture_bowl
+
+```text
+Subject: a Culture Bowl MID-BATCH, the low squat square open vessel in the game screenshot. A wide shallow burgundy fleshy bowl on a small island of living substrate, ivory rim, translucent pale olive culture medium with three small bubbles and one red mushroom cap with two tiny wheat-seed shoots immersed within. One small crimson spore cluster emerging at the back of the liquid. The low bowl is the dominant subject. Slightly elevated view clearly reveals the liquid surface and living folds along its sides. Warm alive, quietly industrious.
+```
+
+### digestive_sac
+
+```text
+Subject: the DIGESTIVE SAC AT WORK, the upright stepped wine-red organ at the right of the reference workshop screenshot. It is a squat upright fleshy digestive vessel with three irregular muscular tiers, an open ivory-lipped feeding mouth on top, a small green side pore and a flared rooted base. Three wheat stalks enter its upper mouth, tissue folds visibly swollen with digestion. A short thick olive biomass bead at its low outlet hints at output, no mess. A small patch of burgundy living substrate roots it to the ground. The single Sac dominates the horizontal vignette; no other machines.
+```
+
+### biomass_bladder
+
+```text
+Subject: the BIOMASS BLADDER FILLING, the ivory-framed translucent green organ in the center of the workshop reference. A squat near-cubic transparent biological reservoir, wine-red fleshy base and cap, four slim ivory bone corner struts. Its semitransparent membrane reveals an olive yellow-green liquid surface about two-thirds full, small pale suspended flecks, a few bubbles rising. One short fleshy inlet at its lower left delivers a trickle of green biomass from beyond the vignette; no pipes or other organ in view. Rooted on a small irregular burgundy living-substrate patch. Clearly a biological storage organ with a visible fluid level.
+```
+
+### living_substrate
+
+```text
+Subject: a PLAYER-FED LIVING SUBSTRATE WAVE viewed directly from overhead. A single small irregular island of soil, with a clearly mature dark mulberry and wine-red fleshy core in the middle-left, a younger rose-veined ring around it and a sparse basic edge of crimson tendrils over brown earth and a few small grey stones on the right. Preserve the branching vascular network of the supplied substrate texture. A small modest sprinkling of ivory bone-meal grains on the mature core communicates the feeding that caused this growth. Three stages are connected by continuous veins, not three separate tiles. It must read as one patch of living ground growing outward, not a tumor, rock pile, diagram or disconnected icons. No organ structures, no geometric grid, no arrows. Flat overhead horizontal landscape vignette.
+```
+
+### organ_bud
+
+```text
+Subject: one ORGAN BUD just awakening on living substrate. Match the small block-like burgundy organ bud at the left of the workshop screenshot: a low squat rounded-square fleshy mound on a flat tissue foot, a raised central rose square cap, and two small recessed olive-green nutrient pores. Give it tender overlapping membrane folds, muted pink new tissue on top and crimson veins joining its base into the substrate. Several tiny pale rootlets at the edge. The single bud is centered in a wide horizontal vignette on its own small patch of living ground. No other organ, no signs, no plants, no eyes, no face.
+```
+
+### a_culture_in_your_hand
+
+```text
+Subject: the SPORE CULTURE starter, a small cluster of six round pale-crimson and rose spore pods of different sizes joined by a fine violet thread, matching the provided icon. A cutaway-like little clod of earthy soil below the pods shows the first fine red root threads entering it; one red mushroom cap and three tiny wheat seeds rest next to the cluster, showing its biological beginnings. Compose the pods, earth, mushroom and seeds as one intimate horizontal still-life vignette. No literal hand, no human, no recipe grid, no arrows, no detached particles. The pods are clearly the dominant focus and have broad soft highlights.
+```
+
+### the_waking_genome
+
+```text
+Subject: THE WAKING GENOME, a closed flesh-bound field-guide tome resting at a slight angle on a small island of living burgundy substrate, with a modest six-pod crimson spore culture growing beside its lower corner. Match the supplied book cover: wine-red living membrane, branching coral veins, one ivory bone clasp and cream page block. The book lies low, face visible in three-quarter view, and the roots and spore cluster extend sideways to make one horizontal vignette. The book and tiny starter culture evoke the beginning of a colony, no other props. No letters anywhere on the cover.
+```
+
+### speak_to_an_organ
+
+```text
+Subject: a SYNAPTIC PROBE touching a single olive-green sensory pore on the flank of a small burgundy living organ. The tool is a slim pale ivory bone shaft, lying diagonally and mostly horizontally across the vignette, with a translucent violet nerve bulb at its tip and three fine crimson filaments making contact with the pore. One small white specular highlight on the bulb, no emitted light. Show only a modest rounded-square fleshy organ flank on the right and its short rooted base; the long probe extends to the left and is the focal point. This is a gentle sensory contact, no stabbing, no damage, no hand. Match the supplied probe icon and painted membrane texture.
+```
+
+### biomass_bucket
+
+```text
+Subject: one standard PLAIN GREY METAL BUCKET filled with thick olive yellow-green biomass, with a thin grey handle arcing behind it, seen from slightly above so the bulging fluid surface and two tiny pale specks are visible. It rests beside a low shallow ivory-lipped living receptacle on a small horizontal patch of crimson substrate, ready to transfer biomass by hand. The bucket is the dominant subject, with familiar simple flared vanilla-family metal bucket silhouette, steel grey bands and a clear dark rim; the small organic receptacle beside it provides context. No second bucket, no large machine, no drips, no pouring, no hand, no arrows. Soft clean upper-left light, painted steel highlights and rich olive fluid.
+```
+
 ## Substrate source prompts
 
 Built-in image generation, 2026-10-15. Generate mature first using the V3 mature substrate and Astra evaluation tissue as references. Derive young from mature and basic from young. Export with `scripts/texture.py --size 256 --tiles 4`. The unnumbered 64x64 textures support the existing models until IF-008 connects the macro tiles. Spore Culture remains pending.

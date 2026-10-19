@@ -25,9 +25,13 @@
   },
   "pages": [
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:culture_bowl",
-      "text": "entry.infestusfrontier.contact.culture_bowl.craft"
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.contact.culture_bowl.name",
+      "images": [
+        "infestusfrontier:textures/book/culture_bowl.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.contact.culture_bowl.description"
     },
     {
       "type": "modonomicon:text",
@@ -42,6 +46,11 @@
       "type": "infestusfrontier:organ_batch",
       "recipe_id_1": "infestusfrontier:culturing/organ_bud",
       "title1": "block.infestusfrontier.organ_bud"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:culture_bowl",
+      "text": "entry.infestusfrontier.contact.culture_bowl.craft"
     }
   ]
 }

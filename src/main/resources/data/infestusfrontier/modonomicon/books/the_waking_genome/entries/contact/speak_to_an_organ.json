@@ -25,13 +25,22 @@
   },
   "pages": [
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:synaptic_probe",
-      "text": "entry.infestusfrontier.contact.speak_to_an_organ.craft"
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.contact.speak_to_an_organ.name",
+      "images": [
+        "infestusfrontier:textures/book/speak_to_an_organ.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.contact.speak_to_an_organ.description"
     },
     {
       "type": "modonomicon:text",
       "text": "entry.infestusfrontier.contact.speak_to_an_organ.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:synaptic_probe",
+      "text": "entry.infestusfrontier.contact.speak_to_an_organ.craft"
     }
   ]
 }

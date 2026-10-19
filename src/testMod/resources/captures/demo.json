@@ -184,6 +184,97 @@
       "name": "book_bowl_recipes",
       "book": "infestusfrontier:contact/culture_bowl",
       "page": 2
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_digestive_sac",
+      "book": "infestusfrontier:contact/digestive_sac"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_biomass_bladder",
+      "book": "infestusfrontier:contact/biomass_bladder"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_living_substrate",
+      "book": "infestusfrontier:contact/living_substrate"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_organ_bud",
+      "book": "infestusfrontier:contact/organ_bud"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_a_culture_in_your_hand",
+      "book": "infestusfrontier:contact/a_culture_in_your_hand"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_the_waking_genome",
+      "book": "infestusfrontier:contact/the_waking_genome"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_speak_to_an_organ",
+      "book": "infestusfrontier:contact/speak_to_an_organ"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_biomass_bucket",
+      "book": "infestusfrontier:contact/biomass_bucket"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_bowl_crafting",
+      "book": "infestusfrontier:contact/culture_bowl",
+      "page": 4
     }
   ]
 }
