@@ -10,6 +10,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -37,6 +39,7 @@ import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.api.CultureBowlContents;
 import org.jd.infestusfrontier.processing.api.OrganBatch;
+import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
 import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 import org.jetbrains.annotations.Nullable;
@@ -179,6 +182,10 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
             bowl.output.insertItem(0, advanced.result().copy(), false);
             bowl.history = bowl.history.completed();
             bowl.batch = Optional.empty();
+            if (level instanceof ServerLevel server)
+                advanced.starter()
+                        .ifPresent(starter -> NeoForge.EVENT_BUS.post(
+                                new OrganBatchCompletedEvent(server, ProcessingModule.CULTURE_BOWL.getId(), starter)));
         } else {
             bowl.batch = Optional.of(advanced);
         }

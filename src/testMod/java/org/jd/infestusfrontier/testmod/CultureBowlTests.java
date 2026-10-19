@@ -3,6 +3,7 @@ package org.jd.infestusfrontier.testmod;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentMap;
@@ -10,6 +11,8 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
@@ -21,6 +24,8 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.foundation.Biomass;
@@ -32,6 +37,7 @@ import org.jd.infestusfrontier.processing.CultureBowlBlock;
 import org.jd.infestusfrontier.processing.CultureBowlMenu;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.CultureBowlContents;
+import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
 import org.jd.infestusfrontier.storage.StorageModule;
 
 /** The Culture Bowl: ingredients, water and biomass loaded by hand, collected again, kept when broken. */
@@ -525,6 +531,45 @@ public final class CultureBowlTests {
         tag.getCompound("contents").putInt("water", 5000);
         bowl.loadWithComponents(tag, registries);
         return registries;
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void contentsAreValuesNotHandles(GameTestHelper h) {
+        placeBowl(h);
+        load(h, Items.RED_MUSHROOM, 3);
+        CultureBowlContents first = contents(h, BOWL);
+        var ops = h.getLevel().registryAccess().createSerializationContext(NbtOps.INSTANCE);
+        CultureBowlContents decoded = CultureBowlContents.CODEC
+                .parse(ops, CultureBowlContents.CODEC.encodeStart(ops, first).getOrThrow())
+                .getOrThrow();
+        h.assertTrue(first.equals(decoded), "decoded contents equal the original");
+        h.assertValueEqual(first.hashCode(), decoded.hashCode(), "and hash alike");
+        first.ingredients().get(0).shrink(2);
+        h.assertValueEqual(first.ingredients().get(0).getCount(), 3, "a stack read out is a copy");
+        h.assertValueEqual(contents(h, BOWL).ingredients().get(0).getCount(), 3, "the bowl keeps its own");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 1300)
+    public static void bowlPostsCompletionForItsStarter(GameTestHelper h) {
+        placeBowl(h);
+        loadCultureInputs(h, true);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        List<OrganBatchCompletedEvent> seen = new ArrayList<>();
+        Consumer<OrganBatchCompletedEvent> listener = event -> {
+            if (event.feeder().equals(player.getUUID())) seen.add(event);
+        };
+        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OrganBatchCompletedEvent.class, listener);
+        menu(h, player).clickMenuButton(player, CultureBowlMenu.START_BUTTON);
+        h.runAtTickTime(BATCH_TICKS + 2, () -> {
+            NeoForge.EVENT_BUS.unregister(listener);
+            h.assertValueEqual(seen.size(), 1, "one completion event");
+            h.assertValueEqual(
+                    seen.get(0).organ(),
+                    ResourceLocation.fromNamespaceAndPath("infestusfrontier", "culture_bowl"),
+                    "organ");
+            h.succeed();
+        });
     }
 
     private static void placeBowl(GameTestHelper h) {

@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -17,6 +16,7 @@ import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.util.RecipeMatcher;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
@@ -67,23 +67,7 @@ public record OrganBatchRecipe(
             for (int i = 0; i < stack.getCount(); i++) items.add(stack);
         }
         if (items.size() != ingredients.size()) return false;
-        int[] owner = new int[items.size()];
-        Arrays.fill(owner, -1);
-        for (int ingredient = 0; ingredient < ingredients.size(); ingredient++)
-            if (!assign(ingredient, items, owner, new boolean[items.size()])) return false;
-        return true;
-    }
-
-    private boolean assign(int ingredient, List<ItemStack> items, int[] owner, boolean[] seen) {
-        for (int item = 0; item < items.size(); item++) {
-            if (seen[item] || !ingredients.get(ingredient).test(items.get(item))) continue;
-            seen[item] = true;
-            if (owner[item] < 0 || assign(owner[item], items, owner, seen)) {
-                owner[item] = ingredient;
-                return true;
-            }
-        }
-        return false;
+        return RecipeMatcher.findMatches(items, ingredients) != null;
     }
 
     /** True when some ingredient of this recipe takes {@code stack}. */

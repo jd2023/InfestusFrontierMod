@@ -15,6 +15,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerPlayer;
@@ -234,6 +237,47 @@ public final class DiscoveryTests {
         h.assertValueEqual(seen.size(), 1, "one bucket event");
         h.assertValueEqual(seen.get(0).block(), id("biomass_bladder"), "block");
         h.assertTrue(seen.get(0).inserted(), "inserted");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void creditsNeverEvictAnotherPlayer(GameTestHelper h) {
+        PendingCredits credits = PendingCredits.get(h.getLevel());
+        List<UUID> players = new ArrayList<>();
+        for (int n = 0; n < 65; n++) {
+            UUID player = UUID.randomUUID();
+            players.add(player);
+            credits.remember(player, id("digestive_sac"));
+        }
+        for (UUID player : players) h.assertTrue(credits.holds(player, id("digestive_sac")), "credit kept: " + player);
+        for (UUID player : players)
+            credits.award(new ServerPlayer(
+                    h.getLevel().getServer(),
+                    h.getLevel(),
+                    new GameProfile(player, "credited"),
+                    ClientInformation.createDefault()));
+        for (UUID player : players) h.assertFalse(credits.holds(player, id("digestive_sac")), "credit spent");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void unreadableCreditsAreKeptNotDropped(GameTestHelper h) {
+        var registries = h.getLevel().registryAccess();
+        CompoundTag bad = new CompoundTag();
+        bad.putString("player", "not a uuid");
+        bad.putString("organ", "infestusfrontier:digestive_sac");
+        ListTag list = new ListTag();
+        list.add(bad);
+        CompoundTag tag = new CompoundTag();
+        tag.put("credits", list);
+        PendingCredits loaded = PendingCredits.load(tag, registries);
+        h.assertValueEqual(loaded.size(), 0, "nothing readable");
+        UUID player = UUID.randomUUID();
+        loaded.remember(player, id("biomass_bladder"));
+        CompoundTag saved = loaded.save(new CompoundTag(), registries);
+        h.assertTrue(saved.getList("unreadable_credits", Tag.TAG_COMPOUND).equals(list), "the bad list is kept");
+        h.assertValueEqual(saved.getList("credits", Tag.TAG_COMPOUND).size(), 1, "new credits still save");
+        h.assertTrue(PendingCredits.load(saved, registries).holds(player, id("biomass_bladder")), "and reload");
         h.succeed();
     }
 

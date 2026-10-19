@@ -19,6 +19,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -36,6 +37,7 @@ import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.core.processing.Batch;
+import org.jd.infestusfrontier.core.processing.RetryGate;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.foundation.Refusals;
@@ -85,6 +87,9 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     private OrganHistory history = OrganHistory.NONE;
     private Optional<DigestionBatch> batch = Optional.empty();
     private Optional<CompoundTag> unreadable = Optional.empty();
+    /** A refused feed slot is not retried every tick: only when the tank or the slot changed. */
+    private final RetryGate<FeedState> feedGate = new RetryGate<>();
+
     private final ItemStackHandler feed = new ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
@@ -200,11 +205,21 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     /** One item from the feed slot starts a batch when the Sac is idle and the yield fits; otherwise it waits. */
     private void takeFromFeedSlot() {
         ItemStack stack = feed.getStackInSlot(0);
+        if (stack.isEmpty()) return;
+        FeedState now = new FeedState(tank, stack.getItem(), stack.getCount());
+        if (!feedGate.due(now)) return;
         Optional<RecipeHolder<DigestionRecipe>> recipe = recipeFor(stack);
-        if (recipe.isEmpty() || refusalFor(recipe.get().value().biomass()).isPresent()) return;
+        if (recipe.isEmpty() || refusalFor(recipe.get().value().biomass()).isPresent()) {
+            feedGate.refused(now);
+            return;
+        }
+        feedGate.clear();
         start(recipe.get(), Optional.empty());
         feed.extractItem(0, 1, false);
     }
+
+    /** What an admission attempt from the feed slot depends on; the gate retries only when it changed. */
+    private record FeedState(BiomassTank tank, Item item, int count) {}
 
     private void start(RecipeHolder<DigestionRecipe> recipe, Optional<UUID> feeder) {
         DigestionRecipe value = recipe.value();

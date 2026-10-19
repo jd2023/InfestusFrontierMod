@@ -1,10 +1,13 @@
 package org.jd.infestusfrontier.discovery;
 
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
@@ -15,15 +18,21 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
+import org.slf4j.Logger;
 
 /**
- * Batch credits for players who were offline when their organ finished. Held on the overworld, at most
- * {@link #LIMIT} entries; the oldest is dropped first. A player's credits fire on login and are forgotten.
+ * Batch credits for players who were offline when their organ finished. Held on the overworld, one credit per
+ * player and organ, so the organ count bounds it per player and no player's credit ever evicts another's. A
+ * player's credits fire on login and are forgotten. A credit list that cannot be read is kept as it was.
  */
 public final class PendingCredits extends SavedData {
-    public static final int LIMIT = 64;
+    /** More entries than this in one saved list is not a credit list we wrote. */
+    static final int MAX_DECODED = 4096;
+
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final String NAME = "infestusfrontier_pending_credits";
     private static final String CREDITS = "credits";
+    private static final String KEPT = "unreadable_credits";
     private static final SavedData.Factory<PendingCredits> FACTORY =
             new SavedData.Factory<>(PendingCredits::new, PendingCredits::load);
 
@@ -35,18 +44,24 @@ public final class PendingCredits extends SavedData {
     }
 
     private final List<Credit> credits = new ArrayList<>();
+    private Optional<Tag> unreadable = Optional.empty();
 
     public static PendingCredits get(ServerLevel level) {
         return level.getServer().overworld().getDataStorage().computeIfAbsent(FACTORY, NAME);
     }
 
-    private static PendingCredits load(CompoundTag tag, HolderLookup.Provider registries) {
+    public static PendingCredits load(CompoundTag tag, HolderLookup.Provider registries) {
         PendingCredits loaded = new PendingCredits();
-        Credit.CODEC
-                .listOf()
-                .parse(registries.createSerializationContext(NbtOps.INSTANCE), tag.get(CREDITS))
-                .result()
-                .ifPresent(read -> read.stream().limit(LIMIT).forEach(loaded.credits::add));
+        if (tag.contains(KEPT)) loaded.unreadable = Optional.of(tag.get(KEPT).copy());
+        if (!tag.contains(CREDITS)) return loaded;
+        DataResult<List<Credit>> read = Credit.CODEC
+                .listOf(0, MAX_DECODED)
+                .parse(registries.createSerializationContext(NbtOps.INSTANCE), tag.get(CREDITS));
+        read.ifSuccess(loaded.credits::addAll);
+        read.ifError(error -> {
+            LOGGER.warn("Pending credits keep an unreadable list: {}", error.message());
+            loaded.unreadable = Optional.of(tag.get(CREDITS).copy());
+        });
         return loaded;
     }
 
@@ -54,7 +69,6 @@ public final class PendingCredits extends SavedData {
         Credit credit = new Credit(player, organ);
         if (credits.contains(credit)) return;
         credits.add(credit);
-        while (credits.size() > LIMIT) credits.remove(0);
         setDirty();
     }
 
@@ -86,6 +100,7 @@ public final class PendingCredits extends SavedData {
                 .encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), credits)
                 .getOrThrow();
         tag.put(CREDITS, encoded);
+        unreadable.ifPresent(kept -> tag.put(KEPT, kept.copy()));
         return tag;
     }
 }
