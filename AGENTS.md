@@ -17,12 +17,12 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 - No `Co-Authored-By` lines. No "Generated with" lines. No agent or model names in commits.
 - Commit message: one imperative line under 72 characters. Add a body only when the diff does not explain itself.
 - Stage files by name. Never `git add -A`. Never commit `build/`, `runs/`, `.ktask/` or IDE files.
-- Start from a clean committed tree. Do not touch files outside your story's `Files`. The only exception is the `Status` line of your story in the sprint file. Do not stash other people's work.
+- Start from a clean committed tree. Touch only what the change needs; when a story lists `Files`, stay inside them. Do not stash other people's work.
 - Run every command in the foreground and wait for it. Do not start background jobs and end your turn.
 
 ## Roles
 
-- **Owner** (human): makes product decisions and plays the build at the end of each sprint. Nothing else goes to the owner. Tuning, API research and technical choices are engineering work.
+- **Owner** (human): makes product decisions and plays the build when a milestone's organs are in. Nothing else goes to the owner. Tuning, API research and technical choices are engineering work.
 - **Builder** (strong model, with the owner): takes a goal, its constraints and one line of acceptance from the owner, says how in a few lines, then implements, gates, and hands the commits to a reviewer. Reads the real code first. Hands a cheap model only work a machine judges.
 - **Worker** (cheap model): a mechanical task from the builder: data files, a further copy of an existing pattern, renames, test ports. Never a framework API shape or a design decision.
 - **Reviewer** (strong model, a fresh run, never the builder's): reads the whole diff and the tests. Says `APPROVED` or `REJECTED` with numbered findings. Never edits. One review per feature; a repair goes back to the same reviewer.

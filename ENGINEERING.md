@@ -1,6 +1,6 @@
 # Engineering
 
-For the coder: builder, worker and repairer. Rules about git and roles are in [AGENTS.md](AGENTS.md).
+For the builder and the worker. Rules about git and roles are in [AGENTS.md](AGENTS.md).
 
 ## Toolchain and commands
 
@@ -201,7 +201,7 @@ A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`:
 
 `bash scripts/demo.sh` builds the mod, deletes `runs/demo/saves/demo`, creates a fresh flat Creative world, runs the commands of the capture scenario `src/testMod/resources/captures/demo.json`, teleports the player to its first view and leaves the game open to play. The same scenario is photographed by `verifyCaptures`, so the gate sees the demo world too. Each exhibit is the blocks or items plus a waxed sign that names it.
 
-Every story that adds or changes a block, item, recipe, screen or guide entry adds its exhibit to `demo.json` and lists the file in `Files`. Exhibits stand north of spawn in three rows, far enough that another scenario sees them only as a line on the horizon: row A at z=-36 with signs at z=-37 (blocks and organs, one per even x), row B at z=-33 to z=-31 with signs at z=-34 (ground plots), row C at z=-29 to z=-26 with signs at z=-30 (patches). The current sprint file lists the taken x positions. The owner must be able to see and try every feature there without commands.
+Every change that adds or alters a block, item, recipe, screen or guide entry adds its exhibit to `demo.json`. Exhibits stand north of spawn in three rows, far enough that another scenario sees them only as a line on the horizon: row A at z=-36 with signs at z=-37 (blocks and organs, one per even x), row B at z=-33 to z=-31 with signs at z=-34 (ground plots), row C at z=-29 to z=-26 with signs at z=-30 (patches). The taken x positions are the ones `demo.json` already holds. The owner must be able to see and try every feature there without commands.
 
 Not covered yet: recipe tests through a crafting menu, optional-mod profiles, multiplayer soak, crash recovery, measured TPS and FPS on a dense base. Each arrives with the feature that needs it.
 
@@ -268,11 +268,10 @@ The sprint loop:
 
 1. The builder reads the real code and ROADMAP.md and writes the sprint file: 5 to 12 stories, each with `Depends` on accepted or earlier stories only.
 2. The builder, or a cheap model for a mechanical story, takes the first `ready` story whose `Depends` are all `accepted`.
-3. The reviewer gives the verdict. On `REJECTED` a repairer fixes the findings in one commit per round. Three rejected rounds block the story and send it back to the builder.
+3. The reviewer gives the verdict. On `REJECTED` the builder fixes the findings in one commit per round. Three rejected rounds block the story and send it back to the builder.
 4. When every story is `accepted`, the owner plays the build. What is broken becomes `repair` stories in this sprint. What is missing becomes stories in the next sprint.
 5. The builder writes the next sprint.
 
-Sprint S01 is also the pilot. Before S02 is written, the builder records in the S01 file: cost per story, review rounds per story, manual interventions, and what changed in the template because of them.
 
 ### Art track
 

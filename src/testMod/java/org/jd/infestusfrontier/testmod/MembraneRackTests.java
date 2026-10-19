@@ -24,8 +24,8 @@ import org.jd.infestusfrontier.storage.StorageModule;
 public final class MembraneRackTests {
     private static final BlockPos GROUND = new BlockPos(1, 1, 1);
     private static final BlockPos RACK = GROUND.above();
-    private static final int FLESH_TICKS = 600;
-    private static final int LEATHER_TICKS = 1200;
+    private static final int FLESH_TICKS = 400;
+    private static final int LEATHER_TICKS = 800;
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void rackPlacesOnlyOnLivingSubstrate(GameTestHelper h) {

@@ -31,12 +31,4 @@ record BatchOrganKind(
     String nameKey() {
         return "block." + InfestusFrontier.MOD_ID + "." + id;
     }
-
-    boolean holdsWater() {
-        return waterMb > 0;
-    }
-
-    boolean holdsBiomass() {
-        return !biomassCapacity.isZero();
-    }
 }

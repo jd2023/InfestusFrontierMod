@@ -23,7 +23,7 @@ import org.jd.infestusfrontier.storage.StorageModule;
 public final class BoneLoomTests {
     private static final BlockPos GROUND = new BlockPos(1, 1, 1);
     private static final BlockPos LOOM = GROUND.above();
-    private static final int PLATE_TICKS = 600;
+    private static final int PLATE_TICKS = 400;
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 700)
     public static void aBoneAndFiftyBiomassGrowAPlate(GameTestHelper h) {

@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.processing;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -46,8 +48,7 @@ public final class BatchOrganBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(
-            StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(WORKING);
     }
 
@@ -106,7 +107,7 @@ public final class BatchOrganBlock extends BaseEntityBlock {
             Level level,
             BlockPos pos,
             Player player,
-            net.minecraft.world.InteractionHand hand,
+            InteractionHand hand,
             BlockHitResult hit) {
         ItemInteractionResult fluid = BiomassFluids.useOn(stack, level, pos, hit.getDirection(), player, hand);
         if (fluid != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) return fluid;

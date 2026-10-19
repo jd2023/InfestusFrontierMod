@@ -138,14 +138,6 @@ public final class BatchOrganMenu extends OrganMenu {
         return kind.waterMb();
     }
 
-    public boolean holdsWater() {
-        return kind.holdsWater();
-    }
-
-    public boolean holdsBiomass() {
-        return kind.holdsBiomass();
-    }
-
     public int water() {
         return synced(WATER);
     }

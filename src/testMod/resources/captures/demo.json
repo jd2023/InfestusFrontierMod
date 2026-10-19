@@ -31,10 +31,10 @@
     "setblock 26 -60 -36 infestusfrontier:culture_bowl{contents:{ingredients:[{id:\"minecraft:red_mushroom\",count:3},{id:\"minecraft:wheat_seeds\",count:2},{id:\"minecraft:bone_meal\",count:1}],output:{id:\"infestusfrontier:spore_culture\",count:2},water:1300,biomass:{stored:450,reserved:0,capacity:2000},history:{completed_batches:2},batch:{batch:{recipe:\"infestusfrontier:culturing/spore_culture\",ticks_required:1200,ticks_done:480},result:{id:\"infestusfrontier:spore_culture\",count:1}}}}",
     "setblock 27 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Culture Bowl\"','\"mushroom, seed\"','\"water bucket\"','\"click: screen\"']}}",
     "setblock 28 -61 -36 infestusfrontier:living_substrate[stage=mature]",
-    "setblock 28 -60 -36 infestusfrontier:membrane_rack[working=true]{contents:{ingredients:[{id:\"minecraft:rotten_flesh\",count:1},{id:\"minecraft:string\",count:1}],output:{id:\"infestusfrontier:membrane_sheet\",count:3},water:700,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:3},batch:{batch:{recipe:\"infestusfrontier:preparing/membrane_sheet\",ticks_required:600,ticks_done:240},result:{id:\"infestusfrontier:membrane_sheet\",count:1}}}}",
+    "setblock 28 -60 -36 infestusfrontier:membrane_rack[working=true]{contents:{ingredients:[{id:\"minecraft:rotten_flesh\",count:1},{id:\"minecraft:string\",count:1}],output:{id:\"infestusfrontier:membrane_sheet\",count:3},water:700,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:3},batch:{batch:{recipe:\"infestusfrontier:preparing/membrane_sheet\",ticks_required:400,ticks_done:240},result:{id:\"infestusfrontier:membrane_sheet\",count:1}}}}",
     "setblock 29 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Membrane Rack\"','\"flesh and string\"','\"water bucket\"','\"makes sheets\"']}}",
     "setblock 30 -61 -36 infestusfrontier:living_substrate[stage=mature]",
-    "setblock 30 -60 -36 infestusfrontier:bone_loom[working=true]{contents:{ingredients:[{id:\"minecraft:bone\",count:2}],output:{id:\"infestusfrontier:bone_plate\",count:2},water:0,biomass:{stored:650,reserved:0,capacity:1000},history:{completed_batches:2},batch:{batch:{recipe:\"infestusfrontier:preparing/bone_plate\",ticks_required:600,ticks_done:150},result:{id:\"infestusfrontier:bone_plate\",count:1}}}}",
+    "setblock 30 -60 -36 infestusfrontier:bone_loom[working=true]{contents:{ingredients:[{id:\"minecraft:bone\",count:2}],output:{id:\"infestusfrontier:bone_plate\",count:2},water:0,biomass:{stored:650,reserved:0,capacity:1000},history:{completed_batches:2},batch:{batch:{recipe:\"infestusfrontier:preparing/bone_plate\",ticks_required:400,ticks_done:150},result:{id:\"infestusfrontier:bone_plate\",count:1}}}}",
     "setblock 31 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Bone Loom\"','\"bone and\"','\"biomass bucket\"','\"grows plates\"']}}",
     "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
     "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",
@@ -319,6 +319,26 @@
       "name": "book_bowl_crafting",
       "book": "infestusfrontier:contact/culture_bowl",
       "page": 4
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_membrane_rack",
+      "book": "infestusfrontier:contact/membrane_rack"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_bone_loom",
+      "book": "infestusfrontier:contact/bone_loom"
     }
   ]
 }
