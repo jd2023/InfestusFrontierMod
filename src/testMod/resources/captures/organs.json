@@ -54,7 +54,13 @@
       "z": -1.5,
       "yaw": 0,
       "pitch": 15,
-      "gui": true
+      "gui": true,
+      "icons": [
+        "infestusfrontier:organ_bud",
+        "infestusfrontier:digestive_sac",
+        "infestusfrontier:biomass_bladder",
+        "infestusfrontier:culture_bowl"
+      ]
     }
   ]
 }

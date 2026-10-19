@@ -24,7 +24,9 @@ record Scenario(String name, List<String> commands, List<View> views) {
      * {@code use} names a block the player right-clicks before the shot, to photograph its screen, with an empty hand
      * or with the item {@code holding} names (given by the scenario's commands) selected in the hotbar;
      * {@code inventory} opens the player's own inventory instead; {@code book} opens the guide at that entry id (empty
-     * for its first screen) on page pair {@code page}. A view with any of these is shot at GUI scale 3.
+     * for its first screen) on page pair {@code page}. A view with any of these is shot at GUI scale 3. {@code icons}
+     * names what the hotbar holds, left to right, for the verifier's centring check; the client selects an empty slot
+     * past them first so no selection ring touches a measured icon.
      */
     record View(
             String name,
@@ -38,7 +40,8 @@ record Scenario(String name, List<String> commands, List<View> views) {
             Optional<String> holding,
             boolean inventory,
             Optional<String> book,
-            int page) {
+            int page,
+            List<String> icons) {
         boolean opensScreen() {
             return use.isPresent() || inventory || book.isPresent();
         }
@@ -98,9 +101,16 @@ record Scenario(String name, List<String> commands, List<View> views) {
                         v.has("holding") ? Optional.of(v.get("holding").getAsString()) : Optional.empty(),
                         v.has("inventory") && v.get("inventory").getAsBoolean(),
                         v.has("book") ? Optional.of(v.get("book").getAsString()) : Optional.empty(),
-                        v.has("page") ? v.get("page").getAsInt() : 0));
+                        v.has("page") ? v.get("page").getAsInt() : 0,
+                        v.has("icons") ? icons(v.getAsJsonArray("icons")) : List.of()));
             }
             return new Scenario(name, List.copyOf(commands), List.copyOf(views));
         }
+    }
+
+    private static List<String> icons(JsonArray array) {
+        List<String> icons = new ArrayList<>();
+        array.forEach(e -> icons.add(e.getAsString()));
+        return List.copyOf(icons);
     }
 }

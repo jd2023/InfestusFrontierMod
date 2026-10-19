@@ -210,6 +210,39 @@ abstract class VerifyCaptures extends DefaultTask {
     @InputDirectory abstract DirectoryProperty getScenarios()
     @InputDirectory @org.gradle.api.tasks.Optional abstract DirectoryProperty getGoldens()
     @InputDirectory abstract DirectoryProperty getCaptures()
+    /**
+     * A view with "icons": [ids...] names what the hotbar holds, left to right. Each icon's visual centroid must sit
+     * within 1.5 px of its slot centre and nothing may be drawn outside the 16 px square. World views are shot at GUI
+     * scale 2, so the hotbar is 182x22 scaled by 2 at the bottom centre; grey hotbar pixels and the dark ground seen
+     * through it are background.
+     */
+    static List<String> iconProblems(String label, java.awt.image.BufferedImage img, List<String> icons) {
+        List<String> problems = []
+        int S = 2
+        int left = img.width.intdiv(2) - 91 * S, top = img.height - 22 * S
+        icons.eachWithIndex { String icon, int i ->
+            int x0 = left + (3 + 20 * i) * S, y0 = top + 3 * S
+            long sx = 0, sy = 0, count = 0
+            int minX = 99, maxX = -1, minY = 99, maxY = -1
+            for (int y = -2 * S; y < 18 * S; y++) for (int x = -2 * S; x < 18 * S; x++) {
+                int rgb = img.getRGB(x0 + x, y0 + y)
+                int r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = rgb & 0xff
+                boolean ground = g >= r && g >= b && g < 90 && r < 80
+                boolean grey = Math.abs(r - g) < 10 && Math.abs(g - b) < 10
+                if (ground || grey) continue
+                sx += x; sy += y; count++
+                minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y)
+            }
+            if (count == 0) { problems << "${label}: ${icon} draws nothing in slot ${i}"; return }
+            double cx = sx / (double) count / S - 7.75, cy = sy / (double) count / S - 7.75 // pixel centres sit at index + 0.5
+            if (Math.abs(cx) > 1.5 || Math.abs(cy) > 1.5)
+                problems << "${label}: ${icon} centroid off by (${String.format('%.1f', cx)}, ${String.format('%.1f', cy)}) px"
+            if (minX < 0 || minY < 0 || maxX >= 16 * S || maxY >= 16 * S)
+                problems << "${label}: ${icon} draws outside its slot (x ${minX / S}..${(maxX + 1) / S}, y ${minY / S}..${(maxY + 1) / S})"
+        }
+        return problems
+    }
+
     @TaskAction void verify() {
         File root = captures.get().asFile
         File reportFile = new File(root, 'report.json')
@@ -256,6 +289,7 @@ abstract class VerifyCaptures extends DefaultTask {
                         if (differing * 1000 > n * 5) problems << "${label}: ${differing} pixels differ from the golden"
                     }
                 }
+                if (view.icons) problems.addAll(iconProblems(label, img, view.icons as List<String>))
                 checked++
             }
         }

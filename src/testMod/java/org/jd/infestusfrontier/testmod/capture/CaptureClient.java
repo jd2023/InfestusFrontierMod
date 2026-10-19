@@ -113,6 +113,8 @@ final class CaptureClient {
                                 .book()
                                 .ifPresent(
                                         entry -> openBook(entry, currentView().page()));
+                        // The selection ring would be measured as icon pixels: park it on the last slot.
+                        if (!currentView().icons().isEmpty()) minecraft.player.getInventory().selected = 8;
                         enter(Stage.FRAME);
                     }
                 }
