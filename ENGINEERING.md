@@ -114,7 +114,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 ### Invariants
 
 - Processing reserves inputs, outputs, containers, waste and target before it starts. One active batch per organ. Saved stage, not wall time, drives recovery.
-- Every organ runs without a player: it starts on its own when its inputs are complete, hoppers and pipes load it through its item and fluid capabilities and take its output, and a batch it started by itself is credited to the last player who loaded it by hand. Buttons are for the player, never the only path.
+- Every organ runs without a player: it starts on its own when its inputs are complete, hoppers and pipes load it through its item and fluid capabilities and take its output, and its batches are credited to the last player who loaded it by hand, hopper batches after that included. A slot admits only a kind of item no other slot holds and that one batch can use with the rest, so a hopper cannot clog it. The Bladder's Fill is the last hand-only step; M3 gives it an automated path.
 - Saved state is judged as a whole on load and on placement (`Persistence.read` with a check). What fails is kept as unreadable bytes: saved back unchanged, carried on the item as `unreadable_save`, refusing every command and every insertion, and counting as contents when a Creative player breaks it. Nothing is silently dropped or replaced.
 - Organ history has one owner. Wall blocks never copy a core's history.
 - Balances have one owner (`storage`). Routes and indexes hold reservations, not totals. Integer math is checked.

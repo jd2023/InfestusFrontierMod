@@ -1,7 +1,11 @@
 package org.jd.infestusfrontier.testmod;
 
+import java.util.List;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.MenuProvider;
@@ -18,6 +22,9 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.jd.infestusfrontier.core.foundation.Biomass;
+import org.jd.infestusfrontier.core.organ.OrganHistory;
+import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.processing.BatchOrganMenu;
 import org.jd.infestusfrontier.processing.ProcessingModule;
@@ -136,6 +143,54 @@ public final class MembraneRackTests {
     }
 
     private static final BlockPos HOPPER = RACK.above();
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aHopperOfferingOneIngredientCannotClogTheRack(GameTestHelper h) {
+        placeRack(h);
+        load(h, Items.WATER_BUCKET, 1);
+        h.getBlockEntity(RACK)
+                .applyComponents(
+                        DataComponentMap.builder()
+                                .set(
+                                        ProcessingModule.BATCH_CONTENTS.get(),
+                                        new BatchOrganContents(
+                                                List.of(new ItemStack(Items.ROTTEN_FLESH, 64), ItemStack.EMPTY),
+                                                ItemStack.EMPTY,
+                                                1000,
+                                                BiomassTank.empty(Biomass.ZERO),
+                                                OrganHistory.NONE,
+                                                Optional.empty()))
+                                .build(),
+                        DataComponentPatch.EMPTY);
+        h.setBlock(HOPPER, Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.DOWN));
+        HopperBlockEntity hopper = (HopperBlockEntity) h.getBlockEntity(HOPPER);
+        hopper.setItem(0, new ItemStack(Items.ROTTEN_FLESH, 8));
+        hopper.setItem(1, new ItemStack(Items.STRING, 4));
+        h.runAfterDelay(40, () -> {
+            BatchOrganContents fed = contents(h);
+            h.assertFalse(fed.ingredients().get(1).is(Items.ROTTEN_FLESH), "the second slot never takes flesh");
+            h.assertTrue(fed.batch().isPresent(), "the string got past the flesh and a batch runs");
+            h.assertValueEqual(
+                    hopper.countItem(Items.ROTTEN_FLESH)
+                            + fed.ingredients().get(0).getCount(),
+                    72 - 1,
+                    "every flesh but the batch's is in the hopper or the first slot");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aSlotTakesOnlyWhatOneBatchCanUseWithTheRest(GameTestHelper h) {
+        placeRack(h);
+        load(h, Items.ROTTEN_FLESH, 1);
+        Player leather = EcologyTests.holding(h, GameType.SURVIVAL, Items.LEATHER, 1);
+        EcologyTests.use(h, leather, RACK, Direction.UP);
+        h.assertValueEqual(leather.getMainHandItem().getCount(), 1, "leather stays in hand beside flesh");
+        h.assertTrue(contents(h).ingredients().get(1).isEmpty(), "no recipe takes flesh and leather together");
+        load(h, Items.STRING, 1);
+        h.assertTrue(contents(h).ingredients().get(1).is(Items.STRING), "string goes in beside flesh");
+        h.succeed();
+    }
 
     private static void placeRack(GameTestHelper h) {
         h.setBlock(GROUND, EcologyModule.LIVING_SUBSTRATE.get());

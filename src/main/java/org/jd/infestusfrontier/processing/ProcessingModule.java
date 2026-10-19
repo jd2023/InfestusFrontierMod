@@ -68,36 +68,36 @@ public final class ProcessingModule {
                     "digestive_sac",
                     () -> BlockEntityType.Builder.of(DigestiveSacBlockEntity::new, DIGESTIVE_SAC.get())
                             .build(null));
-    /** The Culture Bowl: nine ingredient slots, water and biomass, on the tall panel. */
+    /** The Culture Bowl: nine ingredient slots, water and biomass, on a two-strip panel. */
     static final BatchOrganKind BOWL = new BatchOrganKind(
             "culture_bowl",
             9,
             2000,
             Biomass.of(2000),
-            3,
+            2,
             Block.box(1, 0, 1, 15, 6, 15),
             () -> ProcessingModule.CULTURE_BOWL.get(),
             () -> ProcessingModule.CULTURE_BOWL_ENTITY.get(),
             () -> ProcessingModule.CULTURE_BOWL_MENU.get());
-    /** The Membrane Rack: two ingredient slots and water, no biomass, on a one-strip panel. */
+    /** The Membrane Rack: two ingredient slots and water, no biomass, on the plain panel. */
     static final BatchOrganKind RACK = new BatchOrganKind(
             "membrane_rack",
             2,
             1000,
             Biomass.ZERO,
-            1,
+            0,
             Block.box(1, 0, 1, 15, 14, 15),
             () -> ProcessingModule.MEMBRANE_RACK.get(),
             () -> ProcessingModule.MEMBRANE_RACK_ENTITY.get(),
             () -> ProcessingModule.MEMBRANE_RACK_MENU.get());
 
-    /** The Bone Loom: one bone slot and biomass, no water, on a one-strip panel. */
+    /** The Bone Loom: one bone slot and biomass, no water, on the plain panel. */
     static final BatchOrganKind LOOM = new BatchOrganKind(
             "bone_loom",
             1,
             0,
             Biomass.of(1000),
-            1,
+            0,
             Block.box(1, 0, 1, 15, 12, 15),
             () -> ProcessingModule.BONE_LOOM.get(),
             () -> ProcessingModule.BONE_LOOM_ENTITY.get(),

@@ -14,11 +14,11 @@ import org.jd.infestusfrontier.ui.Sheet;
 import org.jd.infestusfrontier.ui.SlotGrid;
 
 /**
- * Client view of the Bowl on a tall panel: nine ingredient wells, the progress vein and the output well beside
+ * Client view of the Bowl on a two-strip panel: nine ingredient wells, the progress vein and the output well beside
  * them, the water trough under them, and the biomass tank.
  */
 final class CultureBowlScreen extends OrganScreen<BatchOrganMenu> {
-    private static final int STRIPS = 3;
+    private static final int STRIPS = 2;
     private static final SlotGrid GRID = SlotGrid.standard3x3();
     private static final int RIGHT_COLUMN_X = GRID.bounds().right() + Sheet.GAP;
     private static final int TROUGH_Y = GRID.bounds().bottom() + Sheet.GAP;

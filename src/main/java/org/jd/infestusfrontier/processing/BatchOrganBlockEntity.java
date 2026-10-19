@@ -86,9 +86,23 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         this.kind = kind;
         this.biomass = BiomassTank.empty(kind.biomassCapacity());
         this.ingredients = new ItemStackHandler(kind.slots()) {
+            /**
+             * One slot per kind of item, and only kinds that one batch can use together with what the other slots
+             * hold: a hopper that offers one ingredient fills one slot and is then refused, so it offers the next.
+             */
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
-                return unreadable.isEmpty() && accepts(stack);
+                if (unreadable.isPresent() || stack.isEmpty()) return false;
+                List<ItemStack> kinds = new ArrayList<>();
+                for (int other = 0; other < getSlots(); other++) {
+                    if (other == slot) continue;
+                    ItemStack held = getStackInSlot(other);
+                    if (held.isEmpty()) continue;
+                    if (ItemStack.isSameItemSameComponents(held, stack)) return false;
+                    kinds.add(held);
+                }
+                kinds.add(stack);
+                return recipes().anyMatch(recipe -> recipe.value().fits(kinds));
             }
 
             @Override
@@ -132,9 +146,10 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         return new BatchOrganPorts(ingredients, output);
     }
 
-    /** Whether some recipe of this organ uses {@code stack}, running batch or not. */
+    /** Whether some slot takes {@code stack} now, running batch or not. */
     boolean accepts(ItemStack stack) {
-        return !stack.isEmpty() && recipes().anyMatch(recipe -> recipe.value().uses(stack));
+        for (int slot = 0; slot < kind.slots(); slot++) if (ingredients.isItemValid(slot, stack)) return true;
+        return false;
     }
 
     /** 0 idle, 1 working, 2 paused for want of a foundation. Matches the menu's state int. */
@@ -143,14 +158,20 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         return level != null && Organs.hasFoundation(level, worldPosition) ? 1 : 2;
     }
 
-    /** This organ's recipes, the ones with most ingredients first, so the fuller recipe wins when both fit. */
+    /** This organ's recipes, in no order. */
     private Stream<RecipeHolder<OrganBatchRecipe>> recipes() {
         if (level == null) return Stream.empty();
         return level.getRecipeManager().getAllRecipesFor(ProcessingModule.ORGAN_BATCH.get()).stream()
-                .filter(recipe -> recipe.value().organ().equals(kind.id()))
+                .filter(recipe -> recipe.value().organ().equals(kind.id()));
+    }
+
+    /** This organ's recipes, the ones with most ingredients first, so the fuller recipe wins when both fit. */
+    private List<RecipeHolder<OrganBatchRecipe>> orderedRecipes() {
+        return recipes()
                 .sorted(Comparator.<RecipeHolder<OrganBatchRecipe>>comparingInt(
                                 recipe -> -recipe.value().ingredients().size())
-                        .thenComparing(recipe -> recipe.id().toString()));
+                        .thenComparing(recipe -> recipe.id().toString()))
+                .toList();
     }
 
     int percent() {
@@ -215,7 +236,7 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         retry = false;
         List<ItemStack> held = new ArrayList<>();
         for (int slot = 0; slot < kind.slots(); slot++) held.add(ingredients.getStackInSlot(slot));
-        for (RecipeHolder<OrganBatchRecipe> holder : recipes().toList()) {
+        for (RecipeHolder<OrganBatchRecipe> holder : orderedRecipes()) {
             OrganBatchRecipe recipe = holder.value();
             if (water.getFluidAmount() < recipe.waterMb() || !biomass.stored().atLeast(recipe.biomass())) continue;
             Optional<int[]> take = recipe.plan(held);

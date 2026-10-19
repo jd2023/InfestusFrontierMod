@@ -373,7 +373,7 @@ public final class CultureBowlTests {
     public static void reloadKeepsIngredients(GameTestHelper h) {
         placeBowl(h);
         load(h, Items.RED_MUSHROOM, 3);
-        load(h, Items.BONE_MEAL, 1);
+        load(h, Items.WHEAT_SEEDS, 1); // no water, so nothing starts
         var registries = h.getLevel().registryAccess();
         CompoundTag tag = h.getBlockEntity(BOWL).saveWithoutMetadata(registries);
         BlockEntity fresh = ((EntityBlock) ProcessingModule.CULTURE_BOWL.get())
@@ -384,8 +384,8 @@ public final class CultureBowlTests {
         h.assertTrue(loaded != null, "the fresh entity has contents");
         h.assertValueEqual(loaded.ingredients().get(0).getCount(), 3, "slot 0 holds three mushrooms");
         h.assertTrue(loaded.ingredients().get(0).is(Items.RED_MUSHROOM), "slot 0 holds mushrooms");
-        h.assertValueEqual(loaded.ingredients().get(1).getCount(), 1, "slot 1 holds one bone meal");
-        h.assertTrue(loaded.ingredients().get(1).is(Items.BONE_MEAL), "slot 1 holds bone meal");
+        h.assertValueEqual(loaded.ingredients().get(1).getCount(), 1, "slot 1 holds one seed");
+        h.assertTrue(loaded.ingredients().get(1).is(Items.WHEAT_SEEDS), "slot 1 holds seeds");
         h.succeed();
     }
 

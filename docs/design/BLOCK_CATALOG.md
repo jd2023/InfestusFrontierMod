@@ -118,7 +118,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Input → output:** 1 mushroom + 1 wheat seed + 100 mB water → 1 Spore Culture; 1 Spore Culture + 2 rotten flesh + 1 bone meal → an Organ Bud. No biomass input is needed to start this supply chain.
 - **Create:** 1 flower pot + 1 Spore Culture + 1 wheat seed; place on substrate.
 - **Growth:** Choose shorter incubation or lower water use. A Honey Culture treatment accepts honey as an alternative nutrient; an Intake Mouth later automates supplies.
-- **Manual operation:** Open the Bowl screen with any hand, select one of its nine recipes, start/cancel work and collect a named occupied slot. The screen shows the server revision, stored water and biomass, retained slots, progress and clear refusal. Ingredients may still be inserted one at a time; water and measured biomass buckets deposit 1000 mB/BU and return their empty bucket. Sneak-use with both hands empty collects one stack while idle. Sneak-use a clock or glass bottle to spend an earned choice on incubation or water economy respectively. Sneak to place beside the Bowl. All transfers pause during incubation; break and replace the Bowl to move its single saved core, owner, contents and history.
+- **Operation:** Any hand opens the Bowl screen: stored water and biomass, the slots, progress. Ingredients go in one at a time by hand or by the stack from a hopper, one slot per kind; a batch starts on its own when the slots hold a recipe, and spare items wait for the next. Water and measured biomass buckets deposit 1000 mB/BU and return their empty bucket. Sneak-use with both hands empty collects one stack. Sneak-use a clock or glass bottle to spend an earned choice on incubation or water economy respectively. Sneak to place beside the Bowl. Break and replace the Bowl to move its single saved core, owner, contents and history.
 - **Baseline:** One batch requires 1200 loaded server ticks (60 seconds at 20 TPS). Each incubation or water choice reduces its base requirement by 10%, capped at 30% after three choices; round water down to whole mB. This gives pure L3 incubation 840 ticks or pure L3 water costs of 70/35 mB. These are calculated initial tuning values, not playtest timings. The Bowl holds nine item slots, one 2000 mB water tank and one 2000 BU biomass tank so whole buckets fit without discarding a remainder. It performs no export and pauses when its substrate is absent. Recipes and quantities are owned by Items.
 
 ### T0-03 — Digestive Sac
@@ -141,14 +141,14 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Does:** Stretches cultivated skin over a bone rack to make the common flexible construction material.
 - **Input → output:** Rotten flesh + string + water → Membrane Sheets; leather can replace flesh for a slower, low-biomass recipe.
 - **Create:** 2 sticks + 2 bones + 1 Spore Culture.
-- **Hand controls:** Load ingredients and water by hand; any other use opens the screen, where Start begins a batch. Sneak-use with both hands empty collects one stack while idle, taking finished output first and otherwise returning unused inputs.
+- **Operation:** Load ingredients by hand or by hopper and water by bucket; a batch starts on its own; any other use opens the screen. Sneak-use with both hands empty collects one stack, taking finished output first and otherwise returning unused inputs.
 - **Growth:** Choose batch speed or water economy. Add a Hearth Lung for faster drying; thermal membranes are a later, distinct Nether-grown material, not an automatic level reward.
 
 ### T0-06 — Bone Loom
 - **Does:** Grows curved plates and load-bearing ribs from existing calcium, rather than fabricating mineral mass from biomass.
 - **Input → output:** 1 bone + 50 BU → 1 Bone Plate. Bone blocks require a separately accounted calcium recipe, not an assumed unpacking into nine bones. A calcite recipe uses extra biomass to supply the organic binder.
 - **Create:** 1 Organ Bud + 2 bones + 2 sticks.
-- **Hand controls:** Load bones and biomass buckets by hand; any other use opens the screen, where Start begins a batch. Sneak-use with both hands empty collects one stack while idle, taking finished output first and otherwise returning unused inputs. Biomass buckets share the portable-transfer admission and successful-transfer discovery rules.
+- **Operation:** Load bones by hand or by hopper and biomass by bucket; a batch starts on its own; any other use opens the screen. Sneak-use with both hands empty collects one stack, taking finished output first and otherwise returning unused inputs. Biomass buckets share the portable-transfer admission and successful-transfer discovery rules.
 - **Growth:** Choose speed or biomass economy. Ferrocyte Paste treatment produces reinforced plates using additional prepared iron; adding frame blocks increases batch size, not mineral yield.
 
 ### T0-07 — Bio-Furnace

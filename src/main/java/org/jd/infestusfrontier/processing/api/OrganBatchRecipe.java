@@ -107,6 +107,23 @@ public record OrganBatchRecipe(
         return made;
     }
 
+    /**
+     * True when {@code kinds}, one stack per kind of item an organ holds, could all be ingredients of one batch of this
+     * recipe at once, each kind its own ingredient. The organ asks before it admits a kind, so no slot ever holds an
+     * item no batch can use with the others.
+     */
+    public boolean fits(List<ItemStack> kinds) {
+        if (kinds.size() > ingredients.size()) return false;
+        List<ItemStack> units = new ArrayList<>(kinds);
+        while (units.size() < ingredients.size()) units.add(ANY_KIND);
+        List<Predicate<ItemStack>> tests = new ArrayList<>();
+        for (Ingredient ingredient : ingredients) tests.add(stack -> stack == ANY_KIND || ingredient.test(stack));
+        return RecipeMatcher.findMatches(units, tests) != null;
+    }
+
+    /** A unit that stands for "whatever else the batch needs"; every ingredient accepts it. */
+    private static final ItemStack ANY_KIND = new ItemStack(net.minecraft.world.item.Items.AIR);
+
     /** True when some ingredient of this recipe takes {@code stack}. */
     public boolean uses(ItemStack stack) {
         return ingredients.stream().anyMatch(ingredient -> ingredient.test(stack));
