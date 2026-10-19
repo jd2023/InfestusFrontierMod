@@ -9,6 +9,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
@@ -73,15 +74,28 @@ class ArchitectureTest {
                 .check(mod);
     }
 
+    /** True for a class whose top-level class has a name ending with {@code suffix}; nested and anonymous ones count. */
+    private static DescribedPredicate<JavaClass> declaredIn(String suffix) {
+        return new DescribedPredicate<>("declared in a *" + suffix) {
+            @Override
+            public boolean test(JavaClass javaClass) {
+                JavaClass top = javaClass;
+                while (top.getEnclosingClass().isPresent())
+                    top = top.getEnclosingClass().get();
+                return top.getSimpleName().endsWith(suffix);
+            }
+        };
+    }
+
     @Test
     void clientCodeStaysInItsPlaces() {
         noClasses()
                 .that(not(resideInAnyPackage("..foundation.screen..", "..integration.."))
-                        .and(not(simpleNameEndingWith("Screen")))
-                        .and(not(simpleNameEndingWith("Module"))))
+                        .and(not(declaredIn("Screen")))
+                        .and(not(declaredIn("Module"))))
                 .should()
                 .dependOnClassesThat()
-                .resideInAPackage("net.minecraft.client..")
+                .resideInAnyPackage("net.minecraft.client..", "net.neoforged.neoforge.client..", "com.mojang.blaze3d..")
                 .check(mod);
     }
 

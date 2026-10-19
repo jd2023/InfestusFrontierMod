@@ -58,7 +58,7 @@ dependencies {
     testModImplementation sourceSets.main.output
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
     testImplementation 'com.tngtech.archunit:archunit-junit5:1.3.0'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.3'
     testModCompileOnly "com.klikli_dev:modonomicon-1.21.1-neoforge:${modonomicon_version}"
 }
 

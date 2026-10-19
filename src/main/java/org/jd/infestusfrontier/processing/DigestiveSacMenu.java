@@ -5,7 +5,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
@@ -60,9 +59,5 @@ public final class DigestiveSacMenu extends OrganMenu {
     @Override
     public int capacity() {
         return Math.max(1, synced(CAPACITY));
-    }
-
-    static boolean isSac(BlockEntity entity) {
-        return entity instanceof DigestiveSacBlockEntity;
     }
 }

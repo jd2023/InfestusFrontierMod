@@ -533,6 +533,64 @@ public final class CultureBowlTests {
         return registries;
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 1300)
+    public static void completionWaitsForRoomInTheOutput(GameTestHelper h) {
+        placeBowl(h);
+        loadCultureInputs(h, true);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        List<OrganBatchCompletedEvent> seen = new ArrayList<>();
+        Consumer<OrganBatchCompletedEvent> listener = event -> {
+            if (event.feeder().equals(player.getUUID())) seen.add(event);
+        };
+        NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OrganBatchCompletedEvent.class, listener);
+        menu(h, player).clickMenuButton(player, CultureBowlMenu.START_BUTTON);
+        CultureBowlContents running = contents(h, BOWL);
+        h.getBlockEntity(BOWL)
+                .applyComponents(
+                        DataComponentMap.builder()
+                                .set(
+                                        ProcessingModule.BOWL_CONTENTS.get(),
+                                        new CultureBowlContents(
+                                                running.ingredients(),
+                                                new ItemStack(Items.STONE, 64),
+                                                running.waterMb(),
+                                                running.biomass(),
+                                                running.history(),
+                                                running.batch()))
+                                .build(),
+                        DataComponentPatch.EMPTY);
+        h.runAtTickTime(BATCH_TICKS + 4, () -> {
+            CultureBowlContents waiting = contents(h, BOWL);
+            h.assertTrue(waiting.batch().isPresent(), "the finished batch waits for room");
+            h.assertTrue(waiting.batch().get().isDone(), "and is done");
+            h.assertValueEqual(waiting.history().completedBatches(), 0, "not counted while waiting");
+            h.assertValueEqual(seen.size(), 0, "no event while waiting");
+            h.getBlockEntity(BOWL)
+                    .applyComponents(
+                            DataComponentMap.builder()
+                                    .set(
+                                            ProcessingModule.BOWL_CONTENTS.get(),
+                                            new CultureBowlContents(
+                                                    waiting.ingredients(),
+                                                    ItemStack.EMPTY,
+                                                    waiting.waterMb(),
+                                                    waiting.biomass(),
+                                                    waiting.history(),
+                                                    waiting.batch()))
+                                    .build(),
+                            DataComponentPatch.EMPTY);
+        });
+        h.runAtTickTime(BATCH_TICKS + 8, () -> {
+            NeoForge.EVENT_BUS.unregister(listener);
+            CultureBowlContents finished = contents(h, BOWL);
+            h.assertTrue(finished.batch().isEmpty(), "finished once the output had room");
+            h.assertTrue(finished.output().is(EcologyModule.SPORE_CULTURE.get()), "the result landed");
+            h.assertValueEqual(finished.history().completedBatches(), 1, "counted once");
+            h.assertValueEqual(seen.size(), 1, "one event");
+            h.succeed();
+        });
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void contentsAreValuesNotHandles(GameTestHelper h) {
         placeBowl(h);
