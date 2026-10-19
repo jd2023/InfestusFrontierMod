@@ -149,9 +149,10 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
         }
         BiomassTank carried = input.getOrDefault(StorageModule.TANK.get(), tank);
         Optional<String> problem = check(carried);
-        if (problem.isPresent() && level != null) {
+        if (problem.isPresent()) {
             StorageModule.LOGGER.warn("Biomass Bladder keeps unreadable carried state: {}", problem.get());
-            unreadable = Optional.of(Persistence.encode(SAVED, carried, level.registryAccess()));
+            unreadable = Optional.of(
+                    level == null ? new CompoundTag() : Persistence.encode(SAVED, carried, level.registryAccess()));
             return;
         }
         tank = carried;

@@ -483,6 +483,39 @@ public final class CultureBowlTests {
         h.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void creativeBreakOfAnUnreadableBowlKeepsItsBytes(GameTestHelper h) {
+        unreadableBowl(h);
+        Player creative = EcologyTests.holding(h, GameType.CREATIVE, Items.AIR, 0);
+        var state = h.getLevel().getBlockState(h.absolutePos(BOWL));
+        state.getBlock().playerWillDestroy(h.getLevel(), h.absolutePos(BOWL), state, creative);
+        List<ItemEntity> drops = h.getEntities(EntityType.ITEM, BOWL, 2.0);
+        h.assertValueEqual(drops.size(), 1, "the kept bytes count as contents");
+        CompoundTag carried = drops.get(0).getItem().get(OrganModule.UNREADABLE_SAVE.get());
+        h.assertTrue(carried != null && carried.getCompound("contents").getInt("water") == 5000, "and travel");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 1300)
+    public static void batchWithUncountableHistoryIsUnreadable(GameTestHelper h) {
+        placeBowl(h);
+        loadCultureInputs(h, true);
+        startBatch(h);
+        var registries = h.getLevel().registryAccess();
+        BlockEntity bowl = h.getBlockEntity(BOWL);
+        CompoundTag tag = bowl.saveWithoutMetadata(registries);
+        tag.getCompound("contents").getCompound("history").putInt("completed_batches", Integer.MAX_VALUE);
+        bowl.loadWithComponents(tag, registries);
+        Player water = EcologyTests.holding(h, GameType.SURVIVAL, Items.WATER_BUCKET, 1);
+        EcologyTests.use(h, water, BOWL, Direction.UP);
+        h.assertTrue(water.getMainHandItem().is(Items.WATER_BUCKET), "unreadable: the batch could never be counted");
+        h.runAtTickTime(BATCH_TICKS + 2, () -> {
+            CompoundTag kept = h.getBlockEntity(BOWL).saveWithoutMetadata(registries);
+            h.assertTrue(kept.getCompound("contents").contains("batch"), "the batch bytes stay, uncompleted");
+            h.succeed();
+        });
+    }
+
     /** A Bowl whose saved water exceeds its tank: a decode error. */
     private static net.minecraft.core.HolderLookup.Provider unreadableBowl(GameTestHelper h) {
         placeBowl(h);

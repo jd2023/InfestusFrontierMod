@@ -88,7 +88,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     private final ItemStackHandler feed = new ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return recipeFor(stack).isPresent();
+            return unreadable.isEmpty() && recipeFor(stack).isPresent();
         }
 
         @Override
@@ -124,6 +124,8 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             Biomass promised = batch.map(DigestionBatch::yield).orElse(Biomass.ZERO);
             if (!tank.reserved().equals(promised))
                 return Optional.of("reserved " + tank.reserved().units() + " but batch promises " + promised.units());
+            if (batch.isPresent() && history.completedBatches() == Integer.MAX_VALUE)
+                return Optional.of("a running batch that history cannot count");
             return Optional.empty();
         }
     }
@@ -311,9 +313,10 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
                 input.getOrDefault(OrganModule.HISTORY.get(), history),
                 Optional.ofNullable(input.get(ProcessingModule.DIGESTION_BATCH.get())));
         Optional<String> problem = carried.check();
-        if (problem.isPresent() && level != null) {
+        if (problem.isPresent()) {
             ProcessingModule.LOGGER.warn("Digestive Sac keeps unreadable carried state: {}", problem.get());
-            unreadable = Optional.of(Persistence.encode(SAVED, carried, level.registryAccess()));
+            unreadable = Optional.of(
+                    level == null ? new CompoundTag() : Persistence.encode(SAVED, carried, level.registryAccess()));
             return;
         }
         tank = carried.tank();

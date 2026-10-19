@@ -137,6 +137,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     }
 
     boolean isEmpty() {
+        if (unreadable.isPresent()) return false; // the kept bytes are contents too
         if (batch.isPresent()
                 || water.getFluidAmount() > 0
                 || !biomass.stored().isZero()
@@ -299,8 +300,8 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     private static Optional<String> check(CultureBowlContents saved) {
         if (!saved.biomass().capacity().equals(CAPACITY))
             return Optional.of("biomass capacity " + saved.biomass().capacity().units());
-        if (saved.batch().isPresent() && saved.batch().get().result().isEmpty())
-            return Optional.of("a running batch promises nothing");
+        if (saved.batch().isPresent() && saved.history().completedBatches() == Integer.MAX_VALUE)
+            return Optional.of("a running batch that history cannot count");
         return Optional.empty();
     }
 
@@ -355,9 +356,10 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
         CultureBowlContents carried = input.get(ProcessingModule.BOWL_CONTENTS.get());
         if (carried == null) return;
         Optional<String> problem = check(carried);
-        if (problem.isPresent() && level != null) {
+        if (problem.isPresent()) {
             ProcessingModule.LOGGER.warn("Culture Bowl keeps unreadable carried state: {}", problem.get());
-            unreadable = Optional.of(Persistence.encode(SAVED, carried, level.registryAccess()));
+            unreadable = Optional.of(
+                    level == null ? new CompoundTag() : Persistence.encode(SAVED, carried, level.registryAccess()));
             return;
         }
         restore(carried);

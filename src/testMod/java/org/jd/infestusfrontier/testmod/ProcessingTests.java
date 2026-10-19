@@ -7,6 +7,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -291,6 +292,20 @@ public final class ProcessingTests {
         Player feeder = EcologyTests.holding(h, GameType.SURVIVAL, Items.WHEAT, 1);
         EcologyTests.use(h, feeder, SAC, Direction.UP);
         h.assertValueEqual(feeder.getMainHandItem().getCount(), 1, "still unreadable, still refusing");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void unreadableSacRefusesFeedThroughItsSlot(GameTestHelper h) {
+        unreadableSac(h);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        MenuProvider provider = (MenuProvider) h.getBlockEntity(SAC);
+        var menu = provider.createMenu(1, player.getInventory(), player);
+        h.assertFalse(menu.slots.get(0).mayPlace(new ItemStack(Items.WHEAT)), "the feed slot refuses");
+        IItemHandler hopperSide = h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(SAC), null);
+        h.assertTrue(hopperSide != null, "the capability still answers");
+        h.assertValueEqual(
+                hopperSide.insertItem(0, new ItemStack(Items.WHEAT, 4), false).getCount(), 4, "hoppers too");
         h.succeed();
     }
 

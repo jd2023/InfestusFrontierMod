@@ -113,7 +113,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 ### Invariants
 
 - Processing reserves inputs, outputs, containers, waste and target before it starts. One active batch per organ. Saved stage, not wall time, drives recovery.
-- Saved state is judged as a whole on load and on placement (`Persistence.read` with a check). What fails is kept as unreadable bytes: saved back unchanged, carried on the item as `unreadable_save`, refusing every command and every insertion. Nothing is silently dropped or replaced.
+- Saved state is judged as a whole on load and on placement (`Persistence.read` with a check). What fails is kept as unreadable bytes: saved back unchanged, carried on the item as `unreadable_save`, refusing every command and every insertion, and counting as contents when a Creative player breaks it. Nothing is silently dropped or replaced.
 - Organ history has one owner. Wall blocks never copy a core's history.
 - Balances have one owner (`storage`). Routes and indexes hold reservations, not totals. Integer math is checked.
 - `equipment` owns every suit predicate and every fuel spend. Nobody rebuilds the full-set check.
