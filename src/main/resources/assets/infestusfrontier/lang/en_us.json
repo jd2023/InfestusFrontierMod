@@ -37,7 +37,7 @@
   "infestusfrontier.refusal.processing.busy": "Still working on the last batch",
   "infestusfrontier.refusal.processing.not_accepted": "This organ makes biomass. It does not take it",
   "infestusfrontier.refusal.organ.unreadable_save": "This organ's saved data cannot be read. It keeps it and refuses commands",
-  "infestusfrontier.refusal.equipment.nothing_to_fill": "Put an awakened piece with room in the slot",
+  "infestusfrontier.refusal.equipment.nothing_to_fill": "Needs biomass in the Bladder and an awakened piece with room in the slot",
   "book.infestusfrontier.the_waking_genome.name": "The Waking Genome",
   "book.infestusfrontier.the_waking_genome.description": "A first guide to the living colony.",
   "book.infestusfrontier.the_waking_genome.tooltip": "Starting ingredients and controlled growth",

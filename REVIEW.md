@@ -48,7 +48,7 @@ Defect classes found in this project before. Check the ones that apply to the di
 - An organ can never clog: every admitted input has an exit.
 
 **Player interaction**
-- Any hand opens an organ's screen, like a chest, through `Organs.openScreen`. Only an item with a job on the organ (fluid container, feed, ingredient, reader) acts instead. Sneaking with an item builds against it.
+- Any hand opens an organ's screen, like a chest, through `Organs.openScreen`. Only an item with a job on the organ (bucket, feed, ingredient, reader) acts instead; an awakened piece opens the screen and is filled from the Bladder's slot. Sneaking with an item builds against it.
 - The server re-derives what the client claims: face, reach, selection, visibility.
 
 **Visuals** (stories with captures)

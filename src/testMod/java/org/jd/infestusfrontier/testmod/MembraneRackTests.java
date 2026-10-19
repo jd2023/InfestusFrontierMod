@@ -10,6 +10,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.ecology.EcologyModule;
@@ -17,6 +19,8 @@ import org.jd.infestusfrontier.processing.BatchOrganMenu;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.storage.StorageModule;
+import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
 
 /** The Membrane Rack: the second batch organ, with two slots, water and no biomass. */
 @GameTestHolder("infestusfrontier_tests")
@@ -85,6 +89,13 @@ public final class MembraneRackTests {
         EcologyTests.use(h, player, RACK, Direction.UP);
         h.assertTrue(player.getMainHandItem().is(StorageModule.BIOMASS_BUCKET.get()), "the bucket stays full");
         h.assertTrue(contents(h).biomass().capacity().isZero(), "no biomass tank");
+        h.assertValueEqual(
+                BiomassFluids.refusal(
+                        new FluidStack(StorageModule.BIOMASS.get(), 1000),
+                        h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(RACK), Direction.UP),
+                        h.getLevel().getCapability(BiomassCapabilities.BLOCK, h.absolutePos(RACK), Direction.UP)),
+                BiomassFluids.WRONG_FLUID,
+                "biomass is the wrong fluid here");
         h.succeed();
     }
 

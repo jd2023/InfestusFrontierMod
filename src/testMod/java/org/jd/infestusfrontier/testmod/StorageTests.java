@@ -28,6 +28,7 @@ import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.storage.BiomassBladderBlock;
 import org.jd.infestusfrontier.storage.BiomassBladderMenu;
 import org.jd.infestusfrontier.storage.StorageModule;
+import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 
 /** The Biomass Bladder: buckets in and out, the fill level, the fluid capability and the screen. */
@@ -72,6 +73,14 @@ public final class StorageTests {
         EcologyTests.use(h, player, BLADDER, Direction.UP);
         h.assertTrue(player.getMainHandItem().is(Items.WATER_BUCKET), "water bucket kept");
         h.assertValueEqual(tank(h).stored(), Biomass.ZERO, "nothing stored");
+        h.assertValueEqual(
+                BiomassFluids.refusal(
+                        new FluidStack(Fluids.WATER, 1000),
+                        h.getLevel()
+                                .getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(BLADDER), Direction.UP),
+                        h.getLevel().getCapability(BiomassCapabilities.BLOCK, h.absolutePos(BLADDER), Direction.UP)),
+                BiomassFluids.WRONG_FLUID,
+                "water is the wrong fluid");
         h.assertBlockPresent(Blocks.AIR, BLADDER.above());
         h.succeed();
     }

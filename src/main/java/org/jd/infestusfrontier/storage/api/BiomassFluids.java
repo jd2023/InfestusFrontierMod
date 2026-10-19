@@ -59,12 +59,14 @@ public final class BiomassFluids {
     }
 
     /**
-     * Moves fluid between the container in the player's hand and the block at {@code pos}, the way any fluid tank
-     * does. Passes to the default block interaction when the stack is not a fluid container or the block has no
-     * fluid capability. A refused move names its reason to the player.
+     * Moves fluid between the bucket in the player's hand and the block at {@code pos}, the way any fluid tank
+     * does. Passes to the default block interaction when the stack is not a bucket or the block has no fluid
+     * capability, so any other item, a piece of awakened equipment included, opens the screen. A refused move names
+     * its reason to the player.
      */
     public static ItemInteractionResult useOn(
             ItemStack stack, Level level, BlockPos pos, @Nullable Direction face, Player player, InteractionHand hand) {
+        if (!(stack.getItem() instanceof BucketItem)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         IFluidHandlerItem container = stack.getCapability(Capabilities.FluidHandler.ITEM);
         if (container == null) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         IFluidHandler block = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, face);
@@ -94,10 +96,6 @@ public final class BiomassFluids {
     }
 
     /**
-     * Why a whole bucket holding {@code held} cannot move into or out of the block. The organ's own biomass rule
-     * speaks for biomass; every other fluid is judged by the block's tanks.
-     */
-    /**
      * The item fluid handler of {@code stack} when it takes biomass and is not a bucket, else null. A piece of awakened
      * equipment answers; a bucket is filled by hand instead.
      */
@@ -107,7 +105,11 @@ public final class BiomassFluids {
         return handler != null && handler.isFluidValid(0, of(Biomass.BUCKET)) ? handler : null;
     }
 
-    static Refusal refusal(FluidStack held, IFluidHandler block, @Nullable BiomassHandler store) {
+    /**
+     * Why a whole bucket holding {@code held} cannot move into or out of the block. The organ's own biomass rule
+     * speaks for biomass; every other fluid is judged by the block's tanks.
+     */
+    public static Refusal refusal(FluidStack held, IFluidHandler block, @Nullable BiomassHandler store) {
         if (held.isEmpty()) {
             if (store != null && store.extract(Biomass.BUCKET, true) instanceof Outcome.Refused<?> refused)
                 return refused.refusal();

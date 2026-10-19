@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
@@ -77,6 +78,22 @@ public final class EquipmentTests {
             h.assertValueEqual(reserve.capacity(), EquipmentModule.RESERVE_CAPACITY, "with a 40 BU reserve");
             h.succeed();
         });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void anAwakenedPieceInHandOpensTheScreenInsteadOfFilling(GameTestHelper h) {
+        StorageTests.placeBladder(h);
+        Player carrier = EcologyTests.holding(h, GameType.SURVIVAL, StorageModule.BIOMASS_BUCKET.get(), 1);
+        EcologyTests.use(h, carrier, ORGAN, Direction.UP);
+        Player wearer = EcologyTests.holding(h, GameType.SURVIVAL, EquipmentModule.AWAKENED_THORAX.get(), 1);
+        h.assertValueEqual(
+                EcologyTests.useHeld(h, wearer, ORGAN, Direction.UP),
+                ItemInteractionResult.CONSUME,
+                "the Bladder answers the piece itself");
+        h.assertValueEqual(
+                Reserves.of(wearer.getMainHandItem()).orElseThrow().stored(), Biomass.ZERO, "the piece stays empty");
+        h.assertValueEqual(StorageTests.tank(h).stored(), Biomass.of(1000), "the Bladder keeps its biomass");
+        h.succeed();
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")

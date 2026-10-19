@@ -2,7 +2,6 @@ package org.jd.infestusfrontier.equipment;
 
 import java.util.List;
 import java.util.Map;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -83,24 +82,18 @@ public final class EquipmentModule {
         return ITEMS.register(
                 name,
                 () -> new ArmorItem(
-                        holder(DORMANT),
-                        type,
-                        new Item.Properties().durability(type.getDurability(DORMANT_DURABILITY))));
+                        DORMANT, type, new Item.Properties().durability(type.getDurability(DORMANT_DURABILITY))));
     }
 
     private static DeferredItem<ArmorItem> awakened(String name, ArmorItem.Type type) {
         return ITEMS.register(
                 name,
                 () -> new AwakenedPieceItem(
-                        holder(AWAKENED),
+                        AWAKENED,
                         type,
                         new Item.Properties()
                                 .durability(type.getDurability(AWAKENED_DURABILITY))
                                 .component(RESERVE.get(), BiomassTank.empty(RESERVE_CAPACITY))));
-    }
-
-    private static Holder<ArmorMaterial> holder(DeferredHolder<ArmorMaterial, ArmorMaterial> material) {
-        return material;
     }
 
     public static void register(IEventBus modBus) {

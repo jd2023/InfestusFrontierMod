@@ -122,7 +122,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 - Freight has one owner at every step and a bounded escrow.
 - A record carried as a data component is a value: item stacks are copied in and out and compared with `ItemStack.matches`.
 - Optional adapters load only when their mod is present. Test mod code never ships.
-- An organ opens its screen for any hand, like a chest, through `Organs.openScreen`. Only a fluid container, a feed item or an ingredient acts on the organ instead. Sneak to build against it.
+- An organ opens its screen for any hand, like a chest, through `Organs.openScreen`. Only a bucket, a feed item or an ingredient acts on the organ instead; an awakened piece opens the screen and is filled from the Bladder's slot. Sneak to build against it.
 
 ## Performance limits
 
