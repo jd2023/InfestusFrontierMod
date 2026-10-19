@@ -28,6 +28,11 @@ record BatchOrganKind(
         return ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, id);
     }
 
+    /** Whether a screen draws the biomass tank, which shortens the parts row. */
+    boolean holdsBiomass() {
+        return !biomassCapacity.isZero();
+    }
+
     String nameKey() {
         return "block." + InfestusFrontier.MOD_ID + "." + id;
     }

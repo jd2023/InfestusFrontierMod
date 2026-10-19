@@ -14,15 +14,20 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
+import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -40,6 +45,7 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
             .toList();
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     static final Biomass CAPACITY = Biomass.of(4000);
+    static final Refusal NOTHING_TO_FILL = new Refusal("equipment.nothing_to_fill");
     private static final MapCodec<BiomassTank> SAVED = RecordCodecBuilder.mapCodec(
             instance -> instance.group(BiomassCodecs.TANK.fieldOf("tank").forGetter(tank -> tank))
                     .apply(instance, tank -> tank));
@@ -97,6 +103,18 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
             }
         }
         return change;
+    }
+
+    /** Moves what {@code item} can take from the tank into it, or says why nothing moved. */
+    Optional<Refusal> fillItem(ItemStack item) {
+        if (unreadable.isPresent()) return Optional.of(Persistence.CORRUPT);
+        IFluidHandlerItem taker = BiomassFluids.takerOf(item);
+        if (taker == null || tank.stored().isZero()) return Optional.of(NOTHING_TO_FILL);
+        int moved = taker.fill(BiomassFluids.of(tank.stored()), IFluidHandler.FluidAction.EXECUTE);
+        if (moved <= 0) return Optional.of(NOTHING_TO_FILL);
+        tank = ((Outcome.Done<BiomassTank>) tank.drain(Biomass.of(moved))).value();
+        setChanged();
+        return Optional.empty();
     }
 
     /** Why {@code saved} cannot be this Bladder's tank, or empty when it can. */

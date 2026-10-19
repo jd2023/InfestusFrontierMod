@@ -1,0 +1,48 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.awakening_cradle.name",
+  "description": "entry.infestusfrontier.contact.awakening_cradle.description",
+  "icon": "infestusfrontier:awakening_cradle",
+  "x": 4,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/bone_loom"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/awakening_cradle"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.awakening_cradle.name",
+      "text": "entry.infestusfrontier.contact.awakening_cradle.use"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:awakening/thorax",
+      "title1": "item.infestusfrontier.awakened_thorax"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.awakening_cradle.fuel_title",
+      "text": "entry.infestusfrontier.contact.awakening_cradle.fuel"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:awakening_cradle",
+      "text": "entry.infestusfrontier.contact.awakening_cradle.craft"
+    }
+  ]
+}

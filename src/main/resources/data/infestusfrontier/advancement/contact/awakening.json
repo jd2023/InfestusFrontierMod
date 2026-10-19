@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/biomass_bladder",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:awakened_thorax"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.awakening.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.awakening.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "awakened": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": {
+        "organ": "infestusfrontier:awakening_cradle"
+      }
+    }
+  }
+}

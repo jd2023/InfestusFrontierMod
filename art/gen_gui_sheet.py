@@ -20,7 +20,7 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   176,96  52x16    button, disabled (sunken, grey)
   176,112 44x12    progress vein, empty
   176,128 44x12    progress vein, full (the screen draws its left part)
-  2,190   5 x 32x32 organ emblems in one row at a 34 px pitch: Sac, Bladder, Bowl, Rack, Loom
+  2,190   6 x 32x32 organ emblems in one row at a 34 px pitch: Sac, Bladder, Bowl, Rack, Loom, Cradle
 
 Every screen writes its title at 8,6, its emblem at 8,27 if it has one, labels at y 26 above
 its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
@@ -55,7 +55,7 @@ BUTTON_OFF = (176, 96)
 BUTTON_SIZE = (52, 16)
 VEIN_EMPTY = (176, 112, 44, 12)
 VEIN_FULL = (176, 128, 44, 12)
-EMBLEMS = [(2 + 34 * i, 190) for i in range(5)]
+EMBLEMS = [(2 + 34 * i, 190) for i in range(6)]
 EMBLEM = 32
 POOL = [(168, 196, 150), (206, 224, 182), (236, 244, 220)]
 BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
@@ -411,8 +411,35 @@ def emblem_loom(img, ox, oy):
                 put(img, ox + x, oy + y, OUTLINE if d > 0.85 else (IVORY[3] if (x - 16) + (y - 17) < 0 else IVORY[2]))
 
 
+def emblem_cradle(img, ox, oy):
+    """Two flesh lobes folding around a pale egg."""
+    for y in range(EMBLEM):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 12.0, (y - 19) / 9.0
+            d = math.hypot(dx, dy)
+            if d > 1.0 or y < 12:
+                continue
+            colour = OUTLINE if d > 0.88 else FLESH[1] if dx > 0.3 else FLESH[2] if dx > -0.3 else FLESH[3]
+            put(img, ox + x, oy + y, colour)
+    for sx in (-1, 1):
+        for y in range(6, 22):
+            for x in range(EMBLEM):
+                dx, dy = (x - 16 - sx * 7) / 5.0, (y - 14) / 8.0
+                d = math.hypot(dx, dy)
+                if d > 1.0:
+                    continue
+                put(img, ox + x, oy + y, OUTLINE if d > 0.85 else (FLESH[3] if sx < 0 else FLESH[2]))
+    for y in range(8, 20):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 4.5, (y - 14) / 6.0
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            put(img, ox + x, oy + y, OUTLINE if d > 0.85 else (IVORY[3] if dx + dy < 0 else IVORY[2]))
+
+
 def emblems(img):
-    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom)):
+    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom, emblem_cradle)):
         draw(img, ox, oy)
 
 

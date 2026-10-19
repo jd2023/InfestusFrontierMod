@@ -7,6 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -96,6 +97,16 @@ public final class BiomassFluids {
      * Why a whole bucket holding {@code held} cannot move into or out of the block. The organ's own biomass rule
      * speaks for biomass; every other fluid is judged by the block's tanks.
      */
+    /**
+     * The item fluid handler of {@code stack} when it takes biomass and is not a bucket, else null. A piece of awakened
+     * equipment answers; a bucket is filled by hand instead.
+     */
+    public static @Nullable IFluidHandlerItem takerOf(ItemStack stack) {
+        if (stack.isEmpty() || stack.getItem() instanceof BucketItem) return null;
+        IFluidHandlerItem handler = stack.getCapability(Capabilities.FluidHandler.ITEM);
+        return handler != null && handler.isFluidValid(0, of(Biomass.BUCKET)) ? handler : null;
+    }
+
     static Refusal refusal(FluidStack held, IFluidHandler block, @Nullable BiomassHandler store) {
         if (held.isEmpty()) {
             if (store != null && store.extract(Biomass.BUCKET, true) instanceof Outcome.Refused<?> refused)
@@ -103,6 +114,7 @@ public final class BiomassFluids {
             return BiomassTank.EMPTY;
         }
         if (isBiomass(held)) {
+            if (store != null && store.tank().capacity().isZero()) return WRONG_FLUID;
             if (store != null && store.insert(Biomass.BUCKET, true) instanceof Outcome.Refused<?> refused)
                 return refused.refusal();
             return BiomassTank.FULL;
@@ -129,7 +141,7 @@ public final class BiomassFluids {
 
         @Override
         public boolean isFluidValid(int tank, FluidStack stack) {
-            return isBiomass(stack);
+            return isBiomass(stack) && !store.tank().capacity().isZero();
         }
 
         @Override

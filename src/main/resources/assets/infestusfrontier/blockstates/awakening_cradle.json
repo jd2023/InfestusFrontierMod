@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "working=false": {
+      "model": "infestusfrontier:block/awakening_cradle"
+    },
+    "working=true": {
+      "model": "infestusfrontier:block/awakening_cradle"
+    }
+  }
+}

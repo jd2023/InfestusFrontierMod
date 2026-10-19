@@ -93,12 +93,14 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
                 setChanged();
             }
         };
-        this.water = new FluidTank(kind.waterMb(), stack -> stack.is(Fluids.WATER) && unreadable.isEmpty()) {
-            @Override
-            protected void onContentsChanged() {
-                setChanged();
-            }
-        };
+        this.water =
+                new FluidTank(
+                        kind.waterMb(), stack -> kind.waterMb() > 0 && stack.is(Fluids.WATER) && unreadable.isEmpty()) {
+                    @Override
+                    protected void onContentsChanged() {
+                        setChanged();
+                    }
+                };
     }
 
     BatchOrganKind kind() {
@@ -213,14 +215,13 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
                 .findFirst();
         if (found.isEmpty()) return Optional.of(NO_RECIPE);
         OrganBatchRecipe recipe = found.get().value();
-        if (!output.insertItem(0, recipe.result().copy(), true).isEmpty()) return Optional.of(OUTPUT_FULL);
+        ItemStack made = recipe.resultFor(held);
+        if (!output.insertItem(0, made, true).isEmpty()) return Optional.of(OUTPUT_FULL);
         for (int slot = 0; slot < kind.slots(); slot++) ingredients.setStackInSlot(slot, ItemStack.EMPTY);
         water.drain(recipe.waterMb(), IFluidHandler.FluidAction.EXECUTE);
         biomass = ((Outcome.Done<BiomassTank>) biomass.drain(recipe.biomass())).value();
         batch = Optional.of(new OrganBatch(
-                Batch.start(found.get().id().toString(), recipe.ticks()),
-                recipe.result().copy(),
-                Optional.of(player.getUUID())));
+                Batch.start(found.get().id().toString(), recipe.ticks()), made, Optional.of(player.getUUID())));
         setChanged();
         return Optional.empty();
     }

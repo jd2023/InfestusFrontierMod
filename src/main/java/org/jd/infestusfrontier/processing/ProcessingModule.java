@@ -103,6 +103,18 @@ public final class ProcessingModule {
             () -> ProcessingModule.BONE_LOOM_ENTITY.get(),
             () -> ProcessingModule.BONE_LOOM_MENU.get());
 
+    /** The Awakening Cradle: a piece and a culture, biomass, no water, on a one-strip panel. */
+    static final BatchOrganKind CRADLE = new BatchOrganKind(
+            "awakening_cradle",
+            2,
+            0,
+            Biomass.of(1000),
+            1,
+            Block.box(1, 0, 1, 15, 10, 15),
+            () -> ProcessingModule.AWAKENING_CRADLE.get(),
+            () -> ProcessingModule.AWAKENING_CRADLE_ENTITY.get(),
+            () -> ProcessingModule.AWAKENING_CRADLE_MENU.get());
+
     public static final DeferredBlock<Block> CULTURE_BOWL = batchOrgan(BOWL, MapColor.TERRACOTTA_PINK, 0.8F);
     public static final DeferredItem<OrganItem> CULTURE_BOWL_ITEM =
             ITEMS.register("culture_bowl", () -> new OrganItem(CULTURE_BOWL.get(), new Item.Properties(), "idle"));
@@ -130,6 +142,14 @@ public final class ProcessingModule {
             batchMenu(LOOM, () -> ProcessingModule.BONE_LOOM_MENU.get());
     /** What the Loom grows: the structural plate. */
     public static final DeferredItem<Item> BONE_PLATE = ITEMS.registerSimpleItem("bone_plate");
+
+    public static final DeferredBlock<Block> AWAKENING_CRADLE = batchOrgan(CRADLE, MapColor.COLOR_MAGENTA, 1.0F);
+    public static final DeferredItem<OrganItem> AWAKENING_CRADLE_ITEM = ITEMS.register(
+            "awakening_cradle", () -> new OrganItem(AWAKENING_CRADLE.get(), new Item.Properties(), "idle"));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> AWAKENING_CRADLE_ENTITY =
+            batchEntity(CRADLE, () -> ProcessingModule.AWAKENING_CRADLE.get());
+    public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> AWAKENING_CRADLE_MENU =
+            batchMenu(CRADLE, () -> ProcessingModule.AWAKENING_CRADLE_MENU.get());
 
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
@@ -197,11 +217,13 @@ public final class ProcessingModule {
             OrganRenderers.register(modBus, "culture_bowl", CULTURE_BOWL_ENTITY, CULTURE_BOWL_ITEM);
             OrganRenderers.register(modBus, "membrane_rack", MEMBRANE_RACK_ENTITY, MEMBRANE_RACK_ITEM);
             OrganRenderers.register(modBus, "bone_loom", BONE_LOOM_ENTITY, BONE_LOOM_ITEM);
+            OrganRenderers.register(modBus, "awakening_cradle", AWAKENING_CRADLE_ENTITY, AWAKENING_CRADLE_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(DIGESTIVE_SAC_MENU.get(), DigestiveSacScreen::new);
                 event.register(CULTURE_BOWL_MENU.get(), CultureBowlScreen::new);
                 event.register(MEMBRANE_RACK_MENU.get(), MembraneRackScreen::new);
                 event.register(BONE_LOOM_MENU.get(), BoneLoomScreen::new);
+                event.register(AWAKENING_CRADLE_MENU.get(), AwakeningCradleScreen::new);
             });
         }
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
@@ -212,7 +234,8 @@ public final class ProcessingModule {
                     Capabilities.FluidHandler.BLOCK,
                     DIGESTIVE_SAC_ENTITY.get(),
                     (sac, side) -> BiomassFluids.handler(sac));
-            for (var entity : List.of(CULTURE_BOWL_ENTITY, MEMBRANE_RACK_ENTITY, BONE_LOOM_ENTITY)) {
+            for (var entity :
+                    List.of(CULTURE_BOWL_ENTITY, MEMBRANE_RACK_ENTITY, BONE_LOOM_ENTITY, AWAKENING_CRADLE_ENTITY)) {
                 event.registerBlockEntity(BiomassCapabilities.BLOCK, entity.get(), (organ, side) -> organ);
                 event.registerBlockEntity(
                         Capabilities.FluidHandler.BLOCK,

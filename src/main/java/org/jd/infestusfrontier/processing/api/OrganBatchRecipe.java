@@ -28,7 +28,13 @@ import org.jd.infestusfrontier.storage.api.BiomassCodecs;
  * {@code result}, {@code ticks}.
  */
 public record OrganBatchRecipe(
-        String organ, List<Ingredient> ingredients, int waterMb, Biomass biomass, ItemStack result, int ticks)
+        String organ,
+        List<Ingredient> ingredients,
+        int waterMb,
+        Biomass biomass,
+        ItemStack result,
+        int ticks,
+        boolean keepsWear)
         implements Recipe<RecipeInput> {
     public static final int MAX_INGREDIENTS = 9;
     public static final MapCodec<OrganBatchRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -40,22 +46,11 @@ public record OrganBatchRecipe(
                     Codec.intRange(0, Integer.MAX_VALUE).fieldOf("water").forGetter(OrganBatchRecipe::waterMb),
                     BiomassCodecs.BIOMASS.fieldOf("biomass").forGetter(OrganBatchRecipe::biomass),
                     ItemStack.CODEC.fieldOf("result").forGetter(OrganBatchRecipe::result),
-                    Codec.intRange(1, Integer.MAX_VALUE).fieldOf("ticks").forGetter(OrganBatchRecipe::ticks))
+                    Codec.intRange(1, Integer.MAX_VALUE).fieldOf("ticks").forGetter(OrganBatchRecipe::ticks),
+                    Codec.BOOL.optionalFieldOf("keeps_wear", false).forGetter(OrganBatchRecipe::keepsWear))
             .apply(instance, OrganBatchRecipe::new));
-    public static final StreamCodec<RegistryFriendlyByteBuf, OrganBatchRecipe> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            OrganBatchRecipe::organ,
-            Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()),
-            OrganBatchRecipe::ingredients,
-            ByteBufCodecs.VAR_INT,
-            OrganBatchRecipe::waterMb,
-            ByteBufCodecs.VAR_INT.map(Biomass::of, Biomass::units),
-            OrganBatchRecipe::biomass,
-            ItemStack.STREAM_CODEC,
-            OrganBatchRecipe::result,
-            ByteBufCodecs.VAR_INT,
-            OrganBatchRecipe::ticks,
-            OrganBatchRecipe::new);
+    public static final StreamCodec<RegistryFriendlyByteBuf, OrganBatchRecipe> STREAM_CODEC =
+            ByteBufCodecs.fromCodecWithRegistries(CODEC.codec());
 
     /** True when the input holds exactly one item per ingredient and every ingredient has its own item. */
     @Override
@@ -68,6 +63,21 @@ public record OrganBatchRecipe(
         }
         if (items.size() != ingredients.size()) return false;
         return RecipeMatcher.findMatches(items, ingredients) != null;
+    }
+
+    /**
+     * The result for these inputs: a copy of {@link #result}, carrying the first damaged input's wear when the recipe
+     * {@link #keepsWear}, so an awakened piece is as worn as the dormant one it came from.
+     */
+    public ItemStack resultFor(List<ItemStack> inputs) {
+        ItemStack made = result.copy();
+        if (!keepsWear || !made.isDamageableItem()) return made;
+        for (ItemStack input : inputs) {
+            if (input.isEmpty() || !input.isDamageableItem()) continue;
+            made.setDamageValue((int) ((long) input.getDamageValue() * made.getMaxDamage() / input.getMaxDamage()));
+            return made;
+        }
+        return made;
     }
 
     /** True when some ingredient of this recipe takes {@code stack}. */

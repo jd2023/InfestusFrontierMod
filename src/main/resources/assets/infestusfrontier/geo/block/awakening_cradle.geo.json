@@ -1,0 +1,74 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.awakening_cradle",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 2,
+        "visible_bounds_height": 1,
+        "visible_bounds_offset": [0, 0.25, 0]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [0, 0, 0]
+        },
+        {
+          "name": "cup",
+          "parent": "root",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            {
+              "origin": [-7, 0, -7],
+              "size": [14, 2, 14],
+              "uv": [0, 0]
+            },
+            {
+              "origin": [-6, 2, -6],
+              "size": [12, 4, 12],
+              "uv": [0, 17]
+            }
+          ]
+        },
+        {
+          "name": "lobe_l",
+          "parent": "root",
+          "pivot": [-6, 6, 0],
+          "cubes": [
+            {
+              "origin": [-6, 6, -5],
+              "size": [4, 5, 10],
+              "uv": [0, 34]
+            }
+          ]
+        },
+        {
+          "name": "lobe_r",
+          "parent": "root",
+          "pivot": [6, 6, 0],
+          "cubes": [
+            {
+              "origin": [2, 6, -5],
+              "size": [4, 5, 10],
+              "uv": [0, 34]
+            }
+          ]
+        },
+        {
+          "name": "core",
+          "parent": "root",
+          "pivot": [0, 6, 0],
+          "cubes": [
+            {
+              "origin": [-2, 6, -2],
+              "size": [4, 4, 4],
+              "uv": [29, 34]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

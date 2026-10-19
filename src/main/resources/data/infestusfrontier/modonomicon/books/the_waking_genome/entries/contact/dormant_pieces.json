@@ -1,0 +1,43 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.dormant_pieces.name",
+  "description": "entry.infestusfrontier.contact.dormant_pieces.description",
+  "icon": "infestusfrontier:dormant_thorax",
+  "x": 4,
+  "y": 2,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/membrane_rack"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/a_culture_in_your_hand"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/dormant_thorax"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.dormant_pieces.name",
+      "text": "entry.infestusfrontier.contact.dormant_pieces.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:dormant_hood",
+      "recipe_id_2": "infestusfrontier:dormant_thorax"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:dormant_legwraps",
+      "recipe_id_2": "infestusfrontier:dormant_treads"
+    }
+  ]
+}

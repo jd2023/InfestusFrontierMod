@@ -1,5 +1,6 @@
 package org.jd.infestusfrontier.discovery;
 
+import java.util.List;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -13,6 +14,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.equipment.EquipmentModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
@@ -50,6 +52,16 @@ public final class DiscoveryModule {
                         output.accept(ProcessingModule.MEMBRANE_SHEET.get());
                         output.accept(ProcessingModule.BONE_LOOM_ITEM.get());
                         output.accept(ProcessingModule.BONE_PLATE.get());
+                        output.accept(ProcessingModule.AWAKENING_CRADLE_ITEM.get());
+                        for (var piece : List.of(
+                                EquipmentModule.DORMANT_HOOD,
+                                EquipmentModule.DORMANT_THORAX,
+                                EquipmentModule.DORMANT_LEGWRAPS,
+                                EquipmentModule.DORMANT_TREADS,
+                                EquipmentModule.AWAKENED_HOOD,
+                                EquipmentModule.AWAKENED_THORAX,
+                                EquipmentModule.AWAKENED_LEGWRAPS,
+                                EquipmentModule.AWAKENED_TREADS)) output.accept(piece.get());
                         output.accept(InteractionModule.SYNAPTIC_PROBE.get());
                     })
                     .build());

@@ -110,7 +110,8 @@ public final class StorageTests {
         BiomassBladderMenu bladder = (BiomassBladderMenu) menu;
         h.assertValueEqual(bladder.stored(), 1000, "menu reads the stored amount");
         h.assertValueEqual(bladder.capacity(), 4000, "menu reads the capacity");
-        h.assertFalse(bladder.clickMenuButton(player, BiomassBladderMenu.FILL_BUTTON), "fill has nothing to do yet");
+        h.assertTrue(bladder.clickMenuButton(player, BiomassBladderMenu.FILL_BUTTON), "fill is handled");
+        h.assertValueEqual(bladder.stored(), 1000, "with nothing in the slot it moves nothing");
         Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.STONE, 1);
         h.assertValueEqual(
                 EcologyTests.useHeld(h, builder, BLADDER, Direction.UP),

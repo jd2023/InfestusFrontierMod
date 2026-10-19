@@ -12,12 +12,15 @@
     "setblock 8 -60 3 infestusfrontier:membrane_rack[working=true]{contents:{ingredients:[],output:{},water:600,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:1},batch:{batch:{recipe:\"infestusfrontier:preparing/membrane_sheet\",ticks_required:400,ticks_done:200},result:{id:\"infestusfrontier:membrane_sheet\",count:1}}}}",
     "setblock 11 -61 3 infestusfrontier:living_substrate[stage=mature]",
     "setblock 11 -60 3 infestusfrontier:bone_loom[working=true]{contents:{ingredients:[{id:\"minecraft:bone\",count:1}],output:{},water:0,biomass:{stored:500,reserved:0,capacity:1000},history:{completed_batches:1},batch:{batch:{recipe:\"infestusfrontier:preparing/bone_plate\",ticks_required:400,ticks_done:200},result:{id:\"infestusfrontier:bone_plate\",count:1}}}}",
+    "setblock 14 -61 3 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 14 -60 3 infestusfrontier:awakening_cradle[working=true]{contents:{ingredients:[],output:{},water:0,biomass:{stored:600,reserved:0,capacity:1000},history:{completed_batches:1},batch:{batch:{recipe:\"infestusfrontier:awakening/thorax\",ticks_required:600,ticks_done:200},result:{id:\"infestusfrontier:awakened_thorax\",count:1}}}}",
     "give @s infestusfrontier:organ_bud 1",
     "give @s infestusfrontier:digestive_sac 1",
     "give @s infestusfrontier:biomass_bladder 1",
     "give @s infestusfrontier:culture_bowl 1",
     "give @s infestusfrontier:membrane_rack 1",
     "give @s infestusfrontier:bone_loom 1",
+    "give @s infestusfrontier:awakening_cradle 1",
     "give @s infestusfrontier:biomass_bucket 1"
   ],
   "views": [
@@ -38,11 +41,27 @@
       "pitch": 15
     },
     {
+      "name": "front_right",
+      "x": 11.5,
+      "y": -60,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 15
+    },
+    {
       "name": "side",
       "x": -7.5,
       "y": -60,
       "z": 3.5,
       "yaw": -90,
+      "pitch": 15
+    },
+    {
+      "name": "back_right",
+      "x": 11.5,
+      "y": -60,
+      "z": 8.5,
+      "yaw": 180,
       "pitch": 15
     },
     {
@@ -67,7 +86,8 @@
         "infestusfrontier:biomass_bladder",
         "infestusfrontier:culture_bowl",
         "infestusfrontier:membrane_rack",
-        "infestusfrontier:bone_loom"
+        "infestusfrontier:bone_loom",
+        "infestusfrontier:awakening_cradle"
       ]
     }
   ]

@@ -186,6 +186,29 @@ Bounds: 32x32 for the icon, 200x200 RGBA for the illustration.
 Evidence: visual
 ```
 
+## ART-005 — Armor pieces and the Cradle artwork
+
+```text
+ART-005  The eight armor pieces have icons and worn textures, the Cradle its guide illustration
+Status: ready
+Milestone: M2
+Owner: equipment
+Kind: art
+Depends: the Cradle commit on v4
+Read: docs/design/ARMOR_EVOLUTION.md#4-fusion-tree (Dormant flesh, Living frame), docs/design/ITEM_CATALOG.md (I013, I014), docs/design/BLOCK_CATALOG.md#t0-08--awakening-cradle
+Files: src/main/resources/assets/infestusfrontier/textures/item/dormant_*.png and awakened_*.png (8), src/main/resources/assets/infestusfrontier/textures/models/armor/dormant_layer_1.png, dormant_layer_2.png, awakened_layer_1.png, awakened_layer_2.png, src/main/resources/assets/infestusfrontier/textures/book/awakening_cradle.png, the_waking_genome/entries/contact/awakening_cradle.json, CREDITS.txt
+Do:
+  1. Eight 32x32 icons in the vanilla armor silhouettes: dormant pieces are dull rotten-flesh red, awakened pieces the mod's wine-red living membrane with one small olive pore. Export with scripts/texture.py --size 32 --colors 0.
+  2. Worn armor layers, 64x32 each, in the vanilla humanoid armor layout: layer_1 holds hood, thorax and treads, layer_2 the legwraps. Dormant: slack flesh with stitches; awakened: living membrane with faint veins and one olive pore on the chest.
+  3. awakening_cradle.png, 200x200 canvas with a 200x100 vignette like the other Contact illustrations: the flesh cup with its two lobes folding around a dormant thorax, the pale core glowing. Then the entry's first page becomes a modonomicon:image page.
+Tests: none. Assets only; the gate's captures are the evidence, plus one screenshot of a worn set from runClient.
+Done:
+  - bash scripts/verify.sh
+Not: the Cradle model (generated), mutation or fusion looks.
+Bounds: 32x32 icons, 64x32 layers, 200x200 RGBA for the illustration.
+Evidence: visual
+```
+
 ## Substrate source prompts
 
 Built-in image generation, 2026-10-15. Generate mature first using the V3 mature substrate and Astra evaluation tissue as references. Derive young from mature and basic from young. Export with `scripts/texture.py --size 256 --tiles 4`. The unnumbered 64x64 textures support the existing models until IF-008 connects the macro tiles. Spore Culture remains pending.

@@ -113,16 +113,26 @@ public final class BatchOrganMenu extends OrganMenu {
                 Sheet.SLOT.height());
     }
 
-    /** Where the kind's output well sits: under the vein on a grid panel, after the vein on a row panel. */
+    /**
+     * Where the kind's output well sits: under the vein on a grid panel; after the vein on a row panel when it fits
+     * before the tank, else at the start of the second row.
+     */
     static Bounds outputWell(BatchOrganKind kind) {
         if (kind.slots() > 3)
             return new Bounds(Sheet.SLOT_X + 57, Sheet.ROW2_Y, Sheet.SLOT.width(), Sheet.SLOT.height());
-        int afterWells = Sheet.FIRST_PART_X + kind.slots() * (Sheet.SLOT.width() + Sheet.GAP);
-        return new Bounds(
-                afterWells + Sheet.VEIN_EMPTY.width() + Sheet.GAP,
-                Sheet.PARTS_Y,
-                Sheet.SLOT.width(),
-                Sheet.SLOT.height());
+        int afterVein = Sheet.FIRST_PART_X
+                + kind.slots() * (Sheet.SLOT.width() + Sheet.GAP)
+                + Sheet.VEIN_EMPTY.width()
+                + Sheet.GAP;
+        int limit = kind.holdsBiomass() ? Sheet.PARTS_END : Sheet.RIGHT_EDGE;
+        if (afterVein + Sheet.SLOT.width() <= limit)
+            return new Bounds(afterVein, Sheet.PARTS_Y, Sheet.SLOT.width(), Sheet.SLOT.height());
+        return new Bounds(Sheet.FIRST_PART_X, Sheet.ROW2_Y, Sheet.SLOT.width(), Sheet.SLOT.height());
+    }
+
+    /** The output well's place on the panel, for the screen that draws it. */
+    public Bounds outputWell() {
+        return outputWell(kind);
     }
 
     public int ingredientSlots() {
