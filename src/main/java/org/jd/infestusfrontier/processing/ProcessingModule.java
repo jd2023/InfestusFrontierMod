@@ -237,6 +237,7 @@ public final class ProcessingModule {
             for (var entity :
                     List.of(CULTURE_BOWL_ENTITY, MEMBRANE_RACK_ENTITY, BONE_LOOM_ENTITY, AWAKENING_CRADLE_ENTITY)) {
                 event.registerBlockEntity(BiomassCapabilities.BLOCK, entity.get(), (organ, side) -> organ);
+                event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, entity.get(), (organ, side) -> organ.ports());
                 event.registerBlockEntity(
                         Capabilities.FluidHandler.BLOCK,
                         entity.get(),

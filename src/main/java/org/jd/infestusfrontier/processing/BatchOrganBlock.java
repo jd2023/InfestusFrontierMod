@@ -29,9 +29,9 @@ import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A hand-loaded batch organ of one {@link BatchOrganKind}. Buckets move water and biomass, ingredients go in one at a
- * time, sneaking with both hands empty takes them back, anything else opens the screen. Sneaking with an item builds
- * against it.
+ * A batch organ of one {@link BatchOrganKind}. Buckets move water and biomass, ingredients go in one at a time by hand
+ * or by the stack from a hopper, sneaking with both hands empty takes a stack back, anything else opens the screen.
+ * Sneaking with an item builds against it. The batch starts on its own.
  */
 public final class BatchOrganBlock extends BaseEntityBlock {
     /** True while a batch runs; the client animates from it. */
@@ -121,6 +121,7 @@ public final class BatchOrganBlock extends BaseEntityBlock {
             Refusals.show(player, refusal.get());
             return ItemInteractionResult.FAIL;
         }
+        organ.fedBy(player);
         return ItemInteractionResult.CONSUME;
     }
 
@@ -131,9 +132,7 @@ public final class BatchOrganBlock extends BaseEntityBlock {
             return Organs.openScreen(level, pos, player).result();
         if (level.isClientSide) return InteractionResult.SUCCESS;
         if (!(level.getBlockEntity(pos) instanceof BatchOrganBlockEntity organ)) return InteractionResult.PASS;
-        var refusal = organ.cancel(player);
-        if (refusal.isPresent()) Refusals.show(player, refusal.get());
-        else organ.collect(player);
+        organ.collect(player);
         return InteractionResult.CONSUME;
     }
 }

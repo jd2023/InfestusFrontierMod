@@ -79,8 +79,7 @@ public final class M2RouteTests {
             Player loader = EcologyTests.holding(h, GameType.SURVIVAL, item, 1);
             EcologyTests.use(h, loader, BOWL, Direction.UP);
         }
-        CultureBowlTests.startBatch(h, BOWL);
-        h.assertTrue(bowlContents(h).batch().isPresent(), "the bowl batch runs at tick " + h.getTick());
+        h.runAfterDelay(1, () -> h.assertTrue(bowlContents(h).batch().isPresent(), "the bowl batch runs on its own"));
 
         Player feeder = EcologyTests.holding(h, GameType.SURVIVAL, Items.WHEAT, 10);
         ProcessingTests.feedRepeatedly(h, feeder, 10, WHEAT_GAP, () -> {

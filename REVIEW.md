@@ -46,6 +46,7 @@ Defect classes found in this project before. Check the ones that apply to the di
 - Earned credit and outputs survive logout, full inventories and Creative mode.
 - Rate limits cannot be bypassed by reopening a menu or using a second route such as buckets.
 - An organ can never clog: every admitted input has an exit.
+- An organ runs without a player: a hopper can load it, its output can be taken by a pipe, and work starts on its own. A feature that only works by hand is a defect.
 
 **Player interaction**
 - Any hand opens an organ's screen, like a chest, through `Organs.openScreen`. Only an item with a job on the organ (bucket, feed, ingredient, reader) acts instead; an awakened piece opens the screen and is filled from the Bladder's slot. Sneaking with an item builds against it.

@@ -1,9 +1,12 @@
 package org.jd.infestusfrontier.processing;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.MenuType;
@@ -12,7 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
-import org.jd.infestusfrontier.foundation.Refusals;
 import org.jd.infestusfrontier.foundation.menu.OrganMenu;
 import org.jd.infestusfrontier.ui.Bounds;
 import org.jd.infestusfrontier.ui.Sheet;
@@ -20,11 +22,10 @@ import org.jd.infestusfrontier.ui.SlotGrid;
 
 /**
  * The server half of every batch organ's screen: the kind's ingredient slots and the output slot backed by the block
- * entity's own handlers, five synced ints (water, biomass, biomass capacity, progress percent, state) and the Start
- * button. Nothing here decides a batch; the block entity does.
+ * entity's own handlers and five synced ints (water, biomass, biomass capacity, progress percent, state). Nothing here
+ * decides a batch; the block entity does, and credits it to the player whose click last changed the ingredients.
  */
 public final class BatchOrganMenu extends OrganMenu {
-    public static final int START_BUTTON = 0;
     public static final int IDLE = 0;
     public static final int WORKING = 1;
     public static final int PAUSED = 2;
@@ -172,9 +173,15 @@ public final class BatchOrganMenu extends OrganMenu {
     }
 
     @Override
-    public boolean clickMenuButton(Player player, int id) {
-        if (id != START_BUTTON) return false;
-        organ.ifPresent(entity -> entity.start(player).ifPresent(refusal -> Refusals.show(player, refusal)));
-        return true;
+    public void clicked(int slotId, int button, ClickType type, Player player) {
+        List<ItemStack> before = ingredientsHeld();
+        super.clicked(slotId, button, type, player);
+        if (!ItemStack.listMatches(before, ingredientsHeld())) organ.ifPresent(entity -> entity.fedBy(player));
+    }
+
+    private List<ItemStack> ingredientsHeld() {
+        List<ItemStack> held = new ArrayList<>();
+        for (int i = 0; i < kind.slots(); i++) held.add(getSlot(i).getItem().copy());
+        return held;
     }
 }

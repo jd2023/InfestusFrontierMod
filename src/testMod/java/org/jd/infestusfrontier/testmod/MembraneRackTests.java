@@ -7,13 +7,17 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HopperBlock;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.processing.BatchOrganMenu;
 import org.jd.infestusfrontier.processing.ProcessingModule;
@@ -22,7 +26,7 @@ import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 
-/** The Membrane Rack: the second batch organ, with two slots, water and no biomass. */
+/** The Membrane Rack: the second batch organ, with two slots, water and no biomass; a hopper can run it. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class MembraneRackTests {
@@ -53,10 +57,11 @@ public final class MembraneRackTests {
         BatchOrganMenu menu = menu(h, player);
         h.assertValueEqual(menu.ingredientSlots(), 2, "two ingredient wells");
         h.assertValueEqual(menu.waterCapacity(), 1000, "a small water tank");
-        h.assertTrue(menu.clickMenuButton(player, BatchOrganMenu.START_BUTTON), "start handled");
-        BatchOrganContents started = contents(h);
-        h.assertTrue(started.batch().isPresent(), "a batch runs");
-        h.assertValueEqual(started.waterMb(), 900, "100 mB of water used");
+        h.runAfterDelay(1, () -> {
+            BatchOrganContents started = contents(h);
+            h.assertTrue(started.batch().isPresent(), "a batch runs on its own");
+            h.assertValueEqual(started.waterMb(), 900, "100 mB of water used");
+        });
         h.runAtTickTime(FLESH_TICKS - 2, () -> h.assertTrue(contents(h).output().isEmpty(), "not done early"));
         h.runAtTickTime(FLESH_TICKS + 2, () -> {
             BatchOrganContents done = contents(h);
@@ -72,9 +77,7 @@ public final class MembraneRackTests {
         load(h, Items.LEATHER, 1);
         load(h, Items.STRING, 1);
         load(h, Items.WATER_BUCKET, 1);
-        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-        menu(h, player).clickMenuButton(player, BatchOrganMenu.START_BUTTON);
-        h.assertTrue(contents(h).batch().isPresent(), "a batch runs");
+        h.runAfterDelay(1, () -> h.assertTrue(contents(h).batch().isPresent(), "a batch runs"));
         h.runAtTickTime(FLESH_TICKS + 2, () -> h.assertTrue(contents(h).output().isEmpty(), "leather is slower"));
         h.runAtTickTime(LEATHER_TICKS + 2, () -> {
             h.assertTrue(contents(h).output().is(ProcessingModule.MEMBRANE_SHEET.get()), "one Membrane Sheet");
@@ -98,6 +101,41 @@ public final class MembraneRackTests {
                 "biomass is the wrong fluid here");
         h.succeed();
     }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 700)
+    public static void aHopperLoadsTheRackAndTheRackRuns(GameTestHelper h) {
+        placeRack(h);
+        load(h, Items.WATER_BUCKET, 1);
+        h.setBlock(HOPPER, Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.DOWN));
+        HopperBlockEntity hopper = (HopperBlockEntity) h.getBlockEntity(HOPPER);
+        hopper.setItem(0, new ItemStack(Items.ROTTEN_FLESH, 4));
+        hopper.setItem(1, new ItemStack(Items.STRING, 4));
+        h.runAfterDelay(40, () -> {
+            BatchOrganContents fed = contents(h);
+            h.assertTrue(fed.batch().isPresent(), "the hopper's items started a batch");
+            h.assertValueEqual(
+                    hopper.countItem(Items.ROTTEN_FLESH)
+                            + fed.ingredients().get(0).getCount(),
+                    3,
+                    "one flesh taken");
+            h.assertTrue(fed.batch().orElseThrow().starter().isEmpty(), "nobody is credited for a hopper's work");
+        });
+        h.runAtTickTime(FLESH_TICKS + 40, () -> {
+            IItemHandler ports =
+                    h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(RACK), Direction.DOWN);
+            h.assertTrue(ports != null, "the rack answers item handlers");
+            h.assertValueEqual(ports.getSlots(), 3, "two ingredient ports and the output");
+            h.assertTrue(ports.extractItem(0, 1, true).isEmpty(), "ingredients cannot be pulled out");
+            h.assertTrue(
+                    ports.insertItem(2, new ItemStack(Items.STRING), true).is(Items.STRING),
+                    "nothing can be pushed into the output");
+            ItemStack sheet = ports.extractItem(2, 1, false);
+            h.assertTrue(sheet.is(ProcessingModule.MEMBRANE_SHEET.get()), "the sheet comes out of the output port");
+            h.succeed();
+        });
+    }
+
+    private static final BlockPos HOPPER = RACK.above();
 
     private static void placeRack(GameTestHelper h) {
         h.setBlock(GROUND, EcologyModule.LIVING_SUBSTRATE.get());

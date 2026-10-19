@@ -39,6 +39,10 @@
     "setblock 32 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 32 -60 -36 infestusfrontier:awakening_cradle[working=true]{contents:{ingredients:[],output:{},water:0,biomass:{stored:700,reserved:0,capacity:1000},history:{completed_batches:1},batch:{batch:{recipe:\"infestusfrontier:awakening/thorax\",ticks_required:600,ticks_done:300},result:{id:\"infestusfrontier:awakened_thorax\",count:1}}}}",
     "setblock 33 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Awakening Cradle\"','\"dormant piece\"','\"culture, biomass\"','\"wakes it\"']}}",
+    "setblock 34 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 34 -60 -36 infestusfrontier:membrane_rack{contents:{ingredients:[],output:{},water:1000,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:0}}}",
+    "setblock 34 -59 -36 hopper[facing=down]{Items:[{Slot:0,id:\"minecraft:rotten_flesh\",count:8},{Slot:1,id:\"minecraft:string\",count:8}]}",
+    "setblock 35 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Fed Rack\"','\"the hopper loads it\"','\"it starts alone\"','\"sneak: take sheets\"']}}",
     "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
     "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",
     "fill 5 -61 -29 8 -61 -26 infestusfrontier:living_substrate[stage=young]",
@@ -131,6 +135,14 @@
       "z": -39.5,
       "yaw": 0,
       "pitch": 15
+    },
+    {
+      "name": "fed_rack",
+      "x": 34.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 0
     },
     {
       "name": "sac_screen",

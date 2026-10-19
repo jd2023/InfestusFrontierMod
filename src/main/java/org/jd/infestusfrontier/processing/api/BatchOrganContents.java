@@ -5,6 +5,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -15,8 +17,9 @@ import org.jd.infestusfrontier.organ.api.OrganCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /**
- * The saved and carried form of a batch organ (Bowl, Rack, Loom), including the batch it is running. A value: the stacks are copied
- * in and copied out, and two contents are equal when every stack matches item for item.
+ * The saved and carried form of a batch organ (Bowl, Rack, Loom, Cradle): what it holds, the batch it is running and
+ * the last player who loaded it by hand, whom its batches are credited to. A value: the stacks are copied in and
+ * copied out, and two contents are equal when every stack matches item for item.
  */
 public record BatchOrganContents(
         List<ItemStack> ingredients,
@@ -24,10 +27,22 @@ public record BatchOrganContents(
         int waterMb,
         BiomassTank biomass,
         OrganHistory history,
-        Optional<OrganBatch> batch) {
+        Optional<OrganBatch> batch,
+        Optional<UUID> feeder) {
     public BatchOrganContents {
         ingredients = ingredients.stream().map(ItemStack::copy).toList();
         output = output.copy();
+    }
+
+    /** Contents nobody has fed by hand. */
+    public BatchOrganContents(
+            List<ItemStack> ingredients,
+            ItemStack output,
+            int waterMb,
+            BiomassTank biomass,
+            OrganHistory history,
+            Optional<OrganBatch> batch) {
+        this(ingredients, output, waterMb, biomass, history, batch, Optional.empty());
     }
 
     @Override
@@ -48,7 +63,8 @@ public record BatchOrganContents(
                 && waterMb == that.waterMb
                 && biomass.equals(that.biomass)
                 && history.equals(that.history)
-                && batch.equals(that.batch);
+                && batch.equals(that.batch)
+                && feeder.equals(that.feeder);
     }
 
     @Override
@@ -59,7 +75,8 @@ public record BatchOrganContents(
                 waterMb,
                 biomass,
                 history,
-                batch);
+                batch,
+                feeder);
     }
 
     /** The most water any batch organ holds; a kind may hold less. */
@@ -76,7 +93,8 @@ public record BatchOrganContents(
                     Codec.intRange(0, MAX_WATER).fieldOf("water").forGetter(BatchOrganContents::waterMb),
                     BiomassCodecs.TANK.fieldOf("biomass").forGetter(BatchOrganContents::biomass),
                     OrganCodecs.HISTORY.fieldOf("history").forGetter(BatchOrganContents::history),
-                    OrganBatch.CODEC.optionalFieldOf("batch").forGetter(BatchOrganContents::batch))
+                    OrganBatch.CODEC.optionalFieldOf("batch").forGetter(BatchOrganContents::batch),
+                    UUIDUtil.CODEC.optionalFieldOf("feeder").forGetter(BatchOrganContents::feeder))
             .apply(instance, BatchOrganContents::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, BatchOrganContents> STREAM_CODEC =
             ByteBufCodecs.fromCodecWithRegistries(CODEC);

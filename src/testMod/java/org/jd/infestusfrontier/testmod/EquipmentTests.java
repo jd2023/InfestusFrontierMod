@@ -62,11 +62,11 @@ public final class EquipmentTests {
         EcologyTests.use(h, loader, ORGAN, Direction.UP);
         load(h, EcologyModule.SPORE_CULTURE.get(), 1);
         load(h, StorageModule.BIOMASS_BUCKET.get(), 1);
-        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-        menu(h, player).clickMenuButton(player, BatchOrganMenu.START_BUTTON);
-        BatchOrganContents started = contents(h);
-        h.assertTrue(started.batch().isPresent(), "a batch runs");
-        h.assertValueEqual(started.biomass().stored().units(), 900, "100 BU spent on waking");
+        h.runAfterDelay(1, () -> {
+            BatchOrganContents started = contents(h);
+            h.assertTrue(started.batch().isPresent(), "a batch runs on its own");
+            h.assertValueEqual(started.biomass().stored().units(), 900, "100 BU spent on waking");
+        });
         h.runAtTickTime(AWAKENING_TICKS + 2, () -> {
             ItemStack woken = contents(h).output();
             h.assertTrue(woken.is(EquipmentModule.AWAKENED_THORAX.get()), "an Awakened Thorax");

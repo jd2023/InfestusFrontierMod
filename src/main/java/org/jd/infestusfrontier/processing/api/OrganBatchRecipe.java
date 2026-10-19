@@ -5,6 +5,8 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -22,8 +24,9 @@ import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /**
- * One batch of an organ: up to nine ingredients, each consumed once, plus {@code waterMb} and {@code biomass}, become
- * {@code result} after {@code ticks} loaded ticks. Data: {@code recipe/culturing/*.json} with
+ * One batch of an organ: up to nine ingredients, one item each, plus {@code waterMb} and {@code biomass}, become
+ * {@code result} after {@code ticks} loaded ticks. The slots may hold more; a batch takes one item per ingredient and
+ * leaves the rest. Data: {@code recipe/culturing/*.json} with
  * {@code "type": "infestusfrontier:organ_batch"}, {@code organ}, {@code ingredients}, {@code water}, {@code biomass},
  * {@code result}, {@code ticks}.
  */
@@ -52,17 +55,41 @@ public record OrganBatchRecipe(
     public static final StreamCodec<RegistryFriendlyByteBuf, OrganBatchRecipe> STREAM_CODEC =
             ByteBufCodecs.fromCodecWithRegistries(CODEC.codec());
 
-    /** True when the input holds exactly one item per ingredient and every ingredient has its own item. */
+    /** True when {@link #plan} finds a batch in the input's slots. */
     @Override
     public boolean matches(RecipeInput input, Level level) {
-        List<ItemStack> items = new ArrayList<>();
-        for (int slot = 0; slot < input.size(); slot++) {
-            ItemStack stack = input.getItem(slot);
-            if (items.size() + stack.getCount() > ingredients.size()) return false;
-            for (int i = 0; i < stack.getCount(); i++) items.add(stack);
+        List<ItemStack> slots = new ArrayList<>();
+        for (int slot = 0; slot < input.size(); slot++) slots.add(input.getItem(slot));
+        return plan(slots).isPresent();
+    }
+
+    /**
+     * How many items each slot gives to one batch, or empty when the slots cannot fill every ingredient. Each
+     * ingredient takes one item; a slot gives at most as many items as ingredients accept its stack; whatever the slots
+     * hold beyond that stays for the next batch.
+     */
+    public Optional<int[]> plan(List<ItemStack> slots) {
+        List<ItemStack> units = new ArrayList<>();
+        List<Integer> from = new ArrayList<>();
+        for (int slot = 0; slot < slots.size(); slot++) {
+            ItemStack stack = slots.get(slot);
+            if (stack.isEmpty()) continue;
+            int accepting = (int) ingredients.stream()
+                    .filter(ingredient -> ingredient.test(stack))
+                    .count();
+            for (int i = 0; i < Math.min(stack.getCount(), accepting); i++) {
+                units.add(stack);
+                from.add(slot);
+            }
         }
-        if (items.size() != ingredients.size()) return false;
-        return RecipeMatcher.findMatches(items, ingredients) != null;
+        if (units.size() < ingredients.size()) return Optional.empty();
+        List<Predicate<ItemStack>> tests = new ArrayList<>(ingredients);
+        while (tests.size() < units.size()) tests.add(any -> true); // the spare units match nothing in particular
+        int[] matched = RecipeMatcher.findMatches(units, tests);
+        if (matched == null) return Optional.empty();
+        int[] take = new int[slots.size()];
+        for (int unit = 0; unit < units.size(); unit++) if (matched[unit] < ingredients.size()) take[from.get(unit)]++;
+        return Optional.of(take);
     }
 
     /**

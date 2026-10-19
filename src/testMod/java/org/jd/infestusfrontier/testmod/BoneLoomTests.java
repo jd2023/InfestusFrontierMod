@@ -34,10 +34,11 @@ public final class BoneLoomTests {
         BatchOrganMenu menu = menu(h, player);
         h.assertValueEqual(menu.ingredientSlots(), 1, "one well");
         h.assertValueEqual(menu.stored(), 1000, "a bucket of biomass went in");
-        h.assertTrue(menu.clickMenuButton(player, BatchOrganMenu.START_BUTTON), "start handled");
-        BatchOrganContents started = contents(h);
-        h.assertTrue(started.batch().isPresent(), "a batch runs");
-        h.assertValueEqual(started.biomass().stored().units(), 950, "50 BU bound the bone");
+        h.runAfterDelay(1, () -> {
+            BatchOrganContents started = contents(h);
+            h.assertTrue(started.batch().isPresent(), "a batch runs on its own");
+            h.assertValueEqual(started.biomass().stored().units(), 950, "50 BU bound the bone");
+        });
         h.runAtTickTime(PLATE_TICKS - 2, () -> h.assertTrue(contents(h).output().isEmpty(), "not done early"));
         h.runAtTickTime(PLATE_TICKS + 2, () -> {
             h.assertTrue(contents(h).output().is(ProcessingModule.BONE_PLATE.get()), "one Bone Plate");
@@ -56,14 +57,14 @@ public final class BoneLoomTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void startRefusesWithoutBiomass(GameTestHelper h) {
+    public static void nothingStartsWithoutBiomass(GameTestHelper h) {
         placeLoom(h);
         load(h, Items.BONE, 1);
-        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-        menu(h, player).clickMenuButton(player, BatchOrganMenu.START_BUTTON);
-        h.assertTrue(contents(h).batch().isEmpty(), "no batch without the 50 BU");
-        h.assertTrue(contents(h).ingredients().get(0).is(Items.BONE), "the bone stays");
-        h.succeed();
+        h.runAfterDelay(2, () -> {
+            h.assertTrue(contents(h).batch().isEmpty(), "no batch without the 50 BU");
+            h.assertTrue(contents(h).ingredients().get(0).is(Items.BONE), "the bone stays");
+            h.succeed();
+        });
     }
 
     private static void placeLoom(GameTestHelper h) {
