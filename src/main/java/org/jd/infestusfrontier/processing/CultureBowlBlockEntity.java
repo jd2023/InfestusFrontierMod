@@ -313,12 +313,9 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     }
 
     private void restore(CultureBowlContents saved) {
+        List<ItemStack> held = saved.ingredients();
         for (int slot = 0; slot < INGREDIENT_SLOTS; slot++)
-            ingredients.setStackInSlot(
-                    slot,
-                    slot < saved.ingredients().size()
-                            ? saved.ingredients().get(slot).copy()
-                            : ItemStack.EMPTY);
+            ingredients.setStackInSlot(slot, slot < held.size() ? held.get(slot) : ItemStack.EMPTY);
         output.setStackInSlot(0, saved.output().copy());
         water.setFluid(saved.waterMb() > 0 ? new FluidStack(Fluids.WATER, saved.waterMb()) : FluidStack.EMPTY);
         biomass = saved.biomass();

@@ -119,6 +119,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 - `equipment` owns every suit predicate and every fuel spend. Nobody rebuilds the full-set check.
 - `genetics` owns native-class predicates. Being in a dimension, owning a genome and having a native bed are three separate conditions.
 - Freight has one owner at every step and a bounded escrow.
+- A record carried as a data component is a value: item stacks are copied in and out and compared with `ItemStack.matches`.
 - Optional adapters load only when their mod is present. Test mod code never ships.
 - An organ opens its screen for any hand, like a chest, through `Organs.openScreen`. Only a fluid container, a feed item or an ingredient acts on the organ instead. Sneak to build against it.
 
@@ -132,6 +133,7 @@ Before implementation, the story states: the work unit, who shares the budget (d
 - No implicit chunk loading. No spread, route, helper or cross-dimension lookup creates a ticket. A paid loader (Sail Roost) has owner, quota, upkeep, expiry and restart tests, and counts the engine-loaded neighbors too.
 - No recursive flood fill, whole-world scan, position-keyed unbounded cache, ever-growing queue, unlimited inventory or attacker-sized NBT allocation.
 - Budgets are shared through `TickQuota` or a sibling in `core`. Rate limiting one machine does not bound a world of machines.
+- Refused admission does not retry every tick. `core.foundation.RetryGate` keys the retry on the state the refusal saw, with a slow periodic retry beside it.
 - Idle systems sleep. Decorative blocks have no block entity. Refused work pauses and retries without losing items or multiplying pending work.
 - Check `isLoaded` before any neighbor read. Vanilla neighbor updates, leaf decay, drops and third-party handlers can reach unloaded chunks.
 - Sync changes only, as compact deltas. Particles are client-side, distance-limited, short-lived, and share one budget.

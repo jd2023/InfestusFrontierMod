@@ -261,6 +261,25 @@ public final class DiscoveryTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aFullCreditListSavesAndLoadsIntact(GameTestHelper h) {
+        var registries = h.getLevel().registryAccess();
+        PendingCredits fresh = PendingCredits.load(new CompoundTag(), registries);
+        UUID last = null;
+        for (int n = 0; n < PendingCredits.LIMIT; n++) {
+            last = UUID.randomUUID();
+            fresh.remember(last, id("digestive_sac"));
+        }
+        UUID refused = UUID.randomUUID();
+        fresh.remember(refused, id("digestive_sac"));
+        h.assertValueEqual(fresh.size(), PendingCredits.LIMIT, "the writer stops at the limit");
+        h.assertFalse(fresh.holds(refused, id("digestive_sac")), "the credit past the limit is refused, not evicting");
+        PendingCredits reloaded = PendingCredits.load(fresh.save(new CompoundTag(), registries), registries);
+        h.assertValueEqual(reloaded.size(), PendingCredits.LIMIT, "a full list reads back whole");
+        h.assertTrue(reloaded.holds(last, id("digestive_sac")), "the last credit survives");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void unreadableCreditsAreKeptNotDropped(GameTestHelper h) {
         var registries = h.getLevel().registryAccess();
         CompoundTag bad = new CompoundTag();

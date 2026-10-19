@@ -26,7 +26,7 @@ public record CultureBowlContents(
         OrganHistory history,
         Optional<OrganBatch> batch) {
     public CultureBowlContents {
-        ingredients = List.copyOf(ingredients.stream().map(ItemStack::copy).toList());
+        ingredients = ingredients.stream().map(ItemStack::copy).toList();
         output = output.copy();
     }
 

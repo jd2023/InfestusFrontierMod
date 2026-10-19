@@ -35,9 +35,9 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.core.foundation.RetryGate;
 import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.core.processing.Batch;
-import org.jd.infestusfrontier.core.processing.RetryGate;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.foundation.Refusals;
@@ -87,7 +87,9 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     private OrganHistory history = OrganHistory.NONE;
     private Optional<DigestionBatch> batch = Optional.empty();
     private Optional<CompoundTag> unreadable = Optional.empty();
-    /** A refused feed slot is not retried every tick: only when the tank or the slot changed. */
+    /** A refused feed slot is retried when the tank or the slot changed, else once every {@value #RETRY_TICKS} ticks. */
+    private static final int RETRY_TICKS = 20;
+
     private final RetryGate<FeedState> feedGate = new RetryGate<>();
 
     private final ItemStackHandler feed = new ItemStackHandler(1) {
@@ -207,7 +209,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
         ItemStack stack = feed.getStackInSlot(0);
         if (stack.isEmpty()) return;
         FeedState now = new FeedState(tank, stack.getItem(), stack.getCount());
-        if (!feedGate.due(now)) return;
+        if (!feedGate.due(now) && level.getGameTime() % RETRY_TICKS != 0) return;
         Optional<RecipeHolder<DigestionRecipe>> recipe = recipeFor(stack);
         if (recipe.isEmpty() || refusalFor(recipe.get().value().biomass()).isPresent()) {
             feedGate.refused(now);

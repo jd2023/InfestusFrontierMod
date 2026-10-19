@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.core.processing;
+package org.jd.infestusfrontier.core.foundation;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

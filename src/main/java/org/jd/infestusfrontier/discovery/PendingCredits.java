@@ -22,12 +22,13 @@ import org.slf4j.Logger;
 
 /**
  * Batch credits for players who were offline when their organ finished. Held on the overworld, one credit per
- * player and organ, so the organ count bounds it per player and no player's credit ever evicts another's. A
- * player's credits fire on login and are forgotten. A credit list that cannot be read is kept as it was.
+ * player and organ and at most {@link #LIMIT} in all: past that a new credit is refused and logged, so no player's
+ * credit ever evicts another's and the list we save is always one we can read back. A player's credits fire on
+ * login and are forgotten. A credit list that cannot be read is kept as it was.
  */
 public final class PendingCredits extends SavedData {
-    /** More entries than this in one saved list is not a credit list we wrote. */
-    static final int MAX_DECODED = 4096;
+    /** The most credits held at once; the reader and the writer share it. */
+    public static final int LIMIT = 4096;
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String NAME = "infestusfrontier_pending_credits";
@@ -55,7 +56,7 @@ public final class PendingCredits extends SavedData {
         if (tag.contains(KEPT)) loaded.unreadable = Optional.of(tag.get(KEPT).copy());
         if (!tag.contains(CREDITS)) return loaded;
         DataResult<List<Credit>> read = Credit.CODEC
-                .listOf(0, MAX_DECODED)
+                .listOf(0, LIMIT)
                 .parse(registries.createSerializationContext(NbtOps.INSTANCE), tag.get(CREDITS));
         read.ifSuccess(loaded.credits::addAll);
         read.ifError(error -> {
@@ -68,6 +69,10 @@ public final class PendingCredits extends SavedData {
     public void remember(UUID player, ResourceLocation organ) {
         Credit credit = new Credit(player, organ);
         if (credits.contains(credit)) return;
+        if (credits.size() >= LIMIT) {
+            LOGGER.warn("Pending credits full ({}); {} loses its credit for {}", LIMIT, player, organ);
+            return;
+        }
         credits.add(credit);
         setDirty();
     }

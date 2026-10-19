@@ -1,4 +1,4 @@
-package org.jd.infestusfrontier.core.processing;
+package org.jd.infestusfrontier.core.foundation;
 
 import java.util.Optional;
 
