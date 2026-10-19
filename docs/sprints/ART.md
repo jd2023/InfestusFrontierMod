@@ -71,14 +71,27 @@ Evidence: visual
 
 ## ART-003 — The Waking Genome artwork
 
-Status: ready for review; full gate passed (81 GameTests, 32 captures). Demo book opened from the hotbar; Bowl opening spread, batch recipes and crafting page inspected. Final capture rerun passed after removing duplicate headings.
-Scope: cover icon, one illustration for each of the nine Contact entries, native image-page wiring, and the client model registration needed by Modonomicon. Category icons wait until a second category exists.
-Files: textures/item/the_waking_genome.png, textures/book/*.png, models/item/the_waking_genome.json, the_waking_genome/book.json and entries/contact/*.json, integration/modonomicon/GuidePages.java, src/testMod/resources/captures/demo.json, CREDITS.txt.
-Tool: built-in image generation, 2026-10-18.
-Export: cover through scripts/texture.py --size 32 --colors 0. Illustrations retain generated alpha, trim to the alpha > 24 content bounds, fit proportionally within 192x104, and center on a transparent 200x200 canvas. Modonomicon 1.21.1 image pages render a square; the transparent padding preserves the roughly 200x100 artwork without stretching it.
-Layout: illustration and existing instructions open each entry. Existing batch recipes follow as a pair; crafting pages remain available afterward.
-Validation: run scripts/verify.sh; open the book from the demo hotbar and inspect the Bowl opening spread, batch recipes, and crafting page. Capture every entry's opening spread.
-Not: organ model changes, gameplay changes, custom page renderers, additional categories.
+```text
+ART-003  The guide has a cover of its own and a painted illustration for every Contact entry
+Status: accepted f162708 (art and pages); record and model wiring tidied in the following commit
+Milestone: M2
+Owner: discovery
+Kind: art
+Depends: IF-019
+Read: docs/design/GUIDE_PROGRESSION_TREE.md#3-contact-the-first-working-patch, the organ captures under build/captures/demo/
+Files: src/main/resources/assets/infestusfrontier/textures/item/the_waking_genome.png, src/main/resources/assets/infestusfrontier/textures/book/*.png, src/main/resources/assets/infestusfrontier/models/item/the_waking_genome.json, src/main/resources/data/infestusfrontier/modonomicon/books/the_waking_genome/book.json and entries/contact/*.json, src/testMod/resources/captures/demo.json, CREDITS.txt
+Do:
+  1. Cover icon, 32x32, exported with scripts/texture.py --size 32 --colors 0; book.json names it as the book model. The one line of Java this needs, registering that model on the client, was done by the planner in integration/modonomicon/GuidePages.java.
+  2. Nine illustrations, one per Contact entry, generated with the shared prompt plus the entry subject below; export keeps the generated alpha, trims to the content, fits it in 192x104 and centers it on a transparent 200x200 canvas. Modonomicon image pages render a square, so the padding keeps the aspect.
+  3. Each entry opens with its illustration and description, then its controls; batch recipes and crafting pages follow.
+  4. demo.json photographs every entry's opening spread.
+Tests: none. Assets only; the gate's captures are the evidence.
+Done:
+  - bash scripts/verify.sh
+Not: organ models, gameplay, custom page renderers, more categories.
+Bounds: 200x200 RGBA per illustration, 32x32 for the cover.
+Evidence: visual
+```
 
 ### Cover prompt
 

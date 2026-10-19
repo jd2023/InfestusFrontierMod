@@ -24,7 +24,8 @@ public final class GuidePages {
                     ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "the_waking_genome");
             ModelResourceLocation model = ModelResourceLocation.standalone(cover.withPrefix("item/"));
             modBus.addListener((ModelEvent.RegisterAdditional event) -> event.register(model));
-            // Modonomicon 1.21.1 resolves book covers by inventory key; NeoForge loads extra models as standalone.
+            // Modonomicon looks the cover up under the "inventory" variant, and NeoForge accepts side-loaded models
+            // only as "standalone": load it standalone, then publish it under the key Modonomicon reads.
             modBus.addListener((ModelEvent.ModifyBakingResult event) -> event.getModels()
                     .put(
                             new ModelResourceLocation(cover, "inventory"),
