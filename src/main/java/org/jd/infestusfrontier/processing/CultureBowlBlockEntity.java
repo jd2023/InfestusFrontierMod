@@ -33,6 +33,7 @@ import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.core.processing.Batch;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
+import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.api.CultureBowlContents;
 import org.jd.infestusfrontier.processing.api.OrganBatch;
@@ -72,7 +73,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     private final ItemStackHandler ingredients = new ItemStackHandler(INGREDIENT_SLOTS) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return batch.isEmpty() && accepts(stack);
+            return unreadable.isEmpty() && batch.isEmpty() && accepts(stack);
         }
 
         @Override
@@ -294,7 +295,16 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
                 held, output.getStackInSlot(0).copy(), water.getFluidAmount(), biomass, history, batch);
     }
 
-    private void restore(CultureBowlContents saved, boolean takeTank) {
+    /** Why {@code saved} cannot be installed as a whole, or empty when it fits together. */
+    private static Optional<String> check(CultureBowlContents saved) {
+        if (!saved.biomass().capacity().equals(CAPACITY))
+            return Optional.of("biomass capacity " + saved.biomass().capacity().units());
+        if (saved.batch().isPresent() && saved.batch().get().result().isEmpty())
+            return Optional.of("a running batch promises nothing");
+        return Optional.empty();
+    }
+
+    private void restore(CultureBowlContents saved) {
         for (int slot = 0; slot < INGREDIENT_SLOTS; slot++)
             ingredients.setStackInSlot(
                     slot,
@@ -303,7 +313,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
                             : ItemStack.EMPTY);
         output.setStackInSlot(0, saved.output().copy());
         water.setFluid(saved.waterMb() > 0 ? new FluidStack(Fluids.WATER, saved.waterMb()) : FluidStack.EMPTY);
-        if (takeTank) biomass = saved.biomass();
+        biomass = saved.biomass();
         history = saved.history();
         batch = saved.batch();
     }
@@ -311,10 +321,10 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        Optional<CultureBowlContents> read =
-                Persistence.read(SAVED, tag, registries, ProcessingModule.LOGGER, "Culture Bowl");
+        Optional<CultureBowlContents> read = Persistence.read(
+                SAVED, tag, registries, ProcessingModule.LOGGER, "Culture Bowl", CultureBowlBlockEntity::check);
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
-        read.ifPresent(saved -> restore(saved, true));
+        read.ifPresent(this::restore);
     }
 
     @Override
@@ -327,14 +337,30 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
+        if (unreadable.isPresent()) {
+            components.set(OrganModule.UNREADABLE_SAVE.get(), unreadable.get().copy());
+            return;
+        }
         components.set(ProcessingModule.BOWL_CONTENTS.get(), contents());
     }
 
     @Override
     protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
+        CompoundTag kept = input.get(OrganModule.UNREADABLE_SAVE.get());
+        if (kept != null) {
+            unreadable = Optional.of(kept.copy());
+            return;
+        }
         CultureBowlContents carried = input.get(ProcessingModule.BOWL_CONTENTS.get());
-        if (carried != null) restore(carried, carried.biomass().capacity().equals(CAPACITY));
+        if (carried == null) return;
+        Optional<String> problem = check(carried);
+        if (problem.isPresent() && level != null) {
+            ProcessingModule.LOGGER.warn("Culture Bowl keeps unreadable carried state: {}", problem.get());
+            unreadable = Optional.of(Persistence.encode(SAVED, carried, level.registryAccess()));
+            return;
+        }
+        restore(carried);
     }
 
     @Override

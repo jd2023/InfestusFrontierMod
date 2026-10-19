@@ -116,7 +116,17 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
                 .getRecipeFor(ProcessingModule.DIGESTION.get(), new SingleRecipeInput(stack), level);
     }
 
-    private record Saved(BiomassTank tank, OrganHistory history, Optional<DigestionBatch> batch) {}
+    private record Saved(BiomassTank tank, OrganHistory history, Optional<DigestionBatch> batch) {
+        /** Why this state cannot be installed as a whole, or empty when it fits together. */
+        Optional<String> check() {
+            if (!tank.capacity().equals(CAPACITY))
+                return Optional.of("tank capacity " + tank.capacity().units());
+            Biomass promised = batch.map(DigestionBatch::yield).orElse(Biomass.ZERO);
+            if (!tank.reserved().equals(promised))
+                return Optional.of("reserved " + tank.reserved().units() + " but batch promises " + promised.units());
+            return Optional.empty();
+        }
+    }
 
     /** The client plays {@code working} while the block state says so; nothing else is sent for it. */
     @Override
@@ -257,7 +267,8 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        Optional<Saved> read = Persistence.read(SAVED, tag, registries, ProcessingModule.LOGGER, "Digestive Sac");
+        Optional<Saved> read =
+                Persistence.read(SAVED, tag, registries, ProcessingModule.LOGGER, "Digestive Sac", Saved::check);
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         read.ifPresent(saved -> {
             tank = saved.tank();
@@ -278,6 +289,10 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
+        if (unreadable.isPresent()) {
+            components.set(OrganModule.UNREADABLE_SAVE.get(), unreadable.get().copy());
+            return;
+        }
         components.set(StorageModule.TANK.get(), tank);
         components.set(OrganModule.HISTORY.get(), history);
         batch.ifPresent(running -> components.set(ProcessingModule.DIGESTION_BATCH.get(), running));
@@ -286,10 +301,24 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     @Override
     protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
-        BiomassTank carried = input.getOrDefault(StorageModule.TANK.get(), tank);
-        if (carried.capacity().equals(CAPACITY)) tank = carried;
-        history = input.getOrDefault(OrganModule.HISTORY.get(), history);
-        batch = Optional.ofNullable(input.get(ProcessingModule.DIGESTION_BATCH.get()));
+        CompoundTag kept = input.get(OrganModule.UNREADABLE_SAVE.get());
+        if (kept != null) {
+            unreadable = Optional.of(kept.copy());
+            return;
+        }
+        Saved carried = new Saved(
+                input.getOrDefault(StorageModule.TANK.get(), tank),
+                input.getOrDefault(OrganModule.HISTORY.get(), history),
+                Optional.ofNullable(input.get(ProcessingModule.DIGESTION_BATCH.get())));
+        Optional<String> problem = carried.check();
+        if (problem.isPresent() && level != null) {
+            ProcessingModule.LOGGER.warn("Digestive Sac keeps unreadable carried state: {}", problem.get());
+            unreadable = Optional.of(Persistence.encode(SAVED, carried, level.registryAccess()));
+            return;
+        }
+        tank = carried.tank();
+        history = carried.history();
+        batch = carried.batch();
     }
 
     @Override

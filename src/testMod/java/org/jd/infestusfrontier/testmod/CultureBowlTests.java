@@ -27,6 +27,7 @@ import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.CultureBowlBlock;
 import org.jd.infestusfrontier.processing.CultureBowlMenu;
 import org.jd.infestusfrontier.processing.ProcessingModule;
@@ -276,12 +277,8 @@ public final class CultureBowlTests {
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void unreadableSaveRefusesWater(GameTestHelper h) {
-        placeBowl(h);
-        var registries = h.getLevel().registryAccess();
+        var registries = unreadableBowl(h);
         BlockEntity bowl = h.getBlockEntity(BOWL);
-        CompoundTag tag = bowl.saveWithoutMetadata(registries);
-        tag.getCompound("contents").putInt("water", 5000);
-        bowl.loadWithComponents(tag, registries);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.WATER_BUCKET, 1);
         EcologyTests.use(h, player, BOWL, Direction.UP);
         h.assertTrue(player.getMainHandItem().is(Items.WATER_BUCKET), "the bucket stays full in hand");
@@ -436,6 +433,65 @@ public final class CultureBowlTests {
 
     private static void startBatch(GameTestHelper h) {
         startBatch(h, BOWL);
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void unreadableBowlRefusesIngredientsThroughItsMenu(GameTestHelper h) {
+        var registries = unreadableBowl(h);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        CultureBowlMenu menu = menu(h, player);
+        h.assertFalse(menu.slots.get(0).mayPlace(new ItemStack(Items.RED_MUSHROOM)), "the slot refuses");
+        ItemStack left = menu.slots.get(0).safeInsert(new ItemStack(Items.RED_MUSHROOM, 1));
+        h.assertValueEqual(left.getCount(), 1, "nothing goes in");
+        h.assertTrue(
+                h.getBlockEntity(BOWL)
+                                .saveWithoutMetadata(registries)
+                                .getCompound("contents")
+                                .getInt("water")
+                        == 5000,
+                "tag kept");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void brokenUnreadableBowlKeepsItsBytes(GameTestHelper h) {
+        var registries = unreadableBowl(h);
+        h.getLevel().destroyBlock(h.absolutePos(BOWL), true);
+        List<ItemEntity> drops = h.getEntities(EntityType.ITEM, BOWL, 2.0);
+        h.assertValueEqual(drops.size(), 1, "one drop");
+        ItemStack dropped = drops.get(0).getItem();
+        CompoundTag carried = dropped.get(OrganModule.UNREADABLE_SAVE.get());
+        h.assertTrue(
+                carried != null && carried.getCompound("contents").getInt("water") == 5000,
+                "the drop carries the bytes");
+        h.assertTrue(dropped.get(ProcessingModule.BOWL_CONTENTS.get()) == null, "no rebuilt contents beside them");
+        drops.get(0).discard();
+        Player placer = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        placer.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dropped.copy());
+        h.placeAt(placer, placer.getMainHandItem(), GROUND, Direction.UP);
+        h.assertBlockPresent(ProcessingModule.CULTURE_BOWL.get(), BOWL);
+        h.assertTrue(
+                h.getBlockEntity(BOWL)
+                                .saveWithoutMetadata(registries)
+                                .getCompound("contents")
+                                .getInt("water")
+                        == 5000,
+                "placed back with its bytes intact");
+        Player water = EcologyTests.holding(h, GameType.SURVIVAL, Items.WATER_BUCKET, 1);
+        EcologyTests.use(h, water, BOWL, Direction.UP);
+        h.assertTrue(water.getMainHandItem().is(Items.WATER_BUCKET), "still unreadable, still refusing");
+        h.succeed();
+    }
+
+    /** A Bowl whose saved water exceeds its tank: a decode error. */
+    private static net.minecraft.core.HolderLookup.Provider unreadableBowl(GameTestHelper h) {
+        placeBowl(h);
+        var registries = h.getLevel().registryAccess();
+        BlockEntity bowl = h.getBlockEntity(BOWL);
+        CompoundTag tag = bowl.saveWithoutMetadata(registries);
+        tag.getCompound("contents").putInt("water", 5000);
+        bowl.loadWithComponents(tag, registries);
+        return registries;
     }
 
     private static void placeBowl(GameTestHelper h) {

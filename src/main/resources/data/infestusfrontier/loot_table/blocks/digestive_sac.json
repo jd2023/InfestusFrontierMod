@@ -11,12 +11,21 @@
             {
               "function": "minecraft:copy_components",
               "source": "block_entity",
-              "include": ["infestusfrontier:biomass_tank", "infestusfrontier:organ_history", "infestusfrontier:digestion_batch"]
+              "include": [
+                "infestusfrontier:biomass_tank",
+                "infestusfrontier:organ_history",
+                "infestusfrontier:digestion_batch",
+                "infestusfrontier:unreadable_save"
+              ]
             }
           ]
         }
       ],
-      "conditions": [{ "condition": "minecraft:survives_explosion" }]
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
     }
   ]
 }

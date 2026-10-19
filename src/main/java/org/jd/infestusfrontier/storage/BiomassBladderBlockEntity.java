@@ -21,6 +21,7 @@ import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
+import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 import org.jetbrains.annotations.Nullable;
@@ -98,6 +99,13 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
         return change;
     }
 
+    /** Why {@code saved} cannot be this Bladder's tank, or empty when it can. */
+    private static Optional<String> check(BiomassTank saved) {
+        return saved.capacity().equals(CAPACITY)
+                ? Optional.empty()
+                : Optional.of("tank capacity " + saved.capacity().units());
+    }
+
     /** 0 when empty, 4 when full, otherwise 1 to 3 so any content shows. */
     static int fillLevel(BiomassTank tank) {
         if (tank.stored().isZero()) return 0;
@@ -108,7 +116,8 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        Optional<BiomassTank> read = Persistence.read(SAVED, tag, registries, StorageModule.LOGGER, "Biomass Bladder");
+        Optional<BiomassTank> read = Persistence.read(
+                SAVED, tag, registries, StorageModule.LOGGER, "Biomass Bladder", BiomassBladderBlockEntity::check);
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         read.ifPresent(saved -> tank = saved);
     }
@@ -123,14 +132,29 @@ final class BiomassBladderBlockEntity extends BlockEntity implements BiomassHand
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
+        if (unreadable.isPresent()) {
+            components.set(OrganModule.UNREADABLE_SAVE.get(), unreadable.get().copy());
+            return;
+        }
         components.set(StorageModule.TANK.get(), tank);
     }
 
     @Override
     protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
+        CompoundTag kept = input.get(OrganModule.UNREADABLE_SAVE.get());
+        if (kept != null) {
+            unreadable = Optional.of(kept.copy());
+            return;
+        }
         BiomassTank carried = input.getOrDefault(StorageModule.TANK.get(), tank);
-        if (carried.capacity().equals(CAPACITY)) tank = carried;
+        Optional<String> problem = check(carried);
+        if (problem.isPresent() && level != null) {
+            StorageModule.LOGGER.warn("Biomass Bladder keeps unreadable carried state: {}", problem.get());
+            unreadable = Optional.of(Persistence.encode(SAVED, carried, level.registryAccess()));
+            return;
+        }
+        tank = carried;
     }
 
     @Override

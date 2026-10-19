@@ -2,6 +2,8 @@ package org.jd.infestusfrontier.organ;
 
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -27,6 +29,12 @@ public final class OrganModule {
             COMPONENTS.registerComponentType(
                     "organ_history",
                     builder -> builder.persistent(OrganCodecs.HISTORY).networkSynchronized(OrganCodecs.HISTORY_STREAM));
+
+    /** The saved bytes of an organ whose state could not be read, carried on its item unchanged. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CompoundTag>> UNREADABLE_SAVE =
+            COMPONENTS.registerComponentType(
+                    "unreadable_save",
+                    builder -> builder.persistent(CompoundTag.CODEC).networkSynchronized(ByteBufCodecs.COMPOUND_TAG));
 
     public static final DeferredBlock<Block> ORGAN_BUD = BLOCKS.registerBlock(
             "organ_bud",

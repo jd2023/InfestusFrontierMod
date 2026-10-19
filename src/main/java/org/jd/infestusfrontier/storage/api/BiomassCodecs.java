@@ -29,7 +29,8 @@ public final class BiomassCodecs {
         }
 
         DataResult<BiomassTank> toTank() {
-            if (!capacity.atLeast(stored.plus(reserved))) return DataResult.error(() -> "Biomass tank over capacity");
+            if ((long) stored.units() + reserved.units() > capacity.units())
+                return DataResult.error(() -> "Biomass tank over capacity");
             return DataResult.success(new BiomassTank(stored, reserved, capacity));
         }
     }

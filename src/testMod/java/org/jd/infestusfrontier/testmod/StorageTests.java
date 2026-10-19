@@ -2,8 +2,10 @@ package org.jd.infestusfrontier.testmod;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -11,6 +13,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -127,6 +130,42 @@ public final class StorageTests {
         h.assertBlockPresent(Blocks.AIR, BLADDER);
         h.assertValueEqual(player.getMainHandItem().getCount(), 1, "bladder kept");
         h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void overflowingTankIsUnreadableNotACrash(GameTestHelper h) {
+        var registries = unreadableBladder(h, Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, StorageModule.BIOMASS_BUCKET.get(), 1);
+        EcologyTests.use(h, player, BLADDER, Direction.UP);
+        h.assertTrue(player.getMainHandItem().is(StorageModule.BIOMASS_BUCKET.get()), "the bucket stays full");
+        CompoundTag kept = h.getBlockEntity(BLADDER).saveWithoutMetadata(registries);
+        h.assertValueEqual(kept.getCompound("tank").getInt("stored"), Integer.MAX_VALUE, "the bytes stay");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void wrongCapacityIsUnreadable(GameTestHelper h) {
+        var registries = unreadableBladder(h, 1000, 0, 5000);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.BUCKET, 1);
+        EcologyTests.use(h, player, BLADDER, Direction.UP);
+        h.assertTrue(player.getMainHandItem().is(Items.BUCKET), "nothing comes out of a tank that is not ours");
+        CompoundTag kept = h.getBlockEntity(BLADDER).saveWithoutMetadata(registries);
+        h.assertValueEqual(kept.getCompound("tank").getInt("capacity"), 5000, "the bytes stay");
+        h.succeed();
+    }
+
+    private static HolderLookup.Provider unreadableBladder(GameTestHelper h, int stored, int reserved, int capacity) {
+        placeBladder(h);
+        var registries = h.getLevel().registryAccess();
+        BlockEntity bladder = h.getBlockEntity(BLADDER);
+        CompoundTag tag = bladder.saveWithoutMetadata(registries);
+        CompoundTag tank = new CompoundTag();
+        tank.putInt("stored", stored);
+        tank.putInt("reserved", reserved);
+        tank.putInt("capacity", capacity);
+        tag.put("tank", tank);
+        bladder.loadWithComponents(tag, registries);
+        return registries;
     }
 
     static void placeBladder(GameTestHelper h) {

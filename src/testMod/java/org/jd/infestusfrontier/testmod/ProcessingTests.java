@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -22,6 +24,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.DigestiveSacBlock;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.StorageModule;
@@ -250,6 +253,63 @@ public final class ProcessingTests {
                 SAC,
                 (BlockState s) -> s.getValue(DigestiveSacBlock.WORKING) == working,
                 () -> "expected working " + working);
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void batchWithoutReservationIsUnreadable(GameTestHelper h) {
+        var registries = unreadableSac(h);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.WHEAT, 2);
+        EcologyTests.use(h, player, SAC, Direction.UP);
+        h.assertValueEqual(player.getMainHandItem().getCount(), 2, "an unreadable sac takes no feed");
+        h.runAfterDelay(WHEAT_TICKS + 2, () -> {
+            CompoundTag kept = h.getBlockEntity(SAC).saveWithoutMetadata(registries);
+            h.assertValueEqual(kept.getCompound("batch").getInt("yield"), 100, "the batch bytes stay");
+            h.assertValueEqual(kept.getCompound("tank").getInt("reserved"), 0, "the tank bytes stay");
+            h.assertValueEqual(tank(h).stored(), Biomass.ZERO, "nothing was committed");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void brokenUnreadableSacKeepsItsBytes(GameTestHelper h) {
+        var registries = unreadableSac(h);
+        h.getLevel().destroyBlock(h.absolutePos(SAC), true);
+        List<ItemEntity> drops = h.getEntities(EntityType.ITEM, SAC, 2.0);
+        h.assertValueEqual(drops.size(), 1, "one drop");
+        ItemStack dropped = drops.get(0).getItem();
+        CompoundTag carried = dropped.get(OrganModule.UNREADABLE_SAVE.get());
+        h.assertTrue(
+                carried != null && carried.getCompound("batch").getInt("yield") == 100, "the drop carries the bytes");
+        h.assertTrue(dropped.get(StorageModule.TANK.get()) == null, "no rebuilt tank beside them");
+        drops.get(0).discard();
+        Player placer = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        placer.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dropped.copy());
+        h.placeAt(placer, placer.getMainHandItem(), GROUND, Direction.UP);
+        h.assertBlockPresent(ProcessingModule.DIGESTIVE_SAC.get(), SAC);
+        CompoundTag again = h.getBlockEntity(SAC).saveWithoutMetadata(registries);
+        h.assertValueEqual(again.getCompound("batch").getInt("yield"), 100, "placed back with its bytes intact");
+        Player feeder = EcologyTests.holding(h, GameType.SURVIVAL, Items.WHEAT, 1);
+        EcologyTests.use(h, feeder, SAC, Direction.UP);
+        h.assertValueEqual(feeder.getMainHandItem().getCount(), 1, "still unreadable, still refusing");
+        h.succeed();
+    }
+
+    /** A Sac whose saved batch promises 100 BU while its tank reserves nothing: decodable, but not as a whole. */
+    private static net.minecraft.core.HolderLookup.Provider unreadableSac(GameTestHelper h) {
+        placeSac(h);
+        var registries = h.getLevel().registryAccess();
+        BlockEntity sac = h.getBlockEntity(SAC);
+        CompoundTag tag = sac.saveWithoutMetadata(registries);
+        CompoundTag progress = new CompoundTag();
+        progress.putString("recipe", "infestusfrontier:digestion/wheat");
+        progress.putInt("ticks_required", WHEAT_TICKS);
+        progress.putInt("ticks_done", 5);
+        CompoundTag batch = new CompoundTag();
+        batch.put("batch", progress);
+        batch.putInt("yield", 100);
+        tag.put("batch", batch);
+        sac.loadWithComponents(tag, registries);
+        return registries;
     }
 
     static void placeSac(GameTestHelper h) {
