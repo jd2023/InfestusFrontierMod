@@ -33,14 +33,20 @@ public abstract class OrganScreen<M extends AbstractContainerMenu & BiomassView>
         inventoryLabelY = imageHeight - 94;
     }
 
+    /** Whether the biomass tank is drawn; an organ that holds no biomass returns false and gets the width. */
+    protected boolean showsBiomass() {
+        return true;
+    }
+
     /** Adds the organ's own parts left to right along {@code row}. Called on open and on every resize. */
     protected abstract void addParts(PartRow row);
 
     @Override
     protected void init() {
         super.init();
-        add(new Tank(Sheet.TANK_X, Sheet.TANK_Y, BIOMASS, menu::stored, menu::capacity, Unit.BIOMASS));
-        addParts(PartRow.standard());
+        if (showsBiomass())
+            add(new Tank(Sheet.TANK_X, Sheet.TANK_Y, BIOMASS, menu::stored, menu::capacity, Unit.BIOMASS));
+        addParts(new PartRow(Sheet.FIRST_PART_X, Sheet.GAP, showsBiomass() ? Sheet.PARTS_END : Sheet.RIGHT_EDGE));
     }
 
     /** Puts a part on the panel and shows it. */

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "working=false": {
+      "model": "infestusfrontier:block/membrane_rack"
+    },
+    "working=true": {
+      "model": "infestusfrontier:block/membrane_rack"
+    }
+  }
+}

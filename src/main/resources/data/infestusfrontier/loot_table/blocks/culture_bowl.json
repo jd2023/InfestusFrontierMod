@@ -12,7 +12,7 @@
               "function": "minecraft:copy_components",
               "source": "block_entity",
               "include": [
-                "infestusfrontier:culture_bowl_contents",
+                "infestusfrontier:batch_organ_contents",
                 "infestusfrontier:unreadable_save"
               ]
             }

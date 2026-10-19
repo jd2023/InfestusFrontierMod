@@ -1,0 +1,48 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.membrane_rack.name",
+  "description": "entry.infestusfrontier.contact.membrane_rack.description",
+  "icon": "infestusfrontier:membrane_rack",
+  "x": 3,
+  "y": 2,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/living_substrate"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/living_substrate"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/membrane_rack"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.membrane_rack.name",
+      "text": "entry.infestusfrontier.contact.membrane_rack.use"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:preparing/membrane_sheet",
+      "title1": "item.infestusfrontier.membrane_sheet"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:preparing/membrane_sheet_from_leather",
+      "title1": "entry.infestusfrontier.contact.membrane_rack.leather"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:membrane_rack",
+      "text": "entry.infestusfrontier.contact.membrane_rack.craft"
+    }
+  ]
+}

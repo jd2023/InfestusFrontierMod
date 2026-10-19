@@ -1,0 +1,19 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "membrane_rack",
+  "ingredients": [
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "minecraft:string"
+    }
+  ],
+  "water": 100,
+  "biomass": 0,
+  "result": {
+    "id": "infestusfrontier:membrane_sheet",
+    "count": 1
+  },
+  "ticks": 1200
+}

@@ -20,7 +20,7 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   176,96  52x16    button, disabled (sunken, grey)
   176,112 44x12    progress vein, empty
   176,128 44x12    progress vein, full (the screen draws its left part)
-  176,184 3 x 32x32 organ emblems, two per row at a 34 px pitch: Sac, Bladder, Bowl
+  176,184 4 x 32x32 organ emblems, two per row at a 34 px pitch: Sac, Bladder, Bowl, Rack
 
 Every screen writes its title at 8,6, its emblem at 8,27 if it has one, labels at y 26 above
 its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
@@ -55,7 +55,7 @@ BUTTON_OFF = (176, 96)
 BUTTON_SIZE = (52, 16)
 VEIN_EMPTY = (176, 112, 44, 12)
 VEIN_FULL = (176, 128, 44, 12)
-EMBLEMS = [(176, 184), (210, 184), (176, 218)]
+EMBLEMS = [(176, 184), (210, 184), (176, 218), (210, 218)]
 EMBLEM = 32
 POOL = [(168, 196, 150), (206, 224, 182), (236, 244, 220)]
 BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
@@ -375,8 +375,28 @@ def emblem_bowl(img, ox, oy):
         put(img, ox + x, oy + y, POOL[2])
 
 
+def emblem_rack(img, ox, oy):
+    """Two bone posts with a crossbar, a pink membrane stretched between them."""
+    for y in range(8, 29):
+        for x in range(10, 23):
+            t = (y - 8) / 20
+            put(img, ox + x, oy + y, mix(FLESH[3], FLESH[2], t * 0.6 + 0.2 * ((x + y) % 3 == 0)))
+    for x in range(10, 23):
+        put(img, ox + x, oy + 8, FLESH[4]); put(img, ox + x, oy + 28, FLESH[1])
+    for x in (12, 16, 20):
+        for y in range(10, 27, 4): put(img, ox + x, oy + y, FLESH[1])
+    for x0 in (6, 23):
+        for y in range(4, 30):
+            for x in range(x0, x0 + 3):
+                edge = x == x0 or x == x0 + 2 or y == 4 or y == 29
+                put(img, ox + x, oy + y, OUTLINE if edge else (IVORY[3] if x == x0 + 1 and y < 17 else IVORY[2]))
+    for x in range(6, 26):
+        for y in (3, 4, 5):
+            put(img, ox + x, oy + y, OUTLINE if y in (3, 5) or x in (6, 25) else IVORY[3])
+
+
 def emblems(img):
-    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl)):
+    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack)):
         draw(img, ox, oy)
 
 

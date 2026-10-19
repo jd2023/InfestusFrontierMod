@@ -33,10 +33,10 @@ import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.organ.OrganModule;
-import org.jd.infestusfrontier.processing.CultureBowlBlock;
-import org.jd.infestusfrontier.processing.CultureBowlMenu;
+import org.jd.infestusfrontier.processing.BatchOrganBlock;
+import org.jd.infestusfrontier.processing.BatchOrganMenu;
 import org.jd.infestusfrontier.processing.ProcessingModule;
-import org.jd.infestusfrontier.processing.api.CultureBowlContents;
+import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
 import org.jd.infestusfrontier.storage.StorageModule;
 
@@ -64,7 +64,7 @@ public final class CultureBowlTests {
         placeBowl(h);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.RED_MUSHROOM, 8);
         for (int i = 0; i < 3; i++) EcologyTests.use(h, player, BOWL, Direction.UP);
-        CultureBowlContents contents = contents(h, BOWL);
+        BatchOrganContents contents = contents(h, BOWL);
         h.assertValueEqual(contents.ingredients().get(0).getCount(), 3, "slot 0 holds three");
         h.assertTrue(contents.ingredients().get(0).is(Items.RED_MUSHROOM), "slot 0 holds mushrooms");
         h.assertValueEqual(player.getMainHandItem().getCount(), 5, "three taken from the hand");
@@ -154,7 +154,7 @@ public final class CultureBowlTests {
             Player placer = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
             placer.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dropped.copy());
             h.placeAt(placer, placer.getMainHandItem(), ground2, Direction.UP);
-            CultureBowlContents placed = contents(h, ground2.above());
+            BatchOrganContents placed = contents(h, ground2.above());
             h.assertValueEqual(placed.ingredients().get(0).getCount(), 3, "three mushrooms kept");
             h.assertValueEqual(placed.waterMb(), 1000, "1000 mB kept");
             h.succeed();
@@ -168,7 +168,7 @@ public final class CultureBowlTests {
         placeBowl(h);
         loadCultureInputs(h, true);
         startBatch(h);
-        CultureBowlContents started = contents(h, BOWL);
+        BatchOrganContents started = contents(h, BOWL);
         h.assertTrue(started.ingredients().stream().allMatch(ItemStack::isEmpty), "ingredients consumed at once");
         h.assertValueEqual(started.waterMb(), 900, "100 mB of water consumed at once");
         h.assertTrue(started.batch().isPresent(), "a batch runs");
@@ -191,7 +191,7 @@ public final class CultureBowlTests {
         placeBowl(h);
         loadCultureInputs(h, false);
         startBatch(h);
-        CultureBowlContents after = contents(h, BOWL);
+        BatchOrganContents after = contents(h, BOWL);
         h.assertTrue(after.ingredients().get(0).is(Items.RED_MUSHROOM), "mushroom still there");
         h.assertTrue(after.ingredients().get(1).is(Items.WHEAT_SEEDS), "seed still there");
         h.assertTrue(after.batch().isEmpty(), "no batch");
@@ -205,24 +205,24 @@ public final class CultureBowlTests {
         startBatch(h);
         h.runAfterDelay(20, () -> {
             // A save from before insert waited can hold a batch and matching ingredients together.
-            CultureBowlContents running = contents(h, BOWL);
+            BatchOrganContents running = contents(h, BOWL);
             List<ItemStack> held =
                     new ArrayList<>(List.of(new ItemStack(Items.RED_MUSHROOM), new ItemStack(Items.WHEAT_SEEDS)));
             while (held.size() < 9) held.add(ItemStack.EMPTY);
-            CultureBowlContents mixed = new CultureBowlContents(
+            BatchOrganContents mixed = new BatchOrganContents(
                     held, running.output(), running.waterMb(), running.biomass(), running.history(), running.batch());
             var registries = h.getLevel().registryAccess();
             BlockEntity bowl = h.getBlockEntity(BOWL);
             CompoundTag tag = bowl.saveWithoutMetadata(registries);
             tag.put(
                     "contents",
-                    CultureBowlContents.CODEC
+                    BatchOrganContents.CODEC
                             .encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, mixed)
                             .getOrThrow());
             bowl.loadWithComponents(tag, registries);
             int done = contents(h, BOWL).batch().orElseThrow().batch().ticksDone();
             startBatch(h);
-            CultureBowlContents after = contents(h, BOWL);
+            BatchOrganContents after = contents(h, BOWL);
             h.assertTrue(after.ingredients().get(0).is(Items.RED_MUSHROOM), "the mushroom is untouched");
             h.assertTrue(after.ingredients().get(1).is(Items.WHEAT_SEEDS), "the seed is untouched");
             h.assertValueEqual(after.waterMb(), 900, "no second spend of water");
@@ -242,7 +242,7 @@ public final class CultureBowlTests {
         h.assertTrue(contents(h, BOWL).ingredients().get(1).is(Items.ROTTEN_FLESH), "items stay");
         load(h, Items.ROTTEN_FLESH, 1);
         startBatch(h);
-        CultureBowlContents started = contents(h, BOWL);
+        BatchOrganContents started = contents(h, BOWL);
         h.assertTrue(started.batch().isPresent(), "four items start the bud");
         h.assertTrue(
                 started.batch()
@@ -267,7 +267,7 @@ public final class CultureBowlTests {
                             h.absolutePos(BOWL),
                             ProcessingModule.CULTURE_BOWL.get().defaultBlockState());
             fresh.loadWithComponents(tag, registries);
-            CultureBowlContents loaded = fresh.collectComponents().get(ProcessingModule.BOWL_CONTENTS.get());
+            BatchOrganContents loaded = fresh.collectComponents().get(ProcessingModule.BATCH_CONTENTS.get());
             h.assertTrue(loaded != null, "the fresh entity has contents");
             h.assertValueEqual(loaded.waterMb(), 900, "water kept");
             h.assertTrue(loaded.output().isEmpty(), "output empty");
@@ -305,7 +305,7 @@ public final class CultureBowlTests {
         h.assertValueEqual(drops.size(), 1, "one dropped bowl");
         ItemStack dropped = drops.get(0).getItem();
         h.assertTrue(dropped.is(ProcessingModule.CULTURE_BOWL_ITEM.get()), "it is a bowl");
-        CultureBowlContents carried = dropped.get(ProcessingModule.BOWL_CONTENTS.get());
+        BatchOrganContents carried = dropped.get(ProcessingModule.BATCH_CONTENTS.get());
         h.assertTrue(carried != null, "it carries the contents");
         h.assertValueEqual(carried.ingredients().get(0).getCount(), 3, "three mushrooms carried");
         h.succeed();
@@ -317,7 +317,7 @@ public final class CultureBowlTests {
         List<ItemStack> held =
                 new ArrayList<>(List.of(new ItemStack(Items.RED_MUSHROOM), new ItemStack(Items.WHEAT_SEEDS)));
         while (held.size() < 9) held.add(ItemStack.EMPTY);
-        CultureBowlContents preset = new CultureBowlContents(
+        BatchOrganContents preset = new BatchOrganContents(
                 held,
                 new ItemStack(EcologyModule.SPORE_CULTURE.get(), 64),
                 100,
@@ -327,11 +327,11 @@ public final class CultureBowlTests {
         h.getBlockEntity(BOWL)
                 .applyComponents(
                         DataComponentMap.builder()
-                                .set(ProcessingModule.BOWL_CONTENTS.get(), preset)
+                                .set(ProcessingModule.BATCH_CONTENTS.get(), preset)
                                 .build(),
                         DataComponentPatch.EMPTY);
         startBatch(h);
-        CultureBowlContents after = contents(h, BOWL);
+        BatchOrganContents after = contents(h, BOWL);
         h.assertTrue(after.batch().isEmpty(), "no batch");
         h.assertTrue(after.ingredients().get(0).is(Items.RED_MUSHROOM), "ingredients stay");
         h.assertValueEqual(after.waterMb(), 100, "water stays");
@@ -344,15 +344,15 @@ public final class CultureBowlTests {
         placeBowl(h);
         loadCultureInputs(h, true);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-        CultureBowlMenu idle = menu(h, player);
+        BatchOrganMenu idle = menu(h, player);
         h.assertValueEqual(idle.water(), 1000, "water before the start");
-        h.assertValueEqual(idle.state(), CultureBowlMenu.IDLE, "idle before the start");
+        h.assertValueEqual(idle.state(), BatchOrganMenu.IDLE, "idle before the start");
         startBatch(h);
-        CultureBowlMenu menu = menu(h, player);
+        BatchOrganMenu menu = menu(h, player);
         h.assertValueEqual(menu.water(), 900, "water after the start");
         h.assertValueEqual(menu.stored(), 0, "no biomass");
         h.assertValueEqual(menu.capacity(), 2000, "biomass capacity");
-        h.assertValueEqual(menu.state(), CultureBowlMenu.WORKING, "working");
+        h.assertValueEqual(menu.state(), BatchOrganMenu.WORKING, "working");
         h.runAfterDelay(120, () -> {
             h.assertTrue(menu.percent() > 0, "progress grows");
             h.succeed();
@@ -364,12 +364,12 @@ public final class CultureBowlTests {
         placeBowl(h);
         loadCultureInputs(h, true);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-        CultureBowlMenu menu = menu(h, player);
-        h.assertTrue(menu.clickMenuButton(player, CultureBowlMenu.START_BUTTON), "the click is handled");
+        BatchOrganMenu menu = menu(h, player);
+        h.assertTrue(menu.clickMenuButton(player, BatchOrganMenu.START_BUTTON), "the click is handled");
         h.assertTrue(contents(h, BOWL).batch().isPresent(), "a batch runs");
         h.runAfterDelay(10, () -> {
             int done = contents(h, BOWL).batch().orElseThrow().batch().ticksDone();
-            h.assertTrue(menu.clickMenuButton(player, CultureBowlMenu.START_BUTTON), "a second click is handled");
+            h.assertTrue(menu.clickMenuButton(player, BatchOrganMenu.START_BUTTON), "a second click is handled");
             h.assertValueEqual(
                     contents(h, BOWL).batch().orElseThrow().batch().ticksDone(), done, "the first batch stays");
             h.succeed();
@@ -404,7 +404,7 @@ public final class CultureBowlTests {
                 .newBlockEntity(
                         h.absolutePos(BOWL), ProcessingModule.CULTURE_BOWL.get().defaultBlockState());
         fresh.loadWithComponents(tag, registries);
-        CultureBowlContents loaded = fresh.collectComponents().get(ProcessingModule.BOWL_CONTENTS.get());
+        BatchOrganContents loaded = fresh.collectComponents().get(ProcessingModule.BATCH_CONTENTS.get());
         h.assertTrue(loaded != null, "the fresh entity has contents");
         h.assertValueEqual(loaded.ingredients().get(0).getCount(), 3, "slot 0 holds three mushrooms");
         h.assertTrue(loaded.ingredients().get(0).is(Items.RED_MUSHROOM), "slot 0 holds mushrooms");
@@ -413,10 +413,10 @@ public final class CultureBowlTests {
         h.succeed();
     }
 
-    private static CultureBowlMenu menu(GameTestHelper h, Player player) {
+    private static BatchOrganMenu menu(GameTestHelper h, Player player) {
         // No GameTest player can receive a screen, so the menu is built the way the block entity builds it.
         MenuProvider provider = (MenuProvider) h.getBlockEntity(BOWL);
-        return (CultureBowlMenu) provider.createMenu(1, player.getInventory(), player);
+        return (BatchOrganMenu) provider.createMenu(1, player.getInventory(), player);
     }
 
     private static void load(GameTestHelper h, net.minecraft.world.item.Item item, int count) {
@@ -434,7 +434,7 @@ public final class CultureBowlTests {
     static void startBatch(GameTestHelper h, BlockPos bowl) {
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
         MenuProvider provider = (MenuProvider) h.getBlockEntity(bowl);
-        provider.createMenu(1, player.getInventory(), player).clickMenuButton(player, CultureBowlMenu.START_BUTTON);
+        provider.createMenu(1, player.getInventory(), player).clickMenuButton(player, BatchOrganMenu.START_BUTTON);
     }
 
     private static void startBatch(GameTestHelper h) {
@@ -445,7 +445,7 @@ public final class CultureBowlTests {
     public static void unreadableBowlRefusesIngredientsThroughItsMenu(GameTestHelper h) {
         var registries = unreadableBowl(h);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-        CultureBowlMenu menu = menu(h, player);
+        BatchOrganMenu menu = menu(h, player);
         h.assertFalse(menu.slots.get(0).mayPlace(new ItemStack(Items.RED_MUSHROOM)), "the slot refuses");
         ItemStack left = menu.slots.get(0).safeInsert(new ItemStack(Items.RED_MUSHROOM, 1));
         h.assertValueEqual(left.getCount(), 1, "nothing goes in");
@@ -470,7 +470,7 @@ public final class CultureBowlTests {
         h.assertTrue(
                 carried != null && carried.getCompound("contents").getInt("water") == 5000,
                 "the drop carries the bytes");
-        h.assertTrue(dropped.get(ProcessingModule.BOWL_CONTENTS.get()) == null, "no rebuilt contents beside them");
+        h.assertTrue(dropped.get(ProcessingModule.BATCH_CONTENTS.get()) == null, "no rebuilt contents beside them");
         drops.get(0).discard();
         Player placer = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
         placer.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dropped.copy());
@@ -543,14 +543,14 @@ public final class CultureBowlTests {
             if (event.feeder().equals(player.getUUID())) seen.add(event);
         };
         NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OrganBatchCompletedEvent.class, listener);
-        menu(h, player).clickMenuButton(player, CultureBowlMenu.START_BUTTON);
-        CultureBowlContents running = contents(h, BOWL);
+        menu(h, player).clickMenuButton(player, BatchOrganMenu.START_BUTTON);
+        BatchOrganContents running = contents(h, BOWL);
         h.getBlockEntity(BOWL)
                 .applyComponents(
                         DataComponentMap.builder()
                                 .set(
-                                        ProcessingModule.BOWL_CONTENTS.get(),
-                                        new CultureBowlContents(
+                                        ProcessingModule.BATCH_CONTENTS.get(),
+                                        new BatchOrganContents(
                                                 running.ingredients(),
                                                 new ItemStack(Items.STONE, 64),
                                                 running.waterMb(),
@@ -560,7 +560,7 @@ public final class CultureBowlTests {
                                 .build(),
                         DataComponentPatch.EMPTY);
         h.runAtTickTime(BATCH_TICKS + 4, () -> {
-            CultureBowlContents waiting = contents(h, BOWL);
+            BatchOrganContents waiting = contents(h, BOWL);
             h.assertTrue(waiting.batch().isPresent(), "the finished batch waits for room");
             h.assertTrue(waiting.batch().get().isDone(), "and is done");
             h.assertValueEqual(waiting.history().completedBatches(), 0, "not counted while waiting");
@@ -569,8 +569,8 @@ public final class CultureBowlTests {
                     .applyComponents(
                             DataComponentMap.builder()
                                     .set(
-                                            ProcessingModule.BOWL_CONTENTS.get(),
-                                            new CultureBowlContents(
+                                            ProcessingModule.BATCH_CONTENTS.get(),
+                                            new BatchOrganContents(
                                                     waiting.ingredients(),
                                                     ItemStack.EMPTY,
                                                     waiting.waterMb(),
@@ -582,7 +582,7 @@ public final class CultureBowlTests {
         });
         h.runAtTickTime(BATCH_TICKS + 8, () -> {
             NeoForge.EVENT_BUS.unregister(listener);
-            CultureBowlContents finished = contents(h, BOWL);
+            BatchOrganContents finished = contents(h, BOWL);
             h.assertTrue(finished.batch().isEmpty(), "finished once the output had room");
             h.assertTrue(finished.output().is(EcologyModule.SPORE_CULTURE.get()), "the result landed");
             h.assertValueEqual(finished.history().completedBatches(), 1, "counted once");
@@ -595,10 +595,10 @@ public final class CultureBowlTests {
     public static void contentsAreValuesNotHandles(GameTestHelper h) {
         placeBowl(h);
         load(h, Items.RED_MUSHROOM, 3);
-        CultureBowlContents first = contents(h, BOWL);
+        BatchOrganContents first = contents(h, BOWL);
         var ops = h.getLevel().registryAccess().createSerializationContext(NbtOps.INSTANCE);
-        CultureBowlContents decoded = CultureBowlContents.CODEC
-                .parse(ops, CultureBowlContents.CODEC.encodeStart(ops, first).getOrThrow())
+        BatchOrganContents decoded = BatchOrganContents.CODEC
+                .parse(ops, BatchOrganContents.CODEC.encodeStart(ops, first).getOrThrow())
                 .getOrThrow();
         h.assertTrue(first.equals(decoded), "decoded contents equal the original");
         h.assertValueEqual(first.hashCode(), decoded.hashCode(), "and hash alike");
@@ -618,7 +618,7 @@ public final class CultureBowlTests {
             if (event.feeder().equals(player.getUUID())) seen.add(event);
         };
         NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OrganBatchCompletedEvent.class, listener);
-        menu(h, player).clickMenuButton(player, CultureBowlMenu.START_BUTTON);
+        menu(h, player).clickMenuButton(player, BatchOrganMenu.START_BUTTON);
         h.runAtTickTime(BATCH_TICKS + 2, () -> {
             NeoForge.EVENT_BUS.unregister(listener);
             h.assertValueEqual(seen.size(), 1, "one completion event");
@@ -635,9 +635,9 @@ public final class CultureBowlTests {
         h.setBlock(BOWL, ProcessingModule.CULTURE_BOWL.get());
     }
 
-    private static CultureBowlContents contents(GameTestHelper h, BlockPos pos) {
-        CultureBowlContents contents =
-                h.getBlockEntity(pos).collectComponents().get(ProcessingModule.BOWL_CONTENTS.get());
+    private static BatchOrganContents contents(GameTestHelper h, BlockPos pos) {
+        BatchOrganContents contents =
+                h.getBlockEntity(pos).collectComponents().get(ProcessingModule.BATCH_CONTENTS.get());
         if (contents == null) h.fail("no bowl contents", pos);
         return contents;
     }
@@ -645,12 +645,12 @@ public final class CultureBowlTests {
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 1300)
     public static void bowlShowsWorkingWhileABatchRuns(GameTestHelper h) {
         placeBowl(h);
-        h.assertBlockProperty(BOWL, CultureBowlBlock.WORKING, false);
+        h.assertBlockProperty(BOWL, BatchOrganBlock.WORKING, false);
         loadCultureInputs(h, true);
         startBatch(h);
-        h.runAfterDelay(2, () -> h.assertBlockProperty(BOWL, CultureBowlBlock.WORKING, true));
+        h.runAfterDelay(2, () -> h.assertBlockProperty(BOWL, BatchOrganBlock.WORKING, true));
         h.runAfterDelay(BATCH_TICKS + 4, () -> {
-            h.assertBlockProperty(BOWL, CultureBowlBlock.WORKING, false);
+            h.assertBlockProperty(BOWL, BatchOrganBlock.WORKING, false);
             h.succeed();
         });
     }

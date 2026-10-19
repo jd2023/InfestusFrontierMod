@@ -8,10 +8,13 @@
     "setblock 2 -60 3 infestusfrontier:biomass_bladder[fill=3]{tank:{stored:3000,reserved:0,capacity:4000}}",
     "setblock 5 -61 3 infestusfrontier:living_substrate[stage=mature]",
     "setblock 5 -60 3 infestusfrontier:culture_bowl[working=true]{contents:{ingredients:[],output:{id:\"infestusfrontier:spore_culture\",count:1},water:900,biomass:{stored:0,reserved:0,capacity:2000},history:{completed_batches:1},batch:{batch:{recipe:\"infestusfrontier:culturing/spore_culture\",ticks_required:1200,ticks_done:300},result:{id:\"infestusfrontier:spore_culture\",count:1}}}}",
+    "setblock 8 -61 3 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 8 -60 3 infestusfrontier:membrane_rack[working=true]{contents:{ingredients:[],output:{},water:600,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:1},batch:{batch:{recipe:\"infestusfrontier:preparing/membrane_sheet\",ticks_required:600,ticks_done:200},result:{id:\"infestusfrontier:membrane_sheet\",count:1}}}}",
     "give @s infestusfrontier:organ_bud 1",
     "give @s infestusfrontier:digestive_sac 1",
     "give @s infestusfrontier:biomass_bladder 1",
     "give @s infestusfrontier:culture_bowl 1",
+    "give @s infestusfrontier:membrane_rack 1",
     "give @s infestusfrontier:biomass_bucket 1"
   ],
   "views": [
@@ -59,7 +62,8 @@
         "infestusfrontier:organ_bud",
         "infestusfrontier:digestive_sac",
         "infestusfrontier:biomass_bladder",
-        "infestusfrontier:culture_bowl"
+        "infestusfrontier:culture_bowl",
+        "infestusfrontier:membrane_rack"
       ]
     }
   ]

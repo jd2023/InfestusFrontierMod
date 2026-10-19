@@ -35,7 +35,7 @@ import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
-import org.jd.infestusfrontier.processing.api.CultureBowlContents;
+import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.processing.api.OrganBatch;
 import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
@@ -48,58 +48,61 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * What the Culture Bowl holds: nine ingredient slots of 64, one output slot, 2000 mB of water and 2000 BU of biomass.
- * Loaded by hand, it runs one batch at a time. Starting consumes the inputs at once and the output slot is checked
- * first, so completion can never be refused. Work advances only while loaded and rooted on a foundation.
+ * One batch organ: ingredient slots, a water tank, a biomass tank and one running batch, shaped by its
+ * {@link BatchOrganKind}. The Bowl, the Rack and the Loom are this class with different kinds.
  */
-final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler, MenuProvider, GeoBlockEntity {
+final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler, MenuProvider, GeoBlockEntity {
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     private static final int BLEND_TICKS = 10;
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
-    static final int INGREDIENT_SLOTS = CultureBowlContents.INGREDIENT_SLOTS;
-    static final Biomass CAPACITY = Biomass.of(2000);
-    static final int WATER_CAPACITY = CultureBowlContents.WATER_CAPACITY;
-    static final String ORGAN = "culture_bowl";
     static final Refusal NO_SLOT = new Refusal("processing.no_slot");
     static final Refusal BUSY = new Refusal("processing.busy");
     static final Refusal NO_RECIPE = new Refusal("processing.no_recipe");
     static final Refusal OUTPUT_FULL = new Refusal("processing.output_full");
     static final Refusal COMMITTED = new Refusal("processing.committed");
 
-    private static final MapCodec<CultureBowlContents> SAVED = CultureBowlContents.CODEC.fieldOf("contents");
+    private static final MapCodec<BatchOrganContents> SAVED = BatchOrganContents.CODEC.fieldOf("contents");
 
+    private final BatchOrganKind kind;
     private Optional<CompoundTag> unreadable = Optional.empty();
-    private final ItemStackHandler ingredients = new ItemStackHandler(INGREDIENT_SLOTS) {
-        @Override
-        public boolean isItemValid(int slot, ItemStack stack) {
-            return unreadable.isEmpty() && batch.isEmpty() && accepts(stack);
-        }
-
-        @Override
-        protected void onContentsChanged(int slot) {
-            setChanged();
-        }
-    };
+    private final ItemStackHandler ingredients;
     private final ItemStackHandler output = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
         }
     };
-    private final FluidTank water =
-            new FluidTank(WATER_CAPACITY, stack -> stack.is(Fluids.WATER) && unreadable.isEmpty()) {
-                @Override
-                protected void onContentsChanged() {
-                    setChanged();
-                }
-            };
-    private BiomassTank biomass = BiomassTank.empty(CAPACITY);
+    private final FluidTank water;
+    private BiomassTank biomass;
     private OrganHistory history = OrganHistory.NONE;
     private Optional<OrganBatch> batch = Optional.empty();
 
-    CultureBowlBlockEntity(BlockPos pos, BlockState state) {
-        super(ProcessingModule.CULTURE_BOWL_ENTITY.get(), pos, state);
+    BatchOrganBlockEntity(BatchOrganKind kind, BlockPos pos, BlockState state) {
+        super(kind.entity().get(), pos, state);
+        this.kind = kind;
+        this.biomass = BiomassTank.empty(kind.biomassCapacity());
+        this.ingredients = new ItemStackHandler(kind.slots()) {
+            @Override
+            public boolean isItemValid(int slot, ItemStack stack) {
+                return unreadable.isEmpty() && batch.isEmpty() && accepts(stack);
+            }
+
+            @Override
+            protected void onContentsChanged(int slot) {
+                setChanged();
+            }
+        };
+        this.water = new FluidTank(kind.waterMb(), stack -> stack.is(Fluids.WATER) && unreadable.isEmpty()) {
+            @Override
+            protected void onContentsChanged() {
+                setChanged();
+            }
+        };
+    }
+
+    BatchOrganKind kind() {
+        return kind;
     }
 
     FluidTank water() {
@@ -129,7 +132,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     private Stream<RecipeHolder<OrganBatchRecipe>> recipes() {
         if (level == null) return Stream.empty();
         return level.getRecipeManager().getAllRecipesFor(ProcessingModule.ORGAN_BATCH.get()).stream()
-                .filter(recipe -> recipe.value().organ().equals(ORGAN));
+                .filter(recipe -> recipe.value().organ().equals(kind.id()));
     }
 
     int percent() {
@@ -142,7 +145,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
                 || water.getFluidAmount() > 0
                 || !biomass.stored().isZero()
                 || !output.getStackInSlot(0).isEmpty()) return false;
-        for (int slot = 0; slot < INGREDIENT_SLOTS; slot++)
+        for (int slot = 0; slot < kind.slots(); slot++)
             if (!ingredients.getStackInSlot(slot).isEmpty()) return false;
         return true;
     }
@@ -155,7 +158,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
                 "state",
                 BLEND_TICKS,
                 state -> state.setAndContinue(
-                        state.getAnimatable().getBlockState().getValue(CultureBowlBlock.WORKING) ? WORKING : IDLE)));
+                        state.getAnimatable().getBlockState().getValue(BatchOrganBlock.WORKING) ? WORKING : IDLE)));
     }
 
     @Override
@@ -166,18 +169,18 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     /** Mirrors whether a batch exists into the block state, so every client can see the Bowl work. */
     private void showWorking(boolean working) {
         if (level == null) return;
-        BlockState shown = getBlockState().setValue(CultureBowlBlock.WORKING, working);
+        BlockState shown = getBlockState().setValue(BatchOrganBlock.WORKING, working);
         if (shown != getBlockState()) level.setBlock(worldPosition, shown, Block.UPDATE_CLIENTS);
     }
 
-    static void serverTick(Level level, BlockPos pos, BlockState state, CultureBowlBlockEntity bowl) {
+    static void serverTick(Level level, BlockPos pos, BlockState state, BatchOrganBlockEntity bowl) {
         bowl.showWorking(bowl.batch.isPresent());
         if (bowl.batch.isEmpty() || bowl.unreadable.isPresent() || !Organs.hasFoundation(level, pos)) return;
         bowl.batch = OrganWork.tick(bowl.batch, finished -> {
             if (!bowl.output.insertItem(0, finished.result(), true).isEmpty()) return false; // no room: wait
             bowl.output.insertItem(0, finished.result(), false);
             bowl.history = bowl.history.completed();
-            OrganWork.completed(level, ProcessingModule.CULTURE_BOWL.getId(), finished);
+            OrganWork.completed(level, bowl.kind.blockId(), finished);
             return true;
         });
         bowl.setChanged();
@@ -191,7 +194,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
         if (unreadable.isPresent()) return Optional.of(Persistence.CORRUPT);
         if (batch.isPresent()) return Optional.of(BUSY);
         List<ItemStack> held = new ArrayList<>();
-        for (int slot = 0; slot < INGREDIENT_SLOTS; slot++) held.add(ingredients.getStackInSlot(slot));
+        for (int slot = 0; slot < kind.slots(); slot++) held.add(ingredients.getStackInSlot(slot));
         RecipeInput input = new RecipeInput() {
             @Override
             public ItemStack getItem(int slot) {
@@ -211,7 +214,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
         if (found.isEmpty()) return Optional.of(NO_RECIPE);
         OrganBatchRecipe recipe = found.get().value();
         if (!output.insertItem(0, recipe.result().copy(), true).isEmpty()) return Optional.of(OUTPUT_FULL);
-        for (int slot = 0; slot < INGREDIENT_SLOTS; slot++) ingredients.setStackInSlot(slot, ItemStack.EMPTY);
+        for (int slot = 0; slot < kind.slots(); slot++) ingredients.setStackInSlot(slot, ItemStack.EMPTY);
         water.drain(recipe.waterMb(), IFluidHandler.FluidAction.EXECUTE);
         biomass = ((Outcome.Done<BiomassTank>) biomass.drain(recipe.biomass())).value();
         batch = Optional.of(new OrganBatch(
@@ -233,7 +236,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
         if (batch.isPresent()) return Optional.of(BUSY);
         ItemStack one = stack.copyWithCount(1);
         for (int pass = 0; pass < 2; pass++) {
-            for (int slot = 0; slot < INGREDIENT_SLOTS; slot++) {
+            for (int slot = 0; slot < kind.slots(); slot++) {
                 ItemStack held = ingredients.getStackInSlot(slot);
                 if ((pass == 0) == held.isEmpty()) continue;
                 if (ingredients.insertItem(slot, one, false).isEmpty()) {
@@ -252,7 +255,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
             output.setStackInSlot(0, ItemStack.EMPTY);
         } else {
             taken = ItemStack.EMPTY;
-            for (int slot = 0; slot < INGREDIENT_SLOTS && taken.isEmpty(); slot++) {
+            for (int slot = 0; slot < kind.slots() && taken.isEmpty(); slot++) {
                 taken = ingredients.getStackInSlot(slot);
                 if (!taken.isEmpty()) ingredients.setStackInSlot(slot, ItemStack.EMPTY);
             }
@@ -286,26 +289,29 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
         return change;
     }
 
-    private CultureBowlContents contents() {
+    private BatchOrganContents contents() {
         List<ItemStack> held = new ArrayList<>();
-        for (int slot = 0; slot < INGREDIENT_SLOTS; slot++)
+        for (int slot = 0; slot < kind.slots(); slot++)
             held.add(ingredients.getStackInSlot(slot).copy());
-        return new CultureBowlContents(
+        return new BatchOrganContents(
                 held, output.getStackInSlot(0).copy(), water.getFluidAmount(), biomass, history, batch);
     }
 
     /** Why {@code saved} cannot be installed as a whole, or empty when it fits together. */
-    private static Optional<String> check(CultureBowlContents saved) {
-        if (!saved.biomass().capacity().equals(CAPACITY))
+    private Optional<String> check(BatchOrganContents saved) {
+        if (!saved.biomass().capacity().equals(kind.biomassCapacity()))
             return Optional.of("biomass capacity " + saved.biomass().capacity().units());
+        if (saved.ingredients().size() > kind.slots())
+            return Optional.of(saved.ingredients().size() + " ingredient slots");
+        if (saved.waterMb() > kind.waterMb()) return Optional.of(saved.waterMb() + " mB of water");
         if (saved.batch().isPresent() && saved.history().completedBatches() == Integer.MAX_VALUE)
             return Optional.of("a running batch that history cannot count");
         return Optional.empty();
     }
 
-    private void restore(CultureBowlContents saved) {
+    private void restore(BatchOrganContents saved) {
         List<ItemStack> held = saved.ingredients();
-        for (int slot = 0; slot < INGREDIENT_SLOTS; slot++)
+        for (int slot = 0; slot < kind.slots(); slot++)
             ingredients.setStackInSlot(slot, slot < held.size() ? held.get(slot) : ItemStack.EMPTY);
         output.setStackInSlot(0, saved.output().copy());
         water.setFluid(saved.waterMb() > 0 ? new FluidStack(Fluids.WATER, saved.waterMb()) : FluidStack.EMPTY);
@@ -317,8 +323,8 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        Optional<CultureBowlContents> read = Persistence.read(
-                SAVED, tag, registries, ProcessingModule.LOGGER, "Culture Bowl", CultureBowlBlockEntity::check);
+        Optional<BatchOrganContents> read =
+                Persistence.read(SAVED, tag, registries, ProcessingModule.LOGGER, kind.id(), this::check);
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         read.ifPresent(this::restore);
     }
@@ -337,7 +343,7 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
             components.set(OrganModule.UNREADABLE_SAVE.get(), unreadable.get().copy());
             return;
         }
-        components.set(ProcessingModule.BOWL_CONTENTS.get(), contents());
+        components.set(ProcessingModule.BATCH_CONTENTS.get(), contents());
     }
 
     @Override
@@ -348,11 +354,11 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
             unreadable = Optional.of(kept.copy());
             return;
         }
-        CultureBowlContents carried = input.get(ProcessingModule.BOWL_CONTENTS.get());
+        BatchOrganContents carried = input.get(ProcessingModule.BATCH_CONTENTS.get());
         if (carried == null) return;
         Optional<String> problem = check(carried);
         if (problem.isPresent()) {
-            ProcessingModule.LOGGER.warn("Culture Bowl keeps unreadable carried state: {}", problem.get());
+            ProcessingModule.LOGGER.warn("{} keeps unreadable carried state: {}", kind.id(), problem.get());
             unreadable = Optional.of(
                     level == null ? new CompoundTag() : Persistence.encode(SAVED, carried, level.registryAccess()));
             return;
@@ -367,11 +373,11 @@ final class CultureBowlBlockEntity extends BlockEntity implements BiomassHandler
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.infestusfrontier.culture_bowl");
+        return Component.translatable(kind.nameKey());
     }
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        return new CultureBowlMenu(id, inventory, this);
+        return new BatchOrganMenu(kind.menu().get(), id, inventory, this);
     }
 }

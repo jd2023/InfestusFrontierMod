@@ -107,6 +107,7 @@ public final class DiscoveryTests {
                 "biomass_bladder",
                 "biomass_bucket",
                 "culture_bowl",
+                "membrane_rack",
                 "speak_to_an_organ")) {
             h.assertTrue(category.getEntries().containsKey(id("contact/" + entry)), "entry " + entry + " loaded");
         }
@@ -143,6 +144,7 @@ public final class DiscoveryTests {
                 "biomass_bladder",
                 "biomass_bucket",
                 "culture_bowl",
+                "membrane_rack",
                 "speak_to_an_organ")) {
             var condition = contact.get(id("contact/" + name)).getCondition();
             h.assertTrue(condition instanceof BookOrCondition, name + " unlocks by step or by item");
@@ -156,7 +158,9 @@ public final class DiscoveryTests {
                 "biomass_bladder",
                 "biomass_bucket",
                 "culture_bowl",
-                "synaptic_probe"))
+                "synaptic_probe",
+                "membrane_rack",
+                "membrane_sheet"))
             h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");
         h.succeed();
     }

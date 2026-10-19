@@ -20,7 +20,7 @@ import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
-import org.jd.infestusfrontier.processing.api.CultureBowlContents;
+import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.storage.StorageModule;
 
 /** The whole M2 workshop route in one test: craft the organs, grow a culture, digest ten wheat, store a bucket. */
@@ -93,7 +93,7 @@ public final class M2RouteTests {
             h.assertTrue(carrier.getMainHandItem().is(Items.BUCKET), "bucket emptied into the bladder");
         });
         h.runAtTickTime(1210, () -> {
-            CultureBowlContents bowlNow = bowlContents(h);
+            BatchOrganContents bowlNow = bowlContents(h);
             h.assertTrue(bowlNow.output().is(EcologyModule.SPORE_CULTURE.get()), "spore culture in the output");
             h.assertValueEqual(bowlNow.output().getCount(), 1, "one spore culture");
             h.assertValueEqual(ProcessingTests.handler(h, BLADDER).tank().stored(), Biomass.of(1000), "bladder 1000");
@@ -127,9 +127,9 @@ public final class M2RouteTests {
         h.placeAt(player, stack, ground, Direction.UP);
     }
 
-    private static CultureBowlContents bowlContents(GameTestHelper h) {
-        CultureBowlContents contents =
-                h.getBlockEntity(BOWL).collectComponents().get(ProcessingModule.BOWL_CONTENTS.get());
+    private static BatchOrganContents bowlContents(GameTestHelper h) {
+        BatchOrganContents contents =
+                h.getBlockEntity(BOWL).collectComponents().get(ProcessingModule.BATCH_CONTENTS.get());
         if (contents == null) h.fail("no bowl contents", BOWL);
         return contents;
     }

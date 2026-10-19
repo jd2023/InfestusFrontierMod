@@ -46,6 +46,8 @@ public final class DiscoveryModule {
                         output.accept(StorageModule.BIOMASS_BLADDER_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BUCKET.get());
                         output.accept(ProcessingModule.CULTURE_BOWL_ITEM.get());
+                        output.accept(ProcessingModule.MEMBRANE_RACK_ITEM.get());
+                        output.accept(ProcessingModule.MEMBRANE_SHEET.get());
                         output.accept(InteractionModule.SYNAPTIC_PROBE.get());
                     })
                     .build());

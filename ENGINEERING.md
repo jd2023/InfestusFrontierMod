@@ -1,6 +1,6 @@
 # Engineering
 
-For the coder: planner, worker and repairer. Rules about git and roles are in [AGENTS.md](AGENTS.md).
+For the coder: builder, worker and repairer. Rules about git and roles are in [AGENTS.md](AGENTS.md).
 
 ## Toolchain and commands
 
@@ -83,7 +83,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 |---|---|
 | foundation (`core`) | Shared work admission (`TickQuota`), checked quantities, bounded identifiers |
 | organ | Organ identity, completed-batch counts, earned choices |
-| processing | Bowl, digestion, rack, loom, furnace, activation: reserved batch execution; `OrganWork` is the one batch lifecycle |
+| processing | Bowl, digestion, rack, loom, furnace, activation: reserved batch execution; `OrganWork` is the one batch lifecycle; `BatchOrganKind` makes the Bowl, the Rack and the Loom one block, block entity and menu |
 | storage | Item, fluid and biomass balances; reservoir cell accounting |
 | construction | Loaded-only structure validation, shell parts, paid placement, transplanting |
 | ecology | Substrate maturity, function, lining, reinforcement, dye, deliberate conversion |
@@ -207,7 +207,7 @@ Not covered yet: recipe tests through a crafting menu, optional-mod profiles, mu
 
 ## Stories and sprints
 
-A strong model plans. A cheap model implements. The owner plays at the end of each sprint.
+The owner directs, a strong model builds, a cheap model does mechanical tasks, and the owner plays when a milestone's organs are in. A sprint file is an optional plan; the template below is for when one is written, and for art stories.
 
 A sprint is one milestone from ROADMAP.md, or one slice of it, and ends in a playable build. Its stories live in one file, `docs/sprints/S<nn>.md`: milestone, goal in one sentence, the acceptance line from ROADMAP.md, then the stories in order. Only the current sprint is written at this depth. Later milestones stay at one line each in ROADMAP.md.
 
@@ -249,7 +249,7 @@ Bounds: hard work and state limits, with numbers
 Evidence: rules | game | visual
 ```
 
-`Status` moves `ready`, `doing`, `review`, `accepted`. The worker writes `doing` and `review` with the commit hash. The planner writes `accepted` or `blocked`. The sprint file is the one file a story may edit beyond its `Files`, and only its own `Status` line.
+`Status` moves `ready`, `doing`, `review`, `accepted`. The worker writes `doing` and `review` with the commit hash. The builder writes `accepted` or `blocked`. The sprint file is the one file a story may edit beyond its `Files`, and only its own `Status` line.
 
 How to do a story:
 
@@ -260,19 +260,19 @@ How to do a story:
 5. Walk through the checklist in [REVIEW.md](REVIEW.md) against your diff.
 6. Set `Status: review <commit>`. Commit, push to `origin/v4`, and report: what you did, what you did not do, what you measured.
 
-The planner decides every name, number and interface before the story enters the sprint, after reading the real code. Common invariants (save and reload, break and replace, refusal leaves state unchanged) are written into the story that owns them.
+The builder decides every name, number and interface before the story enters the sprint, after reading the real code. Common invariants (save and reload, break and replace, refusal leaves state unchanged) are written into the story that owns them.
 
 `Evidence` names what the reviewer looks at: `rules` is JUnit output, `game` is the GameTest line in the gate log, `visual` is the capture PNGs, `gate` is the gate log itself.
 
 The sprint loop:
 
-1. The planner reads the real code and ROADMAP.md and writes the sprint file: 5 to 12 stories, each with `Depends` on accepted or earlier stories only.
-2. The worker takes the first `ready` story whose `Depends` are all `accepted`. One story per run.
-3. The reviewer gives the verdict. On `REJECTED` a repairer fixes the findings in one commit per round. Three rejected rounds block the story and send it back to the planner.
+1. The builder reads the real code and ROADMAP.md and writes the sprint file: 5 to 12 stories, each with `Depends` on accepted or earlier stories only.
+2. The builder, or a cheap model for a mechanical story, takes the first `ready` story whose `Depends` are all `accepted`.
+3. The reviewer gives the verdict. On `REJECTED` a repairer fixes the findings in one commit per round. Three rejected rounds block the story and send it back to the builder.
 4. When every story is `accepted`, the owner plays the build. What is broken becomes `repair` stories in this sprint. What is missing becomes stories in the next sprint.
-5. The planner writes the next sprint.
+5. The builder writes the next sprint.
 
-Sprint S01 is also the pilot. Before S02 is written, the planner records in the S01 file: cost per story, review rounds per story, manual interventions, and what changed in the template because of them.
+Sprint S01 is also the pilot. Before S02 is written, the builder records in the S01 file: cost per story, review rounds per story, manual interventions, and what changed in the template because of them.
 
 ### Art track
 
@@ -281,7 +281,7 @@ Art is its own queue, `docs/sprints/ART.md`, with the same story template and ki
 Two kinds of art story. A texture story gives an image model the prompt, the size and the output path; the owner saves the result. A model story gives a strong model the GeckoLib `geo` and `animation` JSON to write, with bone names, dimensions and animation names fixed in the story. Never mix the two in one story.
 
 - A `platform` story ships placeholder assets: a flat two-tone texture at the shipped size and a vanilla cube or item model. The game must run and the reviewer must see the block before any art exists. Workers never attempt final art.
-- Who makes finals: flat block tiles and item icons come from the image model (Astra) through a texture story. Organ models with their textures, animations and glowmasks, the GUI sheet and fluid textures come from the planner through a generator under `art/` (`art/organ_model.py` is the shared pipeline; `art/gen_<name>.py` is one model). The generator is the source; run it from the repository root and commit its output.
+- Who makes finals: flat block tiles and item icons come from the image model (Astra) through a texture story. Organ models with their textures, animations and glowmasks, the GUI sheet and fluid textures come from the builder through a generator under `art/` (`art/organ_model.py` is the shared pipeline; `art/gen_<name>.py` is one model). The generator is the source; run it from the repository root and commit its output.
 - An animated organ: the block entity implements `GeoBlockEntity`, its item is an `integration.geckolib.OrganItem`, the module calls `OrganRenderers.register` on the client, the block returns `RenderShape.ENTITYBLOCK_ANIMATED` and its blockstate names only the break particle. Block state properties drive the animations; nothing extra is sent.
 - Shipped assets live in `src/main/resources/assets/infestusfrontier/`. File name is the registry id. Block textures are 64x64 and item icons 32x32, exported from image-model sources with `scripts/texture.py`, unless the story says otherwise. Animated organs use GeckoLib models in `geo/` and `animations/`.
 - Image masters and renders stay outside the repository; prompts live in the art story. Model sources (`.bbmodel`) are committed under `art/`, next to any generator that bakes them.

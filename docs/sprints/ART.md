@@ -162,6 +162,29 @@ Subject: a SYNAPTIC PROBE touching a single olive-green sensory pore on the flan
 Subject: one standard PLAIN GREY METAL BUCKET filled with thick olive yellow-green biomass, with a thin grey handle arcing behind it, seen from slightly above so the bulging fluid surface and two tiny pale specks are visible. It rests beside a low shallow ivory-lipped living receptacle on a small horizontal patch of crimson substrate, ready to transfer biomass by hand. The bucket is the dominant subject, with familiar simple flared vanilla-family metal bucket silhouette, steel grey bands and a clear dark rim; the small organic receptacle beside it provides context. No second bucket, no large machine, no drips, no pouring, no hand, no arrows. Soft clean upper-left light, painted steel highlights and rich olive fluid.
 ```
 
+## ART-004 — Membrane Rack and Membrane Sheet artwork
+
+```text
+ART-004  The Membrane Sheet has its icon and the Rack its guide illustration
+Status: ready
+Milestone: M2
+Owner: processing
+Kind: art
+Depends: the Rack commit on v4
+Read: docs/design/BLOCK_CATALOG.md#t0-05--membrane-rack, docs/design/ITEM_CATALOG.md (I002), build/captures/demo/bowl.png (the Rack stands at x=28, right of the Bowl)
+Files: src/main/resources/assets/infestusfrontier/textures/item/membrane_sheet.png, src/main/resources/assets/infestusfrontier/textures/book/membrane_rack.png, the_waking_genome/entries/contact/membrane_rack.json, CREDITS.txt
+Do:
+  1. membrane_sheet.png, 32x32: one pale pinkish stretched skin sheet, slightly curled at one corner, thin dark outline, lit top-left. Replaces the planner's placeholder; export with scripts/texture.py --size 32 --colors 0.
+  2. membrane_rack.png, 200x200 canvas with a 200x100 vignette like the other Contact illustrations: the bone rack with a skin stretched between its posts, a drop falling from it, on a small island of substrate. Then the entry's first page becomes a modonomicon:image page like the others.
+  3. While there: the ART-003 follow-ups, taller vignettes so picture and caption sit closer, and the root entry's icon as the new cover.
+Tests: none. Assets only; the gate's captures are the evidence.
+Done:
+  - bash scripts/verify.sh
+Not: the Rack model (generated), other icons.
+Bounds: 32x32 for the icon, 200x200 RGBA for the illustration.
+Evidence: visual
+```
+
 ## Substrate source prompts
 
 Built-in image generation, 2026-10-15. Generate mature first using the V3 mature substrate and Astra evaluation tissue as references. Derive young from mature and basic from young. Export with `scripts/texture.py --size 256 --tiles 4`. The unnumbered 64x64 textures support the existing models until IF-008 connects the macro tiles. Spore Culture remains pending.
