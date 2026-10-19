@@ -20,7 +20,7 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   176,96  52x16    button, disabled (sunken, grey)
   176,112 44x12    progress vein, empty
   176,128 44x12    progress vein, full (the screen draws its left part)
-  176,184 4 x 32x32 organ emblems, two per row at a 34 px pitch: Sac, Bladder, Bowl, Rack
+  2,190   5 x 32x32 organ emblems in one row at a 34 px pitch: Sac, Bladder, Bowl, Rack, Loom
 
 Every screen writes its title at 8,6, its emblem at 8,27 if it has one, labels at y 26 above
 its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
@@ -55,7 +55,7 @@ BUTTON_OFF = (176, 96)
 BUTTON_SIZE = (52, 16)
 VEIN_EMPTY = (176, 112, 44, 12)
 VEIN_FULL = (176, 128, 44, 12)
-EMBLEMS = [(176, 184), (210, 184), (176, 218), (210, 218)]
+EMBLEMS = [(2 + 34 * i, 190) for i in range(5)]
 EMBLEM = 32
 POOL = [(168, 196, 150), (206, 224, 182), (236, 244, 220)]
 BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
@@ -395,8 +395,24 @@ def emblem_rack(img, ox, oy):
             put(img, ox + x, oy + y, OUTLINE if y in (3, 5) or x in (6, 25) else IVORY[3])
 
 
+def emblem_loom(img, ox, oy):
+    """A bone frame with a plate growing in it: ivory ring plates on a dark loom."""
+    for y in range(6, 28):
+        for x in range(5, 28):
+            edge = x in (5, 27) or y in (6, 27)
+            put(img, ox + x, oy + y, OUTLINE if edge else mix(FLESH[1], FLESH[0], 0.3 + 0.4 * (y - 6) / 21))
+    for y in range(8, 26, 3):
+        for x in range(7, 26):
+            put(img, ox + x, oy + y, mix(IVORY[1], IVORY[3], 0.4 + 0.4 * (1 - abs(x - 16) / 10)))
+    for x in range(10, 23):
+        for y in range(11, 23):
+            d = math.hypot((x - 16) / 6.5, (y - 17) / 6.0)
+            if d <= 1.0:
+                put(img, ox + x, oy + y, OUTLINE if d > 0.85 else (IVORY[3] if (x - 16) + (y - 17) < 0 else IVORY[2]))
+
+
 def emblems(img):
-    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack)):
+    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom)):
         draw(img, ox, oy)
 
 

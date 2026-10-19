@@ -33,6 +33,9 @@
     "setblock 28 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 28 -60 -36 infestusfrontier:membrane_rack[working=true]{contents:{ingredients:[{id:\"minecraft:rotten_flesh\",count:1},{id:\"minecraft:string\",count:1}],output:{id:\"infestusfrontier:membrane_sheet\",count:3},water:700,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:3},batch:{batch:{recipe:\"infestusfrontier:preparing/membrane_sheet\",ticks_required:600,ticks_done:240},result:{id:\"infestusfrontier:membrane_sheet\",count:1}}}}",
     "setblock 29 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Membrane Rack\"','\"flesh and string\"','\"water bucket\"','\"makes sheets\"']}}",
+    "setblock 30 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 30 -60 -36 infestusfrontier:bone_loom[working=true]{contents:{ingredients:[{id:\"minecraft:bone\",count:2}],output:{id:\"infestusfrontier:bone_plate\",count:2},water:0,biomass:{stored:650,reserved:0,capacity:1000},history:{completed_batches:2},batch:{batch:{recipe:\"infestusfrontier:preparing/bone_plate\",ticks_required:600,ticks_done:150},result:{id:\"infestusfrontier:bone_plate\",count:1}}}}",
+    "setblock 31 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Bone Loom\"','\"bone and\"','\"biomass bucket\"','\"grows plates\"']}}",
     "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
     "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",
     "fill 5 -61 -29 8 -61 -26 infestusfrontier:living_substrate[stage=young]",
@@ -47,6 +50,7 @@
     "item replace entity @s inventory.3 with wheat 16",
     "item replace entity @s inventory.4 with rotten_flesh 16",
     "item replace entity @s inventory.5 with string 16",
+    "item replace entity @s inventory.6 with bone 16",
     "give @s bucket 4",
     "give @s infestusfrontier:organ_bud 4",
     "item replace entity @s inventory.0 with red_mushroom 8",
@@ -116,6 +120,14 @@
       "pitch": 15
     },
     {
+      "name": "loom",
+      "x": 30.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 15
+    },
+    {
       "name": "sac_screen",
       "x": 20.5,
       "y": -60,
@@ -168,6 +180,20 @@
       "gui": true,
       "use": [
         28,
+        -60,
+        -36
+      ]
+    },
+    {
+      "name": "loom_screen",
+      "x": 30.5,
+      "y": -60,
+      "z": -38.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        30,
         -60,
         -36
       ]

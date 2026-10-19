@@ -48,6 +48,8 @@ public final class DiscoveryModule {
                         output.accept(ProcessingModule.CULTURE_BOWL_ITEM.get());
                         output.accept(ProcessingModule.MEMBRANE_RACK_ITEM.get());
                         output.accept(ProcessingModule.MEMBRANE_SHEET.get());
+                        output.accept(ProcessingModule.BONE_LOOM_ITEM.get());
+                        output.accept(ProcessingModule.BONE_PLATE.get());
                         output.accept(InteractionModule.SYNAPTIC_PROBE.get());
                     })
                     .build());

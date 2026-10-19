@@ -1,0 +1,43 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.bone_loom.name",
+  "description": "entry.infestusfrontier.contact.bone_loom.description",
+  "icon": "infestusfrontier:bone_loom",
+  "x": 3,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/digestive_sac"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/digestive_sac"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/bone_loom"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.bone_loom.name",
+      "text": "entry.infestusfrontier.contact.bone_loom.use"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:preparing/bone_plate",
+      "title1": "item.infestusfrontier.bone_plate"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:bone_loom",
+      "text": "entry.infestusfrontier.contact.bone_loom.craft"
+    }
+  ]
+}

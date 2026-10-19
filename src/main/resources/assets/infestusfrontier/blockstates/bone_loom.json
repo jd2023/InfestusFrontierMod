@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "working=false": {
+      "model": "infestusfrontier:block/bone_loom"
+    },
+    "working=true": {
+      "model": "infestusfrontier:block/bone_loom"
+    }
+  }
+}

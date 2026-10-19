@@ -35,11 +35,11 @@ public final class Sheet {
     public static final int INVENTORY_Y = 84;
 
     public static final int HOTBAR_Y = 142;
-    /** The organ emblems: 32x32, two per row under the troughs. */
-    public static final int EMBLEM_COUNT = 4;
+    /** The organ emblems: 32x32, in one row under the body strip. */
+    public static final int EMBLEM_COUNT = 5;
 
-    private static final int EMBLEM_SHEET_X = 176;
-    private static final int EMBLEM_SHEET_Y = 184;
+    private static final int EMBLEM_SHEET_X = 2;
+    private static final int EMBLEM_SHEET_Y = 190;
     private static final int EMBLEM_SIZE = 32;
     private static final int EMBLEM_PITCH = 34;
     /** Flesh-dark ink on the ivory membrane. */
@@ -53,6 +53,7 @@ public final class Sheet {
     public static final int BLADDER_EMBLEM = 1;
     public static final int BOWL_EMBLEM = 2;
     public static final int RACK_EMBLEM = 3;
+    public static final int LOOM_EMBLEM = 4;
 
     /** The panel's left margin; the emblem column starts here. */
     public static final int LEFT_X = 8;
@@ -108,14 +109,10 @@ public final class Sheet {
         return HOTBAR_Y + strips * BODY_STRIP.height();
     }
 
-    /** The emblem sprites in order: Sac, Bladder, Bowl, Rack. */
+    /** The emblem sprites in order: Sac, Bladder, Bowl, Rack, Loom. */
     public static Bounds emblem(int index) {
         if (index < 0 || index >= EMBLEM_COUNT) throw new IllegalArgumentException("No emblem " + index);
-        return new Bounds(
-                EMBLEM_SHEET_X + EMBLEM_PITCH * (index % 2),
-                EMBLEM_SHEET_Y + EMBLEM_PITCH * (index / 2),
-                EMBLEM_SIZE,
-                EMBLEM_SIZE);
+        return new Bounds(EMBLEM_SHEET_X + EMBLEM_PITCH * index, EMBLEM_SHEET_Y, EMBLEM_SIZE, EMBLEM_SIZE);
     }
 
     /** The column inside a tank frame placed at {@code x, y}. */
@@ -142,6 +139,7 @@ public final class Sheet {
                 emblem(0),
                 emblem(1),
                 emblem(2),
-                emblem(3));
+                emblem(3),
+                emblem(4));
     }
 }

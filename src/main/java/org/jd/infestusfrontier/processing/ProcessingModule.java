@@ -91,6 +91,18 @@ public final class ProcessingModule {
             () -> ProcessingModule.MEMBRANE_RACK_ENTITY.get(),
             () -> ProcessingModule.MEMBRANE_RACK_MENU.get());
 
+    /** The Bone Loom: one bone slot and biomass, no water, on a one-strip panel. */
+    static final BatchOrganKind LOOM = new BatchOrganKind(
+            "bone_loom",
+            1,
+            0,
+            Biomass.of(1000),
+            1,
+            Block.box(1, 0, 1, 15, 12, 15),
+            () -> ProcessingModule.BONE_LOOM.get(),
+            () -> ProcessingModule.BONE_LOOM_ENTITY.get(),
+            () -> ProcessingModule.BONE_LOOM_MENU.get());
+
     public static final DeferredBlock<Block> CULTURE_BOWL = batchOrgan(BOWL, MapColor.TERRACOTTA_PINK, 0.8F);
     public static final DeferredItem<OrganItem> CULTURE_BOWL_ITEM =
             ITEMS.register("culture_bowl", () -> new OrganItem(CULTURE_BOWL.get(), new Item.Properties(), "idle"));
@@ -108,6 +120,16 @@ public final class ProcessingModule {
             batchMenu(RACK, () -> ProcessingModule.MEMBRANE_RACK_MENU.get());
     /** What the Rack makes: the common flexible construction material. */
     public static final DeferredItem<Item> MEMBRANE_SHEET = ITEMS.registerSimpleItem("membrane_sheet");
+
+    public static final DeferredBlock<Block> BONE_LOOM = batchOrgan(LOOM, MapColor.TERRACOTTA_WHITE, 1.0F);
+    public static final DeferredItem<OrganItem> BONE_LOOM_ITEM =
+            ITEMS.register("bone_loom", () -> new OrganItem(BONE_LOOM.get(), new Item.Properties(), "idle"));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> BONE_LOOM_ENTITY =
+            batchEntity(LOOM, () -> ProcessingModule.BONE_LOOM.get());
+    public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> BONE_LOOM_MENU =
+            batchMenu(LOOM, () -> ProcessingModule.BONE_LOOM_MENU.get());
+    /** What the Loom grows: the structural plate. */
+    public static final DeferredItem<Item> BONE_PLATE = ITEMS.registerSimpleItem("bone_plate");
 
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
@@ -174,10 +196,12 @@ public final class ProcessingModule {
             OrganRenderers.register(modBus, "digestive_sac", DIGESTIVE_SAC_ENTITY, DIGESTIVE_SAC_ITEM);
             OrganRenderers.register(modBus, "culture_bowl", CULTURE_BOWL_ENTITY, CULTURE_BOWL_ITEM);
             OrganRenderers.register(modBus, "membrane_rack", MEMBRANE_RACK_ENTITY, MEMBRANE_RACK_ITEM);
+            OrganRenderers.register(modBus, "bone_loom", BONE_LOOM_ENTITY, BONE_LOOM_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(DIGESTIVE_SAC_MENU.get(), DigestiveSacScreen::new);
                 event.register(CULTURE_BOWL_MENU.get(), CultureBowlScreen::new);
                 event.register(MEMBRANE_RACK_MENU.get(), MembraneRackScreen::new);
+                event.register(BONE_LOOM_MENU.get(), BoneLoomScreen::new);
             });
         }
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
@@ -188,7 +212,7 @@ public final class ProcessingModule {
                     Capabilities.FluidHandler.BLOCK,
                     DIGESTIVE_SAC_ENTITY.get(),
                     (sac, side) -> BiomassFluids.handler(sac));
-            for (var entity : List.of(CULTURE_BOWL_ENTITY, MEMBRANE_RACK_ENTITY)) {
+            for (var entity : List.of(CULTURE_BOWL_ENTITY, MEMBRANE_RACK_ENTITY, BONE_LOOM_ENTITY)) {
                 event.registerBlockEntity(BiomassCapabilities.BLOCK, entity.get(), (organ, side) -> organ);
                 event.registerBlockEntity(
                         Capabilities.FluidHandler.BLOCK,

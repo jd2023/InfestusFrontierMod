@@ -165,22 +165,23 @@ Subject: one standard PLAIN GREY METAL BUCKET filled with thick olive yellow-gre
 ## ART-004 — Membrane Rack and Membrane Sheet artwork
 
 ```text
-ART-004  The Membrane Sheet has its icon and the Rack its guide illustration
+ART-004  The Sheet and the Plate have their icons, the Rack and the Loom their guide illustrations
 Status: ready
 Milestone: M2
 Owner: processing
 Kind: art
 Depends: the Rack commit on v4
-Read: docs/design/BLOCK_CATALOG.md#t0-05--membrane-rack, docs/design/ITEM_CATALOG.md (I002), build/captures/demo/bowl.png (the Rack stands at x=28, right of the Bowl)
-Files: src/main/resources/assets/infestusfrontier/textures/item/membrane_sheet.png, src/main/resources/assets/infestusfrontier/textures/book/membrane_rack.png, the_waking_genome/entries/contact/membrane_rack.json, CREDITS.txt
+Read: docs/design/BLOCK_CATALOG.md#t0-05--membrane-rack and #t0-06--bone-loom, docs/design/ITEM_CATALOG.md (I002, I003), build/captures/demo/bowl.png and loom.png (the Rack stands at x=28, the Loom at x=30)
+Files: src/main/resources/assets/infestusfrontier/textures/item/membrane_sheet.png and bone_plate.png, src/main/resources/assets/infestusfrontier/textures/book/membrane_rack.png and bone_loom.png, the_waking_genome/entries/contact/membrane_rack.json and bone_loom.json, CREDITS.txt
 Do:
   1. membrane_sheet.png, 32x32: one pale pinkish stretched skin sheet, slightly curled at one corner, thin dark outline, lit top-left. Replaces the planner's placeholder; export with scripts/texture.py --size 32 --colors 0.
-  2. membrane_rack.png, 200x200 canvas with a 200x100 vignette like the other Contact illustrations: the bone rack with a skin stretched between its posts, a drop falling from it, on a small island of substrate. Then the entry's first page becomes a modonomicon:image page like the others.
-  3. While there: the ART-003 follow-ups, taller vignettes so picture and caption sit closer, and the root entry's icon as the new cover.
+  2. bone_plate.png, 32x32: one curved ivory plate with a faint rib line, thin dark outline, lit top-left. Same export.
+  3. membrane_rack.png and bone_loom.png, 200x200 canvases with a 200x100 vignette like the other Contact illustrations: the bone rack with a skin stretched between its posts, a drop falling from it, on a small island of substrate. Then the entry's first page becomes a modonomicon:image page like the others.
+  4. While there: the ART-003 follow-ups, taller vignettes so picture and caption sit closer, and the root entry's icon as the new cover.
 Tests: none. Assets only; the gate's captures are the evidence.
 Done:
   - bash scripts/verify.sh
-Not: the Rack model (generated), other icons.
+Not: the Rack and Loom models (generated), other icons.
 Bounds: 32x32 for the icon, 200x200 RGBA for the illustration.
 Evidence: visual
 ```
