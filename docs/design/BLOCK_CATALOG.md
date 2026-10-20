@@ -265,10 +265,9 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Add cells for capacity; Thermal Lining permits hot liquids. Partitioned installations use separate tanks, so a water route cannot contaminate the lava supply.
 
 ### T1-09 — Item Capsule
-- **Does:** Stores a small number of item types in a fleshy cabinet. A large icon on its front shows the selected contents; joined capsules provide more compartments.
-- **Input → output:** Inserted items → the same items through hand access or Item Veins.
-- **Create:** 1 chest + 2 Membrane Sheets + 1 Spore Culture.
-- **Growth:** Add neighboring capsules for capacity. Skeletal Graft treatment improves compression of stackable items but does not merge different equipment histories. Display icons can be hidden per capsule.
+- **Status:** Deferred. General item storage uses vanilla containers and Storage Drawers. Infestus supplies the mouths, veins, routing and controls.
+- **Integration:** Stores retain ownership of their contents. Mouths use standard NeoForge item capabilities; drawer banks connect through their controller. Storage Drawers is optional for the standalone mod.
+- **Reserves:** An Infestus connection can limit its own extraction. It cannot prevent a player or another mod from removing externally stored items; availability is checked again when transferring.
 
 ### T1-10 — Intake Mouth
 - **Does:** Attaches to an organ or store and pulls from the inventory immediately facing its mouth. Makes a hand-fed organ accessible to ordinary storage automation.
@@ -1125,7 +1124,7 @@ Connect established workshops rather than replacing them. Transit consumes local
 - **Growth:** Add compartments for several independent destinations. A fluid compartment needs a compatible lined cyst; incompatible cargo does not share one invisible universal tank.
 
 ### T6-05 — Storage Cortex
-- **Does:** Presents connected Item Capsules and tanks as one searchable local store, while the physical cells still hold the contents.
+- **Does:** Presents connected vanilla containers, supported external stores and biological tanks as one searchable local store. The physical containers still hold the contents; T1-09 defines the storage boundary.
 - **Input → output:** Player queries, deposits and withdrawals + electricity → indexed access and routed items through connected mouths/veins.
 - **Create:** 1 Synaptic Console + 1 Archive Lobe + 1 precision-conditioned Spatial Membrane. A Request Cortex is a separate optional client; storage indexing alone does not require automated recipe planning.
 - **Growth:** Attach Archive Lobes for more connected storage groups. Remote stock is shown separately with availability and freight cost; it cannot be withdrawn instantly from an unloaded dimension.

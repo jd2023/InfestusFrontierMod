@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "minecraft:hopper"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:intake_mouth",
+    "count": 1
+  }
+}

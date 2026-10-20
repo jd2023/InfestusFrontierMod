@@ -1,5 +1,7 @@
 Infestus Frontier original assets
 
+Intake and Output Mouth models and model textures (art/gen_mouths.py, models/block/*_mouth.json, textures/block/*_mouth.png): original work by the repository owner through the shared organ model generator, 2026-10-20; CC BY 4.0.
+
 Every shipped texture, model, sound and name is original work made for this
 project. Add one line per asset family here: what it is, who made it, with what
 tool, on what date. No vanilla, prototype or third-party art is copied.

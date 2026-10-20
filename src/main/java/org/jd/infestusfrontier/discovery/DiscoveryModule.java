@@ -69,6 +69,8 @@ public final class DiscoveryModule {
                         output.accept(LogisticsModule.FLUID_VEIN_ITEM.get());
                         output.accept(LogisticsModule.ITEM_VEIN_ITEM.get());
                         output.accept(LogisticsModule.VASCULAR_JUNCTION_ITEM.get());
+                        output.accept(LogisticsModule.INTAKE_MOUTH_ITEM.get());
+                        output.accept(LogisticsModule.OUTPUT_MOUTH_ITEM.get());
                         for (var piece : List.of(
                                 EquipmentModule.DORMANT_HOOD,
                                 EquipmentModule.DORMANT_THORAX,

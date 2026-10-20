@@ -176,5 +176,15 @@
   "entry.infestusfrontier.circulation.vascular_junction.use": "Place it on Living Substrate. Click a face with the Synaptic Probe to make it an intake, an outlet or closed; the mouth shows it. Every 4 ticks it drains up to 250 mB from each intake, a Bladder, a Sac, a vein or a water source block, into its 1000 mB tank, and pushes as much out of each outlet into a vein, a tank or an organ. It holds one liquid at a time. Any hand opens its screen; sneak with the probe to read it.",
   "entry.infestusfrontier.circulation.vascular_junction.craft": "An Organ Bud, two Membrane Sheets and a slime ball.",
   "gui.infestusfrontier.vascular_junction.tank": "One liquid at a time, 1000 mB. Intakes fill it, outlets drain it, 250 mB every 4 ticks.",
-  "gui.infestusfrontier.fluid": "%s / %s mB"
+  "gui.infestusfrontier.fluid": "%s / %s mB",
+  "block.infestusfrontier.intake_mouth": "Intake Mouth",
+  "entry.infestusfrontier.circulation.intake_mouth.name": "Intake Mouth",
+  "entry.infestusfrontier.circulation.intake_mouth.description": "Connect a store to the living workshop.",
+  "entry.infestusfrontier.circulation.intake_mouth.use": "Attach to a host inventory. The lips face the supply container, one block beyond the mouth. Pulls up to eight items into the host every eight ticks while space is available. Full inventories pause the transfer.",
+  "entry.infestusfrontier.circulation.intake_mouth.craft": "One Bud, one hopper and one Membrane Sheet. Sneak when placing against an organ. No filters or power cost yet.",
+  "block.infestusfrontier.output_mouth": "Output Mouth",
+  "entry.infestusfrontier.circulation.output_mouth.name": "Output Mouth",
+  "entry.infestusfrontier.circulation.output_mouth.description": "Connect a store to the living workshop.",
+  "entry.infestusfrontier.circulation.output_mouth.use": "Attach to a host inventory. The lips face a receiving container or Item Vein, one block beyond the mouth. Pushes up to eight extractable items every eight ticks. Ingredients stay in organs; a full destination pauses extraction.",
+  "entry.infestusfrontier.circulation.output_mouth.craft": "One Bud, one hopper and one bone. Sneak when placing against an organ. No filters or power cost yet."
 }

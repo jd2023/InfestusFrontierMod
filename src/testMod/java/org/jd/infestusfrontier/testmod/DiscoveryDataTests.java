@@ -27,6 +27,19 @@ public final class DiscoveryDataTests {
         return ResourceLocation.fromNamespaceAndPath("infestusfrontier", path);
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void mouthRecipesResolve(GameTestHelper h) {
+        resolves(
+                h,
+                List.of(OrganModule.ORGAN_BUD_ITEM.get(), Items.HOPPER, ProcessingModule.MEMBRANE_SHEET.get()),
+                LogisticsModule.INTAKE_MOUTH_ITEM.get());
+        resolves(
+                h,
+                List.of(OrganModule.ORGAN_BUD_ITEM.get(), Items.HOPPER, Items.BONE),
+                LogisticsModule.OUTPUT_MOUTH_ITEM.get());
+        h.succeed();
+    }
+
     private static void resolves(GameTestHelper h, List<Item> inputs, Item expected) {
         List<ItemStack> stacks =
                 new ArrayList<>(inputs.stream().map(ItemStack::new).toList());
@@ -78,7 +91,9 @@ public final class DiscoveryDataTests {
                 "biomass_bladder",
                 "culture_bowl",
                 "activation_cyst",
-                "vascular_junction")) {
+                "vascular_junction",
+                "intake_mouth",
+                "output_mouth")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));

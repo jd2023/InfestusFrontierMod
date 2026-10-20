@@ -88,7 +88,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 | construction | Loaded-only structure validation, shell parts, paid placement, transplanting |
 | ecology | Substrate maturity, function, lining, reinforcement, dye, deliberate conversion |
 | cultivation | Crop and tree growth, allocated harvest, planting reserves |
-| logistics | Routes, ports, filters, reservations and movement of items, fluids and biomass; a vein cell (`VeinBlock`, one `Carrier`) holds one packet and pushes it on by scheduled ticks, never pulling; the Vascular Junction pumps through its six `Port`s; `api.PortSwitch` is what the probe cycles |
+| logistics | Routes, ports, filters, reservations and movement of items, fluids and biomass; a vein cell (`VeinBlock`, one `Carrier`) holds one packet and pushes it on by scheduled ticks, never pulling; the Vascular Junction pumps through its six `Port`s; `api.PortSwitch` is what the probe cycles; Intake and Output Mouths transfer through adjacent standard item handlers, under a per-dimension quota |
 | control | Signals, interlocks, selection, finite schedules |
 | genetics | Samples, species and quality counts, genome coverage, native eligibility, cultured stock |
 | equipment | Armor piece identity, fusion tree, counters, mutations, fuel, death preservation |

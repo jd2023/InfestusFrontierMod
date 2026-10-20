@@ -7,6 +7,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -14,6 +15,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
@@ -23,7 +25,9 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.core.foundation.TickQuota;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
@@ -44,6 +48,31 @@ public final class LogisticsModule {
             DeferredRegister.create(Registries.MENU, InfestusFrontier.MOD_ID);
     private static final DeferredRegister.DataComponents COMPONENTS =
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, InfestusFrontier.MOD_ID);
+
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
+            DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, InfestusFrontier.MOD_ID);
+    static final DeferredHolder<AttachmentType<?>, AttachmentType<TickQuota>> MOUTH_QUOTA = ATTACHMENTS.register(
+            "mouth_quota", () -> AttachmentType.builder(() -> new TickQuota(64)).build());
+    public static final DeferredBlock<Block> INTAKE_MOUTH = mouth("intake_mouth", true);
+    public static final DeferredBlock<Block> OUTPUT_MOUTH = mouth("output_mouth", false);
+    public static final DeferredItem<BlockItem> INTAKE_MOUTH_ITEM = ITEMS.registerSimpleBlockItem(INTAKE_MOUTH);
+    public static final DeferredItem<BlockItem> OUTPUT_MOUTH_ITEM = ITEMS.registerSimpleBlockItem(OUTPUT_MOUTH);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MouthBlockEntity>> MOUTH_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "mouth",
+                    () -> BlockEntityType.Builder.of(MouthBlockEntity::new, INTAKE_MOUTH.get(), OUTPUT_MOUTH.get())
+                            .build(null));
+
+    private static DeferredBlock<Block> mouth(String id, boolean intake) {
+        return BLOCKS.registerBlock(
+                id,
+                properties -> new MouthBlock(intake, properties),
+                BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.COLOR_PINK)
+                        .strength(0.6F)
+                        .sound(SoundType.SLIME_BLOCK)
+                        .noOcclusion());
+    }
 
     public static final DeferredBlock<VeinBlock> BIOMASS_VEIN = vein(Carrier.BIOMASS);
     public static final DeferredBlock<VeinBlock> FLUID_VEIN = vein(Carrier.FLUID);
@@ -120,6 +149,7 @@ public final class LogisticsModule {
         BLOCK_ENTITIES.register(modBus);
         MENUS.register(modBus);
         COMPONENTS.register(modBus);
+        ATTACHMENTS.register(modBus);
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, VEIN_ENTITY.get(), VeinBlockEntity::fluidPort);
             event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, VEIN_ENTITY.get(), VeinBlockEntity::itemPort);

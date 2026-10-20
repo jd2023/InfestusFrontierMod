@@ -1,0 +1,88 @@
+{
+  "commands": [
+    "advancement grant @s through infestusfrontier:contact/biomass_bladder",
+    "fill -8 -61 -6 10 -54 10 air",
+    "fill -8 -62 -6 10 -62 10 grass_block",
+    "fill -5 -61 0 7 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "setblock -3 -60 2 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:bone\",count:32}]}",
+    "setblock -2 -60 2 infestusfrontier:intake_mouth[facing=west]",
+    "setblock -1 -60 2 infestusfrontier:bone_loom{contents:{ingredients:[],output:{},water:0,biomass:{stored:500,reserved:0,capacity:1000},history:{completed_batches:0}}}",
+    "setblock 0 -60 2 infestusfrontier:output_mouth[facing=east]",
+    "setblock 1 -60 2 chest[facing=north]",
+    "setblock 3 -60 3 minecraft:stone",
+    "setblock 3 -60 2 infestusfrontier:intake_mouth[facing=north]",
+    "setblock 5 -60 3 minecraft:stone",
+    "setblock 5 -60 2 infestusfrontier:output_mouth[facing=north]",
+    "setblock 7 -60 3 minecraft:stone",
+    "setblock 7 -59 3 infestusfrontier:output_mouth[facing=up]",
+    "give @s infestusfrontier:intake_mouth",
+    "give @s infestusfrontier:output_mouth"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 2,
+      "y": -58,
+      "z": -2,
+      "yaw": 0,
+      "pitch": 25
+    },
+    {
+      "name": "back",
+      "x": 2,
+      "y": -57,
+      "z": 8,
+      "yaw": 180,
+      "pitch": 35
+    },
+    {
+      "name": "above",
+      "x": 2,
+      "y": -53,
+      "z": 2,
+      "yaw": 0,
+      "pitch": 85
+    },
+    {
+      "name": "lips",
+      "x": 4,
+      "y": -60,
+      "z": -0.5,
+      "yaw": 0,
+      "pitch": 12
+    },
+    {
+      "name": "hotbar",
+      "x": 2,
+      "y": -58,
+      "z": -2,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:intake_mouth",
+        "infestusfrontier:output_mouth"
+      ]
+    },
+    {
+      "name": "book_intake_mouth",
+      "x": 2,
+      "y": -58,
+      "z": -2,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "book": "infestusfrontier:circulation/intake_mouth"
+    },
+    {
+      "name": "book_output_mouth",
+      "x": 2,
+      "y": -58,
+      "z": -2,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "book": "infestusfrontier:circulation/output_mouth"
+    }
+  ]
+}

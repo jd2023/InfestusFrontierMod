@@ -82,7 +82,14 @@
     "item replace entity @s inventory.1 with wheat_seeds 8",
     "item replace entity @s inventory.2 with water_bucket 1",
     "give @s infestusfrontier:synaptic_probe 1",
-    "give @s modonomicon:modonomicon[modonomicon:book_id=\"infestusfrontier:the_waking_genome\"]"
+    "give @s modonomicon:modonomicon[modonomicon:book_id=\"infestusfrontier:the_waking_genome\"]",
+    "fill 46 -61 -36 50 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 46 -60 -36 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:bone\",count:16}]}",
+    "setblock 47 -60 -36 infestusfrontier:intake_mouth[facing=west]",
+    "setblock 48 -60 -36 infestusfrontier:bone_loom{contents:{ingredients:[],output:{},water:0,biomass:{stored:800,reserved:0,capacity:1000},history:{completed_batches:0}}}",
+    "setblock 49 -60 -36 infestusfrontier:output_mouth[facing=east]",
+    "setblock 50 -60 -36 chest[facing=north]",
+    "setblock 47 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mouths\"','\"chest feeds Loom\"','\"finished plates\"','\"leave to the chest\"']}}"
   ],
   "views": [
     {
@@ -543,6 +550,14 @@
       "gui": true,
       "name": "book_vascular_junction",
       "book": "infestusfrontier:circulation/vascular_junction"
+    },
+    {
+      "name": "mouths",
+      "x": 48,
+      "y": -58,
+      "z": -40,
+      "yaw": 0,
+      "pitch": 32
     }
   ]
 }
