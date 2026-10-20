@@ -205,15 +205,14 @@ public final class ProcessingModule {
             batchEntity(CYST, () -> ProcessingModule.ACTIVATION_CYST.get());
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> ACTIVATION_CYST_MENU =
             batchMenu(CYST, () -> ProcessingModule.ACTIVATION_CYST_MENU.get());
-    /** The treatments the Bowl and the Cyst make. Other modules apply them; ITEM_CATALOG.md names the recipes. */
+    /**
+     * The intermediate treatments the Bowl and the Cyst make, which only other treatments consume. A treatment that
+     * acts on the world is an item of the module that owns the act; the Cyst makes it through data alone.
+     */
     public static final DeferredItem<Item> FUSION_BINDER = ITEMS.registerSimpleItem("fusion_binder");
 
     public static final DeferredItem<Item> ELASTIC_GEL = ITEMS.registerSimpleItem("elastic_gel");
     public static final DeferredItem<Item> ROOTING_GEL = ITEMS.registerSimpleItem("rooting_gel");
-    public static final DeferredItem<Item> CAPILLARY_GEL = ITEMS.registerSimpleItem("capillary_gel");
-    public static final DeferredItem<Item> CONTRACTILE_FIBER = ITEMS.registerSimpleItem("contractile_fiber");
-    public static final DeferredItem<Item> FILTER_MEMBRANE = ITEMS.registerSimpleItem("filter_membrane");
-    public static final DeferredItem<Item> SEALING_RESIN = ITEMS.registerSimpleItem("sealing_resin");
     public static final DeferredItem<Item> SYNAPTIC_GEL = ITEMS.registerSimpleItem("synaptic_gel");
 
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =

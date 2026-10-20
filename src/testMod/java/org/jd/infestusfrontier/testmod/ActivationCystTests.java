@@ -14,6 +14,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.storage.StorageModule;
@@ -47,7 +48,7 @@ public final class ActivationCystTests {
         });
         h.runAtTickTime(CYST_TICKS + 2, () -> {
             BatchOrganContents done = contents(h, CYST);
-            h.assertTrue(done.output().is(ProcessingModule.CAPILLARY_GEL.get()), "capillary gel out");
+            h.assertTrue(done.output().is(LogisticsModule.CAPILLARY_GEL.get()), "capillary gel out");
             h.assertValueEqual(done.output().getCount(), 2, "two doses");
             h.succeed();
         });

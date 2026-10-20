@@ -16,6 +16,7 @@ import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.equipment.EquipmentModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
+import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
@@ -59,11 +60,15 @@ public final class DiscoveryModule {
                                 ProcessingModule.FUSION_BINDER,
                                 ProcessingModule.ELASTIC_GEL,
                                 ProcessingModule.ROOTING_GEL,
-                                ProcessingModule.CAPILLARY_GEL,
-                                ProcessingModule.CONTRACTILE_FIBER,
-                                ProcessingModule.FILTER_MEMBRANE,
-                                ProcessingModule.SEALING_RESIN,
+                                LogisticsModule.CAPILLARY_GEL,
+                                LogisticsModule.CONTRACTILE_FIBER,
+                                LogisticsModule.FILTER_MEMBRANE,
+                                LogisticsModule.SEALING_RESIN,
                                 ProcessingModule.SYNAPTIC_GEL)) output.accept(treatment.get());
+                        output.accept(LogisticsModule.BIOMASS_VEIN_ITEM.get());
+                        output.accept(LogisticsModule.FLUID_VEIN_ITEM.get());
+                        output.accept(LogisticsModule.ITEM_VEIN_ITEM.get());
+                        output.accept(LogisticsModule.VASCULAR_JUNCTION_ITEM.get());
                         for (var piece : List.of(
                                 EquipmentModule.DORMANT_HOOD,
                                 EquipmentModule.DORMANT_THORAX,

@@ -1,0 +1,59 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "sealed": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein"
+      }
+    },
+    {
+      "when": {
+        "sealed": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_unsealed"
+      }
+    },
+    {
+      "when": {
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_cap",
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_cap",
+        "uvlock": true,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_cap",
+        "uvlock": true,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_cap",
+        "uvlock": true,
+        "y": 270
+      }
+    }
+  ]
+}

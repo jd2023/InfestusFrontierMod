@@ -1,0 +1,38 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.vascular_junction.name",
+  "description": "entry.infestusfrontier.circulation.vascular_junction.description",
+  "icon": "infestusfrontier:vascular_junction",
+  "x": 2,
+  "y": 0,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/activation_cyst"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/vascular_junction"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.circulation.vascular_junction.use",
+      "title": "entry.infestusfrontier.circulation.vascular_junction.name"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:vascular_junction",
+      "text": "entry.infestusfrontier.circulation.vascular_junction.craft"
+    }
+  ]
+}

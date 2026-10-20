@@ -1,0 +1,48 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein"
+      }
+    },
+    {
+      "when": {
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_cap",
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_cap",
+        "uvlock": true,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_cap",
+        "uvlock": true,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_cap",
+        "uvlock": true,
+        "y": 270
+      }
+    }
+  ]
+}

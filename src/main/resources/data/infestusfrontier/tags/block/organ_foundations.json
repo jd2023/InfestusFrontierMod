@@ -1,3 +1,8 @@
 {
-  "values": ["infestusfrontier:living_substrate"]
+  "values": [
+    "infestusfrontier:living_substrate",
+    "infestusfrontier:biomass_vein",
+    "infestusfrontier:fluid_vein",
+    "infestusfrontier:item_vein"
+  ]
 }

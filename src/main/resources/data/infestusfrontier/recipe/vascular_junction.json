@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:vascular_junction",
+    "count": 1
+  }
+}

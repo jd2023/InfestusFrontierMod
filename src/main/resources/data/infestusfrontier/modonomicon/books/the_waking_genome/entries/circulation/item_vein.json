@@ -1,0 +1,33 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.item_vein.name",
+  "description": "entry.infestusfrontier.circulation.item_vein.description",
+  "icon": "infestusfrontier:item_vein",
+  "x": 2,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/activation_cyst"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/contractile_fiber"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.circulation.item_vein.use",
+      "title": "entry.infestusfrontier.circulation.item_vein.name"
+    }
+  ]
+}

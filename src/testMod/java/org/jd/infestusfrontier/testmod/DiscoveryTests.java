@@ -117,7 +117,7 @@ public final class DiscoveryTests {
         }
         var circulation = book.getCategory(id("circulation"));
         h.assertTrue(circulation != null, "category circulation loaded");
-        for (String entry : List.of("activation_cyst"))
+        for (String entry : List.of("activation_cyst", "biomass_vein", "item_vein", "fluid_vein", "vascular_junction"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();

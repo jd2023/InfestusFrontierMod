@@ -49,6 +49,13 @@
     "setblock 38 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 38 -60 -36 infestusfrontier:activation_cyst[working=true]{contents:{ingredients:[{id:\"infestusfrontier:elastic_gel\",count:2},{id:\"infestusfrontier:fusion_binder\",count:3}],output:{id:\"infestusfrontier:capillary_gel\",count:2},water:600,biomass:{stored:700,reserved:0,capacity:1000},history:{completed_batches:4},batch:{batch:{recipe:\"infestusfrontier:activating/capillary_gel\",ticks_required:400,ticks_done:150},result:{id:\"infestusfrontier:capillary_gel\",count:2}}}}",
     "setblock 39 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Activation Cyst\"','\"gel and binder\"','\"make treatments\"','\"20 s a batch\"']}}",
+    "fill 40 -61 -36 44 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 40 -60 -36 infestusfrontier:biomass_bladder[fill=3]{tank:{stored:3000,reserved:0,capacity:4000}}",
+    "setblock 41 -60 -36 infestusfrontier:vascular_junction[west=intake,down=outlet]",
+    "fill 41 -61 -36 43 -61 -36 infestusfrontier:biomass_vein",
+    "setblock 43 -60 -36 infestusfrontier:bone_loom{contents:{ingredients:[{id:\"minecraft:bone\",count:4}],output:{},water:0,biomass:{stored:0,reserved:0,capacity:1000},history:{completed_batches:0}}}",
+    "setblock 41 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Vascular Junction\"','\"probe a face:\"','\"intake, outlet\"','\"pumps the Bladder\"']}}",
+    "setblock 43 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Biomass Vein\"','\"under the Loom\"','\"feeds it\"','\"Capillary Gel\"']}}",
     "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
     "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",
     "fill 5 -61 -29 8 -61 -26 infestusfrontier:living_substrate[stage=young]",
@@ -193,6 +200,28 @@
       "gui": true,
       "use": [
         38,
+        -60,
+        -36
+      ]
+    },
+    {
+      "name": "veins",
+      "x": 42.5,
+      "y": -59,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 25
+    },
+    {
+      "name": "junction_screen",
+      "x": 41.5,
+      "y": -60,
+      "z": -38.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        41,
         -60,
         -36
       ]
@@ -474,6 +503,46 @@
       "name": "book_activation_cyst_recipes",
       "book": "infestusfrontier:circulation/activation_cyst",
       "page": 2
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_biomass_vein",
+      "book": "infestusfrontier:circulation/biomass_vein"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_item_vein",
+      "book": "infestusfrontier:circulation/item_vein"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_fluid_vein",
+      "book": "infestusfrontier:circulation/fluid_vein"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_vascular_junction",
+      "book": "infestusfrontier:circulation/vascular_junction"
     }
   ]
 }

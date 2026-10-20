@@ -1,0 +1,105 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.vascular_junction",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 2,
+        "visible_bounds_height": 1,
+        "visible_bounds_offset": [0, 0.25, 0]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [0, 0, 0]
+        },
+        {
+          "name": "hub",
+          "parent": "root",
+          "pivot": [0, 2, 0],
+          "cubes": [
+            {
+              "origin": [-5, 2, -5],
+              "size": [10, 10, 10],
+              "uv": [0, 0]
+            }
+          ]
+        },
+        {
+          "name": "mouth_up",
+          "parent": "root",
+          "pivot": [0, 12, 0],
+          "cubes": [
+            {
+              "origin": [-2.5, 12, -2.5],
+              "size": [5, 3, 5],
+              "uv": [42, 21]
+            }
+          ]
+        },
+        {
+          "name": "mouth_down",
+          "parent": "root",
+          "pivot": [0, 2, 0],
+          "cubes": [
+            {
+              "origin": [-3, 0, -3],
+              "size": [6, 2, 6],
+              "uv": [17, 21]
+            }
+          ]
+        },
+        {
+          "name": "mouth_north",
+          "parent": "root",
+          "pivot": [0, 7, -5],
+          "cubes": [
+            {
+              "origin": [-2.5, 4.5, -8],
+              "size": [5, 5, 3],
+              "uv": [0, 32]
+            }
+          ]
+        },
+        {
+          "name": "mouth_south",
+          "parent": "root",
+          "pivot": [0, 7, 5],
+          "cubes": [
+            {
+              "origin": [-2.5, 4.5, 5],
+              "size": [5, 5, 3],
+              "uv": [17, 32]
+            }
+          ]
+        },
+        {
+          "name": "mouth_east",
+          "parent": "root",
+          "pivot": [5, 7, 0],
+          "cubes": [
+            {
+              "origin": [5, 4.5, -2.5],
+              "size": [3, 5, 5],
+              "uv": [41, 0]
+            }
+          ]
+        },
+        {
+          "name": "mouth_west",
+          "parent": "root",
+          "pivot": [-5, 7, 0],
+          "cubes": [
+            {
+              "origin": [-8, 4.5, -2.5],
+              "size": [3, 5, 5],
+              "uv": [0, 21]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -88,7 +88,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 | construction | Loaded-only structure validation, shell parts, paid placement, transplanting |
 | ecology | Substrate maturity, function, lining, reinforcement, dye, deliberate conversion |
 | cultivation | Crop and tree growth, allocated harvest, planting reserves |
-| logistics | Routes, ports, filters, reservations and movement of items, fluids and biomass |
+| logistics | Routes, ports, filters, reservations and movement of items, fluids and biomass; a vein cell (`VeinBlock`, one `Carrier`) holds one packet and pushes it on by scheduled ticks, never pulling; the Vascular Junction pumps through its six `Port`s; `api.PortSwitch` is what the probe cycles |
 | control | Signals, interlocks, selection, finite schedules |
 | genetics | Samples, species and quality counts, genome coverage, native eligibility, cultured stock |
 | equipment | Armor piece identity, fusion tree, counters, mutations, fuel, death preservation |
@@ -114,7 +114,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 ### Invariants
 
 - Processing reserves inputs, outputs, containers, waste and target before it starts. One active batch per organ. Saved stage, not wall time, drives recovery.
-- Every organ runs without a player: it starts on its own when its inputs are complete, hoppers and pipes load it through its item and fluid capabilities and take its output, and its batches are credited to the last player who loaded it by hand, hopper batches after that included. A slot admits only a kind of item no other slot holds and that one batch can use with the rest, so a hopper cannot clog it. The Bladder's Fill is the last hand-only step; M3 gives it an automated path.
+- Every organ runs without a player: it starts on its own when its inputs are complete, hoppers and pipes load it through its item and fluid capabilities and take its output, and its batches are credited to the last player who loaded it by hand, hopper batches after that included. A slot admits only a kind of item no other slot holds and that one batch can use with the rest, so a hopper cannot clog it. The Bladder's Fill is the last hand-only step; M3 gives it an automated path. A vein cell never pulls and never flows back the way its packet came; a full downstream leaves the packet where it is and the cell retries every 20 ticks. Only a junction pumps, and only from its intakes to its outlets.
 - Saved state is judged as a whole on load and on placement (`Persistence.read` with a check). What fails is kept as unreadable bytes: saved back unchanged, carried on the item as `unreadable_save`, refusing every command and every insertion, and counting as contents when a Creative player breaks it. Nothing is silently dropped or replaced.
 - Organ history has one owner. Wall blocks never copy a core's history.
 - Balances have one owner (`storage`). Routes and indexes hold reservations, not totals. Integer math is checked.
@@ -192,7 +192,7 @@ A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`:
 }
 ```
 
-- The harness sets noon, clear weather, frozen time and weather, no clouds, no view bobbing, an empty hand, and hides the GUI unless `gui` is true. `commands` run as the player, one per tick, before the views.
+- The harness sets frozen time and weather, no clouds, no view bobbing, and hides the GUI unless `gui` is true; before every scenario it clears the inventory and sets noon and clear weather again, so a scenario that sets midnight leaves nothing behind. `commands` run as the player, one per tick, before the views.
 - A view teleports the player to `x y z` with `yaw pitch`. On the ground the player stands; in the air it flies and is pinned there. It waits until every chunk section around the player is rendered, and saves `build/captures/<scenario>/<view>.png`.
 - The player's inventory is cleared before every scenario's commands, so a scenario gives itself what its views show.
 - A view with `"use": [x, y, z]` and `"gui": true` right-clicks that block from where it stands and photographs the screen that opens, with an empty hand, or with the item named by `"holding": "<item id>"` selected in the hotbar (the scenario's commands give it). Every screen gets such a view in `demo.json`. A view with `"inventory": true` opens the player's inventory instead. A view with `"book": "<entry id>"` (empty for the guide's first screen) opens the guide there, `"page"` picking the left page of the pair shown (0, 2, 4, ...); the demo scenario grants the contact advancements first so every entry is unlocked. The window is 1280x720; world views are shot at GUI scale 2, screen views at scale 3. A world view with `"icons": [item ids]` names the hotbar left to right (at most eight: the client parks the selection ring on the last slot); the verifier fails when an icon's centroid is more than 1.5 px off its slot centre or it draws outside its 16 px square.

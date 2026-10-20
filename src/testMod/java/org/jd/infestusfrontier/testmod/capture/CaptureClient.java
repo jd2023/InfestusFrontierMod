@@ -65,8 +65,8 @@ final class CaptureClient {
             "gamerule doMobSpawning false",
             "time set noon",
             "weather clear");
-    /** Runs before every scenario's own commands, so nothing carries over from the scenario before. */
-    private static final String RESET = "clear @s";
+    /** Runs before every scenario's own commands, so nothing carries over from the scenario before: not the inventory, not the night. */
+    private static final List<String> RESET = List.of("clear @s", "time set noon", "weather clear");
 
     private final Path outputDir;
     private final List<Scenario> scenarios;
@@ -165,7 +165,7 @@ final class CaptureClient {
         if (!FlatWorld.joined(minecraft)) return;
         LOGGER.info("INFESTUS_CAPTURE_JOINED");
         commandQueue.addAll(BASELINE);
-        commandQueue.add(RESET);
+        commandQueue.addAll(RESET);
         commandQueue.addAll(scenarios.get(scenarioIndex).commands());
         enter(Stage.COMMANDS);
     }
@@ -353,7 +353,7 @@ final class CaptureClient {
         viewIndex = 0;
         scenarioIndex++;
         if (scenarioIndex < scenarios.size()) {
-            commandQueue.add(RESET);
+            commandQueue.addAll(RESET);
             commandQueue.addAll(scenarios.get(scenarioIndex).commands());
             enter(Stage.COMMANDS);
             return;

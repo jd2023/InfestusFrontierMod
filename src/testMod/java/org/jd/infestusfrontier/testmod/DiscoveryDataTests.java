@@ -14,6 +14,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.StorageModule;
@@ -54,6 +55,7 @@ public final class DiscoveryDataTests {
                 h,
                 List.of(bud, sheet, sheet, ProcessingModule.BONE_PLATE.get()),
                 ProcessingModule.ACTIVATION_CYST_ITEM.get());
+        resolves(h, List.of(bud, sheet, sheet, Items.SLIME_BALL), LogisticsModule.VASCULAR_JUNCTION_ITEM.get());
         h.succeed();
     }
 
@@ -75,7 +77,8 @@ public final class DiscoveryDataTests {
                 "digestive_sac",
                 "biomass_bladder",
                 "culture_bowl",
-                "activation_cyst")) {
+                "activation_cyst",
+                "vascular_junction")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));
