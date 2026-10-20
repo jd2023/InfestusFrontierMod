@@ -121,8 +121,8 @@ public record OrganBatchRecipe(
         return RecipeMatcher.findMatches(units, tests) != null;
     }
 
-    /** A unit that stands for "whatever else the batch needs"; every ingredient accepts it. */
-    private static final ItemStack ANY_KIND = new ItemStack(net.minecraft.world.item.Items.AIR);
+    /** A unit that stands for "whatever else the batch needs"; every ingredient accepts it, no kind is ever empty. */
+    private static final ItemStack ANY_KIND = ItemStack.EMPTY;
 
     /** True when some ingredient of this recipe takes {@code stack}. */
     public boolean uses(ItemStack stack) {

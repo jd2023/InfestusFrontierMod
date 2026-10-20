@@ -534,7 +534,8 @@ public final class CultureBowlTests {
                                                     running.biomass(),
                                                     running.history(),
                                                     running.batch(),
-                                                    running.feeder()))
+                                                    running.feeder(),
+                                                    running.experience()))
                                     .build(),
                             DataComponentPatch.EMPTY);
         });
@@ -556,7 +557,8 @@ public final class CultureBowlTests {
                                                     waiting.biomass(),
                                                     waiting.history(),
                                                     waiting.batch(),
-                                                    waiting.feeder()))
+                                                    waiting.feeder(),
+                                                    waiting.experience()))
                                     .build(),
                             DataComponentPatch.EMPTY);
         });

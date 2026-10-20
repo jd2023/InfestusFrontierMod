@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -31,20 +32,47 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A batch organ of one {@link BatchOrganKind}. Buckets move water and biomass, ingredients go in one at a time by hand
  * or by the stack from a hopper, sneaking with both hands empty takes a stack back, anything else opens the screen.
- * Sneaking with an item builds against it. The batch starts on its own.
+ * Sneaking with an item builds against it. The batch starts on its own. A kind that grows is a {@link Growing}
+ * block, whose state also names its stage.
  */
-public final class BatchOrganBlock extends BaseEntityBlock {
+public class BatchOrganBlock extends BaseEntityBlock {
     /** True while a batch runs; the client animates from it. */
     public static final BooleanProperty WORKING = BooleanProperty.create("working");
+    /** The last stage a growing organ's state can name; a kind grows through at most this many stages after its first. */
+    public static final int LAST_STAGE = 2;
+    /** The growth stage of a {@link Growing} organ; the client picks its grown look from it. */
+    public static final IntegerProperty STAGE = IntegerProperty.create("stage", 0, LAST_STAGE);
 
     private final BatchOrganKind kind;
     private final MapCodec<BatchOrganBlock> codec;
 
-    BatchOrganBlock(BatchOrganKind kind, Properties properties) {
+    private BatchOrganBlock(BatchOrganKind kind, Properties properties) {
         super(properties);
         this.kind = kind;
-        this.codec = simpleCodec(p -> new BatchOrganBlock(kind, p));
+        this.codec = simpleCodec(p -> make(kind, p));
         registerDefaultState(stateDefinition.any().setValue(WORKING, false));
+    }
+
+    /** The block for {@code kind}: a {@link Growing} one when the kind has more than one stage. */
+    static BatchOrganBlock make(BatchOrganKind kind, Properties properties) {
+        if (!kind.grows()) return new BatchOrganBlock(kind, properties);
+        if (kind.growth().stages() > LAST_STAGE + 1)
+            throw new IllegalArgumentException(
+                    kind.id() + " has " + kind.growth().stages() + " stages");
+        return new Growing(kind, properties);
+    }
+
+    /** A batch organ whose state also carries its growth stage. */
+    static final class Growing extends BatchOrganBlock {
+        private Growing(BatchOrganKind kind, Properties properties) {
+            super(kind, properties);
+            registerDefaultState(stateDefinition.any().setValue(WORKING, false).setValue(STAGE, 0));
+        }
+
+        @Override
+        protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+            builder.add(WORKING, STAGE);
+        }
     }
 
     @Override

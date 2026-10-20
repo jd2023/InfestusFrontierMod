@@ -20,7 +20,7 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   176,96  52x16    button, disabled (sunken, grey)
   176,112 44x12    progress vein, empty
   176,128 44x12    progress vein, full (the screen draws its left part)
-  2,190   6 x 32x32 organ emblems in one row at a 34 px pitch: Sac, Bladder, Bowl, Rack, Loom, Cradle
+  2,190   7 x 32x32 organ emblems in one row at a 34 px pitch: Sac, Bladder, Bowl, Rack, Loom, Cradle, Furnace
 
 Every screen writes its title at 8,6, its emblem at 8,27 if it has one, labels at y 26 above
 its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
@@ -40,6 +40,7 @@ FLESH = [(96, 44, 64), (124, 60, 78), (150, 82, 92), (176, 110, 112), (198, 140,
 IVORY = [(150, 138, 112), (188, 176, 148), (222, 212, 186), (242, 236, 216)]
 GREEN = [(44, 92, 52), (96, 190, 78), (170, 255, 120), (228, 255, 198)]
 GREY = [(84, 76, 80), (110, 102, 104), (132, 124, 124)]
+EMBER = [(120, 36, 10), (210, 90, 20), (250, 160, 48)]
 OUTLINE = (52, 30, 40)
 WELL = (76, 44, 56)
 PIT = (42, 24, 34)
@@ -55,7 +56,7 @@ BUTTON_OFF = (176, 96)
 BUTTON_SIZE = (52, 16)
 VEIN_EMPTY = (176, 112, 44, 12)
 VEIN_FULL = (176, 128, 44, 12)
-EMBLEMS = [(2 + 34 * i, 190) for i in range(6)]
+EMBLEMS = [(2 + 34 * i, 190) for i in range(7)]
 EMBLEM = 32
 POOL = [(168, 196, 150), (206, 224, 182), (236, 244, 220)]
 BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
@@ -438,8 +439,32 @@ def emblem_cradle(img, ox, oy):
             put(img, ox + x, oy + y, OUTLINE if d > 0.85 else (IVORY[3] if dx + dy < 0 else IVORY[2]))
 
 
+def emblem_furnace(img, ox, oy):
+    """A plum stomach with a dark mouth on top and an ember band glowing across its middle."""
+    for y in range(EMBLEM):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 12.0, (y - 18) / 11.0
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            if d > 0.88:
+                colour = OUTLINE
+            elif 16 <= y <= 20 and d < 0.8:
+                colour = EMBER[2] if abs(y - 18) < 1.5 else EMBER[1]
+            else:
+                colour = FLESH[3] if dx + dy < -0.3 else FLESH[2] if dx + dy < 0.4 else FLESH[1]
+            put(img, ox + x, oy + y, colour)
+    for y in range(4, 10):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 5.0, (y - 7) / 3.0
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            put(img, ox + x, oy + y, OUTLINE if d > 0.8 else PIT if dy < 0.2 else FLESH[0])
+
+
 def emblems(img):
-    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom, emblem_cradle)):
+    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom, emblem_cradle, emblem_furnace)):
         draw(img, ox, oy)
 
 

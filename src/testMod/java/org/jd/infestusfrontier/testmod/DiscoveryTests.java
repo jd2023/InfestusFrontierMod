@@ -110,6 +110,7 @@ public final class DiscoveryTests {
                 "membrane_rack",
                 "bone_loom",
                 "awakening_cradle",
+                "bio_furnace",
                 "dormant_pieces",
                 "speak_to_an_organ")) {
             h.assertTrue(category.getEntries().containsKey(id("contact/" + entry)), "entry " + entry + " loaded");
@@ -150,6 +151,7 @@ public final class DiscoveryTests {
                 "membrane_rack",
                 "bone_loom",
                 "awakening_cradle",
+                "bio_furnace",
                 "dormant_pieces",
                 "speak_to_an_organ")) {
             var condition = contact.get(id("contact/" + name)).getCondition();
@@ -170,6 +172,7 @@ public final class DiscoveryTests {
                 "bone_loom",
                 "bone_plate",
                 "awakening_cradle",
+                "bio_furnace",
                 "dormant_thorax",
                 "awakened_thorax"))
             h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");

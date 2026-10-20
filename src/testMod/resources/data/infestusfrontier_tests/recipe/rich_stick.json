@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "minecraft:string"
+  },
+  "result": {
+    "id": "minecraft:stick"
+  },
+  "experience": 5000.0,
+  "cookingtime": 200
+}

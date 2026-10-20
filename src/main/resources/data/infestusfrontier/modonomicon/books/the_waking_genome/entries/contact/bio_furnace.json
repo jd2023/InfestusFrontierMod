@@ -1,0 +1,42 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.bio_furnace.name",
+  "description": "entry.infestusfrontier.contact.bio_furnace.description",
+  "icon": "infestusfrontier:bio_furnace",
+  "x": 4,
+  "y": 3,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/membrane_rack"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/digestive_sac"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/bio_furnace"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.bio_furnace.name",
+      "text": "entry.infestusfrontier.contact.bio_furnace.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.bio_furnace.grows"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:bio_furnace",
+      "text": "entry.infestusfrontier.contact.bio_furnace.craft"
+    }
+  ]
+}

@@ -254,3 +254,11 @@ Built-in image generation with true alpha transparency. Export with `python3 scr
 ```text
 Use case: stylized-concept. Asset type: source for a 32x32 voxel-game item icon. Subject: one hand tool, a pale ivory bone shaft held diagonally from lower left to upper right, tipped with a translucent violet nerve bulb that trails three fine crimson filaments. Style: hand-painted game sprite, bold silhouette, soft shading lit from upper left, thin dark outline. Palette: ivory bone, plum and violet bulb, crimson filaments, one small white highlight on the bulb. Constraints: square, true alpha transparency, one isolated object about 80 percent of the canvas, no background, no border, no text. Avoid: glow halo, metal, syringes, photorealism.
 ```
+
+## ART-006 — Bio-Furnace illustration
+
+Status: open. Owner of the asset: Astra.
+Files: src/main/resources/assets/infestusfrontier/textures/book/bio_furnace.png, the_waking_genome/entries/contact/bio_furnace.json, CREDITS.txt
+
+- bio_furnace.png, a 200x200 canvas with a 200x100 vignette like the other Contact illustrations: a plum stomach-shaped organ on a flesh foot, a dark mouth on top, an orange ember band glowing across its middle, a faint shimmer of heat above it, on a small island of substrate. Then the entry's first page becomes a modonomicon:image page like the others.
+- Quality bar: ART.md Quality bar. The organ model, its stage looks (ridges, lobes, chimneys) and the screen emblem come from art/gen_bio_furnace.py and art/gen_gui_sheet.py and are not part of this story.

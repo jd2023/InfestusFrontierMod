@@ -22,8 +22,9 @@ import org.jd.infestusfrontier.ui.SlotGrid;
 
 /**
  * The server half of every batch organ's screen: the kind's ingredient slots and the output slot backed by the block
- * entity's own handlers and five synced ints (water, biomass, biomass capacity, progress percent, state). Nothing here
- * decides a batch; the block entity does, and credits it to the player whose click last changed the ingredients.
+ * entity's own handlers and seven synced ints (water, biomass, biomass capacity, progress percent, state, growth
+ * stage, batches to the next stage). Nothing here decides a batch; the block entity does, and credits it to the player whose click last
+ * changed the ingredients.
  */
 public final class BatchOrganMenu extends OrganMenu {
     public static final int IDLE = 0;
@@ -34,7 +35,9 @@ public final class BatchOrganMenu extends OrganMenu {
     private static final int CAPACITY = 2;
     private static final int PERCENT = 3;
     private static final int STATE = 4;
-    private static final int SYNCED = 5;
+    private static final int STAGE = 5;
+    private static final int TO_NEXT = 6;
+    private static final int SYNCED = 7;
 
     private final BatchOrganKind kind;
     private final Optional<BatchOrganBlockEntity> organ;
@@ -53,7 +56,9 @@ public final class BatchOrganMenu extends OrganMenu {
                         () -> organ.tank().stored().units(),
                         () -> organ.tank().capacity().units(),
                         organ::percent,
-                        organ::state),
+                        organ::state,
+                        organ::stage,
+                        organ::toNextStage),
                 at(organ),
                 Optional.of(organ));
     }
@@ -99,6 +104,13 @@ public final class BatchOrganMenu extends OrganMenu {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
+            }
+
+            /** Whoever takes the output takes the smelting experience that waits with it. */
+            @Override
+            public void onTake(Player player, ItemStack stack) {
+                super.onTake(player, stack);
+                organ.ifPresent(entity -> entity.awardExperience(player));
             }
         });
         addPlayer(inventory, kind.strips());
@@ -170,6 +182,16 @@ public final class BatchOrganMenu extends OrganMenu {
     /** One of {@link #IDLE}, {@link #WORKING}, {@link #PAUSED}. */
     public int state() {
         return Math.clamp(synced(STATE), IDLE, PAUSED);
+    }
+
+    /** The organ's growth stage, from 0. Synced as a small int, so it is right however many batches the organ has done. */
+    public int stage() {
+        return Math.clamp(synced(STAGE), 0, kind.growth().stages() - 1);
+    }
+
+    /** Batches to the next stage, 0 at the last. */
+    public int toNextStage() {
+        return Math.max(0, synced(TO_NEXT));
     }
 
     @Override

@@ -2,22 +2,22 @@ package org.jd.infestusfrontier.processing;
 
 import com.mojang.serialization.MapCodec;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -39,7 +39,6 @@ import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.processing.api.OrganBatch;
-import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -51,14 +50,20 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
  * One batch organ: ingredient slots, a water tank, a biomass tank and one running batch, shaped by its
- * {@link BatchOrganKind}. The Bowl, the Rack, the Loom and the Cradle are this class with different kinds. It runs on
- * its own: whenever its slots, water and biomass can pay for a recipe and the output has room, the next batch starts,
- * credited to the last player who loaded it by hand.
+ * {@link BatchOrganKind}. The Bowl, the Rack, the Loom, the Cradle and the Bio-Furnace are this class with different
+ * kinds. It runs on its own: whenever its slots, water and biomass can pay for a batch of its {@link BatchBook} and
+ * the output has room, the next batch starts, credited to the last player who loaded it by hand. Completed batches
+ * carry it through its {@link org.jd.infestusfrontier.core.organ.Growth} stages, shown in the block state.
  */
 final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler, MenuProvider, GeoBlockEntity {
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     private static final int BLEND_TICKS = 10;
+    private static final List<RawAnimation> GROWN = List.of(
+            RawAnimation.begin().thenLoop("grown_0"),
+            RawAnimation.begin().thenLoop("grown_1"),
+            RawAnimation.begin().thenLoop("grown_2"));
+
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     static final Refusal NO_SLOT = new Refusal("processing.no_slot");
 
@@ -78,6 +83,7 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
     private OrganHistory history = OrganHistory.NONE;
     private Optional<OrganBatch> batch = Optional.empty();
     private Optional<UUID> feeder = Optional.empty();
+    private float experience;
     /** True while something changed since the last look for a recipe, so a tick looks again at most once per change. */
     private boolean retry = true;
 
@@ -92,17 +98,11 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
              */
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
-                if (unreadable.isPresent() || stack.isEmpty()) return false;
-                List<ItemStack> kinds = new ArrayList<>();
-                for (int other = 0; other < getSlots(); other++) {
-                    if (other == slot) continue;
-                    ItemStack held = getStackInSlot(other);
-                    if (held.isEmpty()) continue;
-                    if (ItemStack.isSameItemSameComponents(held, stack)) return false;
-                    kinds.add(held);
-                }
-                kinds.add(stack);
-                return recipes().anyMatch(recipe -> recipe.value().fits(kinds));
+                if (unreadable.isPresent() || level == null || stack.isEmpty()) return false;
+                List<ItemStack> others = new ArrayList<>();
+                for (int other = 0; other < getSlots(); other++)
+                    if (other != slot && !getStackInSlot(other).isEmpty()) others.add(getStackInSlot(other));
+                return kind.book().takes(level, others, stack);
             }
 
             @Override
@@ -152,26 +152,20 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         return false;
     }
 
+    /** The growth stage, from 0. */
+    int stage() {
+        return kind.growth().stage(history);
+    }
+
+    /** Batches to the next stage, 0 at the last. */
+    int toNextStage() {
+        return kind.growth().toNext(history);
+    }
+
     /** 0 idle, 1 working, 2 paused for want of a foundation. Matches the menu's state int. */
     int state() {
         if (batch.isEmpty()) return 0;
         return level != null && Organs.hasFoundation(level, worldPosition) ? 1 : 2;
-    }
-
-    /** This organ's recipes, in no order. */
-    private Stream<RecipeHolder<OrganBatchRecipe>> recipes() {
-        if (level == null) return Stream.empty();
-        return level.getRecipeManager().getAllRecipesFor(ProcessingModule.ORGAN_BATCH.get()).stream()
-                .filter(recipe -> recipe.value().organ().equals(kind.id()));
-    }
-
-    /** This organ's recipes, the ones with most ingredients first, so the fuller recipe wins when both fit. */
-    private List<RecipeHolder<OrganBatchRecipe>> orderedRecipes() {
-        return recipes()
-                .sorted(Comparator.<RecipeHolder<OrganBatchRecipe>>comparingInt(
-                                recipe -> -recipe.value().ingredients().size())
-                        .thenComparing(recipe -> recipe.id().toString()))
-                .toList();
     }
 
     int percent() {
@@ -189,7 +183,10 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         return true;
     }
 
-    /** The client plays {@code working} while the block state says so; nothing else is sent for it. */
+    /**
+     * The client plays {@code working} while the block state says so, and {@code grown_<stage>} for the stage it
+     * says; nothing else is sent for them.
+     */
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(
@@ -198,6 +195,15 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
                 BLEND_TICKS,
                 state -> state.setAndContinue(
                         state.getAnimatable().getBlockState().getValue(BatchOrganBlock.WORKING) ? WORKING : IDLE)));
+        if (kind.grows())
+            controllers.add(new AnimationController<>(
+                    this,
+                    "growth",
+                    0,
+                    state -> state.setAndContinue(GROWN.get(state.getAnimatable()
+                            .getBlockState()
+                            .getOptionalValue(BatchOrganBlock.STAGE)
+                            .orElse(0)))));
     }
 
     @Override
@@ -205,15 +211,18 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         return animatableCache;
     }
 
-    /** Mirrors whether a batch exists into the block state, so every client can see the organ work. */
-    private void showWorking(boolean working) {
+    /** Mirrors whether a batch exists and the growth stage into the block state, so every client can see them. */
+    private void show() {
         if (level == null) return;
-        BlockState shown = getBlockState().setValue(BatchOrganBlock.WORKING, working);
+        BlockState shown = getBlockState().setValue(BatchOrganBlock.WORKING, batch.isPresent());
+        if (shown.hasProperty(BatchOrganBlock.STAGE))
+            shown = shown.setValue(
+                    BatchOrganBlock.STAGE, Math.min(kind.growth().stage(history), BatchOrganBlock.LAST_STAGE));
         if (shown != getBlockState()) level.setBlock(worldPosition, shown, Block.UPDATE_CLIENTS);
     }
 
     static void serverTick(Level level, BlockPos pos, BlockState state, BatchOrganBlockEntity organ) {
-        organ.showWorking(organ.batch.isPresent());
+        organ.show();
         if (organ.unreadable.isPresent() || !Organs.hasFoundation(level, pos)) return;
         if (organ.batch.isEmpty() && organ.retry) organ.start();
         if (organ.batch.isEmpty()) return;
@@ -221,6 +230,7 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
             if (!organ.output.insertItem(0, finished.result(), true).isEmpty()) return false; // no room: wait
             organ.output.insertItem(0, finished.result(), false);
             organ.history = organ.history.completed();
+            organ.experience = Math.min(BatchOrganContents.MAX_EXPERIENCE, organ.experience + finished.experience());
             OrganWork.completed(level, organ.kind.blockId(), finished);
             return true;
         });
@@ -228,31 +238,36 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
     }
 
     /**
-     * Starts the first recipe the slots, the water and the biomass can pay for and whose result fits the output: takes
-     * one item per ingredient, leaves the rest for the next batch, and spends the water and the biomass now. Looks
-     * again only after the next change.
+     * Starts the first batch of the book the slots, the water and the biomass can pay for and whose result fits the
+     * output: takes what the plan says, leaves the rest for the next batch, and spends the water and the biomass now.
+     * Looks again only after the next change.
      */
     private void start() {
         retry = false;
+        if (level == null) return;
         List<ItemStack> held = new ArrayList<>();
         for (int slot = 0; slot < kind.slots(); slot++) held.add(ingredients.getStackInSlot(slot));
-        for (RecipeHolder<OrganBatchRecipe> holder : orderedRecipes()) {
-            OrganBatchRecipe recipe = holder.value();
-            if (water.getFluidAmount() < recipe.waterMb() || !biomass.stored().atLeast(recipe.biomass())) continue;
-            Optional<int[]> take = recipe.plan(held);
-            if (take.isEmpty()) continue;
-            List<ItemStack> taken = new ArrayList<>();
-            for (int slot = 0; slot < kind.slots(); slot++)
-                if (take.get()[slot] > 0) taken.add(held.get(slot).copyWithCount(take.get()[slot]));
-            ItemStack made = recipe.resultFor(taken);
-            if (!output.insertItem(0, made, true).isEmpty()) continue; // no room for this result
-            for (int slot = 0; slot < kind.slots(); slot++) ingredients.extractItem(slot, take.get()[slot], false);
-            water.drain(recipe.waterMb(), IFluidHandler.FluidAction.EXECUTE);
-            biomass = ((Outcome.Done<BiomassTank>) biomass.drain(recipe.biomass())).value();
-            batch = Optional.of(new OrganBatch(Batch.start(holder.id().toString(), recipe.ticks()), made, feeder));
+        for (BatchBook.Plan plan : kind.book().plans(level, held, history)) {
+            if (water.getFluidAmount() < plan.waterMb() || !biomass.stored().atLeast(plan.biomass())) continue;
+            if (!output.insertItem(0, plan.result(), true).isEmpty()) continue; // no room for this result
+            for (int slot = 0; slot < kind.slots(); slot++) ingredients.extractItem(slot, plan.take()[slot], false);
+            water.drain(plan.waterMb(), IFluidHandler.FluidAction.EXECUTE);
+            biomass = ((Outcome.Done<BiomassTank>) biomass.drain(plan.biomass())).value();
+            batch = Optional.of(
+                    new OrganBatch(Batch.start(plan.id(), plan.ticks()), plan.result(), feeder, plan.experience()));
             setChanged();
             return;
         }
+    }
+
+    /** Gives {@code player} the smelting experience the organ kept, as orbs where the player stands, like a furnace. */
+    void awardExperience(Player player) {
+        if (experience <= 0 || !(level instanceof ServerLevel server)) return;
+        int whole = Mth.floor(experience);
+        if (server.random.nextFloat() < Mth.frac(experience)) whole++;
+        ExperienceOrb.award(server, player.position(), whole);
+        experience = 0;
+        setChanged();
     }
 
     /** Remembers who loaded the organ by hand; the batches that follow are credited to them. */
@@ -278,11 +293,15 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         return Optional.of(NO_SLOT);
     }
 
-    /** Gives the player the output stack, else the first non-empty ingredient stack. Returns whether anything moved. */
+    /**
+     * Gives the player the output stack, with the experience that waits with it, else the first non-empty ingredient
+     * stack. Returns whether anything moved.
+     */
     boolean collect(Player player) {
         ItemStack taken = output.getStackInSlot(0);
         if (!taken.isEmpty()) {
             output.setStackInSlot(0, ItemStack.EMPTY);
+            awardExperience(player);
         } else {
             taken = ItemStack.EMPTY;
             for (int slot = 0; slot < kind.slots() && taken.isEmpty(); slot++) {
@@ -324,7 +343,14 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         for (int slot = 0; slot < kind.slots(); slot++)
             held.add(ingredients.getStackInSlot(slot).copy());
         return new BatchOrganContents(
-                held, output.getStackInSlot(0).copy(), water.getFluidAmount(), biomass, history, batch, feeder);
+                held,
+                output.getStackInSlot(0).copy(),
+                water.getFluidAmount(),
+                biomass,
+                history,
+                batch,
+                feeder,
+                experience);
     }
 
     /** Why {@code saved} cannot be installed as a whole, or empty when it fits together. */
@@ -349,6 +375,7 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         history = saved.history();
         batch = saved.batch();
         feeder = saved.feeder();
+        experience = saved.experience();
         retry = true;
     }
 

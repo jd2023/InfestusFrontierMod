@@ -28,6 +28,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.foundation.Biomass;
+import org.jd.infestusfrontier.core.organ.Growth;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
@@ -37,7 +38,7 @@ import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
 
-/** Owner of reserved batch execution. Ships the Digestive Sac and the digestion recipe type. */
+/** Owner of reserved batch execution. Ships the Digestive Sac, the batch organs and the two recipe types. */
 public final class ProcessingModule {
     static final Logger LOGGER = LogUtils.getLogger();
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(InfestusFrontier.MOD_ID);
@@ -71,6 +72,8 @@ public final class ProcessingModule {
     /** The Culture Bowl: nine ingredient slots, water and biomass, on a two-strip panel. */
     static final BatchOrganKind BOWL = new BatchOrganKind(
             "culture_bowl",
+            new BatchBook.Data("culture_bowl"),
+            Growth.NONE,
             9,
             2000,
             Biomass.of(2000),
@@ -82,6 +85,8 @@ public final class ProcessingModule {
     /** The Membrane Rack: two ingredient slots and water, no biomass, on the plain panel. */
     static final BatchOrganKind RACK = new BatchOrganKind(
             "membrane_rack",
+            new BatchBook.Data("membrane_rack"),
+            Growth.NONE,
             2,
             1000,
             Biomass.ZERO,
@@ -94,6 +99,8 @@ public final class ProcessingModule {
     /** The Bone Loom: one bone slot and biomass, no water, on the plain panel. */
     static final BatchOrganKind LOOM = new BatchOrganKind(
             "bone_loom",
+            new BatchBook.Data("bone_loom"),
+            Growth.NONE,
             1,
             0,
             Biomass.of(1000),
@@ -106,6 +113,8 @@ public final class ProcessingModule {
     /** The Awakening Cradle: a piece and a culture, biomass, no water, on a one-strip panel. */
     static final BatchOrganKind CRADLE = new BatchOrganKind(
             "awakening_cradle",
+            new BatchBook.Data("awakening_cradle"),
+            Growth.NONE,
             2,
             0,
             Biomass.of(1000),
@@ -114,6 +123,22 @@ public final class ProcessingModule {
             () -> ProcessingModule.AWAKENING_CRADLE.get(),
             () -> ProcessingModule.AWAKENING_CRADLE_ENTITY.get(),
             () -> ProcessingModule.AWAKENING_CRADLE_MENU.get());
+
+    /** How the Bio-Furnace grows: 64 smelts to the second stage, 512 to the third. */
+    static final Growth FURNACE_GROWTH = Growth.at(64, 512);
+    /** The Bio-Furnace: one smelting slot and biomass, no water, on the plain panel; vanilla smelting at 40 BU, faster at each stage. */
+    static final BatchOrganKind FURNACE = new BatchOrganKind(
+            "bio_furnace",
+            new BatchBook.Smelting(FURNACE_GROWTH, List.of(320, 240, 160), Biomass.of(40)),
+            FURNACE_GROWTH,
+            1,
+            0,
+            Biomass.of(2000),
+            0,
+            Block.box(1, 0, 1, 15, 13, 15),
+            () -> ProcessingModule.BIO_FURNACE.get(),
+            () -> ProcessingModule.BIO_FURNACE_ENTITY.get(),
+            () -> ProcessingModule.BIO_FURNACE_MENU.get());
 
     public static final DeferredBlock<Block> CULTURE_BOWL = batchOrgan(BOWL, MapColor.TERRACOTTA_PINK, 0.8F);
     public static final DeferredItem<OrganItem> CULTURE_BOWL_ITEM =
@@ -151,6 +176,14 @@ public final class ProcessingModule {
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> AWAKENING_CRADLE_MENU =
             batchMenu(CRADLE, () -> ProcessingModule.AWAKENING_CRADLE_MENU.get());
 
+    public static final DeferredBlock<Block> BIO_FURNACE = batchOrgan(FURNACE, MapColor.COLOR_RED, 1.2F);
+    public static final DeferredItem<OrganItem> BIO_FURNACE_ITEM = ITEMS.register(
+            "bio_furnace", () -> new OrganItem(BIO_FURNACE.get(), new Item.Properties(), "idle", "grown_0"));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> BIO_FURNACE_ENTITY =
+            batchEntity(FURNACE, () -> ProcessingModule.BIO_FURNACE.get());
+    public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> BIO_FURNACE_MENU =
+            batchMenu(FURNACE, () -> ProcessingModule.BIO_FURNACE_MENU.get());
+
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
     public static final DeferredHolder<RecipeType<?>, RecipeType<DigestionRecipe>> DIGESTION = RECIPE_TYPES.register(
@@ -179,7 +212,7 @@ public final class ProcessingModule {
     private static DeferredBlock<Block> batchOrgan(BatchOrganKind kind, MapColor colour, float strength) {
         return BLOCKS.registerBlock(
                 kind.id(),
-                properties -> new BatchOrganBlock(kind, properties),
+                properties -> BatchOrganBlock.make(kind, properties),
                 BlockBehaviour.Properties.of()
                         .mapColor(colour)
                         .strength(strength)
@@ -218,12 +251,14 @@ public final class ProcessingModule {
             OrganRenderers.register(modBus, "membrane_rack", MEMBRANE_RACK_ENTITY, MEMBRANE_RACK_ITEM);
             OrganRenderers.register(modBus, "bone_loom", BONE_LOOM_ENTITY, BONE_LOOM_ITEM);
             OrganRenderers.register(modBus, "awakening_cradle", AWAKENING_CRADLE_ENTITY, AWAKENING_CRADLE_ITEM);
+            OrganRenderers.register(modBus, "bio_furnace", BIO_FURNACE_ENTITY, BIO_FURNACE_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(DIGESTIVE_SAC_MENU.get(), DigestiveSacScreen::new);
                 event.register(CULTURE_BOWL_MENU.get(), CultureBowlScreen::new);
                 event.register(MEMBRANE_RACK_MENU.get(), MembraneRackScreen::new);
                 event.register(BONE_LOOM_MENU.get(), BoneLoomScreen::new);
                 event.register(AWAKENING_CRADLE_MENU.get(), AwakeningCradleScreen::new);
+                event.register(BIO_FURNACE_MENU.get(), BioFurnaceScreen::new);
             });
         }
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
@@ -234,8 +269,12 @@ public final class ProcessingModule {
                     Capabilities.FluidHandler.BLOCK,
                     DIGESTIVE_SAC_ENTITY.get(),
                     (sac, side) -> BiomassFluids.handler(sac));
-            for (var entity :
-                    List.of(CULTURE_BOWL_ENTITY, MEMBRANE_RACK_ENTITY, BONE_LOOM_ENTITY, AWAKENING_CRADLE_ENTITY)) {
+            for (var entity : List.of(
+                    CULTURE_BOWL_ENTITY,
+                    MEMBRANE_RACK_ENTITY,
+                    BONE_LOOM_ENTITY,
+                    AWAKENING_CRADLE_ENTITY,
+                    BIO_FURNACE_ENTITY)) {
                 event.registerBlockEntity(BiomassCapabilities.BLOCK, entity.get(), (organ, side) -> organ);
                 event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, entity.get(), (organ, side) -> organ.ports());
                 event.registerBlockEntity(

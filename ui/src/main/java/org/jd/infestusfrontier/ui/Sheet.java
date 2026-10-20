@@ -36,7 +36,7 @@ public final class Sheet {
 
     public static final int HOTBAR_Y = 142;
     /** The organ emblems: 32x32, in one row under the body strip. */
-    public static final int EMBLEM_COUNT = 6;
+    public static final int EMBLEM_COUNT = 7;
 
     private static final int EMBLEM_SHEET_X = 2;
     private static final int EMBLEM_SHEET_Y = 190;
@@ -55,6 +55,7 @@ public final class Sheet {
     public static final int RACK_EMBLEM = 3;
     public static final int LOOM_EMBLEM = 4;
     public static final int CRADLE_EMBLEM = 5;
+    public static final int FURNACE_EMBLEM = 6;
 
     /** The panel's left margin; the emblem column starts here. */
     public static final int LEFT_X = 8;

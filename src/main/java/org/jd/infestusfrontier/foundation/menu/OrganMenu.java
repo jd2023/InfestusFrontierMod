@@ -90,7 +90,11 @@ public abstract class OrganMenu extends AbstractContainerMenu implements Biomass
         return access;
     }
 
-    /** Shift-click: organ slots empty into the inventory; inventory items go to the first organ slot that takes them. */
+    /**
+     * Shift-click: organ slots empty into the inventory; inventory items go to the first organ slot that takes them.
+     * An organ slot's {@code onTake} is called with the whole stack that was there, as vanilla does, even when only
+     * part of it moved; nothing here counts what it is given.
+     */
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = slots.get(index);
@@ -113,6 +117,7 @@ public abstract class OrganMenu extends AbstractContainerMenu implements Biomass
         if (!moved) return ItemStack.EMPTY;
         if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
         else slot.setChanged();
+        if (index < organSlots) slot.onTake(player, before); // vanilla's quick move never calls it
         return before;
     }
 

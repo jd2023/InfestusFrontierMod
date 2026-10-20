@@ -17,9 +17,10 @@ import org.jd.infestusfrontier.organ.api.OrganCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /**
- * The saved and carried form of a batch organ (Bowl, Rack, Loom, Cradle): what it holds, the batch it is running and
- * the last player who loaded it by hand, whom its batches are credited to. A value: the stacks are copied in and
- * copied out, and two contents are equal when every stack matches item for item.
+ * The saved and carried form of a batch organ (Bowl, Rack, Loom, Cradle, Bio-Furnace): what it holds, the batch it is
+ * running, the last player who loaded it by hand, whom its batches are credited to, and the smelting experience it
+ * keeps for whoever takes its output. A value: the stacks are copied in and copied out, and two contents are equal
+ * when every stack matches item for item.
  */
 public record BatchOrganContents(
         List<ItemStack> ingredients,
@@ -28,13 +29,16 @@ public record BatchOrganContents(
         BiomassTank biomass,
         OrganHistory history,
         Optional<OrganBatch> batch,
-        Optional<UUID> feeder) {
+        Optional<UUID> feeder,
+        float experience) {
     public BatchOrganContents {
         ingredients = ingredients.stream().map(ItemStack::copy).toList();
         output = output.copy();
+        if (!(experience >= 0 && experience <= MAX_EXPERIENCE))
+            throw new IllegalArgumentException("experience " + experience);
     }
 
-    /** Contents nobody has fed by hand. */
+    /** Contents nobody has fed by hand and that keep no experience. */
     public BatchOrganContents(
             List<ItemStack> ingredients,
             ItemStack output,
@@ -42,7 +46,7 @@ public record BatchOrganContents(
             BiomassTank biomass,
             OrganHistory history,
             Optional<OrganBatch> batch) {
-        this(ingredients, output, waterMb, biomass, history, batch, Optional.empty());
+        this(ingredients, output, waterMb, biomass, history, batch, Optional.empty(), 0);
     }
 
     @Override
@@ -64,7 +68,8 @@ public record BatchOrganContents(
                 && biomass.equals(that.biomass)
                 && history.equals(that.history)
                 && batch.equals(that.batch)
-                && feeder.equals(that.feeder);
+                && feeder.equals(that.feeder)
+                && experience == that.experience;
     }
 
     @Override
@@ -76,9 +81,12 @@ public record BatchOrganContents(
                 biomass,
                 history,
                 batch,
-                feeder);
+                feeder,
+                experience);
     }
 
+    /** The most smelting experience an organ keeps for whoever takes its output; what a batch earns beyond it is lost. */
+    public static final float MAX_EXPERIENCE = 1000;
     /** The most water any batch organ holds; a kind may hold less. */
     public static final int MAX_WATER = 2000;
     /** The most ingredient slots any batch organ has; a kind may have fewer. */
@@ -94,7 +102,10 @@ public record BatchOrganContents(
                     BiomassCodecs.TANK.fieldOf("biomass").forGetter(BatchOrganContents::biomass),
                     OrganCodecs.HISTORY.fieldOf("history").forGetter(BatchOrganContents::history),
                     OrganBatch.CODEC.optionalFieldOf("batch").forGetter(BatchOrganContents::batch),
-                    UUIDUtil.CODEC.optionalFieldOf("feeder").forGetter(BatchOrganContents::feeder))
+                    UUIDUtil.CODEC.optionalFieldOf("feeder").forGetter(BatchOrganContents::feeder),
+                    Codec.floatRange(0, MAX_EXPERIENCE)
+                            .optionalFieldOf("experience", 0f)
+                            .forGetter(BatchOrganContents::experience))
             .apply(instance, BatchOrganContents::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, BatchOrganContents> STREAM_CODEC =
             ByteBufCodecs.fromCodecWithRegistries(CODEC);

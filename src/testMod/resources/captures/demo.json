@@ -43,6 +43,9 @@
     "setblock 34 -60 -36 infestusfrontier:membrane_rack{contents:{ingredients:[],output:{},water:1000,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:0}}}",
     "setblock 34 -59 -36 hopper[facing=down]{Items:[{Slot:0,id:\"minecraft:rotten_flesh\",count:8},{Slot:1,id:\"minecraft:string\",count:8}]}",
     "setblock 35 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Fed Rack\"','\"the hopper loads it\"','\"it starts alone\"','\"sneak: take sheets\"']}}",
+    "setblock 36 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 36 -60 -36 infestusfrontier:bio_furnace[working=true,stage=1]{contents:{ingredients:[{id:\"minecraft:raw_iron\",count:5}],output:{id:\"minecraft:iron_ingot\",count:3},water:0,biomass:{stored:1200,reserved:0,capacity:2000},history:{completed_batches:70},batch:{batch:{recipe:\"minecraft:iron_ingot_from_smelting_raw_iron\",ticks_required:240,ticks_done:90},result:{id:\"minecraft:iron_ingot\",count:1},experience:0.7},experience:2.1}}",
+    "setblock 37 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Bio-Furnace\"','\"smelts on biomass\"','\"grows with use\"','\"stage 2 of 3\"']}}",
     "fill 0 -61 -29 3 -61 -26 infestusfrontier:living_substrate[stage=basic]",
     "setblock 1 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"basic\"','\"sixteen tiles\"','\"no repeat\"']}}",
     "fill 5 -61 -29 8 -61 -26 infestusfrontier:living_substrate[stage=young]",
@@ -60,6 +63,7 @@
     "item replace entity @s inventory.6 with bone 16",
     "item replace entity @s inventory.7 with infestusfrontier:dormant_thorax 1",
     "item replace entity @s inventory.8 with infestusfrontier:awakened_thorax 1",
+    "item replace entity @s inventory.9 with raw_iron 16",
     "give @s bucket 4",
     "give @s infestusfrontier:organ_bud 4",
     "item replace entity @s inventory.0 with red_mushroom 8",
@@ -143,6 +147,28 @@
       "z": -39.5,
       "yaw": 0,
       "pitch": 0
+    },
+    {
+      "name": "furnace",
+      "x": 36.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 15
+    },
+    {
+      "name": "furnace_screen",
+      "x": 36.5,
+      "y": -60,
+      "z": -38.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        36,
+        -60,
+        -36
+      ]
     },
     {
       "name": "sac_screen",
@@ -380,6 +406,16 @@
       "gui": true,
       "name": "book_awakening_cradle",
       "book": "infestusfrontier:contact/awakening_cradle"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_bio_furnace",
+      "book": "infestusfrontier:contact/bio_furnace"
     },
     {
       "x": 2.5,
