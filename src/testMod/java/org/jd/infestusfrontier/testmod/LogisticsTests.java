@@ -258,6 +258,52 @@ public final class LogisticsTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aCreativeBreakDropsAnItemVeinsPacketOnceAndASealedVeinMovesSealed(GameTestHelper h) {
+        BlockPos cell = new BlockPos(1, Y, 1);
+        h.setBlock(cell, LogisticsModule.ITEM_VEIN.get());
+        h.getLevel()
+                .getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(cell), Direction.UP)
+                .insertItem(0, new ItemStack(Items.BONE, 5), false);
+        Player creative = EcologyTests.holding(h, GameType.CREATIVE, Items.AIR, 0);
+        BlockState state = h.getBlockState(cell);
+        state.getBlock().playerWillDestroy(h.getLevel(), h.absolutePos(cell), state, creative);
+        h.getLevel().removeBlock(h.absolutePos(cell), false);
+        h.runAfterDelay(2, () -> {
+            int bonesOnGround = 0;
+            ItemStack veinItem = ItemStack.EMPTY;
+            for (ItemEntity drop : h.getEntities(EntityType.ITEM, cell, 2.0)) {
+                if (drop.getItem().is(Items.BONE))
+                    bonesOnGround += drop.getItem().getCount();
+                if (drop.getItem().is(LogisticsModule.ITEM_VEIN_ITEM.get()))
+                    veinItem = drop.getItem().copy();
+            }
+            h.assertValueEqual(bonesOnGround, 5, "the five bones dropped");
+            h.assertFalse(veinItem.isEmpty(), "the Creative player gets the cell back");
+            Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            builder.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, veinItem);
+            h.setBlock(cell.below(), Blocks.STONE);
+            h.placeAt(builder, builder.getMainHandItem(), cell.below(), Direction.UP);
+            h.assertBlockPresent(LogisticsModule.ITEM_VEIN.get(), cell);
+            h.assertValueEqual(itemsIn(h, 1, 1), 0, "the placed cell holds no second copy of the bones");
+            BlockPos sealed = new BlockPos(4, Y, 1);
+            h.setBlock(
+                    sealed, LogisticsModule.FLUID_VEIN.get().defaultBlockState().setValue(VeinBlock.SEALED, true));
+            h.getLevel().destroyBlock(h.absolutePos(sealed), true);
+            h.runAfterDelay(2, () -> {
+                ItemStack dropped = h.getEntities(EntityType.ITEM, sealed, 2.0)
+                        .get(0)
+                        .getItem()
+                        .copy();
+                builder.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dropped);
+                h.setBlock(sealed.below(), Blocks.STONE);
+                h.placeAt(builder, builder.getMainHandItem(), sealed.below(), Direction.UP);
+                h.assertTrue(h.getBlockState(sealed).getValue(VeinBlock.SEALED), "a moved sealed vein stays sealed");
+                h.succeed();
+            });
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void theProbeCyclesAJunctionPortAndSneakingReadsIt(GameTestHelper h) {
         BlockPos ground = new BlockPos(1, Y, 1);
         BlockPos junction = ground.above();

@@ -1,5 +1,7 @@
 {
   "commands": [
+    "fill -8 -60 -2 12 -54 10 air",
+    "fill -8 -61 -2 12 -61 10 grass_block",
     "fill -3 -61 2 7 -61 4 infestusfrontier:living_substrate[stage=mature]",
     "setblock -3 -60 3 infestusfrontier:biomass_bladder[fill=3]{tank:{stored:3000,reserved:0,capacity:4000}}",
     "setblock -2 -60 3 infestusfrontier:vascular_junction[west=intake,down=outlet]{fluid:{id:\"infestusfrontier:biomass\",amount:500}}",

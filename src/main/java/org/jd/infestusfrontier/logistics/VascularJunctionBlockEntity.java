@@ -27,7 +27,6 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.fluids.capability.wrappers.BucketPickupHandlerWrapper;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
-import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.logistics.api.PortSwitch;
@@ -55,9 +54,6 @@ final class VascularJunctionBlockEntity extends BlockEntity
     static final int PACKET_MB = 250;
     static final int PULSE_TICKS = 4;
     static final int RETRY_TICKS = 20;
-    /** Hot fluids need a heat lining that does not exist yet. */
-    static final Refusal TOO_HOT = new Refusal("logistics.too_hot");
-
     private static final int HOT_KELVIN = 500;
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final MapCodec<SimpleFluidContent> SAVED = SimpleFluidContent.CODEC.fieldOf("fluid");

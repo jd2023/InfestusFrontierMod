@@ -160,7 +160,6 @@
   "infestusfrontier.port.closed": "closed",
   "infestusfrontier.port.intake": "intake",
   "infestusfrontier.port.outlet": "outlet",
-  "infestusfrontier.refusal.logistics.too_hot": "Too hot for unlined tissue",
   "gui.infestusfrontier.vascular_junction.ports": "Click a face with the Synaptic Probe to cycle it: closed, intake, outlet",
   "entry.infestusfrontier.circulation.biomass_vein.name": "Biomass Vein",
   "entry.infestusfrontier.circulation.biomass_vein.description": "A green lumen that carries biomass",
@@ -176,5 +175,6 @@
   "entry.infestusfrontier.circulation.vascular_junction.description": "The pump: intakes, outlets, closed mouths",
   "entry.infestusfrontier.circulation.vascular_junction.use": "Place it on Living Substrate. Click a face with the Synaptic Probe to make it an intake, an outlet or closed; the mouth shows it. Every 4 ticks it drains up to 250 mB from each intake, a Bladder, a Sac, a vein or a water source block, into its 1000 mB tank, and pushes as much out of each outlet into a vein, a tank or an organ. It holds one liquid at a time. Any hand opens its screen; sneak with the probe to read it.",
   "entry.infestusfrontier.circulation.vascular_junction.craft": "An Organ Bud, two Membrane Sheets and a slime ball.",
-  "gui.infestusfrontier.vascular_junction.tank": "One liquid at a time, 1000 mB. Intakes fill it, outlets drain it, 250 mB every 4 ticks."
+  "gui.infestusfrontier.vascular_junction.tank": "One liquid at a time, 1000 mB. Intakes fill it, outlets drain it, 250 mB every 4 ticks.",
+  "gui.infestusfrontier.fluid": "%s / %s mB"
 }

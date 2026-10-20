@@ -375,5 +375,6 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     public void removeComponentsFromTag(CompoundTag tag) {
         tag.remove("fluid");
         tag.remove("from");
+        tag.remove("items"); // the item packet drops; it never rides along
     }
 }

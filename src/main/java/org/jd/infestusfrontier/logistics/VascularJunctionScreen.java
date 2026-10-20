@@ -48,7 +48,7 @@ final class VascularJunctionScreen extends OrganScreen<VascularJunctionMenu> {
                 y + Sheet.GAP,
                 width,
                 () -> Component.translatable(
-                        menu.holdsBiomass() ? "gui.infestusfrontier.biomass" : "gui.infestusfrontier.water",
+                        menu.holdsBiomass() ? "gui.infestusfrontier.biomass" : "gui.infestusfrontier.fluid",
                         menu.stored(),
                         menu.capacity()),
                 () -> TANK_STORY));

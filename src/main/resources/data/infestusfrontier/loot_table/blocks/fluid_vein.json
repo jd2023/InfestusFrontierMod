@@ -15,6 +15,13 @@
                 "infestusfrontier:fluid_content",
                 "infestusfrontier:unreadable_save"
               ]
+            },
+            {
+              "function": "minecraft:copy_state",
+              "block": "infestusfrontier:fluid_vein",
+              "properties": [
+                "sealed"
+              ]
             }
           ]
         }
