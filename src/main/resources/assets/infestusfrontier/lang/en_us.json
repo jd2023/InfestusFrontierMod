@@ -130,5 +130,20 @@
   "advancement.infestusfrontier.contact.digestive_sac.title": "First Biomass",
   "advancement.infestusfrontier.contact.digestive_sac.description": "Digest a batch in a Digestive Sac for your first fuel; a full Sac pauses instead of spilling.",
   "advancement.infestusfrontier.contact.biomass_bladder.title": "Fuel in Reserve",
-  "advancement.infestusfrontier.contact.biomass_bladder.description": "Pour a bucket of biomass into a Biomass Bladder to store it."
+  "advancement.infestusfrontier.contact.biomass_bladder.description": "Pour a bucket of biomass into a Biomass Bladder to store it.",
+  "block.infestusfrontier.activation_cyst": "Activation Cyst",
+  "item.infestusfrontier.fusion_binder": "Fusion Binder",
+  "item.infestusfrontier.elastic_gel": "Elastic Gel",
+  "item.infestusfrontier.rooting_gel": "Rooting Gel",
+  "item.infestusfrontier.capillary_gel": "Capillary Gel",
+  "item.infestusfrontier.contractile_fiber": "Contractile Fiber",
+  "item.infestusfrontier.filter_membrane": "Filter Membrane",
+  "item.infestusfrontier.sealing_resin": "Sealing Resin",
+  "item.infestusfrontier.synaptic_gel": "Synaptic Gel",
+  "category.infestusfrontier.circulation.name": "Circulation",
+  "entry.infestusfrontier.circulation.activation_cyst.name": "Activation Cyst",
+  "entry.infestusfrontier.circulation.activation_cyst.description": "Culture raw ingredients into treatments",
+  "entry.infestusfrontier.circulation.activation_cyst.use": "Place it on Living Substrate. Put in the ingredients of one treatment, by hand or by hopper, with water and biomass from buckets. It starts on its own and takes 20 seconds. The Bowl makes Fusion Binder, Elastic Gel and Rooting Gel too, in 60. Any other item opens the screen.",
+  "entry.infestusfrontier.circulation.activation_cyst.treatments": "A treatment changes what a cell of mature Living Substrate does. Capillary Gel grows a Biomass Vein, Contractile Fiber an Item Vein, Filter Membrane and Sealing Resin a Fluid Vein, Synaptic Gel nerve, Rooting Gel a crop bed. Fusion Binder and Elastic Gel go into the others.",
+  "entry.infestusfrontier.circulation.activation_cyst.craft": "An Organ Bud, two Membrane Sheets and a Bone Plate."
 }

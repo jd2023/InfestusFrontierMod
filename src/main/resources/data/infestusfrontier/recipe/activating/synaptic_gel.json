@@ -1,0 +1,22 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "activation_cyst",
+  "ingredients": [
+    {
+      "item": "minecraft:redstone"
+    },
+    {
+      "item": "minecraft:string"
+    },
+    {
+      "item": "infestusfrontier:fusion_binder"
+    }
+  ],
+  "water": 0,
+  "biomass": 50,
+  "result": {
+    "id": "infestusfrontier:synaptic_gel",
+    "count": 2
+  },
+  "ticks": 400
+}

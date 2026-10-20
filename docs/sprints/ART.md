@@ -262,3 +262,11 @@ Files: src/main/resources/assets/infestusfrontier/textures/book/bio_furnace.png,
 
 - bio_furnace.png, a 200x200 canvas with a 200x100 vignette like the other Contact illustrations: a plum stomach-shaped organ on a flesh foot, a dark mouth on top, an orange ember band glowing across its middle, a faint shimmer of heat above it, on a small island of substrate. Then the entry's first page becomes a modonomicon:image page like the others.
 - Quality bar: ART.md Quality bar. The organ model, its stage looks (ridges, lobes, chimneys) and the screen emblem come from art/gen_bio_furnace.py and art/gen_gui_sheet.py and are not part of this story.
+
+## ART-007 — Treatment icons
+
+Status: open. Owner of the asset: Astra.
+Files: src/main/resources/assets/infestusfrontier/textures/item/{fusion_binder,elastic_gel,rooting_gel,capillary_gel,contractile_fiber,filter_membrane,sealing_resin,synaptic_gel}.png, CREDITS.txt
+
+- Eight 32x32 icons, `--size 32 --colors 0`, one family with the Spore Culture icon: same outline weight, light from the upper left. Fusion Binder: a pale amber dollop in a thin membrane skin. Elastic Gel: a wobbling green-grey bead. Rooting Gel: an olive drop with a tiny root thread hanging from it. Capillary Gel: a bright green bead with fine red capillaries. Contractile Fiber: a coiled pink-red muscle strand. Filter Membrane: a square of sandy membrane with pores. Sealing Resin: a dark amber tear with a sheen. Synaptic Gel: a red bead with a violet spark inside.
+- Prompt shape as ART-002; one object, true alpha, no background. The placeholders are flat two-tone discs drawn by the builder.

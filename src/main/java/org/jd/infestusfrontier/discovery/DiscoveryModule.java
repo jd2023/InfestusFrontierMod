@@ -53,6 +53,17 @@ public final class DiscoveryModule {
                         output.accept(ProcessingModule.BONE_LOOM_ITEM.get());
                         output.accept(ProcessingModule.BONE_PLATE.get());
                         output.accept(ProcessingModule.AWAKENING_CRADLE_ITEM.get());
+                        output.accept(ProcessingModule.BIO_FURNACE_ITEM.get());
+                        output.accept(ProcessingModule.ACTIVATION_CYST_ITEM.get());
+                        for (var treatment : List.of(
+                                ProcessingModule.FUSION_BINDER,
+                                ProcessingModule.ELASTIC_GEL,
+                                ProcessingModule.ROOTING_GEL,
+                                ProcessingModule.CAPILLARY_GEL,
+                                ProcessingModule.CONTRACTILE_FIBER,
+                                ProcessingModule.FILTER_MEMBRANE,
+                                ProcessingModule.SEALING_RESIN,
+                                ProcessingModule.SYNAPTIC_GEL)) output.accept(treatment.get());
                         for (var piece : List.of(
                                 EquipmentModule.DORMANT_HOOD,
                                 EquipmentModule.DORMANT_THORAX,

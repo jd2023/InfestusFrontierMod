@@ -1,0 +1,19 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "activation_cyst",
+  "ingredients": [
+    {
+      "item": "minecraft:sand"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    }
+  ],
+  "water": 50,
+  "biomass": 25,
+  "result": {
+    "id": "infestusfrontier:filter_membrane",
+    "count": 1
+  },
+  "ticks": 400
+}

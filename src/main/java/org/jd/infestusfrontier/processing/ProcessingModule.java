@@ -38,7 +38,7 @@ import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
 
-/** Owner of reserved batch execution. Ships the Digestive Sac, the batch organs and the two recipe types. */
+/** Owner of reserved batch execution. Ships the Digestive Sac, the batch organs, the treatments and the two recipe types. */
 public final class ProcessingModule {
     static final Logger LOGGER = LogUtils.getLogger();
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(InfestusFrontier.MOD_ID);
@@ -140,6 +140,20 @@ public final class ProcessingModule {
             () -> ProcessingModule.BIO_FURNACE_ENTITY.get(),
             () -> ProcessingModule.BIO_FURNACE_MENU.get());
 
+    /** The Activation Cyst: three ingredient slots, water and biomass, on a two-strip panel; the treatments come from it. */
+    static final BatchOrganKind CYST = new BatchOrganKind(
+            "activation_cyst",
+            new BatchBook.Data("activation_cyst"),
+            Growth.NONE,
+            3,
+            1000,
+            Biomass.of(1000),
+            2,
+            Block.box(1, 0, 1, 15, 13, 15),
+            () -> ProcessingModule.ACTIVATION_CYST.get(),
+            () -> ProcessingModule.ACTIVATION_CYST_ENTITY.get(),
+            () -> ProcessingModule.ACTIVATION_CYST_MENU.get());
+
     public static final DeferredBlock<Block> CULTURE_BOWL = batchOrgan(BOWL, MapColor.TERRACOTTA_PINK, 0.8F);
     public static final DeferredItem<OrganItem> CULTURE_BOWL_ITEM =
             ITEMS.register("culture_bowl", () -> new OrganItem(CULTURE_BOWL.get(), new Item.Properties(), "idle"));
@@ -183,6 +197,24 @@ public final class ProcessingModule {
             batchEntity(FURNACE, () -> ProcessingModule.BIO_FURNACE.get());
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> BIO_FURNACE_MENU =
             batchMenu(FURNACE, () -> ProcessingModule.BIO_FURNACE_MENU.get());
+
+    public static final DeferredBlock<Block> ACTIVATION_CYST = batchOrgan(CYST, MapColor.COLOR_PURPLE, 1.0F);
+    public static final DeferredItem<OrganItem> ACTIVATION_CYST_ITEM = ITEMS.register(
+            "activation_cyst", () -> new OrganItem(ACTIVATION_CYST.get(), new Item.Properties(), "idle"));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> ACTIVATION_CYST_ENTITY =
+            batchEntity(CYST, () -> ProcessingModule.ACTIVATION_CYST.get());
+    public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> ACTIVATION_CYST_MENU =
+            batchMenu(CYST, () -> ProcessingModule.ACTIVATION_CYST_MENU.get());
+    /** The treatments the Bowl and the Cyst make. Other modules apply them; ITEM_CATALOG.md names the recipes. */
+    public static final DeferredItem<Item> FUSION_BINDER = ITEMS.registerSimpleItem("fusion_binder");
+
+    public static final DeferredItem<Item> ELASTIC_GEL = ITEMS.registerSimpleItem("elastic_gel");
+    public static final DeferredItem<Item> ROOTING_GEL = ITEMS.registerSimpleItem("rooting_gel");
+    public static final DeferredItem<Item> CAPILLARY_GEL = ITEMS.registerSimpleItem("capillary_gel");
+    public static final DeferredItem<Item> CONTRACTILE_FIBER = ITEMS.registerSimpleItem("contractile_fiber");
+    public static final DeferredItem<Item> FILTER_MEMBRANE = ITEMS.registerSimpleItem("filter_membrane");
+    public static final DeferredItem<Item> SEALING_RESIN = ITEMS.registerSimpleItem("sealing_resin");
+    public static final DeferredItem<Item> SYNAPTIC_GEL = ITEMS.registerSimpleItem("synaptic_gel");
 
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
@@ -252,6 +284,7 @@ public final class ProcessingModule {
             OrganRenderers.register(modBus, "bone_loom", BONE_LOOM_ENTITY, BONE_LOOM_ITEM);
             OrganRenderers.register(modBus, "awakening_cradle", AWAKENING_CRADLE_ENTITY, AWAKENING_CRADLE_ITEM);
             OrganRenderers.register(modBus, "bio_furnace", BIO_FURNACE_ENTITY, BIO_FURNACE_ITEM);
+            OrganRenderers.register(modBus, "activation_cyst", ACTIVATION_CYST_ENTITY, ACTIVATION_CYST_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(DIGESTIVE_SAC_MENU.get(), DigestiveSacScreen::new);
                 event.register(CULTURE_BOWL_MENU.get(), CultureBowlScreen::new);
@@ -259,6 +292,7 @@ public final class ProcessingModule {
                 event.register(BONE_LOOM_MENU.get(), BoneLoomScreen::new);
                 event.register(AWAKENING_CRADLE_MENU.get(), AwakeningCradleScreen::new);
                 event.register(BIO_FURNACE_MENU.get(), BioFurnaceScreen::new);
+                event.register(ACTIVATION_CYST_MENU.get(), ActivationCystScreen::new);
             });
         }
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
@@ -274,7 +308,8 @@ public final class ProcessingModule {
                     MEMBRANE_RACK_ENTITY,
                     BONE_LOOM_ENTITY,
                     AWAKENING_CRADLE_ENTITY,
-                    BIO_FURNACE_ENTITY)) {
+                    BIO_FURNACE_ENTITY,
+                    ACTIVATION_CYST_ENTITY)) {
                 event.registerBlockEntity(BiomassCapabilities.BLOCK, entity.get(), (organ, side) -> organ);
                 event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, entity.get(), (organ, side) -> organ.ports());
                 event.registerBlockEntity(

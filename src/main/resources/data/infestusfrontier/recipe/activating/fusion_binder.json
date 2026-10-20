@@ -1,0 +1,19 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "activation_cyst",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "infestusfrontier:spore_culture"
+    }
+  ],
+  "water": 0,
+  "biomass": 100,
+  "result": {
+    "id": "infestusfrontier:fusion_binder",
+    "count": 4
+  },
+  "ticks": 400
+}

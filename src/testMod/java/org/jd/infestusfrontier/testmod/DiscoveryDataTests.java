@@ -49,6 +49,11 @@ public final class DiscoveryDataTests {
                 List.of(bud, Items.ROTTEN_FLESH, Items.ROTTEN_FLESH, Items.BOWL),
                 ProcessingModule.DIGESTIVE_SAC_ITEM.get());
         resolves(h, List.of(bud, Items.GLASS, Items.GLASS, Items.SLIME_BALL), StorageModule.BIOMASS_BLADDER_ITEM.get());
+        Item sheet = ProcessingModule.MEMBRANE_SHEET.get();
+        resolves(
+                h,
+                List.of(bud, sheet, sheet, ProcessingModule.BONE_PLATE.get()),
+                ProcessingModule.ACTIVATION_CYST_ITEM.get());
         h.succeed();
     }
 
@@ -64,7 +69,13 @@ public final class DiscoveryDataTests {
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void recipeUnlockAdvancementsExist(GameTestHelper h) {
         for (String path : List.of(
-                "spore_culture", "living_substrate", "organ_bud", "digestive_sac", "biomass_bladder", "culture_bowl")) {
+                "spore_culture",
+                "living_substrate",
+                "organ_bud",
+                "digestive_sac",
+                "biomass_bladder",
+                "culture_bowl",
+                "activation_cyst")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));

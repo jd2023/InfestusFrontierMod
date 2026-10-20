@@ -1,0 +1,22 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "activation_cyst",
+  "ingredients": [
+    {
+      "item": "minecraft:string"
+    },
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "infestusfrontier:fusion_binder"
+    }
+  ],
+  "water": 0,
+  "biomass": 50,
+  "result": {
+    "id": "infestusfrontier:contractile_fiber",
+    "count": 2
+  },
+  "ticks": 400
+}

@@ -1,0 +1,65 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.activation_cyst.name",
+  "description": "entry.infestusfrontier.circulation.activation_cyst.description",
+  "icon": "infestusfrontier:activation_cyst",
+  "x": 0,
+  "y": 0,
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/activation_cyst"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.activation_cyst.name",
+      "text": "entry.infestusfrontier.circulation.activation_cyst.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.circulation.activation_cyst.treatments"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:activating/fusion_binder",
+      "title1": "item.infestusfrontier.fusion_binder",
+      "recipe_id_2": "infestusfrontier:activating/elastic_gel",
+      "title2": "item.infestusfrontier.elastic_gel"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:activating/rooting_gel",
+      "title1": "item.infestusfrontier.rooting_gel",
+      "recipe_id_2": "infestusfrontier:activating/capillary_gel",
+      "title2": "item.infestusfrontier.capillary_gel"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:activating/contractile_fiber",
+      "title1": "item.infestusfrontier.contractile_fiber",
+      "recipe_id_2": "infestusfrontier:activating/filter_membrane",
+      "title2": "item.infestusfrontier.filter_membrane"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:activating/sealing_resin",
+      "title1": "item.infestusfrontier.sealing_resin",
+      "recipe_id_2": "infestusfrontier:activating/synaptic_gel",
+      "title2": "item.infestusfrontier.synaptic_gel"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:activation_cyst",
+      "text": "entry.infestusfrontier.circulation.activation_cyst.craft"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "activation_cyst",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:elastic_gel"
+    },
+    {
+      "item": "infestusfrontier:fusion_binder"
+    }
+  ],
+  "water": 0,
+  "biomass": 50,
+  "result": {
+    "id": "infestusfrontier:capillary_gel",
+    "count": 2
+  },
+  "ticks": 400
+}

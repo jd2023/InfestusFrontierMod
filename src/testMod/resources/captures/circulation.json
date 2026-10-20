@@ -1,0 +1,52 @@
+{
+  "commands": [
+    "setblock -1 -61 3 infestusfrontier:living_substrate[stage=mature]",
+    "setblock -1 -60 3 infestusfrontier:activation_cyst[working=true]{contents:{ingredients:[],output:{},water:500,biomass:{stored:500,reserved:0,capacity:1000},history:{completed_batches:1},batch:{batch:{recipe:\"infestusfrontier:activating/capillary_gel\",ticks_required:400,ticks_done:100},result:{id:\"infestusfrontier:capillary_gel\",count:2}}}}",
+    "give @s infestusfrontier:activation_cyst 1",
+    "give @s infestusfrontier:fusion_binder 1",
+    "give @s infestusfrontier:elastic_gel 1",
+    "give @s infestusfrontier:rooting_gel 1",
+    "give @s infestusfrontier:capillary_gel 1",
+    "give @s infestusfrontier:contractile_fiber 1",
+    "give @s infestusfrontier:filter_membrane 1",
+    "give @s infestusfrontier:sealing_resin 1",
+    "give @s infestusfrontier:synaptic_gel 1"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": -0.5,
+      "y": -60,
+      "z": -0.5,
+      "yaw": 0,
+      "pitch": 15
+    },
+    {
+      "name": "back",
+      "x": -0.5,
+      "y": -60,
+      "z": 6.5,
+      "yaw": 180,
+      "pitch": 15
+    },
+    {
+      "name": "hotbar",
+      "x": -0.5,
+      "y": -60,
+      "z": -0.5,
+      "yaw": 0,
+      "pitch": 15,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:activation_cyst",
+        "infestusfrontier:fusion_binder",
+        "infestusfrontier:elastic_gel",
+        "infestusfrontier:rooting_gel",
+        "infestusfrontier:capillary_gel",
+        "infestusfrontier:contractile_fiber",
+        "infestusfrontier:filter_membrane",
+        "infestusfrontier:sealing_resin"
+      ]
+    }
+  ]
+}

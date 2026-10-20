@@ -83,7 +83,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 |---|---|
 | foundation (`core`) | Shared work admission (`TickQuota`), checked quantities, bounded identifiers |
 | organ | Organ identity, completed-batch counts, earned choices |
-| processing | Bowl, digestion, rack, loom, furnace, activation: reserved batch execution; `OrganWork` is the one batch lifecycle; `BatchOrganKind` makes the Bowl, the Rack, the Loom, the Cradle and the Bio-Furnace one block, block entity and menu; a kind's `BatchBook` is its data recipes or the vanilla smelting book; `core.organ.Growth` turns completed batches into stages, mirrored in the `stage` block state |
+| processing | Bowl, digestion, rack, loom, furnace, activation: reserved batch execution; `OrganWork` is the one batch lifecycle; `BatchOrganKind` makes the Bowl, the Rack, the Loom, the Cradle, the Bio-Furnace and the Activation Cyst one block, block entity and menu; the treatments the Bowl and the Cyst make are its items; a kind's `BatchBook` is its data recipes or the vanilla smelting book; `core.organ.Growth` turns completed batches into stages, mirrored in the `stage` block state |
 | storage | Item, fluid and biomass balances; reservoir cell accounting |
 | construction | Loaded-only structure validation, shell parts, paid placement, transplanting |
 | ecology | Substrate maturity, function, lining, reinforcement, dye, deliberate conversion |

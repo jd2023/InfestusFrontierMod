@@ -115,6 +115,11 @@ public final class DiscoveryTests {
                 "speak_to_an_organ")) {
             h.assertTrue(category.getEntries().containsKey(id("contact/" + entry)), "entry " + entry + " loaded");
         }
+        var circulation = book.getCategory(id("circulation"));
+        h.assertTrue(circulation != null, "category circulation loaded");
+        for (String entry : List.of("activation_cyst"))
+            h.assertTrue(
+                    circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();
     }
 

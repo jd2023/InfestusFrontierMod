@@ -35,8 +35,10 @@ public final class Sheet {
     public static final int INVENTORY_Y = 84;
 
     public static final int HOTBAR_Y = 142;
-    /** The organ emblems: 32x32, in one row under the body strip. */
-    public static final int EMBLEM_COUNT = 7;
+    /** The organ emblems: 32x32, in two rows of seven under the body strip. */
+    public static final int EMBLEM_COUNT = 8;
+
+    private static final int EMBLEMS_PER_ROW = 7;
 
     private static final int EMBLEM_SHEET_X = 2;
     private static final int EMBLEM_SHEET_Y = 190;
@@ -56,6 +58,7 @@ public final class Sheet {
     public static final int LOOM_EMBLEM = 4;
     public static final int CRADLE_EMBLEM = 5;
     public static final int FURNACE_EMBLEM = 6;
+    public static final int CYST_EMBLEM = 7;
 
     /** The panel's left margin; the emblem column starts here. */
     public static final int LEFT_X = 8;
@@ -111,10 +114,14 @@ public final class Sheet {
         return HOTBAR_Y + strips * BODY_STRIP.height();
     }
 
-    /** The emblem sprites in order: Sac, Bladder, Bowl, Rack, Loom, Cradle. */
+    /** The emblem sprites in order: Sac, Bladder, Bowl, Rack, Loom, Cradle, Furnace, then Cyst on the second row. */
     public static Bounds emblem(int index) {
         if (index < 0 || index >= EMBLEM_COUNT) throw new IllegalArgumentException("No emblem " + index);
-        return new Bounds(EMBLEM_SHEET_X + EMBLEM_PITCH * index, EMBLEM_SHEET_Y, EMBLEM_SIZE, EMBLEM_SIZE);
+        return new Bounds(
+                EMBLEM_SHEET_X + EMBLEM_PITCH * (index % EMBLEMS_PER_ROW),
+                EMBLEM_SHEET_Y + EMBLEM_PITCH * (index / EMBLEMS_PER_ROW),
+                EMBLEM_SIZE,
+                EMBLEM_SIZE);
     }
 
     /** The column inside a tank frame placed at {@code x, y}. */
@@ -143,6 +150,8 @@ public final class Sheet {
                 emblem(2),
                 emblem(3),
                 emblem(4),
-                emblem(5));
+                emblem(5),
+                emblem(6),
+                emblem(7));
     }
 }

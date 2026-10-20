@@ -1,0 +1,19 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "activation_cyst",
+  "ingredients": [
+    {
+      "item": "minecraft:wheat_seeds"
+    },
+    {
+      "item": "infestusfrontier:spore_culture"
+    }
+  ],
+  "water": 50,
+  "biomass": 0,
+  "result": {
+    "id": "infestusfrontier:rooting_gel",
+    "count": 2
+  },
+  "ticks": 400
+}

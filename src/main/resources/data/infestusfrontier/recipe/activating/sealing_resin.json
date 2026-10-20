@@ -1,0 +1,19 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "activation_cyst",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:elastic_gel"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    }
+  ],
+  "water": 0,
+  "biomass": 25,
+  "result": {
+    "id": "infestusfrontier:sealing_resin",
+    "count": 2
+  },
+  "ticks": 400
+}
