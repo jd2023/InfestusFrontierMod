@@ -290,13 +290,15 @@ public final class LogisticsTests {
                     sealed, LogisticsModule.FLUID_VEIN.get().defaultBlockState().setValue(VeinBlock.SEALED, true));
             h.getLevel().destroyBlock(h.absolutePos(sealed), true);
             h.runAfterDelay(2, () -> {
-                ItemStack dropped = h.getEntities(EntityType.ITEM, sealed, 2.0)
-                        .get(0)
-                        .getItem()
-                        .copy();
+                var drops = h.getEntities(EntityType.ITEM, sealed, 2.0).stream()
+                        .filter(drop -> drop.getItem().is(LogisticsModule.FLUID_VEIN_ITEM.get()))
+                        .toList();
+                h.assertValueEqual(drops.size(), 1, "one sealed Fluid Vein dropped");
+                ItemStack dropped = drops.getFirst().getItem().copy();
                 builder.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dropped);
                 h.setBlock(sealed.below(), Blocks.STONE);
                 h.placeAt(builder, builder.getMainHandItem(), sealed.below(), Direction.UP);
+                h.assertBlockPresent(LogisticsModule.FLUID_VEIN.get(), sealed);
                 h.assertTrue(h.getBlockState(sealed).getValue(VeinBlock.SEALED), "a moved sealed vein stays sealed");
                 h.succeed();
             });
