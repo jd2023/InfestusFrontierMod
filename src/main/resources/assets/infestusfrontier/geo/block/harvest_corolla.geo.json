@@ -1,0 +1,105 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.harvest_corolla",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 2,
+        "visible_bounds_height": 1,
+        "visible_bounds_offset": [0, 0.25, 0]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [0, 0, 0]
+        },
+        {
+          "name": "foot",
+          "parent": "root",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            {
+              "origin": [-5, 0, -5],
+              "size": [10, 2, 10],
+              "uv": [0, 0]
+            }
+          ]
+        },
+        {
+          "name": "stem",
+          "parent": "root",
+          "pivot": [0, 2, 0],
+          "cubes": [
+            {
+              "origin": [-2, 2, -2],
+              "size": [4, 7, 4],
+              "uv": [41, 0]
+            }
+          ]
+        },
+        {
+          "name": "heart",
+          "parent": "root",
+          "pivot": [0, 9, 0],
+          "cubes": [
+            {
+              "origin": [-2.5, 9, -2.5],
+              "size": [5, 3, 5],
+              "uv": [0, 13]
+            }
+          ]
+        },
+        {
+          "name": "petal_n",
+          "parent": "root",
+          "pivot": [0, 10, -2.5],
+          "cubes": [
+            {
+              "origin": [-3, 10, -8.5],
+              "size": [6, 1, 6],
+              "uv": [21, 13]
+            }
+          ]
+        },
+        {
+          "name": "petal_s",
+          "parent": "root",
+          "pivot": [0, 10, 2.5],
+          "cubes": [
+            {
+              "origin": [-3, 10, 2.5],
+              "size": [6, 1, 6],
+              "uv": [21, 13]
+            }
+          ]
+        },
+        {
+          "name": "petal_e",
+          "parent": "root",
+          "pivot": [2.5, 10, 0],
+          "cubes": [
+            {
+              "origin": [2.5, 10, -3],
+              "size": [6, 1, 6],
+              "uv": [0, 22]
+            }
+          ]
+        },
+        {
+          "name": "petal_w",
+          "parent": "root",
+          "pivot": [-2.5, 10, 0],
+          "cubes": [
+            {
+              "origin": [-8.5, 10, -3],
+              "size": [6, 1, 6],
+              "uv": [0, 22]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

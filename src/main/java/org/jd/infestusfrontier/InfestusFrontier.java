@@ -2,6 +2,7 @@ package org.jd.infestusfrontier;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import org.jd.infestusfrontier.cultivation.CultivationModule;
 import org.jd.infestusfrontier.discovery.DiscoveryModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.equipment.EquipmentModule;
@@ -23,6 +24,7 @@ public final class InfestusFrontier {
         StorageModule.register(modBus);
         ProcessingModule.register(modBus);
         LogisticsModule.register(modBus);
+        CultivationModule.register(modBus);
         EquipmentModule.register(modBus);
         InteractionModule.register(modBus);
         DiscoveryModule.register(modBus);

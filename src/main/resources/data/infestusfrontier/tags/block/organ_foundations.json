@@ -4,6 +4,7 @@
     "infestusfrontier:biomass_vein",
     "infestusfrontier:fluid_vein",
     "infestusfrontier:item_vein",
-    "infestusfrontier:mouth"
+    "infestusfrontier:mouth",
+    "infestusfrontier:cultivation_tissue"
   ]
 }

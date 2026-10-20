@@ -36,7 +36,7 @@ public final class Sheet {
 
     public static final int HOTBAR_Y = 142;
     /** The organ emblems: 32x32, in two rows of seven under the body strip. */
-    public static final int EMBLEM_COUNT = 8;
+    public static final int EMBLEM_COUNT = 9;
 
     private static final int EMBLEMS_PER_ROW = 7;
 
@@ -59,6 +59,7 @@ public final class Sheet {
     public static final int CRADLE_EMBLEM = 5;
     public static final int FURNACE_EMBLEM = 6;
     public static final int CYST_EMBLEM = 7;
+    public static final int COMPOST_EMBLEM = 8;
 
     /** The panel's left margin; the emblem column starts here. */
     public static final int LEFT_X = 8;
@@ -114,7 +115,7 @@ public final class Sheet {
         return HOTBAR_Y + strips * BODY_STRIP.height();
     }
 
-    /** The emblem sprites in order: Sac, Bladder, Bowl, Rack, Loom, Cradle, Furnace, then Cyst on the second row. */
+    /** The emblem sprites in order: Sac, Bladder, Bowl, Rack, Loom, Cradle, Furnace, then Cyst and Compost on the second row. */
     public static Bounds emblem(int index) {
         if (index < 0 || index >= EMBLEM_COUNT) throw new IllegalArgumentException("No emblem " + index);
         return new Bounds(
@@ -152,6 +153,7 @@ public final class Sheet {
                 emblem(4),
                 emblem(5),
                 emblem(6),
-                emblem(7));
+                emblem(7),
+                emblem(8));
     }
 }

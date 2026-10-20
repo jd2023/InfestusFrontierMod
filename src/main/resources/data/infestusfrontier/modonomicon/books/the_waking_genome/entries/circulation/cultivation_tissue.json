@@ -1,0 +1,33 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.cultivation_tissue.name",
+  "description": "entry.infestusfrontier.circulation.cultivation_tissue.description",
+  "icon": "infestusfrontier:cultivation_tissue",
+  "x": 0,
+  "y": 2,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/activation_cyst"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/rooting_gel"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.cultivation_tissue.name",
+      "text": "entry.infestusfrontier.circulation.cultivation_tissue.use"
+    }
+  ]
+}

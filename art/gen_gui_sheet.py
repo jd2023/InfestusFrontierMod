@@ -21,7 +21,7 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   176,112 44x12    progress vein, empty
   176,128 44x12    progress vein, full (the screen draws its left part)
   2,190   32x32 organ emblems, seven to a row at a 34 px pitch, rows 34 apart: Sac, Bladder, Bowl, Rack, Loom,
-                   Cradle, Furnace; then Cyst on the second row
+                   Cradle, Furnace; then Cyst and Compost on the second row
 
 Every screen writes its title at 8,6, its emblem at 8,27 if it has one, labels at y 26 above
 its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
@@ -57,7 +57,7 @@ BUTTON_OFF = (176, 96)
 BUTTON_SIZE = (52, 16)
 VEIN_EMPTY = (176, 112, 44, 12)
 VEIN_FULL = (176, 128, 44, 12)
-EMBLEMS = [(2 + 34 * (i % 7), 190 + 34 * (i // 7)) for i in range(8)]
+EMBLEMS = [(2 + 34 * (i % 7), 190 + 34 * (i // 7)) for i in range(9)]
 EMBLEM = 32
 POOL = [(168, 196, 150), (206, 224, 182), (236, 244, 220)]
 BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
@@ -494,8 +494,38 @@ def emblem_cyst(img, ox, oy):
             put(img, ox + x, oy + y, OUTLINE if d > 0.78 else PIT if dy < 0.1 else FLESH[0])
 
 
+def emblem_compost(img, ox, oy):
+    """A brown gland with a seed-flecked throat on top and a pale bone-meal drop below it."""
+    SOIL = [(70, 44, 30), (104, 66, 42), (138, 92, 58), (170, 120, 78)]
+    for y in range(EMBLEM):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 11.0, (y - 18) / 10.0
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            if d > 0.88:
+                colour = OUTLINE
+            else:
+                colour = SOIL[3] if dx + dy < -0.3 else SOIL[2] if dx + dy < 0.4 else SOIL[1]
+            put(img, ox + x, oy + y, colour)
+    for y in range(4, 11):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 6.0, (y - 7) / 3.5
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            put(img, ox + x, oy + y, OUTLINE if d > 0.78 else GREEN[1] if (x + y) % 3 == 0 else PIT)
+    for y in range(20, 28):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 3.0, (y - 24) / 4.0
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            put(img, ox + x, oy + y, OUTLINE if d > 0.75 else IVORY[3] if dy < -0.2 else IVORY[2])
+
+
 def emblems(img):
-    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom, emblem_cradle, emblem_furnace, emblem_cyst)):
+    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom, emblem_cradle, emblem_furnace, emblem_cyst, emblem_compost)):
         draw(img, ox, oy)
 
 

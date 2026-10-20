@@ -1,0 +1,93 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.planting_proboscis",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 2,
+        "visible_bounds_height": 1,
+        "visible_bounds_offset": [0, 0.25, 0]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [0, 0, 0]
+        },
+        {
+          "name": "foot",
+          "parent": "root",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            {
+              "origin": [-6, 0, -6],
+              "size": [12, 2, 12],
+              "uv": [0, 18]
+            }
+          ]
+        },
+        {
+          "name": "bulb",
+          "parent": "root",
+          "pivot": [0, 2, 0],
+          "cubes": [
+            {
+              "origin": [-5, 2, -5],
+              "size": [10, 7, 10],
+              "uv": [0, 0]
+            }
+          ]
+        },
+        {
+          "name": "trunk_a",
+          "parent": "root",
+          "pivot": [0, 7, -5],
+          "cubes": [
+            {
+              "origin": [-2, 5, -9],
+              "size": [4, 4, 4],
+              "uv": [0, 33]
+            }
+          ]
+        },
+        {
+          "name": "trunk_b",
+          "parent": "trunk_a",
+          "pivot": [0, 5, -7],
+          "cubes": [
+            {
+              "origin": [-1.5, 1, -8.5],
+              "size": [3, 4, 3],
+              "uv": [34, 33]
+            }
+          ]
+        },
+        {
+          "name": "tip",
+          "parent": "trunk_b",
+          "pivot": [0, 1, -7],
+          "cubes": [
+            {
+              "origin": [-1, -1, -8],
+              "size": [2, 2, 2],
+              "uv": [47, 33]
+            }
+          ]
+        },
+        {
+          "name": "crown",
+          "parent": "root",
+          "pivot": [0, 9, 0],
+          "cubes": [
+            {
+              "origin": [-2, 9, -2],
+              "size": [4, 3, 4],
+              "uv": [17, 33]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

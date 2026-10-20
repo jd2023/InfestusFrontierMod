@@ -1,0 +1,20 @@
+{
+  "values": [
+    "minecraft:wheat_seeds",
+    "minecraft:beetroot_seeds",
+    "minecraft:melon_seeds",
+    "minecraft:pumpkin_seeds",
+    "minecraft:torchflower_seeds",
+    "minecraft:pitcher_pod",
+    "minecraft:carrot",
+    "minecraft:potato",
+    "#minecraft:saplings",
+    "minecraft:sweet_berries",
+    "minecraft:glow_berries",
+    "minecraft:sugar_cane",
+    "minecraft:bamboo",
+    "minecraft:cactus",
+    "minecraft:nether_wart",
+    "minecraft:cocoa_beans"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "minecraft:wooden_hoe"
+    },
+    {
+      "item": "infestusfrontier:rooting_gel"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:planting_proboscis",
+    "count": 1
+  }
+}

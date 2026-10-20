@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:composter"
+    },
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:compost_gland",
+    "count": 1
+  }
+}

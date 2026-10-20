@@ -1,0 +1,118 @@
+{
+  "commands": [
+    "fill -8 -60 -2 12 -54 10 air",
+    "fill -8 -61 -2 12 -61 10 grass_block",
+    "kill @e[type=item]",
+    "fill -2 -61 1 4 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "fill 0 -61 2 2 -61 4 infestusfrontier:cultivation_tissue{water:{id:\"minecraft:water\",amount:800}}",
+    "setblock 1 -61 3 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 1 -60 3 infestusfrontier:planting_proboscis[working=true]{tank:{stored:600,reserved:0,capacity:1000},items:{Size:1,Items:[{Slot:0,id:\"minecraft:wheat_seeds\",count:12}]}}",
+    "setblock 0 -60 2 wheat[age=7]",
+    "setblock 1 -60 2 wheat[age=4]",
+    "setblock 2 -60 2 wheat[age=7]",
+    "setblock 0 -60 3 wheat[age=2]",
+    "setblock 2 -60 3 carrots[age=7]",
+    "setblock 0 -60 4 wheat[age=7]",
+    "setblock 2 -60 4 potatoes[age=5]",
+    "setblock 4 -60 3 infestusfrontier:harvest_corolla[working=true]{tank:{stored:700,reserved:0,capacity:1000},items:{Size:4,Items:[{Slot:0,id:\"minecraft:wheat\",count:9},{Slot:1,id:\"minecraft:wheat_seeds\",count:4}]}}",
+    "setblock -2 -60 3 infestusfrontier:seed_pouch{stock:[{id:\"minecraft:wheat_seeds\",count:30},{id:\"minecraft:carrot\",count:12},{},{}],reserve:4}",
+    "setblock -1 -60 3 infestusfrontier:compost_gland[working=true]{contents:{ingredients:[{id:\"minecraft:wheat_seeds\",count:7}],output:{id:\"minecraft:bone_meal\",count:2},water:500,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:2},batch:{batch:{recipe:\"infestusfrontier:composting/seeds\",ticks_required:400,ticks_done:100},result:{id:\"minecraft:bone_meal\",count:1}}}}",
+    "give @s infestusfrontier:seed_pouch 1",
+    "give @s infestusfrontier:planting_proboscis 1",
+    "give @s infestusfrontier:harvest_corolla 1",
+    "give @s infestusfrontier:compost_gland 1",
+    "give @s infestusfrontier:cultivation_tissue 1",
+    "give @s infestusfrontier:rooting_gel 1"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 1.5,
+      "y": -58,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 35
+    },
+    {
+      "name": "back",
+      "x": 1.5,
+      "y": -58,
+      "z": 8.5,
+      "yaw": 180,
+      "pitch": 35
+    },
+    {
+      "name": "pouch_screen",
+      "x": -2.5,
+      "y": -60,
+      "z": 5.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        -2,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "planter_screen",
+      "x": 1.5,
+      "y": -60,
+      "z": 6.5,
+      "yaw": 0,
+      "pitch": 5,
+      "gui": true,
+      "use": [
+        1,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "harvester_screen",
+      "x": 4.5,
+      "y": -60,
+      "z": 5.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        4,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "compost_screen",
+      "x": -1.5,
+      "y": -60,
+      "z": 5.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        -1,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "hotbar",
+      "x": 1.5,
+      "y": -58,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 35,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:seed_pouch",
+        "infestusfrontier:planting_proboscis",
+        "infestusfrontier:harvest_corolla",
+        "infestusfrontier:compost_gland",
+        "infestusfrontier:cultivation_tissue",
+        "infestusfrontier:rooting_gel"
+      ]
+    }
+  ]
+}

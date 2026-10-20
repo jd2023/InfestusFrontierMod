@@ -1,0 +1,74 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.seed_pouch",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 2,
+        "visible_bounds_height": 1,
+        "visible_bounds_offset": [0, 0.25, 0]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [0, 0, 0]
+        },
+        {
+          "name": "foot",
+          "parent": "root",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            {
+              "origin": [-6, 0, -6],
+              "size": [12, 2, 12],
+              "uv": [0, 19]
+            }
+          ]
+        },
+        {
+          "name": "sack",
+          "parent": "root",
+          "pivot": [0, 2, 0],
+          "cubes": [
+            {
+              "origin": [-5, 2, -5],
+              "size": [10, 8, 10],
+              "uv": [0, 0]
+            }
+          ]
+        },
+        {
+          "name": "neck",
+          "parent": "root",
+          "pivot": [0, 10, 0],
+          "cubes": [
+            {
+              "origin": [-3, 10, -3],
+              "size": [6, 2, 6],
+              "uv": [0, 45]
+            },
+            {
+              "origin": [-3.5, 10.5, -3.5],
+              "size": [7, 1, 7],
+              "uv": [33, 34]
+            }
+          ]
+        },
+        {
+          "name": "rim",
+          "parent": "root",
+          "pivot": [0, 12, 0],
+          "cubes": [
+            {
+              "origin": [-4, 12, -4],
+              "size": [8, 2, 8],
+              "uv": [0, 34]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

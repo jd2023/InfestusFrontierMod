@@ -1,0 +1,74 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.compost_gland",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 2,
+        "visible_bounds_height": 1,
+        "visible_bounds_offset": [0, 0.25, 0]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [0, 0, 0]
+        },
+        {
+          "name": "base",
+          "parent": "root",
+          "pivot": [0, 0, 0],
+          "cubes": [
+            {
+              "origin": [-7, 0, -7],
+              "size": [14, 3, 14],
+              "uv": [0, 0]
+            },
+            {
+              "origin": [-5, 3, -5],
+              "size": [10, 2, 10],
+              "uv": [0, 18]
+            }
+          ]
+        },
+        {
+          "name": "rib_l",
+          "parent": "root",
+          "pivot": [-5, 5, 0],
+          "cubes": [
+            {
+              "origin": [-6, 5, -2],
+              "size": [2, 7, 4],
+              "uv": [41, 18]
+            }
+          ]
+        },
+        {
+          "name": "rib_r",
+          "parent": "root",
+          "pivot": [5, 5, 0],
+          "cubes": [
+            {
+              "origin": [4, 5, -2],
+              "size": [2, 7, 4],
+              "uv": [41, 18]
+            }
+          ]
+        },
+        {
+          "name": "plate",
+          "parent": "root",
+          "pivot": [0, 5, 0],
+          "cubes": [
+            {
+              "origin": [-3, 6, -0.5],
+              "size": [6, 4, 1],
+              "uv": [0, 31]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

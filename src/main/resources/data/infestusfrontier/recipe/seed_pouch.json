@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "infestusfrontier:spore_culture"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:seed_pouch",
+    "count": 1
+  }
+}

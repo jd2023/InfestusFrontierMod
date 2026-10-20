@@ -1,0 +1,38 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.planting_proboscis.name",
+  "description": "entry.infestusfrontier.circulation.planting_proboscis.description",
+  "icon": "infestusfrontier:planting_proboscis",
+  "x": 1,
+  "y": 3,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/cultivation_tissue"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/planting_proboscis"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.planting_proboscis.name",
+      "text": "entry.infestusfrontier.circulation.planting_proboscis.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:planting_proboscis",
+      "text": "entry.infestusfrontier.circulation.planting_proboscis.craft"
+    }
+  ]
+}

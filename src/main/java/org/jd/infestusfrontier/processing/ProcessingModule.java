@@ -154,6 +154,20 @@ public final class ProcessingModule {
             () -> ProcessingModule.ACTIVATION_CYST_ENTITY.get(),
             () -> ProcessingModule.ACTIVATION_CYST_MENU.get());
 
+    /** The Compost Gland: one scrap slot and water, no biomass, on the plain panel; four scraps make bone meal. */
+    static final BatchOrganKind COMPOST = new BatchOrganKind(
+            "compost_gland",
+            new BatchBook.Data("compost_gland"),
+            Growth.NONE,
+            1,
+            1000,
+            Biomass.ZERO,
+            0,
+            Block.box(1, 0, 1, 15, 12, 15),
+            () -> ProcessingModule.COMPOST_GLAND.get(),
+            () -> ProcessingModule.COMPOST_GLAND_ENTITY.get(),
+            () -> ProcessingModule.COMPOST_GLAND_MENU.get());
+
     public static final DeferredBlock<Block> CULTURE_BOWL = batchOrgan(BOWL, MapColor.TERRACOTTA_PINK, 0.8F);
     public static final DeferredItem<OrganItem> CULTURE_BOWL_ITEM =
             ITEMS.register("culture_bowl", () -> new OrganItem(CULTURE_BOWL.get(), new Item.Properties(), "idle"));
@@ -212,8 +226,15 @@ public final class ProcessingModule {
     public static final DeferredItem<Item> FUSION_BINDER = ITEMS.registerSimpleItem("fusion_binder");
 
     public static final DeferredItem<Item> ELASTIC_GEL = ITEMS.registerSimpleItem("elastic_gel");
-    public static final DeferredItem<Item> ROOTING_GEL = ITEMS.registerSimpleItem("rooting_gel");
     public static final DeferredItem<Item> SYNAPTIC_GEL = ITEMS.registerSimpleItem("synaptic_gel");
+
+    public static final DeferredBlock<Block> COMPOST_GLAND = batchOrgan(COMPOST, MapColor.COLOR_BROWN, 1.0F);
+    public static final DeferredItem<OrganItem> COMPOST_GLAND_ITEM =
+            ITEMS.register("compost_gland", () -> new OrganItem(COMPOST_GLAND.get(), new Item.Properties(), "idle"));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> COMPOST_GLAND_ENTITY =
+            batchEntity(COMPOST, () -> ProcessingModule.COMPOST_GLAND.get());
+    public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> COMPOST_GLAND_MENU =
+            batchMenu(COMPOST, () -> ProcessingModule.COMPOST_GLAND_MENU.get());
 
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
@@ -284,6 +305,7 @@ public final class ProcessingModule {
             OrganRenderers.register(modBus, "awakening_cradle", AWAKENING_CRADLE_ENTITY, AWAKENING_CRADLE_ITEM);
             OrganRenderers.register(modBus, "bio_furnace", BIO_FURNACE_ENTITY, BIO_FURNACE_ITEM);
             OrganRenderers.register(modBus, "activation_cyst", ACTIVATION_CYST_ENTITY, ACTIVATION_CYST_ITEM);
+            OrganRenderers.register(modBus, "compost_gland", COMPOST_GLAND_ENTITY, COMPOST_GLAND_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(DIGESTIVE_SAC_MENU.get(), DigestiveSacScreen::new);
                 event.register(CULTURE_BOWL_MENU.get(), CultureBowlScreen::new);
@@ -292,6 +314,7 @@ public final class ProcessingModule {
                 event.register(AWAKENING_CRADLE_MENU.get(), AwakeningCradleScreen::new);
                 event.register(BIO_FURNACE_MENU.get(), BioFurnaceScreen::new);
                 event.register(ACTIVATION_CYST_MENU.get(), ActivationCystScreen::new);
+                event.register(COMPOST_GLAND_MENU.get(), CompostGlandScreen::new);
             });
         }
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
@@ -308,7 +331,8 @@ public final class ProcessingModule {
                     BONE_LOOM_ENTITY,
                     AWAKENING_CRADLE_ENTITY,
                     BIO_FURNACE_ENTITY,
-                    ACTIVATION_CYST_ENTITY)) {
+                    ACTIVATION_CYST_ENTITY,
+                    COMPOST_GLAND_ENTITY)) {
                 event.registerBlockEntity(BiomassCapabilities.BLOCK, entity.get(), (organ, side) -> organ);
                 event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, entity.get(), (organ, side) -> organ.ports());
                 event.registerBlockEntity(

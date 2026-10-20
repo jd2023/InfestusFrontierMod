@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "infestusfrontier:block/cultivation_tissue"
+      },
+      {
+        "model": "infestusfrontier:block/cultivation_tissue",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/cultivation_tissue",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/cultivation_tissue",
+        "y": 270
+      }
+    ]
+  }
+}

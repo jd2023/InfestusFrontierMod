@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "minecraft:iron_hoe"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:harvest_corolla",
+    "count": 1
+  }
+}

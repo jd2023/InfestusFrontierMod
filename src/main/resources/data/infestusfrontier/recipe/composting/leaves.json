@@ -1,0 +1,25 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "compost_gland",
+  "ingredients": [
+    {
+      "tag": "minecraft:leaves"
+    },
+    {
+      "tag": "minecraft:leaves"
+    },
+    {
+      "tag": "minecraft:leaves"
+    },
+    {
+      "tag": "minecraft:leaves"
+    }
+  ],
+  "water": 100,
+  "biomass": 0,
+  "result": {
+    "id": "minecraft:bone_meal",
+    "count": 1
+  },
+  "ticks": 400
+}

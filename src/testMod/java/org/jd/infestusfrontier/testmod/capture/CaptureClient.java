@@ -65,8 +65,12 @@ final class CaptureClient {
             "gamerule doMobSpawning false",
             "time set noon",
             "weather clear");
-    /** Runs before every scenario's own commands, so nothing carries over from the scenario before: not the inventory, not the night. */
-    private static final List<String> RESET = List.of("clear @s", "time set noon", "weather clear");
+    /**
+     * Runs before every scenario's own commands, so nothing carries over from the scenario before: not the inventory,
+     * not the night, not an item lying on the ground that the player would pick up.
+     */
+    private static final List<String> RESET =
+            List.of("clear @s", "kill @e[type=item]", "time set noon", "weather clear");
 
     private final Path outputDir;
     private final List<Scenario> scenarios;

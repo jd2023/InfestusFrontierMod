@@ -87,7 +87,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 | storage | Item, fluid and biomass balances; reservoir cell accounting |
 | construction | Loaded-only structure validation, shell parts, paid placement, transplanting |
 | ecology | Substrate maturity, function, lining, reinforcement, dye, deliberate conversion |
-| cultivation | Crop and tree growth, allocated harvest, planting reserves |
+| cultivation | Crop and tree growth, allocated harvest, planting reserves; `CultivationTissueBlock` answers NeoForge's `canSustainPlant` and `isFertile`; a `PlotOrganBlockEntity` acts once a pulse on its `Plot`; the Seed Pouch's `surplus()` is what pullers see |
 | logistics | Routes, ports, filters, reservations and movement of items, fluids and biomass; a vein cell (`VeinBlock`, one `Carrier`) holds one packet and pushes it on by scheduled ticks, never pulling; the Vascular Junction pumps through its six `Port`s; `api.PortSwitch` is what the probe cycles; a Mouth (`MouthBlock`) is a substrate cell under a store; Mouths and Item Veins form an item network, and a Mouth that gives routes each packet to a Mouth that takes (`core.logistics.Delivery`, `Reach`), under a per-dimension quota |
 | control | Signals, interlocks, selection, finite schedules |
 | genetics | Samples, species and quality counts, genome coverage, native eligibility, cultured stock |
@@ -127,7 +127,7 @@ Names are project contracts. Create a module with its first story, not earlier.
 
 ## Performance limits
 
-The gate runs with fixed heaps: the Gradle daemon 2 GB (`gradle.properties`), the GameTest server 2 GB, the capture and demo clients 3 GB (`build.gradle` runs). A leak fails the gate instead of starving the machine.
+The gate runs with fixed heaps: the Gradle daemon 2 GB (`gradle.properties`), the GameTest server 2 GB, the capture and demo clients 3 GB (`build.gradle` runs). A leak fails the gate instead of starving the machine. The GameTest server run times out after 15 minutes and the capture run after 20, so a client stuck on a crash screen fails the gate instead of holding it.
 
 Performance is correctness. A feature that can stall a server is a broken feature.
 
@@ -180,7 +180,7 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 
 The capture client is part of the test mod. `./gradlew verifyCaptures` starts the real client, creates a fresh flat Creative world in `runs/capture`, runs each scenario, writes the screenshots and exits. Then a Gradle task checks every expected image.
 
-A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`:
+A scenario is one JSON file in `src/testMod/resources/captures/<scenario>.json`, with 1 to 96 views. Scenarios share one flat world and run in name order, so a scenario that builds on the common plot near the origin first clears it (`fill ... air` above the ground, `fill ... grass_block` on it, then `kill @e[type=item]` for what the cleared organs dropped); the demo keeps its own rows to the north.
 
 ```json
 {

@@ -13,6 +13,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.cultivation.CultivationModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.equipment.EquipmentModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
@@ -59,7 +60,7 @@ public final class DiscoveryModule {
                         for (var treatment : List.of(
                                 ProcessingModule.FUSION_BINDER,
                                 ProcessingModule.ELASTIC_GEL,
-                                ProcessingModule.ROOTING_GEL,
+                                CultivationModule.ROOTING_GEL,
                                 LogisticsModule.CAPILLARY_GEL,
                                 LogisticsModule.CONTRACTILE_FIBER,
                                 LogisticsModule.FILTER_MEMBRANE,
@@ -70,6 +71,11 @@ public final class DiscoveryModule {
                         output.accept(LogisticsModule.ITEM_VEIN_ITEM.get());
                         output.accept(LogisticsModule.VASCULAR_JUNCTION_ITEM.get());
                         output.accept(LogisticsModule.MOUTH_ITEM.get());
+                        output.accept(CultivationModule.CULTIVATION_TISSUE_ITEM.get());
+                        output.accept(CultivationModule.SEED_POUCH_ITEM.get());
+                        output.accept(CultivationModule.PLANTING_PROBOSCIS_ITEM.get());
+                        output.accept(CultivationModule.HARVEST_COROLLA_ITEM.get());
+                        output.accept(ProcessingModule.COMPOST_GLAND_ITEM.get());
                         for (var piece : List.of(
                                 EquipmentModule.DORMANT_HOOD,
                                 EquipmentModule.DORMANT_THORAX,

@@ -1,0 +1,38 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.harvest_corolla.name",
+  "description": "entry.infestusfrontier.circulation.harvest_corolla.description",
+  "icon": "infestusfrontier:harvest_corolla",
+  "x": 2,
+  "y": 3,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/cultivation_tissue"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/harvest_corolla"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.harvest_corolla.name",
+      "text": "entry.infestusfrontier.circulation.harvest_corolla.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:harvest_corolla",
+      "text": "entry.infestusfrontier.circulation.harvest_corolla.craft"
+    }
+  ]
+}

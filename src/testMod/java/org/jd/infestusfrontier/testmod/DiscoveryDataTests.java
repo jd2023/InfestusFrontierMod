@@ -13,6 +13,7 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.jd.infestusfrontier.cultivation.CultivationModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.organ.OrganModule;
@@ -65,6 +66,13 @@ public final class DiscoveryDataTests {
                 List.of(bud, sheet, sheet, ProcessingModule.BONE_PLATE.get()),
                 ProcessingModule.ACTIVATION_CYST_ITEM.get());
         resolves(h, List.of(bud, sheet, sheet, Items.SLIME_BALL), LogisticsModule.VASCULAR_JUNCTION_ITEM.get());
+        resolves(h, List.of(Items.LEATHER, sheet, culture), CultivationModule.SEED_POUCH_ITEM.get());
+        resolves(
+                h,
+                List.of(bud, Items.WOODEN_HOE, CultivationModule.ROOTING_GEL.get(), sheet),
+                CultivationModule.PLANTING_PROBOSCIS_ITEM.get());
+        resolves(h, List.of(bud, Items.IRON_HOE, sheet, sheet), CultivationModule.HARVEST_COROLLA_ITEM.get());
+        resolves(h, List.of(Items.COMPOSTER, bud, sheet), ProcessingModule.COMPOST_GLAND_ITEM.get());
         h.succeed();
     }
 
@@ -88,7 +96,11 @@ public final class DiscoveryDataTests {
                 "culture_bowl",
                 "activation_cyst",
                 "vascular_junction",
-                "mouth")) {
+                "mouth",
+                "seed_pouch",
+                "planting_proboscis",
+                "harvest_corolla",
+                "compost_gland")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));
