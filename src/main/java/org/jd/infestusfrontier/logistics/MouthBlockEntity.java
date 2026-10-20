@@ -10,14 +10,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Containers;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
+import org.jetbrains.annotations.Nullable;
 
 /** One bounded inventory transfer. A refused insertion retains its extracted packet until a later pulse. */
 final class MouthBlockEntity extends BlockEntity {
@@ -64,7 +67,7 @@ final class MouthBlockEntity extends BlockEntity {
         BlockPos sourcePos = worldPosition.relative(sourceSide);
         BlockPos targetPos = worldPosition.relative(targetSide);
         if (!level.hasChunkAt(sourcePos) || !level.hasChunkAt(targetPos)) return false;
-        IItemHandler target = level.getCapability(Capabilities.ItemHandler.BLOCK, targetPos, targetSide.getOpposite());
+        IItemHandler target = inventory(targetPos, targetSide.getOpposite());
         if (target == null || target.getSlots() == 0) return false;
         targetCursor %= target.getSlots();
         int end = targetCursor + Math.min(WINDOW, target.getSlots() - targetCursor);
@@ -74,7 +77,7 @@ final class MouthBlockEntity extends BlockEntity {
             targetCursor = nextTarget;
             return deliver(window);
         }
-        IItemHandler source = level.getCapability(Capabilities.ItemHandler.BLOCK, sourcePos, sourceSide.getOpposite());
+        IItemHandler source = inventory(sourcePos, sourceSide.getOpposite());
         if (source == null || source.getSlots() == 0) return false;
         sourceCursor %= source.getSlots();
         int visits = Math.min(WINDOW, source.getSlots() - sourceCursor);
@@ -94,6 +97,15 @@ final class MouthBlockEntity extends BlockEntity {
             return deliver(window);
         }
         return false;
+    }
+
+    private @Nullable IItemHandler inventory(BlockPos pos, Direction face) {
+        BlockState state = level.getBlockState(pos);
+        // Vanilla's double-chest capability resolves both halves, even across a chunk boundary.
+        if (state.getBlock() instanceof ChestBlock
+                && state.getValue(ChestBlock.TYPE) != ChestType.SINGLE
+                && !level.hasChunkAt(pos.relative(ChestBlock.getConnectedDirection(state)))) return null;
+        return level.getCapability(Capabilities.ItemHandler.BLOCK, pos, face);
     }
 
     /** A bounded insertion view; inventory implementation and slot rules stay with the provider. */

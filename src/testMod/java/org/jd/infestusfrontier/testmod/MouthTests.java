@@ -1,18 +1,26 @@
 package org.jd.infestusfrontier.testmod;
 
+import java.util.HashSet;
+import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -48,6 +56,77 @@ public final class MouthTests {
                     }
                 },
                 Blocks.GOLD_BLOCK);
+        event.registerBlock(
+                Capabilities.ItemHandler.BLOCK,
+                (level, pos, state, entity, side) -> new CheckedWindowHandler(true),
+                Blocks.DIAMOND_BLOCK);
+        event.registerBlock(
+                Capabilities.ItemHandler.BLOCK,
+                (level, pos, state, entity, side) -> new CheckedWindowHandler(false),
+                Blocks.EMERALD_BLOCK);
+    }
+
+    /** Each capability lookup represents one pulse; access to more than sixteen distinct slots fails. */
+    private static final class CheckedWindowHandler extends ItemStackHandler {
+        private final Set<Integer> visited = new HashSet<>();
+        private final boolean source;
+
+        private CheckedWindowHandler(boolean source) {
+            super(40);
+            this.source = source;
+            if (source) setStackInSlot(32, new ItemStack(Items.BONE, 8));
+        }
+
+        private void visit(int slot) {
+            visited.add(slot);
+            if (visited.size() > 16)
+                throw new IllegalStateException("Mouth scanned more than sixteen slots in one pulse");
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            visit(slot);
+            return super.getStackInSlot(slot);
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            visit(slot);
+            return super.extractItem(slot, amount, simulate);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            visit(slot);
+            return super.insertItem(slot, stack, simulate);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return !source && slot == 32;
+        }
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void sourceScansAreBoundedAndEventuallyReachTheThirdWindow(GameTestHelper h) {
+        h.setBlock(HOST, Blocks.DIAMOND_BLOCK);
+        chest(h, PARTNER);
+        mouth(h, false);
+        h.runAfterDelay(49, () -> {
+            h.assertValueEqual(count(h, PARTNER), 8, "third source window supplied one packet");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 130)
+    public static void destinationScansAreBoundedAndEventuallyReachTheThirdWindow(GameTestHelper h) {
+        chest(h, HOST).setItem(0, new ItemStack(Items.BONE, 8));
+        h.setBlock(PARTNER, Blocks.EMERALD_BLOCK);
+        mouth(h, false);
+        h.runAfterDelay(110, () -> {
+            h.assertValueEqual(count(h, HOST), 0, "third destination window accepted the packet");
+            h.succeed();
+        });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
@@ -246,6 +325,69 @@ public final class MouthTests {
                 h.succeed();
             });
         });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "mouth_boundary")
+    public static void doubleChestEndpointsNeverLoadTheirOtherHalf(GameTestHelper h) {
+        var level = h.getLevel();
+        BlockPos origin = h.absolutePos(HOST);
+        BlockPos edge = new BlockPos((origin.getX() & ~15) + 160015, 80, (origin.getZ() & ~15) + 160008);
+        level.getChunkAt(edge);
+        for (boolean intake : new boolean[] {true, false}) {
+            BlockPos partner = intake ? edge : edge.south(4);
+            BlockPos mouth = partner.west();
+            BlockPos host = mouth.west();
+            h.assertFalse(level.hasChunkAt(partner.east()), "other half starts unloaded");
+            level.setBlock(host, Blocks.CHEST.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+            level.setBlock(
+                    partner,
+                    Blocks.CHEST
+                            .defaultBlockState()
+                            .setValue(ChestBlock.FACING, Direction.NORTH)
+                            .setValue(ChestBlock.TYPE, ChestType.LEFT),
+                    Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+            level.setBlock(
+                    mouth,
+                    (intake ? LogisticsModule.INTAKE_MOUTH.get() : LogisticsModule.OUTPUT_MOUTH.get())
+                            .defaultBlockState()
+                            .setValue(BlockStateProperties.FACING, Direction.EAST),
+                    Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+            ChestBlockEntity source = (ChestBlockEntity) level.getBlockEntity(intake ? partner : host);
+            ChestBlockEntity target = (ChestBlockEntity) level.getBlockEntity(intake ? host : partner);
+            CompoundTag data = new CompoundTag();
+            ListTag items = new ListTag();
+            CompoundTag stack = (CompoundTag) new ItemStack(Items.BONE, 8).save(level.registryAccess());
+            stack.putByte("Slot", (byte) 0);
+            items.add(stack);
+            data.put("Items", items);
+            source.loadWithComponents(data, level.registryAccess());
+            h.assertFalse(level.hasChunkAt(partner.east()), "fixture leaves the other half unloaded");
+            level.getBlockState(mouth).tick(level, mouth, level.random);
+            h.assertFalse(level.hasChunkAt(partner.east()), "capability lookup must not load the other half");
+            h.assertValueEqual(source.getItem(0).getCount(), 8, "refusal preserves the source");
+            h.assertTrue(target.isEmpty(), "refusal leaves the target empty");
+        }
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void mouthsFollowStructureRotationsAndMirrors(GameTestHelper h) {
+        for (Block block : new Block[] {LogisticsModule.INTAKE_MOUTH.get(), LogisticsModule.OUTPUT_MOUTH.get()}) {
+            for (Direction facing : Direction.values()) {
+                var state = block.defaultBlockState().setValue(BlockStateProperties.FACING, facing);
+                for (Rotation rotation : Rotation.values())
+                    h.assertValueEqual(
+                            state.rotate(rotation).getValue(BlockStateProperties.FACING),
+                            rotation.rotate(facing),
+                            "rotated mouth facing");
+                for (Mirror mirror : Mirror.values())
+                    h.assertValueEqual(
+                            state.mirror(mirror).getValue(BlockStateProperties.FACING),
+                            mirror.mirror(facing),
+                            "mirrored mouth facing");
+            }
+        }
+        h.succeed();
     }
 
     private static void mouth(GameTestHelper h, boolean intake) {
