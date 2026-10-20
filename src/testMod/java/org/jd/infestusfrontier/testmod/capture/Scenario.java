@@ -17,7 +17,7 @@ import net.minecraft.core.BlockPos;
 
 /** One scripted scene from {@code <folder>/<name>.json}: commands to run, then views to stand at. */
 record Scenario(String name, List<String> commands, List<View> views) {
-    static final int MAX_VIEWS = 32;
+    static final int MAX_VIEWS = 48;
     private static final String NAME = "[a-z][a-z0-9_]{0,63}";
 
     /**

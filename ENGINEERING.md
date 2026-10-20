@@ -127,6 +127,8 @@ Names are project contracts. Create a module with its first story, not earlier.
 
 ## Performance limits
 
+The gate runs with fixed heaps: the Gradle daemon 2 GB (`gradle.properties`), the GameTest server 2 GB, the capture and demo clients 3 GB (`build.gradle` runs). A leak fails the gate instead of starving the machine.
+
 Performance is correctness. A feature that can stall a server is a broken feature.
 
 Before implementation, the story states: the work unit, who shares the budget (dimension, team, network), the hard per-tick bound, which blocks it reads, maximum entities and geometry, persistent state size, packet rate, behavior on overload, behavior on chunk unload and reload. Each has a test.
