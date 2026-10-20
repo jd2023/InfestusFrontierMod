@@ -13,7 +13,7 @@ import org.jd.infestusfrontier.core.organ.Growth;
 /**
  * What makes one batch organ differ from another: where its batches come from, how it grows, how many ingredient
  * slots it has, how much water and biomass it holds, how tall its screen is and its shape. The Bowl, the Rack, the
- * Loom, the Cradle and the Bio-Furnace are kinds; the block, block entity and menu are shared.
+ * Loom, the Cradle, the Bio-Furnace and the Cyst are kinds; the block, block entity and menu are shared.
  */
 record BatchOrganKind(
         String id,

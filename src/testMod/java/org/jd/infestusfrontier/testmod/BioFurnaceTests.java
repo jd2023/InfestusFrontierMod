@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.Item;
@@ -225,6 +226,23 @@ public final class BioFurnaceTests {
                                                 experience))
                                 .build(),
                         DataComponentPatch.EMPTY);
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aBrokenFurnaceDropsItselfWithItsContents(GameTestHelper h) {
+        placeFurnace(h);
+        preset(h, new ItemStack(Items.IRON_INGOT, 3), new OrganHistory(70), Optional.empty(), 2.0f);
+        h.getLevel().destroyBlock(h.absolutePos(FURNACE), true);
+        h.runAfterDelay(2, () -> {
+            List<ItemEntity> drops = h.getEntities(EntityType.ITEM, FURNACE, 2.0);
+            h.assertValueEqual(drops.size(), 1, "one dropped furnace");
+            h.assertTrue(drops.get(0).getItem().is(ProcessingModule.BIO_FURNACE_ITEM.get()), "it is the furnace");
+            BatchOrganContents carried = drops.get(0).getItem().get(ProcessingModule.BATCH_CONTENTS.get());
+            h.assertTrue(carried != null, "it carries its contents");
+            h.assertValueEqual(carried.history().completedBatches(), 70, "with its history");
+            h.assertValueEqual(carried.output().getCount(), 3, "and its three ingots");
+            h.succeed();
+        });
     }
 
     private static void placeFurnace(GameTestHelper h) {

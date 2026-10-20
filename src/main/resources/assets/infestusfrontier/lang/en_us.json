@@ -144,6 +144,6 @@
   "entry.infestusfrontier.circulation.activation_cyst.name": "Activation Cyst",
   "entry.infestusfrontier.circulation.activation_cyst.description": "Culture raw ingredients into treatments",
   "entry.infestusfrontier.circulation.activation_cyst.use": "Place it on Living Substrate. Put in the ingredients of one treatment, by hand or by hopper, with water and biomass from buckets. It starts on its own and takes 20 seconds. The Bowl makes Fusion Binder, Elastic Gel and Rooting Gel too, in 60. Any other item opens the screen.",
-  "entry.infestusfrontier.circulation.activation_cyst.treatments": "A treatment changes what a cell of mature Living Substrate does. Capillary Gel grows a Biomass Vein, Contractile Fiber an Item Vein, Filter Membrane and Sealing Resin a Fluid Vein, Synaptic Gel nerve, Rooting Gel a crop bed. Fusion Binder and Elastic Gel go into the others.",
+  "entry.infestusfrontier.circulation.activation_cyst.treatments": "Fusion Binder and Elastic Gel are ingredients of the other treatments. Capillary Gel, Contractile Fiber, Filter Membrane, Sealing Resin, Rooting Gel and Synaptic Gel are made for the veins, the crop beds and the nerves that come with the next organs. Until then they are kept, not used.",
   "entry.infestusfrontier.circulation.activation_cyst.craft": "An Organ Bud, two Membrane Sheets and a Bone Plate."
 }

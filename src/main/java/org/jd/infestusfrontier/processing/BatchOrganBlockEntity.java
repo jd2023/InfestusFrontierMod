@@ -50,8 +50,8 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
  * One batch organ: ingredient slots, a water tank, a biomass tank and one running batch, shaped by its
- * {@link BatchOrganKind}. The Bowl, the Rack, the Loom, the Cradle and the Bio-Furnace are this class with different
- * kinds. It runs on its own: whenever its slots, water and biomass can pay for a batch of its {@link BatchBook} and
+ * {@link BatchOrganKind}. The Bowl, the Rack, the Loom, the Cradle, the Bio-Furnace and the Cyst are this class with
+ * different kinds. It runs on its own: whenever its slots, water and biomass can pay for a batch of its {@link BatchBook} and
  * the output has room, the next batch starts, credited to the last player who loaded it by hand. Completed batches
  * carry it through its {@link org.jd.infestusfrontier.core.organ.Growth} stages, shown in the block state.
  */
