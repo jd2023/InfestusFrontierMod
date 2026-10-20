@@ -180,9 +180,13 @@ public final class BioFurnaceTests {
         });
     }
 
+    /** Every point in the orbs around the furnace; two orbs of one value merge into one orb with a count of two. */
     private static int experienceAround(GameTestHelper h) {
         List<ExperienceOrb> orbs = h.getEntities(EntityType.EXPERIENCE_ORB, FURNACE, 3.0);
-        return orbs.stream().mapToInt(ExperienceOrb::getValue).sum();
+        return orbs.stream()
+                .mapToInt(orb ->
+                        orb.getValue() * orb.saveWithoutId(new CompoundTag()).getInt("Count"))
+                .sum();
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
