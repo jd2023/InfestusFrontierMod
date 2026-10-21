@@ -111,6 +111,48 @@ public final class FilterValveTests {
         h.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aRingOfValvesAnswersNothingAndNeverLoops(GameTestHelper h) {
+        BlockPos a = new BlockPos(1, Y + 1, 1);
+        BlockPos b = a.east();
+        BlockPos c = b.south();
+        BlockPos d = a.south();
+        Direction[] faces = {Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.NORTH};
+        BlockPos[] ring = {a, b, c, d};
+        for (int i = 0; i < 4; i++) {
+            h.setBlock(ring[i].below(), EcologyTests.mature());
+            h.setBlock(
+                    ring[i],
+                    LogisticsModule.FILTER_VALVE
+                            .get()
+                            .defaultBlockState()
+                            .setValue(HorizontalDirectionalBlock.FACING, faces[i]));
+        }
+        IFluidHandler handler =
+                h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(a), Direction.WEST);
+        h.assertValueEqual(handler.getTanks(), 0, "a valve facing a valve has no store");
+        h.assertTrue(handler.drain(250, IFluidHandler.FluidAction.EXECUTE).isEmpty(), "and drains nothing");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aBucketDrainsThroughTheValveAndStopsAtTheReserve(GameTestHelper h) {
+        h.setBlock(SOURCE.below(), EcologyTests.mature());
+        h.setBlock(VALVE.below(), EcologyTests.mature());
+        h.setBlock(SOURCE, StorageModule.BIOMASS_BLADDER.get());
+        fill(h, SOURCE, 2500);
+        valve(h, 3); // 1000 mB
+        Player drawer = EcologyTests.holding(h, GameType.SURVIVAL, Items.BUCKET, 1);
+        EcologyTests.use(h, drawer, VALVE, Direction.EAST);
+        h.assertTrue(drawer.getMainHandItem().is(StorageModule.BIOMASS_BUCKET.get()), "the first bucket filled");
+        h.assertValueEqual(stored(h, SOURCE), 1500, "from the store");
+        Player second = EcologyTests.holding(h, GameType.SURVIVAL, Items.BUCKET, 1);
+        EcologyTests.use(h, second, VALVE, Direction.EAST);
+        h.assertTrue(second.getMainHandItem().is(Items.BUCKET), "a second would cross the reserve, so it stays empty");
+        h.assertValueEqual(stored(h, SOURCE), 1500, "the store keeps more than its reserve");
+        h.succeed();
+    }
+
     private static void valve(GameTestHelper h, int reserve) {
         BlockState state = LogisticsModule.FILTER_VALVE
                 .get()

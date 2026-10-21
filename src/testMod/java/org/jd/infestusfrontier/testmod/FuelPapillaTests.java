@@ -178,6 +178,26 @@ public final class FuelPapillaTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void theSettingsAndTheBufferSurviveASaveAndReload(GameTestHelper h) {
+        h.setBlock(PAPILLA, EquipmentModule.FUEL_PAPILLA.get());
+        fill(h, 120);
+        Player setter = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        AbstractContainerMenu menu =
+                ((MenuProvider) h.getBlockEntity(PAPILLA)).createMenu(1, setter.getInventory(), setter);
+        menu.clickMenuButton(setter, 2); // legs skipped
+        menu.clickMenuButton(setter, FuelPapillaMenu.LIMIT_BUTTON); // 100 to 25
+        var registries = h.getLevel().registryAccess();
+        CompoundTag saved = h.getBlockEntity(PAPILLA).saveWithoutMetadata(registries);
+        h.assertValueEqual(saved.getInt("pieces"), 0b1011, "head, body and feet");
+        h.assertValueEqual(saved.getInt("limit"), 25, "a quarter");
+        var fresh = ((net.minecraft.world.level.block.EntityBlock) EquipmentModule.FUEL_PAPILLA.get())
+                .newBlockEntity(h.absolutePos(PAPILLA), h.getBlockState(PAPILLA));
+        fresh.loadWithComponents(saved, registries);
+        h.assertValueEqual(fresh.saveWithoutMetadata(registries), saved, "the reloaded pad saves the same");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void anOrganStandsOnAPapilla(GameTestHelper h) {
         h.setBlock(PAPILLA, EquipmentModule.FUEL_PAPILLA.get());
         Player builder = EcologyTests.holding(h, GameType.SURVIVAL, ProcessingModule.BONE_LOOM_ITEM.get(), 1);

@@ -11,7 +11,7 @@ import org.jd.infestusfrontier.logistics.GraftItem;
 
 /**
  * The Fuel Papilla as a graft (BLOCK_CATALOG T1-36): used on an exposed cell of mature Living Substrate, it turns
- * the cell into a papilla, flush with the ground. A papilla broken and grafted again keeps its buffer and settings.
+ * the cell into a papilla, flush with the ground. A papilla broken and grafted again keeps its buffer; its settings start again.
  */
 final class FuelPapillaItem extends Item {
     private static final int GROWTH_PARTICLES = 15;

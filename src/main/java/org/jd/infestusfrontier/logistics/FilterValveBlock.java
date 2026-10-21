@@ -28,6 +28,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jd.infestusfrontier.organ.api.Organs;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -99,7 +100,10 @@ public final class FilterValveBlock extends HorizontalDirectionalBlock {
         return RESERVES.get(state.getValue(RESERVE));
     }
 
-    /** A stick steps the reserve up, wrapping to none after the largest. */
+    /**
+     * A bucket drains or fills the store through the valve, by the face it clicks; the face toward the store offers
+     * nothing. A stick steps the reserve up, wrapping to none after the largest.
+     */
     @Override
     protected ItemInteractionResult useItemOn(
             ItemStack stack,
@@ -109,7 +113,7 @@ public final class FilterValveBlock extends HorizontalDirectionalBlock {
             Player player,
             InteractionHand hand,
             BlockHitResult hit) {
-        if (!stack.is(Items.STICK)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (!stack.is(Items.STICK)) return BiomassFluids.useOn(stack, level, pos, hit.getDirection(), player, hand);
         if (!level.isClientSide) {
             BlockState next = state.setValue(RESERVE, (state.getValue(RESERVE) + 1) % RESERVES.size());
             level.setBlock(pos, next, Block.UPDATE_ALL);
@@ -134,14 +138,17 @@ public final class FilterValveBlock extends HorizontalDirectionalBlock {
         return new Valve(level, pos.immutable());
     }
 
-    /** The store's handler, or null when the valve is gone or the store's chunk is unloaded. */
+    /**
+     * The store's handler, or null when the valve is gone, the store's chunk is unloaded, or the faced block is
+     * another valve: valves never chain, so a ring of them cannot call itself.
+     */
     private static @Nullable IFluidHandler store(Level level, BlockPos pos) {
         if (!level.hasChunkAt(pos)) return null;
         BlockState state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof FilterValveBlock)) return null;
         Direction facing = state.getValue(FACING);
         BlockPos store = pos.relative(facing);
-        if (!level.hasChunkAt(store)) return null;
+        if (!level.hasChunkAt(store) || level.getBlockState(store).getBlock() instanceof FilterValveBlock) return null;
         return level.getCapability(Capabilities.FluidHandler.BLOCK, store, facing.getOpposite());
     }
 
@@ -150,11 +157,15 @@ public final class FilterValveBlock extends HorizontalDirectionalBlock {
             return FilterValveBlock.store(level, pos);
         }
 
-        /** What may leave the store now: what it holds above the reserve, over all its tanks. */
-        private int allowance(IFluidHandler store) {
+        /**
+         * What of {@code fluid} may leave the store now: what it holds of that fluid above the reserve. Water and
+         * biomass in one organ keep their reserves apart.
+         */
+        private int allowance(IFluidHandler store, FluidStack fluid) {
             long held = 0;
             for (int tank = 0; tank < store.getTanks(); tank++)
-                held += store.getFluidInTank(tank).getAmount();
+                if (FluidStack.isSameFluidSameComponents(store.getFluidInTank(tank), fluid))
+                    held += store.getFluidInTank(tank).getAmount();
             return (int) Math.max(0, Math.min(Integer.MAX_VALUE, held - reserve(level.getBlockState(pos))));
         }
 
@@ -192,7 +203,7 @@ public final class FilterValveBlock extends HorizontalDirectionalBlock {
         public FluidStack drain(FluidStack resource, FluidAction action) {
             IFluidHandler store = store();
             if (store == null || resource.isEmpty()) return FluidStack.EMPTY;
-            int allowed = Math.min(resource.getAmount(), allowance(store));
+            int allowed = Math.min(resource.getAmount(), allowance(store, resource));
             return allowed <= 0 ? FluidStack.EMPTY : store.drain(resource.copyWithAmount(allowed), action);
         }
 
@@ -200,8 +211,10 @@ public final class FilterValveBlock extends HorizontalDirectionalBlock {
         public FluidStack drain(int maxDrain, FluidAction action) {
             IFluidHandler store = store();
             if (store == null) return FluidStack.EMPTY;
-            int allowed = Math.min(maxDrain, allowance(store));
-            return allowed <= 0 ? FluidStack.EMPTY : store.drain(allowed, action);
+            FluidStack first = store.drain(maxDrain, FluidAction.SIMULATE);
+            if (first.isEmpty()) return FluidStack.EMPTY;
+            int allowed = Math.min(maxDrain, allowance(store, first));
+            return allowed <= 0 ? FluidStack.EMPTY : store.drain(first.copyWithAmount(allowed), action);
         }
     }
 }

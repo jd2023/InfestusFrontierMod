@@ -5,10 +5,10 @@
     "kill @e[type=item]",
     "fill -3 -61 0 5 -61 5 infestusfrontier:living_substrate[stage=mature]",
     "setblock 0 -60 2 chest[facing=south]{Items:[{Slot:0,id:\"minecraft:bone\",count:64}]}",
-    "setblock 0 -60 3 infestusfrontier:sensor_polyp[facing=north]",
     "setblock 1 -60 3 redstone_lamp",
+    "setblock 0 -60 3 infestusfrontier:sensor_polyp[facing=north,power=1]",
     "setblock 3 -60 2 chest[facing=south]",
-    "setblock 3 -59 2 infestusfrontier:sensor_polyp[facing=down]",
+    "setblock 3 -59 2 infestusfrontier:sensor_polyp[facing=down,power=0]",
     "give @s infestusfrontier:sensor_polyp"
   ],
   "views": [
@@ -21,20 +21,20 @@
       "pitch": 20
     },
     {
-      "name": "eye",
-      "x": 0.5,
-      "y": -59.2,
-      "z": 5.5,
-      "yaw": 180,
-      "pitch": 15
-    },
-    {
       "name": "top",
       "x": 3.5,
       "y": -58,
       "z": 5.5,
       "yaw": 180,
       "pitch": 30
+    },
+    {
+      "name": "eye",
+      "x": 2.0,
+      "y": -59.4,
+      "z": 1.4,
+      "yaw": 40,
+      "pitch": 10
     }
   ]
 }
