@@ -286,13 +286,13 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 
 ### T1-11a — Feeding Lobe
 - **Does:** A port organ that stands beside a functional organ, faces it and joins it. Whatever reaches the lobe goes into the organ, which keeps only what its next batch can use. With a Yield Lobe it makes an organ a small factory whose layout the player plans.
-- **Input → output:** Items from a Mouth set to intake under the lobe, a hopper or a pipe → the organ's ingredient slots. It gives nothing back.
+- **Input → output:** Items from a Mouth set to intake under the lobe, a hopper above it or a pipe → the organ's ingredient slots. It gives nothing back.
 - **Create:** 1 Organ Bud + 1 Membrane Sheet + 1 slime ball.
 - **Growth:** An organ serves one Feeding Lobe while young and one more for each growth stage; lobes beyond that stay idle, counted north, east, south, west. A bare organ still takes hoppers and pipes directly.
 
 ### T1-11b — Yield Lobe
 - **Does:** The output port organ: it joins the organ it faces and gives what the organ has finished, never its ingredients, fuel or reserved stock.
-- **Input → output:** The organ's products → a Mouth set to output under the lobe, a hopper or a pipe.
+- **Input → output:** The organ's products → a Mouth set to output under the lobe, or a pipe; a lobe stands on a foundation, so no hopper sits under it.
 - **Create:** 1 Organ Bud + 1 Membrane Sheet + 1 Bone Plate.
 - **Growth:** Counted like the Feeding Lobe, apart from it: a young organ serves one of each kind.
 

@@ -171,7 +171,7 @@ public final class LogisticsModule {
             event.registerBlockEntity(LogisticsCapabilities.MOUTH_SCREEN, MOUTH_ENTITY.get(), (mouth, none) -> mouth);
             event.registerBlock(
                     Capabilities.ItemHandler.BLOCK,
-                    (level, pos, state, entity, side) -> ((LobeBlock) state.getBlock()).handler(level, pos, state),
+                    (level, pos, state, entity, side) -> ((LobeBlock) state.getBlock()).handler(level, pos),
                     FEEDING_LOBE.get(),
                     YIELD_LOBE.get());
             event.registerBlockEntity(

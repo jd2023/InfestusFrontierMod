@@ -13,11 +13,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
+import org.jd.infestusfrontier.cultivation.CultivationModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.logistics.MouthBlock;
 import org.jd.infestusfrontier.logistics.MouthMode;
@@ -75,7 +77,7 @@ public final class LobeTests {
         lobe(h, loom.east(), false, Direction.WEST);
         IItemHandler feeding = handler(h, loom.west());
         IItemHandler yield = handler(h, loom.east());
-        h.assertTrue(feeding != null && yield != null, "both lobes serve the loom");
+        h.assertTrue(serves(h, loom.west()) && serves(h, loom.east()), "both lobes serve the loom");
         h.assertTrue(insertAnywhere(feeding, new ItemStack(Items.BONE)).isEmpty(), "the feeding lobe takes a bone");
         h.assertTrue(extractAnything(feeding).isEmpty(), "and gives nothing back");
         h.assertTrue(extractAnything(yield).isEmpty(), "the yield lobe never gives the ingredient");
@@ -91,14 +93,14 @@ public final class LobeTests {
         lobe(h, furnace.north(), true, Direction.SOUTH);
         lobe(h, furnace.east(), true, Direction.WEST);
         lobe(h, furnace.west(), true, Direction.EAST);
-        h.assertTrue(handler(h, furnace.north()) != null, "the young furnace serves its first lobe");
-        h.assertTrue(handler(h, furnace.east()) == null, "but not a second");
-        h.assertTrue(handler(h, furnace.west()) == null, "or a third");
+        h.assertTrue(serves(h, furnace.north()), "the young furnace serves its first lobe");
+        h.assertFalse(serves(h, furnace.east()), "but not a second");
+        h.assertFalse(serves(h, furnace.west()), "or a third");
         h.setBlock(furnace, h.getBlockState(furnace).setValue(Organs.STAGE, 1));
-        h.assertTrue(handler(h, furnace.east()) != null, "a grown furnace serves the second, east before west");
-        h.assertTrue(handler(h, furnace.west()) == null, "but not the third");
+        h.assertTrue(serves(h, furnace.east()), "a grown furnace serves the second, east before west");
+        h.assertFalse(serves(h, furnace.west()), "but not the third");
         lobe(h, furnace.south(), false, Direction.NORTH);
-        h.assertTrue(handler(h, furnace.south()) != null, "a lobe of the other kind counts apart");
+        h.assertTrue(serves(h, furnace.south()), "a lobe of the other kind counts apart");
         h.succeed();
     }
 
@@ -108,7 +110,7 @@ public final class LobeTests {
         h.setBlock(at.below(), EcologyTests.mature());
         h.setBlock(at.east(), Blocks.CHEST);
         lobe(h, at, true, Direction.EAST);
-        h.assertTrue(handler(h, at) == null, "a chest is not an organ a lobe joins");
+        h.assertFalse(serves(h, at), "a chest is not an organ a lobe joins");
         h.succeed();
     }
 
@@ -129,8 +131,53 @@ public final class LobeTests {
                         .setValue(HorizontalDirectionalBlock.FACING, Direction.EAST),
                 quiet);
         h.assertFalse(level.hasChunkAt(edge.east()), "the organ's chunk starts unloaded");
-        h.assertTrue(level.getCapability(Capabilities.ItemHandler.BLOCK, edge, Direction.DOWN) == null, "no handler");
+        var handler = level.getCapability(Capabilities.ItemHandler.BLOCK, edge, Direction.DOWN);
+        h.assertTrue(handler == null || handler.getSlots() == 0, "nothing served");
         h.assertFalse(level.hasChunkAt(edge.east()), "and the lookup loaded nothing");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aPipesCachedHandlerFollowsTheOrganItServes(GameTestHelper h) {
+        // a second Feeding Lobe on a young furnace is idle; a pipe holds its handler through NeoForge's cache
+        BlockPos furnace = new BlockPos(2, Y + 1, 2);
+        h.setBlock(furnace.below(), EcologyTests.mature());
+        h.setBlock(furnace, ProcessingModule.BIO_FURNACE.get());
+        lobe(h, furnace.north(), true, Direction.SOUTH);
+        lobe(h, furnace.east(), true, Direction.WEST);
+        BlockCapabilityCache<IItemHandler, Direction> pipe = BlockCapabilityCache.create(
+                Capabilities.ItemHandler.BLOCK, h.getLevel(), h.absolutePos(furnace.east()), Direction.DOWN);
+        h.assertTrue(
+                pipe.getCapability() == null || pipe.getCapability().getSlots() == 0, "the idle lobe offers nothing");
+        h.setBlock(furnace, h.getBlockState(furnace).setValue(Organs.STAGE, 1));
+        IItemHandler grown = pipe.getCapability();
+        h.assertTrue(grown != null && grown.getSlots() > 0, "once the furnace grows, the cached handler serves it");
+        h.assertTrue(
+                insertSimulated(grown, new ItemStack(Items.RAW_IRON)).isEmpty(), "and takes ore the furnace smelts");
+        h.getLevel().destroyBlock(h.absolutePos(furnace), false);
+        IItemHandler held = pipe.getCapability();
+        ItemStack rest =
+                held == null ? new ItemStack(Items.RAW_IRON) : insertAnywhere(held, new ItemStack(Items.RAW_IRON));
+        h.assertValueEqual(rest.getCount(), 1, "with the furnace gone, the cached handler keeps the ore out");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aYieldLobeNeverServesAPlanterAndAFeedingLobeNeverServesAHarvester(GameTestHelper h) {
+        BlockPos planter = new BlockPos(2, Y + 1, 2);
+        BlockPos harvester = new BlockPos(5, Y + 1, 2);
+        h.setBlock(planter.below(), EcologyTests.mature());
+        h.setBlock(harvester.below(), EcologyTests.mature());
+        h.setBlock(planter, CultivationModule.PLANTING_PROBOSCIS.get());
+        h.setBlock(harvester, CultivationModule.HARVEST_COROLLA.get());
+        h.getLevel()
+                .getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(planter), Direction.UP)
+                .insertItem(0, new ItemStack(Items.WHEAT_SEEDS, 8), false);
+        lobe(h, planter.east(), false, Direction.WEST);
+        lobe(h, harvester.west(), true, Direction.EAST);
+        h.assertFalse(serves(h, planter.east()), "the planter's seeds are its stock, never a product");
+        h.assertTrue(extractAnything(handler(h, planter.east())).isEmpty(), "nothing comes out");
+        h.assertFalse(serves(h, harvester.west()), "a harvester takes nothing in");
         h.succeed();
     }
 
@@ -153,6 +200,11 @@ public final class LobeTests {
         h.setBlock(at, state);
     }
 
+    private static boolean serves(GameTestHelper h, BlockPos at) {
+        IItemHandler handler = handler(h, at);
+        return handler != null && handler.getSlots() > 0;
+    }
+
     private static IItemHandler handler(GameTestHelper h, BlockPos at) {
         return h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(at), Direction.DOWN);
     }
@@ -169,6 +221,12 @@ public final class LobeTests {
     private static ItemStack insertAnywhere(IItemHandler handler, ItemStack stack) {
         for (int slot = 0; slot < handler.getSlots() && !stack.isEmpty(); slot++)
             stack = handler.insertItem(slot, stack, false);
+        return stack;
+    }
+
+    private static ItemStack insertSimulated(IItemHandler handler, ItemStack stack) {
+        for (int slot = 0; slot < handler.getSlots() && !stack.isEmpty(); slot++)
+            stack = handler.insertItem(slot, stack, true);
         return stack;
     }
 

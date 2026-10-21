@@ -27,9 +27,12 @@ public final class Organs {
     public static final TagKey<Item> READERS = TagKey.create(
             Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "organ_readers"));
 
-    /** Organs a Feeding Lobe or a Yield Lobe can serve. */
-    public static final TagKey<Block> PORT_HOSTS = TagKey.create(
-            Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "port_hosts"));
+    /** Organs a Feeding Lobe can serve: their item handler takes ingredients. */
+    public static final TagKey<Block> FEEDING_HOSTS = TagKey.create(
+            Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "feeding_hosts"));
+    /** Organs a Yield Lobe can serve: their item handler gives products and never ingredients or reserved stock. */
+    public static final TagKey<Block> YIELD_HOSTS = TagKey.create(
+            Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "yield_hosts"));
 
     /** The last growth stage an organ's state can name. */
     public static final int LAST_STAGE = 2;

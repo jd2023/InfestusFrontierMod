@@ -22,25 +22,30 @@ def bones(feeds):
     cubes = [
         ('foot', [-5, 0, -4], [10, 2, 10], None),
         ('bulb', [-4, 2, -3], [8, 6, 8], None),
-        ('crown', [-3, 8, -2], [6, 2, 6], None),
-        ('duct', [-2, 3, -8], [4, 4, 5], None),
+        ('duct', [-2, 3, -7], [4, 4, 4], None),
         ('collar', [-3, 2, -4], [6, 6, 1], None),
         ('cuff', [-3, 2, -8], [6, 6, 1], None),
     ]
     if feeds:
+        # the crown is a ring of flesh round a sunken maw, the lips a ring above it: no two faces share a plane
         cubes += [
+            ('crown_ns', [-3, 8, -2], [6, 2, 1], None),
+            ('crown_ns', [-3, 8, 3], [6, 2, 1], None),
+            ('crown_we', [-3, 8, -1], [1, 2, 4], None),
+            ('crown_we', [2, 8, -1], [1, 2, 4], None),
             ('lip_ns', [-3, 10, -2], [6, 1, 1], None),
             ('lip_ns', [-3, 10, 3], [6, 1, 1], None),
             ('lip_we', [-3, 10, -1], [1, 1, 4], None),
             ('lip_we', [2, 10, -1], [1, 1, 4], None),
-            ('maw', [-2, 9, -1], [4, 1, 4], None),
+            ('maw', [-2, 8, -1], [4, 1, 4], None),
         ]
     else:
         cubes += [
-            ('spout', [-2, 2, 5], [4, 3, 2], None),
-            ('ridge', [-3, 2, 4], [1, 4, 1], None),
-            ('ridge', [2, 2, 4], [1, 4, 1], None),
+            ('crown', [-3, 8, -2], [6, 2, 6], None),
             ('cap', [-2, 10, -1], [4, 1, 4], None),
+            ('spout', [-2, 2, 5], [4, 3, 2], None),
+            ('ridge', [-3, 2, 5], [1, 4, 1], None),
+            ('ridge', [2, 2, 5], [1, 4, 1], None),
         ]
     return [('root', None, [0, 8, 0], cubes)]
 
@@ -63,7 +68,7 @@ def make(name, feeds, seed, lift):
                 painter.ramp(rect, DUCT, lambda x, y, w, h: skin(x, y, w, h) + folds(x, y) + light,
                              grain=0.06, mottle=0.22)
                 painter.vein(rect, (120, 30, 60), 3, 160)
-            elif island in ('bulb', 'crown', 'cap'):
+            elif island in ('bulb', 'crown', 'crown_ns', 'crown_we', 'cap'):
                 painter.ramp(rect, FLESH, lambda x, y, w, h: 0.5 * ball(x, y, w, h) + 0.5 * skin(x, y, w, h)
                              + folds(x, y) + light, grain=0.06, mottle=0.24)
                 painter.vein(rect, (92, 28, 54), 4, 140)

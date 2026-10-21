@@ -28,7 +28,9 @@ import org.jetbrains.annotations.Nullable;
  * A port organ: it stands beside a functional organ, faces it and joins it. A Feeding Lobe only puts items into the
  * organ; a Yield Lobe only takes what the organ offers, its products. A Mouth under the lobe, or a hopper, works it.
  * An organ serves one lobe of each kind while young and one more for each growth stage; lobes beyond that are idle,
- * counted in the order north, east, south, west around the organ. A lobe keeps no state of its own.
+ * counted in the order north, east, south, west around the organ. A lobe keeps no state of its own: its item handler
+ * looks up the organ, its stage and the lobe's place on each use, so a pipe that caches the handler never holds a
+ * stale one.
  */
 public final class LobeBlock extends HorizontalDirectionalBlock {
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 12, 14);
@@ -75,8 +77,20 @@ public final class LobeBlock extends HorizontalDirectionalBlock {
         return defaultBlockState().setValue(FACING, context.getHorizontalDirection());
     }
 
-    private static boolean isHost(Level level, BlockPos pos) {
-        return level.hasChunkAt(pos) && level.getBlockState(pos).is(Organs.PORT_HOSTS);
+    private boolean isHost(Level level, BlockPos pos) {
+        return level.hasChunkAt(pos) && level.getBlockState(pos).is(feeds ? Organs.FEEDING_HOSTS : Organs.YIELD_HOSTS);
+    }
+
+    /** The handler appears with the lobe and goes with it; NeoForge's capability caches must hear of both. */
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState old, boolean moved) {
+        if (!level.isClientSide) level.invalidateCapabilities(pos);
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState next, boolean moved) {
+        if (!level.isClientSide) level.invalidateCapabilities(pos);
+        super.onRemove(state, level, pos, next, moved);
     }
 
     @Override
@@ -131,17 +145,82 @@ public final class LobeBlock extends HorizontalDirectionalBlock {
         return place;
     }
 
+    /** The lobe's item handler, live: every use asks whether the lobe serves an organ now. */
+    IItemHandler handler(Level level, BlockPos pos) {
+        return new Live(level, pos);
+    }
+
     /**
-     * The lobe's item handler: the organ's own, one way, while this lobe is served; null otherwise. The organ is
-     * read only when its chunk is loaded.
+     * The organ's handler, one way, while the lobe at {@code pos} serves it; null otherwise. The organ is read only
+     * when its chunk is loaded.
      */
-    @Nullable IItemHandler handler(Level level, BlockPos pos, BlockState state) {
+    private @Nullable IItemHandler organ(Level level, BlockPos pos) {
+        if (!level.hasChunkAt(pos)) return null;
+        BlockState state = level.getBlockState(pos);
+        if (!state.is(this)) return null;
         BlockPos host = pos.relative(state.getValue(FACING));
         if (!isHost(level, host)) return null;
         if (place(level, pos, state) >= slots(level.getBlockState(host))) return null;
         IItemHandler organ = level.getCapability(
                 Capabilities.ItemHandler.BLOCK, host, state.getValue(FACING).getOpposite());
         return organ == null ? null : new OneWay(organ, feeds);
+    }
+
+    /**
+     * What a pipe, a hopper or a Mouth holds: every call finds the organ again (five block reads and one capability
+     * lookup), so an organ that grew, was broken or was joined by another lobe is seen at once, even within a tick.
+     * With no organ served it has no slots.
+     */
+    private final class Live implements IItemHandler {
+        private final Level level;
+        private final BlockPos pos;
+
+        Live(Level level, BlockPos pos) {
+            this.level = level;
+            this.pos = pos.immutable();
+        }
+
+        private @Nullable IItemHandler now() {
+            return organ(level, pos);
+        }
+
+        @Override
+        public int getSlots() {
+            IItemHandler organ = now();
+            return organ == null ? 0 : organ.getSlots();
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            IItemHandler organ = now();
+            return organ == null || slot >= organ.getSlots() ? ItemStack.EMPTY : organ.getStackInSlot(slot);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            IItemHandler organ = now();
+            return organ == null || slot >= organ.getSlots() ? stack : organ.insertItem(slot, stack, simulate);
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            IItemHandler organ = now();
+            return organ == null || slot >= organ.getSlots()
+                    ? ItemStack.EMPTY
+                    : organ.extractItem(slot, amount, simulate);
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            IItemHandler organ = now();
+            return organ == null || slot >= organ.getSlots() ? 0 : organ.getSlotLimit(slot);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            IItemHandler organ = now();
+            return organ != null && slot < organ.getSlots() && organ.isItemValid(slot, stack);
+        }
     }
 
     /** An organ's handler that only takes items in, or only gives them out. */

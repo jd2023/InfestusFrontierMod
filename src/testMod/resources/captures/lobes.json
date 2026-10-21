@@ -3,6 +3,7 @@
     "advancement grant @s through infestusfrontier:contact/biomass_bladder",
     "fill -8 -61 -6 10 -54 10 air",
     "fill -8 -62 -6 10 -62 10 grass_block",
+    "kill @e[type=item]",
     "fill -5 -61 0 6 -61 7 infestusfrontier:living_substrate[stage=mature]",
     "setblock -3 -61 2 infestusfrontier:mouth[mode=output]",
     "setblock -2 -61 2 infestusfrontier:item_vein",
