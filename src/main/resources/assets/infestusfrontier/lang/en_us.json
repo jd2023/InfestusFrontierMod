@@ -251,5 +251,6 @@
   "entry.infestusfrontier.circulation.fuel_papilla.name": "Fuel Papilla",
   "entry.infestusfrontier.circulation.fuel_papilla.description": "Stand on it to refuel",
   "entry.infestusfrontier.circulation.fuel_papilla.use": "A substrate cell with a pale nipple. It holds 1000 BU from a bucket, a vein or a junction. Stand on it wearing awakened pieces and each piece fills by 10 BU a second until it is full or the cell is dry. Organs stand on it like on substrate. No screen; the probe reads it.",
-  "entry.infestusfrontier.circulation.fuel_papilla.craft": "Living Substrate, Capillary Gel and a Membrane Sheet."
+  "entry.infestusfrontier.circulation.fuel_papilla.craft": "Living Substrate, Capillary Gel and a Membrane Sheet.",
+  "entry.infestusfrontier.circulation.sensor_polyp.use": "Place it against the block to watch: beside it on the floor, or on top of it. Every half second it reads how full that block is, biomass first, then any fluid, then items, as a power of 0 to 15, 1 at least for anything at all; its eye lights up when it reads anything. The power comes out of every other side, as weak redstone and as a comparator value. Put a chest in front and a redstone lamp beside it, and the lamp tells you something is there."
 }

@@ -30,7 +30,7 @@ public final class SensorPolypBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
     private static final MapCodec<SensorPolypBlock> CODEC = simpleCodec(SensorPolypBlock::new);
-    private static final VoxelShape SHAPE = Block.box(3, 0, 3, 13, 10, 13);
+    private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 14, 14);
 
     SensorPolypBlock(Properties properties) {
         super(properties);
@@ -58,10 +58,14 @@ public final class SensorPolypBlock extends BaseEntityBlock {
         return SHAPE;
     }
 
-    /** Placed against a block, the eye looks at it. */
+    /**
+     * Placed against a block, the eye looks at it: beside it, standing on the floor, or on top of it, rooted in it.
+     * It never hangs under a block.
+     */
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite());
+        Direction facing = context.getClickedFace().getOpposite();
+        return facing == Direction.UP ? null : defaultBlockState().setValue(FACING, facing);
     }
 
     @Override
@@ -81,15 +85,13 @@ public final class SensorPolypBlock extends BaseEntityBlock {
         return true;
     }
 
-    /** Power on every side but the one it looks through; {@code direction} is the side the asking block is on, inverted. */
+    /**
+     * Weak power on every side but the one it looks through; {@code direction} is the side the asking block is on,
+     * inverted. Like the daylight detector it powers no block strongly, so nothing beyond its neighbours needs telling.
+     */
     @Override
     protected int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
         return direction.getOpposite() == state.getValue(FACING) ? 0 : state.getValue(POWER);
-    }
-
-    @Override
-    protected int getDirectSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return getSignal(state, level, pos, direction);
     }
 
     @Override

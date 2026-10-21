@@ -54,11 +54,12 @@ final class SensorPolypBlockEntity extends BlockEntity {
             if (room > 0) return fullness(held, room);
         }
         IItemHandler items = level.getCapability(Capabilities.ItemHandler.BLOCK, target, side);
-        return items == null ? 0 : ItemHandlerHelper.calcRedstoneFromInventory(items);
+        return items == null ? 0 : Math.clamp(ItemHandlerHelper.calcRedstoneFromInventory(items), 0, 15);
     }
 
+    /** 0 for nothing, 1 to 15 otherwise; a store that reports more than its capacity still reads 15. */
     private static int fullness(long held, long capacity) {
         if (held <= 0) return 0;
-        return Math.max(1, Mth.floor(held * 15.0 / capacity));
+        return Math.clamp(Mth.floor(held * 15.0 / capacity), 1, 15);
     }
 }
