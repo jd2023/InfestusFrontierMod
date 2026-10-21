@@ -11,6 +11,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
@@ -79,8 +80,24 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
     }
 
     /**
-     * Commands and other mods may place any tile; one extra setBlock puts the right one. The tile changes only the
-     * picture, so the neighbours' shapes are left alone: updating them would read, and so load, a neighbour's chunk.
+     * The tile follows the position. Commands and pistons pass the placed state through here before they set it, so
+     * it arrives with the right tile and their own neighbour updates run unchanged.
+     */
+    @Override
+    protected BlockState updateShape(
+            BlockState state,
+            Direction direction,
+            BlockState neighborState,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighborPos) {
+        return state.setValue(TILE, tileAt(pos));
+    }
+
+    /**
+     * A direct setBlock with a wrong tile, from another mod or /clone, gets one more setBlock with the right one. The
+     * tile changes only the picture, so that setBlock leaves the neighbours' shapes alone: updating them would read,
+     * and so load, a neighbour's chunk.
      */
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
