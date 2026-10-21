@@ -35,9 +35,9 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * The packet one vein cell holds and the side it came from. The cell receives through its capability and never
- * pulls. On each pulse it pushes the packet on, first into the consumers on its other sides, in the order up, down,
- * north, east, south, west, then into the next cells of the vein. A full downstream leaves the packet where it is
- * and the cell tries again every {@value VeinBlock#RETRY_TICKS} ticks.
+ * pulls. On each pulse it pushes the packet on, first into the consumers on its other sides, then into the next cells
+ * of the vein; within each of the two passes the sides take turns. A full downstream leaves the packet where it is and
+ * the cell tries again every {@value VeinBlock#RETRY_TICKS} ticks.
  */
 final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     private static final List<Direction> ORDER =
@@ -55,8 +55,8 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     private final Carrier carrier;
     private Optional<Direction> from = Optional.empty();
     private Optional<CompoundTag> unreadable = Optional.empty();
-    /** Where the next pulse starts in {@link #ORDER}; not saved, a reload only restarts the rotation. */
-    private int turn;
+    /** Where each pass of the next pulse starts in {@link #ORDER}: consumers, then veins. Not saved. */
+    private final int[] turns = new int[2];
 
     private final FluidTank fluid;
     private final ItemStackHandler items;
@@ -225,9 +225,10 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     void pulse() {
         if (level == null || unreadable.isPresent() || !holding()) return;
         boolean moved = false;
-        for (boolean toVeins : new boolean[] {false, true}) {
+        for (int pass = 0; pass < turns.length; pass++) {
+            boolean toVeins = pass == 1;
             for (int step = 0; step < ORDER.size(); step++) {
-                int index = (turn + step) % ORDER.size();
+                int index = (turns[pass] + step) % ORDER.size();
                 Direction side = ORDER.get(index);
                 if (from.isPresent() && from.get() == side) continue;
                 BlockPos next = worldPosition.relative(side);
@@ -236,7 +237,7 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
                 if (vein != toVeins) continue;
                 if (push(side, next)) {
                     moved = true;
-                    turn = (index + 1) % ORDER.size();
+                    turns[pass] = (index + 1) % ORDER.size();
                 }
                 if (!holding()) return;
             }

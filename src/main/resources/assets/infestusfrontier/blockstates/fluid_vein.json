@@ -49,15 +49,6 @@
     },
     {
       "when": {
-        "north": "false",
-        "up": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_north"
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "east": "true"
       },
@@ -80,15 +71,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_east"
-      }
-    },
-    {
-      "when": {
-        "east": "false",
-        "up": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_east"
       }
     },
     {
@@ -119,15 +101,6 @@
     },
     {
       "when": {
-        "south": "false",
-        "up": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_south"
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "west": "true"
       },
@@ -153,15 +126,6 @@
       }
     },
     {
-      "when": {
-        "west": "false",
-        "up": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_west"
-      }
-    },
-    {
       "apply": {
         "model": "infestusfrontier:block/vein_corners",
         "x": 180
@@ -271,16 +235,6 @@
     },
     {
       "when": {
-        "south": "false",
-        "down": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_north",
-        "x": 180
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "east": "true"
       },
@@ -305,16 +259,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_east",
-        "x": 180
-      }
-    },
-    {
-      "when": {
-        "east": "false",
-        "down": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_east",
         "x": 180
       }
     },
@@ -349,16 +293,6 @@
     },
     {
       "when": {
-        "north": "false",
-        "down": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_south",
-        "x": 180
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "west": "true"
       },
@@ -383,16 +317,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_west",
-        "x": 180
-      }
-    },
-    {
-      "when": {
-        "west": "false",
-        "down": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_west",
         "x": 180
       }
     },
@@ -506,16 +430,6 @@
     },
     {
       "when": {
-        "down": "false",
-        "north": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_north",
-        "x": 90
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "east": "true"
       },
@@ -540,16 +454,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_east",
-        "x": 90
-      }
-    },
-    {
-      "when": {
-        "east": "false",
-        "north": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_east",
         "x": 90
       }
     },
@@ -584,16 +488,6 @@
     },
     {
       "when": {
-        "up": "false",
-        "north": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_south",
-        "x": 90
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "west": "true"
       },
@@ -618,16 +512,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_west",
-        "x": 90
-      }
-    },
-    {
-      "when": {
-        "west": "false",
-        "north": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_west",
         "x": 90
       }
     },
@@ -748,17 +632,6 @@
     },
     {
       "when": {
-        "down": "false",
-        "south": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_north",
-        "x": 90,
-        "y": 180
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "west": "true"
       },
@@ -785,17 +658,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_east",
-        "x": 90,
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "west": "false",
-        "south": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_east",
         "x": 90,
         "y": 180
       }
@@ -834,17 +696,6 @@
     },
     {
       "when": {
-        "up": "false",
-        "south": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_south",
-        "x": 90,
-        "y": 180
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "east": "true"
       },
@@ -871,17 +722,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_west",
-        "x": 90,
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "east": "false",
-        "south": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_west",
         "x": 90,
         "y": 180
       }
@@ -1003,17 +843,6 @@
     },
     {
       "when": {
-        "down": "false",
-        "east": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_north",
-        "x": 90,
-        "y": 90
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "south": "true"
       },
@@ -1040,17 +869,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_east",
-        "x": 90,
-        "y": 90
-      }
-    },
-    {
-      "when": {
-        "south": "false",
-        "east": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_east",
         "x": 90,
         "y": 90
       }
@@ -1089,17 +907,6 @@
     },
     {
       "when": {
-        "up": "false",
-        "east": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_south",
-        "x": 90,
-        "y": 90
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "north": "true"
       },
@@ -1126,17 +933,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_west",
-        "x": 90,
-        "y": 90
-      }
-    },
-    {
-      "when": {
-        "north": "false",
-        "east": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_west",
         "x": 90,
         "y": 90
       }
@@ -1258,17 +1054,6 @@
     },
     {
       "when": {
-        "down": "false",
-        "west": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_north",
-        "x": 90,
-        "y": 270
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "north": "true"
       },
@@ -1295,17 +1080,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_east",
-        "x": 90,
-        "y": 270
-      }
-    },
-    {
-      "when": {
-        "north": "false",
-        "west": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_east",
         "x": 90,
         "y": 270
       }
@@ -1344,17 +1118,6 @@
     },
     {
       "when": {
-        "up": "false",
-        "west": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_south",
-        "x": 90,
-        "y": 270
-      }
-    },
-    {
-      "when": {
         "sealed": "true",
         "south": "true"
       },
@@ -1381,17 +1144,6 @@
       },
       "apply": {
         "model": "infestusfrontier:block/vein_arm_skin_west",
-        "x": 90,
-        "y": 270
-      }
-    },
-    {
-      "when": {
-        "south": "false",
-        "west": "false"
-      },
-      "apply": {
-        "model": "infestusfrontier:block/vein_rim_west",
         "x": 90,
         "y": 270
       }

@@ -169,16 +169,18 @@ public final class LogisticsTests {
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
     public static void aVeinCarriesBiomassUpAWallOverAndDownAgain(GameTestHelper h) {
-        // up three cells at x=1, across at the top, down three cells at x=2, into a tank under the last cell
+        // up three cells at x=1, across the top, down three cells at x=3, into a tank under the last cell; the gap at
+        // x=2 below the top leaves the route as the only way
         List<BlockPos> route = List.of(
                 new BlockPos(1, Y, 1),
                 new BlockPos(1, Y + 1, 1),
                 new BlockPos(1, Y + 2, 1),
                 new BlockPos(2, Y + 2, 1),
-                new BlockPos(2, Y + 1, 1),
-                new BlockPos(2, Y, 1));
+                new BlockPos(3, Y + 2, 1),
+                new BlockPos(3, Y + 1, 1),
+                new BlockPos(3, Y, 1));
         for (BlockPos cell : route) h.setBlock(cell, LogisticsModule.BIOMASS_VEIN.get());
-        BlockPos tank = new BlockPos(2, Y - 1, 1);
+        BlockPos tank = new BlockPos(3, Y - 1, 1);
         h.setBlock(tank, StorageModule.BIOMASS_BLADDER.get());
         h.assertTrue(
                 h.getBlockState(route.get(1)).getValue(PipeBlock.UP)

@@ -18,6 +18,8 @@
     "fill 42 -60 6 42 -58 6 infestusfrontier:biomass_vein",
     "fill 43 -61 1 44 -61 1 infestusfrontier:item_vein",
     "fill 44 -61 2 44 -61 4 infestusfrontier:item_vein",
+    "setblock 31 -60 2 minecraft:stone",
+    "setblock 35 -60 4 infestusfrontier:vascular_junction[north=intake,down=outlet]",
     "give @s infestusfrontier:fluid_vein"
   ],
   "views": [
@@ -60,6 +62,30 @@
       "z": 0.5,
       "yaw": -60,
       "pitch": 20
+    },
+    {
+      "name": "foot",
+      "x": 32.5,
+      "y": -60,
+      "z": 6.2,
+      "yaw": 0,
+      "pitch": 45
+    },
+    {
+      "name": "column_base",
+      "x": 42.5,
+      "y": -60,
+      "z": 3.6,
+      "yaw": 0,
+      "pitch": 45
+    },
+    {
+      "name": "cover",
+      "x": 33.5,
+      "y": -60,
+      "z": -0.8,
+      "yaw": 0,
+      "pitch": 40
     }
   ]
 }

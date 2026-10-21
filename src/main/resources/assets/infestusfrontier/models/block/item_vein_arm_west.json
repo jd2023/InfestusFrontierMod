@@ -26,7 +26,6 @@
             5
           ],
           "texture": "#lumen",
-          "cullface": "up",
           "rotation": 90
         }
       }
@@ -50,8 +49,7 @@
             5,
             2
           ],
-          "texture": "#wall",
-          "cullface": "up"
+          "texture": "#wall"
         }
       }
     },
@@ -74,8 +72,7 @@
             5,
             2
           ],
-          "texture": "#wall",
-          "cullface": "up"
+          "texture": "#wall"
         }
       }
     }

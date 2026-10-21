@@ -6,9 +6,11 @@ A vein cell is a shell of mature substrate skin. Every face is a 3x3 grid of til
 centre. Where the lumen runs along a face, its tiles are a window recessed 2 px, floored with the lumen and walled.
 A face shows an arm window toward each linked neighbour in its plane, and its centre window whenever any arm is open
 or the lumen passes straight through toward it; the top face always shows its centre. Each part is modelled once in
-the top-face frame and rotated onto the six faces by the blockstate. Where a face touches a linked neighbour, the
-2 px rim of each arm tile stays open: it is the mouth of the perpendicular face's window, so a groove continues from
-cell to cell without a wall across it.
+the top-face frame and rotated onto the six faces by the blockstate.
+
+Only the flat skin carries a cullface. A window's floor and walls are always drawn: a groove seen from a neighbour can
+run into a face of this cell that a block covers, such as the foot of a climb under the next cell up, and the window
+must still be lined there.
 """
 import json
 import math
@@ -35,8 +37,6 @@ LO, MID, HI = (0, 5), (5, 11), (11, 16)
 DEPTH = 2
 ARMS = ['north', 'east', 'south', 'west']
 ARM_TILE = {'north': (MID, (0, 5)), 'south': (MID, (11, 16)), 'west': ((0, 5), MID), 'east': ((11, 16), MID)}
-ARM_RIM = {'north': (MID, (0, 2)), 'south': (MID, (14, 16)), 'west': ((0, 2), MID), 'east': ((14, 16), MID)}
-ARM_INNER = {'north': (MID, (2, 5)), 'south': (MID, (11, 14)), 'west': ((2, 5), MID), 'east': ((11, 14), MID)}
 
 
 def ramp(colours, v):
@@ -88,22 +88,22 @@ def skin(xs, zs):
 
 
 def floor(xs, zs, along_x):
-    face = {'uv': [xs[0], zs[0], xs[1], zs[1]], 'texture': '#lumen', 'cullface': 'up'}
+    face = {'uv': [xs[0], zs[0], xs[1], zs[1]], 'texture': '#lumen'}
     if along_x:
-        face = {'uv': [zs[0], xs[0], zs[1], xs[1]], 'texture': '#lumen', 'cullface': 'up', 'rotation': 90}
+        face = {'uv': [zs[0], xs[0], zs[1], xs[1]], 'texture': '#lumen', 'rotation': 90}
     return {'from': [xs[0], 16 - DEPTH, zs[0]], 'to': [xs[1], 16 - DEPTH, zs[1]], 'faces': {'up': face}}
 
 
 def wall_x(x, zs, facing):
     """A window wall in the plane x = const, facing east or west into the window."""
     return {'from': [x, 16 - DEPTH, zs[0]], 'to': [x, 16, zs[1]],
-            'faces': {facing: {'uv': [zs[0], 0, zs[1], DEPTH], 'texture': '#wall', 'cullface': 'up'}}}
+            'faces': {facing: {'uv': [zs[0], 0, zs[1], DEPTH], 'texture': '#wall'}}}
 
 
 def wall_z(z, xs, facing):
     """A window wall in the plane z = const, facing north or south into the window."""
     return {'from': [xs[0], 16 - DEPTH, z], 'to': [xs[1], 16, z],
-            'faces': {facing: {'uv': [xs[0], 0, xs[1], DEPTH], 'texture': '#wall', 'cullface': 'up'}}}
+            'faces': {facing: {'uv': [xs[0], 0, xs[1], DEPTH], 'texture': '#wall'}}}
 
 
 def arm_window(arm):
@@ -114,17 +114,12 @@ def arm_window(arm):
 
 
 def arm_skin(arm):
-    """The closed arm's inner skin and the centre window's wall on that side; the wall hides under skin when the
-    centre is closed too."""
-    xs, zs = ARM_INNER[arm]
+    """The closed arm's skin and the centre window's wall on that side; the wall hides under skin when the centre is
+    closed too."""
+    xs, zs = ARM_TILE[arm]
     edge = {'north': wall_z(MID[0], MID, 'south'), 'south': wall_z(MID[1], MID, 'north'),
             'west': wall_x(MID[0], MID, 'east'), 'east': wall_x(MID[1], MID, 'west')}[arm]
     return [skin(xs, zs), edge]
-
-
-def rim(arm):
-    xs, zs = ARM_RIM[arm]
-    return [skin(xs, zs)]
 
 
 CORNERS = [skin(LO, LO), skin(HI, LO), skin(LO, HI), skin(HI, HI)]
@@ -167,7 +162,7 @@ for _face, (_x, _y) in FACE_TURN.items():
     assert turn('up', _x, _y) == _face, (_face, turn('up', _x, _y))
 
 
-def apply(name, face, uvlock=False):
+def apply(name, face):
     x, y = FACE_TURN[face]
     out = {'model': NS + name}
     if x:
@@ -200,7 +195,6 @@ def blockstate(vein, lumens):
             for prefix, extra in lumens:
                 parts.append({'when': dict(extra, **{side: 'true'}), 'apply': apply(prefix + '_arm_' + arm, face)})
             parts.append({'when': {side: 'false'}, 'apply': apply('vein_arm_skin_' + arm, face)})
-            parts.append({'when': {side: 'false', face: 'false'}, 'apply': apply('vein_rim_' + arm, face)})
     write(STATES / (vein + '.json'), {'multipart': parts})
 
 
@@ -218,7 +212,8 @@ def turn_element(element, x, y):
     out = {'from': [min(a[i], b[i]) for i in range(3)], 'to': [max(a[i], b[i]) for i in range(3)], 'faces': {}}
     for direction, face in element['faces'].items():
         face = dict(face)
-        face['cullface'] = turn(face['cullface'], x, y)
+        if 'cullface' in face:
+            face['cullface'] = turn(face['cullface'], x, y)
         out['faces'][turn(direction, x, y)] = face
     return out
 
@@ -230,7 +225,7 @@ def item(vein, prefix):
         if face == 'up':
             parts += [floor(MID, MID, False)] + [e for arm in ARMS for e in arm_window(arm)]
         else:
-            parts += [skin(MID, MID)] + [e for arm in ARMS for e in arm_skin(arm) + rim(arm)]
+            parts += [skin(MID, MID)] + [e for arm in ARMS for e in arm_skin(arm)]
         elements += [turn_element(e, x, y) for e in parts]
     textures = dict(SHARED, lumen=NS + LUMENS[prefix])
     write(ITEMS / (vein + '.json'), {'parent': 'minecraft:block/block', 'textures': dict(textures, particle=SKIN),
@@ -250,7 +245,7 @@ def main():
     write(MODELS / 'vein_center_skin.json', model(SHARED, [skin(MID, MID)]))
     for arm in ARMS:
         write(MODELS / ('vein_arm_skin_' + arm + '.json'), model(SHARED, arm_skin(arm)))
-        write(MODELS / ('vein_rim_' + arm + '.json'), model(SHARED, rim(arm)))
+        (MODELS / ('vein_rim_' + arm + '.json')).unlink(missing_ok=True)
     for prefix, texture in LUMENS.items():
         textures = dict(SHARED, lumen=NS + texture)
         write(MODELS / (prefix + '_vein_center.json'), model(textures, [floor(MID, MID, False)]))
@@ -262,7 +257,7 @@ def main():
     item('biomass_vein', 'biomass')
     item('fluid_vein', 'fluid')
     item('item_vein', 'item')
-    print('veins: 4 lumens, 1 wall, 30 part models, 3 blockstates, 3 items')
+    print('veins: 4 lumens, 1 wall, 26 part models, 3 blockstates, 3 items')
 
 
 if __name__ == '__main__':

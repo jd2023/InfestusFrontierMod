@@ -71,10 +71,12 @@ public final class VeinBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
-    /** True when {@code other} is a cell of the same vein, or a Vascular Junction for a fluid vein. */
+    /**
+     * True when {@code other} is a cell of the same vein. The links only shape the model: a vein still fills an organ
+     * or a Junction beside it, but its groove stops at that block's face.
+     */
     private boolean connects(BlockState other) {
-        if (other.getBlock() instanceof VeinBlock vein) return vein.carrier == carrier;
-        return carrier.isFluid() && other.is(LogisticsModule.VASCULAR_JUNCTION.get());
+        return other.getBlock() instanceof VeinBlock vein && vein.carrier == carrier;
     }
 
     @Override
