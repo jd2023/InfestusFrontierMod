@@ -25,6 +25,15 @@
   },
   "pages": [
     {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.contact.membrane_rack.name",
+      "images": [
+        "infestusfrontier:textures/book/membrane_rack.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.contact.membrane_rack.description"
+    },
+    {
       "type": "modonomicon:text",
       "title": "entry.infestusfrontier.contact.membrane_rack.name",
       "text": "entry.infestusfrontier.contact.membrane_rack.use"

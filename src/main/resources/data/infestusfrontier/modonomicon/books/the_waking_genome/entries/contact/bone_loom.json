@@ -25,6 +25,15 @@
   },
   "pages": [
     {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.contact.bone_loom.name",
+      "images": [
+        "infestusfrontier:textures/book/bone_loom.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.contact.bone_loom.description"
+    },
+    {
       "type": "modonomicon:text",
       "title": "entry.infestusfrontier.contact.bone_loom.name",
       "text": "entry.infestusfrontier.contact.bone_loom.use"

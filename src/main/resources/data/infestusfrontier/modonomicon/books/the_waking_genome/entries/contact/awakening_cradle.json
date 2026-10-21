@@ -25,6 +25,15 @@
   },
   "pages": [
     {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.contact.awakening_cradle.name",
+      "images": [
+        "infestusfrontier:textures/book/awakening_cradle.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.contact.awakening_cradle.description"
+    },
+    {
       "type": "modonomicon:text",
       "title": "entry.infestusfrontier.contact.awakening_cradle.name",
       "text": "entry.infestusfrontier.contact.awakening_cradle.use"

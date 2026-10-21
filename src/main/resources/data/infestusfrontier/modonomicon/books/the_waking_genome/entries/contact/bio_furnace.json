@@ -25,6 +25,15 @@
   },
   "pages": [
     {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.contact.bio_furnace.name",
+      "images": [
+        "infestusfrontier:textures/book/bio_furnace.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.contact.bio_furnace.description"
+    },
+    {
       "type": "modonomicon:text",
       "title": "entry.infestusfrontier.contact.bio_furnace.name",
       "text": "entry.infestusfrontier.contact.bio_furnace.use"

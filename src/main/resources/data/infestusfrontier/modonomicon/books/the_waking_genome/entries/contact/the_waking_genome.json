@@ -2,7 +2,12 @@
   "category": "infestusfrontier:contact",
   "name": "entry.infestusfrontier.contact.the_waking_genome.name",
   "description": "entry.infestusfrontier.contact.the_waking_genome.description",
-  "icon": "minecraft:book",
+  "icon": {
+    "item": "modonomicon:modonomicon",
+    "components": {
+      "modonomicon:book_id": "infestusfrontier:the_waking_genome"
+    }
+  },
   "x": 0,
   "y": 0,
   "pages": [

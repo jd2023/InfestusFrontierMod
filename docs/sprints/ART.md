@@ -166,13 +166,13 @@ Subject: one standard PLAIN GREY METAL BUCKET filled with thick olive yellow-gre
 
 ```text
 ART-004  The Sheet and the Plate have their icons, the Rack and the Loom their guide illustrations
-Status: ready
+Status: review
 Milestone: M2
 Owner: processing
 Kind: art
 Depends: the Rack commit on v4
 Read: docs/design/BLOCK_CATALOG.md#t0-05--membrane-rack and #t0-06--bone-loom, docs/design/ITEM_CATALOG.md (I002, I003), build/captures/demo/bowl.png and loom.png (the Rack stands at x=28, the Loom at x=30)
-Files: src/main/resources/assets/infestusfrontier/textures/item/membrane_sheet.png and bone_plate.png, src/main/resources/assets/infestusfrontier/textures/book/membrane_rack.png and bone_loom.png, the_waking_genome/entries/contact/membrane_rack.json and bone_loom.json, CREDITS.txt
+Files: src/main/resources/assets/infestusfrontier/textures/item/membrane_sheet.png and bone_plate.png, src/main/resources/assets/infestusfrontier/textures/book/membrane_rack.png and bone_loom.png, the_waking_genome/entries/contact/membrane_rack.json and bone_loom.json, textures/book/*.png and entries/contact/the_waking_genome.json for step 4, CREDITS.txt
 Do:
   1. membrane_sheet.png, 32x32: one pale pinkish stretched skin sheet, slightly curled at one corner, thin dark outline, lit top-left. Replaces the planner's placeholder; export with scripts/texture.py --size 32 --colors 0.
   2. bone_plate.png, 32x32: one curved ivory plate with a faint rib line, thin dark outline, lit top-left. Same export.
@@ -190,7 +190,7 @@ Evidence: visual
 
 ```text
 ART-005  The eight armor pieces have icons and worn textures, the Cradle its guide illustration
-Status: ready
+Status: review
 Milestone: M2
 Owner: equipment
 Kind: art
@@ -257,7 +257,7 @@ Use case: stylized-concept. Asset type: source for a 32x32 voxel-game item icon.
 
 ## ART-006 — Bio-Furnace illustration
 
-Status: open. Owner of the asset: Astra.
+Status: review. Owner of the asset: Astra.
 Files: src/main/resources/assets/infestusfrontier/textures/book/bio_furnace.png, the_waking_genome/entries/contact/bio_furnace.json, CREDITS.txt
 
 - bio_furnace.png, a 200x200 canvas with a 200x100 vignette like the other Contact illustrations: a plum stomach-shaped organ on a flesh foot, a dark mouth on top, an orange ember band glowing across its middle, a faint shimmer of heat above it, on a small island of substrate. Then the entry's first page becomes a modonomicon:image page like the others.
@@ -265,7 +265,7 @@ Files: src/main/resources/assets/infestusfrontier/textures/book/bio_furnace.png,
 
 ## ART-007 — Treatment icons
 
-Status: open. Owner of the asset: Astra.
+Status: review. Owner of the asset: Astra.
 Files: src/main/resources/assets/infestusfrontier/textures/item/{fusion_binder,elastic_gel,rooting_gel,capillary_gel,contractile_fiber,filter_membrane,sealing_resin,synaptic_gel}.png, CREDITS.txt
 
 - Eight 32x32 icons, `--size 32 --colors 0`, one family with the Spore Culture icon: same outline weight, light from the upper left. Fusion Binder: a pale amber dollop in a thin membrane skin. Elastic Gel: a wobbling green-grey bead. Rooting Gel: an olive drop with a tiny root thread hanging from it. Capillary Gel: a bright green bead with fine red capillaries. Contractile Fiber: a coiled pink-red muscle strand. Filter Membrane: a square of sandy membrane with pores. Sealing Resin: a dark amber tear with a sheen. Synaptic Gel: a red bead with a violet spark inside.
