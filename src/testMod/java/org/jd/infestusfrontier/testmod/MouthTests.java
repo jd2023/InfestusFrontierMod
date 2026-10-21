@@ -116,6 +116,44 @@ public final class MouthTests {
         });
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 300)
+    public static void theOneMouthThatAllowsAnItemGetsItHoweverManyComeFirst(GameTestHelper h) {
+        // nineteen takers in a 5 by 4 block; only the farthest allows bones, the rest list sticks
+        BlockPos source = new BlockPos(1, Y, 1);
+        BlockPos farthest = new BlockPos(5, Y, 4);
+        grid(h, source);
+        store(h, source, new ItemStack(Items.BONE, 8));
+        for (int x = 1; x <= 5; x++)
+            for (int z = 1; z <= 4; z++) {
+                BlockPos at = new BlockPos(x, Y, z);
+                if (!at.equals(source) && !at.equals(farthest)) configure(h, at, control -> control.list(Items.STICK));
+            }
+        h.runAfterDelay(200, () -> {
+            h.assertValueEqual(count(h, farthest, Items.BONE), 8, "the bones reached the last Mouth in order");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 400)
+    public static void fullStoresFirstInOrderDoNotHideAnEmptyOneBehindThem(GameTestHelper h) {
+        BlockPos source = new BlockPos(1, Y, 1);
+        BlockPos farthest = new BlockPos(5, Y, 4);
+        grid(h, source);
+        store(h, source, new ItemStack(Items.BONE, 8));
+        for (int x = 1; x <= 5; x++)
+            for (int z = 1; z <= 4; z++) {
+                BlockPos at = new BlockPos(x, Y, z);
+                if (at.equals(source) || at.equals(farthest)) continue;
+                ChestBlockEntity full = (ChestBlockEntity) h.getBlockEntity(at.above());
+                for (int slot = 0; slot < full.getContainerSize(); slot++)
+                    full.setItem(slot, new ItemStack(Items.STONE, 64));
+            }
+        h.runAfterDelay(300, () -> {
+            h.assertValueEqual(count(h, farthest, Items.BONE), 8, "the bones reached the one store with room");
+            h.succeed();
+        });
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void withNoMouthThatTakesNothingLeavesTheStore(GameTestHelper h) {
         store(h, cell(1), new ItemStack(Items.BONE, 16));
@@ -590,6 +628,16 @@ public final class MouthTests {
 
     private static void mouth(GameTestHelper h, BlockPos at, MouthMode mode) {
         h.setBlock(at, mouthState(mode));
+    }
+
+    /** A giving Mouth at {@code source} and taking Mouths on the rest of a 5 by 4 block, each under a chest. */
+    private static void grid(GameTestHelper h, BlockPos source) {
+        for (int x = 1; x <= 5; x++)
+            for (int z = 1; z <= 4; z++) {
+                BlockPos at = new BlockPos(x, Y, z);
+                mouth(h, at, at.equals(source) ? MouthMode.OUTPUT : MouthMode.INTAKE);
+                store(h, at);
+            }
     }
 
     private static BlockState mouthState(MouthMode mode) {

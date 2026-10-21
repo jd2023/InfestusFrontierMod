@@ -95,6 +95,9 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
     private int offers;
 
     private int sourceCursor;
+    /** Where the next search for a taker starts in the ordered takers; carried from pulse to pulse. */
+    private int cursor;
+
     private int turn;
 
     MouthBlockEntity(BlockPos pos, BlockState state) {
@@ -233,18 +236,16 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
                     : Delivery.outputAllowance(amount, count(source, offered), offered.getCount());
             if (allowed == 0) continue;
             ItemStack wanted = offered.copyWithCount(allowed);
-            for (Route route : order) {
-                if (offers == 0) break;
-                int room = offer(route, wanted);
-                if (room == 0) continue;
-                ItemStack taken = source.extractItem(slot, room, false);
-                if (taken.isEmpty()) break;
-                packets.add(new Packet(taken, route.pos(), now + travel(route)));
-                sourceCursor = slot;
-                turn++;
-                setChanged();
-                return true;
-            }
+            Optional<Taker> taker = taker(order, wanted);
+            if (taker.isEmpty()) continue;
+            ItemStack taken = source.extractItem(slot, taker.get().room(), false);
+            if (taken.isEmpty()) continue;
+            packets.add(new Packet(
+                    taken, taker.get().route().pos(), now + travel(taker.get().route())));
+            sourceCursor = slot;
+            turn++;
+            setChanged();
+            return true;
         }
         sourceCursor = (sourceCursor + look) % slots;
         return false;
@@ -254,19 +255,37 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         return (long) Math.max(1, route.distance()) * TICKS_PER_CELL;
     }
 
-    /** One simulated insert from this pulse's budget: how many of {@code stack} the route's Mouth takes now. */
-    private int offer(Route route, ItemStack stack) {
-        if (offers <= 0) return 0;
-        offers--;
-        return destination(route.pos()).map(d -> d.room(stack)).orElse(0);
+    /** A taker that accepted {@code room} items in a simulated insert. */
+    private record Taker(Route route, int room) {}
+
+    /**
+     * The first taker in {@code order}, from {@link #cursor} on and wrapping, whose store takes some of {@code stack}
+     * now. A taker whose mode or filter refuses the item costs nothing; asking a store costs one offer. When the
+     * budget runs out the cursor keeps its place, so the next pulse asks the takers after it: every taker is asked
+     * within a few pulses however many refuse ahead of it. An acceptance sends the cursor back to the top.
+     */
+    private Optional<Taker> taker(List<Route> order, ItemStack stack) {
+        int size = order.size();
+        if (size == 0) return Optional.empty();
+        int start = Math.floorMod(cursor, size);
+        for (int step = 0; step < size && offers > 0; step++) {
+            int index = (start + step) % size;
+            Route route = order.get(index);
+            Optional<MouthBlockEntity> mouth = destination(route.pos());
+            if (mouth.isEmpty() || !mouth.get().wants(stack)) continue;
+            offers--;
+            cursor = (index + 1) % size;
+            int room = mouth.get().room(stack);
+            if (room > 0) {
+                cursor = 0;
+                return Optional.of(new Taker(route, room));
+            }
+        }
+        return Optional.empty();
     }
 
     private Optional<Route> firstAccepting(ItemStack stack) {
-        for (Route route : ordered()) {
-            if (offers <= 0) return Optional.empty();
-            if (offer(route, stack) > 0) return Optional.of(route);
-        }
-        return Optional.empty();
+        return taker(ordered(), stack).map(Taker::route);
     }
 
     private boolean isRoute(BlockPos pos) {
@@ -333,6 +352,11 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
     // --- this Mouth as a destination ---
 
     /** How many of {@code stack} this Mouth's store takes now, when its mode takes; nothing changes. */
+    /** Whether this Mouth's mode and filter let {@code stack} in; its store is not asked. */
+    boolean wants(ItemStack stack) {
+        return unreadable.isEmpty() && mode().takes() && permits(stack);
+    }
+
     int room(ItemStack stack) {
         if (unreadable.isPresent() || !mode().takes() || !permits(stack)) return 0;
         IItemHandler store = partner();
