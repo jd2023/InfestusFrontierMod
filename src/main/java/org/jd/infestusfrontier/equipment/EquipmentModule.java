@@ -1,5 +1,6 @@
 package org.jd.infestusfrontier.equipment;
 
+import com.mojang.logging.LogUtils;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.core.component.DataComponentType;
@@ -8,26 +9,40 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
+import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
+import org.slf4j.Logger;
 
 /**
  * Armor piece identity and fuel. Four dormant pieces are crafted from rotten flesh (G0 in ARMOR_EVOLUTION.md); the
- * Cradle awakens each into its awakened form (G1), which carries a {@link #RESERVE} of biomass.
+ * Cradle awakens each into its awakened form (G1), which carries a {@link #RESERVE} of biomass. The Fuel Papilla
+ * fills that reserve from the ground.
  */
 public final class EquipmentModule {
+    static final Logger LOGGER = LogUtils.getLogger();
+    private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(InfestusFrontier.MOD_ID);
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(InfestusFrontier.MOD_ID);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
+            DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, InfestusFrontier.MOD_ID);
     private static final DeferredRegister<ArmorMaterial> MATERIALS =
             DeferredRegister.create(Registries.ARMOR_MATERIAL, InfestusFrontier.MOD_ID);
     private static final DeferredRegister.DataComponents COMPONENTS =
@@ -49,6 +64,22 @@ public final class EquipmentModule {
             MATERIALS.register("dormant", () -> material("dormant", 0, 1, 1, 0));
     public static final DeferredHolder<ArmorMaterial, ArmorMaterial> AWAKENED =
             MATERIALS.register("awakened", () -> material("awakened", 1, 2, 2, 1));
+
+    /** The refuelling cell: a substrate cell that fills the worn pieces of whoever stands on it. */
+    public static final DeferredBlock<FuelPapillaBlock> FUEL_PAPILLA = BLOCKS.registerBlock(
+            "fuel_papilla",
+            FuelPapillaBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_PINK)
+                    .strength(0.6F)
+                    .sound(SoundType.GRAVEL));
+
+    public static final DeferredItem<BlockItem> FUEL_PAPILLA_ITEM = ITEMS.registerSimpleBlockItem(FUEL_PAPILLA);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FuelPapillaBlockEntity>> FUEL_PAPILLA_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "fuel_papilla",
+                    () -> BlockEntityType.Builder.of(FuelPapillaBlockEntity::new, FUEL_PAPILLA.get())
+                            .build(null));
 
     public static final DeferredItem<ArmorItem> DORMANT_HOOD = dormant("dormant_hood", ArmorItem.Type.HELMET);
     public static final DeferredItem<ArmorItem> DORMANT_THORAX = dormant("dormant_thorax", ArmorItem.Type.CHESTPLATE);
@@ -99,13 +130,22 @@ public final class EquipmentModule {
     public static void register(IEventBus modBus) {
         MATERIALS.register(modBus);
         COMPONENTS.register(modBus);
+        BLOCKS.register(modBus);
         ITEMS.register(modBus);
-        modBus.addListener((RegisterCapabilitiesEvent event) -> event.registerItem(
-                Capabilities.FluidHandler.ITEM,
-                (stack, context) -> new ReserveHandler(stack),
-                AWAKENED_HOOD.get(),
-                AWAKENED_THORAX.get(),
-                AWAKENED_LEGWRAPS.get(),
-                AWAKENED_TREADS.get()));
+        BLOCK_ENTITIES.register(modBus);
+        modBus.addListener((RegisterCapabilitiesEvent event) -> {
+            event.registerItem(
+                    Capabilities.FluidHandler.ITEM,
+                    (stack, context) -> new ReserveHandler(stack),
+                    AWAKENED_HOOD.get(),
+                    AWAKENED_THORAX.get(),
+                    AWAKENED_LEGWRAPS.get(),
+                    AWAKENED_TREADS.get());
+            event.registerBlockEntity(BiomassCapabilities.BLOCK, FUEL_PAPILLA_ENTITY.get(), (papilla, side) -> papilla);
+            event.registerBlockEntity(
+                    Capabilities.FluidHandler.BLOCK,
+                    FUEL_PAPILLA_ENTITY.get(),
+                    (papilla, side) -> BiomassFluids.handler(papilla));
+        });
     }
 }

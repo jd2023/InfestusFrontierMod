@@ -89,9 +89,9 @@ Names are project contracts. Create a module with its first story, not earlier.
 | ecology | Substrate maturity, function, lining, reinforcement, dye, deliberate conversion |
 | cultivation | Crop and tree growth, allocated harvest, planting reserves; `CultivationTissueBlock` answers NeoForge's `canSustainPlant` and `isFertile`; a `PlotOrganBlockEntity` acts once a pulse on its `Plot`; the Seed Pouch's `surplus()` is what pullers see |
 | logistics | Routes, ports, filters, reservations and movement of items, fluids and biomass; a vein cell (`VeinBlock`, one `Carrier`) holds one packet and pushes it on by scheduled ticks, never pulling; the Vascular Junction pumps through its six `Port`s; `api.PortSwitch` is what the probe cycles; a Mouth (`MouthBlock`) is a substrate cell under a store; Mouths and Item Veins form an item network, and a Mouth that gives routes each packet to a Mouth that takes (`core.logistics.Delivery`, `Reach`), under a per-dimension quota; a `LobeBlock` (Feeding or Yield) joins the organ it faces and is that organ's one-way item handler, as many as `Organs.stage` allows |
-| control | Signals, interlocks, selection, finite schedules |
+| control | Signals, interlocks, selection, finite schedules; the Sensor Polyp reads one faced block into its `power` state |
 | genetics | Samples, species and quality counts, genome coverage, native eligibility, cultured stock |
-| equipment | Armor piece identity, fusion tree, counters, mutations, fuel, death preservation |
+| equipment | Armor piece identity, fusion tree, counters, mutations, fuel, death preservation; the Fuel Papilla fills worn pieces from the ground; the Fuel Papilla fills worn pieces from the ground |
 | portable | Carry Sac and pouch slots; refuses nesting; adds no armor abilities |
 | mineral | Workpiece stages, treatment, fracture, dust and tailings |
 | excavation | Finite survey and cut plans, safe stepping, access and light |

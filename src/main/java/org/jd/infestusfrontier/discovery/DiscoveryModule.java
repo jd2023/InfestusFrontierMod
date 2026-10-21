@@ -13,6 +13,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.control.ControlModule;
 import org.jd.infestusfrontier.cultivation.CultivationModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.equipment.EquipmentModule;
@@ -78,6 +79,8 @@ public final class DiscoveryModule {
                         output.accept(CultivationModule.PLANTING_PROBOSCIS_ITEM.get());
                         output.accept(CultivationModule.HARVEST_COROLLA_ITEM.get());
                         output.accept(ProcessingModule.COMPOST_GLAND_ITEM.get());
+                        output.accept(ControlModule.SENSOR_POLYP_ITEM.get());
+                        output.accept(EquipmentModule.FUEL_PAPILLA_ITEM.get());
                         for (var piece : List.of(
                                 EquipmentModule.DORMANT_HOOD,
                                 EquipmentModule.DORMANT_THORAX,

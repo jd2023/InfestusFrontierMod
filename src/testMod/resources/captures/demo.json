@@ -116,7 +116,13 @@
     "setblock 63 -60 -36 infestusfrontier:feeding_lobe[facing=east]",
     "setblock 65 -60 -36 infestusfrontier:yield_lobe[facing=west]",
     "setblock 67 -60 -36 chest[facing=north]",
-    "setblock 62 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Lobes\"','\"feeding lobe in\"','\"yield lobe out\"','\"plan the floor\"']}}"
+    "setblock 62 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Lobes\"','\"feeding lobe in\"','\"yield lobe out\"','\"plan the floor\"']}}",
+    "setblock 51 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 51 -60 -36 infestusfrontier:sensor_polyp[facing=west,power=0]",
+    "setblock 52 -60 -36 redstone_lamp",
+    "setblock 52 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Sensor Polyp\"','\"reads the chest\"','\"lights the lamp\"','\"comparator too\"']}}",
+    "setblock 59 -61 -36 infestusfrontier:fuel_papilla{tank:{stored:800,reserved:0,capacity:1000}}",
+    "setblock 59 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Fuel Papilla\"','\"stand on it in\"','\"awakened armor\"','\"10 BU a second\"']}}"
   ],
   "views": [
     {
@@ -752,6 +758,34 @@
       "gui": true,
       "name": "book_yield_lobe",
       "book": "infestusfrontier:circulation/yield_lobe"
+    },
+    {
+      "name": "polyp",
+      "x": 51.5,
+      "y": -59,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 20
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_sensor_polyp",
+      "book": "infestusfrontier:circulation/sensor_polyp"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_fuel_papilla",
+      "book": "infestusfrontier:circulation/fuel_papilla"
     }
   ]
 }

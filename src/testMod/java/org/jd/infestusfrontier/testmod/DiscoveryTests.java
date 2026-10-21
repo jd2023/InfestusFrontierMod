@@ -130,7 +130,9 @@ public final class DiscoveryTests {
                 "harvest_corolla",
                 "compost_gland",
                 "feeding_lobe",
-                "yield_lobe"))
+                "yield_lobe",
+                "sensor_polyp",
+                "fuel_papilla"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();

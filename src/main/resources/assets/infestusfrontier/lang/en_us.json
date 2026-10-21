@@ -242,5 +242,14 @@
   "entry.infestusfrontier.circulation.yield_lobe.name": "Yield Lobe",
   "entry.infestusfrontier.circulation.yield_lobe.description": "An organ's mouth for products",
   "entry.infestusfrontier.circulation.yield_lobe.use": "Place it on a foundation beside an organ; it joins it. It gives what the organ has finished and never its ingredients. Stand it on a Mouth set to output and the network carries the products away. Feeding and Yield Lobes make an organ a small factory: plan where they and their Mouths go.",
-  "entry.infestusfrontier.circulation.yield_lobe.craft": "An Organ Bud, a Membrane Sheet and a Bone Plate."
+  "entry.infestusfrontier.circulation.yield_lobe.craft": "An Organ Bud, a Membrane Sheet and a Bone Plate.",
+  "block.infestusfrontier.sensor_polyp": "Sensor Polyp",
+  "block.infestusfrontier.fuel_papilla": "Fuel Papilla",
+  "entry.infestusfrontier.circulation.sensor_polyp.name": "Sensor Polyp",
+  "entry.infestusfrontier.circulation.sensor_polyp.description": "An eye that reads how full a block is",
+  "entry.infestusfrontier.circulation.sensor_polyp.craft": "An Organ Bud, a comparator and a spider eye.",
+  "entry.infestusfrontier.circulation.fuel_papilla.name": "Fuel Papilla",
+  "entry.infestusfrontier.circulation.fuel_papilla.description": "Stand on it to refuel",
+  "entry.infestusfrontier.circulation.fuel_papilla.use": "A substrate cell with a pale nipple. It holds 1000 BU from a bucket, a vein or a junction. Stand on it wearing awakened pieces and each piece fills by 10 BU a second until it is full or the cell is dry. Organs stand on it like on substrate. No screen; the probe reads it.",
+  "entry.infestusfrontier.circulation.fuel_papilla.craft": "Living Substrate, Capillary Gel and a Membrane Sheet."
 }

@@ -13,8 +13,10 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.jd.infestusfrontier.control.ControlModule;
 import org.jd.infestusfrontier.cultivation.CultivationModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.equipment.EquipmentModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
@@ -75,6 +77,11 @@ public final class DiscoveryDataTests {
         resolves(h, List.of(Items.COMPOSTER, bud, sheet), ProcessingModule.COMPOST_GLAND_ITEM.get());
         resolves(h, List.of(bud, sheet, Items.SLIME_BALL), LogisticsModule.FEEDING_LOBE_ITEM.get());
         resolves(h, List.of(bud, sheet, ProcessingModule.BONE_PLATE.get()), LogisticsModule.YIELD_LOBE_ITEM.get());
+        resolves(h, List.of(bud, Items.COMPARATOR, Items.SPIDER_EYE), ControlModule.SENSOR_POLYP_ITEM.get());
+        resolves(
+                h,
+                List.of(EcologyModule.LIVING_SUBSTRATE_ITEM.get(), LogisticsModule.CAPILLARY_GEL.get(), sheet),
+                EquipmentModule.FUEL_PAPILLA_ITEM.get());
         h.succeed();
     }
 
@@ -104,7 +111,10 @@ public final class DiscoveryDataTests {
                 "harvest_corolla",
                 "compost_gland",
                 "feeding_lobe",
-                "yield_lobe")) {
+                "yield_lobe",
+
+                "sensor_polyp",
+                "fuel_papilla")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));

@@ -1,0 +1,38 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.fuel_papilla.name",
+  "description": "entry.infestusfrontier.circulation.fuel_papilla.description",
+  "icon": "infestusfrontier:fuel_papilla",
+  "x": 2,
+  "y": 2,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/biomass_vein"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/fuel_papilla"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.fuel_papilla.name",
+      "text": "entry.infestusfrontier.circulation.fuel_papilla.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:fuel_papilla",
+      "text": "entry.infestusfrontier.circulation.fuel_papilla.craft"
+    }
+  ]
+}
