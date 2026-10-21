@@ -108,7 +108,7 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
     }
 
     static void serverTick(Level level, BlockPos pos, BlockState state, PlotOrganBlockEntity organ) {
-        if (--organ.nextTry > 0) return;
+        if (organ.nextTry > 0 && --organ.nextTry > 0) return;
         if (organ.unreadable.isPresent() || !Organs.hasFoundation(level, pos) || !(level instanceof ServerLevel server))
             return;
         boolean worked = organ.canPay() && organ.act(server);
@@ -154,11 +154,15 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
         return apply(tank.drain(amount), simulate);
     }
 
+    /**
+     * Applies a tank change. Biomass arriving wakes a resting organ within one pulse and never shortens a pulse
+     * already counting down, so a Junction topping the tank up cannot hurry the organ.
+     */
     private Outcome<BiomassTank> apply(Outcome<BiomassTank> change, boolean simulate) {
         if (unreadable.isPresent()) return Outcome.refused(Persistence.CORRUPT);
         if (!simulate && change instanceof Outcome.Done<BiomassTank> done) {
             tank = done.value();
-            nextTry = Math.min(nextTry, PULSE_TICKS); // wakes a resting organ; never shortens a pulse
+            nextTry = Math.min(nextTry, PULSE_TICKS);
             setChanged();
         }
         return change;

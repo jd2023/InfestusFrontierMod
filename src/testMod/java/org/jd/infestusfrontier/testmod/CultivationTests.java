@@ -131,16 +131,17 @@ public final class CultivationTests {
                 .insertItem(0, new ItemStack(Items.WHEAT_SEEDS, 8), false);
         Player fuel = EcologyTests.holding(h, GameType.SURVIVAL, StorageModule.BIOMASS_BUCKET.get(), 1);
         EcologyTests.use(h, fuel, ORGAN, Direction.UP);
-        BlockPos junctionGround = CENTER.east().east();
-        BlockPos tank = junctionGround.east().above();
-        h.setBlock(junctionGround, EcologyTests.mature());
-        h.setBlock(junctionGround.east(), EcologyTests.mature());
+        // the junction stands beside the planter on the plot's east cell, the Bladder beyond it
+        BlockPos junction = ORGAN.east();
+        BlockPos tank = junction.east();
+        h.setBlock(junction.below(), EcologyTests.mature());
+        h.setBlock(tank.below(), EcologyTests.mature());
         h.setBlock(tank, StorageModule.BIOMASS_BLADDER.get());
         h.getLevel()
                 .getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(tank), Direction.UP)
                 .fill(BiomassFluids.of(Biomass.of(4000)), IFluidHandler.FluidAction.EXECUTE);
         h.setBlock(
-                junctionGround.above(),
+                junction,
                 LogisticsModule.VASCULAR_JUNCTION
                         .get()
                         .defaultBlockState()
