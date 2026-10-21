@@ -479,6 +479,9 @@ public final class MouthTests {
         long[] at = new long[2];
         h.startSequence()
                 .thenWaitUntil(() -> h.assertFalse(level.hasChunkAt(end), "the far chunk unloaded"))
+                // scheduled block ticks run only where the chunk's entities have loaded, which a busy server may delay
+                .thenWaitUntil(() -> h.assertTrue(
+                        level.areEntitiesLoaded(ChunkPos.asLong(start)), "the source chunk ticks its scheduled ticks"))
                 .thenExecute(() -> at[0] = level.getGameTime())
                 .thenExecute(() -> level.setBlockAndUpdate(start, mouthState(MouthMode.OUTPUT)))
                 .thenIdle(60)
@@ -496,14 +499,16 @@ public final class MouthTests {
                         level.hasChunkAt(end)
                                 && level.getBlockEntity(end.above()) instanceof ChestBlockEntity chest
                                 && chest.getItem(0).getCount() == 8,
-                        "found and served once the chunk loaded, with no network edited; unloaded at " + at[0]
+                        "found and served once the chunk loaded, with no network edited; ready at " + at[0]
                                 + ", forced at " + at[1] + ", now " + level.getGameTime() + ", far loaded "
                                 + level.hasChunkAt(end) + ", source holds "
                                 + ((ChestBlockEntity) level.getBlockEntity(start.above()))
                                         .getItem(0)
                                         .getCount()
                                 + ", pulse scheduled "
-                                + level.getBlockTicks().hasScheduledTick(start, LogisticsModule.MOUTH.get())))
+                                + level.getBlockTicks().hasScheduledTick(start, LogisticsModule.MOUTH.get())
+                                + ", source chunk entity-ticking " + level.isPositionEntityTicking(start)
+                                + ", path " + path(level, start, end)))
                 .thenExecute(() -> {
                     level.setChunkForced(first.x, first.z, false);
                     level.setChunkForced(last.x, last.z, false);
@@ -631,6 +636,17 @@ public final class MouthTests {
                 h.getBlockState(junction).getValue(VascularJunctionBlock.PORT.get(Direction.NORTH)) != Port.CLOSED,
                 "the clicked port moved on");
         h.succeed();
+    }
+
+    /** The first cell from {@code start} to {@code end} along x that is not what the route needs, or "whole". */
+    private static String path(ServerLevel level, BlockPos start, BlockPos end) {
+        for (BlockPos at = start.east(); !at.equals(end); at = at.east()) {
+            if (!level.hasChunkAt(at)) return "unloaded at " + at.getX();
+            if (!level.getBlockState(at).is(LogisticsModule.ITEM_VEIN.get()))
+                return level.getBlockState(at) + " at " + at.getX();
+        }
+        return "whole; end " + level.getBlockState(end) + " with " + level.getBlockEntity(end) + ", store "
+                + level.getBlockEntity(end.above());
     }
 
     // --- fixtures ---
