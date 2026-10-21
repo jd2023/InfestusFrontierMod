@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
@@ -105,9 +106,44 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
         super(ProcessingModule.DIGESTIVE_SAC_ENTITY.get(), pos, state);
     }
 
-    /** The feed slot, for the screen, pipes and hoppers. */
+    /** The feed slot, for the screen. */
     ItemStackHandler feed() {
         return feed;
+    }
+
+    /** The feed slot as hoppers, pipes and Mouths see it: they put feed in and never take it out. */
+    IItemHandler port() {
+        return new IItemHandler() {
+            @Override
+            public int getSlots() {
+                return feed.getSlots();
+            }
+
+            @Override
+            public ItemStack getStackInSlot(int slot) {
+                return feed.getStackInSlot(slot);
+            }
+
+            @Override
+            public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+                return feed.insertItem(slot, stack, simulate);
+            }
+
+            @Override
+            public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                return ItemStack.EMPTY;
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return feed.getSlotLimit(slot);
+            }
+
+            @Override
+            public boolean isItemValid(int slot, ItemStack stack) {
+                return feed.isItemValid(slot, stack);
+            }
+        };
     }
 
     int percent() {

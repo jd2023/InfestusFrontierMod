@@ -180,7 +180,7 @@
   "block.infestusfrontier.mouth": "Mouth",
   "entry.infestusfrontier.circulation.mouth.name": "Mouth",
   "entry.infestusfrontier.circulation.mouth.description": "Connect a store to the living workshop",
-  "entry.infestusfrontier.circulation.mouth.use": "Set it into the floor under a chest, a barrel or an organ: that store is its partner. Item Veins and Mouths touching its sides make its network. Intake fills the store; output sends its items to the Mouths that take them, highest priority first, then nearest. Both suits an organ: it takes ingredients and gives products. Use the Mouth, or the Synaptic Probe on its store, to set it.",
+  "entry.infestusfrontier.circulation.mouth.use": "Set it in the floor under a chest or an organ: that is its store. Item Veins and Mouths touching its sides make its network. Intake fills the store. Output sends its items to the Mouths that take them, highest priority, then nearest. Both suits an organ: ingredients in, products out. Use the Mouth, or the probe on its store, to set it.",
   "entry.infestusfrontier.circulation.mouth.craft": "One Bud, one hopper and one Membrane Sheet. Nine filter slots allow or deny items. An amount keeps that many in an output's store, or fills an intake's store up to it.",
   "gui.infestusfrontier.mouth.filter": "Filter",
   "gui.infestusfrontier.mouth.filter.story": "Click an item into a slot to list it; click a slot with an empty hand to clear it. An empty filter passes everything.",

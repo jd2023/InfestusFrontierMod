@@ -10,6 +10,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -21,16 +22,25 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.TickQuota;
@@ -39,7 +49,10 @@ import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.logistics.MouthBlock;
 import org.jd.infestusfrontier.logistics.MouthMenu;
 import org.jd.infestusfrontier.logistics.MouthMode;
+import org.jd.infestusfrontier.logistics.Port;
+import org.jd.infestusfrontier.logistics.VascularJunctionBlock;
 import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
+import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 
@@ -50,6 +63,7 @@ import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
  */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
+@EventBusSubscriber(modid = "infestusfrontier_tests", bus = EventBusSubscriber.Bus.MOD)
 public final class MouthTests {
     private static final int Y = 1;
     /** When a freshly placed output Mouth sends its first packet. */
@@ -83,6 +97,23 @@ public final class MouthTests {
         h.assertTrue(h.getBlockState(cell(1)).getValue(PipeBlock.EAST), "the vein beside joins");
         h.assertTrue(h.getBlockState(cell(2)).getValue(PipeBlock.WEST), "both ways");
         h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    public static void aMouthSwitchedToOutputOnItsScreenStartsSending(GameTestHelper h) {
+        store(h, cell(1), new ItemStack(Items.BONE, 8));
+        store(h, cell(3));
+        mouth(h, cell(1), MouthMode.INTAKE);
+        veins(h, 2, 2);
+        mouth(h, cell(3), MouthMode.INTAKE);
+        h.runAfterDelay(20, () -> {
+            configure(h, cell(1), control -> control.press(MouthMenu.MODE_BUTTON, 1));
+            h.assertTrue(h.getBlockState(cell(1)).getValue(MouthBlock.MODE) == MouthMode.OUTPUT, "now output");
+            h.runAfterDelay(60, () -> {
+                h.assertValueEqual(count(h, cell(3), Items.BONE), 8, "the switched Mouth sent its store");
+                h.succeed();
+            });
+        });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
@@ -346,6 +377,211 @@ public final class MouthTests {
         });
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "mouth_boundary")
+    public static void aDoubleChestAcrossAnUnloadedChunkIsNoStore(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos origin = h.absolutePos(BlockPos.ZERO);
+        // x ends in 15: the chest's other half would stand in the next chunk, which nothing has loaded
+        BlockPos edge = new BlockPos((origin.getX() & ~15) + 160015, 80, (origin.getZ() & ~15) + 160008);
+        level.getChunkAt(edge);
+        int quiet = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+        for (MouthMode atTheEdge : new MouthMode[] {MouthMode.OUTPUT, MouthMode.INTAKE}) {
+            BlockPos edgeMouth = edge.south(atTheEdge == MouthMode.OUTPUT ? 0 : 4);
+            BlockPos other = edgeMouth.west(2);
+            h.assertFalse(level.hasChunkAt(edgeMouth.east()), "the next chunk starts unloaded");
+            level.setBlock(
+                    edgeMouth.above(),
+                    Blocks.CHEST
+                            .defaultBlockState()
+                            .setValue(ChestBlock.FACING, Direction.NORTH)
+                            .setValue(ChestBlock.TYPE, ChestType.LEFT),
+                    quiet);
+            level.setBlock(other.above(), Blocks.CHEST.defaultBlockState(), quiet);
+            level.setBlock(edgeMouth, mouthState(atTheEdge), quiet);
+            level.setBlock(edgeMouth.west(), LogisticsModule.ITEM_VEIN.get().defaultBlockState(), quiet);
+            MouthMode across = atTheEdge == MouthMode.OUTPUT ? MouthMode.INTAKE : MouthMode.OUTPUT;
+            level.setBlock(other, mouthState(across), quiet);
+            BlockPos giver = atTheEdge == MouthMode.OUTPUT ? edgeMouth : other;
+            BlockPos taker = atTheEdge == MouthMode.OUTPUT ? other : edgeMouth;
+            ChestBlockEntity source = (ChestBlockEntity) level.getBlockEntity(giver.above());
+            ChestBlockEntity target = (ChestBlockEntity) level.getBlockEntity(taker.above());
+            source.setItem(0, new ItemStack(Items.BONE, 8));
+            level.getBlockState(giver).tick(level, giver, level.random);
+            h.assertFalse(level.hasChunkAt(edgeMouth.east()), "no lookup loaded the other half");
+            h.assertValueEqual(source.getItem(0).getCount(), 8, "the source keeps its items");
+            h.assertTrue(target.isEmpty(), "the target got nothing");
+        }
+        h.succeed();
+    }
+
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "mouth_unload",
+            timeoutTicks = 900)
+    public static void aRouteCutByAnUnloadedChunkIsFoundWhenTheChunkLoads(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos origin = h.absolutePos(BlockPos.ZERO);
+        BlockPos start = new BlockPos((origin.getX() & ~15) + 192002, 80, (origin.getZ() & ~15) + 192008);
+        // the destination stands three chunks east: once only the first chunk is forced, it is not loaded
+        BlockPos end = start.east(48);
+        ChunkPos first = new ChunkPos(start);
+        ChunkPos last = new ChunkPos(end);
+        for (int x = first.x; x <= last.x; x++) level.setChunkForced(x, first.z, true);
+        level.setBlockAndUpdate(start.above(), Blocks.CHEST.defaultBlockState());
+        ((ChestBlockEntity) level.getBlockEntity(start.above())).setItem(0, new ItemStack(Items.BONE, 8));
+        level.setBlockAndUpdate(start, mouthState(MouthMode.CLOSED));
+        for (int x = 1; x < 48; x++)
+            level.setBlockAndUpdate(
+                    start.east(x), LogisticsModule.ITEM_VEIN.get().defaultBlockState());
+        level.setBlockAndUpdate(end, mouthState(MouthMode.INTAKE));
+        level.setBlockAndUpdate(end.above(), Blocks.CHEST.defaultBlockState());
+        for (int x = first.x + 1; x <= last.x; x++) level.setChunkForced(x, first.z, false);
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertFalse(level.hasChunkAt(end), "the far chunk unloaded"))
+                .thenExecute(() -> level.setBlockAndUpdate(start, mouthState(MouthMode.OUTPUT)))
+                .thenIdle(60)
+                .thenExecute(() -> h.assertValueEqual(
+                        ((ChestBlockEntity) level.getBlockEntity(start.above()))
+                                .getItem(0)
+                                .getCount(),
+                        8,
+                        "no destination while its chunk is unloaded"))
+                .thenExecute(() -> level.setChunkForced(last.x, last.z, true))
+                .thenWaitUntil(() -> h.assertTrue(
+                        level.hasChunkAt(end)
+                                && level.getBlockEntity(end.above()) instanceof ChestBlockEntity chest
+                                && chest.getItem(0).getCount() == 8,
+                        "found and served once the chunk loaded, with no network edited"))
+                .thenExecute(() -> {
+                    level.setChunkForced(first.x, first.z, false);
+                    level.setChunkForced(last.x, last.z, false);
+                })
+                .thenSucceed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aMouthWithUnreadableDataKeepsItAndRefusesEverything(GameTestHelper h) {
+        store(h, cell(1), new ItemStack(Items.BONE, 16));
+        store(h, cell(3));
+        mouth(h, cell(1), MouthMode.OUTPUT);
+        veins(h, 2, 2);
+        mouth(h, cell(3), MouthMode.INTAKE);
+        CompoundTag data = new CompoundTag();
+        ListTag packets = new ListTag();
+        CompoundTag packet = new CompoundTag();
+        CompoundTag items = new CompoundTag();
+        items.putString("id", "minecraft:bone");
+        items.putInt("count", 9);
+        packet.put("items", items);
+        packet.putIntArray("to", new int[] {0, 0, 0});
+        packet.putLong("arrival", 0);
+        packets.add(packet);
+        data.put("packets", packets);
+        var registries = h.getLevel().registryAccess();
+        h.getBlockEntity(cell(1)).loadWithComponents(data, registries);
+        configure(h, cell(1), control -> {
+            control.press(MouthMenu.MODE_BUTTON, 1)
+                    .press(MouthMenu.AMOUNT_UP, 1)
+                    .list(Items.STICK);
+            h.assertTrue(control.menu().getSlot(0).getItem().isEmpty(), "the filter refuses a click");
+        });
+        h.assertTrue(h.getBlockState(cell(1)).getValue(MouthBlock.MODE) == MouthMode.OUTPUT, "the mode stays");
+        h.runAfterDelay(40, () -> {
+            h.assertValueEqual(count(h, cell(1), Items.BONE), 16, "nothing extracted");
+            h.assertValueEqual(count(h, cell(3), Items.BONE), 0, "nothing delivered");
+            CompoundTag saved = h.getBlockEntity(cell(1)).saveWithoutMetadata(registries);
+            h.assertValueEqual(saved.getList("packets", 10), packets, "the bytes save back unchanged");
+            h.getLevel().destroyBlock(h.absolutePos(cell(1)), true);
+            h.runAfterDelay(2, () -> {
+                h.assertItemEntityCountIs(Items.BONE, cell(1), 2, 0);
+                var drops = h.getEntities(EntityType.ITEM, cell(1), 2).stream()
+                        .filter(drop -> drop.getItem().is(LogisticsModule.MOUTH_ITEM.get()))
+                        .toList();
+                h.assertValueEqual(drops.size(), 1, "the Mouth dropped");
+                h.assertTrue(
+                        drops.getFirst().getItem().has(OrganModule.UNREADABLE_SAVE.get()),
+                        "its item carries the unreadable bytes");
+                h.succeed();
+            });
+        });
+    }
+
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "mouth_offers",
+            timeoutTicks = 300)
+    public static void aPulseMakesAtMostItsOffersEvenWithPacketsWaiting(GameTestHelper h) {
+        // one giving Mouth and nineteen taking Mouths in a 5 by 4 block, each under a store that says yes when asked
+        // and then refuses the items; once the packets are out, the stores refuse even when asked
+        Counter.reset();
+        for (int x = 1; x <= 5; x++)
+            for (int z = 1; z <= 4; z++) {
+                BlockPos at = new BlockPos(x, Y, z);
+                mouth(h, at, x == 1 && z == 1 ? MouthMode.OUTPUT : MouthMode.INTAKE);
+                if (x != 1 || z != 1) h.setBlock(at.above(), Blocks.LODESTONE);
+            }
+        store(h, new BlockPos(1, Y, 1), new ItemStack(Items.BONE, 64));
+        h.startSequence()
+                .thenIdle(50)
+                .thenExecute(() -> {
+                    Counter.refuseAll = true;
+                    Counter.max = 0;
+                })
+                .thenIdle(120)
+                .thenExecute(() -> {
+                    h.assertTrue(
+                            Counter.max <= 16 + 4,
+                            "at most 16 offers and 4 deliveries a pulse, saw " + Counter.max + " inserts in a tick");
+                    int[] carried = new int[1];
+                    configure(
+                            h,
+                            new BlockPos(1, Y, 1),
+                            control -> carried[0] = control.menu().carried());
+                    h.assertValueEqual(
+                            count(h, new BlockPos(1, Y, 1), Items.BONE) + carried[0], 64, "every bone is somewhere");
+                    Counter.reset();
+                })
+                .thenSucceed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aMouthNeverTakesTheSacsFeed(GameTestHelper h) {
+        BlockPos sac = cell(1).above();
+        mouth(h, cell(1), MouthMode.OUTPUT);
+        veins(h, 2, 2);
+        store(h, cell(3));
+        mouth(h, cell(3), MouthMode.INTAKE);
+        h.setBlock(sac, ProcessingModule.DIGESTIVE_SAC.get());
+        var port = h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(sac), Direction.DOWN);
+        h.assertTrue(
+                port.insertItem(0, new ItemStack(Items.ROTTEN_FLESH, 4), false).isEmpty(), "feed goes in");
+        h.assertTrue(port.extractItem(0, 64, true).isEmpty(), "and never comes out");
+        h.runAfterDelay(40, () -> {
+            h.assertValueEqual(count(h, cell(3), Items.ROTTEN_FLESH), 0, "the Mouth took no feed");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void theProbeOnAJunctionStandingOnAMouthCyclesItsPort(GameTestHelper h) {
+        mouth(h, cell(1), MouthMode.INTAKE);
+        BlockPos junction = cell(1).above();
+        h.setBlock(junction, LogisticsModule.VASCULAR_JUNCTION.get());
+        ServerPlayer player = fakePlayer(h);
+        BlockPos at = h.absolutePos(junction);
+        player.moveTo(at.getX() + 0.5, at.getY(), at.getZ() - 1.5);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(InteractionModule.SYNAPTIC_PROBE.get()));
+        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(at), Direction.NORTH, at, false);
+        player.gameMode.useItemOn(player, h.getLevel(), player.getMainHandItem(), InteractionHand.MAIN_HAND, hit);
+        h.assertFalse(player.containerMenu instanceof MouthMenu, "the Mouth below stays shut");
+        h.assertTrue(
+                h.getBlockState(junction).getValue(VascularJunctionBlock.PORT.get(Direction.NORTH)) != Port.CLOSED,
+                "the clicked port moved on");
+        h.succeed();
+    }
+
     // --- fixtures ---
 
     private static BlockPos cell(int x) {
@@ -353,7 +589,76 @@ public final class MouthTests {
     }
 
     private static void mouth(GameTestHelper h, BlockPos at, MouthMode mode) {
-        h.setBlock(at, LogisticsModule.MOUTH.get().defaultBlockState().setValue(MouthBlock.MODE, mode));
+        h.setBlock(at, mouthState(mode));
+    }
+
+    private static BlockState mouthState(MouthMode mode) {
+        return LogisticsModule.MOUTH.get().defaultBlockState().setValue(MouthBlock.MODE, mode);
+    }
+
+    /**
+     * A store on lodestone, for the offer budget test only (batch mouth_offers runs alone): it counts every insert
+     * per tick, says yes to a simulated insert until {@link #refuseAll}, and never takes the items.
+     */
+    @SubscribeEvent
+    public static void countingStore(RegisterCapabilitiesEvent event) {
+        event.registerBlock(
+                Capabilities.ItemHandler.BLOCK,
+                (level, pos, state, entity, side) -> new IItemHandler() {
+                    @Override
+                    public int getSlots() {
+                        return 1;
+                    }
+
+                    @Override
+                    public ItemStack getStackInSlot(int slot) {
+                        return ItemStack.EMPTY;
+                    }
+
+                    @Override
+                    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+                        Counter.hit(level.getGameTime());
+                        return simulate && !Counter.refuseAll ? ItemStack.EMPTY : stack;
+                    }
+
+                    @Override
+                    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                        return ItemStack.EMPTY;
+                    }
+
+                    @Override
+                    public int getSlotLimit(int slot) {
+                        return 64;
+                    }
+
+                    @Override
+                    public boolean isItemValid(int slot, ItemStack stack) {
+                        return true;
+                    }
+                },
+                Blocks.LODESTONE);
+    }
+
+    private static final class Counter {
+        static boolean refuseAll;
+        static long tick = -1;
+        static int now;
+        static int max;
+
+        static void hit(long time) {
+            if (time != tick) {
+                tick = time;
+                now = 0;
+            }
+            max = Math.max(max, ++now);
+        }
+
+        static void reset() {
+            refuseAll = false;
+            tick = -1;
+            now = 0;
+            max = 0;
+        }
     }
 
     private static void veins(GameTestHelper h, int fromX, int toX) {

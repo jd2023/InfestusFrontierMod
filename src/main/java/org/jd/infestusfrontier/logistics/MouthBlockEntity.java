@@ -19,8 +19,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.logistics.Delivery;
@@ -85,6 +87,13 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
     private Optional<CompoundTag> unreadable = Optional.empty();
     private List<Route> routes = List.of();
     private long routesSeen = -1;
+    /** The last search met an unloaded chunk; it is redone after {@value #RETRY_TICKS} ticks. */
+    private boolean routesCut;
+
+    private long routesAt;
+    /** Simulated inserts left in this pulse, for delivery and extraction together. */
+    private int offers;
+
     private int sourceCursor;
     private int turn;
 
@@ -145,7 +154,6 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         if (level == null || unreadable.isPresent()) return;
         priority = Delivery.nextPriority(priority, up);
         setChanged();
-        LogisticsModule.routesChanged(level);
     }
 
     // --- the pulse ---
@@ -169,6 +177,7 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
             schedule(RETRY_TICKS + 1);
             return;
         }
+        offers = OFFERS;
         boolean worked = deliverArrived(now);
         if (output && packets.size() < IN_FLIGHT) worked |= extract(now);
         long next = worked ? PULSE_TICKS : RETRY_TICKS;
@@ -182,9 +191,10 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
 
     private boolean deliverArrived(long now) {
         boolean moved = false;
-        for (int i = 0; i < packets.size(); i++) {
+        for (int i = 0; i < packets.size() && offers > 0; i++) {
             Packet packet = packets.get(i);
             if (packet.arrival() > now) continue;
+            offers--;
             ItemStack rest = isRoute(packet.to())
                     ? destination(packet.to())
                             .map(d -> d.accept(packet.items()))
@@ -195,10 +205,11 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
                 packets.remove(i--);
             } else {
                 Optional<Route> next = firstAccepting(rest);
+                long retry = now + (offers > 0 ? RETRY_TICKS : PULSE_TICKS);
                 packets.set(
                         i,
                         next.map(r -> new Packet(rest, r.pos(), now + travel(r)))
-                                .orElseGet(() -> new Packet(rest, packet.to(), now + RETRY_TICKS)));
+                                .orElseGet(() -> new Packet(rest, packet.to(), retry)));
             }
             setChanged();
         }
@@ -213,7 +224,6 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         int slots = source.getSlots();
         sourceCursor = Math.floorMod(sourceCursor, slots);
         int look = Math.min(SOURCE_SLOTS, slots);
-        int offers = OFFERS;
         for (int n = 0; n < look && offers > 0; n++) {
             int slot = (sourceCursor + n) % slots;
             ItemStack offered = source.extractItem(slot, PACKET, true);
@@ -224,8 +234,8 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
             if (allowed == 0) continue;
             ItemStack wanted = offered.copyWithCount(allowed);
             for (Route route : order) {
-                if (offers-- == 0) break;
-                int room = destination(route.pos()).map(d -> d.room(wanted)).orElse(0);
+                if (offers == 0) break;
+                int room = offer(route, wanted);
                 if (room == 0) continue;
                 ItemStack taken = source.extractItem(slot, room, false);
                 if (taken.isEmpty()) break;
@@ -244,9 +254,17 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         return (long) Math.max(1, route.distance()) * TICKS_PER_CELL;
     }
 
+    /** One simulated insert from this pulse's budget: how many of {@code stack} the route's Mouth takes now. */
+    private int offer(Route route, ItemStack stack) {
+        if (offers <= 0) return 0;
+        offers--;
+        return destination(route.pos()).map(d -> d.room(stack)).orElse(0);
+    }
+
     private Optional<Route> firstAccepting(ItemStack stack) {
         for (Route route : ordered()) {
-            if (destination(route.pos()).map(d -> d.room(stack)).orElse(0) > 0) return Optional.of(route);
+            if (offers <= 0) return Optional.empty();
+            if (offer(route, stack) > 0) return Optional.of(route);
         }
         return Optional.empty();
     }
@@ -265,10 +283,15 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         return Delivery.order(candidates, turn);
     }
 
-    /** The Mouths of this network that take, found again only after a network in the dimension changed. */
+    /**
+     * The Mouths of this network that take, found again after a network in the dimension changed, or after
+     * {@value #RETRY_TICKS} ticks when the last search met an unloaded chunk: loading a chunk changes no network.
+     */
     private List<Route> routes() {
         long epoch = level.getData(LogisticsModule.ROUTE_EPOCH).current();
-        if (epoch == routesSeen) return routes;
+        long now = level.getGameTime();
+        if (epoch == routesSeen && !(routesCut && now - routesAt >= RETRY_TICKS)) return routes;
+        routesCut = false;
         List<Route> found = new ArrayList<>();
         for (Reach.Reached<BlockPos> cell :
                 Reach.walk(worldPosition, this::links, NETWORK).reached()) {
@@ -279,6 +302,7 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         }
         routes = List.copyOf(found);
         routesSeen = epoch;
+        routesAt = now;
         return routes;
     }
 
@@ -289,7 +313,10 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         for (Direction side : Direction.values()) {
             if (mouth && side == Direction.UP) continue;
             BlockPos next = pos.relative(side);
-            if (!level.hasChunkAt(next)) continue;
+            if (!level.hasChunkAt(next)) {
+                routesCut = true;
+                continue;
+            }
             BlockState state = level.getBlockState(next);
             if (!MouthBlock.isNetwork(state)) continue;
             if (state.getBlock() instanceof MouthBlock && side == Direction.DOWN) continue;
@@ -336,9 +363,17 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         return deny != match;
     }
 
+    /**
+     * The store standing on this Mouth, or null. A double chest whose other half is in an unloaded chunk counts as
+     * absent: vanilla's chest capability reads that half and would load its chunk.
+     */
     private @Nullable IItemHandler partner() {
         BlockPos above = worldPosition.above();
         if (!level.hasChunkAt(above)) return null;
+        BlockState state = level.getBlockState(above);
+        if (state.getBlock() instanceof ChestBlock
+                && state.getValue(ChestBlock.TYPE) != ChestType.SINGLE
+                && !level.hasChunkAt(above.relative(ChestBlock.getConnectedDirection(state)))) return null;
         return level.getCapability(Capabilities.ItemHandler.BLOCK, above, Direction.DOWN);
     }
 

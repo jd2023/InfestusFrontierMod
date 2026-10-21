@@ -32,6 +32,9 @@ final class SynapticProbeItem extends Item {
         Player player = context.getPlayer();
         if (player == null || player.isShiftKeyDown()) return InteractionResult.PASS;
         Level level = context.getLevel();
+        // a block with ports keeps the probe for its ports, even when it stands on a Mouth
+        if (level.getCapability(LogisticsCapabilities.PORT_SWITCH, context.getClickedPos(), context.getClickedFace())
+                != null) return InteractionResult.PASS;
         for (BlockPos at :
                 List.of(context.getClickedPos(), context.getClickedPos().below())) {
             MenuProvider mouth = level.getCapability(LogisticsCapabilities.MOUTH_SCREEN, at, null);

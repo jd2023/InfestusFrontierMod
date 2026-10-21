@@ -297,7 +297,7 @@ public final class ProcessingModule {
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerBlockEntity(BiomassCapabilities.BLOCK, DIGESTIVE_SAC_ENTITY.get(), (sac, side) -> sac);
             event.registerBlockEntity(
-                    Capabilities.ItemHandler.BLOCK, DIGESTIVE_SAC_ENTITY.get(), (sac, side) -> sac.feed());
+                    Capabilities.ItemHandler.BLOCK, DIGESTIVE_SAC_ENTITY.get(), (sac, side) -> sac.port());
             event.registerBlockEntity(
                     Capabilities.FluidHandler.BLOCK,
                     DIGESTIVE_SAC_ENTITY.get(),

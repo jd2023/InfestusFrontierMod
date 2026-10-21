@@ -90,7 +90,7 @@
     "setblock 46 -60 -36 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:bone\",count:16}]}",
     "setblock 48 -60 -36 infestusfrontier:bone_loom{contents:{ingredients:[],output:{},water:0,biomass:{stored:800,reserved:0,capacity:1000},history:{completed_batches:0}}}",
     "setblock 50 -60 -36 chest[facing=north]",
-    "setblock 47 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mouths\"','\"bones to the Loom\"','\"plates to the chest\"','\"probe a chest: set\"']}}"
+    "setblock 47 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mouths\"','\"bones to Loom\"','\"plates to chest\"','\"probe sets them\"']}}"
   ],
   "views": [
     {
