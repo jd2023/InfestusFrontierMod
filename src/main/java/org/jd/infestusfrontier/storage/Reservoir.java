@@ -18,7 +18,8 @@ import org.jd.infestusfrontier.core.storage.Box;
  * The bodies of Reservoir cells in a level. A body is the cells inside one box that all name that box; each holds its
  * own share, so a broken cell takes exactly its share and the rest stays. Every operation reads the whole box, at most
  * {@value Body#MAX_SIDE}³ cells, and is refused while any of it is unloaded. A body found broken (a cell left while
- * its chunk was away) refuses until its cells have fallen apart and formed again on their next tick.
+ * its chunk was away) refuses, and changes nothing, until its cells have fallen apart and formed again on the tick
+ * each schedules when it loads.
  */
 final class Reservoir {
     /** Part of the body is not loaded, or it is still forming. */
@@ -37,12 +38,7 @@ final class Reservoir {
             if (!level.hasChunkAt(pos)) return Optional.empty();
             if (!(level.getBlockEntity(pos) instanceof ReservoirCellBlockEntity member)
                     || !member.isReadable()
-                    || !member.body().equals(body)) {
-                if (!level.isClientSide)
-                    level.scheduleTick(
-                            cell.getBlockPos(), cell.getBlockState().getBlock(), ReservoirCellBlock.FORM_TICKS);
-                return Optional.empty();
-            }
+                    || !member.body().equals(body)) return Optional.empty();
             members.add(member);
         }
         return Optional.of(members);

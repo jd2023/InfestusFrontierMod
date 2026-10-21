@@ -192,6 +192,7 @@ tasks.named('runGameTestServer') {
     dependsOn prepareGameTest
     mustRunAfter ':core:test', ':ui:test', distribution
     timeout = java.time.Duration.ofMinutes(15)
+    doFirst { gameTestLog.asFile.delete() }
     doLast {
         def log = gameTestLog.asFile
         if (!log.exists() || !(log.text =~ /All \d+ required tests passed/))

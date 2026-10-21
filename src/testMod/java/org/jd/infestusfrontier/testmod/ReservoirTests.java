@@ -272,9 +272,8 @@ public final class ReservoirTests {
                     fluid(h, broken).fill(BiomassFluids.of(Biomass.of(100)), IFluidHandler.FluidAction.EXECUTE),
                     0,
                     "it refuses biomass");
-            h.assertTrue(
-                    h.getBlockEntity(broken).collectComponents().get(OrganModule.UNREADABLE_SAVE.get()) != null,
-                    "it keeps its bytes for the item");
+            CompoundTag kept = h.getBlockEntity(broken).collectComponents().get(OrganModule.UNREADABLE_SAVE.get());
+            h.assertTrue(kept != null && kept.getCompound("tank").equals(tank), "it keeps its bytes for the item");
             h.succeed();
         });
     }
@@ -299,10 +298,35 @@ public final class ReservoirTests {
                     fluid(h, cell(2, 0, 1)).fill(BiomassFluids.of(Biomass.of(10)), IFluidHandler.FluidAction.EXECUTE),
                     0,
                     "the other cell finds its body broken and refuses");
+            cell.onLoad(); // as the chunk would on loading it
         });
         h.runAfterDelay(3 * FORMED, () -> {
             h.assertTrue(joined(h, west, Direction.EAST), "the two formed again");
             h.assertValueEqual(body(h, west), 3000, "nothing lost");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aBodyAsWideAsTheWorldIsNoBodyAndTheCellStillForms(GameTestHelper h) {
+        body(h, 1, 2, 1, 1, 1);
+        BlockPos west = cell(1, 0, 1);
+        BlockPos at = h.absolutePos(west);
+        CompoundTag data = new CompoundTag();
+        CompoundTag tank = new CompoundTag();
+        tank.putInt("stored", 1000);
+        tank.putInt("reserved", 0);
+        tank.putInt("capacity", 4000);
+        data.put("tank", tank);
+        data.putIntArray(
+                "body", new int[] {Integer.MIN_VALUE, at.getY(), at.getZ(), Integer.MAX_VALUE, at.getY(), at.getZ()});
+        h.getBlockEntity(west).loadWithComponents(data, h.getLevel().registryAccess());
+        h.assertTrue(
+                h.getBlockEntity(west).collectComponents().get(OrganModule.UNREADABLE_SAVE.get()) == null,
+                "the biomass is readable; only the body is dropped");
+        h.runAfterDelay(FORMED, () -> {
+            h.assertTrue(joined(h, west, Direction.EAST), "the cell formed with its neighbour");
+            h.assertValueEqual(body(h, west), 1000, "with its biomass");
             h.succeed();
         });
     }

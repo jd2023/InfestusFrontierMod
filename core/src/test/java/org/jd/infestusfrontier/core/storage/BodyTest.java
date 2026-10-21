@@ -59,6 +59,16 @@ class BodyTest {
     }
 
     @Test
+    void aBoxSpanningTheWholeIntRangeIsNeverSmall() {
+        assertFalse(new Box(Integer.MIN_VALUE, 0, 0, Integer.MAX_VALUE, 0, 0).fits(4));
+        assertFalse(new Box(-2_000_000_000, 0, 0, 2_000_000_000, 0, 0).fits(4));
+        assertFalse(new Box(0, Integer.MIN_VALUE, 0, 0, Integer.MAX_VALUE, 0).fits(4));
+        assertFalse(new Box(0, 0, Integer.MIN_VALUE, 0, 0, Integer.MAX_VALUE).fits(4));
+        assertThrows(
+                ArithmeticException.class, () -> new Box(Integer.MIN_VALUE, 0, 0, Integer.MAX_VALUE, 0, 0).volume());
+    }
+
+    @Test
     void theBottomLayerFillsFirstAndEvenly() {
         int[][] stored = {{0, 0}, {0, 0}};
         assertEquals(5000, Body.fill(stored, 4000, 5000));

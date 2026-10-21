@@ -115,11 +115,14 @@ final class ReservoirCellBlockEntity extends BlockEntity implements BiomassHandl
         return Reservoir.extract(this, amount, simulate);
     }
 
-    /** A body that changed while this cell was unloaded is checked once the cell is back. */
+    /**
+     * Every cell looks at its body once it is back: a body that changed while the cell was unloaded falls apart and
+     * forms again, and a waiting cell joins a body whose chunk loaded after it.
+     */
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && !level.isClientSide && !body.single())
+        if (level != null && !level.isClientSide)
             level.scheduleTick(worldPosition, getBlockState().getBlock(), ReservoirCellBlock.FORM_TICKS);
     }
 

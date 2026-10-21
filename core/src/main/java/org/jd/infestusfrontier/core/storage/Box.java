@@ -29,28 +29,33 @@ public record Box(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         return contains(other.minX, other.minY, other.minZ) && contains(other.maxX, other.maxY, other.maxZ);
     }
 
+    /** The length of a side, exact for any corners; a side wider than an int throws. */
+    private static int side(int min, int max) {
+        return Math.toIntExact((long) max - min + 1);
+    }
+
     public int sizeX() {
-        return maxX - minX + 1;
+        return side(minX, maxX);
     }
 
     public int sizeY() {
-        return maxY - minY + 1;
+        return side(minY, maxY);
     }
 
     public int sizeZ() {
-        return maxZ - minZ + 1;
+        return side(minZ, maxZ);
     }
 
     public int volume() {
-        return sizeX() * sizeY() * sizeZ();
+        return Math.toIntExact((long) sizeX() * sizeY() * sizeZ());
     }
 
-    /** True when no side is longer than {@code side}. */
+    /** True when no side is longer than {@code side}. Exact for any corners, so check it before anything else. */
     public boolean fits(int side) {
-        return sizeX() <= side && sizeY() <= side && sizeZ() <= side;
+        return (long) maxX - minX < side && (long) maxY - minY < side && (long) maxZ - minZ < side;
     }
 
     public boolean single() {
-        return volume() == 1;
+        return minX == maxX && minY == maxY && minZ == maxZ;
     }
 }
