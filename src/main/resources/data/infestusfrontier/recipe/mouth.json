@@ -9,11 +9,11 @@
       "item": "minecraft:hopper"
     },
     {
-      "item": "minecraft:bone"
+      "item": "infestusfrontier:membrane_sheet"
     }
   ],
   "result": {
-    "id": "infestusfrontier:output_mouth",
+    "id": "infestusfrontier:mouth",
     "count": 1
   }
 }

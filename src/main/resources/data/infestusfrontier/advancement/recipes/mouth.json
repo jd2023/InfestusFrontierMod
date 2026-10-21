@@ -14,7 +14,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "infestusfrontier:output_mouth"
+        "recipe": "infestusfrontier:mouth"
       }
     }
   },
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "infestusfrontier:output_mouth"
+      "infestusfrontier:mouth"
     ]
   }
 }

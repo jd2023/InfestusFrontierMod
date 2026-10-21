@@ -9,10 +9,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.Containers;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -21,9 +17,6 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
@@ -46,10 +39,7 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
                     Direction.CODEC.optionalFieldOf("from").forGetter(Saved::from),
                     SimpleFluidContent.CODEC
                             .optionalFieldOf("fluid", SimpleFluidContent.EMPTY)
-                            .forGetter(Saved::fluid),
-                    ItemStack.OPTIONAL_CODEC
-                            .optionalFieldOf("items", ItemStack.EMPTY)
-                            .forGetter(Saved::items))
+                            .forGetter(Saved::fluid))
             .apply(instance, Saved::new));
 
     private final Carrier carrier;
@@ -59,36 +49,19 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     private final int[] turns = new int[2];
 
     private final FluidTank fluid;
-    private final ItemStackHandler items;
 
     VeinBlockEntity(BlockPos pos, BlockState state) {
         super(LogisticsModule.VEIN_ENTITY.get(), pos, state);
         this.carrier = ((VeinBlock) state.getBlock()).carrier();
-        this.fluid = new FluidTank(carrier.isFluid() ? carrier.packet() : 0, this::takesFluid) {
+        this.fluid = new FluidTank(carrier.packet(), this::takesFluid) {
             @Override
             protected void onContentsChanged() {
                 setChanged();
             }
         };
-        this.items = new ItemStackHandler(1) {
-            @Override
-            public int getSlotLimit(int slot) {
-                return carrier == Carrier.ITEM ? carrier.packet() : 0;
-            }
-
-            @Override
-            public boolean isItemValid(int slot, ItemStack stack) {
-                return carrier == Carrier.ITEM && unreadable.isEmpty();
-            }
-
-            @Override
-            protected void onContentsChanged(int slot) {
-                setChanged();
-            }
-        };
     }
 
-    private record Saved(Optional<Direction> from, SimpleFluidContent fluid, ItemStack items) {}
+    private record Saved(Optional<Direction> from, SimpleFluidContent fluid) {}
 
     Carrier carrier() {
         return carrier;
@@ -108,13 +81,11 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     }
 
     boolean isEmpty() {
-        return unreadable.isEmpty()
-                && fluid.isEmpty()
-                && items.getStackInSlot(0).isEmpty();
+        return unreadable.isEmpty() && fluid.isEmpty();
     }
 
     private boolean holding() {
-        return !fluid.isEmpty() || !items.getStackInSlot(0).isEmpty();
+        return !fluid.isEmpty();
     }
 
     /** The fluid side of the cell as a neighbour on {@code side} sees it: it fills, it never drains. */
@@ -156,44 +127,6 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
             @Override
             public FluidStack drain(int maxDrain, FluidAction action) {
                 return FluidStack.EMPTY;
-            }
-        };
-    }
-
-    /** The item side of the cell as a neighbour on {@code side} sees it: it takes one kind, it never gives. */
-    @Nullable IItemHandler itemPort(@Nullable Direction side) {
-        if (carrier != Carrier.ITEM) return null;
-        return new IItemHandler() {
-            @Override
-            public int getSlots() {
-                return 1;
-            }
-
-            @Override
-            public ItemStack getStackInSlot(int slot) {
-                return items.getStackInSlot(0);
-            }
-
-            @Override
-            public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-                ItemStack rest = items.insertItem(0, stack, simulate);
-                if (rest.getCount() < stack.getCount() && !simulate) received(side);
-                return rest;
-            }
-
-            @Override
-            public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                return ItemStack.EMPTY;
-            }
-
-            @Override
-            public int getSlotLimit(int slot) {
-                return items.getSlotLimit(0);
-            }
-
-            @Override
-            public boolean isItemValid(int slot, ItemStack stack) {
-                return items.isItemValid(0, stack);
             }
         };
     }
@@ -246,25 +179,10 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     }
 
     private boolean push(Direction side, BlockPos next) {
-        if (carrier.isFluid()) {
-            IFluidHandler target = level.getCapability(Capabilities.FluidHandler.BLOCK, next, side.getOpposite());
-            if (target == null) return false;
-            return !FluidUtil.tryFluidTransfer(target, fluid, carrier.packet(), true)
-                    .isEmpty();
-        }
-        IItemHandler target = level.getCapability(Capabilities.ItemHandler.BLOCK, next, side.getOpposite());
+        IFluidHandler target = level.getCapability(Capabilities.FluidHandler.BLOCK, next, side.getOpposite());
         if (target == null) return false;
-        ItemStack packet = items.getStackInSlot(0);
-        ItemStack rest = ItemHandlerHelper.insertItem(target, packet.copy(), false);
-        if (rest.getCount() == packet.getCount()) return false;
-        items.setStackInSlot(0, rest);
-        return true;
-    }
-
-    /** Spills the item packet when the cell is broken; the fluid packet travels on the item instead. */
-    void dropItems(Level level, BlockPos pos) {
-        Containers.dropContents(level, pos, new SimpleContainer(items.getStackInSlot(0)));
-        items.setStackInSlot(0, ItemStack.EMPTY);
+        return !FluidUtil.tryFluidTransfer(target, fluid, carrier.packet(), true)
+                .isEmpty();
     }
 
     @Override
@@ -308,8 +226,6 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
             return Optional.of(saved.fluid().getAmount() + " mB in a " + fluid.getCapacity() + " mB cell");
         if (!saved.fluid().isEmpty() && !takesFluidUnsealed(saved.fluid().copy()))
             return Optional.of("a fluid this vein does not carry");
-        if (saved.items().getCount() > items.getSlotLimit(0))
-            return Optional.of(saved.items().getCount() + " items in a cell of " + items.getSlotLimit(0));
         return Optional.empty();
     }
 
@@ -325,14 +241,10 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     private void restore(Saved saved) {
         from = saved.from();
         fluid.setFluid(saved.fluid().copy());
-        items.setStackInSlot(0, saved.items().copy());
     }
 
     private Saved saved() {
-        return new Saved(
-                from,
-                SimpleFluidContent.copyOf(fluid.getFluid()),
-                items.getStackInSlot(0).copy());
+        return new Saved(from, SimpleFluidContent.copyOf(fluid.getFluid()));
     }
 
     @Override
@@ -372,7 +284,7 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
         }
         SimpleFluidContent carried = input.get(LogisticsModule.FLUID_CONTENT.get());
         if (carried == null) return;
-        Saved saved = new Saved(Optional.empty(), carried, ItemStack.EMPTY);
+        Saved saved = new Saved(Optional.empty(), carried);
         Optional<String> problem = check(saved);
         if (problem.isPresent()) {
             LogisticsModule.LOGGER.warn("{} keeps unreadable carried state: {}", carrier.id(), problem.get());
@@ -387,6 +299,5 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     public void removeComponentsFromTag(CompoundTag tag) {
         tag.remove("fluid");
         tag.remove("from");
-        tag.remove("items"); // the item packet drops; it never rides along
     }
 }

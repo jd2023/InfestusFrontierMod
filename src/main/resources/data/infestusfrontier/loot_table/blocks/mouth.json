@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "infestusfrontier:intake_mouth",
+          "name": "infestusfrontier:mouth",
           "functions": [
             {
               "function": "minecraft:copy_components",

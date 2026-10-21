@@ -1,10 +1,10 @@
 package org.jd.infestusfrontier.logistics;
 
-/** What a vein carries, and how big one packet is: millibuckets for the fluids, items for the Item Vein. */
+/** What a vein carries, and how big one fluid packet is in millibuckets. An Item Vein holds nothing itself. */
 enum Carrier {
     BIOMASS("biomass_vein", 250, 4),
     FLUID("fluid_vein", 250, 4),
-    ITEM("item_vein", 8, 8);
+    ITEM("item_vein", 0, 0);
 
     private final String id;
     private final int packet;

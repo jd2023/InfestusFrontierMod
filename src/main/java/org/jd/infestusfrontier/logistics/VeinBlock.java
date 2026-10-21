@@ -29,8 +29,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * One cell of a vein: mature Living Substrate with a recessed lumen that carries one {@link Carrier}. The six
  * connection properties say which neighbours are cells of the same vein, for the model; the Fluid Vein's
- * {@link #SEALED} says whether Sealing Resin closed it. A cell never ticks on its own: it schedules a tick when it
- * receives a packet and goes quiet when it has nothing to move.
+ * {@link #SEALED} says whether Sealing Resin closed it. A fluid cell never ticks on its own: it schedules a tick when
+ * it receives a packet and goes quiet when it has nothing to move. An Item Vein is a passage of an item network; the
+ * Mouths move the items.
  */
 public final class VeinBlock extends BaseEntityBlock {
     /** A Fluid Vein carries nothing until Sealing Resin seals it; the other two veins are sealed from the start. */
@@ -72,11 +73,13 @@ public final class VeinBlock extends BaseEntityBlock {
     }
 
     /**
-     * True when {@code other} is a cell of the same vein. The links only shape the model: a vein still fills an organ
-     * or a Junction beside it, but its groove stops at that block's face.
+     * True when {@code other} on {@code side} is a cell of the same vein, or a Mouth beside or under an Item Vein. The
+     * links only shape the model: a vein still fills an organ or a Junction beside it, but its groove stops at that
+     * block's face. A Mouth's top face holds its store, so a vein above a Mouth does not join it.
      */
-    private boolean connects(BlockState other) {
-        return other.getBlock() instanceof VeinBlock vein && vein.carrier == carrier;
+    private boolean connects(Direction side, BlockState other) {
+        if (other.getBlock() instanceof VeinBlock vein) return vein.carrier == carrier;
+        return carrier == Carrier.ITEM && other.getBlock() instanceof MouthBlock && side != Direction.DOWN;
     }
 
     @Override
@@ -92,7 +95,7 @@ public final class VeinBlock extends BaseEntityBlock {
             LevelAccessor level,
             BlockPos pos,
             BlockPos neighborPos) {
-        return state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(direction), connects(neighborState));
+        return state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(direction), connects(direction, neighborState));
     }
 
     /** A neighbour changed: a held packet may have somewhere to go now. */
@@ -107,15 +110,21 @@ public final class VeinBlock extends BaseEntityBlock {
         if (level.getBlockEntity(pos) instanceof VeinBlockEntity vein) vein.pulse();
     }
 
+    /** An Item Vein is a passage and holds nothing, so it has no block entity. */
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new VeinBlockEntity(pos, state);
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return carrier == Carrier.ITEM ? null : new VeinBlockEntity(pos, state);
+    }
+
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState old, boolean movedByPiston) {
+        if (carrier == Carrier.ITEM && !level.isClientSide && !old.is(this)) LogisticsModule.routesChanged(level);
     }
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof VeinBlockEntity vein)
-            vein.dropItems(level, pos);
+        if (carrier == Carrier.ITEM && !level.isClientSide && !state.is(newState.getBlock()))
+            LogisticsModule.routesChanged(level);
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
 

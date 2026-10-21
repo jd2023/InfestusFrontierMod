@@ -275,7 +275,7 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Does:** A cell of living substrate with lips on its top face. The store or organ standing on it is its partner; Item Veins and other Mouths touching it are its network. A Mouth set to intake is an Intake Mouth: the network feeds its partner. Makes a hand-fed organ part of ordinary storage automation.
 - **Input → output:** Items routed through Item Veins → the partner's inventory, through its standard item handler; an organ decides which slot takes them.
 - **Create:** 1 Organ Bud + 1 hopper + 1 Membrane Sheet. One Mouth item serves both settings.
-- **Settings:** Intake, output or closed; nine filter slots as an allow or deny list; an amount (intake fills the partner up to it, output keeps it in the partner); a priority for intake. The probe used on the partner opens the Mouth's screen.
+- **Settings:** Intake, output, both or closed (both suits an organ: it takes ingredients and gives only products); nine filter slots as an allow or deny list; an amount (intake fills the partner up to it, output keeps it in the partner); a priority for intake. The probe used on the partner opens the Mouth's screen.
 - **Growth:** Route Imprint treatment adds tag and component filters; a Nerve Tissue connection permits on/off control. Multiple mouths may serve separate ingredients, but never bypass the organ's recipe requirements.
 
 ### T1-11 — Mouth (Output setting)

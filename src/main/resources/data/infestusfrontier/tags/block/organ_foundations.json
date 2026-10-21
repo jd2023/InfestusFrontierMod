@@ -3,6 +3,7 @@
     "infestusfrontier:living_substrate",
     "infestusfrontier:biomass_vein",
     "infestusfrontier:fluid_vein",
-    "infestusfrontier:item_vein"
+    "infestusfrontier:item_vein",
+    "infestusfrontier:mouth"
   ]
 }

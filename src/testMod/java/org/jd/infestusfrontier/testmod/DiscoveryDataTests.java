@@ -28,15 +28,11 @@ public final class DiscoveryDataTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void mouthRecipesResolve(GameTestHelper h) {
+    public static void mouthRecipeResolves(GameTestHelper h) {
         resolves(
                 h,
                 List.of(OrganModule.ORGAN_BUD_ITEM.get(), Items.HOPPER, ProcessingModule.MEMBRANE_SHEET.get()),
-                LogisticsModule.INTAKE_MOUTH_ITEM.get());
-        resolves(
-                h,
-                List.of(OrganModule.ORGAN_BUD_ITEM.get(), Items.HOPPER, Items.BONE),
-                LogisticsModule.OUTPUT_MOUTH_ITEM.get());
+                LogisticsModule.MOUTH_ITEM.get());
         h.succeed();
     }
 
@@ -92,8 +88,7 @@ public final class DiscoveryDataTests {
                 "culture_bowl",
                 "activation_cyst",
                 "vascular_junction",
-                "intake_mouth",
-                "output_mouth")) {
+                "mouth")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));

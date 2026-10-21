@@ -7,7 +7,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -51,28 +51,27 @@ public final class LogisticsModule {
 
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
             DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, InfestusFrontier.MOD_ID);
+    /** Mouth pulses admitted per dimension per tick. */
     static final DeferredHolder<AttachmentType<?>, AttachmentType<TickQuota>> MOUTH_QUOTA = ATTACHMENTS.register(
             "mouth_quota", () -> AttachmentType.builder(() -> new TickQuota(64)).build());
-    public static final DeferredBlock<Block> INTAKE_MOUTH = mouth("intake_mouth", true);
-    public static final DeferredBlock<Block> OUTPUT_MOUTH = mouth("output_mouth", false);
-    public static final DeferredItem<BlockItem> INTAKE_MOUTH_ITEM = ITEMS.registerSimpleBlockItem(INTAKE_MOUTH);
-    public static final DeferredItem<BlockItem> OUTPUT_MOUTH_ITEM = ITEMS.registerSimpleBlockItem(OUTPUT_MOUTH);
+
+    static final DeferredHolder<AttachmentType<?>, AttachmentType<RouteEpoch>> ROUTE_EPOCH = ATTACHMENTS.register(
+            "route_epoch", () -> AttachmentType.builder(RouteEpoch::new).build());
+    public static final DeferredBlock<MouthBlock> MOUTH = BLOCKS.registerBlock(
+            "mouth",
+            MouthBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_PINK)
+                    .strength(0.6F)
+                    .sound(SoundType.GRAVEL));
+    public static final DeferredItem<BlockItem> MOUTH_ITEM = ITEMS.registerSimpleBlockItem(MOUTH);
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MouthBlockEntity>> MOUTH_ENTITY =
             BLOCK_ENTITIES.register(
                     "mouth",
-                    () -> BlockEntityType.Builder.of(MouthBlockEntity::new, INTAKE_MOUTH.get(), OUTPUT_MOUTH.get())
+                    () -> BlockEntityType.Builder.of(MouthBlockEntity::new, MOUTH.get())
                             .build(null));
-
-    private static DeferredBlock<Block> mouth(String id, boolean intake) {
-        return BLOCKS.registerBlock(
-                id,
-                properties -> new MouthBlock(intake, properties),
-                BlockBehaviour.Properties.of()
-                        .mapColor(MapColor.COLOR_PINK)
-                        .strength(0.6F)
-                        .sound(SoundType.SLIME_BLOCK)
-                        .noOcclusion());
-    }
+    public static final DeferredHolder<MenuType<?>, MenuType<MouthMenu>> MOUTH_MENU =
+            MENUS.register("mouth", () -> IMenuTypeExtension.create(MouthMenu::new));
 
     public static final DeferredBlock<VeinBlock> BIOMASS_VEIN = vein(Carrier.BIOMASS);
     public static final DeferredBlock<VeinBlock> FLUID_VEIN = vein(Carrier.FLUID);
@@ -83,8 +82,7 @@ public final class LogisticsModule {
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VeinBlockEntity>> VEIN_ENTITY =
             BLOCK_ENTITIES.register(
                     "vein",
-                    () -> BlockEntityType.Builder.of(
-                                    VeinBlockEntity::new, BIOMASS_VEIN.get(), FLUID_VEIN.get(), ITEM_VEIN.get())
+                    () -> BlockEntityType.Builder.of(VeinBlockEntity::new, BIOMASS_VEIN.get(), FLUID_VEIN.get())
                             .build(null));
 
     /** The treatments that grow a vein out of a mature cell; the Cyst makes them (ITEM_CATALOG I021 to I023, I028). */
@@ -152,7 +150,7 @@ public final class LogisticsModule {
         ATTACHMENTS.register(modBus);
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, VEIN_ENTITY.get(), VeinBlockEntity::fluidPort);
-            event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, VEIN_ENTITY.get(), VeinBlockEntity::itemPort);
+            event.registerBlockEntity(LogisticsCapabilities.MOUTH_SCREEN, MOUTH_ENTITY.get(), (mouth, none) -> mouth);
             event.registerBlockEntity(
                     BiomassCapabilities.BLOCK,
                     VEIN_ENTITY.get(),
@@ -168,9 +166,16 @@ public final class LogisticsModule {
         });
         if (FMLEnvironment.dist == Dist.CLIENT) {
             OrganRenderers.register(modBus, "vascular_junction", VASCULAR_JUNCTION_ENTITY, VASCULAR_JUNCTION_ITEM);
-            modBus.addListener((RegisterMenuScreensEvent event) ->
-                    event.register(VASCULAR_JUNCTION_MENU.get(), VascularJunctionScreen::new));
+            modBus.addListener((RegisterMenuScreensEvent event) -> {
+                event.register(VASCULAR_JUNCTION_MENU.get(), VascularJunctionScreen::new);
+                event.register(MOUTH_MENU.get(), MouthScreen::new);
+            });
         }
+    }
+
+    /** A cell of some item network in {@code level} was placed or removed, or a Mouth's routing changed. */
+    static void routesChanged(Level level) {
+        level.getData(ROUTE_EPOCH).changed();
     }
 
     /** The veins, for anyone listing them. */

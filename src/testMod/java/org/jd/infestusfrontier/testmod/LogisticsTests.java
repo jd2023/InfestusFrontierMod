@@ -14,7 +14,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.PipeBlock;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
@@ -196,21 +195,20 @@ public final class LogisticsTests {
         });
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
-    public static void anItemVeinCarriesAHoppersItemsToAChest(GameTestHelper h) {
-        BlockPos hopper = new BlockPos(1, Y + 1, 1);
-        BlockPos chest = new BlockPos(5, Y + 1, 1);
-        for (int x = 1; x <= 5; x++) h.setBlock(new BlockPos(x, Y, 1), LogisticsModule.ITEM_VEIN.get());
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void anItemVeinIsAPassageThatHoldsNothing(GameTestHelper h) {
+        BlockPos cell = new BlockPos(1, Y, 1);
+        BlockPos hopper = cell.above();
+        h.setBlock(cell, LogisticsModule.ITEM_VEIN.get());
         h.setBlock(hopper, Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.DOWN));
-        h.setBlock(chest, Blocks.CHEST);
         ((HopperBlockEntity) h.getBlockEntity(hopper)).setItem(0, new ItemStack(Items.BONE, 20));
-        h.runAfterDelay(180, () -> {
-            ChestBlockEntity box = (ChestBlockEntity) h.getBlockEntity(chest);
-            int inChest = box.countItem(Items.BONE);
-            int inHopper = ((HopperBlockEntity) h.getBlockEntity(hopper)).countItem(Items.BONE);
-            h.assertTrue(inChest > 0, "bones reached the chest");
-            h.assertValueEqual(inChest + inHopper + itemsIn(h, 1, 5), 20, "every bone is somewhere");
-            h.assertTrue(itemsIn(h, 1, 1) == 0 || inHopper > 0, "the first cell drains towards the chest");
+        h.assertTrue(h.getLevel().getBlockEntity(h.absolutePos(cell)) == null, "no block entity");
+        h.assertTrue(
+                h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(cell), Direction.UP) == null,
+                "nothing to insert into");
+        h.runAfterDelay(40, () -> {
+            h.assertValueEqual(
+                    ((HopperBlockEntity) h.getBlockEntity(hopper)).countItem(Items.BONE), 20, "the hopper keeps all");
             h.succeed();
         });
     }
@@ -275,19 +273,13 @@ public final class LogisticsTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void aBrokenCellCarriesItsFluidAndDropsItsItems(GameTestHelper h) {
+    public static void aBrokenCellCarriesItsFluid(GameTestHelper h) {
         BlockPos cell = new BlockPos(1, Y, 1);
-        BlockPos itemCell = new BlockPos(6, Y, 1);
         h.setBlock(cell, LogisticsModule.BIOMASS_VEIN.get());
-        h.setBlock(itemCell, LogisticsModule.ITEM_VEIN.get());
         h.getLevel()
                 .getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(cell), Direction.UP)
                 .fill(BiomassFluids.of(Biomass.of(200)), IFluidHandler.FluidAction.EXECUTE);
-        h.getLevel()
-                .getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(itemCell), Direction.UP)
-                .insertItem(0, new ItemStack(Items.BONE, 5), false);
         h.getLevel().destroyBlock(h.absolutePos(cell), true);
-        h.getLevel().destroyBlock(h.absolutePos(itemCell), true);
         h.runAfterDelay(2, () -> {
             List<ItemEntity> drops = h.getEntities(EntityType.ITEM, cell, 2.0).stream()
                     .filter(drop -> drop.getItem().is(LogisticsModule.BIOMASS_VEIN_ITEM.get()))
@@ -297,10 +289,6 @@ public final class LogisticsTests {
             h.assertTrue(
                     carried != null && carried.getAmount() == 200 && BiomassFluids.isBiomass(carried.copy()),
                     "200 mB of biomass on the item");
-            int bones = 0;
-            for (ItemEntity drop : h.getEntities(EntityType.ITEM, itemCell, 2.0))
-                if (drop.getItem().is(Items.BONE)) bones += drop.getItem().getCount();
-            h.assertValueEqual(bones, 5, "the five bones dropped");
             Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
             builder.setItemInHand(
                     net.minecraft.world.InteractionHand.MAIN_HAND,
@@ -314,33 +302,24 @@ public final class LogisticsTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void aCreativeBreakDropsAnItemVeinsPacketOnceAndASealedVeinMovesSealed(GameTestHelper h) {
+    public static void aCreativeBreakKeepsAVeinsPacketAndASealedVeinMovesSealed(GameTestHelper h) {
         BlockPos cell = new BlockPos(1, Y, 1);
-        h.setBlock(cell, LogisticsModule.ITEM_VEIN.get());
+        h.setBlock(cell, LogisticsModule.BIOMASS_VEIN.get());
         h.getLevel()
-                .getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(cell), Direction.UP)
-                .insertItem(0, new ItemStack(Items.BONE, 5), false);
+                .getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(cell), Direction.UP)
+                .fill(BiomassFluids.of(Biomass.of(200)), IFluidHandler.FluidAction.EXECUTE);
         Player creative = EcologyTests.holding(h, GameType.CREATIVE, Items.AIR, 0);
         BlockState state = h.getBlockState(cell);
         state.getBlock().playerWillDestroy(h.getLevel(), h.absolutePos(cell), state, creative);
         h.getLevel().removeBlock(h.absolutePos(cell), false);
         h.runAfterDelay(2, () -> {
-            int bonesOnGround = 0;
-            ItemStack veinItem = ItemStack.EMPTY;
-            for (ItemEntity drop : h.getEntities(EntityType.ITEM, cell, 2.0)) {
-                if (drop.getItem().is(Items.BONE))
-                    bonesOnGround += drop.getItem().getCount();
-                if (drop.getItem().is(LogisticsModule.ITEM_VEIN_ITEM.get()))
-                    veinItem = drop.getItem().copy();
-            }
-            h.assertValueEqual(bonesOnGround, 5, "the five bones dropped");
-            h.assertFalse(veinItem.isEmpty(), "the Creative player gets the cell back");
+            var cells = h.getEntities(EntityType.ITEM, cell, 2.0).stream()
+                    .filter(drop -> drop.getItem().is(LogisticsModule.BIOMASS_VEIN_ITEM.get()))
+                    .toList();
+            h.assertValueEqual(cells.size(), 1, "the Creative player gets the cell back");
+            SimpleFluidContent carried = cells.getFirst().getItem().get(LogisticsModule.FLUID_CONTENT.get());
+            h.assertTrue(carried != null && carried.getAmount() == 200, "with its packet on the item");
             Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-            builder.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, veinItem);
-            h.setBlock(cell.below(), Blocks.STONE);
-            h.placeAt(builder, builder.getMainHandItem(), cell.below(), Direction.UP);
-            h.assertBlockPresent(LogisticsModule.ITEM_VEIN.get(), cell);
-            h.assertValueEqual(itemsIn(h, 1, 1), 0, "the placed cell holds no second copy of the bones");
             BlockPos sealed = new BlockPos(4, Y, 1);
             h.setBlock(
                     sealed, LogisticsModule.FLUID_VEIN.get().defaultBlockState().setValue(VeinBlock.SEALED, true));
@@ -416,16 +395,6 @@ public final class LogisticsTests {
         for (int tank = 0; tank < handler.getTanks(); tank++)
             if (BiomassFluids.isBiomass(handler.getFluidInTank(tank)))
                 total += handler.getFluidInTank(tank).getAmount();
-        return total;
-    }
-
-    private static int itemsIn(GameTestHelper h, int fromX, int toX) {
-        int total = 0;
-        for (int x = fromX; x <= toX; x++) {
-            var handler = h.getLevel()
-                    .getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(new BlockPos(x, Y, 1)), null);
-            if (handler != null) total += handler.getStackInSlot(0).getCount();
-        }
         return total;
     }
 }

@@ -3,86 +3,87 @@
     "advancement grant @s through infestusfrontier:contact/biomass_bladder",
     "fill -8 -61 -6 10 -54 10 air",
     "fill -8 -62 -6 10 -62 10 grass_block",
-    "fill -5 -61 0 7 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "fill -5 -61 0 7 -61 6 infestusfrontier:living_substrate[stage=mature]",
+    "fill -3 -61 2 3 -61 2 infestusfrontier:item_vein",
+    "setblock -3 -61 2 infestusfrontier:mouth[mode=output]",
+    "setblock 0 -61 2 infestusfrontier:mouth[mode=both]",
+    "setblock 3 -61 2 infestusfrontier:mouth[mode=intake]{filter:[{id:\"infestusfrontier:bone_plate\",count:1}]}",
     "setblock -3 -60 2 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:bone\",count:32}]}",
-    "setblock -2 -60 2 infestusfrontier:intake_mouth[facing=west]",
-    "setblock -1 -60 2 infestusfrontier:bone_loom{contents:{ingredients:[],output:{},water:0,biomass:{stored:500,reserved:0,capacity:1000},history:{completed_batches:0}}}",
-    "setblock 0 -60 2 infestusfrontier:output_mouth[facing=east]",
-    "setblock 1 -60 2 chest[facing=north]",
-    "setblock 3 -60 3 minecraft:stone",
-    "setblock 3 -60 2 infestusfrontier:intake_mouth[facing=north]",
-    "setblock 5 -60 3 minecraft:stone",
-    "setblock 5 -60 2 infestusfrontier:output_mouth[facing=north]",
-    "setblock 7 -60 3 minecraft:stone",
-    "setblock 7 -59 3 infestusfrontier:output_mouth[facing=up]",
-    "give @s infestusfrontier:intake_mouth",
-    "give @s infestusfrontier:output_mouth"
+    "setblock 0 -60 2 infestusfrontier:bone_loom{contents:{ingredients:[],output:{},water:0,biomass:{stored:800,reserved:0,capacity:1000},history:{completed_batches:0}}}",
+    "setblock 3 -60 2 chest[facing=north]",
+    "setblock -2 -61 4 infestusfrontier:mouth[mode=intake]",
+    "setblock 0 -61 4 infestusfrontier:mouth[mode=output]",
+    "setblock 2 -61 4 infestusfrontier:mouth[mode=both]",
+    "setblock 4 -61 4 infestusfrontier:mouth[mode=closed]",
+    "setblock 5 -61 4 infestusfrontier:item_vein",
+    "setblock 4 -61 5 infestusfrontier:item_vein",
+    "give @s infestusfrontier:mouth",
+    "give @s infestusfrontier:item_vein",
+    "give @s infestusfrontier:synaptic_probe"
   ],
   "views": [
     {
       "name": "front",
-      "x": 2,
+      "x": 0.5,
       "y": -58,
-      "z": -2,
+      "z": -2.5,
       "yaw": 0,
-      "pitch": 25
+      "pitch": 32
     },
     {
       "name": "back",
-      "x": 2,
-      "y": -57,
-      "z": 8,
+      "x": 0.5,
+      "y": -58,
+      "z": 8.5,
       "yaw": 180,
-      "pitch": 35
-    },
-    {
-      "name": "above",
-      "x": 2,
-      "y": -53,
-      "z": 2,
-      "yaw": 0,
-      "pitch": 85
+      "pitch": 32
     },
     {
       "name": "lips",
-      "x": 4,
+      "x": 1.5,
+      "y": -59,
+      "z": 2.6,
+      "yaw": 0,
+      "pitch": 60
+    },
+    {
+      "name": "screen",
+      "x": -2.5,
       "y": -60,
       "z": -0.5,
       "yaw": 0,
-      "pitch": 12
+      "pitch": 20,
+      "gui": true,
+      "use": [
+        -3,
+        -60,
+        2
+      ],
+      "holding": "infestusfrontier:synaptic_probe"
     },
     {
       "name": "hotbar",
-      "x": 2,
+      "x": 0.5,
       "y": -58,
-      "z": -2,
+      "z": -2.5,
       "yaw": 0,
-      "pitch": 25,
+      "pitch": 32,
       "gui": true,
       "icons": [
-        "infestusfrontier:intake_mouth",
-        "infestusfrontier:output_mouth"
+        "infestusfrontier:mouth",
+        "infestusfrontier:item_vein",
+        "infestusfrontier:synaptic_probe"
       ]
     },
     {
-      "name": "book_intake_mouth",
-      "x": 2,
-      "y": -58,
-      "z": -2,
+      "name": "book_mouth",
+      "x": 0.5,
+      "y": -60,
+      "z": -2.5,
       "yaw": 0,
       "pitch": 10,
       "gui": true,
-      "book": "infestusfrontier:circulation/intake_mouth"
-    },
-    {
-      "name": "book_output_mouth",
-      "x": 2,
-      "y": -58,
-      "z": -2,
-      "yaw": 0,
-      "pitch": 10,
-      "gui": true,
-      "book": "infestusfrontier:circulation/output_mouth"
+      "book": "infestusfrontier:circulation/mouth"
     }
   ]
 }

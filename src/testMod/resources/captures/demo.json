@@ -83,13 +83,14 @@
     "item replace entity @s inventory.2 with water_bucket 1",
     "give @s infestusfrontier:synaptic_probe 1",
     "give @s modonomicon:modonomicon[modonomicon:book_id=\"infestusfrontier:the_waking_genome\"]",
-    "fill 46 -61 -36 50 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "fill 46 -61 -36 50 -61 -36 infestusfrontier:item_vein",
+    "setblock 46 -61 -36 infestusfrontier:mouth[mode=output]",
+    "setblock 48 -61 -36 infestusfrontier:mouth[mode=both]",
+    "setblock 50 -61 -36 infestusfrontier:mouth[mode=intake]{filter:[{id:\"infestusfrontier:bone_plate\",count:1}]}",
     "setblock 46 -60 -36 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:bone\",count:16}]}",
-    "setblock 47 -60 -36 infestusfrontier:intake_mouth[facing=west]",
     "setblock 48 -60 -36 infestusfrontier:bone_loom{contents:{ingredients:[],output:{},water:0,biomass:{stored:800,reserved:0,capacity:1000},history:{completed_batches:0}}}",
-    "setblock 49 -60 -36 infestusfrontier:output_mouth[facing=east]",
     "setblock 50 -60 -36 chest[facing=north]",
-    "setblock 47 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mouths\"','\"chest feeds Loom\"','\"finished plates\"','\"leave to the chest\"']}}"
+    "setblock 47 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mouths\"','\"bones to the Loom\"','\"plates to the chest\"','\"probe a chest: set\"']}}"
   ],
   "views": [
     {
@@ -538,6 +539,16 @@
       "yaw": 0,
       "pitch": 10,
       "gui": true,
+      "name": "book_mouth",
+      "book": "infestusfrontier:circulation/mouth"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
       "name": "book_fluid_vein",
       "book": "infestusfrontier:circulation/fluid_vein"
     },
@@ -558,6 +569,21 @@
       "z": -40,
       "yaw": 0,
       "pitch": 32
+    },
+    {
+      "name": "mouth_screen",
+      "x": 46.5,
+      "y": -60,
+      "z": -38.5,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "use": [
+        46,
+        -60,
+        -36
+      ],
+      "holding": "infestusfrontier:synaptic_probe"
     }
   ]
 }

@@ -221,6 +221,7 @@ final class CaptureClient {
         if (bookEntry == null) throw new IllegalStateException("entry " + entry + " not in " + bookId);
         if (!BookUnlockStateManager.get().isUnlockedFor(Minecraft.getInstance().player, bookEntry))
             throw new IllegalStateException(entry + " is locked for the capture player");
+        BookGuiManager.get().openBook(BookAddress.defaultFor(book)); // an entry needs the book's screens behind it
         BookGuiManager.get()
                 .openEntry(bookEntry, BookAddress.of(bookId, bookEntry.getCategoryId(), bookEntry.getId(), page));
     }
