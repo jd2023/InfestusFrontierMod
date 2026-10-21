@@ -1,0 +1,33 @@
+{
+  "textures": {
+    "skin": "infestusfrontier:block/living_substrate_mature_5",
+    "wall": "infestusfrontier:block/vein_wall",
+    "particle": "infestusfrontier:block/living_substrate_mature_5"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        16,
+        14
+      ],
+      "to": [
+        11,
+        16,
+        16
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            5,
+            14,
+            11,
+            16
+          ],
+          "texture": "#skin",
+          "cullface": "up"
+        }
+      }
+    }
+  ]
+}

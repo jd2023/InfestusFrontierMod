@@ -141,6 +141,60 @@ public final class LogisticsTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    public static void aForkServesItsArmsInTurn(GameTestHelper h) {
+        // packets enter the fork from the west; one arm leads north, one south, each to a tank on its last cell
+        BlockPos fork = new BlockPos(2, Y, 2);
+        BlockPos north = fork.north();
+        BlockPos south = fork.south();
+        for (BlockPos cell : List.of(fork, north, south)) h.setBlock(cell, LogisticsModule.BIOMASS_VEIN.get());
+        h.setBlock(north.above(), StorageModule.BIOMASS_BLADDER.get());
+        h.setBlock(south.above(), StorageModule.BIOMASS_BLADDER.get());
+        IFluidHandler entry =
+                h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(fork), Direction.WEST);
+        for (int packet = 0; packet < 4; packet++)
+            h.runAtTickTime(
+                    1 + packet * 12,
+                    () -> h.assertValueEqual(
+                            entry.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE),
+                            250,
+                            "the fork took the packet"));
+        h.runAtTickTime(80, () -> {
+            h.assertValueEqual(
+                    ProcessingTests.handler(h, north.above()).tank().stored().units(), 500, "north half");
+            h.assertValueEqual(
+                    ProcessingTests.handler(h, south.above()).tank().stored().units(), 500, "south half");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    public static void aVeinCarriesBiomassUpAWallOverAndDownAgain(GameTestHelper h) {
+        // up three cells at x=1, across at the top, down three cells at x=2, into a tank under the last cell
+        List<BlockPos> route = List.of(
+                new BlockPos(1, Y, 1),
+                new BlockPos(1, Y + 1, 1),
+                new BlockPos(1, Y + 2, 1),
+                new BlockPos(2, Y + 2, 1),
+                new BlockPos(2, Y + 1, 1),
+                new BlockPos(2, Y, 1));
+        for (BlockPos cell : route) h.setBlock(cell, LogisticsModule.BIOMASS_VEIN.get());
+        BlockPos tank = new BlockPos(2, Y - 1, 1);
+        h.setBlock(tank, StorageModule.BIOMASS_BLADDER.get());
+        h.assertTrue(
+                h.getBlockState(route.get(1)).getValue(PipeBlock.UP)
+                        && h.getBlockState(route.get(1)).getValue(PipeBlock.DOWN),
+                "a cell in the climb links up and down");
+        IFluidHandler entry = h.getLevel()
+                .getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(route.getFirst()), Direction.WEST);
+        h.assertValueEqual(
+                entry.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE), 250, "one packet in");
+        h.runAtTickTime(60, () -> {
+            h.assertValueEqual(ProcessingTests.handler(h, tank).tank().stored().units(), 250, "the packet came down");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
     public static void anItemVeinCarriesAHoppersItemsToAChest(GameTestHelper h) {
         BlockPos hopper = new BlockPos(1, Y + 1, 1);
         BlockPos chest = new BlockPos(5, Y + 1, 1);

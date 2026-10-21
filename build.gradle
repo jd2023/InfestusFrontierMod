@@ -38,6 +38,8 @@ configurations {
 
 def captureScenarioDir = layout.projectDirectory.dir('src/testMod/resources/captures')
 def captureScenarios = fileTree(captureScenarioDir) { include '*.json' }.files.collect { it.name - '.json' }.sort()
+// -PcaptureOnly=a,b photographs only those scenarios with runCapture, for iterating on one scene; the gate runs all.
+def captureOnly = providers.gradleProperty('captureOnly').map { it.split(',') as List }.getOrElse(captureScenarios)
 def captureOutput = layout.buildDirectory.dir('captures')
 
 // Optional runtime mods for manual play: ./gradlew runClient -PwithJei -PwithCurios
@@ -105,7 +107,7 @@ neoForge {
             gameDirectory = project.file('runs/capture')
             loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
             systemProperty 'infestusfrontier.capture.dir', captureOutput.get().asFile.absolutePath
-            systemProperty 'infestusfrontier.capture.scenarios', captureScenarios.join(',')
+            systemProperty 'infestusfrontier.capture.scenarios', captureOnly.join(',')
             jvmArgument '-Xmx3G'
         }
         // Playable client in a fresh world built from the capture scenario src/testMod/resources/captures/demo.json.

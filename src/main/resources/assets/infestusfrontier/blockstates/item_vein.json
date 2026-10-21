@@ -2,7 +2,20 @@
   "multipart": [
     {
       "apply": {
-        "model": "infestusfrontier:block/item_vein"
+        "model": "infestusfrontier:block/vein_corners"
+      }
+    },
+    {
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center"
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_north"
       }
     },
     {
@@ -10,8 +23,24 @@
         "north": "false"
       },
       "apply": {
-        "model": "infestusfrontier:block/vein_cap",
-        "uvlock": true
+        "model": "infestusfrontier:block/vein_arm_skin_north"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_north"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_east"
       }
     },
     {
@@ -19,9 +48,24 @@
         "east": "false"
       },
       "apply": {
-        "model": "infestusfrontier:block/vein_cap",
-        "uvlock": true,
-        "y": 90
+        "model": "infestusfrontier:block/vein_arm_skin_east"
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_east"
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_south"
       }
     },
     {
@@ -29,8 +73,440 @@
         "south": "false"
       },
       "apply": {
-        "model": "infestusfrontier:block/vein_cap",
-        "uvlock": true,
+        "model": "infestusfrontier:block/vein_arm_skin_south"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_south"
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_west"
+      }
+    },
+    {
+      "when": {
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west"
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_west"
+      }
+    },
+    {
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "south": "true"
+          },
+          {
+            "east": "true"
+          },
+          {
+            "north": "true"
+          },
+          {
+            "west": "true"
+          },
+          {
+            "up": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "east": "false",
+        "north": "false",
+        "west": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_center_skin",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_north",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_north",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_east",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_east",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_south",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_south",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_west",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_west",
+        "x": 180
+      }
+    },
+    {
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "down": "true"
+          },
+          {
+            "east": "true"
+          },
+          {
+            "up": "true"
+          },
+          {
+            "west": "true"
+          },
+          {
+            "south": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "east": "false",
+        "up": "false",
+        "west": "false",
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_center_skin",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_north",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_north",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_east",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_east",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_south",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_south",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_west",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_west",
+        "x": 90
+      }
+    },
+    {
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "down": "true"
+          },
+          {
+            "west": "true"
+          },
+          {
+            "up": "true"
+          },
+          {
+            "east": "true"
+          },
+          {
+            "north": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "west": "false",
+        "up": "false",
+        "east": "false",
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_center_skin",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_north",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_north",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_east",
+        "x": 90,
         "y": 180
       }
     },
@@ -39,8 +515,423 @@
         "west": "false"
       },
       "apply": {
-        "model": "infestusfrontier:block/vein_cap",
-        "uvlock": true,
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_east",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_south",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_south",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_west",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_west",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "down": "true"
+          },
+          {
+            "south": "true"
+          },
+          {
+            "up": "true"
+          },
+          {
+            "north": "true"
+          },
+          {
+            "west": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "south": "false",
+        "up": "false",
+        "north": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_center_skin",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_north",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_north",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_east",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_east",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_south",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_south",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_west",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_west",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "down": "true"
+          },
+          {
+            "north": "true"
+          },
+          {
+            "up": "true"
+          },
+          {
+            "south": "true"
+          },
+          {
+            "east": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "north": "false",
+        "up": "false",
+        "south": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_center_skin",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_north",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_north",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_east",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "north": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_east",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_south",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_south",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_arm_west",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_rim_west",
+        "x": 90,
         "y": 270
       }
     }

@@ -1,0 +1,65 @@
+{
+  "commands": [
+    "fill 28 -61 -2 46 -52 14 air",
+    "fill 28 -62 -2 46 -62 14 grass_block",
+    "fill 29 -61 -1 45 -61 12 infestusfrontier:living_substrate[stage=mature]",
+    "fill 29 -60 8 45 -57 9 infestusfrontier:living_substrate[stage=mature]",
+    "fill 31 -61 2 35 -61 2 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 35 -61 3 35 -61 4 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 33 -61 3 33 -61 4 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 38 -61 2 42 -61 2 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 40 -61 0 40 -61 4 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 32 -61 5 32 -61 8 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 32 -60 8 32 -57 8 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 33 -58 8 36 -58 8 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 36 -59 8 36 -60 8 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 32 -57 9 32 -57 9 infestusfrontier:fluid_vein[sealed=true]",
+    "fill 38 -61 6 42 -61 6 infestusfrontier:biomass_vein",
+    "fill 42 -60 6 42 -58 6 infestusfrontier:biomass_vein",
+    "fill 43 -61 1 44 -61 1 infestusfrontier:item_vein",
+    "fill 44 -61 2 44 -61 4 infestusfrontier:item_vein",
+    "give @s infestusfrontier:fluid_vein"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 37.5,
+      "y": -56,
+      "z": -5.5,
+      "yaw": 0,
+      "pitch": 35
+    },
+    {
+      "name": "above",
+      "x": 37.5,
+      "y": -50,
+      "z": 4.5,
+      "yaw": 0,
+      "pitch": 88
+    },
+    {
+      "name": "wall",
+      "x": 34.5,
+      "y": -58,
+      "z": 4.5,
+      "yaw": 0,
+      "pitch": 15
+    },
+    {
+      "name": "column",
+      "x": 45.5,
+      "y": -58,
+      "z": 2.5,
+      "yaw": 45,
+      "pitch": 20
+    },
+    {
+      "name": "low",
+      "x": 36.5,
+      "y": -60,
+      "z": 0.5,
+      "yaw": -60,
+      "pitch": 20
+    }
+  ]
+}

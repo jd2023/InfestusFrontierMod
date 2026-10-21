@@ -1,0 +1,83 @@
+{
+  "textures": {
+    "skin": "infestusfrontier:block/living_substrate_mature_5",
+    "wall": "infestusfrontier:block/vein_wall",
+    "lumen": "infestusfrontier:block/vein_lumen_dry",
+    "particle": "infestusfrontier:block/living_substrate_mature_5"
+  },
+  "elements": [
+    {
+      "from": [
+        11,
+        14,
+        5
+      ],
+      "to": [
+        16,
+        14,
+        11
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            5,
+            11,
+            11,
+            16
+          ],
+          "texture": "#lumen",
+          "cullface": "up",
+          "rotation": 90
+        }
+      }
+    },
+    {
+      "from": [
+        11,
+        14,
+        5
+      ],
+      "to": [
+        16,
+        16,
+        5
+      ],
+      "faces": {
+        "south": {
+          "uv": [
+            11,
+            0,
+            16,
+            2
+          ],
+          "texture": "#wall",
+          "cullface": "up"
+        }
+      }
+    },
+    {
+      "from": [
+        11,
+        14,
+        11
+      ],
+      "to": [
+        16,
+        16,
+        11
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            11,
+            0,
+            16,
+            2
+          ],
+          "texture": "#wall",
+          "cullface": "up"
+        }
+      }
+    }
+  ]
+}

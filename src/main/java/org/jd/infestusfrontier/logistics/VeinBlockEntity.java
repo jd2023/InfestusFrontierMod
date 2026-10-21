@@ -55,6 +55,9 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     private final Carrier carrier;
     private Optional<Direction> from = Optional.empty();
     private Optional<CompoundTag> unreadable = Optional.empty();
+    /** Where the next pulse starts in {@link #ORDER}; not saved, a reload only restarts the rotation. */
+    private int turn;
+
     private final FluidTank fluid;
     private final ItemStackHandler items;
 
@@ -215,18 +218,26 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
         level.scheduleTick(worldPosition, getBlockState().getBlock(), ticks);
     }
 
-    /** One try to push the packet on. Six capability reads at most, all in loaded chunks. */
+    /**
+     * One try to push the packet on. Six capability reads at most, all in loaded chunks. The sides are tried from the
+     * one after the side last served, so a fork's arms and a cell's consumers take turns.
+     */
     void pulse() {
         if (level == null || unreadable.isPresent() || !holding()) return;
         boolean moved = false;
         for (boolean toVeins : new boolean[] {false, true}) {
-            for (Direction side : ORDER) {
+            for (int step = 0; step < ORDER.size(); step++) {
+                int index = (turn + step) % ORDER.size();
+                Direction side = ORDER.get(index);
                 if (from.isPresent() && from.get() == side) continue;
                 BlockPos next = worldPosition.relative(side);
                 if (!level.hasChunkAt(next)) continue;
                 boolean vein = level.getBlockState(next).getBlock() instanceof VeinBlock;
                 if (vein != toVeins) continue;
-                moved |= push(side, next);
+                if (push(side, next)) {
+                    moved = true;
+                    turn = (index + 1) % ORDER.size();
+                }
                 if (!holding()) return;
             }
         }
