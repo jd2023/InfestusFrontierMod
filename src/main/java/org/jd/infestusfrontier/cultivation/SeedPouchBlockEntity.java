@@ -35,9 +35,10 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * Four kinds of planting stock, one kind a slot, up to a stack each, and one reserve: hoppers, mouths and planters
- * take only what a slot holds beyond it. A stick raises the reserve by one, a sneaking stick lowers it; it runs 0 to
- * {@value #MAX_RESERVE} and starts at {@value #FIRST_RESERVE}. The screen takes stock out past the reserve.
+ * Four kinds of planting stock, one kind a slot, up to a stack each, and one reserve that applies to each kind:
+ * hoppers, mouths and planters take only what a slot holds beyond it. A stick raises the reserve by one, from
+ * {@value #MAX_RESERVE} back to 0 (a sneaking hand builds, so there is no lowering gesture); it starts at
+ * {@value #FIRST_RESERVE}. The screen takes stock out past the reserve.
  */
 final class SeedPouchBlockEntity extends BlockEntity implements MenuProvider, GeoBlockEntity {
     static final int SLOTS = 4;
@@ -119,9 +120,9 @@ final class SeedPouchBlockEntity extends BlockEntity implements MenuProvider, Ge
         };
     }
 
-    /** Moves the reserve one step, within its range, and says where it is now. */
-    Component adjustReserve(int by) {
-        reserve = Math.clamp(reserve + by, 0, MAX_RESERVE);
+    /** Raises the reserve by one, from {@value #MAX_RESERVE} back to 0, and says where it is now. */
+    Component raiseReserve() {
+        reserve = (reserve + 1) % (MAX_RESERVE + 1);
         setChanged();
         return Component.translatable("infestusfrontier.status.reserve", reserve);
     }

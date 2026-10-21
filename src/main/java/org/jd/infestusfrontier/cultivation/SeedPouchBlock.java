@@ -24,8 +24,8 @@ import org.jd.infestusfrontier.organ.api.Organs;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A rooted store for planting stock. Planting stock in hand goes in one at a time; a stick sets the reserve;
- * anything else opens the screen; sneaking with an item builds against it. Breaking it spills the stock.
+ * A rooted store for planting stock. Planting stock in hand goes in one at a time; a stick raises the reserve by
+ * one, from 64 back to 0; anything else opens the screen; sneaking with an item builds against it. Breaking it spills the stock.
  */
 public final class SeedPouchBlock extends BaseEntityBlock {
     private static final MapCodec<SeedPouchBlock> CODEC = simpleCodec(SeedPouchBlock::new);
@@ -80,7 +80,7 @@ public final class SeedPouchBlock extends BaseEntityBlock {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if (stack.is(Items.STICK)) {
             if (level.isClientSide) return ItemInteractionResult.SUCCESS;
-            player.displayClientMessage(pouch.adjustReserve(player.isShiftKeyDown() ? -1 : 1), true);
+            player.displayClientMessage(pouch.raiseReserve(), true);
             return ItemInteractionResult.CONSUME;
         }
         if (!PlantingStock.is(stack)) return Organs.openScreen(stack, level, pos, player);

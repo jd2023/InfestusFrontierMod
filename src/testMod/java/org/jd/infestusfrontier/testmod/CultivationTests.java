@@ -24,6 +24,10 @@ import org.jd.infestusfrontier.cultivation.CultivationModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.logistics.MouthBlock;
 import org.jd.infestusfrontier.logistics.MouthMode;
+import org.jd.infestusfrontier.logistics.Port;
+import org.jd.infestusfrontier.logistics.VascularJunctionBlock;
+import org.jd.infestusfrontier.processing.ProcessingModule;
+import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 
@@ -75,11 +79,11 @@ public final class CultivationTests {
         EcologyTests.use(h, stick, ORGAN, Direction.UP);
         EcologyTests.use(h, stick, ORGAN, Direction.UP);
         h.assertValueEqual(surplus.extractItem(0, 64, true).getCount(), 2, "two sticks: reserve three");
-        stick.setShiftKeyDown(true);
+        for (int click = 3; click < 65; click++) EcologyTests.use(h, stick, ORGAN, Direction.UP);
+        h.assertValueEqual(surplus.extractItem(0, 64, true).getCount(), 5, "at 65 clicks the reserve is 0 again");
         EcologyTests.use(h, stick, ORGAN, Direction.UP);
-        h.assertValueEqual(
-                surplus.extractItem(0, 64, false).getCount(), 3, "a sneaking stick: reserve two, three taken");
-        h.assertValueEqual(surplus.getStackInSlot(0).getCount(), 2, "the reserve stays");
+        h.assertValueEqual(surplus.extractItem(0, 64, false).getCount(), 4, "then 1: four taken");
+        h.assertValueEqual(surplus.getStackInSlot(0).getCount(), 1, "the reserve stays");
         h.assertTrue(
                 surplus.insertItem(1, new ItemStack(Items.WHEAT_SEEDS, 4), true).getCount() == 4, "one kind a slot");
         h.assertTrue(
@@ -113,6 +117,78 @@ public final class CultivationTests {
             h.assertValueEqual(ProcessingTests.handler(h, ORGAN).tank().stored().units(), 975, "25 BU paid");
             h.succeed();
         });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    public static void aJunctionFeedingThePlanterDoesNotHurryIt(GameTestHelper h) {
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dz = -1; dz <= 1; dz++)
+                h.setBlock(CENTER.offset(dx, 0, dz), CultivationModule.CULTIVATION_TISSUE.get());
+        h.setBlock(CENTER, EcologyTests.mature());
+        h.setBlock(ORGAN, CultivationModule.PLANTING_PROBOSCIS.get());
+        h.getLevel()
+                .getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(ORGAN), Direction.UP)
+                .insertItem(0, new ItemStack(Items.WHEAT_SEEDS, 8), false);
+        Player fuel = EcologyTests.holding(h, GameType.SURVIVAL, StorageModule.BIOMASS_BUCKET.get(), 1);
+        EcologyTests.use(h, fuel, ORGAN, Direction.UP);
+        BlockPos junctionGround = CENTER.east().east();
+        BlockPos tank = junctionGround.east().above();
+        h.setBlock(junctionGround, EcologyTests.mature());
+        h.setBlock(junctionGround.east(), EcologyTests.mature());
+        h.setBlock(tank, StorageModule.BIOMASS_BLADDER.get());
+        h.getLevel()
+                .getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(tank), Direction.UP)
+                .fill(BiomassFluids.of(Biomass.of(4000)), IFluidHandler.FluidAction.EXECUTE);
+        h.setBlock(
+                junctionGround.above(),
+                LogisticsModule.VASCULAR_JUNCTION
+                        .get()
+                        .defaultBlockState()
+                        .setValue(VascularJunctionBlock.PORT.get(Direction.EAST), Port.INTAKE)
+                        .setValue(VascularJunctionBlock.PORT.get(Direction.WEST), Port.OUTLET));
+        h.runAfterDelay(70, () -> {
+            int wheat = 0;
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dz = -1; dz <= 1; dz++)
+                    if (h.getBlockState(ORGAN.offset(dx, 0, dz)).is(Blocks.WHEAT)) wheat++;
+            h.assertTrue(wheat <= 4, "at most one planting a pulse while the junction tops the tank up: " + wheat);
+            h.assertTrue(wheat >= 2, "and it keeps planting: " + wheat);
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 500)
+    public static void theCompostGlandMakesBoneMealFromFourSeedsAndWater(GameTestHelper h) {
+        h.setBlock(CENTER, EcologyTests.mature());
+        h.setBlock(ORGAN, ProcessingModule.COMPOST_GLAND.get());
+        Player water = EcologyTests.holding(h, GameType.SURVIVAL, Items.WATER_BUCKET, 1);
+        EcologyTests.use(h, water, ORGAN, Direction.UP);
+        IItemHandler ports =
+                h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(ORGAN), Direction.UP);
+        h.assertTrue(
+                ports.insertItem(0, new ItemStack(Items.WHEAT_SEEDS, 3), false).isEmpty(), "a hopper loads seeds");
+        h.runAfterDelay(2, () -> {
+            h.assertTrue(compost(h).batch().isEmpty(), "three seeds do not start a batch");
+            ports.insertItem(0, new ItemStack(Items.WHEAT_SEEDS, 1), false);
+            h.runAfterDelay(2, () -> {
+                h.assertTrue(compost(h).batch().isPresent(), "four seeds start on their own");
+                h.assertValueEqual(compost(h).batch().orElseThrow().batch().ticksRequired(), 400, "20 seconds");
+                h.assertValueEqual(compost(h).waterMb(), 900, "100 mB of water spent");
+                h.assertTrue(compost(h).ingredients().get(0).isEmpty(), "all four seeds taken");
+            });
+        });
+        h.runAtTickTime(410, () -> {
+            h.assertTrue(compost(h).output().is(Items.BONE_MEAL), "one bone meal");
+            h.assertValueEqual(compost(h).output().getCount(), 1, "one");
+            h.succeed();
+        });
+    }
+
+    private static BatchOrganContents compost(GameTestHelper h) {
+        BatchOrganContents contents =
+                h.getBlockEntity(ORGAN).collectComponents().get(ProcessingModule.BATCH_CONTENTS.get());
+        if (contents == null) h.fail("no compost gland contents", ORGAN);
+        return contents;
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)

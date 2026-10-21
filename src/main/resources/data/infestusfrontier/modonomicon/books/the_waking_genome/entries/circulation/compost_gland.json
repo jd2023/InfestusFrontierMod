@@ -32,9 +32,9 @@
     {
       "type": "infestusfrontier:organ_batch",
       "recipe_id_1": "infestusfrontier:composting/seeds",
-      "title1": "minecraft:bone_meal",
+      "title1": "item.minecraft.bone_meal",
       "recipe_id_2": "infestusfrontier:composting/leaves",
-      "title2": "minecraft:bone_meal"
+      "title2": "item.minecraft.bone_meal"
     },
     {
       "type": "modonomicon:crafting_recipe",

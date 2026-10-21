@@ -108,9 +108,9 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
     }
 
     static void serverTick(Level level, BlockPos pos, BlockState state, PlotOrganBlockEntity organ) {
+        if (--organ.nextTry > 0) return;
         if (organ.unreadable.isPresent() || !Organs.hasFoundation(level, pos) || !(level instanceof ServerLevel server))
             return;
-        if (--organ.nextTry > 0) return;
         boolean worked = organ.canPay() && organ.act(server);
         organ.nextTry = worked ? PULSE_TICKS : RETRY_TICKS;
         BlockState shown = state.setValue(PlotOrganBlock.WORKING, worked);
@@ -158,7 +158,7 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
         if (unreadable.isPresent()) return Outcome.refused(Persistence.CORRUPT);
         if (!simulate && change instanceof Outcome.Done<BiomassTank> done) {
             tank = done.value();
-            nextTry = Math.min(nextTry, 1);
+            nextTry = Math.min(nextTry, PULSE_TICKS); // wakes a resting organ; never shortens a pulse
             setChanged();
         }
         return change;
