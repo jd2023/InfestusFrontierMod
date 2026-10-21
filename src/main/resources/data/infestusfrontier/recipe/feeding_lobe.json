@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:feeding_lobe",
+    "count": 1
+  }
+}

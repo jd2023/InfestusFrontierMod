@@ -71,6 +71,8 @@ public final class DiscoveryModule {
                         output.accept(LogisticsModule.ITEM_VEIN_ITEM.get());
                         output.accept(LogisticsModule.VASCULAR_JUNCTION_ITEM.get());
                         output.accept(LogisticsModule.MOUTH_ITEM.get());
+                        output.accept(LogisticsModule.FEEDING_LOBE_ITEM.get());
+                        output.accept(LogisticsModule.YIELD_LOBE_ITEM.get());
                         output.accept(CultivationModule.CULTIVATION_TISSUE_ITEM.get());
                         output.accept(CultivationModule.SEED_POUCH_ITEM.get());
                         output.accept(CultivationModule.PLANTING_PROBOSCIS_ITEM.get());

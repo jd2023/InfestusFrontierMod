@@ -39,9 +39,9 @@ public class BatchOrganBlock extends BaseEntityBlock {
     /** True while a batch runs; the client animates from it. */
     public static final BooleanProperty WORKING = BooleanProperty.create("working");
     /** The last stage a growing organ's state can name; a kind grows through at most this many stages after its first. */
-    public static final int LAST_STAGE = 2;
+    public static final int LAST_STAGE = Organs.LAST_STAGE;
     /** The growth stage of a {@link Growing} organ; the client picks its grown look from it. */
-    public static final IntegerProperty STAGE = IntegerProperty.create("stage", 0, LAST_STAGE);
+    public static final IntegerProperty STAGE = Organs.STAGE;
 
     private final BatchOrganKind kind;
     private final MapCodec<BatchOrganBlock> codec;

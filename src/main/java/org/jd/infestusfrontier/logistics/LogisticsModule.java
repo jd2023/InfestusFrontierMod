@@ -73,6 +73,24 @@ public final class LogisticsModule {
     public static final DeferredHolder<MenuType<?>, MenuType<MouthMenu>> MOUTH_MENU =
             MENUS.register("mouth", () -> IMenuTypeExtension.create(MouthMenu::new));
 
+    /** The port organs: a Feeding Lobe puts items into the organ it faces, a Yield Lobe takes its products. */
+    public static final DeferredBlock<LobeBlock> FEEDING_LOBE = lobe("feeding_lobe", true);
+
+    public static final DeferredBlock<LobeBlock> YIELD_LOBE = lobe("yield_lobe", false);
+    public static final DeferredItem<BlockItem> FEEDING_LOBE_ITEM = ITEMS.registerSimpleBlockItem(FEEDING_LOBE);
+    public static final DeferredItem<BlockItem> YIELD_LOBE_ITEM = ITEMS.registerSimpleBlockItem(YIELD_LOBE);
+
+    private static DeferredBlock<LobeBlock> lobe(String id, boolean feeds) {
+        return BLOCKS.registerBlock(
+                id,
+                properties -> new LobeBlock(feeds, properties),
+                BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.COLOR_PINK)
+                        .strength(0.6F)
+                        .sound(SoundType.SLIME_BLOCK)
+                        .noOcclusion());
+    }
+
     public static final DeferredBlock<VeinBlock> BIOMASS_VEIN = vein(Carrier.BIOMASS);
     public static final DeferredBlock<VeinBlock> FLUID_VEIN = vein(Carrier.FLUID);
     public static final DeferredBlock<VeinBlock> ITEM_VEIN = vein(Carrier.ITEM);
@@ -151,6 +169,11 @@ public final class LogisticsModule {
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, VEIN_ENTITY.get(), VeinBlockEntity::fluidPort);
             event.registerBlockEntity(LogisticsCapabilities.MOUTH_SCREEN, MOUTH_ENTITY.get(), (mouth, none) -> mouth);
+            event.registerBlock(
+                    Capabilities.ItemHandler.BLOCK,
+                    (level, pos, state, entity, side) -> ((LobeBlock) state.getBlock()).handler(level, pos, state),
+                    FEEDING_LOBE.get(),
+                    YIELD_LOBE.get());
             event.registerBlockEntity(
                     BiomassCapabilities.BLOCK,
                     VEIN_ENTITY.get(),

@@ -229,5 +229,18 @@
   "entry.infestusfrontier.circulation.compost_gland.name": "Compost Gland",
   "entry.infestusfrontier.circulation.compost_gland.description": "Bone meal from scraps",
   "entry.infestusfrontier.circulation.compost_gland.use": "Place it on Living Substrate. Four seeds or four leaf blocks and 100 mB of water make one bone meal in 20 seconds. It starts on its own; a hopper or a mouth loads it. What goes to compost cannot also go to the Sac.",
-  "entry.infestusfrontier.circulation.compost_gland.craft": "A composter, an Organ Bud and a Membrane Sheet."
+  "entry.infestusfrontier.circulation.compost_gland.craft": "A composter, an Organ Bud and a Membrane Sheet.",
+  "block.infestusfrontier.feeding_lobe": "Feeding Lobe",
+  "block.infestusfrontier.yield_lobe": "Yield Lobe",
+  "infestusfrontier.status.lobe.no_organ": "No organ to serve: face it at an organ's side",
+  "infestusfrontier.status.lobe.serving": "Serves the %s: lobe %s of the %s its stage takes",
+  "infestusfrontier.status.lobe.idle": "Idle: the %s takes %s of this kind at its stage",
+  "entry.infestusfrontier.circulation.feeding_lobe.name": "Feeding Lobe",
+  "entry.infestusfrontier.circulation.feeding_lobe.description": "An organ's mouth for ingredients",
+  "entry.infestusfrontier.circulation.feeding_lobe.use": "Place it on a foundation beside an organ; it turns to face it and joins it. Whatever reaches the lobe goes into the organ, which keeps only what its next batch can use. Stand it on a Mouth set to intake and the network feeds the organ. A young organ takes one lobe of each kind, and one more for each stage it grows. Use it to read its state.",
+  "entry.infestusfrontier.circulation.feeding_lobe.craft": "An Organ Bud, a Membrane Sheet and a slime ball.",
+  "entry.infestusfrontier.circulation.yield_lobe.name": "Yield Lobe",
+  "entry.infestusfrontier.circulation.yield_lobe.description": "An organ's mouth for products",
+  "entry.infestusfrontier.circulation.yield_lobe.use": "Place it on a foundation beside an organ; it joins it. It gives what the organ has finished and never its ingredients. Stand it on a Mouth set to output and the network carries the products away. Feeding and Yield Lobes make an organ a small factory: plan where they and their Mouths go.",
+  "entry.infestusfrontier.circulation.yield_lobe.craft": "An Organ Bud, a Membrane Sheet and a Bone Plate."
 }

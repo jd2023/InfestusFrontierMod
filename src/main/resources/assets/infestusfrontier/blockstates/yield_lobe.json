@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "infestusfrontier:block/yield_lobe"
+    },
+    "facing=east": {
+      "model": "infestusfrontier:block/yield_lobe",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "infestusfrontier:block/yield_lobe",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "infestusfrontier:block/yield_lobe",
+      "y": 270
+    }
+  }
+}

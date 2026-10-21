@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "infestusfrontier:block/feeding_lobe"
+    },
+    "facing=east": {
+      "model": "infestusfrontier:block/feeding_lobe",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "infestusfrontier:block/feeding_lobe",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "infestusfrontier:block/feeding_lobe",
+      "y": 270
+    }
+  }
+}

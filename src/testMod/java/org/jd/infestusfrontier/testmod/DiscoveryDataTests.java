@@ -73,6 +73,8 @@ public final class DiscoveryDataTests {
                 CultivationModule.PLANTING_PROBOSCIS_ITEM.get());
         resolves(h, List.of(bud, Items.IRON_HOE, sheet, sheet), CultivationModule.HARVEST_COROLLA_ITEM.get());
         resolves(h, List.of(Items.COMPOSTER, bud, sheet), ProcessingModule.COMPOST_GLAND_ITEM.get());
+        resolves(h, List.of(bud, sheet, Items.SLIME_BALL), LogisticsModule.FEEDING_LOBE_ITEM.get());
+        resolves(h, List.of(bud, sheet, ProcessingModule.BONE_PLATE.get()), LogisticsModule.YIELD_LOBE_ITEM.get());
         h.succeed();
     }
 
@@ -100,7 +102,9 @@ public final class DiscoveryDataTests {
                 "seed_pouch",
                 "planting_proboscis",
                 "harvest_corolla",
-                "compost_gland")) {
+                "compost_gland",
+                "feeding_lobe",
+                "yield_lobe")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));

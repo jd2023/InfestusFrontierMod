@@ -128,7 +128,9 @@ public final class DiscoveryTests {
                 "seed_pouch",
                 "planting_proboscis",
                 "harvest_corolla",
-                "compost_gland"))
+                "compost_gland",
+                "feeding_lobe",
+                "yield_lobe"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();
