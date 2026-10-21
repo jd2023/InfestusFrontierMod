@@ -1,0 +1,25 @@
+{
+  "type": "infestusfrontier:reservoir_cell",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:biomass_bladder"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:reservoir_cell",
+    "count": 1
+  }
+}

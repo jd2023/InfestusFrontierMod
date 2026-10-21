@@ -50,6 +50,7 @@ public final class DiscoveryModule {
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BLADDER_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BUCKET.get());
+                        output.accept(StorageModule.RESERVOIR_CELL_ITEM.get());
                         output.accept(ProcessingModule.CULTURE_BOWL_ITEM.get());
                         output.accept(ProcessingModule.MEMBRANE_RACK_ITEM.get());
                         output.accept(ProcessingModule.MEMBRANE_SHEET.get());

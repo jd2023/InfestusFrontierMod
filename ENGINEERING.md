@@ -43,7 +43,7 @@ foundation/menu/                         OrganMenu, the server half every organ 
 ui/                                      layout grammar, sheet geometry and palette, used by the kit and by menus
 ```
 
-- Arrows point inward only. No cycles. `core` and `ui` import only the JDK; the build fails otherwise. `src/test` holds ArchUnit rules that `./gradlew test` runs: no cycles between feature packages, an `api` package reaches its module's implementation only through the `*Module` class, client classes (`net.minecraft.client`, NeoForge client, Blaze3D) are used only by `foundation/screen`, `*Screen`, `*Module` and `integration`, and block entities stay package-private.
+- Arrows point inward only. No cycles. `core` and `ui` import only the JDK; the build fails otherwise. `src/test` holds ArchUnit rules that `./gradlew test` runs: no cycles between feature packages, an `api` package reaches its module's implementation only through the `*Module` class, client classes (`net.minecraft.client`, NeoForge client, Blaze3D) are used only by `foundation/screen`, `foundation/render` (shared block-entity renderers), `*Screen`, `*Module` and `integration`, and block entities stay package-private.
 - One behavior has one owner module. One folder per owner. No global `block/`, `item/`, `menu/` buckets.
 - Each owner registers its own content. The entry point calls one `register` per module.
 - Public types live in `<owner>/api`, plus one `<Owner>Module` class with `register(IEventBus)` and the module's registry handles. Everything else is package-private.

@@ -5,10 +5,13 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -36,6 +39,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
+import org.jd.infestusfrontier.foundation.render.JoinedTankRenderer;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
@@ -43,7 +47,10 @@ import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
 
-/** Owner of item, fluid and biomass balances. Ships the biomass fluid, its bucket and the Biomass Bladder. */
+/**
+ * Owner of item, fluid and biomass balances. Ships the biomass fluid, its bucket, the Biomass Bladder and the Reservoir
+ * cell.
+ */
 public final class StorageModule {
     static final Logger LOGGER = LogUtils.getLogger();
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(InfestusFrontier.MOD_ID);
@@ -56,6 +63,8 @@ public final class StorageModule {
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, InfestusFrontier.MOD_ID);
     private static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(Registries.MENU, InfestusFrontier.MOD_ID);
+    private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
+            DeferredRegister.create(Registries.RECIPE_SERIALIZER, InfestusFrontier.MOD_ID);
     private static final DeferredRegister.DataComponents COMPONENTS =
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, InfestusFrontier.MOD_ID);
 
@@ -119,6 +128,30 @@ public final class StorageModule {
                             .build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<BiomassBladderMenu>> BIOMASS_BLADDER_MENU =
             MENUS.register("biomass_bladder", () -> IMenuTypeExtension.create(BiomassBladderMenu::new));
+    public static final DeferredBlock<ReservoirCellBlock> RESERVOIR_CELL = BLOCKS.registerBlock(
+            "reservoir_cell",
+            ReservoirCellBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PINK)
+                    .strength(1.0F)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.BLOCK)
+                    .isViewBlocking((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false));
+    public static final DeferredItem<BlockItem> RESERVOIR_CELL_ITEM = ITEMS.registerSimpleBlockItem(RESERVOIR_CELL);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ReservoirCellBlockEntity>> RESERVOIR_CELL_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "reservoir_cell",
+                    () -> BlockEntityType.Builder.of(ReservoirCellBlockEntity::new, RESERVOIR_CELL.get())
+                            .build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<ReservoirCellMenu>> RESERVOIR_CELL_MENU =
+            MENUS.register("reservoir_cell", () -> IMenuTypeExtension.create(ReservoirCellMenu::new));
+    static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ReservoirCellRecipe>> RESERVOIR_CELL_RECIPE =
+            RECIPE_SERIALIZERS.register("reservoir_cell", ReservoirCellRecipe.Serializer::new);
+    /** Blocks a Reservoir cell may also stand on: pumps that fill it from below. */
+    public static final TagKey<Block> RESERVOIR_SUPPORTS = TagKey.create(
+            Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "reservoir_supports"));
     /** The balance an organ carries on its item when broken and placed again. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<BiomassTank>> TANK =
             COMPONENTS.registerComponentType(
@@ -144,6 +177,7 @@ public final class StorageModule {
         BLOCK_ENTITIES.register(modBus);
         MENUS.register(modBus);
         COMPONENTS.register(modBus);
+        RECIPE_SERIALIZERS.register(modBus);
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerBlockEntity(
                     BiomassCapabilities.BLOCK, BIOMASS_BLADDER_ENTITY.get(), (bladder, side) -> bladder);
@@ -151,11 +185,27 @@ public final class StorageModule {
                     Capabilities.FluidHandler.BLOCK,
                     BIOMASS_BLADDER_ENTITY.get(),
                     (bladder, side) -> BiomassFluids.handler(bladder));
+            event.registerBlockEntity(BiomassCapabilities.BLOCK, RESERVOIR_CELL_ENTITY.get(), (cell, side) -> cell);
+            event.registerBlockEntity(
+                    Capabilities.FluidHandler.BLOCK,
+                    RESERVOIR_CELL_ENTITY.get(),
+                    (cell, side) -> BiomassFluids.handler(cell));
         });
         if (FMLEnvironment.dist == Dist.CLIENT) {
             OrganRenderers.register(modBus, "biomass_bladder", BIOMASS_BLADDER_ENTITY, BIOMASS_BLADDER_ITEM);
-            modBus.addListener((RegisterMenuScreensEvent event) ->
-                    event.register(BIOMASS_BLADDER_MENU.get(), BiomassBladderScreen::new));
+            modBus.addListener((RegisterMenuScreensEvent event) -> {
+                event.register(BIOMASS_BLADDER_MENU.get(), BiomassBladderScreen::new);
+                event.register(RESERVOIR_CELL_MENU.get(), ReservoirCellScreen::new);
+            });
+            // the liquid stops inside the membrane panes, above the fleshy base and under the lid
+            JoinedTankRenderer.register(
+                    modBus,
+                    RESERVOIR_CELL_ENTITY,
+                    ReservoirCellBlock.FILL,
+                    ReservoirCellBlock.FILL_STEPS,
+                    ReservoirCellBlock.JOINED,
+                    () -> STILL,
+                    new JoinedTankRenderer.Insets(0.75F / 16, 2F / 16, 0.75F / 16));
             modBus.addListener((RegisterClientExtensionsEvent event) -> event.registerFluidType(
                     new IClientFluidTypeExtensions() {
                         @Override

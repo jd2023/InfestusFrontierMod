@@ -1,0 +1,6 @@
+{
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "particle": "infestusfrontier:block/reservoir_membrane"
+  }
+}
