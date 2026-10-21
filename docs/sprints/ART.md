@@ -166,7 +166,7 @@ Subject: one standard PLAIN GREY METAL BUCKET filled with thick olive yellow-gre
 
 ```text
 ART-004  The Sheet and the Plate have their icons, the Rack and the Loom their guide illustrations
-Status: review
+Status: accepted ca4840d
 Milestone: M2
 Owner: processing
 Kind: art
@@ -190,7 +190,7 @@ Evidence: visual
 
 ```text
 ART-005  The eight armor pieces have icons and worn textures, the Cradle its guide illustration
-Status: review
+Status: accepted ca4840d
 Milestone: M2
 Owner: equipment
 Kind: art
@@ -257,7 +257,7 @@ Use case: stylized-concept. Asset type: source for a 32x32 voxel-game item icon.
 
 ## ART-006 — Bio-Furnace illustration
 
-Status: review. Owner of the asset: Astra.
+Status: accepted ca4840d. Owner of the asset: Astra.
 Files: src/main/resources/assets/infestusfrontier/textures/book/bio_furnace.png, the_waking_genome/entries/contact/bio_furnace.json, CREDITS.txt
 
 - bio_furnace.png, a 200x200 canvas with a 200x100 vignette like the other Contact illustrations: a plum stomach-shaped organ on a flesh foot, a dark mouth on top, an orange ember band glowing across its middle, a faint shimmer of heat above it, on a small island of substrate. Then the entry's first page becomes a modonomicon:image page like the others.
@@ -265,7 +265,7 @@ Files: src/main/resources/assets/infestusfrontier/textures/book/bio_furnace.png,
 
 ## ART-007 — Treatment icons
 
-Status: review. Owner of the asset: Astra.
+Status: accepted ca4840d. Owner of the asset: Astra.
 Files: src/main/resources/assets/infestusfrontier/textures/item/{fusion_binder,elastic_gel,rooting_gel,capillary_gel,contractile_fiber,filter_membrane,sealing_resin,synaptic_gel}.png, CREDITS.txt
 
 - Eight 32x32 icons, `--size 32 --colors 0`, one family with the Spore Culture icon: same outline weight, light from the upper left. Fusion Binder: a pale amber dollop in a thin membrane skin. Elastic Gel: a wobbling green-grey bead. Rooting Gel: an olive drop with a tiny root thread hanging from it. Capillary Gel: a bright green bead with fine red capillaries. Contractile Fiber: a coiled pink-red muscle strand. Filter Membrane: a square of sandy membrane with pores. Sealing Resin: a dark amber tear with a sheen. Synaptic Gel: a red bead with a violet spark inside.
