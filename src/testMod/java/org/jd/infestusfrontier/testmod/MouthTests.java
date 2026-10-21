@@ -475,8 +475,11 @@ public final class MouthTests {
         level.setBlockAndUpdate(end, mouthState(MouthMode.INTAKE));
         level.setBlockAndUpdate(end.above(), Blocks.CHEST.defaultBlockState());
         for (int x = first.x + 1; x <= last.x; x++) level.setChunkForced(x, first.z, false);
+        // the game time at each step, so a failure names the step that was slow
+        long[] at = new long[2];
         h.startSequence()
                 .thenWaitUntil(() -> h.assertFalse(level.hasChunkAt(end), "the far chunk unloaded"))
+                .thenExecute(() -> at[0] = level.getGameTime())
                 .thenExecute(() -> level.setBlockAndUpdate(start, mouthState(MouthMode.OUTPUT)))
                 .thenIdle(60)
                 .thenExecute(() -> h.assertValueEqual(
@@ -485,12 +488,22 @@ public final class MouthTests {
                                 .getCount(),
                         8,
                         "no destination while its chunk is unloaded"))
-                .thenExecute(() -> level.setChunkForced(last.x, last.z, true))
+                .thenExecute(() -> {
+                    level.setChunkForced(last.x, last.z, true);
+                    at[1] = level.getGameTime();
+                })
                 .thenWaitUntil(() -> h.assertTrue(
                         level.hasChunkAt(end)
                                 && level.getBlockEntity(end.above()) instanceof ChestBlockEntity chest
                                 && chest.getItem(0).getCount() == 8,
-                        "found and served once the chunk loaded, with no network edited"))
+                        "found and served once the chunk loaded, with no network edited; unloaded at " + at[0]
+                                + ", forced at " + at[1] + ", now " + level.getGameTime() + ", far loaded "
+                                + level.hasChunkAt(end) + ", source holds "
+                                + ((ChestBlockEntity) level.getBlockEntity(start.above()))
+                                        .getItem(0)
+                                        .getCount()
+                                + ", pulse scheduled "
+                                + level.getBlockTicks().hasScheduledTick(start, LogisticsModule.MOUTH.get())))
                 .thenExecute(() -> {
                     level.setChunkForced(first.x, first.z, false);
                     level.setChunkForced(last.x, last.z, false);
