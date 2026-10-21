@@ -265,20 +265,23 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Add cells for capacity; Thermal Lining permits hot liquids. Partitioned installations use separate tanks, so a water route cannot contaminate the lava supply.
 
 ### T1-09 — Item Capsule
-- **Status:** Deferred. General item storage uses vanilla containers and Storage Drawers. Infestus supplies the mouths, veins, routing and controls.
-- **Integration:** Stores retain ownership of their contents. Mouths use standard NeoForge item capabilities; drawer banks connect through their controller. Storage Drawers is optional for the standalone mod.
-- **Reserves:** An Infestus connection can limit its own extraction. It cannot prevent a player or another mod from removing externally stored items; availability is checked again when transferring.
+- **Does:** Stores a small number of item types in a fleshy cabinet. A large icon on its front shows the selected contents; joined capsules in one rectangular body form one store with more compartments.
+- **Input → output:** Inserted items → the same items through hand access, hoppers, Mouths or Item Veins.
+- **Create:** 1 chest + 2 Membrane Sheets + 1 Spore Culture.
+- **Growth:** Add neighboring capsules for capacity. Skeletal Graft treatment improves compression of stackable items but does not merge different equipment histories. Display icons can be hidden per capsule.
+- **Storage boundary:** Vanilla containers stay fully supported: Mouths work with any standard item inventory. The capsule is the store the colony knows natively: Mouths read its counts directly and its reserves hold inside it.
 
-### T1-10 — Intake Mouth
-- **Does:** Attaches to an organ or store and pulls from the inventory immediately facing its mouth. Makes a hand-fed organ accessible to ordinary storage automation.
-- **Input → output:** Selected items from a chest, hopper or Item Vein → a chosen input slot of the attached organ.
-- **Create:** 1 Organ Bud + 1 hopper + 1 Membrane Sheet.
-- **Growth:** Route Imprint treatment adds an item filter; a Nerve Tissue connection permits on/off control. Multiple mouths may serve separate ingredients, but never bypass the organ's recipe requirements.
+### T1-10 — Mouth (Intake setting)
+- **Does:** A cell of living substrate with lips on its top face. The store or organ standing on it is its partner; Item Veins and other Mouths touching it are its network. A Mouth set to intake is an Intake Mouth: the network feeds its partner. Makes a hand-fed organ part of ordinary storage automation.
+- **Input → output:** Items routed through Item Veins → the partner's inventory, through its standard item handler; an organ decides which slot takes them.
+- **Create:** 1 Organ Bud + 1 hopper + 1 Membrane Sheet. One Mouth item serves both settings.
+- **Settings:** Intake, output or closed; nine filter slots as an allow or deny list; an amount (intake fills the partner up to it, output keeps it in the partner); a priority for intake. The probe used on the partner opens the Mouth's screen.
+- **Growth:** Route Imprint treatment adds tag and component filters; a Nerve Tissue connection permits on/off control. Multiple mouths may serve separate ingredients, but never bypass the organ's recipe requirements.
 
-### T1-11 — Output Mouth
-- **Does:** Extracts completed products from a machine, without stealing its ingredients, fuel or reserved seed stock.
-- **Input → output:** Completed items from the host → a neighboring inventory or Item Vein. No space means no extraction.
-- **Create:** 1 Organ Bud + 1 hopper + 1 bone.
+### T1-11 — Mouth (Output setting)
+- **Does:** A Mouth set to output is an Output Mouth: it takes completed products from its partner and sends each packet to an Intake Mouth on the network that accepts it, without stealing ingredients, fuel or reserved seed stock.
+- **Input → output:** Items the partner offers for extraction → the best accepting Intake Mouth: highest priority, then nearest. No accepting destination means no extraction.
+- **Create:** The same Mouth item, set to output.
 - **Growth:** Route Imprint treatment chooses output/byproduct filters. Pair with Intake Mouths to automate the original Bio-Furnace instead of replacing it with a new machine.
 
 ### T1-12 — Filter Valve
@@ -1124,7 +1127,7 @@ Connect established workshops rather than replacing them. Transit consumes local
 - **Growth:** Add compartments for several independent destinations. A fluid compartment needs a compatible lined cyst; incompatible cargo does not share one invisible universal tank.
 
 ### T6-05 — Storage Cortex
-- **Does:** Presents connected vanilla containers, supported external stores and biological tanks as one searchable local store. The physical containers still hold the contents; T1-09 defines the storage boundary.
+- **Does:** Presents connected Item Capsules and tanks as one searchable local store, while the physical cells still hold the contents.
 - **Input → output:** Player queries, deposits and withdrawals + electricity → indexed access and routed items through connected mouths/veins.
 - **Create:** 1 Synaptic Console + 1 Archive Lobe + 1 precision-conditioned Spatial Membrane. A Request Cortex is a separate optional client; storage indexing alone does not require automated recipe planning.
 - **Growth:** Attach Archive Lobes for more connected storage groups. Remote stock is shown separately with availability and freight cost; it cannot be withdrawn instantly from an unloaded dimension.
