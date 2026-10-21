@@ -351,12 +351,12 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
 
     // --- this Mouth as a destination ---
 
-    /** How many of {@code stack} this Mouth's store takes now, when its mode takes; nothing changes. */
     /** Whether this Mouth's mode and filter let {@code stack} in; its store is not asked. */
     boolean wants(ItemStack stack) {
         return unreadable.isEmpty() && mode().takes() && permits(stack);
     }
 
+    /** How many of {@code stack} this Mouth's store takes now, when its mode takes; nothing changes. */
     int room(ItemStack stack) {
         if (unreadable.isPresent() || !mode().takes() || !permits(stack)) return 0;
         IItemHandler store = partner();
