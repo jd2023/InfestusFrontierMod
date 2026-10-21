@@ -253,9 +253,9 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Bone reinforcement supports a short free-standing span. Longer hills use repeated visible steps; a stitch does not discover an invisible route automatically.
 
 ### T1-07 — Biomass Reservoir Cell
-- **Does:** Forms a rounded rectangular reservoir with a fleshy bottom and transparent membrane sides. Adjacent cells share one visible level and remove internal walls.
+- **Does:** Forms a rounded rectangular reservoir with a fleshy bottom and transparent membrane sides. Cells in one full box, up to 4 on a side, share one visible level and remove internal walls; the body fills from the bottom layer.
 - **Input → output:** Biomass through buckets or a supporting Vascular Junction → a shared reserve for connected consumers.
-- **Create:** Mutate a Biomass Bladder with 2 Bone Plates + 2 Membrane Sheets. Additional cells extend the rectangular body.
+- **Create:** Mutate a Biomass Bladder with 2 Bone Plates + 2 Membrane Sheets; the cell keeps the Bladder's biomass. Additional cells extend the rectangular body.
 - **Growth:** Add a complete row/layer to increase capacity. An incomplete extension waits outside the existing body until valid; existing stored biomass is not erased. A second junction provides another access point, not a second copy of the contents.
 
 ### T1-08 — Fluid Cyst

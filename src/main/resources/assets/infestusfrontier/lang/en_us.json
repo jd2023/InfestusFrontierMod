@@ -270,5 +270,13 @@
   "entry.infestusfrontier.circulation.filter_valve.name": "Filter Valve",
   "entry.infestusfrontier.circulation.filter_valve.description": "A reserve that stays home",
   "entry.infestusfrontier.circulation.filter_valve.use": "Place it on a foundation facing a store: a Bladder, a Sac, a tank. Drain the store through the valve with a Junction intake or a bucket on its other sides, and the valve stops it at the reserve. Filling goes through. A stick steps the reserve: none, 250, 500, 1000 up to 16000 mB, then none again. Any other hand reads it.",
-  "entry.infestusfrontier.circulation.filter_valve.craft": "A Bone Plate, a slime ball and paper."
+  "entry.infestusfrontier.circulation.filter_valve.craft": "A Bone Plate, a slime ball and paper.",
+  "block.infestusfrontier.reservoir_cell": "Reservoir Cell",
+  "infestusfrontier.refusal.storage.body_out_of_reach": "Part of this reservoir is not loaded or is still forming",
+  "gui.infestusfrontier.reservoir_cell.body": "Body %s × %s × %s",
+  "gui.infestusfrontier.reservoir_cell.body.story": "%s cells in one full box share one tank. It fills from the bottom layer and drains from the top. A whole row or layer grows it, up to 4 on a side; a cell that would leave a gap waits outside with its own biomass.",
+  "entry.infestusfrontier.circulation.reservoir_cell.name": "Reservoir Cell",
+  "entry.infestusfrontier.circulation.reservoir_cell.description": "Bladders that grow into one tank",
+  "entry.infestusfrontier.circulation.reservoir_cell.use": "A cell holds 4000 BU and stands on a foundation such as Living Substrate, on another cell or on a Vascular Junction. Touching cells that fill a whole box, up to 4 on a side, become one body: the walls between them go, and biomass fills the bottom layer first and drains from the top. Grow it by whole rows and layers; a cell that would leave a gap waits outside with its own biomass. A bucket, vein or junction on any cell reaches the whole body. A broken cell keeps its own share.",
+  "entry.infestusfrontier.circulation.reservoir_cell.craft": "A Biomass Bladder, two Bone Plates and two Membrane Sheets. The cell keeps what the Bladder held."
 }

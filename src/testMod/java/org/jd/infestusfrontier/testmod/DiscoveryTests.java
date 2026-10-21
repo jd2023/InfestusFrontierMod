@@ -133,7 +133,8 @@ public final class DiscoveryTests {
                 "yield_lobe",
                 "sensor_polyp",
                 "fuel_papilla",
-                "filter_valve"))
+                "filter_valve",
+                "reservoir_cell"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();

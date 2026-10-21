@@ -1,0 +1,94 @@
+{
+  "commands": [
+    "advancement grant @s through infestusfrontier:contact/biomass_bladder",
+    "fill -8 -61 -6 10 -54 10 air",
+    "fill -8 -62 -6 10 -62 10 grass_block",
+    "kill @e[type=item]",
+    "fill -4 -61 1 6 -61 4 infestusfrontier:living_substrate[stage=mature]",
+    "fill 0 -60 2 2 -59 3 infestusfrontier:reservoir_cell{tank:{stored:2500,reserved:0,capacity:4000},body:[0,-60,2,2,-59,3]}",
+    "setblock 3 -60 2 infestusfrontier:reservoir_cell{tank:{stored:1500,reserved:0,capacity:4000}}",
+    "setblock -3 -60 2 infestusfrontier:vascular_junction[up=outlet]",
+    "setblock -3 -59 2 infestusfrontier:reservoir_cell{tank:{stored:3000,reserved:0,capacity:4000},body:[-3,-59,2,-3,-58,2]}",
+    "setblock -3 -58 2 infestusfrontier:reservoir_cell{tank:{stored:3000,reserved:0,capacity:4000},body:[-3,-59,2,-3,-58,2]}",
+    "setblock 5 -60 2 infestusfrontier:reservoir_cell",
+    "give @s infestusfrontier:reservoir_cell"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 1.0,
+      "y": -57.5,
+      "z": -3.5,
+      "yaw": 0,
+      "pitch": 25
+    },
+    {
+      "name": "back",
+      "x": 1.0,
+      "y": -57.5,
+      "z": 9.5,
+      "yaw": 180,
+      "pitch": 25
+    },
+    {
+      "name": "side",
+      "x": 9.5,
+      "y": -58.0,
+      "z": 3.0,
+      "yaw": 90,
+      "pitch": 20
+    },
+    {
+      "name": "top",
+      "x": 1.5,
+      "y": -54.5,
+      "z": -0.5,
+      "yaw": 0,
+      "pitch": 60
+    },
+    {
+      "name": "close",
+      "x": 0.2,
+      "y": -58.8,
+      "z": 0.3,
+      "yaw": -25,
+      "pitch": 20
+    },
+    {
+      "name": "hotbar",
+      "x": 1.0,
+      "y": -57.5,
+      "z": -3.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:reservoir_cell"
+      ]
+    },
+    {
+      "name": "screen",
+      "x": 1.5,
+      "y": -60,
+      "z": -0.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        1,
+        -60,
+        2
+      ]
+    },
+    {
+      "name": "book_reservoir_cell",
+      "x": 1.5,
+      "y": -60,
+      "z": -2.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "book": "infestusfrontier:circulation/reservoir_cell"
+    }
+  ]
+}

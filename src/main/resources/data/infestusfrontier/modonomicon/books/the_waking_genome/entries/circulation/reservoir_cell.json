@@ -1,0 +1,38 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.reservoir_cell.name",
+  "description": "entry.infestusfrontier.circulation.reservoir_cell.description",
+  "icon": "infestusfrontier:reservoir_cell",
+  "x": 3,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/vascular_junction"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/reservoir_cell"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.reservoir_cell.name",
+      "text": "entry.infestusfrontier.circulation.reservoir_cell.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:reservoir_cell",
+      "text": "entry.infestusfrontier.circulation.reservoir_cell.craft"
+    }
+  ]
+}

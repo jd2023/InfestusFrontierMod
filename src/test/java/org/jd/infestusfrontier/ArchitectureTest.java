@@ -90,7 +90,7 @@ class ArchitectureTest {
     @Test
     void clientCodeStaysInItsPlaces() {
         noClasses()
-                .that(not(resideInAnyPackage("..foundation.screen..", "..integration.."))
+                .that(not(resideInAnyPackage("..foundation.screen..", "..foundation.render..", "..integration.."))
                         .and(not(declaredIn("Screen")))
                         .and(not(declaredIn("Module"))))
                 .should()
