@@ -186,10 +186,17 @@ def prepareGameTest = tasks.register('prepareGameTest', Copy) {
     onlyIf { !gameTestProperties.asFile.exists() }
 }
 // A hung game process fails the gate instead of holding it: no run outlives its timeout.
+// A server that never ran its tests, as one whose mods failed to load, exits cleanly too: the log must say they passed.
+def gameTestLog = layout.projectDirectory.file('runs/gametest/logs/latest.log')
 tasks.named('runGameTestServer') {
     dependsOn prepareGameTest
     mustRunAfter ':core:test', ':ui:test', distribution
     timeout = java.time.Duration.ofMinutes(15)
+    doLast {
+        def log = gameTestLog.asFile
+        if (!log.exists() || !(log.text =~ /All \d+ required tests passed/))
+            throw new GradleException("The GameTest server did not report its tests passed; see ${log}")
+    }
 }
 
 // Feature screens declare parts; only the kit in foundation/screen draws.
