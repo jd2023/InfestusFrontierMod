@@ -130,8 +130,8 @@ final class ReservoirCellBlockEntity extends BlockEntity implements BiomassHandl
      * A body saved somewhere else, as a structure moved elsewhere, is no body: the cell is alone and forms again.
      */
     private boolean holdsThisCell(Box box) {
-        return box.contains(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ())
-                && box.fits(Body.MAX_SIDE);
+        return box.fits(Body.MAX_SIDE)
+                && box.contains(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
     }
 
     private static Optional<String> check(Saved saved) {
