@@ -1,0 +1,124 @@
+{
+  "variants": {
+    "facing=north,reserve=0": {
+      "model": "infestusfrontier:block/filter_valve"
+    },
+    "facing=north,reserve=1": {
+      "model": "infestusfrontier:block/filter_valve"
+    },
+    "facing=north,reserve=2": {
+      "model": "infestusfrontier:block/filter_valve"
+    },
+    "facing=north,reserve=3": {
+      "model": "infestusfrontier:block/filter_valve"
+    },
+    "facing=north,reserve=4": {
+      "model": "infestusfrontier:block/filter_valve"
+    },
+    "facing=north,reserve=5": {
+      "model": "infestusfrontier:block/filter_valve"
+    },
+    "facing=north,reserve=6": {
+      "model": "infestusfrontier:block/filter_valve"
+    },
+    "facing=north,reserve=7": {
+      "model": "infestusfrontier:block/filter_valve"
+    },
+    "facing=east,reserve=0": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 90
+    },
+    "facing=east,reserve=1": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 90
+    },
+    "facing=east,reserve=2": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 90
+    },
+    "facing=east,reserve=3": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 90
+    },
+    "facing=east,reserve=4": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 90
+    },
+    "facing=east,reserve=5": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 90
+    },
+    "facing=east,reserve=6": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 90
+    },
+    "facing=east,reserve=7": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 90
+    },
+    "facing=south,reserve=0": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 180
+    },
+    "facing=south,reserve=1": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 180
+    },
+    "facing=south,reserve=2": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 180
+    },
+    "facing=south,reserve=3": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 180
+    },
+    "facing=south,reserve=4": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 180
+    },
+    "facing=south,reserve=5": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 180
+    },
+    "facing=south,reserve=6": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 180
+    },
+    "facing=south,reserve=7": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 180
+    },
+    "facing=west,reserve=0": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 270
+    },
+    "facing=west,reserve=1": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 270
+    },
+    "facing=west,reserve=2": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 270
+    },
+    "facing=west,reserve=3": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 270
+    },
+    "facing=west,reserve=4": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 270
+    },
+    "facing=west,reserve=5": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 270
+    },
+    "facing=west,reserve=6": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 270
+    },
+    "facing=west,reserve=7": {
+      "model": "infestusfrontier:block/filter_valve",
+      "y": 270
+    }
+  }
+}

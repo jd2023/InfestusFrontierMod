@@ -91,6 +91,18 @@ public final class LogisticsModule {
                         .noOcclusion());
     }
 
+    /** Stands between a store and what drains it, and keeps the reserve. */
+    public static final DeferredBlock<FilterValveBlock> FILTER_VALVE = BLOCKS.registerBlock(
+            "filter_valve",
+            FilterValveBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PINK)
+                    .strength(0.8F)
+                    .sound(SoundType.BONE_BLOCK)
+                    .noOcclusion());
+
+    public static final DeferredItem<BlockItem> FILTER_VALVE_ITEM = ITEMS.registerSimpleBlockItem(FILTER_VALVE);
+
     public static final DeferredBlock<VeinBlock> BIOMASS_VEIN = vein(Carrier.BIOMASS);
     public static final DeferredBlock<VeinBlock> FLUID_VEIN = vein(Carrier.FLUID);
     public static final DeferredBlock<VeinBlock> ITEM_VEIN = vein(Carrier.ITEM);
@@ -169,6 +181,12 @@ public final class LogisticsModule {
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, VEIN_ENTITY.get(), VeinBlockEntity::fluidPort);
             event.registerBlockEntity(LogisticsCapabilities.MOUTH_SCREEN, MOUTH_ENTITY.get(), (mouth, none) -> mouth);
+            event.registerBlock(
+                    Capabilities.FluidHandler.BLOCK,
+                    (level, pos, state, entity, side) -> side == state.getValue(FilterValveBlock.FACING)
+                            ? null
+                            : FILTER_VALVE.get().handler(level, pos),
+                    FILTER_VALVE.get());
             event.registerBlock(
                     Capabilities.ItemHandler.BLOCK,
                     (level, pos, state, entity, side) -> ((LobeBlock) state.getBlock()).handler(level, pos),

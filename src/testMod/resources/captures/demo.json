@@ -121,8 +121,14 @@
     "setblock 51 -60 -36 infestusfrontier:sensor_polyp[facing=west,power=0]",
     "setblock 52 -60 -36 redstone_lamp",
     "setblock 52 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Sensor Polyp\"','\"reads the chest\"','\"lights the lamp\"','\"comparator too\"']}}",
-    "setblock 59 -61 -36 infestusfrontier:fuel_papilla{tank:{stored:800,reserved:0,capacity:1000}}",
-    "setblock 59 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Fuel Papilla\"','\"stand on it in\"','\"awakened armor\"','\"10 BU a second\"']}}"
+    "setblock 59 -61 -36 infestusfrontier:fuel_papilla{tank:{stored:200,reserved:0,capacity:250}}",
+    "setblock 59 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Fuel Papilla\"','\"stand on it in\"','\"awakened armor\"','\"10 BU a second\"']}}",
+    "fill 69 -61 -36 72 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 69 -60 -36 infestusfrontier:biomass_bladder[fill=3]{tank:{stored:3000,reserved:0,capacity:4000}}",
+    "setblock 70 -60 -36 infestusfrontier:filter_valve[facing=west,reserve=3]",
+    "setblock 71 -60 -36 infestusfrontier:vascular_junction[west=intake,east=outlet]",
+    "setblock 72 -60 -36 infestusfrontier:biomass_bladder",
+    "setblock 73 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Filter Valve\"','\"keeps 1000 mB\"','\"in the Bladder\"','\"stick: reserve\"']}}"
   ],
   "views": [
     {
@@ -786,6 +792,32 @@
       "gui": true,
       "name": "book_fuel_papilla",
       "book": "infestusfrontier:circulation/fuel_papilla"
+    },
+    {
+      "name": "valve",
+      "x": 70.5,
+      "y": -58.5,
+      "z": -40.5,
+      "yaw": 0,
+      "pitch": 20
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_filter_valve",
+      "book": "infestusfrontier:circulation/filter_valve"
+    },
+    {
+      "name": "papilla",
+      "x": 59.5,
+      "y": -58,
+      "z": -38.5,
+      "yaw": 0,
+      "pitch": 50
     }
   ]
 }

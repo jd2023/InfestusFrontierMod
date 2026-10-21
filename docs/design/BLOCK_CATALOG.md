@@ -297,9 +297,9 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Counted like the Feeding Lobe, apart from it: a young organ serves one of each kind.
 
 ### T1-12 — Filter Valve
-- **Does:** Gives a vein branch an explicit destination/filter and minimum source reserve. Its open or sealed throat is visible from outside.
-- **Input → output:** A permitted item or fluid stream → admitted flow; rejected material stays upstream.
-- **Create:** 1 Bone Plate + 1 slime ball + 1 paper, applied to a vein face.
+- **Does:** Keeps a minimum reserve in a fluid or biomass store. It stands on a foundation between the store and what drains it, facing the store: a Junction intake or a bucket drains through it and stops at the reserve. Its sphincter throat faces the store. Items keep their reserves with a Mouth's amount instead.
+- **Input → output:** The store's contents above the reserve → whatever drains the valve; filling passes through unchanged.
+- **Create:** 1 Bone Plate + 1 slime ball + 1 paper. A stick steps the reserve.
 - **Growth:** Synaptic Gel treatment adds signal control. Later electrical mutation offers proportional flow rather than only open/closed operation.
 
 ### T1-13 — Overflow Valve
@@ -309,7 +309,7 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Skeletal Graft treatment adds a reserved emergency outlet. A tank visible through the valve's window lets the player distinguish a full reserve from a blocked relief route.
 
 ### T1-14 — Sensor Polyp
-- **Does:** Measures one attached organ or storage: fullness, low fuel, blocked output or completed batch. Useful before a central control system exists.
+- **Does:** Measures one attached organ or storage: fullness, low fuel, blocked output or completed batch. Useful before a central control system exists. M3 ships fullness; the other measures come with the organs that need them.
 - **Input → output:** A selected measured value → redstone strength or a nerve signal.
 - **Create:** 1 Organ Bud + 1 comparator + 1 spider eye.
 - **Growth:** Survey Gel treatment gives separate upper/lower thresholds to prevent rapid switching. It observes its configured target, not every inventory in the base.
@@ -442,7 +442,7 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 
 ### T1-36 — Fuel Papilla
 - **Does:** Mutated Living Substrate, flush with the ground, that feeds worn armor. No separate free-standing feeder, healing head or digestive function.
-- **Input → output:** Colony biomass → biomass delivered to authorized selected worn pieces. Base rate10BU/s plus ceil(delivered/5)BU overhead per one-second batch. Works with partial suits; full pieces are skipped. Source reserve and maximum fill are configurable; it is not a hidden reservoir or a through-vein.
+- **Input → output:** Colony biomass → biomass delivered to authorized selected worn pieces. Base rate 10 BU/s plus ceil(delivered/5) BU overhead per one-second batch. Works with partial suits; full pieces are skipped. Maximum fill and the pieces are set on the pad; a Filter Valve keeps the source's reserve. It holds one 250 BU packet and is not a hidden reservoir or a through-vein.
 - **Create:** Apply 1 Capillary Gel + 1 Membrane Sheet to exposed mature substrate. Keep maturity and compatible reinforcement; drain/replace any previous primary function first.
 - **Growth:** Add four adjacent Biomass Vein cells and four corner Rib Frames in a3×3 flush service pad:40BU/s with ceil(delivered/20)BU overhead per batch. One pad serves one wearer; no multiplicative stacking. No learning from filling/circulating biomass. Probe/UI starts filling without intercepting block placement. Healing Dock remains a separate service.
 

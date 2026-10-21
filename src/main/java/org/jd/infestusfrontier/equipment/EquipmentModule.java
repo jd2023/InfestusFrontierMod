@@ -7,9 +7,9 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -17,9 +17,13 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -45,6 +49,10 @@ public final class EquipmentModule {
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, InfestusFrontier.MOD_ID);
     private static final DeferredRegister<ArmorMaterial> MATERIALS =
             DeferredRegister.create(Registries.ARMOR_MATERIAL, InfestusFrontier.MOD_ID);
+    private static final DeferredRegister<MenuType<?>> MENUS =
+            DeferredRegister.create(Registries.MENU, InfestusFrontier.MOD_ID);
+    public static final DeferredHolder<MenuType<?>, MenuType<FuelPapillaMenu>> FUEL_PAPILLA_MENU =
+            MENUS.register("fuel_papilla", () -> IMenuTypeExtension.create(FuelPapillaMenu::new));
     private static final DeferredRegister.DataComponents COMPONENTS =
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, InfestusFrontier.MOD_ID);
 
@@ -74,7 +82,9 @@ public final class EquipmentModule {
                     .strength(0.6F)
                     .sound(SoundType.GRAVEL));
 
-    public static final DeferredItem<BlockItem> FUEL_PAPILLA_ITEM = ITEMS.registerSimpleBlockItem(FUEL_PAPILLA);
+    /** The papilla as a graft: used on exposed mature substrate it grows the cell. */
+    public static final DeferredItem<Item> FUEL_PAPILLA_ITEM = ITEMS.registerItem("fuel_papilla", FuelPapillaItem::new);
+
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FuelPapillaBlockEntity>> FUEL_PAPILLA_ENTITY =
             BLOCK_ENTITIES.register(
                     "fuel_papilla",
@@ -133,6 +143,10 @@ public final class EquipmentModule {
         BLOCKS.register(modBus);
         ITEMS.register(modBus);
         BLOCK_ENTITIES.register(modBus);
+        MENUS.register(modBus);
+        if (FMLEnvironment.dist == Dist.CLIENT)
+            modBus.addListener((RegisterMenuScreensEvent event) ->
+                    event.register(FUEL_PAPILLA_MENU.get(), FuelPapillaScreen::new));
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerItem(
                     Capabilities.FluidHandler.ITEM,

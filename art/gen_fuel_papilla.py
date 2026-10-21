@@ -1,43 +1,67 @@
-"""Fuel Papilla: a substrate cell with a pale nipple and a green pore on top. Static model.
+"""Fuel Papilla: a substrate cell, flush with the ground, with a pore sunk 3 px into its top. The pore is floored with
+the flowing biomass lumen and holds a pale nipple whose tip stays 1 px below the surface, so nothing stands proud of
+the block. Skin, lumen and wall are the veins' textures; the nipple is the Mouth's ivory lip.
 
     python3 art/gen_fuel_papilla.py
 """
-from organ_model import Painter, islands, faces, pack, write_static, skin, flat, ball
+import json
+from pathlib import Path
 
-SHEET = 64
-SKIN = [(96, 44, 64), (124, 60, 78), (150, 82, 92), (176, 110, 112), (198, 140, 134)]
-PALE = [(170, 130, 130), (200, 160, 156), (224, 190, 184), (240, 214, 206)]
-PORE = [(44, 92, 52), (96, 190, 78), (170, 255, 120), (228, 255, 198)]
-
-BONES = [
-    ('root', None, [0, 0, 0], []),
-    ('cell', 'root', [0, 0, 0], [
-        ('cube', [-8, 0, -8], [16, 14, 16], None),
-        ('rim', [-8, 14, -8], [16, 2, 16], None),
-        ('nipple', [-3, 16, -3], [6, 2, 6], None),
-        ('pore', [-1, 18, -1], [2, 1, 2], None),
-    ]),
-]
+ASSETS = Path('src/main/resources/assets/infestusfrontier')
+NS = 'infestusfrontier:block/'
+SKIN, LUMEN, WALL, IVORY = (NS + 'living_substrate_mature_5', NS + 'vein_lumen_biomass', NS + 'vein_wall',
+                            NS + 'mouth_lip_bone')
+LO, HI, FLOOR = 4, 12, 13
 
 
-def textures(uv):
-    p = Painter(SHEET, 509)
-    sizes = islands(BONES)
-    rects = {name: faces(sizes[name], uv[name]) for name in sizes}
-    for name in ('cube', 'rim'):
-        for face, rect in rects[name].items():
-            p.ramp(rect, SKIN, lambda x, y, w, h: skin(x, y, w, h) + 0.1, mottle=0.3)
-    for face, rect in rects['nipple'].items():
-        p.ramp(rect, PALE, lambda x, y, w, h: 0.4 + 0.4 * ball(x, y, w, h), grain=0.04, mottle=0.1)
-    for face, rect in rects['pore'].items():
-        p.ramp(rect, PORE, flat(0.7), grain=0.03, mottle=0.05)
-    return p
+def box(frm, to, faces):
+    return {'from': frm, 'to': to, 'faces': faces}
+
+
+def face(tex, uv, cull=None):
+    out = {'uv': uv, 'texture': tex}
+    if cull:
+        out['cullface'] = cull
+    return out
 
 
 def main():
-    uv = pack(BONES, SHEET)
-    write_static('fuel_papilla', BONES, SHEET, textures(uv))
-    print('fuel_papilla: static')
+    sides = {d: face('#skin', [0, 0, 16, 16], d) for d in ('north', 'south', 'east', 'west', 'down')}
+    base = box([0, 0, 0], [16, FLOOR, 16], dict(sides, up=face('#lumen', [LO, LO, HI, HI])))
+    for d in ('north', 'south', 'east', 'west'):
+        base['faces'][d] = face('#skin', [0, 16 - FLOOR, 16, 16], d)
+    ring = [
+        box([0, FLOOR, 0], [16, 16, LO], {'up': face('#skin', [0, 0, 16, LO], 'up'),
+                                          'north': face('#skin', [0, 0, 16, 3], 'north'),
+                                          'east': face('#skin', [16 - LO, 0, 16, 3], 'east'),
+                                          'west': face('#skin', [0, 0, LO, 3], 'west'),
+                                          'south': face('#wall', [LO, 0, HI, 3])}),
+        box([0, FLOOR, HI], [16, 16, 16], {'up': face('#skin', [0, HI, 16, 16], 'up'),
+                                           'south': face('#skin', [0, 0, 16, 3], 'south'),
+                                           'east': face('#skin', [0, 0, LO, 3], 'east'),
+                                           'west': face('#skin', [HI, 0, 16, 3], 'west'),
+                                           'north': face('#wall', [LO, 0, HI, 3])}),
+        box([0, FLOOR, LO], [LO, 16, HI], {'up': face('#skin', [0, LO, LO, HI], 'up'),
+                                           'west': face('#skin', [LO, 0, HI, 3], 'west'),
+                                           'east': face('#wall', [LO, 0, HI, 3])}),
+        box([HI, FLOOR, LO], [16, 16, HI], {'up': face('#skin', [HI, LO, 16, HI], 'up'),
+                                            'east': face('#skin', [LO, 0, HI, 3], 'east'),
+                                            'west': face('#wall', [LO, 0, HI, 3])}),
+    ]
+    nipple = [
+        box([6, FLOOR, 6], [10, FLOOR + 1, 10], {d: face('#ivory', [0, 0, 4, 1]) for d in ('north', 'south', 'east', 'west')}
+            | {'up': face('#ivory', [6, 6, 10, 10])}),
+        box([7, FLOOR + 1, 7], [9, 15, 9], {d: face('#ivory', [8, 0, 10, 1]) for d in ('north', 'south', 'east', 'west')}
+            | {'up': face('#ivory', [7, 7, 9, 9])}),
+    ]
+    model = {'parent': 'minecraft:block/block',
+             'textures': {'skin': SKIN, 'lumen': LUMEN, 'wall': WALL, 'ivory': IVORY, 'particle': SKIN},
+             'elements': [base] + ring + nipple}
+    (ASSETS / 'models/block/fuel_papilla.json').write_text(json.dumps(model, indent=2) + '\n')
+    stale = ASSETS / 'textures/block/fuel_papilla.png'
+    if stale.exists():
+        stale.unlink()
+    print('fuel_papilla: 1 model')
 
 
 if __name__ == '__main__':

@@ -78,10 +78,11 @@ public final class DiscoveryDataTests {
         resolves(h, List.of(bud, sheet, Items.SLIME_BALL), LogisticsModule.FEEDING_LOBE_ITEM.get());
         resolves(h, List.of(bud, sheet, ProcessingModule.BONE_PLATE.get()), LogisticsModule.YIELD_LOBE_ITEM.get());
         resolves(h, List.of(bud, Items.COMPARATOR, Items.SPIDER_EYE), ControlModule.SENSOR_POLYP_ITEM.get());
+        resolves(h, List.of(LogisticsModule.CAPILLARY_GEL.get(), sheet), EquipmentModule.FUEL_PAPILLA_ITEM.get());
         resolves(
                 h,
-                List.of(EcologyModule.LIVING_SUBSTRATE_ITEM.get(), LogisticsModule.CAPILLARY_GEL.get(), sheet),
-                EquipmentModule.FUEL_PAPILLA_ITEM.get());
+                List.of(ProcessingModule.BONE_PLATE.get(), Items.SLIME_BALL, Items.PAPER),
+                LogisticsModule.FILTER_VALVE_ITEM.get());
         h.succeed();
     }
 
@@ -112,9 +113,9 @@ public final class DiscoveryDataTests {
                 "compost_gland",
                 "feeding_lobe",
                 "yield_lobe",
-
                 "sensor_polyp",
-                "fuel_papilla")) {
+                "fuel_papilla",
+                "filter_valve")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));
