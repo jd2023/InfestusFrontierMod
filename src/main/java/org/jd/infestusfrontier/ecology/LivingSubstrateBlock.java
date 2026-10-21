@@ -78,11 +78,15 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
         return cellAt(context.getClickedPos());
     }
 
-    /** Commands and other mods may place any tile; one extra setBlock puts the right one. */
+    /**
+     * Commands and other mods may place any tile; one extra setBlock puts the right one. The tile changes only the
+     * picture, so the neighbours' shapes are left alone: updating them would read, and so load, a neighbour's chunk.
+     */
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         int tile = tileAt(pos);
-        if (state.getValue(TILE) != tile) level.setBlock(pos, state.setValue(TILE, tile), Block.UPDATE_CLIENTS);
+        if (state.getValue(TILE) != tile)
+            level.setBlock(pos, state.setValue(TILE, tile), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
     }
 
     @Override

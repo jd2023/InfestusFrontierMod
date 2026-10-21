@@ -168,6 +168,22 @@ public final class EcologyTests {
         });
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "substrate_boundary")
+    public static void aTileFixUpAtAChunkEdgeNeverLoadsTheNextChunk(GameTestHelper h) {
+        var level = h.getLevel();
+        BlockPos origin = h.absolutePos(BlockPos.ZERO);
+        // x ends in 15: the next chunk east is one nothing has loaded
+        BlockPos edge = new BlockPos((origin.getX() & ~15) + 208015, 80, (origin.getZ() & ~15) + 208008);
+        level.getChunkAt(edge);
+        int quiet = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+        h.assertFalse(level.hasChunkAt(edge.east()), "the next chunk starts unloaded");
+        // one of the two tiles is wrong for this cell, so its placement corrects itself
+        for (int tile = 0; tile <= 1; tile++)
+            level.setBlock(edge, mature().setValue(LivingSubstrateBlock.TILE, tile), quiet);
+        h.assertFalse(level.hasChunkAt(edge.east()), "correcting the tile loaded no chunk");
+        h.succeed();
+    }
+
     static BlockState mature() {
         return EcologyModule.LIVING_SUBSTRATE
                 .get()
