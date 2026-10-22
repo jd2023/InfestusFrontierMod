@@ -273,7 +273,7 @@ Files: src/main/resources/assets/infestusfrontier/textures/item/{fusion_binder,e
 
 ## ART-008 — Storage tissue: Reservoir and Item Capsule textures
 
-Status: review. Owner of the asset: Astra.
+Status: accepted e7870a3. Owner of the asset: Astra.
 Files: src/main/resources/assets/infestusfrontier/textures/block/{reservoir_membrane,reservoir_bone,reservoir_flesh,item_capsule_lining}.png, CREDITS.txt
 
 - Four 64x64 block textures, seamless on all four edges, one family with the Living Substrate tiles. They replace procedural placeholders from art/gen_reservoir.py and art/gen_item_capsule.py; the part models, the blockstates and the liquid stay with those generators, so a repaint changes no model.
