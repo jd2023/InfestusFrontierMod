@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.storage;
 
 import java.util.List;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -79,10 +80,10 @@ final class CapsuleBody {
         return holds(slot) ? cell(slot).held(compartment(slot)) : ItemStack.EMPTY;
     }
 
-    /** How many of its kind a slot holds at most: the limit of what it holds, or of a full stack of 64 when empty. */
+    /** How many of its kind a slot holds at most: the limit of what it holds, or of the largest stack when empty. */
     int limit(int slot) {
         ItemStack held = stack(slot);
-        return Compartments.limit(held.isEmpty() ? 64 : held.getMaxStackSize());
+        return Compartments.limit(held.isEmpty() ? Item.ABSOLUTE_MAX_STACK_SIZE : held.getMaxStackSize());
     }
 
     /** Whether a slot could ever take {@code stack}: a kind the capsule takes, into its own or an empty slot. */
@@ -154,9 +155,13 @@ final class CapsuleBody {
         return total;
     }
 
+    /** Items the body holds at most with the kinds it holds; an empty compartment counts as one of a 64 stack kind. */
     long capacity() {
         long total = 0;
-        for (int slot = 0; slot < slots(); slot++) total += limit(slot);
+        for (int slot = 0; slot < slots(); slot++) {
+            ItemStack held = stack(slot);
+            total += Compartments.limit(held.isEmpty() ? 64 : held.getMaxStackSize());
+        }
         return total;
     }
 

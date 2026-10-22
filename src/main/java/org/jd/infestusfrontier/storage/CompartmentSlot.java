@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.storage;
 
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.core.storage.Compartments;
@@ -47,6 +48,16 @@ final class CompartmentSlot extends Slot {
         if (taken <= 0) return ItemStack.EMPTY;
         set(held.copyWithCount(held.getCount() - taken));
         return held.copyWithCount(taken);
+    }
+
+    /**
+     * Never: {@link #getItem} is a copy, so an item that edits the clicked stack in place, as a bundle does after
+     * asking this, would change only the copy. Plain clicks still take and put through {@link #remove} and
+     * {@link #set}.
+     */
+    @Override
+    public boolean allowModification(Player player) {
+        return false;
     }
 
     @Override

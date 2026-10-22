@@ -25,6 +25,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ChunkPos;
@@ -432,6 +433,42 @@ public final class ItemCapsuleTests {
             menu.clicked(inventorySlot, 0, ClickType.QUICK_MOVE, player);
             h.assertValueEqual(store(h, cell(2, 0, 1)).count(stack(Items.DIRT, 1)), 40, "shift-click fills the body");
             h.assertTrue(player.getInventory().getItem(0).isEmpty(), "from the hand");
+            player.closeContainer();
+            h.succeed();
+        });
+    }
+
+    /** Diamonds in a stack: loose, or inside a bundle. */
+    private static int diamonds(ItemStack stack) {
+        if (stack.is(Items.DIAMOND)) return stack.getCount();
+        BundleContents contents = stack.get(DataComponents.BUNDLE_CONTENTS);
+        int total = 0;
+        if (contents != null)
+            for (ItemStack held : contents.items()) if (held.is(Items.DIAMOND)) total += held.getCount();
+        return total;
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aBundleInACompartmentNeitherMakesNorLosesItems(GameTestHelper h) {
+        body(h, 1, 1, 1, 1, 1);
+        h.runAfterDelay(FORMED, () -> {
+            ItemStack bundle = new ItemStack(Items.BUNDLE);
+            bundle.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(List.of(stack(Items.DIAMOND, 32))));
+            h.assertTrue(store(h, cell(1, 0, 1)).insert(bundle, false).isEmpty(), "the bundle went in");
+            MenuPlayer player = new MenuPlayer(h.getLevel());
+            BlockPos at = h.absolutePos(cell(1, 0, 1));
+            player.moveTo(at.getX() + 0.5, at.getY(), at.getZ() - 1.5);
+            player.openMenu((MenuProvider) h.getBlockEntity(cell(1, 0, 1)), at);
+            AbstractContainerMenu menu = player.containerMenu;
+            menu.setCarried(stack(Items.DIRT, 10));
+            menu.clicked(0, 1, ClickType.PICKUP, player);
+            h.assertValueEqual(menu.getCarried().getCount(), 10, "no dirt vanishes into the bundle");
+            h.assertValueEqual(diamonds(items(h, cell(1, 0, 1)).getStackInSlot(0)), 32, "the bundle is unchanged");
+            menu.setCarried(ItemStack.EMPTY);
+            menu.clicked(0, 1, ClickType.PICKUP, player);
+            int total = diamonds(menu.getCarried())
+                    + diamonds(items(h, cell(1, 0, 1)).getStackInSlot(0));
+            h.assertValueEqual(total, 32, "a right click makes no diamonds");
             player.closeContainer();
             h.succeed();
         });

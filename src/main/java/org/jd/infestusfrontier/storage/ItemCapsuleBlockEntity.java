@@ -260,6 +260,7 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
             return;
         }
         restore(carried);
+        if (store != null) store.touch();
     }
 
     /** A carried value is checked as the saved one is, since it never passed the codec's limits. */

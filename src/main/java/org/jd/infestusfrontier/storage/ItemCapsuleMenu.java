@@ -141,6 +141,13 @@ public final class ItemCapsuleMenu extends OrganMenu {
         return ItemStack.EMPTY;
     }
 
+    /** The cell itself must still stand there: a cell broken and placed again is another cell. */
+    @Override
+    public boolean stillValid(Player player) {
+        return super.stillValid(player)
+                && cell.map(standing -> !standing.isRemoved()).orElse(true);
+    }
+
     @Override
     public int stored() {
         return 0;
