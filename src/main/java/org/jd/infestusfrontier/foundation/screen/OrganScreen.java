@@ -6,9 +6,12 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.ui.Bounds;
 import org.jd.infestusfrontier.ui.PartRow;
 import org.jd.infestusfrontier.ui.Sheet;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Every organ screen: the panel, the title, the biomass tank on the right, and the organ's own parts in one row
@@ -79,6 +82,17 @@ public abstract class OrganScreen<M extends AbstractContainerMenu & BiomassView>
     protected final void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         Draw.ink(graphics, title, titleLabelX, titleLabelY);
         Draw.ink(graphics, playerInventoryTitle, inventoryLabelX, inventoryLabelY);
+    }
+
+    /** A count past 99, from a store that holds more than a stack in a slot, is drawn small so it stays in its slot. */
+    @Override
+    protected void renderSlotContents(GuiGraphics graphics, ItemStack stack, Slot slot, @Nullable String countString) {
+        if (countString != null || stack.getCount() <= 99) {
+            super.renderSlotContents(graphics, stack, slot, countString);
+            return;
+        }
+        super.renderSlotContents(graphics, stack, slot, "");
+        Draw.smallCount(graphics, Integer.toString(stack.getCount()), slot.x + 17, slot.y + 17);
     }
 
     @Override

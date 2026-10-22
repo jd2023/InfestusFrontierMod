@@ -29,6 +29,7 @@ import org.jd.infestusfrontier.core.logistics.Delivery;
 import org.jd.infestusfrontier.core.logistics.Reach;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
+import org.jd.infestusfrontier.storage.api.ItemStore;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -401,13 +402,17 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         return level.getCapability(Capabilities.ItemHandler.BLOCK, above, Direction.DOWN);
     }
 
+    /** A store the colony knows takes the stack by its own rules; any other store slot by slot. */
     private static ItemStack insert(IItemHandler store, ItemStack stack, boolean simulate) {
+        if (store instanceof ItemStore known) return known.insert(stack, simulate);
         int slots = Math.min(STORE_SLOTS, store.getSlots());
         for (int slot = 0; slot < slots && !stack.isEmpty(); slot++) stack = store.insertItem(slot, stack, simulate);
         return stack;
     }
 
+    /** A store the colony knows gives its whole count; any other store is counted over its first slots. */
     private static int count(IItemHandler store, ItemStack like) {
+        if (store instanceof ItemStore known) return known.count(like);
         int total = 0;
         int slots = Math.min(STORE_SLOTS, store.getSlots());
         for (int slot = 0; slot < slots; slot++) {

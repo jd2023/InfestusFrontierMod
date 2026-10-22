@@ -38,6 +38,15 @@ final class Draw {
         ink(graphics, text, centerX - font().width(text) / 2, y);
     }
 
+    /** A slot count at half size, white with its shadow as vanilla draws counts, ending at {@code rightX, bottomY}. */
+    static void smallCount(GuiGraphics graphics, String count, int rightX, int bottomY) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(rightX, bottomY, 200);
+        graphics.pose().scale(0.5F, 0.5F, 1);
+        graphics.drawString(font(), count, -font().width(count), 1 - font().lineHeight, 0xFFFFFF, true);
+        graphics.pose().popPose();
+    }
+
     static void rightAligned(GuiGraphics graphics, Component text, int rightX, int y) {
         ink(graphics, text, rightX - font().width(text), y);
     }

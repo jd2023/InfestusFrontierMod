@@ -131,7 +131,14 @@
     "setblock 73 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Filter Valve\"','\"keeps 1000 mB\"','\"in the Bladder\"','\"stick: reserve\"']}}",
     "fill 53 -61 -36 55 -61 -35 infestusfrontier:living_substrate[stage=mature]",
     "fill 53 -60 -36 55 -59 -35 infestusfrontier:reservoir_cell{tank:{stored:2500,reserved:0,capacity:4000},body:[53,-60,-36,55,-59,-35]}",
-    "setblock 56 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Reservoir\"','\"twelve cells\"','\"one tank\"','\"bucket any cell\"']}}"
+    "setblock 56 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Reservoir\"','\"twelve cells\"','\"one tank\"','\"bucket any cell\"']}}",
+    "setblock 75 -60 -36 infestusfrontier:item_capsule[facing=north]{stock:[{slot:0,item:{id:\"minecraft:cobblestone\"},count:640},{slot:1,item:{id:\"minecraft:bone\"},count:48},{slot:2,item:{id:\"minecraft:wheat_seeds\"},count:32}],body:[75,-60,-36,76,-59,-36]}",
+    "setblock 76 -60 -36 infestusfrontier:item_capsule[facing=north]{stock:[{slot:0,item:{id:\"minecraft:wheat\"},count:200}],body:[75,-60,-36,76,-59,-36]}",
+    "setblock 75 -59 -36 infestusfrontier:item_capsule[facing=north]{stock:[],body:[75,-60,-36,76,-59,-36]}",
+    "setblock 76 -59 -36 infestusfrontier:item_capsule[facing=north]{stock:[],body:[75,-60,-36,76,-59,-36]}",
+    "setblock 79 -60 -36 infestusfrontier:item_capsule[facing=north]{stock:[]}",
+    "setblock 77 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Item Capsule\"','\"4 kinds a cell\"','\"box = one store\"','\"place one beside\"']}}",
+    "give @s infestusfrontier:item_capsule 8"
   ],
   "views": [
     {
@@ -853,6 +860,38 @@
       "gui": true,
       "name": "book_reservoir_cell",
       "book": "infestusfrontier:circulation/reservoir_cell"
+    },
+    {
+      "name": "capsule",
+      "x": 76.5,
+      "y": -58.5,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 15
+    },
+    {
+      "name": "capsule_screen",
+      "x": 75.5,
+      "y": -60,
+      "z": -38.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        75,
+        -60,
+        -36
+      ]
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_item_capsule",
+      "book": "infestusfrontier:circulation/item_capsule"
     }
   ]
 }

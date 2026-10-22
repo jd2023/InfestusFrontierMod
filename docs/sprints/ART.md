@@ -270,3 +270,15 @@ Files: src/main/resources/assets/infestusfrontier/textures/item/{fusion_binder,e
 
 - Eight 32x32 icons, `--size 32 --colors 0`, one family with the Spore Culture icon: same outline weight, light from the upper left. Fusion Binder: a pale amber dollop in a thin membrane skin. Elastic Gel: a wobbling green-grey bead. Rooting Gel: an olive drop with a tiny root thread hanging from it. Capillary Gel: a bright green bead with fine red capillaries. Contractile Fiber: a coiled pink-red muscle strand. Filter Membrane: a square of sandy membrane with pores. Sealing Resin: a dark amber tear with a sheen. Synaptic Gel: a red bead with a violet spark inside.
 - Prompt shape as ART-002; one object, true alpha, no background. The placeholders are flat two-tone discs drawn by the builder.
+
+## ART-008 — Storage tissue: Reservoir and Item Capsule textures
+
+Status: open. Owner of the asset: Astra.
+Files: src/main/resources/assets/infestusfrontier/textures/block/{reservoir_membrane,reservoir_bone,reservoir_flesh,item_capsule_lining}.png, CREDITS.txt
+
+- Four 64x64 block textures, seamless on all four edges, one family with the Living Substrate tiles. They replace procedural placeholders from art/gen_reservoir.py and art/gen_item_capsule.py; the part models, the blockstates and the liquid stay with those generators, so a repaint changes no model.
+- reservoir_membrane: a thin translucent pink membrane (alpha about 90 to 130), a few broad crimson veins and fine capillaries between them, veins continuing across opposite edges and nearly opaque. It is the side panes and the lid of the Reservoir; the biomass behind it must show through. The blockstate turns it four ways at random, so no vein may end at an edge.
+- reservoir_bone: smooth ivory bone, broad soft swells, faint growth lines running one way, a few small pores. Opaque. The Reservoir's ribs and knuckles, the Item Capsule's ribs and the frame around its four pockets are cut from it at 1 to 2 pixels wide, so it must read as bone even in a narrow strip.
+- reservoir_flesh: lobed pink-red muscle, broad swells parted by narrow dark creases, a fine wrinkle and a wet sheen on the crowns. Opaque. The Reservoir's base and rims and every wall of the Item Capsule; a 4x2 capsule wall shows it 8 times side by side.
+- item_capsule_lining: dark wet flesh, almost maroon-black, soft vertical folds with a faint sheen. Opaque. The floor of the capsule's pockets, behind the item icons and their white counts, so it stays dark and quiet.
+- Prompt shape as ART-001; evidence `build/art/<name>-tiled.png` and the captures reservoir and item_capsule.

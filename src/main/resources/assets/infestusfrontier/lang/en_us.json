@@ -278,5 +278,14 @@
   "entry.infestusfrontier.circulation.reservoir_cell.name": "Reservoir Cell",
   "entry.infestusfrontier.circulation.reservoir_cell.description": "Bladders that grow into one tank",
   "entry.infestusfrontier.circulation.reservoir_cell.use": "A cell holds 4000 BU and stands on a foundation such as Living Substrate, on another cell or on a Vascular Junction. Touching cells that fill a whole box, up to 4 on a side, become one body: the walls between them go, and biomass fills the bottom layer first and drains from the top. Grow it by whole rows and layers; a cell that would leave a gap waits outside with its own biomass. A bucket, vein or junction on any cell reaches the whole body. A broken cell keeps its own share.",
-  "entry.infestusfrontier.circulation.reservoir_cell.craft": "A Biomass Bladder, two Bone Plates and two Membrane Sheets. The cell keeps what the Bladder held."
+  "entry.infestusfrontier.circulation.reservoir_cell.craft": "A Biomass Bladder, two Bone Plates and two Membrane Sheets. The cell keeps what the Bladder held.",
+  "block.infestusfrontier.item_capsule": "Item Capsule",
+  "gui.infestusfrontier.item_capsule.compartments": "Compartments",
+  "gui.infestusfrontier.item_capsule.body": "%s×%s×%s · %s/%s used",
+  "gui.infestusfrontier.item_capsule.body.story": "Each cell has four compartments, one kind of item each, up to 16 stacks of it. Cells that fill a whole box, up to 4 on a side, are one store: hoppers, Mouths and shift-click reach every compartment, and a kind fills its own compartments before it opens an empty one. A cell that would leave a gap waits outside with its own items.",
+  "tooltip.infestusfrontier.item_capsule.held": "%s × %s",
+  "entry.infestusfrontier.circulation.item_capsule.name": "Item Capsule",
+  "entry.infestusfrontier.circulation.item_capsule.description": "A cabinet that grows into one store",
+  "entry.infestusfrontier.circulation.item_capsule.use": "A cell shows four compartments on its front. Each holds one kind of item, up to 16 stacks of it: 1024 of most things. Touching cells that fill a whole box, up to 4 on a side, become one store: a hopper, pipe or Mouth on any cell reaches every compartment, and items join their own kind before they open an empty compartment. Grow it by whole rows and layers. Any hand opens a cell; shift-click puts a stack into the store. A broken cell keeps its items on the item.",
+  "entry.infestusfrontier.circulation.item_capsule.craft": "A chest, two Membrane Sheets and a Spore Culture."
 }

@@ -1,10 +1,7 @@
 package org.jd.infestusfrontier.storage;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -20,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
-import org.jd.infestusfrontier.core.storage.Body;
 import org.jd.infestusfrontier.core.storage.Box;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
@@ -32,22 +28,15 @@ import org.jd.infestusfrontier.storage.api.BiomassHandler;
  * {@link BiomassHandler} it speaks for the whole body through {@link Reservoir}: a bucket, a vein or a junction on any
  * cell fills the body from the bottom layer and drains it from the top.
  */
-final class ReservoirCellBlockEntity extends BlockEntity implements BiomassHandler, MenuProvider {
+final class ReservoirCellBlockEntity extends BlockEntity implements BiomassHandler, MenuProvider, Bodies.Cell {
     static final int CAPACITY_BU = 4000;
     static final Biomass CAPACITY = Biomass.of(CAPACITY_BU);
-
-    /** A body as its two corners, min x y z then max x y z. */
-    private static final Codec<Box> BOX = Codec.INT
-            .listOf(6, 6)
-            .comapFlatMap(
-                    ReservoirCellBlockEntity::box,
-                    box -> List.of(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ()));
 
     private record Saved(BiomassTank tank, Optional<Box> body) {}
 
     private static final MapCodec<Saved> SAVED = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     BiomassCodecs.TANK.fieldOf("tank").forGetter(Saved::tank),
-                    BOX.optionalFieldOf("body").forGetter(Saved::body))
+                    Bodies.BOX.optionalFieldOf("body").forGetter(Saved::body))
             .apply(instance, Saved::new));
 
     private BiomassTank tank = BiomassTank.empty(CAPACITY);
@@ -56,18 +45,7 @@ final class ReservoirCellBlockEntity extends BlockEntity implements BiomassHandl
 
     ReservoirCellBlockEntity(BlockPos pos, BlockState state) {
         super(StorageModule.RESERVOIR_CELL_ENTITY.get(), pos, state);
-        body = single(pos);
-    }
-
-    private static DataResult<Box> box(List<Integer> corners) {
-        if (corners.get(0) > corners.get(3) || corners.get(1) > corners.get(4) || corners.get(2) > corners.get(5))
-            return DataResult.error(() -> "Inverted body " + corners);
-        return DataResult.success(new Box(
-                corners.get(0), corners.get(1), corners.get(2), corners.get(3), corners.get(4), corners.get(5)));
-    }
-
-    static Box single(BlockPos pos) {
-        return Box.of(pos.getX(), pos.getY(), pos.getZ());
+        body = Bodies.single(pos);
     }
 
     /** This cell's own share, as it would leave on the item. */
@@ -80,16 +58,19 @@ final class ReservoirCellBlockEntity extends BlockEntity implements BiomassHandl
         setChanged();
     }
 
-    Box body() {
+    @Override
+    public Box body() {
         return body;
     }
 
-    void setBody(Box next) {
+    @Override
+    public void setBody(Box next) {
         body = next;
         setChanged();
     }
 
-    boolean isReadable() {
+    @Override
+    public boolean isReadable() {
         return unreadable.isEmpty();
     }
 
@@ -123,15 +104,7 @@ final class ReservoirCellBlockEntity extends BlockEntity implements BiomassHandl
     public void onLoad() {
         super.onLoad();
         if (level != null && !level.isClientSide)
-            level.scheduleTick(worldPosition, getBlockState().getBlock(), ReservoirCellBlock.FORM_TICKS);
-    }
-
-    /**
-     * A body saved somewhere else, as a structure moved elsewhere, is no body: the cell is alone and forms again.
-     */
-    private boolean holdsThisCell(Box box) {
-        return box.fits(Body.MAX_SIDE)
-                && box.contains(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
+            level.scheduleTick(worldPosition, getBlockState().getBlock(), Bodies.FORM_TICKS);
     }
 
     private static Optional<String> check(Saved saved) {
@@ -149,7 +122,9 @@ final class ReservoirCellBlockEntity extends BlockEntity implements BiomassHandl
                 SAVED, tag, registries, StorageModule.LOGGER, "Reservoir Cell", ReservoirCellBlockEntity::check);
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         tank = read.map(Saved::tank).orElse(tank);
-        body = read.flatMap(Saved::body).filter(this::holdsThisCell).orElse(single(worldPosition));
+        body = read.flatMap(Saved::body)
+                .filter(box -> Bodies.holds(box, worldPosition))
+                .orElse(Bodies.single(worldPosition));
     }
 
     @Override

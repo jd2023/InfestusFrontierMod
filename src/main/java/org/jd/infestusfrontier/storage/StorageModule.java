@@ -39,17 +39,19 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
+import org.jd.infestusfrontier.foundation.render.FrontStockRenderer;
 import org.jd.infestusfrontier.foundation.render.JoinedTankRenderer;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
+import org.jd.infestusfrontier.storage.api.CapsuleStock;
 import org.slf4j.Logger;
 
 /**
- * Owner of item, fluid and biomass balances. Ships the biomass fluid, its bucket, the Biomass Bladder and the Reservoir
- * cell.
+ * Owner of item, fluid and biomass balances. Ships the biomass fluid, its bucket, the Biomass Bladder, the Reservoir
+ * cell and the Item Capsule.
  */
 public final class StorageModule {
     static final Logger LOGGER = LogUtils.getLogger();
@@ -149,6 +151,25 @@ public final class StorageModule {
             MENUS.register("reservoir_cell", () -> IMenuTypeExtension.create(ReservoirCellMenu::new));
     static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ReservoirCellRecipe>> RESERVOIR_CELL_RECIPE =
             RECIPE_SERIALIZERS.register("reservoir_cell", ReservoirCellRecipe.Serializer::new);
+    public static final DeferredBlock<ItemCapsuleBlock> ITEM_CAPSULE = BLOCKS.registerBlock(
+            "item_capsule",
+            ItemCapsuleBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PINK)
+                    .strength(1.5F)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.BLOCK)
+                    .isViewBlocking((state, level, pos) -> false));
+    public static final DeferredItem<BlockItem> ITEM_CAPSULE_ITEM =
+            ITEMS.register("item_capsule", () -> new ItemCapsuleItem(ITEM_CAPSULE.get(), new Item.Properties()));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemCapsuleBlockEntity>> ITEM_CAPSULE_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "item_capsule",
+                    () -> BlockEntityType.Builder.of(ItemCapsuleBlockEntity::new, ITEM_CAPSULE.get())
+                            .build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<ItemCapsuleMenu>> ITEM_CAPSULE_MENU =
+            MENUS.register("item_capsule", () -> IMenuTypeExtension.create(ItemCapsuleMenu::new));
     /** Blocks a Reservoir cell may also stand on: pumps that fill it from below. */
     public static final TagKey<Block> RESERVOIR_SUPPORTS = TagKey.create(
             Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "reservoir_supports"));
@@ -157,6 +178,12 @@ public final class StorageModule {
             COMPONENTS.registerComponentType(
                     "biomass_tank",
                     builder -> builder.persistent(BiomassCodecs.TANK).networkSynchronized(BiomassCodecs.TANK_STREAM));
+
+    /** The compartments a capsule cell carries on its item when broken and placed again. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CapsuleStock>> CAPSULE_STOCK =
+            COMPONENTS.registerComponentType(
+                    "capsule_stock",
+                    builder -> builder.persistent(CapsuleStock.CODEC).networkSynchronized(CapsuleStock.STREAM_CODEC));
 
     private StorageModule() {}
 
@@ -190,13 +217,23 @@ public final class StorageModule {
                     Capabilities.FluidHandler.BLOCK,
                     RESERVOIR_CELL_ENTITY.get(),
                     (cell, side) -> BiomassFluids.handler(cell));
+            event.registerBlockEntity(
+                    Capabilities.ItemHandler.BLOCK, ITEM_CAPSULE_ENTITY.get(), (cell, side) -> new CapsuleItems(cell));
         });
         if (FMLEnvironment.dist == Dist.CLIENT) {
             OrganRenderers.register(modBus, "biomass_bladder", BIOMASS_BLADDER_ENTITY, BIOMASS_BLADDER_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(BIOMASS_BLADDER_MENU.get(), BiomassBladderScreen::new);
                 event.register(RESERVOIR_CELL_MENU.get(), ReservoirCellScreen::new);
+                event.register(ITEM_CAPSULE_MENU.get(), ItemCapsuleScreen::new);
             });
+            // four pockets on the front, two by two, each icon over its count
+            FrontStockRenderer.register(
+                    modBus,
+                    ITEM_CAPSULE_ENTITY,
+                    ItemCapsuleBlock.FACING,
+                    ItemCapsuleBlockEntity::shown,
+                    new FrontStockRenderer.Pockets(2, 4.75F, 11.25F, 6.5F, 3.5F, 1.7F));
             // the liquid stops inside the membrane panes, above the fleshy base and under the lid
             JoinedTankRenderer.register(
                     modBus,

@@ -1,0 +1,205 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_core"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "facing": "east|south|west"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_wall_north"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_front_north"
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "facing": "north|south|west"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_wall_east"
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_front_east"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "facing": "north|east|west"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_wall_south"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_front_south"
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "facing": "north|east|south"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_wall_west"
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_front_west"
+      }
+    },
+    {
+      "when": {
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_wall_up"
+      }
+    },
+    {
+      "when": {
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_wall_down"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_north_east"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_north_west"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_north_up"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_north_down"
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_east_south"
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_east_up"
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_east_down"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_south_west"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_south_up"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_south_down"
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_west_up"
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_capsule_rib_west_down"
+      }
+    }
+  ]
+}

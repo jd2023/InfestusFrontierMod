@@ -1,0 +1,34 @@
+{
+  "textures": {
+    "flesh": "infestusfrontier:block/reservoir_flesh",
+    "bone": "infestusfrontier:block/reservoir_bone",
+    "lining": "infestusfrontier:block/item_capsule_lining",
+    "particle": "infestusfrontier:block/reservoir_flesh"
+  },
+  "elements": [
+    {
+      "from": [
+        14.5,
+        0,
+        0
+      ],
+      "to": [
+        15.5,
+        16,
+        16
+      ],
+      "faces": {
+        "east": {
+          "texture": "#flesh",
+          "uv": [
+            0.0,
+            0.0,
+            16.0,
+            16.0
+          ],
+          "cullface": "east"
+        }
+      }
+    }
+  ]
+}

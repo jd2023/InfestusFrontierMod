@@ -13,6 +13,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
+import org.jd.infestusfrontier.storage.api.ItemStore;
 
 /**
  * Reads the faced block every {@value #READ_TICKS} ticks: biomass first, then any fluid, then items, as a fullness of
@@ -54,6 +55,8 @@ final class SensorPolypBlockEntity extends BlockEntity {
             if (room > 0) return fullness(held, room);
         }
         IItemHandler items = level.getCapability(Capabilities.ItemHandler.BLOCK, target, side);
+        if (items instanceof ItemStore known)
+            return known.capacity() > 0 ? fullness(known.stored(), known.capacity()) : 0;
         return items == null ? 0 : Math.clamp(ItemHandlerHelper.calcRedstoneFromInventory(items), 0, 15);
     }
 

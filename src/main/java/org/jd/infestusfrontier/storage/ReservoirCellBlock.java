@@ -45,9 +45,6 @@ public final class ReservoirCellBlock extends BaseEntityBlock {
     public static final int FILL_STEPS = 16;
     public static final IntegerProperty FILL = IntegerProperty.create("fill", 0, FILL_STEPS);
     public static final Map<Direction, BooleanProperty> JOINED = PipeBlock.PROPERTY_BY_DIRECTION;
-    /** Ticks from a placement or a break to the cell's look for a body. */
-    static final int FORM_TICKS = 1;
-
     private static final MapCodec<ReservoirCellBlock> CODEC = simpleCodec(ReservoirCellBlock::new);
 
     ReservoirCellBlock(Properties properties) {
@@ -120,20 +117,20 @@ public final class ReservoirCellBlock extends BaseEntityBlock {
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
-        if (!level.isClientSide && !oldState.is(this)) level.scheduleTick(pos, this, FORM_TICKS);
+        if (!level.isClientSide && !oldState.is(this)) level.scheduleTick(pos, this, Bodies.FORM_TICKS);
     }
 
     /** A cell that leaves takes its own share; the rest of its body falls apart into cells that form again. */
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof ReservoirCellBlockEntity cell)
-            Reservoir.leave(cell);
+            Bodies.leave(cell, Reservoir.KIND);
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (level.getBlockEntity(pos) instanceof ReservoirCellBlockEntity cell) Reservoir.form(cell);
+        if (level.getBlockEntity(pos) instanceof ReservoirCellBlockEntity cell) Bodies.form(cell, Reservoir.KIND);
     }
 
     /** A Creative player who breaks a cell holding biomass still gets it back, as with a shulker box. */
