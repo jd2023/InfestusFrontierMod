@@ -135,7 +135,9 @@ public final class DiscoveryTests {
                 "fuel_papilla",
                 "filter_valve",
                 "reservoir_cell",
-                "item_capsule"))
+                "item_capsule",
+                "septum_crossing",
+                "vascular_stitch"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();

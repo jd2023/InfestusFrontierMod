@@ -243,13 +243,13 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 ### T1-05 — Septum Crossing
 - **Does:** Lets two routes cross through the same substrate block without connecting their contents. Two separated lumens remain visible at the exposed faces.
 - **Input → output:** Two independent same-carrier streams → their respective opposite exits, with no mixing.
-- **Create:** Apply 1 Membrane Sheet + 1 Bone Plate to an existing vein; choose the second passage direction with the configuration tool.
+- **Create:** Craft the graft from 1 Membrane Sheet + 1 Bone Plate and use it on an existing vein cell. The clicked face shows both lumens; the configuration tool on another face turns the crossing.
 - **Growth:** Thermal Lining permits hot-fluid crossings. Mutating to a junction deliberately joins routes; crossing is never assumed to mean splitting.
 
 ### T1-06 — Vascular Stitch
-- **Does:** Bridges a one-block terrain step between two visible vein cells. A recessed tendon curves over the shared terrain edge; no buried target must be clicked.
-- **Input → output:** One route's items or fluid → its continuation above, below or around the corner.
-- **Create:** Apply 1 Contractile Fiber + 1 Membrane Sheet to the exposed edge between the selected cells.
+- **Does:** Bridges a one-block terrain step between two visible vein cells. A tendon lies in the step's corner, from the upper cell's edge down its face to the lower cell's top; no buried target must be clicked.
+- **Input → output:** One route's items or fluid → its continuation one block above or below, on a floor or under a ceiling.
+- **Create:** Craft 1 Contractile Fiber + 1 Membrane Sheet and place the stitch in the step's corner, against the lower cell's top or the upper cell's side.
 - **Growth:** Bone reinforcement supports a short free-standing span. Longer hills use repeated visible steps; a stitch does not discover an invisible route automatically.
 
 ### T1-07 — Biomass Reservoir Cell

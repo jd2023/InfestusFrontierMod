@@ -64,6 +64,17 @@
     "setblock 11 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"4x4 patch\"','\"mature\"','\"sixteen tiles\"','\"no repeat\"']}}",
     "setblock 16 -60 -36 lectern[facing=south]",
     "setblock 16 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"The Waking Genome\"','\"guide book in\"','\"your hotbar\"','\"\"']}}",
+    "fill 28 -61 -33 32 -61 -31 infestusfrontier:living_substrate[stage=mature]",
+    "fill 28 -61 -32 32 -61 -32 infestusfrontier:biomass_vein",
+    "fill 30 -61 -33 30 -61 -31 infestusfrontier:biomass_vein",
+    "setblock 30 -61 -32 infestusfrontier:septum_crossing[carrier=biomass,axis=y]",
+    "setblock 30 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Septum Crossing\"','\"two passages\"','\"never mix\"','\"probe turns it\"']}}",
+    "fill 35 -61 -33 40 -61 -31 infestusfrontier:living_substrate[stage=mature]",
+    "fill 38 -60 -33 40 -60 -31 infestusfrontier:living_substrate[stage=mature]",
+    "fill 35 -61 -32 37 -61 -32 infestusfrontier:biomass_vein",
+    "fill 38 -60 -32 40 -60 -32 infestusfrontier:biomass_vein",
+    "setblock 37 -60 -32 infestusfrontier:vascular_stitch[facing=east,face=floor,carrier=biomass]",
+    "setblock 37 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Vascular Stitch\"','\"joins two veins\"','\"over a step\"','\"place in corner\"']}}",
     "give @s infestusfrontier:spore_culture 16",
     "give @s infestusfrontier:living_substrate 16",
     "give @s bone_meal 64",
@@ -892,6 +903,42 @@
       "gui": true,
       "name": "book_item_capsule",
       "book": "infestusfrontier:circulation/item_capsule"
+    },
+    {
+      "name": "crossing",
+      "x": 30.5,
+      "y": -58.0,
+      "z": -35.5,
+      "yaw": 0,
+      "pitch": 50
+    },
+    {
+      "name": "stitch",
+      "x": 34.5,
+      "y": -58.5,
+      "z": -34.5,
+      "yaw": 300,
+      "pitch": 30
+    },
+    {
+      "name": "book_septum_crossing",
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "book": "infestusfrontier:circulation/septum_crossing"
+    },
+    {
+      "name": "book_vascular_stitch",
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "book": "infestusfrontier:circulation/vascular_stitch"
     }
   ]
 }

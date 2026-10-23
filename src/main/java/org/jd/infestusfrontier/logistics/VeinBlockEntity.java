@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * The packet one vein cell holds and the side it came from. The cell receives through its capability and never
  * pulls. On each pulse it pushes the packet on, first into the consumers on its other sides, then into the next cells
- * of the vein; within each of the two passes the sides take turns. A full downstream leaves the packet where it is and
+ * of the route ({@link Routes#isRoute}); within each of the two passes the sides take turns. A full downstream leaves the packet where it is and
  * the cell tries again every {@value VeinBlock#RETRY_TICKS} ticks.
  */
 final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
@@ -69,15 +69,7 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
 
     /** Biomass for a Biomass Vein; any other cool fluid for a sealed Fluid Vein. */
     private boolean takesFluid(FluidStack stack) {
-        if (unreadable.isPresent()) return false;
-        return switch (carrier) {
-            case BIOMASS -> BiomassFluids.isBiomass(stack);
-            case FLUID ->
-                !BiomassFluids.isBiomass(stack)
-                        && VascularJunctionBlockEntity.isCool(stack)
-                        && getBlockState().getValue(VeinBlock.SEALED);
-            case ITEM -> false;
-        };
+        return unreadable.isEmpty() && carrier.carries(stack) && getBlockState().getValue(VeinBlock.SEALED);
     }
 
     boolean isEmpty() {
@@ -166,7 +158,7 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
                 if (from.isPresent() && from.get() == side) continue;
                 BlockPos next = worldPosition.relative(side);
                 if (!level.hasChunkAt(next)) continue;
-                boolean vein = level.getBlockState(next).getBlock() instanceof VeinBlock;
+                boolean vein = Routes.isRoute(level.getBlockState(next));
                 if (vein != toVeins) continue;
                 if (push(side, next)) {
                     moved = true;
@@ -224,18 +216,10 @@ final class VeinBlockEntity extends BlockEntity implements BiomassHandler {
     private Optional<String> check(Saved saved) {
         if (saved.fluid().getAmount() > fluid.getCapacity())
             return Optional.of(saved.fluid().getAmount() + " mB in a " + fluid.getCapacity() + " mB cell");
-        if (!saved.fluid().isEmpty() && !takesFluidUnsealed(saved.fluid().copy()))
+        // the carrier rule without the seal: a sealed vein that lost its seal keeps its packet unreadable, not lost
+        if (!saved.fluid().isEmpty() && !carrier.carries(saved.fluid().copy()))
             return Optional.of("a fluid this vein does not carry");
         return Optional.empty();
-    }
-
-    /** The carrier rule without the seal: a sealed vein that lost its seal keeps its packet unreadable, not lost. */
-    private boolean takesFluidUnsealed(FluidStack stack) {
-        return switch (carrier) {
-            case BIOMASS -> BiomassFluids.isBiomass(stack);
-            case FLUID -> !BiomassFluids.isBiomass(stack) && VascularJunctionBlockEntity.isCool(stack);
-            case ITEM -> false;
-        };
     }
 
     private void restore(Saved saved) {

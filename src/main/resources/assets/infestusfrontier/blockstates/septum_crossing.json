@@ -1,0 +1,2422 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_biomass",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_biomass",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_biomass"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_biomass",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west"
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_biomass",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_biomass",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/biomass_vein_center",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "biomass",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_fluid",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_fluid",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_fluid"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_fluid",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west"
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_fluid",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_fluid",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/fluid_vein_center",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "fluid",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_item",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "x"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_item",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_item"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_item",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "y"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west"
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_item",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/septum_crossing_item",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_corners",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/item_vein_center",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_north",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_east",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_south",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "carrier": "item",
+        "axis": "z"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/vein_arm_skin_west",
+        "x": 90,
+        "y": 270
+      }
+    }
+  ]
+}

@@ -313,12 +313,13 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         if (epoch == routesSeen && !(routesCut && now - routesAt >= RETRY_TICKS)) return routes;
         routesCut = false;
         List<Route> found = new ArrayList<>();
-        for (Reach.Reached<BlockPos> cell :
-                Reach.walk(worldPosition, this::links, NETWORK).reached()) {
+        for (Reach.Reached<Node> cell : Reach.walk(new Node(worldPosition, Optional.empty()), this::links, NETWORK)
+                .reached()) {
             if (cell.distance() == 0) continue;
-            BlockState state = level.getBlockState(cell.node());
+            BlockPos at = cell.node().pos();
+            BlockState state = level.getBlockState(at);
             if (state.getBlock() instanceof MouthBlock
-                    && state.getValue(MouthBlock.MODE).takes()) found.add(new Route(cell.node(), cell.distance()));
+                    && state.getValue(MouthBlock.MODE).takes()) found.add(new Route(at, cell.distance()));
         }
         routes = List.copyOf(found);
         routesSeen = epoch;
@@ -326,21 +327,31 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         return routes;
     }
 
-    /** The loaded network cells joined to {@code pos}; a Mouth joins nothing through its top face. */
-    private List<BlockPos> links(BlockPos pos) {
-        List<BlockPos> out = new ArrayList<>(6);
-        boolean mouth = level.getBlockState(pos).getBlock() instanceof MouthBlock;
+    /**
+     * A cell of the network. A Septum Crossing is two cells, one for each passage, so a walk entering it along one axis
+     * leaves along the same axis; every other cell has no passage.
+     */
+    private record Node(BlockPos pos, Optional<Direction.Axis> passage) {}
+
+    /**
+     * The loaded network cells joined to {@code node}: through each face the cell opens and the neighbour opens back.
+     * A Mouth joins nothing through its top face; a crossing joins only along its passage.
+     */
+    private List<Node> links(Node node) {
+        List<Node> out = new ArrayList<>(6);
+        BlockState here = level.getBlockState(node.pos());
         for (Direction side : Direction.values()) {
-            if (mouth && side == Direction.UP) continue;
-            BlockPos next = pos.relative(side);
+            if (!MouthBlock.opens(here, side)) continue;
+            if (node.passage().isPresent() && node.passage().get() != side.getAxis()) continue;
+            BlockPos next = node.pos().relative(side);
             if (!level.hasChunkAt(next)) {
                 routesCut = true;
                 continue;
             }
             BlockState state = level.getBlockState(next);
-            if (!MouthBlock.isNetwork(state)) continue;
-            if (state.getBlock() instanceof MouthBlock && side == Direction.DOWN) continue;
-            out.add(next);
+            if (!MouthBlock.opens(state, side.getOpposite())) continue;
+            boolean crossing = state.getBlock() instanceof SeptumCrossingBlock;
+            out.add(new Node(next, crossing ? Optional.of(side.getAxis()) : Optional.empty()));
         }
         return out;
     }

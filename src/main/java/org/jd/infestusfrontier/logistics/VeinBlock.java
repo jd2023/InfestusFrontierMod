@@ -73,12 +73,13 @@ public final class VeinBlock extends BaseEntityBlock {
     }
 
     /**
-     * True when {@code other} on {@code side} is a cell of the same vein, or a Mouth beside or under an Item Vein. The
-     * links only shape the model: a vein still fills an organ or a Junction beside it, but its groove stops at that
-     * block's face. A Mouth's top face holds its store, so a vein above a Mouth does not join it.
+     * True when {@code other} on {@code side} is a cell of the same vein, a crossing or stitch of its carrier open
+     * toward this cell, or a Mouth beside or under an Item Vein. The links only shape the model: a vein still fills an
+     * organ or a Junction beside it, but its groove stops at that block's face. A Mouth's top face holds its store, so
+     * a vein above a Mouth does not join it.
      */
     private boolean connects(Direction side, BlockState other) {
-        if (other.getBlock() instanceof VeinBlock vein) return vein.carrier == carrier;
+        if (Routes.opens(other, side.getOpposite(), carrier)) return true;
         return carrier == Carrier.ITEM && other.getBlock() instanceof MouthBlock && side != Direction.DOWN;
     }
 

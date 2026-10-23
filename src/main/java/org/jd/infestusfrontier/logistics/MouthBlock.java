@@ -59,10 +59,14 @@ public final class MouthBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
-    /** True for the cells an item network is made of. */
-    static boolean isNetwork(BlockState state) {
-        return state.getBlock() instanceof MouthBlock
-                || state.getBlock() instanceof VeinBlock vein && vein.carrier() == Carrier.ITEM;
+    /**
+     * Whether items pass between a network cell and {@code state} through the face {@code face} of {@code state}: a
+     * Mouth through any face but its top, which holds its store; an Item Vein, item crossing or item stitch through
+     * the faces it opens.
+     */
+    static boolean opens(BlockState state, Direction face) {
+        if (state.getBlock() instanceof MouthBlock) return face != Direction.UP;
+        return Routes.opens(state, face, Carrier.ITEM);
     }
 
     @Override
@@ -80,7 +84,10 @@ public final class MouthBlock extends BaseEntityBlock {
             BlockPos pos,
             BlockPos neighborPos) {
         return state.setValue(
-                PipeBlock.PROPERTY_BY_DIRECTION.get(direction), direction != Direction.UP && isNetwork(neighborState));
+                PipeBlock.PROPERTY_BY_DIRECTION.get(direction),
+                direction != Direction.UP
+                        && (neighborState.getBlock() instanceof MouthBlock
+                                || opens(neighborState, direction.getOpposite())));
     }
 
     @Override

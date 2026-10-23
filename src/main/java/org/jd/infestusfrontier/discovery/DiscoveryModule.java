@@ -72,6 +72,8 @@ public final class DiscoveryModule {
                         output.accept(LogisticsModule.BIOMASS_VEIN_ITEM.get());
                         output.accept(LogisticsModule.FLUID_VEIN_ITEM.get());
                         output.accept(LogisticsModule.ITEM_VEIN_ITEM.get());
+                        output.accept(LogisticsModule.SEPTUM_CROSSING_ITEM.get());
+                        output.accept(LogisticsModule.VASCULAR_STITCH_ITEM.get());
                         output.accept(LogisticsModule.VASCULAR_JUNCTION_ITEM.get());
                         output.accept(LogisticsModule.MOUTH_ITEM.get());
                         output.accept(LogisticsModule.FEEDING_LOBE_ITEM.get());

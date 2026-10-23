@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:contractile_fiber"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:vascular_stitch",
+    "count": 1
+  }
+}

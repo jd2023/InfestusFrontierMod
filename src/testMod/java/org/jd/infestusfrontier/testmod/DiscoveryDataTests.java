@@ -117,7 +117,9 @@ public final class DiscoveryDataTests {
                 "fuel_papilla",
                 "filter_valve",
                 "reservoir_cell",
-                "item_capsule")) {
+                "item_capsule",
+                "septum_crossing",
+                "vascular_stitch")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));
