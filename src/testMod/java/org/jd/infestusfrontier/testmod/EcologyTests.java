@@ -22,6 +22,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.ecology.LivingSubstrateBlock;
 import org.jd.infestusfrontier.ecology.SubstrateStage;
+import org.jd.infestusfrontier.logistics.LogisticsModule;
 
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
@@ -198,9 +199,17 @@ public final class EcologyTests {
         h.setBlock(piston, Blocks.PISTON.defaultBlockState().setValue(DirectionalBlock.FACING, Direction.EAST));
         h.setBlock(cell, mature());
         h.setBlock(piston.west(), Blocks.REDSTONE_BLOCK);
+        // a Septum Crossing is a plain block, so only its push reaction keeps it in place
+        BlockPos veinPiston = piston.south(2);
+        BlockPos vein = veinPiston.east();
+        h.setBlock(veinPiston, Blocks.PISTON.defaultBlockState().setValue(DirectionalBlock.FACING, Direction.EAST));
+        h.setBlock(vein, LogisticsModule.SEPTUM_CROSSING.get());
+        h.setBlock(veinPiston.west(), Blocks.REDSTONE_BLOCK);
         h.runAfterDelay(10, () -> {
             assertStage(h, cell, SubstrateStage.MATURE);
             h.assertBlockPresent(Blocks.AIR, landing);
+            h.assertBlockPresent(LogisticsModule.SEPTUM_CROSSING.get(), vein);
+            h.assertBlockPresent(Blocks.AIR, vein.east());
             h.succeed();
         });
     }

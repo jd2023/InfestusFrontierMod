@@ -12,14 +12,14 @@ Proposed cell anatomy. Maturity, function, framework and lining are separate pro
 
 | Stage | How the player makes it | What it supports | Appearance |
 |---|---|---|---|
-| **Basic** | Craft dirt with Spore Culture, or apply culture to exposed eligible ground. | Culture Bowl, Digestive Sac and other starter organs. This must work before automated biomass production exists. | Sparse threads; much of the original ground remains visible. |
+| **Basic** | Apply culture to exposed eligible ground. Substrate is only grown, never crafted. | Culture Bowl, Digestive Sac and other starter organs. This must work before automated biomass production exists. | Sparse threads; much of the original ground remains visible. |
 | **Young** | Bone meal on the cell, or a wave from a treated cell beside it. | Established starter organs and a denser living ground cover. | Joined veins, small pores and scattered soft growth. |
 | **Mature** | The same wave, 30 ticks later. | Functional mutations and the foundations required by larger organs. | Interlocking tissue, deeper folds, varied pores and room for bushes and roots. |
 
 Bone meal starts one bounded wave. The treated cell gets 3 vigor and grows one step every 30 ticks. Young tissue is the growing edge: a basic cell becomes young and converts up to 2 exposed host blocks beside it (level, one up or one down) into basic cells with one vigor less; a young cell with 2 or more vigor becomes mature; a mature cell that was fed converts hosts the same way. Then the cell goes dormant. One bone meal on basic ground therefore reaches at most 15 cells, 3 mature in the core, 4 young around them and 8 basic at the edge, and is over within 5 seconds. Bone meal on the basic edge grows the colony on. Bone meal on a dormant mature cell with no exposed host beside it is not used up. A later Foundation Cyst treats a marked area the same way from its packed stock.
 
 Maturity does not decay when the player leaves. An unfed active function pauses.
-A broken cell drops an item that keeps its stage, not its vigor. Placed again, it has the same stage and is dormant.
+Grown tissue never moves: a broken cell, whatever its stage or function, dies into Dead Tissue, and no piston pushes it (ENGINEERING.md, Invariants).
 Cells have no block entity and no random ticks. A cell ticks only while it has vigor, through vanilla scheduled ticks, and goes dormant on its own. A colony may hold hundreds of thousands of cells, so a dormant cell costs the server nothing.
 Destructive contamination can kill tissue under [containment rules](BLOCK_CATALOG.md#containment-failures); ordinary lack of fuel cannot. Older-looking patterns are visual variants of mature tissue, not another mandatory progression level.
 
@@ -109,7 +109,7 @@ Reconfiguration applies to substrate cells only.
 
 - **Change function:** Isolate the cell, drain fluid or return held items to storage, then remove the functional graft with the configuration tool and apply the new recipe. Keep maturity and compatible reinforcement. Used graft ingredients are not refunded, preventing free repeated recipe changes.
 - **Change lining:** Keep the old lining until a compatible replacement is confirmed. Refuse the change if it would expose a hot/chemical route, break an occupied structure or require somewhere to put material that has no available container.
-- **Normal dismantling:** The recovered substrate retains its mature/native form, reinforcement, functional graft and configuration. Any earned functional progress, if that function has counters, belongs to the same recovered cell—not a duplicate left at the old position. Route links are revalidated at the new location.
+- **Moving:** Substrate cells and their functions cannot be moved; a broken cell dies into Dead Tissue, and a new cell is grown where it is wanted. Organs standing on cells are broken whole and placed again, carrying their contents and history.
 - **Expand a multiblock:** Upgrade the additional required footing cells first, then add the body's ribs, chambers or service attachments. Unsupported extra blocks wait outside the valid body; they do not erase the old organ's history or inventory.
 - **Keep living detail:** Ribs follow edges, veins remain recessed, and unoccupied surfaces retain varied pores, soft growth and space for vegetation. Reinforcement should not turn the colony into a uniform armored pavement.
 

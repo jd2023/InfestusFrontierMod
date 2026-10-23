@@ -80,8 +80,8 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
     }
 
     /**
-     * The tile follows the position. Commands and pistons pass the placed state through here before they set it, so
-     * it arrives with the right tile and their own neighbour updates run unchanged.
+     * The tile follows the position. Commands pass the placed state through here before they set it, so it arrives
+     * with the right tile and their own neighbour updates run unchanged.
      */
     @Override
     protected BlockState updateShape(

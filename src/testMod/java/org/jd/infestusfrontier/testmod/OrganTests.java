@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -64,6 +65,30 @@ public final class OrganTests {
         List<Block> organs = new ArrayList<>();
         BuiltInRegistries.BLOCK.getTagOrEmpty(Organs.ORGANS).forEach(holder -> organs.add(holder.value()));
         h.assertValueEqual(organs.size(), 19, "nineteen organs");
+        for (String id : List.of(
+                "digestive_sac",
+                "biomass_bladder",
+                "organ_bud",
+                "culture_bowl",
+                "membrane_rack",
+                "bone_loom",
+                "awakening_cradle",
+                "bio_furnace",
+                "activation_cyst",
+                "compost_gland",
+                "vascular_junction",
+                "reservoir_cell",
+                "seed_pouch",
+                "planting_proboscis",
+                "harvest_corolla",
+                "sensor_polyp",
+                "feeding_lobe",
+                "yield_lobe",
+                "filter_valve"))
+            h.assertTrue(
+                    organs.contains(
+                            BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("infestusfrontier", id))),
+                    id + " is an organ");
         for (Block organ : organs) {
             BlockState state = organ.defaultBlockState();
             h.assertValueEqual(state.getDestroySpeed(h.getLevel(), at), Organs.HARDNESS, organ + " hardness");

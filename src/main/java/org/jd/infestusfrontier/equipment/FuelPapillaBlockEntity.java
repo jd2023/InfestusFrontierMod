@@ -78,10 +78,6 @@ final class FuelPapillaBlockEntity extends BlockEntity implements BiomassHandler
         return unreadable.isPresent();
     }
 
-    boolean isEmpty() {
-        return unreadable.isEmpty() && tank.stored().isZero();
-    }
-
     void togglePiece(int index) {
         if (unreadable.isPresent() || index < 0 || index >= ARMOR.size()) return;
         pieces ^= 1 << index;

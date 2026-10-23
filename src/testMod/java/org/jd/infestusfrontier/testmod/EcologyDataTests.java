@@ -122,7 +122,8 @@ public final class EcologyDataTests {
                         new SingleRecipeInput(new ItemStack(EcologyModule.DEAD_TISSUE.get())),
                         h.getLevel());
         h.assertTrue(recipe.isPresent(), "Dead Tissue is feed");
-        h.assertValueEqual(recipe.get().value().biomass().units(), 20, "20 BU");
+        h.assertValueEqual(recipe.get().value().biomass().units(), 5, "5 BU");
+        h.assertValueEqual(recipe.get().value().ticks(), 80, "in 80 ticks");
         h.succeed();
     }
 

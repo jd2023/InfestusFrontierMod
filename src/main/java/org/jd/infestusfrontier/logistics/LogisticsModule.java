@@ -181,7 +181,7 @@ public final class LogisticsModule {
                             .build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<VascularJunctionMenu>> VASCULAR_JUNCTION_MENU =
             MENUS.register("vascular_junction", () -> IMenuTypeExtension.create(VascularJunctionMenu::new));
-    /** The fluid a broken vein cell or junction carries on its item. */
+    /** The fluid a broken junction carries on its item. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<SimpleFluidContent>> FLUID_CONTENT =
             COMPONENTS.registerComponentType(
                     "fluid_content",
