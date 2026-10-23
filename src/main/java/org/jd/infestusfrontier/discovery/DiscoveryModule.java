@@ -45,6 +45,7 @@ public final class DiscoveryModule {
                     .icon(() -> new ItemStack(EcologyModule.SPORE_CULTURE.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(EcologyModule.SPORE_CULTURE.get());
+                        output.accept(EcologyModule.DEAD_TISSUE.get());
                         output.accept(EcologyModule.LIVING_SUBSTRATE_ITEM.get());
                         output.accept(OrganModule.ORGAN_BUD_ITEM.get());
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());
@@ -96,6 +97,7 @@ public final class DiscoveryModule {
                                 EquipmentModule.AWAKENED_LEGWRAPS,
                                 EquipmentModule.AWAKENED_TREADS)) output.accept(piece.get());
                         output.accept(InteractionModule.SYNAPTIC_PROBE.get());
+                        output.accept(InteractionModule.SURGICAL_BLADE.get());
                     })
                     .build());
 

@@ -20,14 +20,13 @@ import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.ecology.LivingSubstrateBlock;
 import org.jd.infestusfrontier.ecology.SubstrateStage;
 
-/** The whole M1 route in one test: craft, place, convert, bone meal, mature. */
+/** The whole M1 route in one test: craft cultures, convert two hosts, bone meal, mature. Substrate is only grown. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class M1RouteTests {
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 150)
     public static void m1Route(GameTestHelper h) {
         BlockPos stone = new BlockPos(1, 1, 1);
-        BlockPos placed = stone.above();
         BlockPos grass = new BlockPos(4, 1, 1);
         h.setBlock(stone, Blocks.STONE);
         h.setBlock(grass, Blocks.GRASS_BLOCK);
@@ -45,24 +44,18 @@ public final class M1RouteTests {
             else cultures.grow(made.getCount());
         }
         h.assertValueEqual(cultures.getCount(), 3, "cultures crafted");
-        cultures.shrink(1);
-        ItemStack substrate = craft(
-                h,
-                List.of(new ItemStack(Items.DIRT), new ItemStack(EcologyModule.SPORE_CULTURE.get())),
-                EcologyModule.LIVING_SUBSTRATE_ITEM.get());
-        player.setItemInHand(InteractionHand.MAIN_HAND, substrate);
-        h.placeAt(player, substrate, stone, Direction.UP);
-        EcologyTests.assertStage(h, placed, SubstrateStage.BASIC);
         player.setItemInHand(InteractionHand.MAIN_HAND, cultures);
+        EcologyTests.use(h, player, stone, Direction.UP);
         EcologyTests.use(h, player, grass, Direction.UP);
+        EcologyTests.assertStage(h, stone, SubstrateStage.BASIC);
         EcologyTests.assertStage(h, grass, SubstrateStage.BASIC);
         h.assertValueEqual(cultures.getCount(), 1, "cultures left after the route");
-        for (BlockPos cell : new BlockPos[] {placed, grass}) {
+        for (BlockPos cell : new BlockPos[] {stone, grass}) {
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BONE_MEAL, 1));
             EcologyTests.use(h, player, cell, Direction.UP);
         }
         h.runAfterDelay(2 * LivingSubstrateBlock.GROWTH_DELAY_TICKS + 2, () -> {
-            EcologyTests.assertStage(h, placed, SubstrateStage.MATURE);
+            EcologyTests.assertStage(h, stone, SubstrateStage.MATURE);
             EcologyTests.assertStage(h, grass, SubstrateStage.MATURE);
             h.succeed();
         });

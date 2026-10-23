@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "infestusfrontier:vascular_stitch"
+          "name": "infestusfrontier:dead_tissue"
         }
       ],
       "conditions": [

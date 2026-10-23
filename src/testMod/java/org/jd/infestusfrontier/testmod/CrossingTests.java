@@ -3,7 +3,6 @@ package org.jd.infestusfrontier.testmod;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -13,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.BlockItemStateProperties;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -29,6 +27,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.foundation.Biomass;
+import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.logistics.MouthBlock;
@@ -207,25 +206,14 @@ public final class CrossingTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void aBrokenCrossingGivesBackItsVeinAndItsGraft(GameTestHelper h) {
+    public static void aBrokenCrossingDiesIntoDeadTissue(GameTestHelper h) {
         BlockPos crossing = new BlockPos(2, Y, 2);
         h.setBlock(crossing, crossing(LogisticsModule.FLUID_VEIN.get(), Direction.Axis.Y));
         h.getLevel().destroyBlock(h.absolutePos(crossing), true);
         h.runAfterDelay(2, () -> {
             List<ItemEntity> drops = h.getEntities(EntityType.ITEM, crossing, 2.0);
-            List<ItemStack> veins = drops.stream()
-                    .map(ItemEntity::getItem)
-                    .filter(stack -> stack.is(LogisticsModule.FLUID_VEIN_ITEM.get()))
-                    .toList();
-            h.assertValueEqual(veins.size(), 1, "the Fluid Vein comes back");
-            BlockItemStateProperties state = veins.getFirst().get(DataComponents.BLOCK_STATE);
-            h.assertTrue(state != null && "true".equals(state.properties().get("sealed")), "sealed, as it was grafted");
-            h.assertValueEqual(
-                    drops.stream()
-                            .filter(drop -> drop.getItem().is(LogisticsModule.SEPTUM_CROSSING_ITEM.get()))
-                            .count(),
-                    1L,
-                    "and the graft");
+            h.assertValueEqual(drops.size(), 1, "one drop");
+            h.assertTrue(drops.getFirst().getItem().is(EcologyModule.DEAD_TISSUE.get()), "Dead Tissue, nothing back");
             h.succeed();
         });
     }
@@ -342,7 +330,8 @@ public final class CrossingTests {
         step(h, low, high, Direction.EAST);
         h.setBlock(high, Blocks.AIR);
         h.assertBlockPresent(Blocks.AIR, low.above());
-        h.assertItemEntityPresent(LogisticsModule.VASCULAR_STITCH_ITEM.get(), low.above(), 2.0);
+        h.assertItemEntityPresent(EcologyModule.DEAD_TISSUE.get(), low.above(), 2.0);
+        h.assertItemEntityNotPresent(LogisticsModule.VASCULAR_STITCH_ITEM.get(), low.above(), 2.0);
         h.assertFalse(h.getBlockState(low).getValue(PipeBlock.UP), "the low cell closes its top again");
         h.succeed();
     }

@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -72,21 +71,5 @@ public final class FuelPapillaBlock extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(
             BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         return Organs.openScreen(level, pos, player).result();
-    }
-
-    /** A Creative player who breaks a papilla holding biomass or unreadable bytes still gets it back with them. */
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide
-                && player.isCreative()
-                && level.getBlockEntity(pos) instanceof FuelPapillaBlockEntity papilla
-                && !papilla.isEmpty()) {
-            ItemStack stack = new ItemStack(EquipmentModule.FUEL_PAPILLA_ITEM.get());
-            papilla.saveToItem(stack, level.registryAccess());
-            ItemEntity drop = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-            drop.setDefaultPickUpDelay();
-            level.addFreshEntity(drop);
-        }
-        return super.playerWillDestroy(level, pos, state, player);
     }
 }

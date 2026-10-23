@@ -31,6 +31,7 @@ import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.organ.Growth;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
+import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
 import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
@@ -59,7 +60,7 @@ public final class ProcessingModule {
             DigestiveSacBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PURPLE)
-                    .strength(1.0F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion());
     public static final DeferredItem<OrganItem> DIGESTIVE_SAC_ITEM =
@@ -168,7 +169,7 @@ public final class ProcessingModule {
             () -> ProcessingModule.COMPOST_GLAND_ENTITY.get(),
             () -> ProcessingModule.COMPOST_GLAND_MENU.get());
 
-    public static final DeferredBlock<Block> CULTURE_BOWL = batchOrgan(BOWL, MapColor.TERRACOTTA_PINK, 0.8F);
+    public static final DeferredBlock<Block> CULTURE_BOWL = batchOrgan(BOWL, MapColor.TERRACOTTA_PINK);
     public static final DeferredItem<OrganItem> CULTURE_BOWL_ITEM =
             ITEMS.register("culture_bowl", () -> new OrganItem(CULTURE_BOWL.get(), new Item.Properties(), "idle"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> CULTURE_BOWL_ENTITY =
@@ -176,7 +177,7 @@ public final class ProcessingModule {
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> CULTURE_BOWL_MENU =
             batchMenu(BOWL, () -> ProcessingModule.CULTURE_BOWL_MENU.get());
 
-    public static final DeferredBlock<Block> MEMBRANE_RACK = batchOrgan(RACK, MapColor.COLOR_PINK, 0.8F);
+    public static final DeferredBlock<Block> MEMBRANE_RACK = batchOrgan(RACK, MapColor.COLOR_PINK);
     public static final DeferredItem<OrganItem> MEMBRANE_RACK_ITEM =
             ITEMS.register("membrane_rack", () -> new OrganItem(MEMBRANE_RACK.get(), new Item.Properties(), "idle"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> MEMBRANE_RACK_ENTITY =
@@ -186,7 +187,7 @@ public final class ProcessingModule {
     /** What the Rack makes: the common flexible construction material. */
     public static final DeferredItem<Item> MEMBRANE_SHEET = ITEMS.registerSimpleItem("membrane_sheet");
 
-    public static final DeferredBlock<Block> BONE_LOOM = batchOrgan(LOOM, MapColor.TERRACOTTA_WHITE, 1.0F);
+    public static final DeferredBlock<Block> BONE_LOOM = batchOrgan(LOOM, MapColor.TERRACOTTA_WHITE);
     public static final DeferredItem<OrganItem> BONE_LOOM_ITEM =
             ITEMS.register("bone_loom", () -> new OrganItem(BONE_LOOM.get(), new Item.Properties(), "idle"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> BONE_LOOM_ENTITY =
@@ -196,7 +197,7 @@ public final class ProcessingModule {
     /** What the Loom grows: the structural plate. */
     public static final DeferredItem<Item> BONE_PLATE = ITEMS.registerSimpleItem("bone_plate");
 
-    public static final DeferredBlock<Block> AWAKENING_CRADLE = batchOrgan(CRADLE, MapColor.COLOR_MAGENTA, 1.0F);
+    public static final DeferredBlock<Block> AWAKENING_CRADLE = batchOrgan(CRADLE, MapColor.COLOR_MAGENTA);
     public static final DeferredItem<OrganItem> AWAKENING_CRADLE_ITEM = ITEMS.register(
             "awakening_cradle", () -> new OrganItem(AWAKENING_CRADLE.get(), new Item.Properties(), "idle"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> AWAKENING_CRADLE_ENTITY =
@@ -204,7 +205,7 @@ public final class ProcessingModule {
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> AWAKENING_CRADLE_MENU =
             batchMenu(CRADLE, () -> ProcessingModule.AWAKENING_CRADLE_MENU.get());
 
-    public static final DeferredBlock<Block> BIO_FURNACE = batchOrgan(FURNACE, MapColor.COLOR_RED, 1.2F);
+    public static final DeferredBlock<Block> BIO_FURNACE = batchOrgan(FURNACE, MapColor.COLOR_RED);
     public static final DeferredItem<OrganItem> BIO_FURNACE_ITEM = ITEMS.register(
             "bio_furnace", () -> new OrganItem(BIO_FURNACE.get(), new Item.Properties(), "idle", "grown_0"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> BIO_FURNACE_ENTITY =
@@ -212,7 +213,7 @@ public final class ProcessingModule {
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> BIO_FURNACE_MENU =
             batchMenu(FURNACE, () -> ProcessingModule.BIO_FURNACE_MENU.get());
 
-    public static final DeferredBlock<Block> ACTIVATION_CYST = batchOrgan(CYST, MapColor.COLOR_PURPLE, 1.0F);
+    public static final DeferredBlock<Block> ACTIVATION_CYST = batchOrgan(CYST, MapColor.COLOR_PURPLE);
     public static final DeferredItem<OrganItem> ACTIVATION_CYST_ITEM = ITEMS.register(
             "activation_cyst", () -> new OrganItem(ACTIVATION_CYST.get(), new Item.Properties(), "idle"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> ACTIVATION_CYST_ENTITY =
@@ -228,7 +229,7 @@ public final class ProcessingModule {
     public static final DeferredItem<Item> ELASTIC_GEL = ITEMS.registerSimpleItem("elastic_gel");
     public static final DeferredItem<Item> SYNAPTIC_GEL = ITEMS.registerSimpleItem("synaptic_gel");
 
-    public static final DeferredBlock<Block> COMPOST_GLAND = batchOrgan(COMPOST, MapColor.COLOR_BROWN, 1.0F);
+    public static final DeferredBlock<Block> COMPOST_GLAND = batchOrgan(COMPOST, MapColor.COLOR_BROWN);
     public static final DeferredItem<OrganItem> COMPOST_GLAND_ITEM =
             ITEMS.register("compost_gland", () -> new OrganItem(COMPOST_GLAND.get(), new Item.Properties(), "idle"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> COMPOST_GLAND_ENTITY =
@@ -261,13 +262,13 @@ public final class ProcessingModule {
 
     private ProcessingModule() {}
 
-    private static DeferredBlock<Block> batchOrgan(BatchOrganKind kind, MapColor colour, float strength) {
+    private static DeferredBlock<Block> batchOrgan(BatchOrganKind kind, MapColor colour) {
         return BLOCKS.registerBlock(
                 kind.id(),
                 properties -> BatchOrganBlock.make(kind, properties),
                 BlockBehaviour.Properties.of()
                         .mapColor(colour)
-                        .strength(strength)
+                        .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                         .sound(SoundType.SLIME_BLOCK)
                         .noOcclusion());
     }

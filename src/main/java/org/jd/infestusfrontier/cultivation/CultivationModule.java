@@ -25,6 +25,7 @@ import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.logistics.GraftItem;
+import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public final class CultivationModule {
             SeedPouchBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_BROWN)
-                    .strength(0.8F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.WOOL)
                     .noOcclusion());
     public static final DeferredItem<OrganItem> SEED_POUCH_ITEM =
@@ -116,7 +117,7 @@ public final class CultivationModule {
     private static BlockBehaviour.Properties organ(MapColor colour) {
         return BlockBehaviour.Properties.of()
                 .mapColor(colour)
-                .strength(1.0F)
+                .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                 .sound(SoundType.SLIME_BLOCK)
                 .noOcclusion();
     }

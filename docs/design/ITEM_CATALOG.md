@@ -114,6 +114,8 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I009 | The Waking Genome | 1 ordinary book + 1 Culture → 1 guide; first-join claim is a separate once-only delivery | Persistent access to instructions; losing a book loses no research. |
 | I010 | Synaptic Probe | Craft 1 bone + 1 slime ball + 1 Culture → 1 | Inspect/configure reachable organs, show port direction, mark bounded areas. It is a tool, not an upgrade ingredient. |
 | I011 | Empty Sample Vial | Craft 1 glass bottle + 1 paper → 1 | Manually withdraw one I040 sample from a pouch/archive or package one harvested plant specimen. Extraction returns this vial; directly collected samples need no vial. |
+| I129 | Dead Tissue | Any broken grown cell: Living Substrate or a cell grown in it → 1 | Digestive Sac feed, 20 BU in 4 s. Grown tissue never moves, so this is all a broken cell gives. |
+| I130 | Surgical Blade | Craft 1 iron ingot + 1 bone + 1 Membrane Sheet → 1; 64 uses | Breaks an organ in 1.5 s instead of 18; the organ comes out whole either way. No effect on grown cells. |
 | I012 | Sample Pouch | Craft 2 Membrane Sheets + 1 string + 1 Sealing Resin → 1 | Standalone sample collection; capacities and upgrades below. No armor required. |
 | I013 | Dormant Hood / Thorax / Legwraps / Treads | Four distinct armor items: 5 / 8 / 7 / 4 rotten flesh in vanilla armor silhouettes | One piece awakened in Cradle using Culture, Membrane Sheet and 100 BU. |
 | I014 | Living Hood / Thorax / Legwraps / Treads | Awaken the corresponding existing dormant piece; empty fuel, preserved wear percentage | Four persistent equipment identities; full material and mutation tree in Armor Evolution. Frame variants are item data, not dozens of interchangeable crafting products. |

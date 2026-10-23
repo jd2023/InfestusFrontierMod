@@ -32,6 +32,7 @@ import org.jd.infestusfrontier.core.foundation.TickQuota;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
+import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.slf4j.Logger;
 
@@ -87,7 +88,7 @@ public final class LogisticsModule {
                 properties -> new LobeBlock(feeds, properties),
                 BlockBehaviour.Properties.of()
                         .mapColor(MapColor.COLOR_PINK)
-                        .strength(0.6F)
+                        .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                         .sound(SoundType.SLIME_BLOCK)
                         .noOcclusion());
     }
@@ -98,7 +99,7 @@ public final class LogisticsModule {
             FilterValveBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PINK)
-                    .strength(0.8F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.BONE_BLOCK)
                     .noOcclusion());
 
@@ -158,7 +159,7 @@ public final class LogisticsModule {
             VascularJunctionBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_MAGENTA)
-                    .strength(1.0F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion());
     public static final DeferredItem<OrganItem> VASCULAR_JUNCTION_ITEM = ITEMS.register(
@@ -196,7 +197,8 @@ public final class LogisticsModule {
                 BlockBehaviour.Properties.of()
                         .mapColor(MapColor.TERRACOTTA_PINK)
                         .strength(0.6F)
-                        .sound(SoundType.GRAVEL));
+                        .sound(SoundType.GRAVEL)
+                        .pushReaction(PushReaction.BLOCK));
     }
 
     public static void register(IEventBus modBus) {

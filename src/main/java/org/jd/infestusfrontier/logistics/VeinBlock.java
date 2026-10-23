@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -127,22 +126,6 @@ public final class VeinBlock extends BaseEntityBlock {
         if (carrier == Carrier.ITEM && !level.isClientSide && !state.is(newState.getBlock()))
             LogisticsModule.routesChanged(level);
         super.onRemove(state, level, pos, newState, movedByPiston);
-    }
-
-    /** A Creative player who breaks a loaded cell still gets it back, as with a shulker box. */
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide
-                && player.isCreative()
-                && level.getBlockEntity(pos) instanceof VeinBlockEntity vein
-                && !vein.isEmpty()) {
-            ItemStack stack = new ItemStack(this);
-            vein.saveToItem(stack, level.registryAccess());
-            ItemEntity drop = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-            drop.setDefaultPickUpDelay();
-            level.addFreshEntity(drop);
-        }
-        return super.playerWillDestroy(level, pos, state, player);
     }
 
     /** A bucket moves fluid like on any tank; everything else builds against the cell, it has no screen. */

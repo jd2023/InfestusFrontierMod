@@ -5,72 +5,8 @@
       "rolls": 1,
       "entries": [
         {
-          "type": "minecraft:alternatives",
-          "children": [
-            {
-              "type": "minecraft:item",
-              "name": "infestusfrontier:biomass_vein",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "infestusfrontier:septum_crossing",
-                  "properties": {
-                    "carrier": "biomass"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "minecraft:item",
-              "name": "infestusfrontier:fluid_vein",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "infestusfrontier:septum_crossing",
-                  "properties": {
-                    "carrier": "fluid"
-                  }
-                }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:set_components",
-                  "components": {
-                    "minecraft:block_state": {
-                      "sealed": "true"
-                    }
-                  }
-                }
-              ]
-            },
-            {
-              "type": "minecraft:item",
-              "name": "infestusfrontier:item_vein",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "infestusfrontier:septum_crossing",
-                  "properties": {
-                    "carrier": "item"
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ]
-    },
-    {
-      "rolls": 1,
-      "entries": [
-        {
           "type": "minecraft:item",
-          "name": "infestusfrontier:septum_crossing"
+          "name": "infestusfrontier:dead_tissue"
         }
       ],
       "conditions": [

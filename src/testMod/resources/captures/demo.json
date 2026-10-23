@@ -17,7 +17,7 @@
     "setblock 7 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Sand\"','\"not a host\"','\"nothing happens\"','\"\"']}}",
     "setblock 12 -60 -36 crafting_table",
     "setblock 14 -60 -36 chest[facing=south]{Items:[{Slot:0,id:\"minecraft:rotten_flesh\",count:8},{Slot:1,id:\"minecraft:red_mushroom\",count:8},{Slot:2,id:\"minecraft:wheat_seeds\",count:8},{Slot:3,id:\"minecraft:dirt\",count:8},{Slot:4,id:\"minecraft:bone_meal\",count:8},{Slot:5,id:\"minecraft:bowl\",count:4},{Slot:6,id:\"minecraft:glass\",count:8},{Slot:7,id:\"minecraft:slime_ball\",count:4},{Slot:8,id:\"minecraft:flower_pot\",count:2}]}",
-    "setblock 11 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Craft\"','\"Spore Culture\"','\"Living Substrate\"','\"and the organs\"']}}",
+    "setblock 11 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Craft\"','\"Spore Culture\"','\"and the organs;\"','\"grow substrate\"']}}",
     "setblock 20 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 20 -60 -36 infestusfrontier:digestive_sac[working=true]{tank:{stored:300,reserved:100,capacity:1000},history:{completed_batches:3},batch:{batch:{recipe:\"infestusfrontier:digestion/wheat\",ticks_required:2400,ticks_done:700},yield:100},feed:{Size:1,Items:[{Slot:0,id:\"minecraft:wheat\",count:5}]}}",
     "setblock 19 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Digestive Sac\"','\"feed wheat or\"','\"rotten flesh\"','\"fills the bladder\"']}}",
@@ -75,6 +75,9 @@
     "fill 38 -60 -32 40 -60 -32 infestusfrontier:biomass_vein",
     "setblock 37 -60 -32 infestusfrontier:vascular_stitch[facing=east,face=floor,carrier=biomass]",
     "setblock 37 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Vascular Stitch\"','\"joins two veins\"','\"over a step\"','\"place in corner\"']}}",
+    "summon item_frame 81 -60 -36 {Facing:1b,Fixed:1b,Item:{id:\"infestusfrontier:surgical_blade\",count:1}}",
+    "summon item_frame 83 -60 -36 {Facing:1b,Fixed:1b,Item:{id:\"infestusfrontier:dead_tissue\",count:1}}",
+    "setblock 82 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Surgical Blade\"','\"and Dead Tissue\"','\"organs: blade\"','\"cells: tissue\"']}}",
     "give @s infestusfrontier:spore_culture 16",
     "give @s infestusfrontier:living_substrate 16",
     "give @s bone_meal 64",
@@ -939,6 +942,24 @@
       "pitch": 10,
       "gui": true,
       "book": "infestusfrontier:circulation/vascular_stitch"
+    },
+    {
+      "name": "blade_and_tissue",
+      "x": 82.5,
+      "y": -58.6,
+      "z": -38.8,
+      "yaw": 0,
+      "pitch": 55
+    },
+    {
+      "name": "book_surgical_blade",
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "book": "infestusfrontier:contact/surgical_blade"
     }
   ]
 }

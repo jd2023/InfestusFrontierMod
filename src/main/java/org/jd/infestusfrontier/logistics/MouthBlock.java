@@ -8,7 +8,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -116,22 +115,6 @@ public final class MouthBlock extends BaseEntityBlock {
             if (!level.isClientSide) LogisticsModule.routesChanged(level);
         }
         super.onRemove(state, level, pos, next, moved);
-    }
-
-    /** A Creative player who breaks a Mouth whose save could not be read still gets those bytes back on its item. */
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide
-                && player.isCreative()
-                && level.getBlockEntity(pos) instanceof MouthBlockEntity mouth
-                && mouth.isUnreadable()) {
-            ItemStack stack = new ItemStack(this);
-            mouth.saveToItem(stack, level.registryAccess());
-            ItemEntity drop = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-            drop.setDefaultPickUpDelay();
-            level.addFreshEntity(drop);
-        }
-        return super.playerWillDestroy(level, pos, state, player);
     }
 
     /** Any hand opens the screen, like a chest; sneaking with an item builds against the cell instead. */

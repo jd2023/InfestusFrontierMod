@@ -99,7 +99,6 @@ public final class DiscoveryDataTests {
     public static void recipeUnlockAdvancementsExist(GameTestHelper h) {
         for (String path : List.of(
                 "spore_culture",
-                "living_substrate",
                 "organ_bud",
                 "digestive_sac",
                 "biomass_bladder",
@@ -118,6 +117,7 @@ public final class DiscoveryDataTests {
                 "filter_valve",
                 "reservoir_cell",
                 "item_capsule",
+                "surgical_blade",
                 "septum_crossing",
                 "vascular_stitch")) {
             ResourceLocation recipe = id(path);

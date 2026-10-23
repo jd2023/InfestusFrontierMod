@@ -13,6 +13,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.organ.api.Organs;
 import org.slf4j.Logger;
 
 /** Owner of signals and interlocks. Ships the Sensor Polyp. */
@@ -28,7 +29,7 @@ public final class ControlModule {
             SensorPolypBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PURPLE)
-                    .strength(0.8F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion());
     public static final DeferredItem<BlockItem> SENSOR_POLYP_ITEM = ITEMS.registerSimpleBlockItem(SENSOR_POLYP);

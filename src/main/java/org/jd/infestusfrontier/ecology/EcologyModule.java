@@ -5,6 +5,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -22,9 +23,15 @@ public final class EcologyModule {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.TERRACOTTA_PINK)
                     .strength(0.6F)
-                    .sound(SoundType.GRAVEL));
+                    .sound(SoundType.GRAVEL)
+                    .pushReaction(PushReaction.BLOCK));
     public static final DeferredItem<BlockItem> LIVING_SUBSTRATE_ITEM = ITEMS.registerSimpleBlockItem(LIVING_SUBSTRATE);
     public static final DeferredItem<Item> SPORE_CULTURE = ITEMS.registerItem("spore_culture", SporeCultureItem::new);
+    /**
+     * What a grown cell leaves when it is broken: Living Substrate and everything grown in it die and never move. The
+     * Digestive Sac digests it back into a little biomass.
+     */
+    public static final DeferredItem<Item> DEAD_TISSUE = ITEMS.registerSimpleItem("dead_tissue");
 
     private EcologyModule() {}
 

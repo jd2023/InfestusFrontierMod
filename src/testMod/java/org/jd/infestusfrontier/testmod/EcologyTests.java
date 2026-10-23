@@ -13,7 +13,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -190,25 +189,18 @@ public final class EcologyTests {
         h.succeed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 60)
-    public static void aPushedCellStillTellsItsNeighbours(GameTestHelper h) {
-        // a piston pushes a substrate cell one block east; the glass pane beside the landing cell must connect to it
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aPistonCannotPushACell(GameTestHelper h) {
+        // grown tissue never moves: a powered piston leaves the cell where it grew
         BlockPos piston = new BlockPos(1, 2, 2);
         BlockPos cell = piston.east();
         BlockPos landing = cell.east();
-        BlockPos pane = landing.north();
         h.setBlock(piston, Blocks.PISTON.defaultBlockState().setValue(DirectionalBlock.FACING, Direction.EAST));
         h.setBlock(cell, mature());
-        h.setBlock(pane, Blocks.GLASS_PANE);
-        h.assertFalse(h.getBlockState(pane).getValue(CrossCollisionBlock.SOUTH), "nothing to join yet");
         h.setBlock(piston.west(), Blocks.REDSTONE_BLOCK);
         h.runAfterDelay(10, () -> {
-            h.assertBlockPresent(EcologyModule.LIVING_SUBSTRATE.get(), landing);
-            h.assertValueEqual(
-                    h.getBlockState(landing).getValue(LivingSubstrateBlock.TILE),
-                    LivingSubstrateBlock.tileAt(h.absolutePos(landing)),
-                    "the pushed cell shows its new tile");
-            h.assertTrue(h.getBlockState(pane).getValue(CrossCollisionBlock.SOUTH), "the pane joined the cell");
+            assertStage(h, cell, SubstrateStage.MATURE);
+            h.assertBlockPresent(Blocks.AIR, landing);
             h.succeed();
         });
     }

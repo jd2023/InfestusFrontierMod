@@ -282,3 +282,11 @@ Files: src/main/resources/assets/infestusfrontier/textures/block/{reservoir_memb
 - reservoir_flesh: lobed pink-red muscle, broad swells parted by narrow dark creases, a fine wrinkle and a wet sheen on the crowns. Opaque. The Reservoir's base and rims and every wall of the Item Capsule; a 4x2 capsule wall shows it 8 times side by side.
 - item_capsule_lining: dark wet flesh, almost maroon-black, soft vertical folds with a faint sheen. Opaque. The floor of the capsule's pockets, behind the item icons and their white counts, so it stays dark and quiet.
 - Prompt shape as ART-001; evidence `build/art/<name>-tiled.png` and the captures reservoir and item_capsule.
+
+## ART-009 — Dead Tissue and Surgical Blade icons
+
+Status: open. Owner of the asset: Astra.
+Files: src/main/resources/assets/infestusfrontier/textures/item/{dead_tissue,surgical_blade}.png, CREDITS.txt
+
+- Two 32x32 icons, `--size 32 --colors 0`, one family with the Spore Culture and treatment icons: same outline weight, light from the upper left. Dead Tissue: a limp grey-brown scrap of flesh, dry and wrinkled, a dull pink fleck where it tore. Surgical Blade: a short pale bone handle bound with a strip of pink membrane, a thin curved steel blade, held diagonally from lower left to upper right like the probe; the item renders as a handheld tool.
+- Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background. The placeholders are flat two-tone discs drawn by the builder.

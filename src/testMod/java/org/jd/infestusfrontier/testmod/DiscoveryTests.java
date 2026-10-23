@@ -112,7 +112,8 @@ public final class DiscoveryTests {
                 "awakening_cradle",
                 "bio_furnace",
                 "dormant_pieces",
-                "speak_to_an_organ")) {
+                "speak_to_an_organ",
+                "surgical_blade")) {
             h.assertTrue(category.getEntries().containsKey(id("contact/" + entry)), "entry " + entry + " loaded");
         }
         var circulation = book.getCategory(id("circulation"));
@@ -178,7 +179,8 @@ public final class DiscoveryTests {
                 "awakening_cradle",
                 "bio_furnace",
                 "dormant_pieces",
-                "speak_to_an_organ")) {
+                "speak_to_an_organ",
+                "surgical_blade")) {
             var condition = contact.get(id("contact/" + name)).getCondition();
             h.assertTrue(condition instanceof BookOrCondition, name + " unlocks by step or by item");
         }
@@ -192,6 +194,8 @@ public final class DiscoveryTests {
                 "biomass_bucket",
                 "culture_bowl",
                 "synaptic_probe",
+                "surgical_blade",
+                "dead_tissue",
                 "membrane_rack",
                 "membrane_sheet",
                 "bone_loom",

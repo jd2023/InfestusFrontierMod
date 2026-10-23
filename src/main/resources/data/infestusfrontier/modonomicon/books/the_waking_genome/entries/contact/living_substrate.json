@@ -36,11 +36,6 @@
     {
       "type": "modonomicon:text",
       "text": "entry.infestusfrontier.contact.living_substrate.use"
-    },
-    {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:living_substrate",
-      "text": "entry.infestusfrontier.contact.living_substrate.craft"
     }
   ]
 }

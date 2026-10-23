@@ -511,9 +511,9 @@ public final class ItemCapsuleTests {
         ChunkPos kept = new ChunkPos(anchor);
         ChunkPos near = new ChunkPos(west);
         ChunkPos far = new ChunkPos(west.east(2));
-        level.setChunkForced(kept.x, kept.z, true);
-        level.setChunkForced(near.x, near.z, true);
-        level.setChunkForced(far.x, far.z, true);
+        TestChunks.force(level, kept);
+        TestChunks.force(level, near);
+        TestChunks.force(level, far);
         List<BlockPos> cells = List.of(west, west.east(), west.east(2), west.east(3));
         for (BlockPos pos : cells)
             level.setBlockAndUpdate(pos, StorageModule.ITEM_CAPSULE.get().defaultBlockState());
@@ -539,8 +539,8 @@ public final class ItemCapsuleTests {
                     h.assertValueEqual(port[0].getSlots(), 0, "a body with a cell out of reach has no slots");
                     h.assertValueEqual(
                             port[0].insertItem(0, stack(Items.DIRT, 1), false).getCount(), 1, "and takes nothing");
-                    level.setChunkForced(near.x, near.z, true);
-                    level.setChunkForced(far.x, far.z, true);
+                    TestChunks.force(level, near);
+                    TestChunks.force(level, far);
                 })
                 .thenWaitUntil(() -> h.assertValueEqual(port[0].getSlots(), 16, "the body is whole again"))
                 .thenExecute(() -> {

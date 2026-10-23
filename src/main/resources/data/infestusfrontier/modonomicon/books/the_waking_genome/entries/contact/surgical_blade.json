@@ -1,0 +1,38 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.surgical_blade.name",
+  "description": "entry.infestusfrontier.contact.surgical_blade.description",
+  "icon": "infestusfrontier:surgical_blade",
+  "x": 3,
+  "y": 0,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/speak_to_an_organ"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/surgical_blade"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.surgical_blade.name",
+      "text": "entry.infestusfrontier.contact.surgical_blade.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:surgical_blade",
+      "text": "entry.infestusfrontier.contact.surgical_blade.craft"
+    }
+  ]
+}
