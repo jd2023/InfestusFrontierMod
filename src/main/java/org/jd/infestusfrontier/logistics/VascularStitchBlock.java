@@ -14,6 +14,8 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.AttachFace;
@@ -144,8 +146,18 @@ public final class VascularStitchBlock extends Block {
         if (!(state.getBlock() instanceof VascularStitchBlock) || !ends(state).contains(entry)) return null;
         Direction out = entry == vertical(state) ? state.getValue(FACING) : vertical(state);
         BlockPos far = pos.relative(out);
-        if (!level.hasChunkAt(far)) return null;
+        if (!level.hasChunkAt(far) || !holds(level.getBlockState(far), state.getValue(Routes.CARRIER))) return null;
         return level.getCapability(Capabilities.FluidHandler.BLOCK, far, out.getOpposite());
+    }
+
+    @Override
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override

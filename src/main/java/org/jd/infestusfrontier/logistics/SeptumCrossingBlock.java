@@ -8,6 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -45,6 +47,11 @@ public final class SeptumCrossingBlock extends Block {
     @Override
     protected MapCodec<SeptumCrossingBlock> codec() {
         return CODEC;
+    }
+
+    @Override
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return RotatedPillarBlock.rotatePillar(state, rotation);
     }
 
     /** Whether a passage of the crossing runs along {@code axis}. */

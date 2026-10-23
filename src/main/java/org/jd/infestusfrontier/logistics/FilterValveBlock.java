@@ -140,7 +140,8 @@ public final class FilterValveBlock extends HorizontalDirectionalBlock {
 
     /**
      * The store's handler, or null when the valve is gone, the store's chunk is unloaded, or the faced block is
-     * another valve: valves never chain, so a ring of them cannot call itself.
+     * another valve, a Septum Crossing or a Vascular Stitch: none of them is a store, and since all of them pass a
+     * call on, a ring of them could call itself.
      */
     private static @Nullable IFluidHandler store(Level level, BlockPos pos) {
         if (!level.hasChunkAt(pos)) return null;
@@ -148,7 +149,11 @@ public final class FilterValveBlock extends HorizontalDirectionalBlock {
         if (!(state.getBlock() instanceof FilterValveBlock)) return null;
         Direction facing = state.getValue(FACING);
         BlockPos store = pos.relative(facing);
-        if (!level.hasChunkAt(store) || level.getBlockState(store).getBlock() instanceof FilterValveBlock) return null;
+        if (!level.hasChunkAt(store)) return null;
+        Block faced = level.getBlockState(store).getBlock();
+        if (faced instanceof FilterValveBlock
+                || faced instanceof SeptumCrossingBlock
+                || faced instanceof VascularStitchBlock) return null;
         return level.getCapability(Capabilities.FluidHandler.BLOCK, store, facing.getOpposite());
     }
 

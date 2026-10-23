@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -227,6 +228,26 @@ public final class CrossingTests {
                     "and the graft");
             h.succeed();
         });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "crossing_boundary")
+    public static void aCrossingOrStitchAtAChunkEdgeNeverLoadsTheFarChunk(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos origin = h.absolutePos(BlockPos.ZERO);
+        BlockPos edge = new BlockPos((origin.getX() & ~15) + 232015, 80, (origin.getZ() & ~15) + 232008);
+        level.getChunkAt(edge);
+        int quiet = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+        level.setBlock(edge, crossing(LogisticsModule.BIOMASS_VEIN.get(), Direction.Axis.Y), quiet);
+        BlockPos above = edge.above(2);
+        level.setBlock(above, stitch(LogisticsModule.BIOMASS_VEIN.get(), Direction.EAST, false), quiet);
+        h.assertFalse(level.hasChunkAt(edge.east()), "the far chunk starts unloaded");
+        IFluidHandler crossing = level.getCapability(Capabilities.FluidHandler.BLOCK, edge, Direction.WEST);
+        h.assertValueEqual(
+                crossing.fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE), 0, "the crossing passes nothing");
+        IFluidHandler stitch = level.getCapability(Capabilities.FluidHandler.BLOCK, above, Direction.DOWN);
+        h.assertValueEqual(stitch.fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE), 0, "nor does the stitch");
+        h.assertFalse(level.hasChunkAt(edge.east()), "and nothing loaded the far chunk");
+        h.succeed();
     }
 
     // --- the Vascular Stitch ---

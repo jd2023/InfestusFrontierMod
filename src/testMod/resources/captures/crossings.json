@@ -1,8 +1,8 @@
 {
   "commands": [
     "advancement grant @s through infestusfrontier:contact/biomass_bladder",
-    "fill -8 -61 -6 10 -54 16 air",
-    "fill -8 -62 -6 10 -62 16 grass_block",
+    "fill -8 -61 -6 10 -54 18 air",
+    "fill -8 -62 -6 10 -62 18 grass_block",
     "kill @e[type=item]",
     "fill -7 -61 0 7 -61 6 infestusfrontier:living_substrate[stage=mature]",
     "fill -7 -61 3 -1 -61 3 infestusfrontier:biomass_vein",
@@ -22,6 +22,12 @@
     "fill -7 -61 13 -1 -61 13 infestusfrontier:item_vein",
     "fill 0 -60 13 6 -60 13 infestusfrontier:item_vein",
     "setblock -1 -60 13 infestusfrontier:vascular_stitch[facing=east,face=floor,carrier=item]",
+    "fill -2 -57 15 1 -57 17 infestusfrontier:living_substrate[stage=mature]",
+    "fill 2 -57 15 5 -57 17 infestusfrontier:living_substrate[stage=mature]",
+    "fill 2 -58 15 5 -58 17 infestusfrontier:living_substrate[stage=mature]",
+    "fill -2 -57 16 1 -57 16 infestusfrontier:biomass_vein",
+    "fill 2 -58 16 5 -58 16 infestusfrontier:biomass_vein",
+    "setblock 1 -58 16 infestusfrontier:vascular_stitch[facing=east,face=ceiling,carrier=biomass]",
     "give @s infestusfrontier:septum_crossing",
     "give @s infestusfrontier:vascular_stitch"
   ],
@@ -89,6 +95,14 @@
       "z": 11.0,
       "yaw": 90,
       "pitch": 35
+    },
+    {
+      "name": "stitch_ceiling",
+      "x": 1.5,
+      "y": -61,
+      "z": 20.5,
+      "yaw": 180,
+      "pitch": -22
     },
     {
       "name": "hotbar",

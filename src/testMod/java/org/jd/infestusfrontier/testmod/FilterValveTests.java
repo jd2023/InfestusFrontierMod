@@ -136,6 +136,36 @@ public final class FilterValveTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aRingOfValvesAndCrossingsAnswersNothingAndNeverLoops(GameTestHelper h) {
+        // valves at the corners of a 3 by 3 ring, each facing a biomass crossing whose passage leads to the next valve
+        Direction[] faces = {Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.NORTH};
+        BlockPos[] valves = {
+            new BlockPos(1, Y + 1, 1), new BlockPos(3, Y + 1, 1), new BlockPos(3, Y + 1, 3), new BlockPos(1, Y + 1, 3)
+        };
+        BlockState crossing = LogisticsModule.SEPTUM_CROSSING.get().defaultBlockState();
+        for (int i = 0; i < 4; i++) {
+            BlockPos between = valves[i].relative(faces[i]);
+            h.setBlock(valves[i].below(), EcologyTests.mature());
+            h.setBlock(between.below(), EcologyTests.mature());
+            h.setBlock(
+                    valves[i],
+                    LogisticsModule.FILTER_VALVE
+                            .get()
+                            .defaultBlockState()
+                            .setValue(HorizontalDirectionalBlock.FACING, faces[i]));
+            h.setBlock(between, crossing);
+        }
+        IFluidHandler handler =
+                h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(valves[0]), Direction.WEST);
+        h.assertValueEqual(
+                handler.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.SIMULATE),
+                0,
+                "a valve facing a crossing has no store");
+        h.assertValueEqual(handler.getTanks(), 0, "and no tanks");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void aBucketDrainsThroughTheValveAndStopsAtTheReserve(GameTestHelper h) {
         h.setBlock(SOURCE.below(), EcologyTests.mature());
         h.setBlock(VALVE.below(), EcologyTests.mature());

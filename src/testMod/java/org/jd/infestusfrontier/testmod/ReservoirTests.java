@@ -378,7 +378,7 @@ public final class ReservoirTests {
     public static void aBodyAcrossAnUnloadedChunkRefusesAndHealsWhenItLoads(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos origin = h.absolutePos(BlockPos.ZERO);
-        BlockPos anchor = new BlockPos((origin.getX() & ~15) + 192000, 80, (origin.getZ() & ~15) + 192008);
+        BlockPos anchor = new BlockPos((origin.getX() & ~15) + 192000, 80, (origin.getZ() & ~15) + 256008);
         // two cells at the east end of the chunk two east of the anchor, two at the west end of the next
         BlockPos west = anchor.east(46);
         ChunkPos kept = new ChunkPos(anchor);

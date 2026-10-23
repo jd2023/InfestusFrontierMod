@@ -123,7 +123,8 @@ public final class LogisticsModule {
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.TERRACOTTA_PINK)
                     .strength(0.6F)
-                    .sound(SoundType.GRAVEL));
+                    .sound(SoundType.GRAVEL)
+                    .pushReaction(PushReaction.BLOCK));
 
     public static final DeferredItem<Item> SEPTUM_CROSSING_ITEM =
             ITEMS.registerItem("septum_crossing", SeptumCrossingItem::new);

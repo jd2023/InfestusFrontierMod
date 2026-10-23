@@ -29,13 +29,15 @@ AXIS_FACES = {'x': ('east', 'west'), 'y': ('up', 'down'), 'z': ('north', 'south'
 
 
 def uv(face, frm, to):
+    """The face's texture square, projected from the block; a part standing above the block keeps its own height
+    but is moved down into the sprite."""
     x0, y0, z0 = frm
     x1, y1, z1 = to
     if face in ('up', 'down'):
         return [x0, z0, x1, z1]
-    if face in ('north', 'south'):
-        return [x0, 16 - y1, x1, 16 - y0]
-    return [z0, 16 - y1, z1, 16 - y0]
+    above = max(0, y1 - 16)
+    u0, u1 = (x0, x1) if face in ('north', 'south') else (z0, z1)
+    return [u0, 16 - y1 + above, u1, 16 - y0 + above]
 
 
 def cube(frm, to, textures, skip=()):
