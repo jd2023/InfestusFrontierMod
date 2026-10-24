@@ -13,8 +13,9 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * The lower half of a Sphincter Door or a door hardened from it, which draws the whole iris. It saves nothing: the door's {@code open} block
- * state picks the animation, so a door that was already open when its chunk loaded starts open instead of dilating.
+ * The lower half of a Sphincter Door or a door hardened from it, which draws the whole iris. It saves nothing: the
+ * door's {@code open} block state picks the animation, so a door that was already open when its chunk loaded starts
+ * open instead of dilating.
  */
 final class SphincterDoorBlockEntity extends BlockEntity implements GeoBlockEntity {
     private static final RawAnimation OPEN = RawAnimation.begin().thenLoop("open");

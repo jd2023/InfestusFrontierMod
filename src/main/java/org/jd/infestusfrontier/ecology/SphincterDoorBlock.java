@@ -34,8 +34,9 @@ import org.jetbrains.annotations.Nullable;
  * doorway; open, nothing stops a walker. Grown, never placed: broken, it dies into Dead Tissue.
  *
  * <p>The Sphincter Door is a simple door, like a wooden one: hands and redstone open it, villagers open it (it is in
- * {@code minecraft:mob_interactable_doors}), and zombies on Hard break it down because it opens by hand. Grafts harden it into the Clenched and then the Calcified Door, which follow the
- * vanilla iron door: only redstone opens them, so no mob opens or breaks them, and no piston moves them.
+ * {@code minecraft:mob_interactable_doors}), and zombies on Hard break it down because it opens by hand. Grafts
+ * harden it into the Clenched and then the Calcified Door, which follow the vanilla iron door: only redstone opens
+ * them, so no mob opens or breaks them, and no piston moves them.
  */
 public final class SphincterDoorBlock extends DoorBlock implements EntityBlock {
     /** The simple door's sounds and who may open it: any hand, redstone, never an arrow or a wind charge. */
