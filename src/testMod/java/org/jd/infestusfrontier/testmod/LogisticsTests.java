@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -273,7 +272,7 @@ public final class LogisticsTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void aBrokenCellCarriesItsFluid(GameTestHelper h) {
+    public static void aBrokenCellDiesWithItsPacket(GameTestHelper h) {
         BlockPos cell = new BlockPos(1, Y, 1);
         h.setBlock(cell, LogisticsModule.BIOMASS_VEIN.get());
         h.getLevel()
@@ -281,28 +280,15 @@ public final class LogisticsTests {
                 .fill(BiomassFluids.of(Biomass.of(200)), IFluidHandler.FluidAction.EXECUTE);
         h.getLevel().destroyBlock(h.absolutePos(cell), true);
         h.runAfterDelay(2, () -> {
-            List<ItemEntity> drops = h.getEntities(EntityType.ITEM, cell, 2.0).stream()
-                    .filter(drop -> drop.getItem().is(LogisticsModule.BIOMASS_VEIN_ITEM.get()))
-                    .toList();
-            h.assertValueEqual(drops.size(), 1, "one dropped cell");
-            SimpleFluidContent carried = drops.get(0).getItem().get(LogisticsModule.FLUID_CONTENT.get());
-            h.assertTrue(
-                    carried != null && carried.getAmount() == 200 && BiomassFluids.isBiomass(carried.copy()),
-                    "200 mB of biomass on the item");
-            Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-            builder.setItemInHand(
-                    net.minecraft.world.InteractionHand.MAIN_HAND,
-                    drops.get(0).getItem().copy());
-            h.setBlock(cell.below(), Blocks.STONE);
-            h.placeAt(builder, builder.getMainHandItem(), cell.below(), Direction.UP);
-            h.assertBlockPresent(LogisticsModule.BIOMASS_VEIN.get(), cell);
-            h.assertValueEqual(biomassIn(h, cell), 200, "placed again with its packet");
+            List<ItemEntity> drops = h.getEntities(EntityType.ITEM, cell, 2.0);
+            h.assertValueEqual(drops.size(), 1, "one drop");
+            h.assertTrue(drops.getFirst().getItem().is(EcologyModule.DEAD_TISSUE.get()), "Dead Tissue, not the cell");
             h.succeed();
         });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void aCreativeBreakKeepsAVeinsPacketAndASealedVeinMovesSealed(GameTestHelper h) {
+    public static void aCreativeBreakLeavesNothing(GameTestHelper h) {
         BlockPos cell = new BlockPos(1, Y, 1);
         h.setBlock(cell, LogisticsModule.BIOMASS_VEIN.get());
         h.getLevel()
@@ -313,30 +299,8 @@ public final class LogisticsTests {
         state.getBlock().playerWillDestroy(h.getLevel(), h.absolutePos(cell), state, creative);
         h.getLevel().removeBlock(h.absolutePos(cell), false);
         h.runAfterDelay(2, () -> {
-            var cells = h.getEntities(EntityType.ITEM, cell, 2.0).stream()
-                    .filter(drop -> drop.getItem().is(LogisticsModule.BIOMASS_VEIN_ITEM.get()))
-                    .toList();
-            h.assertValueEqual(cells.size(), 1, "the Creative player gets the cell back");
-            SimpleFluidContent carried = cells.getFirst().getItem().get(LogisticsModule.FLUID_CONTENT.get());
-            h.assertTrue(carried != null && carried.getAmount() == 200, "with its packet on the item");
-            Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-            BlockPos sealed = new BlockPos(4, Y, 1);
-            h.setBlock(
-                    sealed, LogisticsModule.FLUID_VEIN.get().defaultBlockState().setValue(VeinBlock.SEALED, true));
-            h.getLevel().destroyBlock(h.absolutePos(sealed), true);
-            h.runAfterDelay(2, () -> {
-                var drops = h.getEntities(EntityType.ITEM, sealed, 2.0).stream()
-                        .filter(drop -> drop.getItem().is(LogisticsModule.FLUID_VEIN_ITEM.get()))
-                        .toList();
-                h.assertValueEqual(drops.size(), 1, "one sealed Fluid Vein dropped");
-                ItemStack dropped = drops.getFirst().getItem().copy();
-                builder.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, dropped);
-                h.setBlock(sealed.below(), Blocks.STONE);
-                h.placeAt(builder, builder.getMainHandItem(), sealed.below(), Direction.UP);
-                h.assertBlockPresent(LogisticsModule.FLUID_VEIN.get(), sealed);
-                h.assertTrue(h.getBlockState(sealed).getValue(VeinBlock.SEALED), "a moved sealed vein stays sealed");
-                h.succeed();
-            });
+            h.assertValueEqual(h.getEntities(EntityType.ITEM, cell, 2.0).size(), 0, "a Creative break drops nothing");
+            h.succeed();
         });
     }
 

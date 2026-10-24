@@ -99,7 +99,6 @@ public final class DiscoveryDataTests {
     public static void recipeUnlockAdvancementsExist(GameTestHelper h) {
         for (String path : List.of(
                 "spore_culture",
-                "living_substrate",
                 "organ_bud",
                 "digestive_sac",
                 "biomass_bladder",
@@ -117,7 +116,12 @@ public final class DiscoveryDataTests {
                 "fuel_papilla",
                 "filter_valve",
                 "reservoir_cell",
-                "item_capsule")) {
+                "item_capsule",
+                "surgical_blade",
+                "membrane_window",
+                "sphincter_door",
+                "septum_crossing",
+                "vascular_stitch")) {
             ResourceLocation recipe = id(path);
             AdvancementHolder holder =
                     h.getLevel().getServer().getAdvancements().get(id("recipes/" + path));

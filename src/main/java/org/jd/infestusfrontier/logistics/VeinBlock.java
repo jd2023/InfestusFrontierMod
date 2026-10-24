@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -73,12 +72,13 @@ public final class VeinBlock extends BaseEntityBlock {
     }
 
     /**
-     * True when {@code other} on {@code side} is a cell of the same vein, or a Mouth beside or under an Item Vein. The
-     * links only shape the model: a vein still fills an organ or a Junction beside it, but its groove stops at that
-     * block's face. A Mouth's top face holds its store, so a vein above a Mouth does not join it.
+     * True when {@code other} on {@code side} is a cell of the same vein, a crossing or stitch of its carrier open
+     * toward this cell, or a Mouth beside or under an Item Vein. The links only shape the model: a vein still fills an
+     * organ or a Junction beside it, but its groove stops at that block's face. A Mouth's top face holds its store, so
+     * a vein above a Mouth does not join it.
      */
     private boolean connects(Direction side, BlockState other) {
-        if (other.getBlock() instanceof VeinBlock vein) return vein.carrier == carrier;
+        if (Routes.opens(other, side.getOpposite(), carrier)) return true;
         return carrier == Carrier.ITEM && other.getBlock() instanceof MouthBlock && side != Direction.DOWN;
     }
 
@@ -126,22 +126,6 @@ public final class VeinBlock extends BaseEntityBlock {
         if (carrier == Carrier.ITEM && !level.isClientSide && !state.is(newState.getBlock()))
             LogisticsModule.routesChanged(level);
         super.onRemove(state, level, pos, newState, movedByPiston);
-    }
-
-    /** A Creative player who breaks a loaded cell still gets it back, as with a shulker box. */
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide
-                && player.isCreative()
-                && level.getBlockEntity(pos) instanceof VeinBlockEntity vein
-                && !vein.isEmpty()) {
-            ItemStack stack = new ItemStack(this);
-            vein.saveToItem(stack, level.registryAccess());
-            ItemEntity drop = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-            drop.setDefaultPickUpDelay();
-            level.addFreshEntity(drop);
-        }
-        return super.playerWillDestroy(level, pos, state, player);
     }
 
     /** A bucket moves fluid like on any tank; everything else builds against the cell, it has no screen. */

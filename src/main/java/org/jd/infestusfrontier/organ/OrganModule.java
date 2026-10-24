@@ -17,6 +17,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.organ.api.OrganCodecs;
+import org.jd.infestusfrontier.organ.api.Organs;
 
 /** Owner of organ identity and history. An organ's history travels on its item when it is broken and placed again. */
 public final class OrganModule {
@@ -41,7 +42,7 @@ public final class OrganModule {
             OrganBudBlock::new,
             Properties.of()
                     .mapColor(MapColor.COLOR_PINK)
-                    .strength(0.5F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion());
     public static final DeferredItem<BlockItem> ORGAN_BUD_ITEM = ITEMS.registerSimpleBlockItem(ORGAN_BUD);

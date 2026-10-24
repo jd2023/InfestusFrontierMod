@@ -13,7 +13,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -22,11 +21,11 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
+import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.equipment.EquipmentModule;
 import org.jd.infestusfrontier.equipment.FuelPapillaMenu;
 import org.jd.infestusfrontier.equipment.api.Reserves;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
-import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -140,39 +139,18 @@ public final class FuelPapillaTests {
         CompoundTag saved =
                 h.getBlockEntity(PAPILLA).saveWithoutMetadata(h.getLevel().registryAccess());
         h.assertValueEqual(saved.getCompound("tank").getInt("stored"), 800, "the carried 800 BU are kept, not dropped");
-        h.getLevel().destroyBlock(h.absolutePos(PAPILLA), true);
-        h.runAfterDelay(2, () -> {
-            var drops = h.getEntities(EntityType.ITEM, PAPILLA, 2).stream()
-                    .filter(drop -> drop.getItem().is(EquipmentModule.FUEL_PAPILLA_ITEM.get()))
-                    .toList();
-            h.assertValueEqual(drops.size(), 1, "the pad dropped");
-            h.assertTrue(
-                    drops.getFirst().getItem().has(OrganModule.UNREADABLE_SAVE.get()), "with its bytes on the item");
-            h.succeed();
-        });
+        h.succeed();
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void aCreativeBreakKeepsTheBufferForTheNextGraft(GameTestHelper h) {
+    public static void aBrokenPadDiesWithItsBuffer(GameTestHelper h) {
         h.setBlock(PAPILLA, EquipmentModule.FUEL_PAPILLA.get());
         fill(h, 100);
-        Player creative = EcologyTests.holding(h, GameType.CREATIVE, Items.AIR, 0);
-        BlockState state = h.getBlockState(PAPILLA);
-        state.getBlock().playerWillDestroy(h.getLevel(), h.absolutePos(PAPILLA), state, creative);
-        h.getLevel().removeBlock(h.absolutePos(PAPILLA), false);
+        h.getLevel().destroyBlock(h.absolutePos(PAPILLA), true);
         h.runAfterDelay(2, () -> {
-            var drops = h.getEntities(EntityType.ITEM, PAPILLA, 2).stream()
-                    .filter(drop -> drop.getItem().is(EquipmentModule.FUEL_PAPILLA_ITEM.get()))
-                    .toList();
-            h.assertValueEqual(drops.size(), 1, "the Creative player gets the pad back");
-            BlockPos again = PAPILLA.east(2);
-            h.setBlock(again, EcologyTests.mature());
-            Player grower = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-            grower.setItemInHand(
-                    net.minecraft.world.InteractionHand.MAIN_HAND,
-                    drops.getFirst().getItem().copy());
-            EcologyTests.use(h, grower, again, Direction.UP);
-            h.assertValueEqual(ProcessingTests.handler(h, again).tank().stored().units(), 100, "with its 100 BU");
+            var drops = h.getEntities(EntityType.ITEM, PAPILLA, 2);
+            h.assertValueEqual(drops.size(), 1, "one drop");
+            h.assertTrue(drops.getFirst().getItem().is(EcologyModule.DEAD_TISSUE.get()), "Dead Tissue, not the pad");
             h.succeed();
         });
     }

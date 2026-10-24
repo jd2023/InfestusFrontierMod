@@ -378,15 +378,15 @@ public final class ReservoirTests {
     public static void aBodyAcrossAnUnloadedChunkRefusesAndHealsWhenItLoads(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos origin = h.absolutePos(BlockPos.ZERO);
-        BlockPos anchor = new BlockPos((origin.getX() & ~15) + 192000, 80, (origin.getZ() & ~15) + 192008);
+        BlockPos anchor = new BlockPos((origin.getX() & ~15) + 192000, 80, (origin.getZ() & ~15) + 256008);
         // two cells at the east end of the chunk two east of the anchor, two at the west end of the next
         BlockPos west = anchor.east(46);
         ChunkPos kept = new ChunkPos(anchor);
         ChunkPos near = new ChunkPos(west);
         ChunkPos far = new ChunkPos(west.east(2));
-        level.setChunkForced(kept.x, kept.z, true);
-        level.setChunkForced(near.x, near.z, true);
-        level.setChunkForced(far.x, far.z, true);
+        TestChunks.force(level, kept);
+        TestChunks.force(level, near);
+        TestChunks.force(level, far);
         List<BlockPos> cells = List.of(west, west.east(), west.east(2), west.east(3));
         for (BlockPos pos : cells) {
             level.setBlockAndUpdate(pos.below(), EcologyTests.mature());
@@ -426,8 +426,8 @@ public final class ReservoirTests {
                                     .getAmount(),
                             2000,
                             "with its share");
-                    level.setChunkForced(near.x, near.z, true);
-                    level.setChunkForced(far.x, far.z, true);
+                    TestChunks.force(level, near);
+                    TestChunks.force(level, far);
                 })
                 .thenWaitUntil(() -> h.assertTrue(
                         level.hasChunkAt(west.east(3))

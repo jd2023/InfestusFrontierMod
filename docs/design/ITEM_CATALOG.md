@@ -114,6 +114,8 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I009 | The Waking Genome | 1 ordinary book + 1 Culture → 1 guide; first-join claim is a separate once-only delivery | Persistent access to instructions; losing a book loses no research. |
 | I010 | Synaptic Probe | Craft 1 bone + 1 slime ball + 1 Culture → 1 | Inspect/configure reachable organs, show port direction, mark bounded areas. It is a tool, not an upgrade ingredient. |
 | I011 | Empty Sample Vial | Craft 1 glass bottle + 1 paper → 1 | Manually withdraw one I040 sample from a pouch/archive or package one harvested plant specimen. Extraction returns this vial; directly collected samples need no vial. |
+| I129 | Dead Tissue | Any broken grown cell: Living Substrate or a cell grown in it → 1 | Digestive Sac feed, 5 BU in 4 s. Grown tissue never moves, so this is all a broken cell gives. |
+| I130 | Surgical Blade | Craft 1 iron ingot + 1 bone + 1 Membrane Sheet → 1; 64 uses | Breaks an organ in 1.5 s instead of 18; the organ comes out whole either way. On anything else it is no faster than a hand, and every block it breaks wears it. |
 | I012 | Sample Pouch | Craft 2 Membrane Sheets + 1 string + 1 Sealing Resin → 1 | Standalone sample collection; capacities and upgrades below. No armor required. |
 | I013 | Dormant Hood / Thorax / Legwraps / Treads | Four distinct armor items: 5 / 8 / 7 / 4 rotten flesh in vanilla armor silhouettes | One piece awakened in Cradle using Culture, Membrane Sheet and 100 BU. |
 | I014 | Living Hood / Thorax / Legwraps / Treads | Awaken the corresponding existing dormant piece; empty fuel, preserved wear percentage | Four persistent equipment identities; full material and mutation tree in Armor Evolution. Frame variants are item data, not dozens of interchangeable crafting products. |
@@ -121,7 +123,8 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I016 | Living Pick / Hatchet / Spade / Hoe | Awaken corresponding I015 tool | Persistent tool counterparts. Mineral fusion must respect real harvest tier; area/precision branches remain proposed, not approved damage or yield rules. |
 | I017 | Dormant Fang | 2 Bone Plates + 1 stick → 1 | Basic weak melee weapon; same cradle awakening route as tools. |
 | I018 | Living Fang | Awaken I017 | Base for separately designed piercing/control weapon branches. |
-| I050 | Skeletal Graft | Bone Loom: 1 Bone Plate + 1 Binder + 25 BU → 1 | Reinforce one cell or permitted organ skeleton; the plate is not duplicated. |
+| I050 | Skeletal Graft | Activation Cyst: 1 Bone Plate + 1 Binder + 25 BU → 1 | Hardens one Living Wall into a Ribbed Wall; later reinforces one cell or permitted organ skeleton. The plate is not duplicated. |
+| I131 | Calcifying Graft | Activation Cyst: 4 Bone Plates + 1 Binder + 200 BU → 1 | Hardens one Ribbed Wall into a Calcified Wall, which no explosion breaks. |
 | I051 | Mutation Graft | Host rank I at T0; genetic/higher grafts from T2. Typed family under “Mutation grafts” below. | Installed once; target, equipment slot and rank are explicit. An installed armor graft cannot be extracted. |
 | I019 | Biomass Bucket | Fill a vanilla bucket with exactly 1,000 mB from a compatible store | Real fluid transfer. It empties only when the complete 1,000 mB fits and otherwise remains held unchanged. World placement stays unavailable until finite spill admission exists; containment and damage follow the Block Catalog's containment rules. |
 

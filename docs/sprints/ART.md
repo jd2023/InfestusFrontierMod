@@ -313,3 +313,28 @@ Files: src/main/resources/assets/infestusfrontier/textures/block/{reservoir_memb
 - reservoir_flesh: lobed pink-red muscle, broad swells parted by narrow dark creases, a fine wrinkle and a wet sheen on the crowns. Opaque. The Reservoir's base and rims and every wall of the Item Capsule; a 4x2 capsule wall shows it 8 times side by side.
 - item_capsule_lining: dark wet flesh, almost maroon-black, soft vertical folds with a faint sheen. Opaque. The floor of the capsule's pockets, behind the item icons and their white counts, so it stays dark and quiet.
 - Prompt shape as ART-001; evidence `build/art/<name>-tiled.png` and the captures reservoir and item_capsule.
+
+## ART-009 — Dead Tissue and Surgical Blade icons
+
+Status: open. Owner of the asset: Astra.
+Files: src/main/resources/assets/infestusfrontier/textures/item/{dead_tissue,surgical_blade}.png, CREDITS.txt
+
+- Two 32x32 icons, `--size 32 --colors 0`, one family with the Spore Culture and treatment icons: same outline weight, light from the upper left. Dead Tissue: a limp grey-brown scrap of flesh, dry and wrinkled, a dull pink fleck where it tore. Surgical Blade: a short pale bone handle bound with a strip of pink membrane, a thin curved steel blade, held diagonally from lower left to upper right like the probe; the item renders as a handheld tool.
+- Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background. The placeholders are flat two-tone discs drawn by the builder.
+
+## ART-010 — Living wall tile and graft icons
+
+Status: open. Owner of the asset: Astra.
+Files: src/main/resources/assets/infestusfrontier/textures/block/living_wall.png, textures/item/{skeletal_graft,calcifying_graft}.png, CREDITS.txt
+
+- living_wall: a 64x64 block texture, seamless on all four edges, one family with the Living Substrate tiles and reservoir_flesh. Dense dark muscular tissue: broad lobes parted by narrow dark creases, a faint grain of fibres running one way, a wet sheen on the crowns. Opaque. It covers every face of the three wall tiers; the Ribbed Wall's ribs and the Calcified Wall's plates are model parts cut from reservoir_bone and stay with art/gen_walls.py. The blockstate turns the Living Wall four ways at random, about the vertical and the horizontal axis, so the edges must still match after a 90-degree turn and no feature may end at an edge. The Ribbed Wall is not turned (its ribs must line up), so its flesh repeats every block and must not show an obvious motif.
+- skeletal_graft and calcifying_graft: two 32x32 icons, `--size 32 --colors 0`, one family with the treatment icons. Skeletal Graft: a small curved bone splint wrapped in a pink membrane strip. Calcifying Graft: a chalky white lump of bone paste with a hard, cracked crust.
+- Prompt shapes as ART-001 and the synaptic_probe source prompt; evidence `build/art/living_wall-tiled.png` and the capture walls. The placeholders are art/gen_walls.py's generated flesh and flat two-tone discs.
+
+## ART-011 — Window and door graft icons
+
+Status: open. Owner of the asset: Astra.
+Files: src/main/resources/assets/infestusfrontier/textures/item/{membrane_window,sphincter_door}.png, CREDITS.txt
+
+- Two 32x32 icons, `--size 32 --colors 0`, one family with the treatment icons. Membrane Window: a small square of pale pink translucent membrane with red veins in a thin ivory bone frame. Sphincter Door: a closed iris of six overlapping pink membrane petals spiralling into a dark centre, ringed by a muscular red rim.
+- Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background. The placeholders are flat two-tone discs; the window block and the door model come from art/gen_openings.py and are not part of this story.

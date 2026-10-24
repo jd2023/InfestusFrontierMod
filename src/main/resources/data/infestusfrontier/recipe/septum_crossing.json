@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:septum_crossing",
+    "count": 1
+  }
+}

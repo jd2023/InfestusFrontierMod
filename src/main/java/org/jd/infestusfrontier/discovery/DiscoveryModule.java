@@ -45,6 +45,14 @@ public final class DiscoveryModule {
                     .icon(() -> new ItemStack(EcologyModule.SPORE_CULTURE.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(EcologyModule.SPORE_CULTURE.get());
+                        output.accept(EcologyModule.DEAD_TISSUE.get());
+                        output.accept(EcologyModule.LIVING_WALL_ITEM.get());
+                        output.accept(EcologyModule.RIBBED_WALL_ITEM.get());
+                        output.accept(EcologyModule.CALCIFIED_WALL_ITEM.get());
+                        output.accept(EcologyModule.SKELETAL_GRAFT.get());
+                        output.accept(EcologyModule.CALCIFYING_GRAFT.get());
+                        output.accept(EcologyModule.MEMBRANE_WINDOW_ITEM.get());
+                        output.accept(EcologyModule.SPHINCTER_DOOR_ITEM.get());
                         output.accept(EcologyModule.LIVING_SUBSTRATE_ITEM.get());
                         output.accept(OrganModule.ORGAN_BUD_ITEM.get());
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());
@@ -72,6 +80,8 @@ public final class DiscoveryModule {
                         output.accept(LogisticsModule.BIOMASS_VEIN_ITEM.get());
                         output.accept(LogisticsModule.FLUID_VEIN_ITEM.get());
                         output.accept(LogisticsModule.ITEM_VEIN_ITEM.get());
+                        output.accept(LogisticsModule.SEPTUM_CROSSING_ITEM.get());
+                        output.accept(LogisticsModule.VASCULAR_STITCH_ITEM.get());
                         output.accept(LogisticsModule.VASCULAR_JUNCTION_ITEM.get());
                         output.accept(LogisticsModule.MOUTH_ITEM.get());
                         output.accept(LogisticsModule.FEEDING_LOBE_ITEM.get());
@@ -94,6 +104,7 @@ public final class DiscoveryModule {
                                 EquipmentModule.AWAKENED_LEGWRAPS,
                                 EquipmentModule.AWAKENED_TREADS)) output.accept(piece.get());
                         output.accept(InteractionModule.SYNAPTIC_PROBE.get());
+                        output.accept(InteractionModule.SURGICAL_BLADE.get());
                     })
                     .build());
 

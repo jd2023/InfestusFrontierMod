@@ -43,6 +43,7 @@ import org.jd.infestusfrontier.foundation.render.FrontStockRenderer;
 import org.jd.infestusfrontier.foundation.render.JoinedTankRenderer;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
+import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -118,7 +119,7 @@ public final class StorageModule {
             BiomassBladderBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_MAGENTA)
-                    .strength(1.0F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion());
     public static final DeferredItem<OrganItem> BIOMASS_BLADDER_ITEM = ITEMS.register(
@@ -135,7 +136,7 @@ public final class StorageModule {
             ReservoirCellBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PINK)
-                    .strength(1.0F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion()
                     .pushReaction(PushReaction.BLOCK)

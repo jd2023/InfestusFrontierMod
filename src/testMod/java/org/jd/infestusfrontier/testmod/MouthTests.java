@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -17,7 +16,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -44,6 +42,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.TickQuota;
+import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.logistics.MouthBlock;
@@ -52,7 +51,6 @@ import org.jd.infestusfrontier.logistics.MouthMode;
 import org.jd.infestusfrontier.logistics.Port;
 import org.jd.infestusfrontier.logistics.VascularJunctionBlock;
 import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
-import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 
@@ -299,12 +297,8 @@ public final class MouthTests {
             h.getLevel().destroyBlock(h.absolutePos(cell(1)), true);
             h.runAfterDelay(2, () -> {
                 h.assertItemEntityCountIs(Items.BONE, cell(1), 2, 8);
-                h.assertItemEntityCountIs(LogisticsModule.MOUTH_ITEM.get(), cell(1), 2, 1);
-                for (var drop : h.getEntities(EntityType.ITEM, cell(1), 2))
-                    if (drop.getItem().is(LogisticsModule.MOUTH_ITEM.get()))
-                        h.assertFalse(
-                                drop.getItem().has(DataComponents.BLOCK_ENTITY_DATA),
-                                "the Mouth item carries no second copy");
+                h.assertItemEntityCountIs(EcologyModule.DEAD_TISSUE.get(), cell(1), 2, 1);
+                h.assertItemEntityNotPresent(LogisticsModule.MOUTH_ITEM.get(), cell(1), 2);
                 h.runAfterDelay(60, () -> {
                     h.assertValueEqual(count(h, cell(8), Items.BONE), 0, "the dropped packet never arrives");
                     h.succeed();
@@ -465,7 +459,7 @@ public final class MouthTests {
         BlockPos end = start.east(48);
         ChunkPos first = new ChunkPos(start);
         ChunkPos last = new ChunkPos(end);
-        for (int x = first.x; x <= last.x; x++) level.setChunkForced(x, first.z, true);
+        for (int x = first.x; x <= last.x; x++) TestChunks.force(level, new ChunkPos(x, first.z));
         level.setBlockAndUpdate(start.above(), Blocks.CHEST.defaultBlockState());
         ((ChestBlockEntity) level.getBlockEntity(start.above())).setItem(0, new ItemStack(Items.BONE, 8));
         level.setBlockAndUpdate(start, mouthState(MouthMode.CLOSED));
@@ -492,7 +486,7 @@ public final class MouthTests {
                         8,
                         "no destination while its chunk is unloaded"))
                 .thenExecute(() -> {
-                    level.setChunkForced(last.x, last.z, true);
+                    TestChunks.force(level, last);
                     at[1] = level.getGameTime();
                 })
                 .thenWaitUntil(() -> h.assertTrue(
@@ -551,13 +545,8 @@ public final class MouthTests {
             h.getLevel().destroyBlock(h.absolutePos(cell(1)), true);
             h.runAfterDelay(2, () -> {
                 h.assertItemEntityCountIs(Items.BONE, cell(1), 2, 0);
-                var drops = h.getEntities(EntityType.ITEM, cell(1), 2).stream()
-                        .filter(drop -> drop.getItem().is(LogisticsModule.MOUTH_ITEM.get()))
-                        .toList();
-                h.assertValueEqual(drops.size(), 1, "the Mouth dropped");
-                h.assertTrue(
-                        drops.getFirst().getItem().has(OrganModule.UNREADABLE_SAVE.get()),
-                        "its item carries the unreadable bytes");
+                h.assertItemEntityCountIs(EcologyModule.DEAD_TISSUE.get(), cell(1), 2, 1);
+                h.assertItemEntityNotPresent(LogisticsModule.MOUTH_ITEM.get(), cell(1), 2);
                 h.succeed();
             });
         });

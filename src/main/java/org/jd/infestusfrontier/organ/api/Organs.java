@@ -34,6 +34,17 @@ public final class Organs {
     public static final TagKey<Block> YIELD_HOSTS = TagKey.create(
             Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "yield_hosts"));
 
+    /**
+     * Every organ block. Organs are hard to break, so a stray click never takes one; the Surgical Blade is the one
+     * tool made for them. A broken organ comes out whole, carrying what it holds.
+     */
+    public static final TagKey<Block> ORGANS =
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "organs"));
+    /** An organ's hardness: about 18 seconds with a hand or any ordinary tool. */
+    public static final float HARDNESS = 12.0F;
+    /** An organ's blast resistance, stone's: an explosion still breaks it. */
+    public static final float BLAST_RESISTANCE = 6.0F;
+
     /** The last growth stage an organ's state can name. */
     public static final int LAST_STAGE = 2;
     /** The growth stage of an organ that grows: 0 young, up to {@link #LAST_STAGE}. */

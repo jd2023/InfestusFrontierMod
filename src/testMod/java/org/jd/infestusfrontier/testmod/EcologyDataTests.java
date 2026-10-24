@@ -2,24 +2,27 @@ package org.jd.infestusfrontier.testmod;
 
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.jd.infestusfrontier.cultivation.CultivationModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.ecology.LivingSubstrateBlock;
 import org.jd.infestusfrontier.ecology.SubstrateStage;
+import org.jd.infestusfrontier.equipment.EquipmentModule;
+import org.jd.infestusfrontier.logistics.LogisticsModule;
+import org.jd.infestusfrontier.processing.ProcessingModule;
 
 /** Recipes and loot of the Spore Culture and Living Substrate. */
 @GameTestHolder("infestusfrontier_tests")
@@ -40,45 +43,87 @@ public final class EcologyDataTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void livingSubstrateRecipeResolves(GameTestHelper h) {
-        assertCrafts(
-                h,
-                List.of(new ItemStack(Items.DIRT), new ItemStack(EcologyModule.SPORE_CULTURE.get())),
-                EcologyModule.LIVING_SUBSTRATE_ITEM.get());
+    public static void dirtAndCultureNoLongerCraftSubstrate(GameTestHelper h) {
+        List<ItemStack> inputs = List.of(new ItemStack(Items.DIRT), new ItemStack(EcologyModule.SPORE_CULTURE.get()));
+        h.assertTrue(
+                h.getLevel()
+                        .getRecipeManager()
+                        .getRecipeFor(RecipeType.CRAFTING, CraftingInput.of(2, 1, inputs), h.getLevel())
+                        .isEmpty(),
+                "substrate is grown from culture, never crafted");
         h.succeed();
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void substrateDropsItself(GameTestHelper h) {
-        h.setBlock(CELL, mature());
-        h.getLevel().destroyBlock(h.absolutePos(CELL), true);
-        h.assertItemEntityPresent(EcologyModule.LIVING_SUBSTRATE_ITEM.get(), CELL, 2.0);
-        h.succeed();
-    }
-
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void substrateKeepsStage(GameTestHelper h) {
-        h.setBlock(CELL, mature());
-        h.getLevel().destroyBlock(h.absolutePos(CELL), true);
+    public static void substrateDiesIntoDeadTissueAtEveryStage(GameTestHelper h) {
+        int x = 1;
+        for (SubstrateStage stage : SubstrateStage.values()) {
+            BlockPos cell = new BlockPos(x, 1, 1);
+            h.setBlock(
+                    cell,
+                    EcologyModule.LIVING_SUBSTRATE
+                            .get()
+                            .defaultBlockState()
+                            .setValue(LivingSubstrateBlock.STAGE, stage));
+            h.getLevel().destroyBlock(h.absolutePos(cell), true);
+            x += 4;
+        }
         List<ItemEntity> drops =
                 h.getLevel().getEntitiesOfClass(ItemEntity.class, h.getBounds().inflate(1));
-        h.assertTrue(drops.size() == 1, "one drop");
-        ItemStack drop = drops.get(0).getItem();
-        h.assertTrue(
-                drop.get(DataComponents.BLOCK_STATE) != null
-                        && "mature"
-                                .equals(drop.get(DataComponents.BLOCK_STATE)
-                                        .properties()
-                                        .get("stage")),
-                "the drop carries stage=mature");
-        BlockPos ground = new BlockPos(4, 1, 1);
-        h.setBlock(ground, Blocks.STONE);
-        Player player = EcologyTests.holding(h, GameType.SURVIVAL, drop.getItem(), 1);
-        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, drop.copy());
-        h.placeAt(player, player.getMainHandItem(), ground, Direction.UP);
-        BlockState placed = h.getBlockState(ground.above());
-        h.assertTrue(placed.is(EcologyModule.LIVING_SUBSTRATE.get()), "substrate placed");
-        h.assertTrue(placed.getValue(LivingSubstrateBlock.STAGE) == SubstrateStage.MATURE, "placed cell is mature");
+        h.assertValueEqual(drops.size(), SubstrateStage.values().length, "one drop a cell");
+        for (ItemEntity drop : drops)
+            h.assertTrue(drop.getItem().is(EcologyModule.DEAD_TISSUE.get()), "each is Dead Tissue");
+        h.succeed();
+    }
+
+    /**
+     * Living Substrate and every cell grown in it give Dead Tissue only, even to a Silk Touch tool: nothing grown can
+     * be picked up and placed again.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void everyGrownCellGivesOnlyDeadTissueEvenToSilkTouch(GameTestHelper h) {
+        ItemStack silk = new ItemStack(Items.DIAMOND_PICKAXE);
+        silk.enchant(
+                h.getLevel()
+                        .registryAccess()
+                        .lookupOrThrow(Registries.ENCHANTMENT)
+                        .getOrThrow(Enchantments.SILK_TOUCH),
+                1);
+        BlockPos at = h.absolutePos(CELL);
+        for (Block grown : List.of(
+                EcologyModule.LIVING_SUBSTRATE.get(),
+                LogisticsModule.BIOMASS_VEIN.get(),
+                LogisticsModule.FLUID_VEIN.get(),
+                LogisticsModule.ITEM_VEIN.get(),
+                LogisticsModule.SEPTUM_CROSSING.get(),
+                LogisticsModule.VASCULAR_STITCH.get(),
+                LogisticsModule.MOUTH.get(),
+                CultivationModule.CULTIVATION_TISSUE.get(),
+                EquipmentModule.FUEL_PAPILLA.get())) {
+            for (ItemStack tool : List.of(ItemStack.EMPTY, silk)) {
+                List<ItemStack> drops = Block.getDrops(grown.defaultBlockState(), h.getLevel(), at, null, null, tool);
+                h.assertTrue(
+                        drops.size() == 1
+                                && drops.getFirst().is(EcologyModule.DEAD_TISSUE.get())
+                                && drops.getFirst().getCount() == 1,
+                        grown + " gives one Dead Tissue " + (tool.isEmpty() ? "by hand" : "to Silk Touch") + ", not "
+                                + drops);
+            }
+        }
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void theSacDigestsDeadTissue(GameTestHelper h) {
+        var recipe = h.getLevel()
+                .getRecipeManager()
+                .getRecipeFor(
+                        ProcessingModule.DIGESTION.get(),
+                        new SingleRecipeInput(new ItemStack(EcologyModule.DEAD_TISSUE.get())),
+                        h.getLevel());
+        h.assertTrue(recipe.isPresent(), "Dead Tissue is feed");
+        h.assertValueEqual(recipe.get().value().biomass().units(), 5, "5 BU");
+        h.assertValueEqual(recipe.get().value().ticks(), 80, "in 80 ticks");
         h.succeed();
     }
 

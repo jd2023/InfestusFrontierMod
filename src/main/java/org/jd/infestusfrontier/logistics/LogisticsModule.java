@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -31,12 +32,13 @@ import org.jd.infestusfrontier.core.foundation.TickQuota;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
+import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.slf4j.Logger;
 
 /**
  * Owner of routes, ports and the movement of items, fluids and biomass. Ships the three veins, the treatments that
- * grow them and the Vascular Junction.
+ * grow them, the Septum Crossing and the Vascular Stitch, and the Vascular Junction.
  */
 public final class LogisticsModule {
     static final Logger LOGGER = LogUtils.getLogger();
@@ -86,7 +88,7 @@ public final class LogisticsModule {
                 properties -> new LobeBlock(feeds, properties),
                 BlockBehaviour.Properties.of()
                         .mapColor(MapColor.COLOR_PINK)
-                        .strength(0.6F)
+                        .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                         .sound(SoundType.SLIME_BLOCK)
                         .noOcclusion());
     }
@@ -97,7 +99,7 @@ public final class LogisticsModule {
             FilterValveBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PINK)
-                    .strength(0.8F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.BONE_BLOCK)
                     .noOcclusion());
 
@@ -115,6 +117,33 @@ public final class LogisticsModule {
                     () -> BlockEntityType.Builder.of(VeinBlockEntity::new, BIOMASS_VEIN.get(), FLUID_VEIN.get())
                             .build(null));
 
+    /** Two passages of one carrier through one cell, grafted onto a vein; it holds nothing. */
+    public static final DeferredBlock<SeptumCrossingBlock> SEPTUM_CROSSING = BLOCKS.registerBlock(
+            "septum_crossing",
+            SeptumCrossingBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_PINK)
+                    .strength(0.6F)
+                    .sound(SoundType.GRAVEL)
+                    .pushReaction(PushReaction.BLOCK));
+
+    public static final DeferredItem<Item> SEPTUM_CROSSING_ITEM =
+            ITEMS.registerItem("septum_crossing", SeptumCrossingItem::new);
+
+    /** A tendon over a one-block step between two vein cells; it holds nothing. */
+    public static final DeferredBlock<VascularStitchBlock> VASCULAR_STITCH = BLOCKS.registerBlock(
+            "vascular_stitch",
+            VascularStitchBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PINK)
+                    .strength(0.2F)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noCollission()
+                    .noOcclusion()
+                    .pushReaction(PushReaction.DESTROY));
+
+    public static final DeferredItem<BlockItem> VASCULAR_STITCH_ITEM = ITEMS.registerSimpleBlockItem(VASCULAR_STITCH);
+
     /** The treatments that grow a vein out of a mature cell; the Cyst makes them (ITEM_CATALOG I021 to I023, I028). */
     public static final DeferredItem<Item> CAPILLARY_GEL =
             ITEMS.registerItem("capillary_gel", properties -> new GraftItem(properties, () -> BIOMASS_VEIN.get()));
@@ -130,7 +159,7 @@ public final class LogisticsModule {
             VascularJunctionBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_MAGENTA)
-                    .strength(1.0F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion());
     public static final DeferredItem<OrganItem> VASCULAR_JUNCTION_ITEM = ITEMS.register(
@@ -152,7 +181,7 @@ public final class LogisticsModule {
                             .build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<VascularJunctionMenu>> VASCULAR_JUNCTION_MENU =
             MENUS.register("vascular_junction", () -> IMenuTypeExtension.create(VascularJunctionMenu::new));
-    /** The fluid a broken vein cell or junction carries on its item. */
+    /** The fluid a broken junction carries on its item. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<SimpleFluidContent>> FLUID_CONTENT =
             COMPONENTS.registerComponentType(
                     "fluid_content",
@@ -168,7 +197,8 @@ public final class LogisticsModule {
                 BlockBehaviour.Properties.of()
                         .mapColor(MapColor.TERRACOTTA_PINK)
                         .strength(0.6F)
-                        .sound(SoundType.GRAVEL));
+                        .sound(SoundType.GRAVEL)
+                        .pushReaction(PushReaction.BLOCK));
     }
 
     public static void register(IEventBus modBus) {
@@ -192,6 +222,18 @@ public final class LogisticsModule {
                     (level, pos, state, entity, side) -> ((LobeBlock) state.getBlock()).handler(level, pos),
                     FEEDING_LOBE.get(),
                     YIELD_LOBE.get());
+            event.registerBlock(
+                    Capabilities.FluidHandler.BLOCK,
+                    (level, pos, state, entity, side) -> SeptumCrossingBlock.fluid(level, pos, state, side),
+                    SEPTUM_CROSSING.get());
+            event.registerBlock(
+                    LogisticsCapabilities.PORT_SWITCH,
+                    (level, pos, state, entity, side) -> SeptumCrossingBlock.ports(level, pos),
+                    SEPTUM_CROSSING.get());
+            event.registerBlock(
+                    Capabilities.FluidHandler.BLOCK,
+                    (level, pos, state, entity, side) -> VascularStitchBlock.fluid(level, pos, state, side),
+                    VASCULAR_STITCH.get());
             event.registerBlockEntity(
                     BiomassCapabilities.BLOCK,
                     VEIN_ENTITY.get(),

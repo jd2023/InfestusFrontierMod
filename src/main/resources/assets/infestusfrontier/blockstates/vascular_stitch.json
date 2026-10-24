@@ -1,0 +1,106 @@
+{
+  "variants": {
+    "carrier=biomass,face=floor,facing=north": {
+      "model": "infestusfrontier:block/vascular_stitch_biomass"
+    },
+    "carrier=biomass,face=ceiling,facing=north": {
+      "model": "infestusfrontier:block/vascular_stitch_biomass",
+      "x": 180,
+      "y": 180
+    },
+    "carrier=biomass,face=floor,facing=east": {
+      "model": "infestusfrontier:block/vascular_stitch_biomass",
+      "y": 90
+    },
+    "carrier=biomass,face=ceiling,facing=east": {
+      "model": "infestusfrontier:block/vascular_stitch_biomass",
+      "x": 180,
+      "y": 270
+    },
+    "carrier=biomass,face=floor,facing=south": {
+      "model": "infestusfrontier:block/vascular_stitch_biomass",
+      "y": 180
+    },
+    "carrier=biomass,face=ceiling,facing=south": {
+      "model": "infestusfrontier:block/vascular_stitch_biomass",
+      "x": 180
+    },
+    "carrier=biomass,face=floor,facing=west": {
+      "model": "infestusfrontier:block/vascular_stitch_biomass",
+      "y": 270
+    },
+    "carrier=biomass,face=ceiling,facing=west": {
+      "model": "infestusfrontier:block/vascular_stitch_biomass",
+      "x": 180,
+      "y": 90
+    },
+    "carrier=fluid,face=floor,facing=north": {
+      "model": "infestusfrontier:block/vascular_stitch_fluid"
+    },
+    "carrier=fluid,face=ceiling,facing=north": {
+      "model": "infestusfrontier:block/vascular_stitch_fluid",
+      "x": 180,
+      "y": 180
+    },
+    "carrier=fluid,face=floor,facing=east": {
+      "model": "infestusfrontier:block/vascular_stitch_fluid",
+      "y": 90
+    },
+    "carrier=fluid,face=ceiling,facing=east": {
+      "model": "infestusfrontier:block/vascular_stitch_fluid",
+      "x": 180,
+      "y": 270
+    },
+    "carrier=fluid,face=floor,facing=south": {
+      "model": "infestusfrontier:block/vascular_stitch_fluid",
+      "y": 180
+    },
+    "carrier=fluid,face=ceiling,facing=south": {
+      "model": "infestusfrontier:block/vascular_stitch_fluid",
+      "x": 180
+    },
+    "carrier=fluid,face=floor,facing=west": {
+      "model": "infestusfrontier:block/vascular_stitch_fluid",
+      "y": 270
+    },
+    "carrier=fluid,face=ceiling,facing=west": {
+      "model": "infestusfrontier:block/vascular_stitch_fluid",
+      "x": 180,
+      "y": 90
+    },
+    "carrier=item,face=floor,facing=north": {
+      "model": "infestusfrontier:block/vascular_stitch_item"
+    },
+    "carrier=item,face=ceiling,facing=north": {
+      "model": "infestusfrontier:block/vascular_stitch_item",
+      "x": 180,
+      "y": 180
+    },
+    "carrier=item,face=floor,facing=east": {
+      "model": "infestusfrontier:block/vascular_stitch_item",
+      "y": 90
+    },
+    "carrier=item,face=ceiling,facing=east": {
+      "model": "infestusfrontier:block/vascular_stitch_item",
+      "x": 180,
+      "y": 270
+    },
+    "carrier=item,face=floor,facing=south": {
+      "model": "infestusfrontier:block/vascular_stitch_item",
+      "y": 180
+    },
+    "carrier=item,face=ceiling,facing=south": {
+      "model": "infestusfrontier:block/vascular_stitch_item",
+      "x": 180
+    },
+    "carrier=item,face=floor,facing=west": {
+      "model": "infestusfrontier:block/vascular_stitch_item",
+      "y": 270
+    },
+    "carrier=item,face=ceiling,facing=west": {
+      "model": "infestusfrontier:block/vascular_stitch_item",
+      "x": 180,
+      "y": 90
+    }
+  }
+}

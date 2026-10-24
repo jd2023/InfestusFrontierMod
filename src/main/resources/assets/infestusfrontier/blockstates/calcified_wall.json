@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "infestusfrontier:block/calcified_wall"
+      },
+      {
+        "model": "infestusfrontier:block/calcified_wall",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/calcified_wall",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/calcified_wall",
+        "y": 270
+      }
+    ]
+  }
+}

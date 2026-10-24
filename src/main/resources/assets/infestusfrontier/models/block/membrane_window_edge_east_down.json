@@ -1,0 +1,82 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:translucent",
+  "ambientocclusion": false,
+  "textures": {
+    "membrane": "infestusfrontier:block/reservoir_membrane",
+    "bone": "infestusfrontier:block/reservoir_bone",
+    "particle": "infestusfrontier:block/reservoir_membrane"
+  },
+  "elements": [
+    {
+      "from": [
+        14,
+        -0.05,
+        0
+      ],
+      "to": [
+        16.05,
+        2,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            2.0500000000000007,
+            2.05
+          ],
+          "texture": "#bone"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            2.05
+          ],
+          "texture": "#bone",
+          "cullface": "east"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            2.0500000000000007,
+            2.05
+          ],
+          "texture": "#bone"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            2.05
+          ],
+          "texture": "#bone"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2.0500000000000007,
+            16
+          ],
+          "texture": "#bone"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2.0500000000000007,
+            16
+          ],
+          "texture": "#bone",
+          "cullface": "down"
+        }
+      }
+    }
+  ]
+}

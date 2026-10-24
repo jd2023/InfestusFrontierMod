@@ -110,8 +110,14 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 ### T0-01 — Living Substrate
 - **Does:** Replaces exposed ground with living, mottled tissue. Basic, young and mature patches differ in pores, veins and undergrowth. Ordinary occupants are slowed; a full bio suit avoids the penalty.
 - **Input → output:** Applied Spore Culture → converted exposed soil or stone. No autonomous unlimited spreading; applying culture does not produce terrain loot.
-- **Create:** Apply Spore Culture to a visible eligible ground block; use bone meal to mature that cell. Cultured dirt is also craftable from 1 dirt + 1 Spore Culture.
+- **Create:** Apply Spore Culture to a visible eligible ground block; use bone meal to mature that cell. Substrate is only grown: no recipe makes a cell to place, and a broken cell, or anything grown in one, dies into Dead Tissue whatever the tool.
 - **Growth:** Mutate individual cells into conduits, farms, defense or travel surfaces. Each cell has one primary function; a fast path is not simultaneously a damaging floor.
+
+### T0-17 — Living Wall
+- **Does:** Dense muscular tissue grown upward from the colony floor: the colony's own walls. Three tiers by hardening: a Living Wall as grown, a Ribbed Wall with upright bone ribs, and a Calcified Wall plated in bone that no explosion breaks.
+- **Input → output:** One bone meal → one wall block; one graft → one block one tier harder. No running input.
+- **Create:** Sneak and use bone meal on a mature substrate cell: a Living Wall grows on it. Bone meal on the top face of a wall grows one more block on it. A Skeletal Graft hardens a Living Wall into a Ribbed Wall; a Calcifying Graft hardens a Ribbed Wall into a Calcified Wall. Walls are grown, never placed, and broken they die into Dead Tissue.
+- **Growth:** A fourth tier hardened with Nether material resists the Wither. A wall mutates into a Membrane Window or a Sphincter Door.
 
 ### T0-02 — Culture Bowl
 - **Does:** Grows small batches of construction cultures on a shallow, rooted dish. Its first batches are slow and loaded by hand.
@@ -185,7 +191,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 ### T0-12 — Membrane Window
 - **Does:** Transparent living skin held by thin ribs. Connected windows remove interior borders, so a large chamber looks like one enclosed body.
 - **Input → output:** No running input → visibility through walls and machine chambers.
-- **Create:** 1 glass + 1 Membrane Sheet + 1 bone → 2 windows.
+- **Create:** Craft the graft from 1 glass + 1 Membrane Sheet + 1 bone (2 grafts) and use it on a living wall cell of any tier. Grown, never placed: broken, a window dies into Dead Tissue.
 - **Growth:** Dye tints the skin; glow ink highlights its outer ribs. Thermal Lining or Spatial Membrane enables the corresponding chamber wall variant.
 
 ### T0-13 — Lumen Tissue
@@ -243,13 +249,13 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 ### T1-05 — Septum Crossing
 - **Does:** Lets two routes cross through the same substrate block without connecting their contents. Two separated lumens remain visible at the exposed faces.
 - **Input → output:** Two independent same-carrier streams → their respective opposite exits, with no mixing.
-- **Create:** Apply 1 Membrane Sheet + 1 Bone Plate to an existing vein; choose the second passage direction with the configuration tool.
+- **Create:** Craft the graft from 1 Membrane Sheet + 1 Bone Plate and use it on an existing vein cell. The clicked face shows both lumens; the configuration tool on another face turns the crossing.
 - **Growth:** Thermal Lining permits hot-fluid crossings. Mutating to a junction deliberately joins routes; crossing is never assumed to mean splitting.
 
 ### T1-06 — Vascular Stitch
-- **Does:** Bridges a one-block terrain step between two visible vein cells. A recessed tendon curves over the shared terrain edge; no buried target must be clicked.
-- **Input → output:** One route's items or fluid → its continuation above, below or around the corner.
-- **Create:** Apply 1 Contractile Fiber + 1 Membrane Sheet to the exposed edge between the selected cells.
+- **Does:** Bridges a one-block terrain step between two visible vein cells. A tendon lies in the step's corner, from the upper cell's edge down its face to the lower cell's top; no buried target must be clicked.
+- **Input → output:** One route's items or fluid → its continuation one block above or below, on a floor or under a ceiling.
+- **Create:** Craft 1 Contractile Fiber + 1 Membrane Sheet and place the stitch in the step's corner, against the lower cell's top or the upper cell's side.
 - **Growth:** Bone reinforcement supports a short free-standing span. Longer hills use repeated visible steps; a stitch does not discover an invisible route automatically.
 
 ### T1-07 — Biomass Reservoir Cell
@@ -399,9 +405,9 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Choose collection speed or reduced nutrient demand. More taps on one tree share its production rather than multiplying it; a Fluid Cyst or Item Capsule receives the chosen resin form.
 
 ### T1-29 — Sphincter Door
-- **Does:** A living doorway that retracts into its rim, keeping a biological room usable without mechanical-looking doors. Supports deliberate access control.
+- **Does:** A living doorway that retracts into its rim, keeping a biological room usable without mechanical-looking doors. Four pleated membrane flaps meet under a pucker and draw back into the rim's corners when it opens. Supports deliberate access control.
 - **Input → output:** Player use, redstone or nerve command → open/closed doorway. No operating biomass for ordinary doors.
-- **Create:** 2 Membrane Sheets + 1 Rib Frame → one two-block doorway.
+- **Create:** Craft the graft from 2 Membrane Sheets + 2 Bone Plates and use it on a living wall cell that has another wall cell above or below it; the two become the doorway, facing the clicked side. Grown, never placed: broken, it dies into Dead Tissue.
 - **Growth:** Thermal Lining makes a sealed process hatch; bone reinforcement makes a stronger gate. It does not automatically close on an occupied doorway to trap its authorized user.
 
 ### T1-30 — Activation Cyst

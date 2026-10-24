@@ -1,0 +1,8 @@
+{
+  "type": "infestusfrontier:digestion",
+  "feed": {
+    "item": "infestusfrontier:dead_tissue"
+  },
+  "biomass": 5,
+  "ticks": 80
+}
