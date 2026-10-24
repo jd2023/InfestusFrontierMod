@@ -405,10 +405,10 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Choose collection speed or reduced nutrient demand. More taps on one tree share its production rather than multiplying it; a Fluid Cyst or Item Capsule receives the chosen resin form.
 
 ### T1-29 — Sphincter Door
-- **Does:** A living doorway that retracts into its rim, keeping a biological room usable without mechanical-looking doors. Four pleated membrane flaps meet under a pucker and draw back into the rim's corners when it opens. Supports deliberate access control.
+- **Does:** A living doorway that retracts into its rim, keeping a biological room usable without mechanical-looking doors. Four pleated membrane flaps meet under a pucker and draw back into the rim's corners when it opens. Owner, 2026-10-24: it is a simple door, like a wooden one, so villagers open it and zombies on Hard can break it down.
 - **Input → output:** Player use, redstone or nerve command → open/closed doorway. No operating biomass for ordinary doors.
 - **Create:** Craft the graft from 2 Membrane Sheets + 2 Bone Plates and use it on a living wall cell that has another wall cell above or below it; the two become the doorway, facing the clicked side. Grown, never placed: broken, it dies into Dead Tissue.
-- **Growth:** Thermal Lining makes a sealed process hatch; bone reinforcement makes a stronger gate. It does not automatically close on an occupied doorway to trap its authorized user.
+- **Growth:** Owner, 2026-10-24: it can be mutated into something safer. Proposed: a Skeletal Graft clenches it into a Clenched Door that works like an iron door, opened only by redstone or a nerve command, so no mob opens or breaks it; a Calcifying Graft then makes it explosion-proof like a Calcified Wall. Thermal Lining makes a sealed process hatch. It does not automatically close on an occupied doorway to trap its authorized user.
 
 ### T1-30 — Activation Cyst
 - **Does:** Cultures raw ingredients into consumable active gels, enzymes and secretions. Its side windows show separate source and carrier chambers.

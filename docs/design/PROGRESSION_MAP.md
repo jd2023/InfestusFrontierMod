@@ -5,6 +5,12 @@ Progress depends on actual materials, working organs and dimension-native produc
 Initial implementation covers SR0–SR7; SR8–SR9 remain the expansion horizon.
 Catalogs own recipes and numerical baselines; this document owns player projects.
 
+Owner, 2026-10-24: factory management is a core part of the game, and a fully
+balanced system is a challenge to set up. A line that runs is easy; one where every
+rate matches, every by-product has a sink and no buffer slowly fills or starves takes
+planning. Tuning keeps organ rates unequal on purpose, so ratios matter, and gives the
+player the readings to find the bottleneck, not a layout that balances itself.
+
 ## 1. SR0 — Start beside a vanilla home
 
 **Build:** make Spore Culture from ordinary ingredients. Establish selected Living
