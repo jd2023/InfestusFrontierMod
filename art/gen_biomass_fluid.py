@@ -3,8 +3,8 @@
 
 Run from the repository root: python3 art/gen_biomass_fluid.py
 Deterministic: fixed seed, no timestamps. Writes
-  src/main/resources/assets/infestusfrontier/textures/block/biomass_still.png  (+ .mcmeta)  32 x 32, 16 frames
-  src/main/resources/assets/infestusfrontier/textures/block/biomass_flow.png   (+ .mcmeta)  64 x 64, 16 frames
+  src/main/resources/assets/infestusfrontier/textures/block/biomass_still.png  (+ .mcmeta)  32 x 32, 64 frames
+  src/main/resources/assets/infestusfrontier/textures/block/biomass_flow.png   (+ .mcmeta)  64 x 64, 64 frames
   src/main/resources/assets/infestusfrontier/textures/item/biomass_bucket.png  16 x 16, the fluid alone
 
 The bucket icon is vanilla's own bucket sprite with this fluid overlay on its open top, drawn as a second
@@ -28,7 +28,8 @@ BUCKET_TOP = (2, [
     '...0344324230...',
     '.....023320.....',
 ])
-FRAMES = 16
+FRAMES = 64
+TIME_CELLS = 4
 # dark to light
 BODY = [(28, 52, 30), (38, 72, 38), (52, 96, 46), (74, 128, 56), (108, 168, 72), (160, 214, 110)]
 SPECK = (214, 250, 160)
@@ -58,18 +59,21 @@ def noise(grid, x, y, f):
 
 
 def frame(size, index, drift, seed):
-    big, small, specks = lattice(seed, 4, FRAMES), lattice(seed + 1, 8, FRAMES), lattice(seed + 2, 16, FRAMES)
+    big, small, specks = lattice(seed, 4, TIME_CELLS), lattice(seed + 1, 8, TIME_CELLS), lattice(seed + 2, 16, 1)
     img = Image.new('RGBA', (size, size))
     for y in range(size):
         for x in range(size):
             u, v = x / size, (y / size + drift * index / FRAMES) % 1.0
-            t = index
-            a = noise(big, u * 4, v * 4, t * 4 / FRAMES * 4)
-            b = noise(small, u * 8, v * 8, t * 8 / FRAMES * 8)
+            t = index * TIME_CELLS / FRAMES
+            a = noise(big, u * 4, v * 4, t)
+            b = noise(small, u * 8, v * 8, t)
             value = 0.25 + 0.5 * a + 0.3 * (b - 0.5)
-            shade = BODY[max(0, min(len(BODY) - 1, int(value * len(BODY))))]
-            if noise(specks, u * 16, v * 16, t * 16 / FRAMES * 16) > 0.93 and b > 0.55:
-                shade = SPECK
+            level = max(0, min(len(BODY) - 1.001, value * (len(BODY) - 1)))
+            lo = int(level)
+            shade = [round(a + (b - a) * (level - lo)) for a, b in zip(BODY[lo], BODY[lo + 1])]
+            # Embedded specks drift with the material; they never blink on a noise threshold.
+            glint = max(0, (noise(specks, u * 16, v * 16, 0) - 0.88) / 0.12) * 0.35
+            shade = tuple(round(a + (b - a) * glint) for a, b in zip(shade, SPECK))
             img.putpixel((x, y), shade + (255,))
     return img
 
@@ -80,7 +84,7 @@ def sheet(name, size, drift, seed, frametime):
         strip.paste(frame(size, i, drift, seed), (0, i * size))
     OUT.mkdir(parents=True, exist_ok=True)
     strip.save(OUT / (name + '.png'), optimize=True)
-    (OUT / (name + '.png.mcmeta')).write_text(json.dumps({'animation': {'frametime': frametime}}) + '\n')
+    (OUT / (name + '.png.mcmeta')).write_text(json.dumps({'animation': {'frametime': frametime, 'interpolate': True}}) + '\n')
 
 
 def bucket_overlay():
@@ -97,7 +101,7 @@ def bucket_overlay():
 
 def main():
     sheet('biomass_still', 32, 0.0, 7, 4)
-    sheet('biomass_flow', 64, 1.0, 7, 3)
+    sheet('biomass_flow', 64, 1.0, 7, 4)
     bucket_overlay()
 
 
