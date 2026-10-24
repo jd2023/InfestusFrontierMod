@@ -34,22 +34,22 @@
           "cubes": [
             {
               "origin": [-7, 2, -7],
-              "size": [1, 11, 1],
+              "size": [1, 10, 1],
               "uv": [84, 24]
             },
             {
               "origin": [6, 2, -7],
-              "size": [1, 11, 1],
+              "size": [1, 10, 1],
               "uv": [84, 24]
             },
             {
               "origin": [-7, 2, 6],
-              "size": [1, 11, 1],
+              "size": [1, 10, 1],
               "uv": [84, 24]
             },
             {
               "origin": [6, 2, 6],
-              "size": [1, 11, 1],
+              "size": [1, 10, 1],
               "uv": [84, 24]
             },
             {
@@ -77,10 +77,10 @@
         {
           "name": "fluid",
           "parent": "root",
-          "pivot": [0, 2, 0],
+          "pivot": [0, 2.125, 0],
           "cubes": [
             {
-              "origin": [-5, 2, -5],
+              "origin": [-5, 2.125, -5],
               "size": [10, 10, 10],
               "uv": [49, 0]
             }
@@ -100,7 +100,7 @@
         },
         {
           "name": "cap",
-          "parent": "root",
+          "parent": "membrane",
           "pivot": [0, 13, 0],
           "cubes": [
             {
@@ -117,16 +117,16 @@
         },
         {
           "name": "pustules",
-          "parent": "root",
+          "parent": "membrane",
           "pivot": [0, 2, 0],
           "cubes": [
             {
-              "origin": [-8, 3, -1],
+              "origin": [-7, 3, -1],
               "size": [1, 2, 2],
               "uv": [17, 41]
             },
             {
-              "origin": [7, 5, 1],
+              "origin": [6, 5, 1],
               "size": [1, 2, 2],
               "uv": [17, 41]
             }

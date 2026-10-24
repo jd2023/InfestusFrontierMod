@@ -165,7 +165,7 @@ def geo(name, bones, uv, sheet, bounds=(2, 2, (0, 0.5, 0))):
 
 
 def r(value):
-    value = round(value, 3)
+    value = round(value, 6)
     return 0 if value == 0 else value
 
 

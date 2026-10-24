@@ -8,7 +8,7 @@ and art/digestive_sac.bbmodel.
 
 A stomach on a root slab: three plum belly rings stacked on a fleshy mound, a glowing green gland belt between
 the lower rings, an ivory-lipped mouth on top that the player feeds, and green pustules on the skin. Idle, it
-breathes over four seconds. Working, it squeezes from the bottom up once a second and the mouth opens.
+breathes slowly. Working, a contraction travels from the bottom up and opens the mouth.
 """
 import sys
 from pathlib import Path
@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from organ_model import Painter, ball, bone_along, faces, flat, folds, islands, pack, sampled, squeeze, wave, write
 
 SHEET = 128
-IDLE, WORKING = 4.0, 1.0
+IDLE, WORKING = 6.0, 3.0
 FLESH = [(84, 36, 52), (116, 52, 64), (148, 74, 80), (178, 100, 98), (204, 130, 120), (224, 160, 146)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 IVORY = [(112, 96, 84), (156, 140, 114), (194, 180, 148), (222, 212, 184), (240, 234, 212), (250, 248, 236)]
@@ -38,23 +38,23 @@ BONES = [
         ('mound', [-6, 2, -6], [12, 2, 12], None),
     ]),
     ('roots', 'root', [0, 0, 0], [claw(1, 1), claw(1, -1), claw(-1, 1), claw(-1, -1)]),
-    ('belly_low', 'root', [0, 4, 0], [('belly_low', [-6, 4, -6], [12, 3, 12], None)]),
+    ('belly_low', 'root', [0, 4, 0], [
+        ('belly_low', [-6, 4, -6], [12, 3, 12], None),
+        ('pustule', [-8, 5, 1], [2, 2, 2], None),
+    ]),
     ('gland', 'root', [0, 7, 0], [('gland', [-5, 7, -5], [10, 1, 10], None)]),
     ('belly_mid', 'root', [0, 8, 0], [
         ('belly_mid', [-5, 8, -5], [10, 3, 10], None),
         ('bulge', [-3, 8.5, -6], [6, 2, 1], None),
+        ('pustule', [5, 9, -1], [2, 2, 2], None),
+        ('pustule', [-1, 9, 5], [2, 2, 2], None),
     ]),
     ('belly_high', 'root', [0, 11, 0], [('belly_high', [-4, 11, -4], [8, 2, 8], None)]),
-    ('mouth', 'root', [0, 13, 0], [('pit', [-2, 13, -2], [4, 1, 4], None)]),
+    ('mouth', 'belly_high', [0, 13, 0], [('pit', [-2, 13, -2], [4, 1, 4], None)]),
     ('lip_north', 'mouth', [0, 13, -3], [('lip_long', [-3, 13, -3], [6, 1, 1], None)]),
     ('lip_south', 'mouth', [0, 13, 3], [('lip_long', [-3, 13, 2], [6, 1, 1], None)]),
     ('lip_west', 'mouth', [-3, 13, 0], [('lip_short', [-3, 13, -2], [1, 1, 4], None)]),
     ('lip_east', 'mouth', [3, 13, 0], [('lip_short', [2, 13, -2], [1, 1, 4], None)]),
-    ('pustules', 'root', [0, 8, 0], [
-        ('pustule', [5, 9, -1], [2, 2, 2], None),
-        ('pustule', [-8, 5, 1], [2, 2, 2], None),
-        ('pustule', [-1, 9, 5], [2, 2, 2], None),
-    ]),
 ]
 LIPS = {'lip_north': ([-1, 0, 0]), 'lip_south': ([1, 0, 0]), 'lip_west': ([0, 0, 1]), 'lip_east': ([0, 0, -1])}
 
@@ -110,26 +110,14 @@ def textures(uv):
 
 
 def animations():
-    idle = {
-        'belly_low': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.03 * wave(t, IDLE), 1 + 0.02 * wave(t, IDLE), 1 + 0.03 * wave(t, IDLE)])},
-        'belly_mid': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.03 * wave(t, IDLE, 0.3), 1 + 0.02 * wave(t, IDLE, 0.3), 1 + 0.03 * wave(t, IDLE, 0.3)])},
-        'belly_high': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.03 * wave(t, IDLE, 0.6), 1 + 0.02 * wave(t, IDLE, 0.6), 1 + 0.03 * wave(t, IDLE, 0.6)])},
-        'gland': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.04 * wave(t, IDLE, 0.4), 1, 1 + 0.04 * wave(t, IDLE, 0.4)])},
-        'mouth': {'position': sampled(IDLE, 0.1, lambda t: [0, 0.15 + 0.15 * wave(t, IDLE, 0.6), 0])},
-        'pustules': {'scale': sampled(IDLE, 0.1, lambda t: [1, 1 + 0.2 * wave(t, IDLE, 0.8), 1])},
-    }
-    working = {
-        'belly_low': {'scale': sampled(WORKING, 0.05, lambda t: [1 - 0.08 * squeeze(t), 1 + 0.06 * squeeze(t), 1 - 0.08 * squeeze(t)])},
-        'belly_mid': {'scale': sampled(WORKING, 0.05, lambda t: [1 - 0.08 * squeeze(t, lag=0.15), 1 + 0.06 * squeeze(t, lag=0.15), 1 - 0.08 * squeeze(t, lag=0.15)])},
-        'belly_high': {'scale': sampled(WORKING, 0.05, lambda t: [1 - 0.08 * squeeze(t, lag=0.3), 1 + 0.06 * squeeze(t, lag=0.3), 1 - 0.08 * squeeze(t, lag=0.3)])},
-        'gland': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.12 * squeeze(t, lag=0.1), 1 + 0.4 * squeeze(t, lag=0.1), 1 + 0.12 * squeeze(t, lag=0.1)])},
-        'mouth': {'position': sampled(WORKING, 0.05, lambda t: [0, 0.6 * squeeze(t, lag=0.3), 0])},
-        'pustules': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.1 * squeeze(t, lag=0.2), 1 + 0.6 * squeeze(t, lag=0.2), 1 + 0.1 * squeeze(t, lag=0.2)])},
-        'roots': {'scale': sampled(WORKING, 0.05, lambda t: [1 - 0.04 * squeeze(t), 1 + 0.15 * squeeze(t), 1 - 0.04 * squeeze(t)])},
-    }
+    idle, working = {}, {}
+    # Ring heights stay fixed at their shared seams; only the soft radial tissue contracts.
+    for bone, lag in (('belly_low', 0), ('gland', 0.3), ('belly_mid', 0.45), ('belly_high', 0.9)):
+        idle[bone] = {'scale': sampled(IDLE, 0.1, lambda t, lag=lag: [1 + 0.02 * wave(t, IDLE, lag), 1, 1 + 0.02 * wave(t, IDLE, lag)])}
+        working[bone] = {'scale': sampled(WORKING, 0.05, lambda t, lag=lag: [1 - 0.05 * squeeze(t, WORKING, lag), 1, 1 - 0.05 * squeeze(t, WORKING, lag)])}
     for lip, axis in LIPS.items():
         idle[lip] = {'rotation': sampled(IDLE, 0.1, lambda t, a=axis: [v * 3 * wave(t, IDLE, 0.6) for v in a])}
-        working[lip] = {'rotation': sampled(WORKING, 0.05, lambda t, a=axis: [v * 28 * squeeze(t, lag=0.35) for v in a])}
+        working[lip] = {'rotation': sampled(WORKING, 0.05, lambda t, a=axis: [v * 12 * squeeze(t, WORKING, lag=1.05) for v in a])}
     return {'idle': (IDLE, True, idle), 'working': (WORKING, True, working)}
 
 

@@ -7,7 +7,7 @@ Idle: the lobes rest open and breathe. Working: they fold in over the core and t
 from organ_model import Painter, islands, faces, pack, write, skin, folds, ball, flat, sampled, wave
 
 SHEET = 64
-IDLE, WORKING = 4.0, 2.0
+IDLE, WORKING = 8.0, 5.0
 FLESH = [(84, 36, 52), (116, 52, 64), (148, 74, 80), (178, 100, 98), (204, 130, 120), (224, 160, 146)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 IVORY = [(112, 96, 84), (156, 140, 114), (194, 180, 148), (222, 212, 184), (240, 234, 212), (250, 248, 236)]
@@ -20,9 +20,9 @@ BONES = [
         ('foot', [-7, 0, -7], [14, 2, 14], None),
         ('bowl', [-6, 2, -6], [12, 4, 12], None),
     ]),
-    ('lobe_l', 'root', [-6, 6, 0], [('lobe', [-6, 6, -5], [4, 5, 10], None)]),
-    ('lobe_r', 'root', [6, 6, 0], [('lobe', [2, 6, -5], [4, 5, 10], None)]),
-    ('core', 'root', [0, 6, 0], [('core', [-2, 6, -2], [4, 4, 4], None)]),
+    ('lobe_l', 'root', [-6, 6, 0], [('lobe', [-6, 6, -5], [3, 5, 10], None)]),
+    ('lobe_r', 'root', [6, 6, 0], [('lobe', [3, 6, -5], [3, 5, 10], None)]),
+    ('core', 'root', [0, 6, 0], [('core', [-1, 6, -2], [2, 4, 4], None)]),
 ]
 
 

@@ -9,7 +9,7 @@ lobes and a crown of chimneys. The grown bones are scaled to nothing below their
 from organ_model import Painter, islands, faces, pack, write, skin, folds, ball, flat, sampled, wave
 
 SHEET = 128
-IDLE, WORKING = 4.0, 1.2
+IDLE, WORKING = 7.2, 3.6
 FLESH = [(84, 36, 52), (116, 52, 64), (148, 74, 80), (178, 100, 98), (204, 130, 120), (224, 160, 146)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 CHITIN = [(28, 18, 24), (46, 30, 36), (64, 42, 48), (84, 58, 62)]
@@ -23,20 +23,25 @@ BONES = [
         ('belly', [-6, 2, -6], [12, 9, 12], None),
         ('mouth', [-3, 11, -3], [6, 2, 6], None),
     ]),
-    ('ember', 'root', [0, 2, 0], [('ember', [-6.5, 5, -6.5], [13, 3, 13], None)]),
-    ('throat_l', 'belly', [-6, 6, 0], [('throat', [-8, 5, -2], [2, 4, 4], None)]),
-    ('throat_r', 'belly', [6, 6, 0], [('throat', [6, 5, -2], [2, 4, 4], None)]),
-    ('ridges', 'belly', [0, 2, 0], [
-        ('ridge_x', [-7, 5, -2], [14, 2, 4], None),
-        ('ridge_z', [-2, 5, -7], [4, 2, 14], None),
+    ('ember', 'belly', [0, 9, 0], [
+        ('ember_ns', [-5, 8.5, -6.125], [10, 1, 1], None),
+        ('ember_ns', [-5, 8.5, 5.125], [10, 1, 1], None),
     ]),
-    ('lobe_l', 'belly', [-6, 4, 0], [('lobe', [-8, 3, -4], [3, 6, 8], None)]),
-    ('lobe_r', 'belly', [6, 4, 0], [('lobe', [5, 3, -4], [3, 6, 8], None)]),
+    ('throat_l', 'belly', [-6, 6, -3.5], [('throat', [-8, 5, -5], [2, 3, 3], None)]),
+    ('throat_r', 'belly', [6, 6, -3.5], [('throat', [6, 5, -5], [2, 3, 3], None)]),
+    ('ridges', 'belly', [0, 2, 0], [
+        ('ridge_x', [-6, 5, -7], [12, 2, 1], None),
+        ('ridge_x', [-6, 5, 6], [12, 2, 1], None),
+        ('ridge_z', [-7, 5, -2], [1, 2, 4], None),
+        ('ridge_z', [6, 5, -2], [1, 2, 4], None),
+    ]),
+    ('lobe_l', 'belly', [-6, 4, 4], [('lobe', [-8, 3, 2], [2, 6, 4], None)]),
+    ('lobe_r', 'belly', [6, 4, 4], [('lobe', [6, 3, 2], [2, 6, 4], None)]),
     ('crown', 'belly', [0, 13, 0], [
-        ('chimney_a', [-5, 12, -5], [3, 5, 3], None),
-        ('chimney_b', [2, 12, 2], [3, 6, 3], None),
-        ('chimney_c', [-5, 12, 2], [3, 4, 3], None),
-        ('chimney_d', [2, 12, -5], [3, 3, 3], None),
+        ('chimney_a', [-3, 13, -3], [2, 4, 2], None),
+        ('chimney_b', [1, 13, 1], [2, 5, 2], None),
+        ('chimney_c', [-3, 13, 1], [2, 3, 2], None),
+        ('chimney_d', [1, 13, -3], [2, 2, 2], None),
     ]),
 ]
 GROWN = {0: [], 1: ['ridges'], 2: ['ridges', 'lobe_l', 'lobe_r', 'crown']}
@@ -60,7 +65,7 @@ def textures(uv):
             p.vein(rect, VEIN, 4, 120)
     for face, rect in rects['mouth'].items():
         p.ramp(rect, CHITIN, lambda x, y, w, h: 0.2 + 0.6 * (1 - ball(x, y, w, h)) if face == 'up' else 0.45, grain=0.05, mottle=0.1)
-    for face, rect in rects['ember'].items():
+    for face, rect in rects['ember_ns'].items():
         p.ramp(rect, EMBER, lambda x, y, w, h: 0.35 + 0.4 * ball(x, y, w, h), grain=0.08, mottle=0.2)
         p.glow_rect(rect, 200)
     for name in ('throat', 'lobe'):
@@ -88,10 +93,10 @@ def animations():
         'ember': {'scale': still(0)},
     }
     working = {
-        'belly': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.07 * wave(t, WORKING), 1 - 0.05 * wave(t, WORKING), 1 + 0.07 * wave(t, WORKING)])},
-        'ember': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.04 * wave(t, WORKING), 1 + 0.3 * wave(t, WORKING, 0.3), 1 + 0.04 * wave(t, WORKING)])},
-        'throat_l': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.4 * wave(t, WORKING, 0.2), 1 + 0.2 * wave(t, WORKING, 0.2), 1])},
-        'throat_r': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.4 * wave(t, WORKING, 0.8), 1 + 0.2 * wave(t, WORKING, 0.8), 1])},
+        'belly': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.025 * wave(t, WORKING), 1 - 0.02 * wave(t, WORKING), 1 + 0.025 * wave(t, WORKING)])},
+        'ember': {'scale': still(1)},
+        'throat_l': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.12 * wave(t, WORKING, 0.3), 1, 1])},
+        'throat_r': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.12 * wave(t, WORKING, 1.8), 1, 1])},
     }
     out = {'idle': (IDLE, True, idle), 'working': (WORKING, True, working)}
     grown_bones = ['ridges', 'lobe_l', 'lobe_r', 'crown']

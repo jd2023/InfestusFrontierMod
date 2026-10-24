@@ -17,8 +17,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from organ_model import Painter, ball, bone_along, faces, flat, folds, islands, pack, sampled, wave, write
 
 SHEET = 128
-IDLE = 4.0
-LEVELS = [0.03, 0.27, 0.52, 0.76, 1.0]
+IDLE = 8.0
+LEVELS = [0, 0.27, 0.52, 0.76, 1.0]
 FLESH = [(84, 36, 52), (116, 52, 64), (148, 74, 80), (178, 100, 98), (204, 130, 120), (224, 160, 146)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 IVORY = [(112, 96, 84), (156, 140, 114), (194, 180, 148), (222, 212, 184), (240, 234, 212), (250, 248, 236)]
@@ -29,24 +29,24 @@ BONES = [
     ('root', None, [0, 0, 0], []),
     ('base', 'root', [0, 0, 0], [('slab', [-7, 0, -7], [14, 2, 14], None)]),
     ('ribs', 'root', [0, 2, 0], [
-        ('rib', [-7, 2, -7], [1, 11, 1], None),
-        ('rib', [6, 2, -7], [1, 11, 1], None),
-        ('rib', [-7, 2, 6], [1, 11, 1], None),
-        ('rib', [6, 2, 6], [1, 11, 1], None),
+        ('rib', [-7, 2, -7], [1, 10, 1], None),
+        ('rib', [6, 2, -7], [1, 10, 1], None),
+        ('rib', [-7, 2, 6], [1, 10, 1], None),
+        ('rib', [6, 2, 6], [1, 10, 1], None),
         ('rail', [-7, 12, -7], [14, 1, 1], None),
         ('rail', [-7, 12, 6], [14, 1, 1], None),
         ('rail_side', [-7, 12, -6], [1, 1, 12], None),
         ('rail_side', [6, 12, -6], [1, 1, 12], None),
     ]),
-    ('fluid', 'root', [0, 2, 0], [('fluid', [-5, 2, -5], [10, 10, 10], None)]),
+    ('fluid', 'root', [0, 2.125, 0], [('fluid', [-5, 2.125, -5], [10, 10, 10], None)]),
     ('membrane', 'root', [0, 2, 0], [('membrane', [-6, 2, -6], [12, 11, 12], None)]),
-    ('cap', 'root', [0, 13, 0], [
+    ('cap', 'membrane', [0, 13, 0], [
         ('cap', [-4, 13, -4], [8, 2, 8], None),
         ('port', [-2, 15, -2], [4, 1, 4], None),
     ]),
-    ('pustules', 'root', [0, 2, 0], [
-        ('pustule', [-8, 3, -1], [1, 2, 2], None),
-        ('pustule', [7, 5, 1], [1, 2, 2], None),
+    ('pustules', 'membrane', [0, 2, 0], [
+        ('pustule', [-7, 3, -1], [1, 2, 2], None),
+        ('pustule', [6, 5, 1], [1, 2, 2], None),
     ]),
 ]
 
@@ -93,13 +93,11 @@ def textures(uv):
 
 def animations():
     out = {'idle': (IDLE, True, {
-        'membrane': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.02 * wave(t, IDLE), 1 + 0.012 * wave(t, IDLE), 1 + 0.02 * wave(t, IDLE)])},
-        'cap': {'position': sampled(IDLE, 0.1, lambda t: [0, 0.13 + 0.13 * wave(t, IDLE), 0])},
-        'pustules': {'scale': sampled(IDLE, 0.1, lambda t: [1, 1 + 0.2 * wave(t, IDLE, 0.8), 1])},
+        'membrane': {'scale': sampled(IDLE, 0.1, lambda t: [0.985 + 0.01 * wave(t, IDLE), 1, 0.985 + 0.01 * wave(t, IDLE)])},
     })}
     for n, level in enumerate(LEVELS):
         out['fill_%d' % n] = (IDLE, True, {
-            'fluid': {'scale': sampled(IDLE, 0.1, lambda t, lv=level: [1 + 0.02 * wave(t, IDLE, 0.5), lv, 1 + 0.02 * wave(t, IDLE, 1.5)])},
+            'fluid': {'scale': sampled(IDLE, 0.1, lambda t, lv=level: [1 if lv else 0, lv, 1 if lv else 0])},
         })
     return out
 

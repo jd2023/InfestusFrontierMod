@@ -7,7 +7,7 @@ Idle: the ribs breathe. Working: the plate between them thickens and the ribs pr
 from organ_model import Painter, islands, faces, pack, write, skin, folds, ball, flat, sampled, wave
 
 SHEET = 64
-IDLE, WORKING = 4.0, 1.0
+IDLE, WORKING = 6.0, 2.4
 FLESH = [(84, 36, 52), (116, 52, 64), (148, 74, 80), (178, 100, 98), (204, 130, 120), (224, 160, 146)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 IVORY = [(112, 96, 84), (156, 140, 114), (194, 180, 148), (222, 212, 184), (240, 234, 212), (250, 248, 236)]

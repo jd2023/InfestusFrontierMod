@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from organ_model import Painter, ball, faces, flat, folds, islands, pack, sampled, skin, wave, write
 
 SHEET = 64
-IDLE, WORKING = 4.0, 1.0
+IDLE, WORKING = 6.0, 3.6
 FLESH = [(84, 36, 52), (116, 52, 64), (148, 74, 80), (178, 100, 98), (204, 130, 120), (224, 160, 146)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 IVORY = [(112, 96, 84), (156, 140, 114), (194, 180, 148), (222, 212, 184), (240, 234, 212), (250, 248, 236)]
@@ -35,12 +35,9 @@ BONES = [
         ('wall_ew', [6, 2, -6], [1, 4, 12], None),
     ]),
     ('pool', 'root', [0, 2, 0], [('pool', [-6, 2, -6], [12, 3, 12], None)]),
-    ('bubbles', 'root', [0, 5, 0], [
-        ('bubble', [-3, 5, -2], [1, 1, 1], None),
-        ('bubble', [2, 5, 1], [1, 1, 1], None),
-        ('bubble', [0, 5, 3], [1, 1, 1], None),
-    ]),
 ]
+for n, (x, z) in enumerate(((-3, -2), (2, 1), (0, 3))):
+    BONES.append((f'bubble_{n}', 'pool', [x + 0.5, 5, z + 0.5], [('bubble', [x, 5, z], [1, 1, 1], None)]))
 
 
 def textures(uv):
@@ -78,16 +75,14 @@ def textures(uv):
 
 def animations():
     idle = {
-        'pool': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.015 * wave(t, IDLE), 1 + 0.04 * wave(t, IDLE), 1 + 0.015 * wave(t, IDLE)])},
-        'bubbles': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.15 * wave(t, IDLE, 0.7), 1 + 0.15 * wave(t, IDLE, 0.7), 1 + 0.15 * wave(t, IDLE, 0.7)])},
+        'pool': {'scale': sampled(IDLE, 0.1, lambda t: [1, 1 + 0.02 * wave(t, IDLE), 1])},
     }
     working = {
-        'pool': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.03 * wave(t, WORKING), 1 + 0.08 * wave(t, WORKING, 0.25), 1 - 0.03 * wave(t, WORKING)])},
-        'bubbles': {
-            'position': sampled(WORKING, 0.05, lambda t: [0, 0.6 + 0.6 * wave(t, WORKING, 0.5), 0]),
-            'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.4 * wave(t, WORKING, 0.5), 1 + 0.4 * wave(t, WORKING, 0.5), 1 + 0.4 * wave(t, WORKING, 0.5)]),
-        },
+        'pool': {'scale': sampled(WORKING, 0.05, lambda t: [1, 1 + 0.04 * wave(t, WORKING), 1])},
     }
+    for n in range(3):
+        idle[f'bubble_{n}'] = {'scale': sampled(IDLE, 0.1, lambda t, lag=n * IDLE / 3: [0.8 + 0.1 * wave(t, IDLE, lag)] * 3)}
+        working[f'bubble_{n}'] = {'scale': sampled(WORKING, 0.05, lambda t, lag=n * WORKING / 3: [0.75 + 0.35 * wave(t, WORKING, lag)] * 3)}
     return {'idle': (IDLE, True, idle), 'working': (WORKING, True, working)}
 
 
