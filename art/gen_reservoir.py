@@ -246,6 +246,14 @@ PARTS = {
     'knuckle': [box((-0.5, 14.75, -0.25), (2, 16.75, 1.625), 'bone', ['up', 'down'] + SIDES),
                 box((-0.25, 14.875, -0.5), (1.625, 16.625, 2), 'bone', ['up', 'down'] + SIDES)],
 }
+# Straight joins extend to the cell boundary; corner ends stay clear of ribs and knuckles.
+for edge in ('foot', 'rim'):
+    body = PARTS[edge][0]
+    low, high = body['from'], body['to']
+    PARTS[edge + '_left'] = [box((0, low[1], low[2]), (low[0], high[1], high[2]),
+                                'flesh', list(body['faces']))]
+    PARTS[edge + '_right'] = [box((high[0], low[1], low[2]), (16, high[1], high[2]),
+                                 'flesh', list(body['faces']))]
 TEXTURE_MAP = {
     'membrane': NS + 'reservoir_membrane',
     'bone': NS + 'reservoir_bone',
@@ -290,6 +298,10 @@ def write_blockstate():
         part('pane_low', {'down': 'false', side: 'false'})
         part('pane_tall', {'down': 'true', side: 'false'})
         part('rim', {'up': 'false', side: 'false'})
+        right = {'west': 'east', 'north': 'south', 'east': 'west', 'south': 'north'}[left]
+        for edge, vertical in (('foot', 'down'), ('rim', 'up')):
+            part(edge + '_left', {vertical: 'false', side: 'false', left: 'true'})
+            part(edge + '_right', {vertical: 'false', side: 'false', right: 'true'})
         part('rib', {side: 'false', left: 'false'})
         part('knuckle', {'up': 'false', side: 'false', left: 'false'})
     (STATES / 'reservoir_cell.json').write_text(json.dumps({'multipart': parts}, indent=2) + '\n')

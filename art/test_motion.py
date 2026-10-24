@@ -97,6 +97,33 @@ class OrganMotionTest(unittest.TestCase):
             bones = {b['name']: b for b in geometry(model)['bones']}
             self.assertEqual(bones[child]['parent'], parent, (model, child))
 
+    def test_joined_reservoir_edges_are_continuous_without_overlapping_faces(self):
+        parts = json.loads((ASSETS / 'blockstates/reservoir_cell.json').read_text())['multipart']
+        for edge, inset in (('rim', 2), ('foot', 1.5)):
+            elements = []
+            for cell in range(3):
+                state = dict(north='false', south='false', up='false', down='false',
+                             west=str(cell > 0).lower(), east=str(cell < 2).lower())
+                for part in parts:
+                    apply = part['apply']
+                    if isinstance(apply, list) or apply.get('y', 0) != 0:
+                        continue
+                    name = apply['model'].split(':')[1]
+                    if not name.startswith('block/reservoir_cell_' + edge):
+                        continue
+                    if not all(state[k] == v for k, v in part.get('when', {}).items()):
+                        continue
+                    for element in json.loads((ASSETS / 'models' / (name + '.json')).read_text())['elements']:
+                        element['from'][0] += cell * 16
+                        element['to'][0] += cell * 16
+                        elements.append(element)
+            spans = sorted((e['from'][0], e['to'][0]) for e in elements)
+            self.assertEqual(spans[0][0], inset)
+            self.assertEqual(spans[-1][1], 48 - inset)
+            for first, second in zip(spans, spans[1:]):
+                self.assertEqual(first[1], second[0], (edge, spans))
+            self.assertEqual(coplanar_faces(elements), [])
+
     def test_all_animation_bones_and_loop_endpoints(self):
         for path in (ASSETS / 'animations/block').glob('*.animation.json'):
             name = path.name.removesuffix('.animation.json')

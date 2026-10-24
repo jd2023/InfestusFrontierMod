@@ -92,6 +92,46 @@
     },
     {
       "when": {
+        "down": "false",
+        "north": "false",
+        "west": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_foot_left"
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "north": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_foot_right"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "north": "false",
+        "west": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_rim_left"
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "north": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_rim_right"
+      }
+    },
+    {
+      "when": {
         "north": "false",
         "west": "false"
       },
@@ -174,6 +214,50 @@
       },
       "apply": {
         "model": "infestusfrontier:block/reservoir_cell_rim",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "east": "false",
+        "north": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_foot_left",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "east": "false",
+        "south": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_foot_right",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "east": "false",
+        "north": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_rim_left",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "east": "false",
+        "south": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_rim_right",
         "y": 90
       }
     },
@@ -263,6 +347,50 @@
       },
       "apply": {
         "model": "infestusfrontier:block/reservoir_cell_rim",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "south": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_foot_left",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "south": "false",
+        "west": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_foot_right",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "south": "false",
+        "east": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_rim_left",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "south": "false",
+        "west": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_rim_right",
         "y": 180
       }
     },
@@ -352,6 +480,50 @@
       },
       "apply": {
         "model": "infestusfrontier:block/reservoir_cell_rim",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "west": "false",
+        "south": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_foot_left",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "down": "false",
+        "west": "false",
+        "north": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_foot_right",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "west": "false",
+        "south": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_rim_left",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "false",
+        "west": "false",
+        "north": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/reservoir_cell_rim_right",
         "y": 270
       }
     },
