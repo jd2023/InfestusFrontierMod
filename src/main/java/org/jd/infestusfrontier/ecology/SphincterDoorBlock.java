@@ -33,8 +33,8 @@ import org.jetbrains.annotations.Nullable;
  * animates the whole iris, the upper half draws nothing of its own. Closed, a membrane four pixels thick fills the
  * doorway; open, nothing stops a walker. Grown, never placed: broken, it dies into Dead Tissue.
  *
- * <p>The Sphincter Door is a simple door, like a wooden one: hands and redstone open it, so villagers open it too and
- * zombies on Hard break it down. Grafts harden it into the Clenched and then the Calcified Door, which follow the
+ * <p>The Sphincter Door is a simple door, like a wooden one: hands and redstone open it, villagers open it (it is in
+ * {@code minecraft:mob_interactable_doors}), and zombies on Hard break it down because it opens by hand. Grafts harden it into the Clenched and then the Calcified Door, which follow the
  * vanilla iron door: only redstone opens them, so no mob opens or breaks them, and no piston moves them.
  */
 public final class SphincterDoorBlock extends DoorBlock implements EntityBlock {
@@ -96,8 +96,8 @@ public final class SphincterDoorBlock extends DoorBlock implements EntityBlock {
     }
 
     /**
-     * A graft in hand hardens the doorway instead of opening it: vanilla's skip of the block's own use hands the click
-     * to the item.
+     * A graft that hardens this door, in hand, hardens it instead of opening it: vanilla's skip of the block's own use
+     * hands the click to the item. Any other graft leaves the click to the door.
      */
     @Override
     protected ItemInteractionResult useItemOn(
@@ -108,7 +108,7 @@ public final class SphincterDoorBlock extends DoorBlock implements EntityBlock {
             Player player,
             InteractionHand hand,
             BlockHitResult hit) {
-        return stack.getItem() instanceof WallGraftItem
+        return stack.getItem() instanceof WallGraftItem graft && graft.hardens(state)
                 ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
                 : super.useItemOn(stack, state, level, pos, player, hand, hit);
     }

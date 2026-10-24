@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -236,12 +237,15 @@ public final class OpeningTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void villagersAndZombiesTreatOnlyTheSphincterDoorAsWooden(GameTestHelper h) {
-        h.assertTrue(
-                DoorBlock.isWoodenDoor(EcologyModule.SPHINCTER_DOOR.get().defaultBlockState()),
-                "the Sphincter Door is a simple door that villagers open and zombies break");
-        for (Block hard : List.of(EcologyModule.CLENCHED_DOOR.get(), EcologyModule.CALCIFIED_DOOR.get()))
-            h.assertFalse(DoorBlock.isWoodenDoor(hard.defaultBlockState()), hard + " is an iron door to mobs");
+    public static void villagersOpenAndZombiesBreakOnlyTheSphincterDoor(GameTestHelper h) {
+        BlockState simple = EcologyModule.SPHINCTER_DOOR.get().defaultBlockState();
+        h.assertTrue(simple.is(BlockTags.MOB_INTERACTABLE_DOORS), "villagers open the Sphincter Door");
+        h.assertTrue(DoorBlock.isWoodenDoor(simple), "zombies on Hard break the Sphincter Door");
+        for (Block hard : List.of(EcologyModule.CLENCHED_DOOR.get(), EcologyModule.CALCIFIED_DOOR.get())) {
+            h.assertFalse(
+                    hard.defaultBlockState().is(BlockTags.MOB_INTERACTABLE_DOORS), "villagers never open " + hard);
+            h.assertFalse(DoorBlock.isWoodenDoor(hard.defaultBlockState()), "zombies never break " + hard);
+        }
         BlockPos at = h.absolutePos(new BlockPos(1, Y, 1));
         h.assertValueEqual(
                 EcologyModule.CLENCHED_DOOR.get().defaultBlockState().getDestroySpeed(h.getLevel(), at),
@@ -251,6 +255,18 @@ public final class OpeningTests {
                 EcologyModule.CALCIFIED_DOOR.get().getExplosionResistance(),
                 EcologyModule.CALCIFIED_WALL.get().getExplosionResistance(),
                 "a Calcified Door resists blasts as a Calcified Wall");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aGraftWithNoStepForTheDoorLeavesItToTheHand(GameTestHelper h) {
+        BlockPos lower = door(h, new BlockPos(2, Y + 1, 2));
+        Player hand = EcologyTests.holding(h, GameType.SURVIVAL, EcologyModule.CALCIFYING_GRAFT.get(), 1);
+        EcologyTests.use(h, hand, lower, Direction.NORTH);
+        h.assertTrue(
+                h.getBlockState(lower).getValue(DoorBlock.OPEN), "the click opens the door as an empty hand would");
+        h.assertBlockPresent(EcologyModule.SPHINCTER_DOOR.get(), lower);
+        h.assertValueEqual(hand.getMainHandItem().getCount(), 1, "and spends no graft");
         h.succeed();
     }
 
