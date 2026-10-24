@@ -70,7 +70,7 @@ final class CaptureClient {
      * not the night, not an item lying on the ground that the player would pick up.
      */
     private static final List<String> RESET =
-            List.of("clear @s", "kill @e[type=item]", "time set noon", "weather clear");
+            List.of("tick unfreeze", "clear @s", "kill @e[type=item]", "time set noon", "weather clear");
 
     private final Path outputDir;
     private final List<Scenario> scenarios;
@@ -80,6 +80,7 @@ final class CaptureClient {
     private int ticksInStage;
     private int scenarioIndex;
     private int viewIndex;
+    private int sequenceFrame;
     private boolean frameReady;
     private int readyFrames;
     private boolean resized;
@@ -308,6 +309,7 @@ final class CaptureClient {
         Minecraft minecraft = Minecraft.getInstance();
         Scenario scenario = scenarios.get(scenarioIndex);
         Scenario.View view = scenario.views().get(viewIndex);
+        if (sequenceFrame > 0 && ticksInStage < view.frameTicks()) return;
         // A view that used a block waits for its container screen; every other view waits for no screen at all.
         boolean screenOpen = view.book().isPresent()
                 ? minecraft.screen != null
@@ -317,7 +319,9 @@ final class CaptureClient {
         try {
             Path scenarioDir = outputDir.resolve(scenario.name());
             Files.createDirectories(scenarioDir);
-            String file = view.name() + ".png";
+            String frameName =
+                    view.name() + (sequenceFrame == 0 ? "" : String.format(Locale.ROOT, "_%03d", sequenceFrame));
+            String file = frameName + ".png";
             Screenshot.grab(
                     scenarioDir.toFile(),
                     file,
@@ -332,11 +336,16 @@ final class CaptureClient {
                             Files.deleteIfExists(grabbed);
                             JsonObject entry = new JsonObject();
                             entry.addProperty("scenario", scenario.name());
-                            entry.addProperty("view", view.name());
+                            entry.addProperty("view", frameName);
+                            entry.addProperty("capturedAtMillis", System.currentTimeMillis());
                             entry.addProperty("file", scenarioDir.resolve(file).toString());
                             report.add(entry);
                             LOGGER.info("INFESTUS_CAPTURE scenario={} view={}", scenario.name(), view.name());
-                            advance(minecraft);
+                            if (++sequenceFrame < view.frames()) enter(Stage.FRAME);
+                            else {
+                                sequenceFrame = 0;
+                                advance(minecraft);
+                            }
                         } catch (IOException e) {
                             fail(minecraft, e);
                         }

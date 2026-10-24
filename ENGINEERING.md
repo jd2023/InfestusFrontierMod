@@ -163,6 +163,7 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 | Pure tests | `./gradlew :core:test :ui:test` | Rules, limits, edge cases. Milliseconds, no Minecraft |
 | Boundaries | `:core:verifyBoundary`, `:ui:verifyBoundary` | Those modules have an empty classpath |
 | Distribution | `verifyDistribution` | The JAR holds the entry point, `core`, `ui`, expanded metadata, and no test mod |
+| Visual assets | `verifyVisualAssets` (Python 3 with Pillow) | Loop closure, bone references and UV bounds; overlapping storage/model faces; fluid continuity and repaired motion regressions |
 | GameTests | `runGameTestServer` | Server-side behavior across real ticks, in `runs/gametest` |
 | Client captures | `./gradlew verifyCaptures` | Real client screenshots in `build/captures/<scenario>/<view>.png`. Checked for missing textures and blank frames, compared with goldens when present. The reviewer opens the images |
 | Demo world | `bash scripts/demo.sh` | Every shipped block, item and recipe in one fresh world, labeled. The owner plays it after each sprint |
@@ -177,6 +178,19 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 - Run graphical and headless runs as separate Gradle invocations. `scripts/verify.sh` runs `verifyAll` and then `verifyCaptures`.
 
 ### Captures
+
+A view may request `frames` (1–96) and `frameTicks` (1–20, default 4) for a timed
+sequence at the same camera position. The first image keeps the view name; later
+images add `_001`, `_002`, and so on. The report records actual capture timestamps.
+The verifier checks every frame. `art/gen_motion_captures.py` owns the organ motion
+fixtures: vanilla `tick freeze` holds idle/working, fill and port states while the
+render clock runs. These prove appearance, not gameplay. Each scenario resets the
+server with `tick unfreeze` before its commands.
+
+`./gradlew verifyCaptures -PcaptureOnly=<scenario>,<scenario>` reruns and verifies
+only the named scenes during visual iteration. The full gate always runs every
+scene. `python3 art/motion_contact_sheets.py` makes timestamped contact sheets in
+`build/art/motion/` from a completed capture report.
 
 The capture client is part of the test mod. `./gradlew verifyCaptures` starts the real client, creates a fresh flat Creative world in `runs/capture`, runs each scenario, writes the screenshots and exits. Then a Gradle task checks every expected image.
 

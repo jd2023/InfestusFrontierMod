@@ -41,7 +41,9 @@ record Scenario(String name, List<String> commands, List<View> views) {
             boolean inventory,
             Optional<String> book,
             int page,
-            List<String> icons) {
+            List<String> icons,
+            int frames,
+            int frameTicks) {
         boolean opensScreen() {
             return use.isPresent() || inventory || book.isPresent();
         }
@@ -81,6 +83,10 @@ record Scenario(String name, List<String> commands, List<View> views) {
                     throw new IOException(name + ": bad or duplicate view name " + viewName);
                 }
                 Optional<BlockPos> use = Optional.empty();
+                int frames = v.has("frames") ? v.get("frames").getAsInt() : 1;
+                int frameTicks = v.has("frameTicks") ? v.get("frameTicks").getAsInt() : 4;
+                if (frames < 1 || frames > 96 || frameTicks < 1 || frameTicks > 20)
+                    throw new IOException(name + ": frames must be 1..96 and frameTicks 1..20");
                 if (v.has("use")) {
                     JsonArray at = v.getAsJsonArray("use");
                     if (at.size() != 3) throw new IOException(name + ": use needs [x, y, z] in view " + viewName);
@@ -102,7 +108,9 @@ record Scenario(String name, List<String> commands, List<View> views) {
                         v.has("inventory") && v.get("inventory").getAsBoolean(),
                         v.has("book") ? Optional.of(v.get("book").getAsString()) : Optional.empty(),
                         v.has("page") ? v.get("page").getAsInt() : 0,
-                        v.has("icons") ? icons(v.getAsJsonArray("icons")) : List.of()));
+                        v.has("icons") ? icons(v.getAsJsonArray("icons")) : List.of(),
+                        frames,
+                        frameTicks));
             }
             return new Scenario(name, List.copyOf(commands), List.copyOf(views));
         }

@@ -38,7 +38,7 @@ configurations {
 
 def captureScenarioDir = layout.projectDirectory.dir('src/testMod/resources/captures')
 def captureScenarios = fileTree(captureScenarioDir) { include '*.json' }.files.collect { it.name - '.json' }.sort()
-// -PcaptureOnly=a,b photographs only those scenarios with runCapture, for iterating on one scene; the gate runs all.
+// -PcaptureOnly=a,b photographs and verifies only those scenarios; scripts/verify.sh runs all.
 def captureOnly = providers.gradleProperty('captureOnly').map { it.split(',') as List }.getOrElse(captureScenarios)
 def captureOutput = layout.buildDirectory.dir('captures')
 
@@ -214,6 +214,13 @@ tasks.register('verifyScreenKit') {
 tasks.named('test') { useJUnitPlatform() }
 tasks.named('check') { dependsOn 'verifyScreenKit' }
 
+tasks.register('verifyVisualAssets', Exec) {
+    group = 'verification'
+    description = 'Checks organ motion, model surfaces and biomass texture continuity (Python 3 with Pillow).'
+    commandLine 'python3', '-m', 'unittest', 'discover', '-s', 'art', '-p', 'test_*.py'
+}
+tasks.named('check') { dependsOn 'verifyVisualAssets' }
+
 tasks.register('verifyAll') {
     group = 'verification'
     description = 'The gate: pure tests, boundaries, shipped JAR contents, GameTests in a real server.'
@@ -223,6 +230,7 @@ tasks.register('verifyAll') {
 // Every capture must exist, show no missing texture, not be a flat frame, and match its golden when one exists.
 abstract class VerifyCaptures extends DefaultTask {
     @InputDirectory abstract DirectoryProperty getScenarios()
+    @Input abstract ListProperty<String> getSelected()
     @InputDirectory @org.gradle.api.tasks.Optional abstract DirectoryProperty getGoldens()
     @InputDirectory abstract DirectoryProperty getCaptures()
     /**
@@ -269,27 +277,28 @@ abstract class VerifyCaptures extends DefaultTask {
         if (report.failure) throw new GradleException("Capture client failed: ${report.failure}")
         List<String> problems = []
         int checked = 0
-        scenarios.get().asFile.listFiles({ File f -> f.name.endsWith('.json') } as FileFilter).sort().each { File scenarioFile ->
+        def available = scenarios.get().asFile.listFiles().findAll { it.name.endsWith('.json') }.collect { it.name - '.json' }
+        if (selected.get().empty || !available.containsAll(selected.get()))
+            throw new GradleException("Unknown or empty capture selection: ${selected.get()}")
+        scenarios.get().asFile.listFiles({ File f -> f.name.endsWith('.json') && selected.get().contains(f.name - '.json') } as FileFilter).sort().each { File scenarioFile ->
             String scenario = scenarioFile.name - '.json'
             def spec = new groovy.json.JsonSlurper().parse(scenarioFile)
-            spec.views.each { view ->
+            spec.views.collectMany { view ->
+                (0..<(view.frames ?: 1)).collect { frame ->
+                    def shot = new LinkedHashMap(view)
+                    shot.name = view.name + (frame == 0 ? '' : String.format('_%03d', frame))
+                    shot
+                }
+            }.each { view ->
                 File image = new File(root, "${scenario}/${view.name}.png")
                 String label = "${scenario}/${view.name}.png"
                 if (!image.file) { problems << "${label}: missing"; return }
                 java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(image)
                 if (img == null) { problems << "${label}: not a readable PNG"; return }
                 int w = img.width, h = img.height, n = w * h
-                long magenta = 0
-                double sum = 0, sumSq = 0
-                for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) {
-                    int rgb = img.getRGB(x, y)
-                    int r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = rgb & 0xff
-                    if (r > 200 && g < 60 && b > 200) magenta++
-                    double lum = 0.299 * r + 0.587 * g + 0.114 * b
-                    sum += lum; sumSq += lum * lum
-                }
-                double mean = sum / n
-                double stddev = Math.sqrt(Math.max(0, sumSq / n - mean * mean))
+                double[] stats = imageStats(img)
+                long magenta = (long) stats[0]
+                double stddev = stats[1]
                 if (magenta * 1000 > n * 2) problems << "${label}: ${magenta} missing-texture pixels"
                 if (stddev < 4) problems << "${label}: flat frame (luminance stddev ${String.format('%.2f', stddev)})"
                 File golden = goldens.present ? new File(goldens.get().asFile, "${scenario}/${view.name}.png") : null
@@ -313,6 +322,23 @@ abstract class VerifyCaptures extends DefaultTask {
         }
         if (problems) throw new GradleException("Capture checks failed:\n  " + problems.join('\n  '))
         logger.lifecycle("Captures verified: ${checked} images under ${root}")
+    }
+
+    // Timed sequences inspect every pixel of every frame; compile this hot loop without Groovy boxing.
+    @groovy.transform.CompileStatic
+    private static double[] imageStats(java.awt.image.BufferedImage img) {
+        int w = img.width, h = img.height, n = w * h
+        long magenta = 0
+        double sum = 0, sumSq = 0
+        for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) {
+            int rgb = img.getRGB(x, y)
+            int r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = rgb & 0xff
+            if (r > 200 && g < 60 && b > 200) magenta++
+            double lum = 0.299 * r + 0.587 * g + 0.114 * b
+            sum += lum; sumSq += lum * lum
+        }
+        double mean = sum / n
+        return [magenta, Math.sqrt(Math.max(0d, sumSq / n - mean * mean))] as double[]
     }
 }
 
@@ -363,6 +389,7 @@ tasks.register('verifyCaptures', VerifyCaptures) {
     description = 'Runs the capture client and checks every screenshot.'
     dependsOn tasks.named('runCapture')
     scenarios = captureScenarioDir
+    selected = captureOnly
     captures = captureOutput
     def goldenDir = captureScenarioDir.dir('golden')
     if (goldenDir.asFile.directory) goldens = goldenDir

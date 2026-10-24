@@ -1,0 +1,78 @@
+{
+  "commands": [
+    "kill @e[type=armor_stand,tag=visual_audit]",
+    "fill -8 -61 -4 12 -54 10 air",
+    "fill -8 -62 -4 12 -62 10 grass_block",
+    "fill -3 -61 1 11 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 0 -60 3 infestusfrontier:organ_bud",
+    "setblock 3 -60 3 infestusfrontier:filter_valve",
+    "setblock 6 -61 3 infestusfrontier:fuel_papilla",
+    "setblock 9 -61 3 infestusfrontier:mouth"
+  ],
+  "views": [
+    {
+      "name": "organ_bud_front",
+      "x": 0.5,
+      "y": -59.5,
+      "z": 0.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "organ_bud_back",
+      "x": 0.5,
+      "y": -59.5,
+      "z": 6.5,
+      "yaw": 180,
+      "pitch": 30
+    },
+    {
+      "name": "filter_valve_front",
+      "x": 3.5,
+      "y": -59.5,
+      "z": 0.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "filter_valve_back",
+      "x": 3.5,
+      "y": -59.5,
+      "z": 6.5,
+      "yaw": 180,
+      "pitch": 30
+    },
+    {
+      "name": "fuel_papilla_front",
+      "x": 6.5,
+      "y": -59.5,
+      "z": 0.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "fuel_papilla_back",
+      "x": 6.5,
+      "y": -59.5,
+      "z": 6.5,
+      "yaw": 180,
+      "pitch": 30
+    },
+    {
+      "name": "mouth_front",
+      "x": 9.5,
+      "y": -59.5,
+      "z": 0.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "mouth_back",
+      "x": 9.5,
+      "y": -59.5,
+      "z": 6.5,
+      "yaw": 180,
+      "pitch": 30
+    }
+  ]
+}

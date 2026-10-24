@@ -21,6 +21,37 @@ Quality bar. The owner rejects anything below it, and a sprint is not done while
 - Model sources are `.bbmodel` files committed under `art/`, openable in Blockbench; the shipped `geo` and `animation` JSON are exported from them. The first model story also adds the lint that measures the four rules above.
 - Evidence for a texture: `build/art/<name>-tiled.png` and the captures. For a model: front, side, back, dark and an animation frame sheet.
 
+### Model and animation verification
+
+The [capture generator](../../art/gen_motion_captures.py) covers every shipped
+GeckoLib clip, including each furnace stage, bladder fill and junction port mode.
+Each organ scene shows idle and working side by side, followed by back and side
+views. The Seed Pouch and storage scenes show their available resting states.
+Timed frames and their capture timestamps are kept in `build/captures/`.
+[Contact sheets](../../art/motion_contact_sheets.py) summarize them under
+`build/art/motion/`; inspect the source frames for fine detail.
+
+| Models | Visual checks |
+|---|---|
+| Culture Bowl | Pool stays inside its walls; bubbles form independently at the surface |
+| Digestive Sac | Ring seams stay joined during contraction; mouth and nodules stay attached |
+| Biomass Bladder | Empty is empty; all fill levels stay inside the membrane; frame has no overlapping faces |
+| Membrane Rack | Skin stays between posts; the droplet resets while invisible |
+| Bone Loom, Awakening Cradle | Ribs and lobes clear their contents through the working cycle |
+| Bio-Furnace | All three stages; glow, ridges, throats and chimneys remain distinct |
+| Activation Cyst, Seed Pouch | Chambers, neck, rim and throat follow their supporting tissue |
+| Planting Proboscis, Harvest Corolla | Moving parts remain attached; petals clear the heart; tips clear the floor |
+| Compost Gland | Distinct scrap hopper and fertilizer outlet, with a slow compression cycle |
+| Vascular Junction | All six faces in all three modes; bottom port stays on the foundation |
+| Reservoir, Item Capsule | Joined bodies, exterior corners, fill surfaces and inventory models |
+| Bud, veins, Mouth, lobes, cultivation, Polyp, Valve, Papilla | Existing static scenes plus `visual_static`: front/back views, recessed surfaces and connections |
+| Dormant and awakened armor | `visual_armor`: front/back/side views with bent arms and legs |
+
+[Asset regression checks](../../art/test_motion.py) run in the engineering gate.
+They cover resource references, UV bounds, bone references, loop closure, rotation
+speed, overlapping surface planes and the motion constraints above. In-game visual
+review remains required; those checks cannot judge appearance by themselves.
+
 ---
 
 ```text
