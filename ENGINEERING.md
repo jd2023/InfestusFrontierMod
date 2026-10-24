@@ -184,6 +184,8 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 A view may request `frames` (1–96) and `frameTicks` (1–20, default 4) for a timed
 sequence at the same camera position. The first image keeps the view name; later
 images add `_001`, `_002`, and so on. The report records actual capture timestamps.
+An optional `trigger` command runs once when the camera is ready, immediately before
+the first frame. Door sequences use it to capture redstone opening and closing.
 The verifier checks every frame. `art/gen_motion_captures.py` owns the organ motion
 fixtures: vanilla `tick freeze` holds idle/working, fill and port states while the
 render clock runs. These prove appearance, not gameplay. Each scenario resets the

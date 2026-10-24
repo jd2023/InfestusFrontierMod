@@ -46,6 +46,8 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Reservoir, Item Capsule | Joined bodies, exterior corners, fill surfaces and inventory models |
 | Bud, veins, Mouth, lobes, cultivation, Polyp, Valve, Papilla | Existing static scenes plus `visual_static`: front/back views, recessed surfaces and connections |
 | Dormant and awakened armor | `visual_armor`: front/back/side views with bent arms and legs |
+| Living walls, windows, crossings and stitches | `walls`, `openings`, `crossings`: all tiers, joined frames and routed faces |
+| Sphincter Door | `motion_sphincter_door`: closed pulse and redstone opening/closing from both sides; sealed flaps and distinct edge planes |
 
 [Asset regression checks](../../art/test_motion.py) run in the engineering gate.
 They cover resource references, UV bounds, bone references, loop closure, rotation

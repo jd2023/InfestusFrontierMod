@@ -315,6 +315,8 @@ final class CaptureClient {
                 ? minecraft.screen != null
                 : minecraft.screen instanceof AbstractContainerScreen<?>;
         if (view.opensScreen() ? !screenOpen || ticksInStage < MOVE_TICKS : minecraft.screen != null) return;
+        // Trigger a state change only after the camera is ready, so the sequence includes its transition.
+        if (sequenceFrame == 0) view.trigger().ifPresent(command -> FlatWorld.command(minecraft, command));
         enter(Stage.GRABBING);
         try {
             Path scenarioDir = outputDir.resolve(scenario.name());
