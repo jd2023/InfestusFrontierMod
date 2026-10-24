@@ -46,6 +46,11 @@ public final class DiscoveryModule {
                     .displayItems((parameters, output) -> {
                         output.accept(EcologyModule.SPORE_CULTURE.get());
                         output.accept(EcologyModule.DEAD_TISSUE.get());
+                        output.accept(EcologyModule.LIVING_WALL_ITEM.get());
+                        output.accept(EcologyModule.RIBBED_WALL_ITEM.get());
+                        output.accept(EcologyModule.CALCIFIED_WALL_ITEM.get());
+                        output.accept(EcologyModule.SKELETAL_GRAFT.get());
+                        output.accept(EcologyModule.CALCIFYING_GRAFT.get());
                         output.accept(EcologyModule.LIVING_SUBSTRATE_ITEM.get());
                         output.accept(OrganModule.ORGAN_BUD_ITEM.get());
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());

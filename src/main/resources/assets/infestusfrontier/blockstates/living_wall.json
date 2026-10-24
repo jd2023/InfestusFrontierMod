@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "infestusfrontier:block/living_wall"
+      },
+      {
+        "model": "infestusfrontier:block/living_wall",
+        "x": 90
+      },
+      {
+        "model": "infestusfrontier:block/living_wall",
+        "x": 180
+      },
+      {
+        "model": "infestusfrontier:block/living_wall",
+        "x": 90,
+        "y": 90
+      }
+    ]
+  }
+}

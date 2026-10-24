@@ -290,3 +290,12 @@ Files: src/main/resources/assets/infestusfrontier/textures/item/{dead_tissue,sur
 
 - Two 32x32 icons, `--size 32 --colors 0`, one family with the Spore Culture and treatment icons: same outline weight, light from the upper left. Dead Tissue: a limp grey-brown scrap of flesh, dry and wrinkled, a dull pink fleck where it tore. Surgical Blade: a short pale bone handle bound with a strip of pink membrane, a thin curved steel blade, held diagonally from lower left to upper right like the probe; the item renders as a handheld tool.
 - Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background. The placeholders are flat two-tone discs drawn by the builder.
+
+## ART-010 — Living wall tile and graft icons
+
+Status: open. Owner of the asset: Astra.
+Files: src/main/resources/assets/infestusfrontier/textures/block/living_wall.png, textures/item/{skeletal_graft,calcifying_graft}.png, CREDITS.txt
+
+- living_wall: a 64x64 block texture, seamless on all four edges, one family with the Living Substrate tiles and reservoir_flesh. Dense dark muscular tissue: broad lobes parted by narrow dark creases, a faint grain of fibres running one way, a wet sheen on the crowns. Opaque. It covers every face of the three wall tiers; the Ribbed Wall's ribs and the Calcified Wall's plates are model parts cut from reservoir_bone and stay with art/gen_walls.py. The blockstate turns the Living Wall four ways at random, so no feature may end at an edge.
+- skeletal_graft and calcifying_graft: two 32x32 icons, `--size 32 --colors 0`, one family with the treatment icons. Skeletal Graft: a small curved bone splint wrapped in a pink membrane strip. Calcifying Graft: a chalky white lump of bone paste with a hard, cracked crust.
+- Prompt shapes as ART-001 and the synaptic_probe source prompt; evidence `build/art/living_wall-tiled.png` and the capture walls. The placeholders are art/gen_walls.py's generated flesh and flat two-tone discs.

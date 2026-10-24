@@ -1,0 +1,47 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.living_wall.name",
+  "description": "entry.infestusfrontier.contact.living_wall.description",
+  "icon": "infestusfrontier:living_wall",
+  "x": 0,
+  "y": 3,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/living_substrate"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/living_substrate"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/living_wall"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.living_wall.name",
+      "text": "entry.infestusfrontier.contact.living_wall.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.living_wall.tiers"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:activating/skeletal_graft",
+      "title1": "item.infestusfrontier.skeletal_graft"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:activating/calcifying_graft",
+      "title1": "item.infestusfrontier.calcifying_graft"
+    }
+  ]
+}

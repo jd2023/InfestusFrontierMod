@@ -113,6 +113,12 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Create:** Apply Spore Culture to a visible eligible ground block; use bone meal to mature that cell. Substrate is only grown: no recipe makes a cell to place, and a broken cell, or anything grown in one, dies into Dead Tissue whatever the tool.
 - **Growth:** Mutate individual cells into conduits, farms, defense or travel surfaces. Each cell has one primary function; a fast path is not simultaneously a damaging floor.
 
+### T0-17 — Living Wall
+- **Does:** Dense muscular tissue grown upward from the colony floor: the colony's own walls. Three tiers by hardening: a Living Wall as grown, a Ribbed Wall with upright bone ribs, and a Calcified Wall plated in bone that no explosion breaks.
+- **Input → output:** One bone meal → one wall block; one graft → one block one tier harder. No running input.
+- **Create:** Sneak and use bone meal on a mature substrate cell: a Living Wall grows on it. Bone meal on the top face of a wall grows one more block on it. A Skeletal Graft hardens a Living Wall into a Ribbed Wall; a Calcifying Graft hardens a Ribbed Wall into a Calcified Wall. Walls are grown, never placed, and broken they die into Dead Tissue.
+- **Growth:** A fourth tier hardened with Nether material resists the Wither. A wall mutates into a Membrane Window or a Sphincter Door.
+
 ### T0-02 — Culture Bowl
 - **Does:** Grows small batches of construction cultures on a shallow, rooted dish. Its first batches are slow and loaded by hand.
 - **Input → output:** 1 mushroom + 1 wheat seed + 100 mB water → 1 Spore Culture; 1 Spore Culture + 2 rotten flesh + 1 bone meal → an Organ Bud. No biomass input is needed to start this supply chain.

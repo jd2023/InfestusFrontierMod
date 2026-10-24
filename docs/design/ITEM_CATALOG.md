@@ -123,7 +123,8 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I016 | Living Pick / Hatchet / Spade / Hoe | Awaken corresponding I015 tool | Persistent tool counterparts. Mineral fusion must respect real harvest tier; area/precision branches remain proposed, not approved damage or yield rules. |
 | I017 | Dormant Fang | 2 Bone Plates + 1 stick → 1 | Basic weak melee weapon; same cradle awakening route as tools. |
 | I018 | Living Fang | Awaken I017 | Base for separately designed piercing/control weapon branches. |
-| I050 | Skeletal Graft | Bone Loom: 1 Bone Plate + 1 Binder + 25 BU → 1 | Reinforce one cell or permitted organ skeleton; the plate is not duplicated. |
+| I050 | Skeletal Graft | Activation Cyst: 1 Bone Plate + 1 Binder + 25 BU → 1 | Hardens one Living Wall into a Ribbed Wall; later reinforces one cell or permitted organ skeleton. The plate is not duplicated. |
+| I131 | Calcifying Graft | Activation Cyst: 4 Bone Plates + 1 Binder + 200 BU → 1 | Hardens one Ribbed Wall into a Calcified Wall, which no explosion breaks. |
 | I051 | Mutation Graft | Host rank I at T0; genetic/higher grafts from T2. Typed family under “Mutation grafts” below. | Installed once; target, equipment slot and rank are explicit. An installed armor graft cannot be extracted. |
 | I019 | Biomass Bucket | Fill a vanilla bucket with exactly 1,000 mB from a compatible store | Real fluid transfer. It empties only when the complete 1,000 mB fits and otherwise remains held unchanged. World placement stays unavailable until finite spill admission exists; containment and damage follow the Block Catalog's containment rules. |
 

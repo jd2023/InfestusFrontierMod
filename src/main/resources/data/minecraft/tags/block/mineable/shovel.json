@@ -1,3 +1,6 @@
 {
-  "values": ["infestusfrontier:living_substrate"]
+  "values": [
+    "infestusfrontier:living_substrate",
+    "infestusfrontier:living_wall"
+  ]
 }

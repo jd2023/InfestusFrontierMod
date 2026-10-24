@@ -1,0 +1,100 @@
+{
+  "commands": [
+    "advancement grant @s through infestusfrontier:contact/living_substrate",
+    "fill -8 -61 -6 10 -54 12 air",
+    "fill -8 -62 -6 10 -62 12 grass_block",
+    "kill @e[type=item]",
+    "fill -7 -61 1 7 -61 4 infestusfrontier:living_substrate[stage=mature]",
+    "fill -6 -60 2 -3 -58 2 infestusfrontier:living_wall",
+    "fill -1 -60 2 2 -58 2 infestusfrontier:ribbed_wall",
+    "fill 4 -60 2 7 -58 2 infestusfrontier:calcified_wall",
+    "fill -6 -60 3 -6 -58 4 infestusfrontier:living_wall",
+    "fill 7 -60 3 7 -58 4 infestusfrontier:calcified_wall",
+    "give @s infestusfrontier:skeletal_graft",
+    "give @s infestusfrontier:calcifying_graft"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 0.5,
+      "y": -58.5,
+      "z": -6.5,
+      "yaw": 0,
+      "pitch": 12
+    },
+    {
+      "name": "close_ribbed",
+      "x": 0.5,
+      "y": -59.0,
+      "z": -0.8,
+      "yaw": 0,
+      "pitch": 8
+    },
+    {
+      "name": "close_calcified",
+      "x": 5.5,
+      "y": -59.0,
+      "z": -0.8,
+      "yaw": 0,
+      "pitch": 8
+    },
+    {
+      "name": "back",
+      "x": 0.5,
+      "y": -58.5,
+      "z": 10.5,
+      "yaw": 180,
+      "pitch": 12
+    },
+    {
+      "name": "corner",
+      "x": -10.5,
+      "y": -58.0,
+      "z": 7.5,
+      "yaw": 225,
+      "pitch": 18
+    },
+    {
+      "name": "top",
+      "x": 0.5,
+      "y": -55.0,
+      "z": -2.5,
+      "yaw": 0,
+      "pitch": 55
+    },
+    {
+      "name": "hotbar",
+      "x": 0.5,
+      "y": -58.5,
+      "z": -6.5,
+      "yaw": 0,
+      "pitch": 12,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:skeletal_graft",
+        "infestusfrontier:calcifying_graft"
+      ]
+    },
+    {
+      "name": "book_living_wall",
+      "x": 0.5,
+      "y": -61,
+      "z": -2.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "book": "infestusfrontier:contact/living_wall"
+    },
+    {
+      "name": "book_living_wall_grafts",
+      "x": 0.5,
+      "y": -61,
+      "z": -2.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "book": "infestusfrontier:contact/living_wall",
+      "page": 2
+    }
+  ]
+}

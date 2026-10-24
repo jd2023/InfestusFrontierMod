@@ -1,0 +1,19 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "activation_cyst",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "infestusfrontier:fusion_binder"
+    }
+  ],
+  "water": 0,
+  "biomass": 25,
+  "result": {
+    "id": "infestusfrontier:skeletal_graft",
+    "count": 1
+  },
+  "ticks": 400
+}
