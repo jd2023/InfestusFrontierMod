@@ -14,6 +14,11 @@ two on each flap, and each flap is painted with finer folds, so the closed door 
 generator fails if any pixel between the lips is left open. Opening shrinks every flap into its outer corner, behind
 the rim's fillets, with a little twist, and the pucker vanishes: the hole dilates from the centre. Closing reverses
 it. The block entity plays closed or open as a loop, and opening or closing once when the door changes.
+
+The safer doors grafts harden it into share its shape and motion, as the wall tiers share the wall's. The Clenched
+Door grows an upright bone rib through each jamb, as the Ribbed Wall does, and its flaps turn denser and darker under
+bone ridges. The Calcified Door plates each jamb with three bevelled bone plates parted by flesh seams, as the
+Calcified Wall is plated, and its flaps are chalky bone plating with staggered seams over the same pleats.
 """
 import json
 import math
@@ -115,6 +120,14 @@ OPEN_SCALE = 0.08
 RIDGES = ((12, 12), (38, 6))
 RIDGE_Z = -1.35
 SHUT, IDLE = 0.5, 6.5
+# the safer doors a graft hardens the Sphincter Door into, as it hardens the wall tiers
+TOUGH = [(66, 18, 32), (96, 30, 46), (128, 48, 62), (160, 74, 84), (190, 108, 110)]
+CHALK = [(132, 112, 92), (168, 148, 118), (198, 180, 148), (224, 210, 180), (244, 236, 214)]
+VARIANTS = {
+    'sphincter_door': dict(petal=PETAL, ridge=PETAL, vein=True, ribs=False, plates=False),
+    'clenched_door': dict(petal=TOUGH, ridge=IVORY, vein=True, ribs=True, plates=False),
+    'calcified_door': dict(petal=CHALK, ridge=IVORY, vein=False, ribs=False, plates=True),
+}
 
 
 def covered():
@@ -128,7 +141,7 @@ def covered():
     return True
 
 
-def bones():
+def bones(variant):
     frame = [
         ('jamb', [-8, 0, -3], [3, 32, 6], None),
         ('jamb', [5, 0, -3], [3, 32, 6], None),
@@ -147,6 +160,11 @@ def bones():
         ('band', [-7.125, 23, -4], [2, 2, 8], None),
         ('band', [5.125, 23, -4], [2, 2, 8], None),
     ]
+    # bone stops a texel short of the jamb's ends, so no face lies in the jamb's top or bottom
+    if variant['ribs']:  # one upright bone rib through each jamb, standing out of its front and back
+        frame += [('rib', [x, 1, -3.5], [1, 30, 7], None) for x in (-7, 6)]
+    if variant['plates']:  # three bone plates up each jamb, parted by seams of flesh
+        frame += [('plate', [x, y, -3.5], [2, 9, 7], None) for x in (-7.5, 5.5) for y in (1, 11, 21)]
     out = [('root', None, [0, 0, 0], []), ('frame', 'root', [0, 0, 0], frame)]
     for name, origin, size, pivot, _ in FLAPS:
         cubes = [(name, origin, size, None)]
@@ -176,7 +194,16 @@ def pleats(cx, cy):
     return value
 
 
-def textures(model_bones, uv):
+def plated(base):
+    """Bone plates over a pleated flap: staggered seams four texels apart, each plate lit on its top edge."""
+    def value(x, y, w, h):
+        row = y % 4
+        seam = row == 3 or (x + 2 * (y // 4)) % 5 == 4
+        return 0.12 if seam else 0.45 + 0.35 * base(x, y, w, h) + 0.12 * (row == 0)
+    return value
+
+
+def textures(model_bones, uv, variant):
     p = Painter(SHEET, 307)
     sizes = islands(model_bones)
     rects = {name: faces(sizes[name], uv[name]) for name in sizes}
@@ -191,24 +218,30 @@ def textures(model_bones, uv):
             p.ramp(rect, LIP, lambda x, y, w, h: 0.55 + 0.1 * math.sin(x + y), mottle=0.2)
     for face, rect in rects['band'].items():
         p.ramp(rect, IVORY, lambda x, y, w, h: 0.62 + 0.15 * (y == 0) - 0.12 * (y == h - 1), grain=0.04, mottle=0.1)
+    for rect in rects.get('rib', {}).values():
+        p.ramp(rect, IVORY, lambda x, y, w, h: 0.58 + 0.16 * (x == 0) - 0.1 * (x == w - 1), grain=0.05, mottle=0.12)
+    for rect in rects.get('plate', {}).values():
+        p.ramp(rect, IVORY, lambda x, y, w, h: 0.6 + 0.2 * (y == 0 or x == 0) - 0.25 * (y == h - 1 or x == w - 1),
+               grain=0.05, mottle=0.12)
     for rect in rects['pucker'].values():
         p.ramp(rect, PUCKER, lambda x, y, w, h: 0.1 if 0 < x < w - 1 and 0 < y < h - 1 else 0.7, grain=0.03, mottle=0.1)
     for name in sizes:
         if name.startswith('ridge'):
             for face, rect in rects[name].items():
                 crest = face in ('north', 'south')
-                p.ramp(rect, PETAL, lambda x, y, w, h, c=crest: (0.78 if c else 0.3) - 0.2 * (y / max(1, h - 1)),
+                p.ramp(rect, variant['ridge'], lambda x, y, w, h, c=crest: (0.78 if c else 0.3) - 0.2 * (y / max(1, h - 1)),
                        grain=0.03, mottle=0.08)
     for name, origin, size, _, _ in FLAPS:
         x0, y0 = origin[0], origin[1]
         x1, y1 = x0 + size[0], y0 + size[1]
         for face, rect in rects[name].items():
-            if face == 'north':  # seen from the front, the face's left edge is the flap's +x edge
-                p.ramp(rect, PETAL, pleats(x1 - CENTRE[0] - 0.5, y1 - CENTRE[1] - 0.5), grain=0.03, mottle=0.1)
-                p.vein(rect, VEIN, rect[3] // 2)
-            elif face == 'south':  # seen from behind, the left edge is the flap's -x edge
-                p.ramp(rect, PETAL, pleats(CENTRE[0] - x0 - 0.5, y1 - CENTRE[1] - 0.5), grain=0.03, mottle=0.1)
-                p.vein(rect, VEIN, rect[3] // 2)
+            if face in ('north', 'south'):
+                # seen from the front, the face's left edge is the flap's +x edge; seen from behind, its -x edge
+                left = x1 - CENTRE[0] - 0.5 if face == 'north' else CENTRE[0] - x0 - 0.5
+                value = pleats(left, y1 - CENTRE[1] - 0.5)
+                p.ramp(rect, variant['petal'], plated(value) if variant['plates'] else value, grain=0.03, mottle=0.1)
+                if variant['vein']:
+                    p.vein(rect, VEIN, rect[3] // 2)
             else:
                 p.ramp(rect, LIP, lambda x, y, w, h: 0.4, mottle=0.1)
     return p, rects['jamb']['north']
@@ -232,21 +265,24 @@ def animations(model_bones):
             'opening': (SHUT, False, opening), 'closing': (SHUT, False, closing)}
 
 
-def door():
+def door(name):
     assert covered(), 'the closed flaps leave part of the doorway open'
-    model_bones = bones()
-    painter, particle = textures(model_bones, pack(model_bones, SHEET))
-    write_organ('sphincter_door', model_bones, SHEET, painter, animations(model_bones), (particle[0], particle[1]),
+    variant = VARIANTS[name]
+    model_bones = bones(variant)
+    painter, particle = textures(model_bones, pack(model_bones, SHEET), variant)
+    write_organ(name, model_bones, SHEET, painter, animations(model_bones), (particle[0], particle[1]),
                 bounds=(2, 3, (0, 1.5, 0)))
-    write(MODELS / 'sphincter_door.json', {'textures': {'particle': NS + 'sphincter_door'}})
-    write(STATES / 'sphincter_door.json', {'variants': {'': {'model': NS + 'sphincter_door'}}})
+    write(MODELS / (name + '.json'), {'textures': {'particle': NS + name}})
+    write(STATES / (name + '.json'), {'variants': {'': {'model': NS + name}}})
     return len(model_bones), sum(len(b[3]) for b in model_bones)
 
 
 def main():
     bars = window()
-    bone_count, cubes = door()
-    print('openings: window pane and %d edge bars; door bones %d, cubes %d' % (bars, bone_count, cubes))
+    for name in VARIANTS:
+        bone_count, cubes = door(name)
+        print('openings: %s bones %d, cubes %d' % (name, bone_count, cubes))
+    print('openings: window pane and %d edge bars' % bars)
 
 
 if __name__ == '__main__':

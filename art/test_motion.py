@@ -152,14 +152,21 @@ class OrganMotionTest(unittest.TestCase):
     def test_door_transitions_meet_open_pose_and_closed_flaps_seal(self):
         import gen_openings as door
         self.assertTrue(door.covered())
-        clips = animations('sphincter_door')
-        for name, channels in clips['open']['bones'].items():
-            for channel, keys in channels.items():
-                opened = next(iter(keys.values()))
-                opening = clips['opening']['bones'][name][channel]
-                closing = clips['closing']['bones'][name][channel]
-                self.assertEqual(opening[max(opening, key=float)], opened)
-                self.assertEqual(closing[min(closing, key=float)], opened)
+        for door_name in door.VARIANTS:
+            clips = animations(door_name)
+            for name, channels in clips['open']['bones'].items():
+                for channel, keys in channels.items():
+                    opened = next(iter(keys.values()))
+                    opening = clips['opening']['bones'][name][channel]
+                    closing = clips['closing']['bones'][name][channel]
+                    self.assertEqual(opening[max(opening, key=float)], opened)
+                    self.assertEqual(closing[min(closing, key=float)], opened)
+
+    def test_hardened_doors_keep_the_iris_and_add_bone(self):
+        base = {bone['name'] for bone in geometry('sphincter_door')['bones']}
+        for name in ('clenched_door', 'calcified_door'):
+            self.assertEqual({bone['name'] for bone in geometry(name)['bones']}, base)
+            self.assertGreater(len(geometry(name)['bones'][1]['cubes']), len(geometry('sphincter_door')['bones'][1]['cubes']))
 
     def test_drop_is_invisible_on_both_sides_of_its_reset(self):
         drop = animations('membrane_rack')['working']['bones']['drop']['scale']

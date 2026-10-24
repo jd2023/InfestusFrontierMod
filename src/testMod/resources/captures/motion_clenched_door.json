@@ -1,0 +1,66 @@
+{
+  "commands": [
+    "fill -8 -61 -4 8 -54 10 air",
+    "fill -8 -62 -4 8 -62 10 grass_block",
+    "fill -3 -61 1 3 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 0 -60 3 infestusfrontier:clenched_door[half=lower,facing=north]",
+    "setblock 0 -59 3 infestusfrontier:clenched_door[half=upper,facing=north]",
+    "kill @e[type=item]"
+  ],
+  "views": [
+    {
+      "name": "motion_closed",
+      "x": 0.5,
+      "y": -59.5,
+      "z": 0,
+      "yaw": 0,
+      "pitch": 0,
+      "frames": 32,
+      "frameTicks": 4
+    },
+    {
+      "name": "opening",
+      "x": 0.5,
+      "y": -59.5,
+      "z": 0,
+      "yaw": 0,
+      "pitch": 0,
+      "frames": 18,
+      "frameTicks": 1,
+      "trigger": "setblock 0 -61 3 redstone_block"
+    },
+    {
+      "name": "closing",
+      "x": 0.5,
+      "y": -59.5,
+      "z": 0,
+      "yaw": 0,
+      "pitch": 0,
+      "frames": 18,
+      "frameTicks": 1,
+      "trigger": "setblock 0 -61 3 infestusfrontier:living_substrate[stage=mature]"
+    },
+    {
+      "name": "back_opening",
+      "x": 0.5,
+      "y": -59.5,
+      "z": 7,
+      "yaw": 180,
+      "pitch": 0,
+      "frames": 18,
+      "frameTicks": 1,
+      "trigger": "setblock 0 -61 3 redstone_block"
+    },
+    {
+      "name": "back_closing",
+      "x": 0.5,
+      "y": -59.5,
+      "z": 7,
+      "yaw": 180,
+      "pitch": 0,
+      "frames": 18,
+      "frameTicks": 1,
+      "trigger": "setblock 0 -61 3 infestusfrontier:living_substrate[stage=mature]"
+    }
+  ]
+}

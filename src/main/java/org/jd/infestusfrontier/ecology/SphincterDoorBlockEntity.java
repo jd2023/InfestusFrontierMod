@@ -3,6 +3,7 @@ package org.jd.infestusfrontier.ecology;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -12,7 +13,7 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * The lower half of a Sphincter Door, which draws the whole iris. It saves nothing: the door's {@code open} block
+ * The lower half of a Sphincter Door or a door hardened from it, which draws the whole iris. It saves nothing: the door's {@code open} block
  * state picks the animation, so a door that was already open when its chunk loaded starts open instead of dilating.
  */
 final class SphincterDoorBlockEntity extends BlockEntity implements GeoBlockEntity {
@@ -29,8 +30,8 @@ final class SphincterDoorBlockEntity extends BlockEntity implements GeoBlockEnti
 
     private RawAnimation showing = CLOSED;
 
-    SphincterDoorBlockEntity(BlockPos pos, BlockState state) {
-        super(EcologyModule.SPHINCTER_DOOR_ENTITY.get(), pos, state);
+    SphincterDoorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
 
     @Override

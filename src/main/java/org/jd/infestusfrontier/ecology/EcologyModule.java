@@ -1,5 +1,9 @@
 package org.jd.infestusfrontier.ecology;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
@@ -7,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.api.distmarker.Dist;
@@ -56,13 +61,6 @@ public final class EcologyModule {
     public static final DeferredItem<BlockItem> RIBBED_WALL_ITEM = ITEMS.registerSimpleBlockItem(RIBBED_WALL);
     public static final DeferredItem<BlockItem> CALCIFIED_WALL_ITEM = ITEMS.registerSimpleBlockItem(CALCIFIED_WALL);
 
-    /** Hardens a Living Wall into a Ribbed Wall (ITEM_CATALOG I050). */
-    public static final DeferredItem<Item> SKELETAL_GRAFT =
-            ITEMS.registerItem("skeletal_graft", properties -> new WallGraftItem(properties, LIVING_WALL, RIBBED_WALL));
-    /** Hardens a Ribbed Wall into a Calcified Wall (ITEM_CATALOG I131). */
-    public static final DeferredItem<Item> CALCIFYING_GRAFT = ITEMS.registerItem(
-            "calcifying_graft", properties -> new WallGraftItem(properties, RIBBED_WALL, CALCIFIED_WALL));
-
     /** A wall cell turned into translucent membrane in a bone frame; joined windows read as one pane. */
     public static final DeferredBlock<MembraneWindowBlock> MEMBRANE_WINDOW = BLOCKS.registerBlock(
             "membrane_window",
@@ -77,22 +75,68 @@ public final class EcologyModule {
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false)
                     .pushReaction(PushReaction.BLOCK));
-    /** A two-high doorway in a wall whose membrane blades open like an iris. */
-    public static final DeferredBlock<SphincterDoorBlock> SPHINCTER_DOOR = BLOCKS.registerBlock(
+    /** A two-high doorway in a wall whose membrane blades open like an iris; a simple door, as a wooden one. */
+    public static final DeferredBlock<SphincterDoorBlock> SPHINCTER_DOOR = door(
             "sphincter_door",
-            SphincterDoorBlock::new,
-            BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.TERRACOTTA_PINK)
-                    .strength(1.5F, 3.0F)
-                    .sound(SoundType.SLIME_BLOCK)
-                    .noOcclusion()
-                    .pushReaction(PushReaction.DESTROY));
+            SphincterDoorBlock.TYPE,
+            MapColor.TERRACOTTA_PINK,
+            1.5F,
+            3.0F,
+            SoundType.SLIME_BLOCK,
+            PushReaction.DESTROY);
+    /** The Sphincter Door hardened by a Skeletal Graft: bone-ribbed, as tough as a Ribbed Wall, redstone only. */
+    public static final DeferredBlock<SphincterDoorBlock> CLENCHED_DOOR = door(
+            "clenched_door",
+            SphincterDoorBlock.CLENCHED,
+            MapColor.TERRACOTTA_WHITE,
+            4.0F,
+            9.0F,
+            SoundType.BONE_BLOCK,
+            PushReaction.BLOCK);
+    /** The Clenched Door hardened by a Calcifying Graft: plated, past any explosion as a Calcified Wall. */
+    public static final DeferredBlock<SphincterDoorBlock> CALCIFIED_DOOR = door(
+            "calcified_door",
+            SphincterDoorBlock.CLENCHED,
+            MapColor.SAND,
+            25.0F,
+            1200.0F,
+            SoundType.BONE_BLOCK,
+            PushReaction.BLOCK);
 
-    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SphincterDoorBlockEntity>> SPHINCTER_DOOR_ENTITY =
-            BLOCK_ENTITIES.register(
-                    "sphincter_door",
-                    () -> BlockEntityType.Builder.of(SphincterDoorBlockEntity::new, SPHINCTER_DOOR.get())
-                            .build(null));
+    private static final Map<String, DeferredHolder<BlockEntityType<?>, BlockEntityType<SphincterDoorBlockEntity>>>
+            DOOR_ENTITIES = new HashMap<>();
+
+    static {
+        for (DeferredBlock<SphincterDoorBlock> door : List.of(SPHINCTER_DOOR, CLENCHED_DOOR, CALCIFIED_DOOR)) {
+            String name = door.getId().getPath();
+            DOOR_ENTITIES.put(
+                    name,
+                    BLOCK_ENTITIES.register(
+                            name,
+                            holder -> BlockEntityType.Builder.of(
+                                            (pos, state) -> new SphincterDoorBlockEntity(
+                                                    BuiltInRegistries.BLOCK_ENTITY_TYPE.get(holder), pos, state),
+                                            door.get())
+                                    .build(null)));
+        }
+    }
+
+    /**
+     * Hardens a Living Wall into a Ribbed Wall and a Sphincter Door into a Clenched Door (ITEM_CATALOG I050, BLOCK_CATALOG
+     * T1-29).
+     */
+    public static final DeferredItem<Item> SKELETAL_GRAFT = ITEMS.registerItem(
+            "skeletal_graft",
+            properties ->
+                    new WallGraftItem(properties, Map.of(LIVING_WALL, RIBBED_WALL, SPHINCTER_DOOR, CLENCHED_DOOR)));
+    /**
+     * Hardens a Ribbed Wall into a Calcified Wall and a Clenched Door into a Calcified Door (ITEM_CATALOG I131, BLOCK_CATALOG
+     * T1-29).
+     */
+    public static final DeferredItem<Item> CALCIFYING_GRAFT = ITEMS.registerItem(
+            "calcifying_graft",
+            properties ->
+                    new WallGraftItem(properties, Map.of(RIBBED_WALL, CALCIFIED_WALL, CLENCHED_DOOR, CALCIFIED_DOOR)));
     /** Turns a wall cell into a Membrane Window (BLOCK_CATALOG T0-12). */
     public static final DeferredItem<Item> MEMBRANE_WINDOW_ITEM =
             ITEMS.registerItem("membrane_window", properties -> new OpeningGraftItem(properties, false));
@@ -101,6 +145,30 @@ public final class EcologyModule {
             ITEMS.registerItem("sphincter_door", properties -> new OpeningGraftItem(properties, true));
 
     private EcologyModule() {}
+
+    /** The block entity type that draws the door of this name. */
+    static BlockEntityType<SphincterDoorBlockEntity> doorEntity(String name) {
+        return DOOR_ENTITIES.get(name).get();
+    }
+
+    private static DeferredBlock<SphincterDoorBlock> door(
+            String id,
+            BlockSetType type,
+            MapColor colour,
+            float hardness,
+            float blastResistance,
+            SoundType sound,
+            PushReaction push) {
+        return BLOCKS.registerBlock(
+                id,
+                properties -> new SphincterDoorBlock(type, id, properties),
+                BlockBehaviour.Properties.of()
+                        .mapColor(colour)
+                        .strength(hardness, blastResistance)
+                        .sound(sound)
+                        .noOcclusion()
+                        .pushReaction(push));
+    }
 
     private static DeferredBlock<LivingWallBlock> wall(
             String id, MapColor colour, float hardness, float blastResistance, SoundType sound) {
@@ -119,7 +187,7 @@ public final class EcologyModule {
         ITEMS.register(modBus);
         BLOCK_ENTITIES.register(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT)
-            OrganRenderers.registerBlock(modBus, "sphincter_door", SPHINCTER_DOOR_ENTITY, 2);
+            DOOR_ENTITIES.forEach((name, type) -> OrganRenderers.registerBlock(modBus, name, type, 2));
         // vanilla skips a block's own use while its user sneaks with an item, so starting a wall listens here
         NeoForge.EVENT_BUS.addListener((PlayerInteractEvent.RightClickBlock event) -> {
             if (LivingWallBlock.start(

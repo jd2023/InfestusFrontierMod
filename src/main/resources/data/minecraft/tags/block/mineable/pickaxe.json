@@ -1,6 +1,8 @@
 {
   "values": [
     "infestusfrontier:ribbed_wall",
-    "infestusfrontier:calcified_wall"
+    "infestusfrontier:calcified_wall",
+    "infestusfrontier:clenched_door",
+    "infestusfrontier:calcified_door"
   ]
 }

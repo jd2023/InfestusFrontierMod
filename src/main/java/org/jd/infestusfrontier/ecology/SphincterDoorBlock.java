@@ -1,10 +1,17 @@
 package org.jd.infestusfrontier.ecology;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.EntityBlock;
@@ -14,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -21,14 +29,17 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A two-high doorway mutated from a wall (BLOCK_CATALOG T1-29): a muscular rim whose membrane blades close like an
- * iris. It is a vanilla door, so hands and redstone open it and its two halves stay one doorway; the lower half keeps
- * the block entity that draws and animates the whole iris, the upper half draws nothing of its own. Closed, a membrane
- * four pixels thick fills the doorway; open, nothing stops a walker. Grown, never placed: broken, it dies into Dead
- * Tissue.
+ * iris. It is a vanilla door, so its two halves stay one doorway; the lower half keeps the block entity that draws and
+ * animates the whole iris, the upper half draws nothing of its own. Closed, a membrane four pixels thick fills the
+ * doorway; open, nothing stops a walker. Grown, never placed: broken, it dies into Dead Tissue.
+ *
+ * <p>The Sphincter Door is a simple door, like a wooden one: hands and redstone open it, so villagers open it too and
+ * zombies on Hard break it down. Grafts harden it into the Clenched and then the Calcified Door, which follow the
+ * vanilla iron door: only redstone opens them, so no mob opens or breaks them, and no piston moves them.
  */
 public final class SphincterDoorBlock extends DoorBlock implements EntityBlock {
-    /** How the doorway sounds and who may open it: any hand, redstone, never an arrow or a wind charge. */
-    static final BlockSetType TYPE = new BlockSetType(
+    /** The simple door's sounds and who may open it: any hand, redstone, never an arrow or a wind charge. */
+    static final BlockSetType TYPE = BlockSetType.register(new BlockSetType(
             "infestusfrontier:sphincter",
             true,
             false,
@@ -42,21 +53,64 @@ public final class SphincterDoorBlock extends DoorBlock implements EntityBlock {
             SoundEvents.SLIME_BLOCK_STEP,
             SoundEvents.SLIME_BLOCK_STEP,
             SoundEvents.SLIME_BLOCK_STEP,
-            SoundEvents.SLIME_BLOCK_STEP);
+            SoundEvents.SLIME_BLOCK_STEP));
 
-    public static final MapCodec<SphincterDoorBlock> CODEC = simpleCodec(SphincterDoorBlock::new);
+    /** The hardened doors: redstone only, as the vanilla iron door, and heavier sounds of bone closing on flesh. */
+    static final BlockSetType CLENCHED = BlockSetType.register(new BlockSetType(
+            "infestusfrontier:clenched",
+            false,
+            false,
+            false,
+            BlockSetType.PressurePlateSensitivity.MOBS,
+            SoundType.BONE_BLOCK,
+            SoundEvents.BONE_BLOCK_PLACE,
+            SoundEvents.HONEY_BLOCK_SLIDE,
+            SoundEvents.BONE_BLOCK_PLACE,
+            SoundEvents.HONEY_BLOCK_SLIDE,
+            SoundEvents.BONE_BLOCK_STEP,
+            SoundEvents.BONE_BLOCK_STEP,
+            SoundEvents.BONE_BLOCK_STEP,
+            SoundEvents.BONE_BLOCK_STEP));
+
+    public static final MapCodec<SphincterDoorBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    BlockSetType.CODEC.fieldOf("block_set_type").forGetter(DoorBlock::type),
+                    Codec.STRING.fieldOf("model").forGetter(door -> door.model),
+                    propertiesCodec())
+            .apply(instance, (type, model, properties) -> new SphincterDoorBlock(type, model, properties)));
     private static final VoxelShape ACROSS_X = Block.box(0, 0, 6, 16, 16, 10);
     private static final VoxelShape ACROSS_Z = Block.box(6, 0, 0, 10, 16, 16);
     private static final VoxelShape JAMBS_X = Shapes.or(Block.box(0, 0, 6, 3, 16, 10), Block.box(13, 0, 6, 16, 16, 10));
     private static final VoxelShape JAMBS_Z = Shapes.or(Block.box(6, 0, 0, 10, 16, 3), Block.box(6, 0, 13, 10, 16, 16));
 
-    SphincterDoorBlock(Properties properties) {
-        super(TYPE, properties);
+    /** The block entity type whose model draws this door, by the name of that model. */
+    private final String model;
+
+    SphincterDoorBlock(BlockSetType type, String model, Properties properties) {
+        super(type, properties);
+        this.model = model;
     }
 
     @Override
     public MapCodec<SphincterDoorBlock> codec() {
         return CODEC;
+    }
+
+    /**
+     * A graft in hand hardens the doorway instead of opening it: vanilla's skip of the block's own use hands the click
+     * to the item.
+     */
+    @Override
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
+        return stack.getItem() instanceof WallGraftItem
+                ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
+                : super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
 
     /** Closed, the membrane across the doorway; open, only the jambs, so a click passes through the doorway. */
@@ -81,6 +135,8 @@ public final class SphincterDoorBlock extends DoorBlock implements EntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return state.getValue(HALF) == DoubleBlockHalf.LOWER ? new SphincterDoorBlockEntity(pos, state) : null;
+        return state.getValue(HALF) == DoubleBlockHalf.LOWER
+                ? new SphincterDoorBlockEntity(EcologyModule.doorEntity(model), pos, state)
+                : null;
     }
 }

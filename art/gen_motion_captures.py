@@ -48,24 +48,25 @@ def main():
 
 
 def door():
-    commands = ['fill -8 -61 -4 8 -54 10 air', 'fill -8 -62 -4 8 -62 10 grass_block',
-                'fill -3 -61 1 3 -61 5 infestusfrontier:living_substrate[stage=mature]',
-                'setblock 0 -60 3 infestusfrontier:sphincter_door[half=lower,facing=north]',
-                'setblock 0 -59 3 infestusfrontier:sphincter_door[half=upper,facing=north]',
-                'kill @e[type=item]']
-    views = []
-    for name, z, yaw, frames, trigger in (
-            ('motion_closed', 0, 0, 32, None),
-            ('opening', 0, 0, 18, 'redstone_block'),
-            ('closing', 0, 0, 18, 'infestusfrontier:living_substrate[stage=mature]'),
-            ('back_opening', 7, 180, 18, 'redstone_block'),
-            ('back_closing', 7, 180, 18, 'infestusfrontier:living_substrate[stage=mature]')):
-        view = dict(name=name, x=0.5, y=-59.5, z=z, yaw=yaw, pitch=0, frames=frames,
-                    frameTicks=1 if trigger else 4)
-        if trigger:
-            view['trigger'] = 'setblock 0 -61 3 ' + trigger
-        views.append(view)
-    (OUT / 'motion_sphincter_door.json').write_text(json.dumps(dict(commands=commands, views=views), indent=2) + '\n')
+    for name in ('sphincter_door', 'clenched_door', 'calcified_door'):
+        commands = ['fill -8 -61 -4 8 -54 10 air', 'fill -8 -62 -4 8 -62 10 grass_block',
+                    'fill -3 -61 1 3 -61 5 infestusfrontier:living_substrate[stage=mature]',
+                    f'setblock 0 -60 3 infestusfrontier:{name}[half=lower,facing=north]',
+                    f'setblock 0 -59 3 infestusfrontier:{name}[half=upper,facing=north]',
+                    'kill @e[type=item]']
+        views = []
+        for view_name, z, yaw, frames, trigger in (
+                ('motion_closed', 0, 0, 32, None),
+                ('opening', 0, 0, 18, 'redstone_block'),
+                ('closing', 0, 0, 18, 'infestusfrontier:living_substrate[stage=mature]'),
+                ('back_opening', 7, 180, 18, 'redstone_block'),
+                ('back_closing', 7, 180, 18, 'infestusfrontier:living_substrate[stage=mature]')):
+            view = dict(name=view_name, x=0.5, y=-59.5, z=z, yaw=yaw, pitch=0, frames=frames,
+                        frameTicks=1 if trigger else 4)
+            if trigger:
+                view['trigger'] = 'setblock 0 -61 3 ' + trigger
+            views.append(view)
+        (OUT / f'motion_{name}.json').write_text(json.dumps(dict(commands=commands, views=views), indent=2) + '\n')
 
 
 def armor():

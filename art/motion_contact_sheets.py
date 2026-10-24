@@ -24,7 +24,7 @@ def main():
         for group, shots in groups.items():
             if len(shots) < 8:
                 continue
-            door = folder.name == 'motion_sphincter_door'
+            door = folder.name.endswith('_door')
             bounds = (465, 140, 815, 680) if door else (365, 245, 915, 515)
             w, h = bounds[2] - bounds[0], bounds[3] - bounds[1]
             sheet = Image.new('RGB', (w * 2, (h + 20) * 4), '#202020')
