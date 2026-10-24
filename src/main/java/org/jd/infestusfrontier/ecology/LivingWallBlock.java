@@ -55,12 +55,13 @@ public final class LivingWallBlock extends Block {
     }
 
     /**
-     * Grows a Living Wall at {@code at} when it is loaded, inside the world, empty and clear of anyone standing there,
-     * as vanilla placement requires; spends one bone meal.
+     * Grows a Living Wall at {@code at} for a player who may build (not a spectator or adventurer) when it is loaded,
+     * inside the world, empty and clear of anyone standing there, as vanilla placement requires; spends one bone meal.
      */
     private static boolean grow(Level level, BlockPos at, Player player, ItemStack stack) {
         BlockState wall = EcologyModule.LIVING_WALL.get().defaultBlockState();
-        if (!level.isInWorldBounds(at)
+        if (!player.mayBuild()
+                || !level.isInWorldBounds(at)
                 || !level.hasChunkAt(at)
                 || !level.getBlockState(at).canBeReplaced()
                 || !level.isUnobstructed(wall, at, CollisionContext.empty())) return false;

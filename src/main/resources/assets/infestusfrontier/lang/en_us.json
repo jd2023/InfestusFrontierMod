@@ -72,7 +72,7 @@
   "entry.infestusfrontier.contact.living_wall.name": "Living Walls",
   "entry.infestusfrontier.contact.living_wall.description": "Grow the colony upward",
   "entry.infestusfrontier.contact.living_wall.use": "Walls are grown, never placed. Sneak and use bone meal on a mature cell: a Living Wall grows on it. Bone meal on the top of a wall grows it one block higher, one block a bone meal. Like every grown cell, a broken wall dies into Dead Tissue, and no piston moves it.",
-  "entry.infestusfrontier.contact.living_wall.tiers": "Grafts harden a wall one block at a time. A Skeletal Graft turns a Living Wall into a Ribbed Wall, tougher than stone. A Calcifying Graft turns a Ribbed Wall into a Calcified Wall, which no explosion breaks; it takes a pickaxe and patience. The Activation Cyst makes both grafts.",
+  "entry.infestusfrontier.contact.living_wall.tiers": "Grafts harden a wall one block at a time. A Skeletal Graft turns a Living Wall into a Ribbed Wall, tougher than stone. A Calcifying Graft turns a Ribbed Wall into a Calcified Wall, which no explosion breaks; a pickaxe takes it down fastest. The Activation Cyst makes both grafts.",
   "entry.infestusfrontier.contact.organ_bud.craft": "Spore Culture, two rotten flesh and bone meal.",
   "entry.infestusfrontier.contact.organ_bud.use": "Place a Bud on Living Substrate. Craft an organ from it. The Culture Bowl grows Buds in batches.",
   "entry.infestusfrontier.contact.digestive_sac.craft": "An Organ Bud, two rotten flesh and a bowl.",

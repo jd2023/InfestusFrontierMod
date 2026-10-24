@@ -148,16 +148,21 @@ def write(path, data):
     path.write_text(json.dumps(data, indent=2) + '\n')
 
 
-def model(elements):
-    return {'parent': 'minecraft:block/block', 'textures': {'flesh': FLESH, 'bone': BONE, 'particle': FLESH},
-            'elements': elements}
+def model(elements, occlusion=True):
+    """A wall model. Bone parts turn off ambient occlusion: with it, vanilla lights a part's side faces from the
+    neighbouring wall they point into, which is dark; without it, every face takes its light from its cullface side."""
+    out = {'parent': 'minecraft:block/block', 'textures': {'flesh': FLESH, 'bone': BONE, 'particle': FLESH},
+           'elements': elements}
+    if not occlusion:
+        out['ambientocclusion'] = False
+    return out
 
 
 def main():
     wall_texture()
     write(MODELS / 'living_wall.json', model([cube()]))
-    write(MODELS / 'ribbed_wall.json', model(ribbed()))
-    write(MODELS / 'calcified_wall.json', model(calcified()))
+    write(MODELS / 'ribbed_wall.json', model(ribbed(), occlusion=False))
+    write(MODELS / 'calcified_wall.json', model(calcified(), occlusion=False))
     turns = [{'model': NS + 'living_wall'}, {'model': NS + 'living_wall', 'x': 90},
              {'model': NS + 'living_wall', 'x': 180}, {'model': NS + 'living_wall', 'x': 90, 'y': 90}]
     write(STATES / 'living_wall.json', {'variants': {'': turns}})

@@ -84,7 +84,7 @@
     "fill 85 -60 -36 85 -59 -36 infestusfrontier:living_wall",
     "fill 87 -60 -36 87 -59 -36 infestusfrontier:ribbed_wall",
     "fill 89 -60 -36 89 -59 -36 infestusfrontier:calcified_wall",
-    "setblock 87 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Living Walls\"','\"sneak+bone meal\"','\"grafts harden:\"','\"ribbed, calcified\"']}}",
+    "setblock 88 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Living Walls\"','\"sneak+bone meal\"','\"grafts harden:\"','\"ribbed, calcified\"']}}",
     "give @s infestusfrontier:spore_culture 16",
     "give @s infestusfrontier:living_substrate 16",
     "give @s bone_meal 64",

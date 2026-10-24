@@ -13,6 +13,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -24,6 +25,8 @@ import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.ecology.LivingSubstrateBlock;
+import org.jd.infestusfrontier.ecology.SubstrateStage;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 
@@ -53,6 +56,63 @@ public final class WallTests {
         h.assertBlockPresent(EcologyModule.LIVING_WALL.get(), cell.above());
         h.assertValueEqual(player.getMainHandItem().getCount(), 2, "one bone meal a block");
         EcologyTests.assertStage(h, cell, org.jd.infestusfrontier.ecology.SubstrateStage.MATURE);
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void onlyTheTopOfAMatureCellStartsAWall(GameTestHelper h) {
+        BlockPos young = new BlockPos(2, Y, 2);
+        BlockPos mature = new BlockPos(5, Y, 2);
+        h.setBlock(
+                young,
+                EcologyModule.LIVING_SUBSTRATE
+                        .get()
+                        .defaultBlockState()
+                        .setValue(LivingSubstrateBlock.STAGE, SubstrateStage.YOUNG));
+        h.setBlock(mature, EcologyTests.mature());
+        FakePlayer player = gardener(h, 3);
+        use(h, player, young, Direction.UP, true);
+        use(h, player, mature, Direction.NORTH, true);
+        h.assertFalse(h.getBlockState(young.above()).is(EcologyModule.LIVING_WALL.get()), "no wall on a young cell");
+        h.assertBlockPresent(Blocks.AIR, mature.above());
+        h.assertBlockPresent(Blocks.AIR, mature.north());
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void spectatorsAndAdventurersGrowNoWall(GameTestHelper h) {
+        BlockPos cell = new BlockPos(2, Y, 2);
+        BlockPos wall = new BlockPos(5, Y + 1, 2);
+        h.setBlock(cell, EcologyTests.mature());
+        h.setBlock(wall.below(), EcologyTests.mature());
+        h.setBlock(wall, EcologyModule.LIVING_WALL.get());
+        for (GameType mode : List.of(GameType.ADVENTURE, GameType.SPECTATOR)) {
+            FakePlayer player = gardener(h, 2);
+            player.setGameMode(mode);
+            use(h, player, cell, Direction.UP, true);
+            use(h, player, wall, Direction.UP, false);
+            h.assertBlockPresent(Blocks.AIR, cell.above());
+            h.assertBlockPresent(Blocks.AIR, wall.above());
+            h.assertValueEqual(player.getMainHandItem().getCount(), 2, mode + " spends no bone meal");
+            player.setGameMode(GameType.SURVIVAL);
+        }
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void creativeSpendsNeitherBoneMealNorGrafts(GameTestHelper h) {
+        BlockPos cell = new BlockPos(2, Y, 2);
+        h.setBlock(cell, EcologyTests.mature());
+        FakePlayer player = gardener(h, 1);
+        player.setGameMode(GameType.CREATIVE);
+        use(h, player, cell, Direction.UP, true);
+        h.assertBlockPresent(EcologyModule.LIVING_WALL.get(), cell.above());
+        h.assertValueEqual(player.getMainHandItem().getCount(), 1, "the bone meal is kept");
+        player.setGameMode(GameType.SURVIVAL);
+        var hand = EcologyTests.holding(h, GameType.CREATIVE, EcologyModule.SKELETAL_GRAFT.get(), 1);
+        EcologyTests.use(h, hand, cell.above(), Direction.NORTH);
+        h.assertBlockPresent(EcologyModule.RIBBED_WALL.get(), cell.above());
+        h.assertValueEqual(hand.getMainHandItem().getCount(), 1, "the graft is kept");
         h.succeed();
     }
 
@@ -177,6 +237,7 @@ public final class WallTests {
         FakePlayer player = FakePlayerFactory.get(
                 h.getLevel(), new GameProfile(UUID.fromString("7a1c33f2-0b5e-4f7e-9d0e-5b8a2f4c6e10"), "wall_tests"));
         player.setShiftKeyDown(false);
+        player.setGameMode(GameType.SURVIVAL);
         player.getInventory().clearContent();
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BONE_MEAL, count));
         return player;
