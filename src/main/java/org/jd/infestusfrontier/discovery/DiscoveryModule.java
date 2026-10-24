@@ -93,6 +93,7 @@ public final class DiscoveryModule {
                         output.accept(CultivationModule.HARVEST_COROLLA_ITEM.get());
                         output.accept(ProcessingModule.COMPOST_GLAND_ITEM.get());
                         output.accept(ControlModule.SENSOR_POLYP_ITEM.get());
+                        output.accept(ControlModule.TREAD_RECEPTOR_ITEM.get());
                         output.accept(EquipmentModule.FUEL_PAPILLA_ITEM.get());
                         for (var piece : List.of(
                                 EquipmentModule.DORMANT_HOOD,

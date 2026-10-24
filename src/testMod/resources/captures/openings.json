@@ -17,6 +17,10 @@
     "setblock 10 -60 2 infestusfrontier:calcified_door[half=lower,facing=north]",
     "setblock 10 -59 2 infestusfrontier:calcified_door[half=upper,facing=north]",
     "setblock 9 -60 1 stone_button[face=wall,facing=north]",
+    "setblock 8 -61 1 infestusfrontier:tread_receptor",
+    "setblock 10 -61 1 infestusfrontier:tread_receptor",
+    "kill @e[type=armor_stand,tag=receptor_demo]",
+    "summon armor_stand 8.5 -60 1.5 {Tags:[\"receptor_demo\"],NoBasePlate:1b,Rotation:[180f,0f]}",
     "give @s infestusfrontier:membrane_window",
     "give @s infestusfrontier:sphincter_door"
   ],
@@ -76,6 +80,14 @@
       "z": 7.0,
       "yaw": 180,
       "pitch": 6
+    },
+    {
+      "name": "receptors",
+      "x": 9.0,
+      "y": -58.0,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 40
     },
     {
       "name": "windows",

@@ -136,7 +136,7 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I021 | Capillary Gel | Cyst: 1 Elastic Gel + 1 Binder + 50 BU → 2 | Biomass Vein and Fuel Papilla tissue grafts; Nutrient Intake; organic pumping upgrades. |
 | I022 | Filter Membrane | Cyst: 1 sand + 1 Sheet + 50 mB water + 25 BU → 1 | Washing/filtration attachments and Fluid Vein treatment. Sand becomes embedded filter material. |
 | I023 | Contractile Fiber | Cyst: 1 string + 1 leather + 1 Binder + 50 BU → 2 | Item Veins, terrain stitches, transport-organ upgrades. |
-| I024 | Synaptic Gel | Cyst: 1 redstone dust + 1 string + 1 Binder + 50 BU → 2 | Nerve Tissue and control treatments. Not electrical fuel. |
+| I024 | Synaptic Gel | Cyst: 1 redstone dust + 1 string + 1 Binder + 50 BU → 2 | Nerve Tissue and control treatments; with a spider eye, the Tread Receptor graft. Not electrical fuel. |
 | I026 | Digestive Enzyme | Cyst: 1 fermented spider eye + 1 Elastic Gel + 1 Binder + 50 BU → 2 | Digestive Tissue; digestive-organ upgrades; C13 Digestive Crop graft preparation with zombie stock. No DNA required for the simple defensive floor; armor has its own genome gate. |
 | I027 | Locomotor Gel | Cyst: 1 sugar + 1 rabbit hide + 1 Binder + 50 BU → 2 | Travel Tissue; later DNA-specific acceleration treatments. |
 | I028 | Sealing Resin | Cyst: 1 resin or Elastic Gel + 1 Sheet + 25 BU → 2 | Chemical lining; sealed containers. Does not provide thermal/spatial protection. |

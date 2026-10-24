@@ -204,6 +204,7 @@ public final class DiscoveryTests {
                 "calcifying_graft",
                 "membrane_window",
                 "sphincter_door",
+                "tread_receptor",
                 "membrane_rack",
                 "membrane_sheet",
                 "bone_loom",

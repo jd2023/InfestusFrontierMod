@@ -470,6 +470,12 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 Filter Membrane; root on ordinary or the required native bed.
 - **Growth:** Choose speed or biomass economy. Thermal Lining treatment permits Nether fruit; Spatial Membrane treatment permits chorus. No electricity required for first operation.
 
+### T1-40 — Tread Receptor
+- **Does:** Owner, 2026-10-24: a mutation of Living Substrate into a detector that works like a pressure plate. A flush cell whose sunken pad of nerve bulbs feels who stands on it: any living creature presses it, as on a stone plate, and it springs back a second after the last one leaves; items do not. Pressed, its bulbs light and it powers the blocks beside and below it, so a door standing on the next cell opens.
+- **Input → output:** A creature standing on it → redstone power 15. No biomass.
+- **Create:** Craft the graft from 1 Synaptic Gel + 1 spider eye and use it on an exposed mature substrate cell. Grown, never placed: broken, it dies into Dead Tissue.
+- **Growth:** Mobs press it too, so a receptor outside a Clenched Door lets zombies in; where the receptors go is part of planning a base. Later mutations could count weight or admit only the colony's own.
+
 ## T2 — Directed mutation: genomes, specialized organs and planned excavation
 
 Build sample processing and a physical DNA bank. A genome is available only through a connected loaded compatible bank; no personal research level grants remote access. Collecting unrelated samples is not a substitute.

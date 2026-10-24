@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "infestusfrontier:block/tread_receptor"
+    },
+    "powered=true": {
+      "model": "infestusfrontier:block/tread_receptor_pressed"
+    }
+  }
+}

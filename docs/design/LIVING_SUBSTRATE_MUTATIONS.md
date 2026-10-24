@@ -37,6 +37,7 @@ Each cell has **one primary function**. Mutating it does not remove its ability 
 | **Fluid Vein** | Filter Membrane + Sealing Resin. | Carries one selected liquid; hot liquids require heat lining. | Pumping supply and a receiving tank/consumer. |
 | **Item Vein** | Contractile Fiber. | Carries item packets along configured faces. | Connected transfer organs and free destination space. |
 | **Nerve Tissue** | Synaptic Gel. | Carries control signals, separate from resources and power. | Input signal; no biomass upkeep. |
+| **Tread Receptor** | Synaptic Gel + spider eye on an exposed mature cell. | A flush pressure plate: a creature standing on it powers the blocks beside and below it, so a door on the next cell opens. | No upkeep. |
 | **Steam Vein** | Mutate a Fluid Vein with Thermal Lining + Bone Plate. | Carries steam; uses the heat lining slot and needs a condensate outlet. | Supplied steam; pressure falls as work and heat are lost. |
 | **Conductive Tissue** | Conductive Myelin. | Carries electricity through a separate circuit. | Actual electrical input. |
 | **Cultivation Tissue** | Hoe the mature cell, then apply Rooting Gel and the selected seed. The hoe is not consumed. | Maintains crop growth. Planting, harvest and seed/output reserves belong to separate organs or player actions. | Water; optional biomass-assisted growth. |
