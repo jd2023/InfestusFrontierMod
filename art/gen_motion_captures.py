@@ -46,7 +46,7 @@ def main():
 
 def armor():
     commands = ['kill @e[type=armor_stand,tag=visual_audit]', 'fill -8 -61 -4 8 -54 10 air',
-                'fill -8 -62 -4 8 -61 10 grass_block']
+                'fill -8 -62 -4 8 -61 10 grass_block', 'kill @e[type=item]']
     for x, kind in ((-1, 'dormant'), (1, 'awakened')):
         items = ','.join('{id:"infestusfrontier:' + kind + '_' + piece + '",count:1}'
                          for piece in ('treads', 'legwraps', 'thorax', 'hood'))

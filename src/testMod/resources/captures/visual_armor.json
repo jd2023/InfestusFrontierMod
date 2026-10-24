@@ -3,6 +3,7 @@
     "kill @e[type=armor_stand,tag=visual_audit]",
     "fill -8 -61 -4 8 -54 10 air",
     "fill -8 -62 -4 8 -61 10 grass_block",
+    "kill @e[type=item]",
     "summon armor_stand -1 -60 3 {Tags:[\"visual_audit\"],NoGravity:1b,ShowArms:1b,NoBasePlate:1b,ArmorItems:[{id:\"infestusfrontier:dormant_treads\",count:1},{id:\"infestusfrontier:dormant_legwraps\",count:1},{id:\"infestusfrontier:dormant_thorax\",count:1},{id:\"infestusfrontier:dormant_hood\",count:1}],Rotation:[180f,0f],Pose:{LeftArm:[-35f,0f,-15f],RightArm:[-70f,0f,15f],LeftLeg:[-20f,0f,0f],RightLeg:[20f,0f,0f]}}",
     "summon armor_stand 1 -60 3 {Tags:[\"visual_audit\"],NoGravity:1b,ShowArms:1b,NoBasePlate:1b,ArmorItems:[{id:\"infestusfrontier:awakened_treads\",count:1},{id:\"infestusfrontier:awakened_legwraps\",count:1},{id:\"infestusfrontier:awakened_thorax\",count:1},{id:\"infestusfrontier:awakened_hood\",count:1}],Rotation:[180f,0f],Pose:{LeftArm:[-35f,0f,-15f],RightArm:[-70f,0f,15f],LeftLeg:[-20f,0f,0f],RightLeg:[20f,0f,0f]}}"
   ],

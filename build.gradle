@@ -296,7 +296,7 @@ abstract class VerifyCaptures extends DefaultTask {
                 java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(image)
                 if (img == null) { problems << "${label}: not a readable PNG"; return }
                 int w = img.width, h = img.height, n = w * h
-                double[] stats = imageStats(img)
+                double[] stats = VerifyCaptures.imageStats(img)
                 long magenta = (long) stats[0]
                 double stddev = stats[1]
                 if (magenta * 1000 > n * 2) problems << "${label}: ${magenta} missing-texture pixels"
@@ -326,7 +326,7 @@ abstract class VerifyCaptures extends DefaultTask {
 
     // Timed sequences inspect every pixel of every frame; compile this hot loop without Groovy boxing.
     @groovy.transform.CompileStatic
-    private static double[] imageStats(java.awt.image.BufferedImage img) {
+    static double[] imageStats(java.awt.image.BufferedImage img) {
         int w = img.width, h = img.height, n = w * h
         long magenta = 0
         double sum = 0, sumSq = 0
