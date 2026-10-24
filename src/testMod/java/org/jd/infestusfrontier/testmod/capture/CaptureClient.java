@@ -410,13 +410,14 @@ final class CaptureClient {
     }
 
     /** Player position, camera angles and render state, for the timeout message. */
-    private static String where(Minecraft minecraft) {
+    private String where(Minecraft minecraft) {
         if (minecraft.player == null || minecraft.level == null) return " (not in a world)";
         var renderer = minecraft.levelRenderer;
         var camera = minecraft.gameRenderer.getMainCamera();
+        Scenario.View view = scenarioIndex < scenarios.size() ? currentView() : null;
         return String.format(
                 Locale.ROOT,
-                " at %.3f %.3f %.3f yaw %.2f pitch %.2f flying=%s sections=%d all=%s screen=%s",
+                " at %.3f %.3f %.3f yaw %.2f pitch %.2f flying=%s sections=%d all=%s chunks=%s compiled=%s screen=%s",
                 minecraft.player.getX(),
                 minecraft.player.getY(),
                 minecraft.player.getZ(),
@@ -425,6 +426,8 @@ final class CaptureClient {
                 minecraft.player.getAbilities().flying,
                 renderer.countRenderedSections(),
                 renderer.hasRenderedAllSections(),
+                view != null && chunksArrived(minecraft, view),
+                renderer.isSectionCompiled(minecraft.player.blockPosition()),
                 minecraft.screen == null ? null : minecraft.screen.getClass().getSimpleName());
     }
 

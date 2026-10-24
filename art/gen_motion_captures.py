@@ -12,8 +12,10 @@ MODELS = ('culture_bowl', 'digestive_sac', 'membrane_rack', 'bone_loom', 'awaken
 
 
 def scene(name, left, right, frames=48):
+    # Move while ticks run so the server tracks the fixture's chunks before freezing.
     spec = {
         'commands': [
+            'tp @s 0.5 -59.5 0 0 22',
             'fill -8 -61 -4 8 -54 10 air', 'fill -8 -62 -4 8 -62 10 grass_block',
             'kill @e[type=item]', 'tick freeze',
             'fill -3 -61 1 3 -61 5 infestusfrontier:living_substrate[stage=mature]',
