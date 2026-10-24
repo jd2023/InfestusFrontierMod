@@ -232,19 +232,19 @@ PARTS = {
     # under the bottom layer: the fleshy floor of the tank
     'base': [box((0, 0, 0), (16, 2, 16), 'flesh', ['up', 'down'] + SIDES, cull=['down'] + SIDES)],
     # a rounded lip along a bottom edge that faces out
-    'foot': [box((0, 0, -0.375), (16, 2.5, 1.125), 'flesh', ['north', 'up', 'south'])],
+    'foot': [box((1.5, 0, -0.375), (14.5, 2.5, 1.125), 'flesh', ['north', 'up', 'south'])],
     # a side membrane over the base, and one running the full height above the bottom layer
     'pane_low': [box((0, 2, 0), (16, 16, 0.5), 'membrane', ['north', 'south'], cull=['north'])],
     'pane_tall': [box((0, 0, 0), (16, 16, 0.5), 'membrane', ['north', 'south'], cull=['north'])],
     'lid': [box((0, 15.5, 0), (16, 16, 16), 'membrane', ['up', 'down'], cull=['up'])],
-    'rim': [box((0, 14.5, -0.375), (16, 16.25, 1.125), 'flesh', ['north', 'up', 'down', 'south'])],
+    'rim': [box((2, 14.5, -0.375), (14, 16.25, 1.125), 'flesh', ['north', 'up', 'down', 'south'])],
     # a corner rib rounded by two cross bars over a square core; every face plane differs from the panes and the rims
     'rib': [box((-0.125, 0, -0.125), (1.5, 16, 1.5), 'bone', SIDES),
             box((-0.3125, 0, 0.3125), (1.8125, 16, 1.0), 'bone', SIDES),
             box((0.3125, 0, -0.3125), (1.0, 16, 1.8125), 'bone', SIDES)],
     # a domed cap: the lower cross bar shows round the edge of the upper one
-    'knuckle': [box((-0.5, 14.75, -0.125), (2, 16.75, 1.625), 'bone', ['up', 'down'] + SIDES),
-                box((-0.125, 14.875, -0.5), (1.625, 16.625, 2), 'bone', ['up', 'down'] + SIDES)],
+    'knuckle': [box((-0.5, 14.75, -0.25), (2, 16.75, 1.625), 'bone', ['up', 'down'] + SIDES),
+                box((-0.25, 14.875, -0.5), (1.625, 16.625, 2), 'bone', ['up', 'down'] + SIDES)],
 }
 TEXTURE_MAP = {
     'membrane': NS + 'reservoir_membrane',

@@ -104,11 +104,14 @@ def span(face, inward):
 
 
 def rib(f, g):
-    """A rounded bone bar along the edge between faces f and g: a core and two cross bars, every face shown."""
+    """A rounded bone bar made of five disjoint strips, with no overlapping end caps."""
     axis = ({'x', 'y', 'z'} - {FACE_AXIS[f], FACE_AXIS[g]}).pop()
     core, wide, narrow = SECTIONS[axis]
     elements = []
-    for sf, sg in ((core, core), (wide, narrow), (narrow, wide)):
+    sections = [(core, core)]
+    for wing in ((wide[0], core[0]), (core[1], wide[1])):
+        sections.extend(((wing, narrow), (narrow, wing)))
+    for sf, sg in sections:
         lo, hi = [0.0, 0.0, 0.0], [16.0, 16.0, 16.0]
         for face, inward in ((f, sf), (g, sg)):
             k = 'xyz'.index(FACE_AXIS[face])
