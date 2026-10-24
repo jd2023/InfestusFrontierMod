@@ -105,16 +105,16 @@ CENTRE = (0.0, 15.0)
 OPENING = (-4, 2, 4, 28)  # x0, y0, x1, y1 between the lips
 # flaps: name, origin, size, the pivot at its outer corner, the twist it turns as it shrinks there
 FLAPS = [
-    ('flap_tl', [-4, 15, -0.5], [5, 13, 1], [-4, 28, 0], 20),
-    ('flap_tr', [-1, 15, -0.75], [5, 13, 1], [4, 28, 0], -20),
-    ('flap_bl', [-4, 2, -0.6], [5, 14, 1], [-4, 2, 0], -20),
-    ('flap_br', [-1, 2, -0.85], [5, 14, 1], [4, 2, 0], 20),
+    ('flap_tl', [-4.125, 15.125, -0.5], [5, 13, 1], [-4, 28, 0], 20),
+    ('flap_tr', [-0.875, 15.25, -0.75], [5, 13, 1], [4, 28, 0], -20),
+    ('flap_bl', [-4.25, 1.875, -0.6], [5, 15, 1], [-4, 2, 0], -20),
+    ('flap_br', [-0.75, 1.75, -0.85], [5, 15, 1], [4, 2, 0], 20),
 ]
 OPEN_SCALE = 0.08
 # raised folds on each flap's front, radiating from the pucker: degrees from the vertical, length
 RIDGES = ((12, 12), (38, 6))
 RIDGE_Z = -1.35
-SHUT, IDLE = 0.5, 4.0
+SHUT, IDLE = 0.5, 6.5
 
 
 def covered():
@@ -142,10 +142,10 @@ def bones():
         ('fillet', [2, 2, -1], [2, 3, 2], None),
         ('fillet', [-4, 25, -1], [2, 3, 2], None),
         ('fillet', [2, 25, -1], [2, 3, 2], None),
-        ('band', [-7, 6, -4], [2, 2, 8], None),
-        ('band', [5, 6, -4], [2, 2, 8], None),
-        ('band', [-7, 23, -4], [2, 2, 8], None),
-        ('band', [5, 23, -4], [2, 2, 8], None),
+        ('band', [-7.125, 6, -4], [2, 2, 8], None),
+        ('band', [5.125, 6, -4], [2, 2, 8], None),
+        ('band', [-7.125, 23, -4], [2, 2, 8], None),
+        ('band', [5.125, 23, -4], [2, 2, 8], None),
     ]
     out = [('root', None, [0, 0, 0], []), ('frame', 'root', [0, 0, 0], frame)]
     for name, origin, size, pivot, _ in FLAPS:

@@ -135,7 +135,8 @@ class OrganMotionTest(unittest.TestCase):
                         values = sorted((float(t), v) for t, v in keys.items())
                         self.assertEqual(values[0][0], 0, (name, clip, bone, channel))
                         self.assertLessEqual(values[-1][0], animation['animation_length'])
-                        self.assertEqual(values[0][1], values[-1][1], (name, clip, bone, channel))
+                        if animation['loop'] is True:
+                            self.assertEqual(values[0][1], values[-1][1], (name, clip, bone, channel))
                         for t, value in values:
                             self.assertTrue(all(math.isfinite(v) for v in value))
                             if channel == 'scale':
@@ -147,6 +148,18 @@ class OrganMotionTest(unittest.TestCase):
     def test_compost_has_its_own_silhouette_and_source(self):
         self.assertNotEqual(geometry('compost_gland')['bones'], geometry('bone_loom')['bones'])
         self.assertTrue((ASSETS.parents[4] / 'art/compost_gland.bbmodel').is_file())
+
+    def test_door_transitions_meet_open_pose_and_closed_flaps_seal(self):
+        import gen_openings as door
+        self.assertTrue(door.covered())
+        clips = animations('sphincter_door')
+        for name, channels in clips['open']['bones'].items():
+            for channel, keys in channels.items():
+                opened = next(iter(keys.values()))
+                opening = clips['opening']['bones'][name][channel]
+                closing = clips['closing']['bones'][name][channel]
+                self.assertEqual(opening[max(opening, key=float)], opened)
+                self.assertEqual(closing[min(closing, key=float)], opened)
 
     def test_drop_is_invisible_on_both_sides_of_its_reset(self):
         drop = animations('membrane_rack')['working']['bones']['drop']['scale']
