@@ -47,6 +47,8 @@ public final class SphincterDoorBlock extends DoorBlock implements EntityBlock {
     public static final MapCodec<SphincterDoorBlock> CODEC = simpleCodec(SphincterDoorBlock::new);
     private static final VoxelShape ACROSS_X = Block.box(0, 0, 6, 16, 16, 10);
     private static final VoxelShape ACROSS_Z = Block.box(6, 0, 0, 10, 16, 16);
+    private static final VoxelShape JAMBS_X = Shapes.or(Block.box(0, 0, 6, 3, 16, 10), Block.box(13, 0, 6, 16, 16, 10));
+    private static final VoxelShape JAMBS_Z = Shapes.or(Block.box(6, 0, 0, 10, 16, 3), Block.box(6, 0, 13, 10, 16, 16));
 
     SphincterDoorBlock(Properties properties) {
         super(TYPE, properties);
@@ -57,10 +59,12 @@ public final class SphincterDoorBlock extends DoorBlock implements EntityBlock {
         return CODEC;
     }
 
-    /** The membrane across the doorway, open or closed, so the doorway can always be clicked. */
+    /** Closed, the membrane across the doorway; open, only the jambs, so a click passes through the doorway. */
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return state.getValue(FACING).getAxis() == Direction.Axis.Z ? ACROSS_X : ACROSS_Z;
+        boolean acrossX = state.getValue(FACING).getAxis() == Direction.Axis.Z;
+        if (isOpen(state)) return acrossX ? JAMBS_X : JAMBS_Z;
+        return acrossX ? ACROSS_X : ACROSS_Z;
     }
 
     /** Closed, the membrane stops a walker; open, nothing does. */

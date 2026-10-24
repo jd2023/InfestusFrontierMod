@@ -9,15 +9,16 @@ keeps one frame round its outside and none inside. The models turn off ambient o
 the open side, as the hardened walls do. The membrane and the bone are the Reservoir's painted textures.
 
 A Sphincter Door is a muscular rim, a jamb on each side with bone bands, a lintel and a sill, round a doorway closed
-by six membrane blades. Each blade hangs from a pivot on the rim and points past the centre with a slight twist, so
-the closed iris reads as a spiral. Opening turns every blade further about its pivot and shrinks it into the rim;
-closing reverses it. The block entity plays closed or open as a loop, and opening or closing once when the door
-changes.
+by four membrane flaps that meet in the middle under a dark pucker. Raised folds run out from the pucker to the rim,
+two on each flap, and each flap is painted with finer folds, so the closed door reads as one puckered orifice; the flaps tile the doorway exactly, and the
+generator fails if any pixel between the lips is left open. Opening shrinks every flap into its outer corner, behind
+the rim's fillets, with a little twist, and the pucker vanishes: the hole dilates from the centre. Closing reverses
+it. The block entity plays closed or open as a loop, and opening or closing once when the door changes.
 """
 import json
 import math
 
-from organ_model import Painter, faces, islands, pack, sampled, skin, folds, bone_along, wave, write as write_organ
+from organ_model import Painter, faces, islands, pack, sampled, skin, folds, wave, write as write_organ
 from gen_reservoir import MODELS, NS, STATES, ITEMS
 
 # --- the window ---
@@ -25,6 +26,7 @@ from gen_reservoir import MODELS, NS, STATES, ITEMS
 MEMBRANE = NS + 'reservoir_membrane'
 BONE = NS + 'reservoir_bone'
 BAR = 2
+INSET = 0.05
 DIRS = ['north', 'east', 'south', 'west', 'up', 'down']
 AXIS = {'north': 'z', 'south': 'z', 'east': 'x', 'west': 'x', 'up': 'y', 'down': 'y'}
 LOW = {'north': True, 'west': True, 'down': True, 'south': False, 'east': False, 'up': False}
@@ -35,8 +37,9 @@ def write(path, data):
 
 
 def pane():
+    """Membrane on every face, set a hair inside the cube so the bone bars, flush with the faces, always lie in front."""
     faces_ = {d: {'uv': [0, 0, 16, 16], 'texture': '#membrane', 'cullface': d} for d in DIRS}
-    return {'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': faces_}
+    return {'from': [INSET] * 3, 'to': [16 - INSET] * 3, 'faces': faces_}
 
 
 def span(direction):
@@ -45,14 +48,18 @@ def span(direction):
 
 
 def bar(a, b):
-    """The bone bar along the edge where faces {@code a} and {@code b} meet, inside the block."""
+    """The bone bar along the edge where faces {@code a} and {@code b} meet, inside the block; each face's texture is
+    cut to its own size, a 2 by 16 strip along the bar and a 2 by 2 square at each end."""
     lo, hi = [0, 0, 0], [16, 16, 16]
     for d in (a, b):
         i = 'xyz'.index(AXIS[d])
         lo[i], hi[i] = span(d)
+    size = [hi[i] - lo[i] for i in range(3)]
+    plane = {'x': ('z', 'y'), 'y': ('x', 'z'), 'z': ('x', 'y')}
     faces_ = {}
     for d in DIRS:
-        face = {'uv': [0, 0, 16, BAR] if AXIS[d] not in (AXIS[a], AXIS[b]) else [0, 0, BAR, BAR], 'texture': '#bone'}
+        u, v = plane[AXIS[d]]
+        face = {'uv': [0, 0, size['xyz'.index(u)], size['xyz'.index(v)]], 'texture': '#bone'}
         if d in (a, b):
             face['cullface'] = d
         faces_[d] = face
@@ -94,28 +101,30 @@ PUCKER = [(30, 8, 16), (52, 14, 28), (80, 24, 42)]
 PETAL = [(96, 30, 52), (136, 52, 74), (176, 84, 100), (208, 122, 132), (232, 166, 168)]
 VEIN = (120, 28, 52)
 CENTRE = (0.0, 15.0)
-RIM = (4.5, 13.5)
-# blades: angle of the pivot on the rim (degrees from +x), width
-BLADES = [(90, 6), (270, 6), (30, 7), (150, 7), (210, 7), (330, 7)]
-TWIST = 25
-OPEN_TURN = 55
-OPEN_SCALE = 0.25
+OPENING = (-4, 2, 4, 28)  # x0, y0, x1, y1 between the lips
+# flaps: name, origin, size, the pivot at its outer corner, the twist it turns as it shrinks there
+FLAPS = [
+    ('flap_tl', [-4, 15, -0.5], [5, 13, 1], [-4, 28, 0], 20),
+    ('flap_tr', [-1, 15, -0.75], [5, 13, 1], [4, 28, 0], -20),
+    ('flap_bl', [-4, 2, -0.6], [5, 14, 1], [-4, 2, 0], -20),
+    ('flap_br', [-1, 2, -0.85], [5, 14, 1], [4, 2, 0], 20),
+]
+OPEN_SCALE = 0.08
+# raised folds on each flap's front, radiating from the pucker: degrees from the vertical, length
+RIDGES = ((12, 12), (38, 6))
+RIDGE_Z = -1.35
 SHUT, IDLE = 0.5, 4.0
 
 
-def blade_cube(index, angle, width):
-    px = RIM[0] * math.cos(math.radians(angle)) + CENTRE[0]
-    py = RIM[1] * math.sin(math.radians(angle)) + CENTRE[1]
-    dx, dy = CENTRE[0] - px, CENTRE[1] - py
-    length = round(math.hypot(dx, dy) + 3)
-    # the cube hangs down from its pivot; this turn points it at the centre, plus the twist of the iris
-    # geo turns about +z clockwise as seen from the front, the opposite of the maths angle
-    phi = -(math.degrees(math.atan2(dx, -dy)) + TWIST)
-    z = -1.5 + 0.6 * index
-    pivot = [round(px, 3), round(py, 3), 0]
-    cube = ('blade_%d' % width + '_%d' % length, [round(px - width / 2, 3), round(py - length, 3), round(z, 3)],
-            [width, length, 1], ([0, 0, round(phi, 3)], [pivot[0], pivot[1], round(z, 3)]))
-    return pivot, cube
+def covered():
+    """True when the closed flaps cover every pixel of the doorway between the lips."""
+    x0, y0, x1, y1 = OPENING
+    for x in range(x0, x1):
+        for y in range(y0, y1):
+            if not any(o[0] <= x and x + 1 <= o[0] + sz[0] and o[1] <= y and y + 1 <= o[1] + sz[1]
+                       for _, o, sz, _, _ in FLAPS):
+                return False
+    return True
 
 
 def bones():
@@ -138,12 +147,32 @@ def bones():
         ('band', [5, 23, -4], [2, 2, 8], None),
     ]
     out = [('root', None, [0, 0, 0], []), ('frame', 'root', [0, 0, 0], frame)]
-    for i, (angle, width) in enumerate(BLADES):
-        pivot, cube = blade_cube(i, angle, width)
-        out.append(('blade_%d' % i, 'root', pivot, [cube]))
-    # the pucker where the blades meet, in front of and behind them; it shrinks away as the iris opens
-    out.append(('pucker', 'root', [0, 15, 0], [('pucker', [-1, 14, -2.5], [2, 2, 5], None)]))
+    for name, origin, size, pivot, _ in FLAPS:
+        cubes = [(name, origin, size, None)]
+        side = 1 if name.endswith('r') else -1  # +x for the flaps on the right of the model
+        up = name[5] == 't'
+        for angle, length in RIDGES:
+            # the cube runs from the centre along +y (top flaps) or -y (bottom ones) and turns out into its flap;
+            # geo turns about +z clockwise as seen from the front
+            y0 = CENTRE[1] if up else CENTRE[1] - length
+            turn = side * angle if up else -side * angle
+            cubes.append(('ridge_%d' % length, [CENTRE[0] - 0.5, y0, RIDGE_Z], [1, length, 1],
+                          ([0, 0, -turn], [CENTRE[0], CENTRE[1], RIDGE_Z])))
+        out.append((name, 'root', pivot, cubes))
+    # the pucker where the flaps meet, standing in front of and behind them; it shrinks away as the doorway dilates
+    out.append(('pucker', 'root', [0, 15, 0], [('pucker', [-1, 14, -1.5], [2, 2, 3], None)]))
     return out
+
+
+def pleats(cx, cy):
+    """Folds radiating from the texel (cx, cy), the doorway's centre, darker towards it."""
+    def value(x, y, w, h):
+        dx, dy = x - cx, y - cy
+        dist = math.hypot(dx, dy)
+        angle = math.atan2(dy, dx)
+        v = 0.5 + 0.24 * math.cos(9 * angle) * min(1.0, dist / 3) + 0.012 * dist
+        return v - 0.3 * max(0.0, 1 - dist / 4)
+    return value
 
 
 def textures(model_bones, uv):
@@ -164,50 +193,46 @@ def textures(model_bones, uv):
     for rect in rects['pucker'].values():
         p.ramp(rect, PUCKER, lambda x, y, w, h: 0.3, grain=0.03, mottle=0.1)
     for name in sizes:
-        if not name.startswith('blade'):
-            continue
+        if name.startswith('ridge'):
+            for face, rect in rects[name].items():
+                crest = face in ('north', 'south')
+                p.ramp(rect, PETAL, lambda x, y, w, h, c=crest: (0.78 if c else 0.3) - 0.2 * (y / max(1, h - 1)),
+                       grain=0.03, mottle=0.08)
+    for name, origin, size, _, _ in FLAPS:
+        x0, y0 = origin[0], origin[1]
+        x1, y1 = x0 + size[0], y0 + size[1]
         for face, rect in rects[name].items():
-            if face in ('north', 'south'):
-                # dark under the leading edge where the next blade overlaps it, a light crest along the trailing one
-                lead = 0 if face == 'north' else None
-
-                def petal(x, y, w, h, flip=(face == 'south')):
-                    t = (w - 1 - x if flip else x) / max(1, w - 1)
-                    v = 0.25 + 0.55 * t + 0.08 * (y / max(1, h - 1))
-                    if t == 0:
-                        v = 0.05
-                    elif t >= 0.99:
-                        v = 0.95
-                    return v
-                p.ramp(rect, PETAL, petal, grain=0.04, mottle=0.12, alpha=245)
-                p.vein(rect, VEIN, rect[3] // 2, alpha=245)
+            if face == 'north':  # seen from the front, the face's left edge is the flap's +x edge
+                p.ramp(rect, PETAL, pleats(x1 - CENTRE[0] - 0.5, y1 - CENTRE[1] - 0.5), grain=0.03, mottle=0.1)
+                p.vein(rect, VEIN, rect[3] // 2)
+            elif face == 'south':  # seen from behind, the left edge is the flap's -x edge
+                p.ramp(rect, PETAL, pleats(CENTRE[0] - x0 - 0.5, y1 - CENTRE[1] - 0.5), grain=0.03, mottle=0.1)
+                p.vein(rect, VEIN, rect[3] // 2)
             else:
                 p.ramp(rect, LIP, lambda x, y, w, h: 0.4, mottle=0.1)
     return p, rects['jamb']['north']
 
 
-def blade_keys(turn, scale):
-    return {'rotation': {'0.0': [0, 0, turn]}, 'scale': {'0.0': [scale, scale, scale]}}
-
-
 def animations(model_bones):
-    blades = [name for name, _, _, _ in model_bones if name.startswith('blade')]  # the pucker follows them
-    closed = {b: {'scale': sampled(IDLE, 0.25, lambda t, i=i: [1 + 0.015 * wave(t, IDLE, i * 0.3)] * 3)}
-              for i, b in enumerate(blades)}
-    opened = {b: blade_keys(OPEN_TURN, OPEN_SCALE) for b in blades}
+    flaps = [name for name, _, _, _, _ in FLAPS]
+    twists = {name: twist for name, _, _, _, twist in FLAPS}
+    closed = {f: {'scale': sampled(IDLE, 0.25, lambda t, i=i: [1 + 0.012 * wave(t, IDLE, i * 0.4)] * 3)}
+              for i, f in enumerate(flaps)}
+    opened = {f: {'rotation': {'0.0': [0, 0, twists[f]]}, 'scale': {'0.0': [OPEN_SCALE] * 3}} for f in flaps}
+    opening = {f: {'rotation': {'0.0': [0, 0, 0], str(SHUT): [0, 0, twists[f]]},
+                   'scale': {'0.0': [1, 1, 1], str(SHUT): [OPEN_SCALE] * 3}} for f in flaps}
+    closing = {f: {'rotation': {'0.0': [0, 0, twists[f]], str(SHUT): [0, 0, 0]},
+                   'scale': {'0.0': [OPEN_SCALE] * 3, str(SHUT): [1, 1, 1]}} for f in flaps}
     closed['pucker'] = {'scale': {'0.0': [1, 1, 1]}}
     opened['pucker'] = {'scale': {'0.0': [0, 0, 0]}}
-    opening = {b: {'rotation': {'0.0': [0, 0, 0], str(SHUT): [0, 0, OPEN_TURN]},
-                   'scale': {'0.0': [1, 1, 1], str(SHUT): [OPEN_SCALE] * 3}} for b in blades}
-    closing = {b: {'rotation': {'0.0': [0, 0, OPEN_TURN], str(SHUT): [0, 0, 0]},
-                   'scale': {'0.0': [OPEN_SCALE] * 3, str(SHUT): [1, 1, 1]}} for b in blades}
     opening['pucker'] = {'scale': {'0.0': [1, 1, 1], str(SHUT / 2): [0, 0, 0]}}
-    closing['pucker'] = {'scale': {'0.0': [0, 0, 0], str(SHUT): [1, 1, 1]}}
+    closing['pucker'] = {'scale': {'0.0': [0, 0, 0], str(SHUT / 2): [0, 0, 0], str(SHUT): [1, 1, 1]}}
     return {'closed': (IDLE, True, closed), 'open': (IDLE, True, opened),
             'opening': (SHUT, False, opening), 'closing': (SHUT, False, closing)}
 
 
 def door():
+    assert covered(), 'the closed flaps leave part of the doorway open'
     model_bones = bones()
     painter, particle = textures(model_bones, pack(model_bones, SHEET))
     write_organ('sphincter_door', model_bones, SHEET, painter, animations(model_bones), (particle[0], particle[1]),

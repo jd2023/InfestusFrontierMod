@@ -11,6 +11,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -118,6 +119,38 @@ public final class OpeningTests {
         h.setBlock(other.east(), Blocks.REDSTONE_BLOCK);
         h.assertTrue(h.getBlockState(other).getValue(DoorBlock.OPEN), "redstone opens it");
         h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aDoorGraftedBesideASignalStartsOpen(GameTestHelper h) {
+        BlockPos lower = new BlockPos(2, Y + 1, 2);
+        h.setBlock(lower.east(), Blocks.REDSTONE_BLOCK);
+        door(h, lower);
+        h.assertTrue(h.getBlockState(lower).getValue(DoorBlock.OPEN), "the signal already on opens it");
+        h.assertTrue(h.getBlockState(lower).getValue(DoorBlock.POWERED), "and it knows it is powered");
+        h.setBlock(lower.east(), Blocks.AIR);
+        h.assertFalse(h.getBlockState(lower).getValue(DoorBlock.OPEN), "the signal going off closes it");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aWindowUnlinksWhenItsNeighbourGoesAndNoPistonMovesIt(GameTestHelper h) {
+        BlockPos left = new BlockPos(2, Y + 1, 2);
+        BlockPos right = left.east();
+        h.setBlock(left, EcologyModule.MEMBRANE_WINDOW.get());
+        h.setBlock(right, EcologyModule.MEMBRANE_WINDOW.get());
+        h.assertTrue(h.getBlockState(left).getValue(PipeBlock.EAST), "joined");
+        h.setBlock(right, Blocks.AIR);
+        h.assertFalse(h.getBlockState(left).getValue(PipeBlock.EAST), "the frame closes again");
+        BlockPos piston = new BlockPos(1, Y + 1, 5);
+        h.setBlock(piston, Blocks.PISTON.defaultBlockState().setValue(DirectionalBlock.FACING, Direction.EAST));
+        h.setBlock(piston.east(), EcologyModule.MEMBRANE_WINDOW.get());
+        h.setBlock(piston.west(), Blocks.REDSTONE_BLOCK);
+        h.runAfterDelay(10, () -> {
+            h.assertBlockPresent(EcologyModule.MEMBRANE_WINDOW.get(), piston.east());
+            h.assertBlockPresent(Blocks.AIR, piston.east(2));
+            h.succeed();
+        });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")

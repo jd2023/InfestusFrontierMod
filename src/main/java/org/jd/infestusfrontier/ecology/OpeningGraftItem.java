@@ -61,11 +61,15 @@ final class OpeningGraftItem extends Item {
         Direction facing = clicked.getAxis().isHorizontal()
                 ? clicked
                 : context.getHorizontalDirection().getOpposite();
+        // as vanilla placement does, a doorway grafted beside a signal that is already on starts powered and open
+        boolean powered = level.hasNeighborSignal(lower) || level.hasNeighborSignal(lower.above());
         BlockState bottom = EcologyModule.SPHINCTER_DOOR
                 .get()
                 .defaultBlockState()
                 .setValue(DoorBlock.FACING, facing)
-                .setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER);
+                .setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER)
+                .setValue(DoorBlock.POWERED, powered)
+                .setValue(DoorBlock.OPEN, powered);
         if (!bottom.canSurvive(level, lower)) return false;
         if (level.isClientSide) return true;
         level.setBlock(lower, bottom, Block.UPDATE_ALL);

@@ -79,7 +79,7 @@
   "entry.infestusfrontier.contact.living_wall.tiers": "Grafts harden a wall one block at a time. A Skeletal Graft turns a Living Wall into a Ribbed Wall, tougher than stone. A Calcifying Graft turns a Ribbed Wall into a Calcified Wall, which no explosion breaks; a pickaxe takes it down fastest. The Activation Cyst makes both grafts.",
   "entry.infestusfrontier.contact.openings.name": "Windows and Doors",
   "entry.infestusfrontier.contact.openings.description": "Openings in a living wall",
-  "entry.infestusfrontier.contact.openings.use": "A wall opens by mutation. Use a Membrane Window on a wall cell of any tier: it turns to clear membrane in a bone frame, and windows side by side join into one pane. Use a Sphincter Door on a wall cell with another wall cell above or below it: the two become a doorway whose membrane opens like an iris, by hand or by redstone. Broken, both die into Dead Tissue.",
+  "entry.infestusfrontier.contact.openings.use": "A wall opens by mutation. Use a Membrane Window on a wall cell of any tier: it turns to veined, translucent membrane in a bone frame, and windows side by side join into one pane. Use a Sphincter Door on a wall cell with another wall cell above or below it: the two become a doorway whose membrane flaps draw back into the rim, by hand or by redstone. Broken, both die into Dead Tissue.",
   "entry.infestusfrontier.contact.organ_bud.craft": "Spore Culture, two rotten flesh and bone meal.",
   "entry.infestusfrontier.contact.organ_bud.use": "Place a Bud on Living Substrate. Craft an organ from it. The Culture Bowl grows Buds in batches.",
   "entry.infestusfrontier.contact.digestive_sac.craft": "An Organ Bud, two rotten flesh and a bowl.",
