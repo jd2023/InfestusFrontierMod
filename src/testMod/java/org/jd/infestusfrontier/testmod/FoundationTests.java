@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.testmod;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -13,6 +14,10 @@ import org.jd.infestusfrontier.ui.Bounds;
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class FoundationTests {
+    public FoundationTests(IEventBus modBus) {
+        modBus.addListener(M3RouteTests::registerTickets);
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void productionModCoreAndUiLoadTogether(GameTestHelper h) {
         h.assertTrue(ModList.get().isLoaded("infestusfrontier"), "Production mod must load");

@@ -173,6 +173,7 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 - Every reviewer finding gets a regression test.
 - Test save and reload through a real save, not only the codec.
 - Shared-budget tests isolate one fixture, then test contention separately.
+- The GameTest server sets `randomTickSpeed` to 0 and ticks no chunk without a player. A test that needs crops to grow runs in its own batch, like `M3RouteTests`: `@BeforeBatch` raises the vanilla gamerule, a NeoForge ticket forces the test's chunks to tick, and `@AfterBatch` puts both back.
 - A flaky test is a defect to investigate. Never rerun until green. Never delete the assertion. Never raise a limit or replace a golden image to get green.
 - Fixtures and the test mod stay in `src/testMod`. Use disposable worlds under `runs/`. Never touch a personal save.
 - Run graphical and headless runs as separate Gradle invocations. `scripts/verify.sh` runs `verifyAll` and then `verifyCaptures`.
