@@ -1,0 +1,38 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.openings.name",
+  "description": "entry.infestusfrontier.contact.openings.description",
+  "icon": "infestusfrontier:membrane_window",
+  "x": 1,
+  "y": 3,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/living_wall"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/living_substrate"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/membrane_window"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.openings.name",
+      "text": "entry.infestusfrontier.contact.openings.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:membrane_window",
+      "recipe_id_2": "infestusfrontier:sphincter_door"
+    }
+  ]
+}

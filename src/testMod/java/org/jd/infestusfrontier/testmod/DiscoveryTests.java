@@ -114,7 +114,8 @@ public final class DiscoveryTests {
                 "dormant_pieces",
                 "speak_to_an_organ",
                 "surgical_blade",
-                "living_wall")) {
+                "living_wall",
+                "openings")) {
             h.assertTrue(category.getEntries().containsKey(id("contact/" + entry)), "entry " + entry + " loaded");
         }
         var circulation = book.getCategory(id("circulation"));
@@ -182,7 +183,8 @@ public final class DiscoveryTests {
                 "dormant_pieces",
                 "speak_to_an_organ",
                 "surgical_blade",
-                "living_wall")) {
+                "living_wall",
+                "openings")) {
             var condition = contact.get(id("contact/" + name)).getCondition();
             h.assertTrue(condition instanceof BookOrCondition, name + " unlocks by step or by item");
         }
@@ -200,6 +202,8 @@ public final class DiscoveryTests {
                 "dead_tissue",
                 "skeletal_graft",
                 "calcifying_graft",
+                "membrane_window",
+                "sphincter_door",
                 "membrane_rack",
                 "membrane_sheet",
                 "bone_loom",

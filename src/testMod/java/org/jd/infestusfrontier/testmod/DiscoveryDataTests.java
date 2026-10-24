@@ -118,6 +118,8 @@ public final class DiscoveryDataTests {
                 "reservoir_cell",
                 "item_capsule",
                 "surgical_blade",
+                "membrane_window",
+                "sphincter_door",
                 "septum_crossing",
                 "vascular_stitch")) {
             ResourceLocation recipe = id(path);

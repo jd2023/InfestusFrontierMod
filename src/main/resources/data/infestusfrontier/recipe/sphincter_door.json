@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:sphincter_door",
+    "count": 1
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_pane"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "east": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_north_east"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_north_west"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_north_up"
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_north_down"
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "south": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_east_south"
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_east_up"
+      }
+    },
+    {
+      "when": {
+        "east": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_east_down"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_south_west"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_south_up"
+      }
+    },
+    {
+      "when": {
+        "south": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_south_down"
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "up": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_west_up"
+      }
+    },
+    {
+      "when": {
+        "west": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/membrane_window_edge_west_down"
+      }
+    }
+  ]
+}

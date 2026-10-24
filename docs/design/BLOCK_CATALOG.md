@@ -191,7 +191,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 ### T0-12 — Membrane Window
 - **Does:** Transparent living skin held by thin ribs. Connected windows remove interior borders, so a large chamber looks like one enclosed body.
 - **Input → output:** No running input → visibility through walls and machine chambers.
-- **Create:** 1 glass + 1 Membrane Sheet + 1 bone → 2 windows.
+- **Create:** Craft the graft from 1 glass + 1 Membrane Sheet + 1 bone (2 grafts) and use it on a living wall cell of any tier. Grown, never placed: broken, a window dies into Dead Tissue.
 - **Growth:** Dye tints the skin; glow ink highlights its outer ribs. Thermal Lining or Spatial Membrane enables the corresponding chamber wall variant.
 
 ### T0-13 — Lumen Tissue
@@ -407,7 +407,7 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 ### T1-29 — Sphincter Door
 - **Does:** A living doorway that retracts into its rim, keeping a biological room usable without mechanical-looking doors. Supports deliberate access control.
 - **Input → output:** Player use, redstone or nerve command → open/closed doorway. No operating biomass for ordinary doors.
-- **Create:** 2 Membrane Sheets + 1 Rib Frame → one two-block doorway.
+- **Create:** Craft the graft from 2 Membrane Sheets + 2 Bone Plates and use it on a living wall cell that has another wall cell above or below it; the two become the doorway, facing the clicked side. Grown, never placed: broken, it dies into Dead Tissue.
 - **Growth:** Thermal Lining makes a sealed process hatch; bone reinforcement makes a stronger gate. It does not automatically close on an occupied doorway to trap its authorized user.
 
 ### T1-30 — Activation Cyst

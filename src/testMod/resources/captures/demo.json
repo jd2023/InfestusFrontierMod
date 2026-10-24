@@ -84,7 +84,13 @@
     "fill 85 -60 -36 85 -59 -36 infestusfrontier:living_wall",
     "fill 87 -60 -36 87 -59 -36 infestusfrontier:ribbed_wall",
     "fill 89 -60 -36 89 -59 -36 infestusfrontier:calcified_wall",
-    "setblock 88 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Living Walls\"','\"sneak+bone meal\"','\"grafts harden:\"','\"ribbed, calcified\"']}}",
+    "setblock 87 -60 -38 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Living Walls\"','\"sneak+bone meal\"','\"grafts harden:\"','\"ribbed, calcified\"']}}",
+    "fill 91 -61 -36 95 -61 -36 infestusfrontier:living_substrate[stage=mature]",
+    "fill 91 -60 -36 95 -58 -36 infestusfrontier:living_wall",
+    "fill 91 -59 -36 92 -58 -36 infestusfrontier:membrane_window",
+    "setblock 94 -60 -36 infestusfrontier:sphincter_door[half=lower,facing=north]",
+    "setblock 94 -59 -36 infestusfrontier:sphincter_door[half=upper,facing=north]",
+    "setblock 93 -60 -38 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Windows, Doors\"','\"graft a wall\"','\"door: click or\"','\"redstone\"']}}",
     "give @s infestusfrontier:spore_culture 16",
     "give @s infestusfrontier:living_substrate 16",
     "give @s bone_meal 64",
@@ -985,6 +991,24 @@
       "pitch": 10,
       "gui": true,
       "book": "infestusfrontier:contact/living_wall"
+    },
+    {
+      "name": "openings",
+      "x": 93.5,
+      "y": -58.8,
+      "z": -41.5,
+      "yaw": 0,
+      "pitch": 8
+    },
+    {
+      "name": "book_openings",
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "book": "infestusfrontier:contact/openings"
     }
   ]
 }
