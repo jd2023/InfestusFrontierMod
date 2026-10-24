@@ -58,22 +58,22 @@ def axis(name):
 
 
 def animations():
-    out = {'idle': (IDLE, True, {'hub': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.02 * wave(t, IDLE), 1 + 0.03 * wave(t, IDLE), 1 + 0.02 * wave(t, IDLE)])}})}
+    out = {'idle': (IDLE, True, {'hub': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.02 * wave(t, IDLE), 1, 1 + 0.02 * wave(t, IDLE)])}})}
     for index, name in enumerate(MOUTHS):
         bone = 'mouth_' + name
         ax = axis(name)
         lag = index * PULSE / len(MOUTHS)
 
-        def closed(t, ax=ax):
-            return [0.45 if ax[i] == 0 else 0.3 for i in range(3)]
+        def closed(t, ax=ax, name=name):
+            return [1 if name == 'down' and i == 1 else 0.45 if ax[i] == 0 else 0.3 for i in range(3)]
 
-        def intake(t, ax=ax, lag=lag):
+        def intake(t, ax=ax, lag=lag, name=name):
             s = squeeze(t, PULSE, lag)
-            return [1 + 0.3 * s if ax[i] == 0 else 1 - 0.25 * s for i in range(3)]
+            return [1 if name == 'down' and i == 1 else 1 + 0.3 * s if ax[i] == 0 else 1 - 0.25 * s for i in range(3)]
 
-        def outlet(t, ax=ax, lag=lag):
+        def outlet(t, ax=ax, lag=lag, name=name):
             s = squeeze(t, PULSE, lag)
-            return [1 - 0.15 * s if ax[i] == 0 else 1 + 0.15 * s for i in range(3)]
+            return [1 if name == 'down' and i == 1 else 1 - 0.15 * s if ax[i] == 0 else 1 + 0.15 * s for i in range(3)]
 
         out[name + '_closed'] = (PULSE, True, {bone: {'scale': sampled(PULSE, 0.5, closed)}})
         out[name + '_intake'] = (PULSE, True, {bone: {'scale': sampled(PULSE, 0.05, intake)}})
