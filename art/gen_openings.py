@@ -26,7 +26,7 @@ from gen_reservoir import MODELS, NS, STATES, ITEMS
 MEMBRANE = NS + 'reservoir_membrane'
 BONE = NS + 'reservoir_bone'
 BAR = 2
-INSET = 0.05
+PROUD = 0.05  # how far a bar's outer faces stand out of the block, in front of the membrane
 DIRS = ['north', 'east', 'south', 'west', 'up', 'down']
 AXIS = {'north': 'z', 'south': 'z', 'east': 'x', 'west': 'x', 'up': 'y', 'down': 'y'}
 LOW = {'north': True, 'west': True, 'down': True, 'south': False, 'east': False, 'up': False}
@@ -37,14 +37,15 @@ def write(path, data):
 
 
 def pane():
-    """Membrane on every face, set a hair inside the cube so the bone bars, flush with the faces, always lie in front."""
+    """Membrane flush with every face, so the faces of joined windows meet with no gap."""
     faces_ = {d: {'uv': [0, 0, 16, 16], 'texture': '#membrane', 'cullface': d} for d in DIRS}
-    return {'from': [INSET] * 3, 'to': [16 - INSET] * 3, 'faces': faces_}
+    return {'from': [0, 0, 0], 'to': [16, 16, 16], 'faces': faces_}
 
 
 def span(direction):
-    """The bar's extent on the axis of {@code direction}: hugging that face."""
-    return (0, BAR) if LOW[direction] else (16 - BAR, 16)
+    """The bar's extent on the axis of {@code direction}: hugging that face, its outer face a hair proud of the
+    membrane so depth, not draw order, puts the bone in front."""
+    return (-PROUD, BAR) if LOW[direction] else (16 - BAR, 16 + PROUD)
 
 
 def bar(a, b):
@@ -97,7 +98,7 @@ SHEET = 128
 FLESH = [(70, 22, 36), (104, 36, 50), (138, 56, 66), (170, 80, 86), (200, 110, 108), (226, 146, 136)]
 LIP = [(60, 14, 30), (92, 26, 46), (124, 42, 62), (156, 64, 80)]
 IVORY = [(168, 150, 124), (200, 184, 152), (226, 214, 186), (242, 234, 212), (252, 248, 236)]
-PUCKER = [(30, 8, 16), (52, 14, 28), (80, 24, 42)]
+PUCKER = [(58, 16, 30), (84, 28, 44), (112, 42, 60)]
 PETAL = [(96, 30, 52), (136, 52, 74), (176, 84, 100), (208, 122, 132), (232, 166, 168)]
 VEIN = (120, 28, 52)
 CENTRE = (0.0, 15.0)
@@ -191,7 +192,7 @@ def textures(model_bones, uv):
     for face, rect in rects['band'].items():
         p.ramp(rect, IVORY, lambda x, y, w, h: 0.62 + 0.15 * (y == 0) - 0.12 * (y == h - 1), grain=0.04, mottle=0.1)
     for rect in rects['pucker'].values():
-        p.ramp(rect, PUCKER, lambda x, y, w, h: 0.3, grain=0.03, mottle=0.1)
+        p.ramp(rect, PUCKER, lambda x, y, w, h: 0.1 if 0 < x < w - 1 and 0 < y < h - 1 else 0.7, grain=0.03, mottle=0.1)
     for name in sizes:
         if name.startswith('ridge'):
             for face, rect in rects[name].items():
