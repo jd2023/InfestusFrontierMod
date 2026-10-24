@@ -8,7 +8,7 @@ Idle: the bulb breathes and the windows glow faintly. Working: the two chambers 
 from organ_model import Painter, islands, faces, pack, write, skin, folds, ball, flat, sampled, wave, squeeze
 
 SHEET = 64
-IDLE, WORKING = 4.0, 1.6
+IDLE, WORKING = 6.4, 3.2
 FLESH = [(84, 36, 52), (116, 52, 64), (148, 74, 80), (178, 100, 98), (204, 130, 120), (224, 160, 146)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 AMBER = [(96, 62, 24), (150, 104, 36), (204, 150, 56), (236, 196, 110), (250, 232, 180)]
@@ -19,9 +19,9 @@ BONES = [
     ('root', None, [0, 0, 0], []),
     ('foot', 'root', [0, 0, 0], [('foot', [-7, 0, -7], [14, 2, 14], None)]),
     ('body', 'root', [0, 2, 0], [('body', [-5, 2, -5], [10, 8, 10], None)]),
-    ('source', 'root', [-5, 6, 0], [('amber', [-7, 4, -3], [2, 5, 6], None)]),
-    ('carrier', 'root', [5, 6, 0], [('green', [5, 4, -3], [2, 5, 6], None)]),
-    ('throat', 'root', [0, 10, 0], [('throat', [-2, 10, -2], [4, 3, 4], None)]),
+    ('source', 'body', [-5, 6, 0], [('amber', [-7, 4, -3], [2, 5, 6], None)]),
+    ('carrier', 'body', [5, 6, 0], [('green', [5, 4, -3], [2, 5, 6], None)]),
+    ('throat', 'body', [0, 10, 0], [('throat', [-2, 10, -2], [4, 3, 4], None)]),
 ]
 
 

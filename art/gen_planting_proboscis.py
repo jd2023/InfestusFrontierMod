@@ -7,7 +7,7 @@ Idle: the trunk hangs curled and sways. Working: it unrolls, dips and comes back
 from organ_model import Painter, islands, faces, pack, write, skin, folds, flat, ball, sampled, wave, squeeze
 
 SHEET = 64
-IDLE, WORKING = 4.0, 1.0
+IDLE, WORKING = 6.0, 2.0
 FLESH = [(84, 36, 52), (116, 52, 64), (148, 74, 80), (178, 100, 98), (204, 130, 120), (224, 160, 146)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 GREEN = [(40, 86, 50), (70, 130, 70), (110, 176, 100), (160, 214, 140)]
@@ -17,9 +17,9 @@ BONES = [
     ('root', None, [0, 0, 0], []),
     ('foot', 'root', [0, 0, 0], [('foot', [-6, 0, -6], [12, 2, 12], None)]),
     ('bulb', 'root', [0, 2, 0], [('bulb', [-5, 2, -5], [10, 7, 10], None)]),
-    ('trunk_a', 'root', [0, 7, -5], [('trunk_a', [-2, 5, -9], [4, 4, 4], None)]),
-    ('trunk_b', 'trunk_a', [0, 5, -7], [('trunk_b', [-1.5, 1, -8.5], [3, 4, 3], None)]),
-    ('tip', 'trunk_b', [0, 1, -7], [('tip', [-1, -1, -8], [2, 2, 2], None)]),
+    ('trunk_a', 'root', [0, 8, -5], [('trunk_a', [-1.5, 5, -8], [3, 3, 3], None)]),
+    ('trunk_b', 'trunk_a', [0, 5, -6.5], [('trunk_b', [-1, 2, -7.5], [2, 3, 2], None)]),
+    ('tip', 'trunk_b', [0, 2, -6.5], [('tip', [-0.5, 1, -7], [1, 1, 1], None)]),
     ('crown', 'root', [0, 9, 0], [('crown', [-2, 9, -2], [4, 3, 4], None)]),
 ]
 
@@ -43,14 +43,14 @@ def textures(uv):
 
 def animations():
     idle = {
-        'trunk_a': {'rotation': sampled(IDLE, 0.1, lambda t: [-20 + 4 * wave(t, IDLE), 0, 0])},
-        'trunk_b': {'rotation': sampled(IDLE, 0.1, lambda t: [-70 + 5 * wave(t, IDLE, 0.5), 0, 0])},
+        'trunk_a': {'rotation': sampled(IDLE, 0.1, lambda t: [-10 + 2 * wave(t, IDLE), 0, 0])},
+        'trunk_b': {'rotation': sampled(IDLE, 0.1, lambda t: [-35 + 3 * wave(t, IDLE, 0.5), 0, 0])},
         'crown': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.04 * wave(t, IDLE)] * 3)},
     }
     working = {
-        'trunk_a': {'rotation': sampled(WORKING, 0.05, lambda t: [-20 + 45 * squeeze(t, WORKING), 0, 0])},
-        'trunk_b': {'rotation': sampled(WORKING, 0.05, lambda t: [-70 + 60 * squeeze(t, WORKING, 0.1), 0, 0])},
-        'tip': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.3 * squeeze(t, WORKING, 0.2)] * 3)},
+        'trunk_a': {'rotation': sampled(WORKING, 0.05, lambda t: [-10 + 25 * squeeze(t, WORKING), 0, 0])},
+        'trunk_b': {'rotation': sampled(WORKING, 0.05, lambda t: [-35 + 25 * squeeze(t, WORKING, 0.2), 0, 0])},
+        'tip': {'scale': sampled(WORKING, 0.05, lambda t: [1 + 0.15 * squeeze(t, WORKING, 0.4), 1, 1 + 0.15 * squeeze(t, WORKING, 0.4)])},
     }
     return {'idle': (IDLE, True, idle), 'working': (WORKING, True, working)}
 

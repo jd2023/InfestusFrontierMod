@@ -29,72 +29,72 @@
         },
         {
           "name": "mouth_up",
-          "parent": "root",
+          "parent": "hub",
           "pivot": [0, 12, 0],
           "cubes": [
             {
               "origin": [-2.5, 12, -2.5],
               "size": [5, 3, 5],
-              "uv": [42, 21]
+              "uv": [40, 21]
             }
           ]
         },
         {
           "name": "mouth_down",
-          "parent": "root",
+          "parent": "hub",
           "pivot": [0, 2, 0],
           "cubes": [
             {
               "origin": [-3, 0, -3],
               "size": [6, 2, 6],
-              "uv": [17, 21]
+              "uv": [15, 21]
             }
           ]
         },
         {
           "name": "mouth_north",
-          "parent": "root",
+          "parent": "hub",
           "pivot": [0, 7, -5],
           "cubes": [
             {
-              "origin": [-2.5, 4.5, -8],
-              "size": [5, 5, 3],
+              "origin": [-2.5, 4.5, -7],
+              "size": [5, 5, 2],
               "uv": [0, 32]
             }
           ]
         },
         {
           "name": "mouth_south",
-          "parent": "root",
+          "parent": "hub",
           "pivot": [0, 7, 5],
           "cubes": [
             {
               "origin": [-2.5, 4.5, 5],
-              "size": [5, 5, 3],
-              "uv": [17, 32]
+              "size": [5, 5, 2],
+              "uv": [15, 32]
             }
           ]
         },
         {
           "name": "mouth_east",
-          "parent": "root",
+          "parent": "hub",
           "pivot": [5, 7, 0],
           "cubes": [
             {
               "origin": [5, 4.5, -2.5],
-              "size": [3, 5, 5],
+              "size": [2, 5, 5],
               "uv": [41, 0]
             }
           ]
         },
         {
           "name": "mouth_west",
-          "parent": "root",
+          "parent": "hub",
           "pivot": [-5, 7, 0],
           "cubes": [
             {
-              "origin": [-8, 4.5, -2.5],
-              "size": [3, 5, 5],
+              "origin": [-7, 4.5, -2.5],
+              "size": [2, 5, 5],
               "uv": [0, 21]
             }
           ]

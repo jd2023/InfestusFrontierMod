@@ -7,7 +7,7 @@ Idle: the sack breathes slowly.
 from organ_model import Painter, islands, faces, pack, write, skin, folds, flat, ball, sampled, wave
 
 SHEET = 64
-IDLE = 5.0
+IDLE = 8.0
 LEATHER = [(70, 44, 30), (104, 66, 42), (138, 92, 58), (170, 120, 78), (196, 150, 104)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 CORD = [(150, 82, 92), (178, 100, 112), (204, 130, 134), (224, 160, 156)]
@@ -17,8 +17,8 @@ BONES = [
     ('root', None, [0, 0, 0], []),
     ('foot', 'root', [0, 0, 0], [('foot', [-6, 0, -6], [12, 2, 12], None)]),
     ('sack', 'root', [0, 2, 0], [('sack', [-5, 2, -5], [10, 8, 10], None)]),
-    ('neck', 'root', [0, 10, 0], [('neck', [-3, 10, -3], [6, 2, 6], None), ('cord', [-3.5, 10.5, -3.5], [7, 1, 7], None)]),
-    ('rim', 'root', [0, 12, 0], [('rim', [-4, 12, -4], [8, 2, 8], None)]),
+    ('neck', 'sack', [0, 10, 0], [('neck', [-3, 10, -3], [6, 2, 6], None), ('cord', [-3.5, 10.5, -3.5], [7, 1, 7], None)]),
+    ('rim', 'neck', [0, 12, 0], [('rim', [-4, 12, -4], [8, 2, 8], None)]),
 ]
 
 
@@ -45,7 +45,6 @@ def textures(uv):
 def animations():
     idle = {
         'sack': {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.02 * wave(t, IDLE), 1 - 0.015 * wave(t, IDLE), 1 + 0.02 * wave(t, IDLE)])},
-        'rim': {'rotation': sampled(IDLE, 0.1, lambda t: [0, 3 * wave(t, IDLE), 0])},
     }
     return {'idle': (IDLE, True, idle)}
 

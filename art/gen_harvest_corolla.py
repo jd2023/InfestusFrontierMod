@@ -7,7 +7,7 @@ Idle: the petals rest half open and breathe. Working: they fling wide and clap t
 from organ_model import Painter, islands, faces, pack, write, skin, folds, flat, ball, sampled, wave, squeeze
 
 SHEET = 64
-IDLE, WORKING = 4.0, 1.0
+IDLE, WORKING = 5.6, 2.8
 FLESH = [(84, 36, 52), (116, 52, 64), (148, 74, 80), (178, 100, 98), (204, 130, 120), (224, 160, 146)]
 ROOT = [(46, 26, 34), (70, 38, 42), (98, 56, 54), (126, 78, 68), (154, 104, 86)]
 PETAL = [(150, 60, 90), (190, 90, 120), (222, 130, 150), (244, 180, 190)]
@@ -17,11 +17,11 @@ BONES = [
     ('root', None, [0, 0, 0], []),
     ('foot', 'root', [0, 0, 0], [('foot', [-5, 0, -5], [10, 2, 10], None)]),
     ('stem', 'root', [0, 2, 0], [('stem', [-2, 2, -2], [4, 7, 4], None)]),
-    ('heart', 'root', [0, 9, 0], [('heart', [-2.5, 9, -2.5], [5, 3, 5], None)]),
-    ('petal_n', 'root', [0, 10, -2.5], [('petal', [-3, 10, -8.5], [6, 1, 6], None)]),
-    ('petal_s', 'root', [0, 10, 2.5], [('petal', [-3, 10, 2.5], [6, 1, 6], None)]),
-    ('petal_e', 'root', [2.5, 10, 0], [('petal_x', [2.5, 10, -3], [6, 1, 6], None)]),
-    ('petal_w', 'root', [-2.5, 10, 0], [('petal_x', [-8.5, 10, -3], [6, 1, 6], None)]),
+    ('heart', 'stem', [0, 9, 0], [('heart', [-2.5, 9, -2.5], [5, 3, 5], None)]),
+    ('petal_n', 'stem', [0, 12, -2.5], [('petal', [-2, 12, -7.5], [4, 1, 5], None)]),
+    ('petal_s', 'stem', [0, 12, 2.5], [('petal', [-2, 12, 2.5], [4, 1, 5], None)]),
+    ('petal_e', 'stem', [2.5, 12, 0], [('petal_x', [2.5, 12, -2], [5, 1, 4], None)]),
+    ('petal_w', 'stem', [-2.5, 12, 0], [('petal_x', [-7.5, 12, -2], [5, 1, 4], None)]),
 ]
 
 
@@ -52,15 +52,14 @@ def animations():
             v[axis] = angle
             return v
         idle[name] = {'rotation': sampled(IDLE, 0.1, lambda t, s=sign: rot(s * (35 + 5 * wave(t, IDLE))))}
-        working[name] = {'rotation': sampled(WORKING, 0.05, lambda t, s=sign: rot(s * (70 - 90 * squeeze(t, WORKING))))}
-    idle['heart'] = {'scale': sampled(IDLE, 0.1, lambda t: [1 + 0.03 * wave(t, IDLE)] * 3)}
+        working[name] = {'rotation': sampled(WORKING, 0.05, lambda t, s=sign: rot(s * (50 - 55 * squeeze(t, WORKING))))}
     working['stem'] = {'scale': sampled(WORKING, 0.05, lambda t: [1, 1 - 0.1 * squeeze(t, WORKING, 0.15), 1])}
     return {'idle': (IDLE, True, idle), 'working': (WORKING, True, working)}
 
 
 def main():
     painter, particle = textures(pack(BONES, SHEET))
-    write('harvest_corolla', BONES, SHEET, painter, animations(), (particle[0], particle[1]), bounds=(2, 1, (0, 0.25, 0)))
+    write('harvest_corolla', BONES, SHEET, painter, animations(), (particle[0], particle[1]), bounds=(2, 1.5, (0, 0.5, 0)))
     print('harvest_corolla: bones', len(BONES), 'cubes', sum(len(b[3]) for b in BONES))
 
 

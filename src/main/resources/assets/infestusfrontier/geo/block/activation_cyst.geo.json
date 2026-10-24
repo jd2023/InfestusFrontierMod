@@ -41,7 +41,7 @@
         },
         {
           "name": "source",
-          "parent": "root",
+          "parent": "body",
           "pivot": [-5, 6, 0],
           "cubes": [
             {
@@ -53,7 +53,7 @@
         },
         {
           "name": "carrier",
-          "parent": "root",
+          "parent": "body",
           "pivot": [5, 6, 0],
           "cubes": [
             {
@@ -65,7 +65,7 @@
         },
         {
           "name": "throat",
-          "parent": "root",
+          "parent": "body",
           "pivot": [0, 10, 0],
           "cubes": [
             {
