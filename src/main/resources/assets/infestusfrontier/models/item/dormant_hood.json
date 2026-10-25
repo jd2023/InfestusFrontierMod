@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "infestusfrontier:item/dormant_hood"
+    "layer0": "infestusfrontier:item/dormant_hood",
+    "layer1": "infestusfrontier:item/dormant_hood_overlay"
   }
 }

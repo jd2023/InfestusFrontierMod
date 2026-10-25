@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "infestusfrontier:item/dormant_thorax"
+    "layer0": "infestusfrontier:item/dormant_thorax",
+    "layer1": "infestusfrontier:item/dormant_thorax_overlay"
   }
 }

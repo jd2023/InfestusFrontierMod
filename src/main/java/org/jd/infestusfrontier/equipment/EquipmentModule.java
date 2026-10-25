@@ -3,6 +3,7 @@ package org.jd.infestusfrontier.equipment;
 import com.mojang.logging.LogUtils;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -31,6 +33,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
+import org.jd.infestusfrontier.foundation.render.LivingArmor;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -114,7 +117,9 @@ public final class EquipmentModule {
                 5,
                 SoundEvents.ARMOR_EQUIP_LEATHER,
                 () -> Ingredient.of(Items.ROTTEN_FLESH),
-                List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, layer))),
+                // one dyeable layer: dye tints it as it tints leather, and trims draw on its vanilla shape
+                List.of(new ArmorMaterial.Layer(
+                        ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, layer), "", true)),
                 0.0F,
                 0.0F);
     }
@@ -144,17 +149,44 @@ public final class EquipmentModule {
         ITEMS.register(modBus);
         BLOCK_ENTITIES.register(modBus);
         MENUS.register(modBus);
-        if (FMLEnvironment.dist == Dist.CLIENT)
+        if (FMLEnvironment.dist == Dist.CLIENT) {
             modBus.addListener((RegisterMenuScreensEvent event) ->
                     event.register(FUEL_PAPILLA_MENU.get(), FuelPapillaScreen::new));
+            LivingArmor.register(
+                    modBus,
+                    ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "dormant"),
+                    DORMANT_HOOD,
+                    DORMANT_THORAX,
+                    DORMANT_LEGWRAPS,
+                    DORMANT_TREADS);
+            LivingArmor.register(
+                    modBus,
+                    ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "awakened"),
+                    AWAKENED_HOOD,
+                    AWAKENED_THORAX,
+                    AWAKENED_LEGWRAPS,
+                    AWAKENED_TREADS);
+        }
+        // a water cauldron washes the dye off, as it washes leather: vanilla's own interaction, listed for these items
+        modBus.addListener((FMLCommonSetupEvent event) -> event.enqueueWork(() -> {
+            for (var piece : List.of(
+                    DORMANT_HOOD,
+                    DORMANT_THORAX,
+                    DORMANT_LEGWRAPS,
+                    DORMANT_TREADS,
+                    AWAKENED_HOOD,
+                    AWAKENED_THORAX,
+                    AWAKENED_LEGWRAPS,
+                    AWAKENED_TREADS)) CauldronInteraction.WATER.map().put(piece.get(), CauldronInteraction.DYED_ITEM);
+        }));
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
             event.registerItem(
                     Capabilities.FluidHandler.ITEM,
                     (stack, context) -> new ReserveHandler(stack),
-                    AWAKENED_HOOD.get(),
-                    AWAKENED_THORAX.get(),
-                    AWAKENED_LEGWRAPS.get(),
-                    AWAKENED_TREADS.get());
+                    AWAKENED_HOOD,
+                    AWAKENED_THORAX,
+                    AWAKENED_LEGWRAPS,
+                    AWAKENED_TREADS);
             event.registerBlockEntity(BiomassCapabilities.BLOCK, FUEL_PAPILLA_ENTITY.get(), (papilla, side) -> papilla);
             event.registerBlockEntity(
                     Capabilities.FluidHandler.BLOCK,

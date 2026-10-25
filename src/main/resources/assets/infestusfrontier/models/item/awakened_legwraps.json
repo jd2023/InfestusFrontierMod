@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "infestusfrontier:item/awakened_legwraps"
+    "layer0": "infestusfrontier:item/awakened_legwraps",
+    "layer1": "infestusfrontier:item/awakened_legwraps_overlay"
   }
 }

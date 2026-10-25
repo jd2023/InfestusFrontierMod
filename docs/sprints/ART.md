@@ -45,7 +45,7 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Vascular Junction | All six faces in all three modes; bottom port stays on the foundation |
 | Reservoir, Item Capsule | Joined bodies, exterior corners, fill surfaces and inventory models |
 | Bud, veins, Mouth, lobes, cultivation, Polyp, Valve, Papilla | Existing static scenes plus `visual_static`: front/back views, recessed surfaces and connections |
-| Dormant and awakened armor | `visual_armor`: front/back/side views with bent arms and legs |
+| Dormant and awakened armor | `visual_armor`: front/back/side views with bent arms and legs; dyed, trimmed and enchanted sets; an adult and a baby zombie wearing them |
 | Living walls, windows, crossings and stitches | `walls`, `openings`, `crossings`: all tiers, joined frames and routed faces |
 | Sphincter Door | `motion_sphincter_door`: closed pulse and redstone opening/closing from both sides; sealed flaps and distinct edge planes |
 
@@ -223,7 +223,7 @@ Evidence: visual
 
 ```text
 ART-005  The eight armor pieces have icons and worn textures, the Cradle its guide illustration
-Status: accepted ca4840d
+Status: accepted ca4840d; armor superseded 2026-10-24 by S04 F15 (art/gen_armor.py), the Cradle illustration stands
 Milestone: M2
 Owner: equipment
 Kind: art

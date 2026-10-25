@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "infestusfrontier:item/dormant_legwraps"
+    "layer0": "infestusfrontier:item/dormant_legwraps",
+    "layer1": "infestusfrontier:item/dormant_legwraps_overlay"
   }
 }

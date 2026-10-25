@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "infestusfrontier:item/awakened_hood"
+    "layer0": "infestusfrontier:item/awakened_hood",
+    "layer1": "infestusfrontier:item/awakened_hood_overlay"
   }
 }
