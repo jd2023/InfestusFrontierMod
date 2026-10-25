@@ -155,8 +155,8 @@ public final class ProcessingModule {
             1000,
             Biomass.of(1000),
             2,
-            Block.box(1, 0, 1, 15, 13, 15),
-            OrganEffects.NONE,
+            Block.box(1, 0, 1, 15, 15, 15),
+            CystBrew.INSTANCE,
             () -> ProcessingModule.ACTIVATION_CYST.get(),
             () -> ProcessingModule.ACTIVATION_CYST_ENTITY.get(),
             () -> ProcessingModule.ACTIVATION_CYST_MENU.get());

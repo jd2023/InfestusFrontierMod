@@ -411,7 +411,7 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Owner, 2026-10-24: it can be mutated into something safer. A Skeletal Graft clenches it into a Clenched Door, as tough as a Ribbed Wall, that works like an iron door: only redstone opens it (a button, lever or plate; later a nerve command), so no mob opens or breaks it. A Calcifying Graft then turns it into a Calcified Door that no explosion breaks, as a Calcified Wall; like every door it stands on the block below it, so it is only as safe as its floor. Thermal Lining makes a sealed process hatch. It does not automatically close on an occupied doorway to trap its authorized user.
 
 ### T1-30 — Activation Cyst
-- **Does:** Cultures raw ingredients into consumable active gels, enzymes and secretions. Its side windows show separate source and carrier chambers.
+- **Does:** Cultures raw ingredients into consumable active gels, enzymes and secretions. A living alembic: a sinew stalk carries an amber source chamber and a green carrier chamber, tubed up into a mixing bubble; while it works the chambers squeeze, bubbles rise in the mix, it glows (light 5) and bubbles like a brewing stand.
 - **Input → output:** Listed ingredient + biological carrier and feed → the Item Catalog's named active treatment; returned containers go to a reserved slot.
 - **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 Bone Plate. No advanced graft is needed to build it.
 - **Growth:** Choose batch speed or biomass economy. Intake/Output Mouths automate it; one recipe mode at a time. Bowl-compatible recipes run faster, but give the same yield.

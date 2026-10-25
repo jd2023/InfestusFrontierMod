@@ -46,6 +46,9 @@ public final class ActivationCystTests {
             h.assertValueEqual(started.batch().orElseThrow().batch().ticksRequired(), CYST_TICKS, "20 seconds");
             h.assertValueEqual(started.biomass().stored().units(), 950, "50 BU spent");
         });
+        h.runAfterDelay(
+                3, // the state shows the batch from the next tick
+                () -> h.assertValueEqual(h.getBlockState(CYST).getLightEmission(), 5, "the brewing chambers glow"));
         h.runAtTickTime(CYST_TICKS + 2, () -> {
             BatchOrganContents done = contents(h, CYST);
             h.assertTrue(done.output().is(LogisticsModule.CAPILLARY_GEL.get()), "capillary gel out");
