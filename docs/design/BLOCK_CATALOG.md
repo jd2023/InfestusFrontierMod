@@ -164,7 +164,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Growth:** Choose speed or biomass economy at each level. L1 permits a Char Gland Feed treatment for solid-fuel feeding; Hearth Lungs improve combustion. Mouths automate loading; a T3 Thermal Mantle enables hotter recipes on this same core.
 
 ### T0-08 — Awakening Cradle
-- **Does:** Turns crafted dormant bio equipment into living equipment. Holds one armor piece, tool or weapon at a time; the body of the cradle folds around it.
+- **Does:** Turns crafted dormant bio equipment into living equipment. Holds one armor piece, tool or weapon at a time: a violet flower whose petals close into a bud around a silk cocoon while it works; the cocoon glows (light 7) and beats like a heart.
 - **Input → output:** Dormant equipment + Spore Culture + biomass → awakened equipment with the same identity. It does not supply free healing or an infinite personal fuel reserve.
 - **Create:** 1 Organ Bud + 2 Bone Plates + 2 Membrane Sheets.
 - **Growth:** Choose shorter awakening or lower biomass cost. Honey Culture treatment reduces awakening's processing biomass cost, not the wearer's starvation pain. Later mutation converts the cradle into a Healing Dock, preserving its history.

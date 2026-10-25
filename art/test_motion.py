@@ -212,16 +212,32 @@ class OrganMotionTest(unittest.TestCase):
         for scale in animations('biomass_bladder')['fill_0']['bones']['fluid']['scale'].values():
             self.assertEqual(scale, [0, 0, 0])
 
-    def test_cradle_working_lobes_clear_the_core_through_their_sweep(self):
-        bones = {b['name']: b for b in geometry('awakening_cradle')['bones']}
-        left = bones['lobe_l']
-        width, height, _ = left['cubes'][0]['size']
-        clip = animations('awakening_cradle')['working']['bones']
-        for time, angle in clip['lobe_l']['rotation'].items():
-            radians = math.radians(abs(angle[2]))
-            inner = left['pivot'][0] + width * math.cos(radians) + height * math.sin(radians)
-            core_half = bones['core']['cubes'][0]['size'][0] / 2 * clip['core']['scale'][time][0]
-            self.assertLess(inner, -core_half)
+    def test_cradle_petals_close_clear_of_the_cocoon_and_open_inside_the_block(self):
+        """Closed in a bud, no petal touches the cocoon or its pulse; open, none leans past the block's edge."""
+        import numpy as np
+        import geo_audit
+        geo = geometry('awakening_cradle')
+        clips = animations('awakening_cradle')
+
+        def boxes(clip, t):
+            out = {}
+            for name, m, lo, hi in geo_audit.world_cubes(geo, clips[clip], t):
+                corners = np.array([[x, y, z, 1] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
+                world = (m @ corners.T).T[:, :3]
+                out[name] = (world.min(axis=0), world.max(axis=0))
+            return out
+
+        for clip in ('idle', 'working'):
+            for t in sorted({float(k) for ch in clips[clip]['bones'].values() for keys in ch.values() for k in keys}):
+                cubes = boxes(clip, t)
+                for name, (lo, hi) in cubes.items():
+                    if not name.startswith('petal_'):
+                        continue
+                    self.assertTrue(np.all(np.abs(lo[[0, 2]]) <= 8) and np.all(np.abs(hi[[0, 2]]) <= 8), (clip, t, name))
+                    for other in [n for n in cubes if n.startswith(('cocoon', 'pulse'))]:
+                        olo, ohi = cubes[other]
+                        apart = np.any(hi <= olo) or np.any(ohi <= lo)
+                        self.assertTrue(apart, (clip, t, name, other))
 
     def test_petals_hinge_above_the_heart_and_follow_the_stem(self):
         bones = {b['name']: b for b in geometry('harvest_corolla')['bones']}

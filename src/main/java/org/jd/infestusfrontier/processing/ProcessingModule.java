@@ -3,7 +3,6 @@ package org.jd.infestusfrontier.processing;
 import com.mojang.logging.LogUtils;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -81,6 +80,7 @@ public final class ProcessingModule {
             Biomass.of(2000),
             2,
             Block.box(1, 0, 1, 15, 6, 15),
+            OrganEffects.NONE,
             () -> ProcessingModule.CULTURE_BOWL.get(),
             () -> ProcessingModule.CULTURE_BOWL_ENTITY.get(),
             () -> ProcessingModule.CULTURE_BOWL_MENU.get());
@@ -94,6 +94,7 @@ public final class ProcessingModule {
             Biomass.ZERO,
             0,
             Block.box(1, 0, 1, 15, 14, 15),
+            OrganEffects.NONE,
             () -> ProcessingModule.MEMBRANE_RACK.get(),
             () -> ProcessingModule.MEMBRANE_RACK_ENTITY.get(),
             () -> ProcessingModule.MEMBRANE_RACK_MENU.get());
@@ -108,6 +109,7 @@ public final class ProcessingModule {
             Biomass.of(1000),
             0,
             Block.box(1, 0, 1, 15, 12, 15),
+            OrganEffects.NONE,
             () -> ProcessingModule.BONE_LOOM.get(),
             () -> ProcessingModule.BONE_LOOM_ENTITY.get(),
             () -> ProcessingModule.BONE_LOOM_MENU.get());
@@ -121,7 +123,8 @@ public final class ProcessingModule {
             0,
             Biomass.of(1000),
             1,
-            Block.box(1, 0, 1, 15, 10, 15),
+            Block.box(1, 0, 1, 15, 12, 15),
+            CradleGlow.INSTANCE,
             () -> ProcessingModule.AWAKENING_CRADLE.get(),
             () -> ProcessingModule.AWAKENING_CRADLE_ENTITY.get(),
             () -> ProcessingModule.AWAKENING_CRADLE_MENU.get());
@@ -138,6 +141,7 @@ public final class ProcessingModule {
             Biomass.of(2000),
             0,
             Block.box(1, 0, 1, 15, 14, 15),
+            FurnaceFire.INSTANCE,
             () -> ProcessingModule.BIO_FURNACE.get(),
             () -> ProcessingModule.BIO_FURNACE_ENTITY.get(),
             () -> ProcessingModule.BIO_FURNACE_MENU.get());
@@ -152,6 +156,7 @@ public final class ProcessingModule {
             Biomass.of(1000),
             2,
             Block.box(1, 0, 1, 15, 13, 15),
+            OrganEffects.NONE,
             () -> ProcessingModule.ACTIVATION_CYST.get(),
             () -> ProcessingModule.ACTIVATION_CYST_ENTITY.get(),
             () -> ProcessingModule.ACTIVATION_CYST_MENU.get());
@@ -166,6 +171,7 @@ public final class ProcessingModule {
             Biomass.ZERO,
             0,
             Block.box(1, 0, 1, 15, 12, 15),
+            OrganEffects.NONE,
             () -> ProcessingModule.COMPOST_GLAND.get(),
             () -> ProcessingModule.COMPOST_GLAND_ENTITY.get(),
             () -> ProcessingModule.COMPOST_GLAND_MENU.get());
@@ -206,8 +212,7 @@ public final class ProcessingModule {
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> AWAKENING_CRADLE_MENU =
             batchMenu(CRADLE, () -> ProcessingModule.AWAKENING_CRADLE_MENU.get());
 
-    public static final DeferredBlock<Block> BIO_FURNACE =
-            batchOrgan(FURNACE, MapColor.COLOR_RED, properties -> properties.lightLevel(FurnaceFire::light));
+    public static final DeferredBlock<Block> BIO_FURNACE = batchOrgan(FURNACE, MapColor.COLOR_RED);
     public static final DeferredItem<OrganItem> BIO_FURNACE_ITEM = ITEMS.register(
             "bio_furnace", () -> new OrganItem(BIO_FURNACE.get(), new Item.Properties(), "idle", "grown_0"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> BIO_FURNACE_ENTITY =
@@ -265,19 +270,15 @@ public final class ProcessingModule {
     private ProcessingModule() {}
 
     private static DeferredBlock<Block> batchOrgan(BatchOrganKind kind, MapColor colour) {
-        return batchOrgan(kind, colour, UnaryOperator.identity());
-    }
-
-    private static DeferredBlock<Block> batchOrgan(
-            BatchOrganKind kind, MapColor colour, UnaryOperator<BlockBehaviour.Properties> extra) {
         return BLOCKS.registerBlock(
                 kind.id(),
                 properties -> BatchOrganBlock.make(kind, properties),
-                extra.apply(BlockBehaviour.Properties.of()
+                BlockBehaviour.Properties.of()
                         .mapColor(colour)
                         .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                         .sound(SoundType.SLIME_BLOCK)
-                        .noOcclusion()));
+                        .lightLevel(state -> kind.effects().light(state))
+                        .noOcclusion());
     }
 
     private static DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> batchEntity(

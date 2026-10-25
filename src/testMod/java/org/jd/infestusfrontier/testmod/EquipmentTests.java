@@ -67,6 +67,9 @@ public final class EquipmentTests {
             h.assertTrue(started.batch().isPresent(), "a batch runs on its own");
             h.assertValueEqual(started.biomass().stored().units(), 900, "100 BU spent on waking");
         });
+        h.runAfterDelay(
+                3, // the state shows the batch from the next tick
+                () -> h.assertValueEqual(h.getBlockState(ORGAN).getLightEmission(), 7, "the waking cocoon glows"));
         h.runAtTickTime(AWAKENING_TICKS + 2, () -> {
             ItemStack woken = contents(h).output();
             h.assertTrue(woken.is(EquipmentModule.AWAKENED_THORAX.get()), "an Awakened Thorax");
@@ -76,6 +79,7 @@ public final class EquipmentTests {
             var reserve = Reserves.of(woken).orElseThrow();
             h.assertValueEqual(reserve.stored(), Biomass.ZERO, "wakes empty");
             h.assertValueEqual(reserve.capacity(), EquipmentModule.RESERVE_CAPACITY, "with a 40 BU reserve");
+            h.assertValueEqual(h.getBlockState(ORGAN).getLightEmission(), 0, "and goes dark when it is done");
             h.succeed();
         });
     }

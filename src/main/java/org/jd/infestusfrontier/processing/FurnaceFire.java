@@ -13,17 +13,21 @@ import net.minecraft.world.level.block.state.BlockState;
  * the crackle, and smoke from its chimneys. The places match art/gen_bio_furnace.py: the mouth faces north, the
  * chimney's lip is centred 1.5 px behind the middle and the second chimney (stage 2) stands to one side.
  */
-final class FurnaceFire {
+final class FurnaceFire implements OrganEffects {
+    static final FurnaceFire INSTANCE = new FurnaceFire();
+
     /** The light a working furnace gives, a vanilla furnace's. */
     static final int LIGHT = 13;
 
     private FurnaceFire() {}
 
-    static int light(BlockState state) {
+    @Override
+    public int light(BlockState state) {
         return state.getValue(BatchOrganBlock.WORKING) ? LIGHT : 0;
     }
 
-    static void animate(BlockState state, Level level, BlockPos pos, RandomSource random) {
+    @Override
+    public void animate(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (!state.getValue(BatchOrganBlock.WORKING)) return;
         double x = pos.getX() + 0.5;
         double y = pos.getY();

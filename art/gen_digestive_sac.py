@@ -6,7 +6,7 @@ Writes geo/block/digestive_sac.geo.json, animations/block/digestive_sac.animatio
 textures/block_entity/digestive_sac.png and _glowmask.png, textures/block/digestive_sac.png (break particle)
 and art/digestive_sac.bbmodel.
 
-A stomach. A pale, bloated sac sits on gnarled root claws, swollen at the sides; a veined membrane window in its
+A stomach. A bloated mauve sac sits on gnarled root claws, swollen at the sides; a veined membrane window in its
 front shows the green acid inside, glowing, with half-digested lumps floating in it; a ribbed gullet rises from its
 shoulder to a thick-lipped mouth that the player feeds; green glands bead its skin. It must read as a stomach from
 across a room: the window of glowing acid is the cue, the body stays pale and quiet around it.
@@ -25,7 +25,7 @@ IDLE, WORKING = 6.0, 3.0
 SKIN = [(74, 28, 44), (104, 42, 60), (136, 64, 82), (164, 92, 104), (190, 122, 126), (210, 154, 150)]
 LIP = [(64, 20, 34), (92, 34, 48), (124, 54, 66), (156, 80, 88), (184, 110, 112)]
 ROOT = [(30, 18, 22), (48, 30, 32), (70, 46, 44), (96, 66, 58), (122, 90, 76)]
-ACID = [(18, 70, 36), (34, 110, 48), (62, 156, 60), (104, 200, 74), (160, 234, 104), (214, 252, 156)]
+ACID = [(70, 78, 10), (112, 124, 16), (156, 172, 24), (196, 212, 40), (226, 240, 80), (248, 255, 150)]  # bile: yellow-green, not the Bladder's biomass green
 LINING = [(30, 10, 18), (48, 16, 28), (70, 26, 38), (94, 40, 52)]
 VEIN = [(84, 22, 40), (110, 34, 54)]
 MEMBRANE = (226, 214, 176)
@@ -158,10 +158,6 @@ def textures(uv):
                        grain=0.05, mottle=0.2)
     for face, rect in rects['pit'].items():
         p.ramp(rect, LINING, flat(0.25))
-        if face == 'up':
-            x0, y0, w, h = rect
-            p.put(rect, 1, 2, ACID[2], glow=160)  # a glint of acid down the throat
-            p.put(rect, 2, 1, ACID[1], glow=120)
     for name, vertical in (('lip_long', False), ('lip_short', True)):
         for face, rect in rects[name].items():
             p.ramp(rect, LIP, bone_along(vertical), grain=0.05, mottle=0.15)  # thick fleshy lips

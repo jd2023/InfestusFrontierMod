@@ -101,10 +101,10 @@ public class BatchOrganBlock extends BaseEntityBlock {
         return Organs.hasFoundation(context.getLevel(), context.getClickedPos()) ? defaultBlockState() : null;
     }
 
-    /** A smelting organ burns, and shows it as a vanilla furnace does. */
+    /** The kind's particles and sounds, as a vanilla furnace shows its fire. */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (kind.book() instanceof BatchBook.Smelting) FurnaceFire.animate(state, level, pos, random);
+        kind.effects().animate(state, level, pos, random);
     }
 
     @Override
