@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.testmod;
 
 import com.mojang.authlib.GameProfile;
+import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
@@ -490,6 +491,31 @@ public final class ItemCapsuleTests {
             player.closeContainer();
             h.succeed();
         });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void theClientRefusesToSwapAnotherKindIntoAnOccupiedCompartment(GameTestHelper h) {
+        MenuPlayer player = new MenuPlayer(h.getLevel());
+        RegistryFriendlyByteBuf extra =
+                new RegistryFriendlyByteBuf(Unpooled.buffer(), h.getLevel().registryAccess());
+        ItemCapsuleMenu menu;
+        try {
+            extra.writeBlockPos(h.absolutePos(cell(1, 0, 1)));
+            menu = new ItemCapsuleMenu(99, player.getInventory(), extra);
+        } finally {
+            extra.release();
+        }
+        for (int dimension = 0; dimension < 3; dimension++) menu.setData(dimension, 1);
+        menu.getSlot(0).set(stack(Items.COBBLESTONE, 200));
+        menu.setCarried(stack(Items.DIRT, 3));
+        h.assertFalse(menu.getSlot(0).mayPlace(menu.getCarried()), "client refuses a different occupied kind");
+        menu.clicked(0, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().is(Items.DIRT), "prediction keeps the cursor kind");
+        h.assertValueEqual(menu.getCarried().getCount(), 3, "prediction keeps the cursor count");
+        h.assertValueEqual(menu.getSlot(0).getItem().getCount(), 200, "prediction keeps the compartment count");
+        h.assertTrue(menu.getSlot(0).mayPlace(stack(Items.COBBLESTONE, 1)), "matching kinds still fit");
+        h.assertTrue(menu.getSlot(1).mayPlace(stack(Items.DIRT, 1)), "empty compartments still fit");
+        h.succeed();
     }
 
     /** Diamonds in a stack: loose, or inside a bundle. */

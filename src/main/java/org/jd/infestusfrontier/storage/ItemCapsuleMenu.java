@@ -89,7 +89,8 @@ public final class ItemCapsuleMenu extends OrganMenu {
             @Override
             public boolean accepts(int slot, ItemStack stack) {
                 return page.cell().isEmpty()
-                        || page.usable()
+                        ? copy[slot].isEmpty() || ItemStack.isSameItemSameComponents(copy[slot], stack)
+                        : page.usable()
                                 .map(body -> body.accepts(bodySlot(slot), stack))
                                 .orElse(false);
             }
