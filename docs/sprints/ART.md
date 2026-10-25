@@ -307,7 +307,7 @@ Files: src/main/resources/assets/infestusfrontier/textures/item/{fusion_binder,e
 
 ## ART-008 — Storage tissue: Reservoir and Item Capsule textures
 
-Status: accepted e7870a3. Owner of the asset: Astra.
+Status: accepted e7870a3. Owner of the asset: Astra. Since S04 F20 (2026-10-25) the Item Capsule paints its own tiles and uses none of these.
 Files: src/main/resources/assets/infestusfrontier/textures/block/{reservoir_membrane,reservoir_bone,reservoir_flesh,item_capsule_lining}.png, CREDITS.txt
 
 - Four 64x64 block textures, seamless on all four edges, one family with the Living Substrate tiles. They replace procedural placeholders from art/gen_reservoir.py and art/gen_item_capsule.py; the part models, the blockstates and the liquid stay with those generators, so a repaint changes no model.
@@ -342,12 +342,8 @@ Files: src/main/resources/assets/infestusfrontier/textures/item/{membrane_window
 - Two 32x32 icons, `--size 32 --colors 0`, one family with the treatment icons. Membrane Window: a small square of pale pink translucent membrane with red veins in a thin ivory bone frame. Sphincter Door: a closed iris of six overlapping pink membrane petals spiralling into a dark centre, ringed by a muscular red rim.
 - Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background. The placeholders are flat two-tone discs; the window block and the door model come from art/gen_openings.py and are not part of this story.
 
-### Item Capsule cocoon surface
+### Item Capsule surface
 
-The capsule uses `item_capsule_membrane.png` for its quiet outer skin and lips. `reservoir_bone.png` supplies the thin exterior ribs; `item_capsule_lining.png` supplies the dark pouch floors. `art/gen_item_capsule.py` owns the multipart geometry. The exterior wall masks continue across joined cells and retreat only at body edges. Four pouches per exposed front breathe on a shared nine-second cycle; their icons and counts stay fixed.
+Owner, 2026-10-25: the cocoon was not Minecrafty; something between it and the first box. `art/gen_item_capsule.py` owns the textures and the multipart geometry, all at sixteen texels a block: `item_capsule_skin` (a mottled mauve hide with a wandering vein, nodules and spiracle pores), `item_capsule_bone` (its outer two-pixel strips bevelled and notched into vertebrae), `item_capsule_flesh` (the front lattice) and `item_capsule_lining` (dark folds in the pockets). A two-pixel bone frame runs along every outer edge of a body and meets in corner knuckles; each outer face is hide sunk one pixel inside it, continuous across joined cells; the front is a flesh lattice of four pockets a cell, five pixels wide and three deep, whose positions `StorageModule` gives `FrontStockRenderer`. The pockets' membranes breathe on a shared nine-second cycle; icons and counts stay fixed. Parts meet edge to edge and never share a face plane (`test_capsule_bodies_have_no_faces_fighting_across_parts`).
 
-Original bitmap made with built-in image generation, without a reference image. Export with `scripts/texture.py --size 64 --colors 96`.
-
-Prompt: "Original seamless square opaque game material texture for a delicate living storage cocoon in a voxel game, to downsample to 64x64. Orthographic flat material swatch filling the entire canvas edge to edge, no object, no border, no text. Soft dusty mauve and muted rose membrane with broad gently flowing diagonal silk-like tissue folds, restrained cream-pink highlights from upper left, sparse extremely fine dark muted plum veins embedded beneath smooth skin. Quiet low-contrast surface with large calm areas, thin supple biological membrane, subtly fibrous. Organic hand-painted game texture, elegant and delicate, no chunky flesh lobes, no gore, no holes, no metal, no scales, no busy noise, no strong repeated motif. Seamlessly tileable across both axes with matching opposite edges. One continuous material, no panels or framing."
-
-Evidence: `build/art/item_capsule_membrane-tiled.png` and the `item_capsule` captures: single cell, wide/tall face, deep body, rotated 4×4×4 body, shared pages and nine-second breath.
+Evidence: the `item_capsule` and `capsule_joining` captures: single cell, wide/tall face, deep body, rotated 4×4×4 body, shared pages and nine-second breath.

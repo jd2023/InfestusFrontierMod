@@ -228,13 +228,13 @@ public final class StorageModule {
                 event.register(RESERVOIR_CELL_MENU.get(), ReservoirCellScreen::new);
                 event.register(ITEM_CAPSULE_MENU.get(), ItemCapsuleScreen::new);
             });
-            // four pockets on the front, two by two, each icon over its count
+            // four pockets on the front, two by two, each icon over its count; art/gen_item_capsule.py POCKETS
             FrontStockRenderer.register(
                     modBus,
                     ITEM_CAPSULE_ENTITY,
                     ItemCapsuleBlock.FACING,
                     ItemCapsuleBlockEntity::shown,
-                    new FrontStockRenderer.Pockets(2, 4F, 12F, 8F, 3.5F, 1.1F),
+                    new FrontStockRenderer.Pockets(2, 4.5F, 11.5F, 7F, 3.5F, 2.6F, 2.5F, 4F),
                     ResourceLocation.fromNamespaceAndPath("infestusfrontier", "block/item_capsule_lining"));
             // the liquid stops inside the membrane panes, above the fleshy base and under the lid
             JoinedTankRenderer.register(

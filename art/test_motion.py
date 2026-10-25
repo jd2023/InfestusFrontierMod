@@ -95,19 +95,27 @@ class OrganMotionTest(unittest.TestCase):
                 for path in (ASSETS / 'models' / folder).glob(prefix + '*.json'):
                     self.assertEqual(coplanar_faces(json.loads(path.read_text()).get('elements', [])), [], str(path))
 
-    def test_capsule_join_masks_reach_each_world_edge(self):
-        import gen_item_capsule as capsule
-        direction = {'west': (0, 0), 'east': (0, 16), 'down': (1, 0),
-                     'up': (1, 16), 'north': (2, 0), 'south': (2, 16)}
-        for side, neighbors in capsule.ADJACENT.items():
-            axis, plane = direction[side]
-            surface = 0.3125 if plane == 0 else 15.6875
-            for bit, neighbor in enumerate(neighbors):
-                along, edge = direction[neighbor]
-                faces = [e for e in capsule.wall(side, 1 << bit) if side in e['faces']
-                         and abs(e['from' if plane == 0 else 'to'][axis] - surface) < 1e-6]
-                extent = min(e['from'][along] for e in faces) if edge == 0 else max(e['to'][along] for e in faces)
-                self.assertEqual(extent, edge, (side, neighbor))
+    def test_capsule_bodies_have_no_faces_fighting_across_parts(self):
+        """Every part a joined body draws, cell by cell; parts may meet edge to edge but never share a face plane."""
+        parts = json.loads((ASSETS / 'blockstates/item_capsule.json').read_text())['multipart']
+        steps = {'west': (-1, 0, 0), 'east': (1, 0, 0), 'down': (0, -1, 0), 'up': (0, 1, 0),
+                 'north': (0, 0, -1), 'south': (0, 0, 1)}
+        for size, facing in (((1, 1, 1), 'north'), ((2, 1, 1), 'south'), ((1, 2, 2), 'west'), ((2, 2, 3), 'east')):
+            cells = [(x, y, z) for x in range(size[0]) for y in range(size[1]) for z in range(size[2])]
+            elements = []
+            for cell in cells:
+                state = {'facing': facing}
+                for side, step in steps.items():
+                    state[side] = str(tuple(c + d for c, d in zip(cell, step)) in cells).lower()
+                for part in parts:
+                    if not all(state[k] in v.split('|') for k, v in part.get('when', {}).items()):
+                        continue
+                    name = part['apply']['model'].split(':')[1]
+                    for element in json.loads((ASSETS / 'models' / (name + '.json')).read_text()).get('elements', []):
+                        element['from'] = [a + 16 * c for a, c in zip(element['from'], cell)]
+                        element['to'] = [a + 16 * c for a, c in zip(element['to'], cell)]
+                        elements.append(element)
+            self.assertEqual(coplanar_faces(elements), [], (size, facing))
 
     def test_attached_parts_inherit_their_support_motion(self):
         for model, child, parent in (

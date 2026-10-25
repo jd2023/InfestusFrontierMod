@@ -35,9 +35,12 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
     /**
      * Where the pockets are on a front, in block pixels seen from in front: {@code columns} across, the first
      * pocket's centre at {@code firstX} from the left and {@code firstY} from the bottom, {@code pitch} between
-     * centres, icons {@code icon} wide, drawn on the plane {@code depth} pixels behind the block's front face.
+     * centres, icons {@code icon} wide, drawn on the plane {@code depth} pixels behind the block's front face. Each
+     * pocket opens {@code half} pixels each way from its centre and its floor lies {@code floor} pixels behind the
+     * front face; the breathing membrane is drawn just in front of that floor.
      */
-    public record Pockets(int columns, float firstX, float firstY, float pitch, float icon, float depth) {}
+    public record Pockets(
+            int columns, float firstX, float firstY, float pitch, float icon, float depth, float half, float floor) {}
 
     /** Text height in block pixels. */
     private static final float TEXT = 1.5F;
@@ -88,7 +91,8 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
         VertexConsumer surface = buffers.getBuffer(Sheets.solidBlockSheet());
         // A shared nine-second breath keeps joined pouches in phase, without packets or ticking entities.
         double phase = level == null ? 0 : ((level.getGameTime() % 180) + partialTick) * Math.PI * 2 / 180;
-        float centreDepth = 1.5F + 0.12F * (float) Math.sin(phase);
+        float edgeDepth = pockets.floor() - 0.05F;
+        float centreDepth = pockets.floor() - 0.45F + 0.12F * (float) Math.sin(phase);
         for (int i = 0; i < stock.size(); i++) {
             membrane(
                     surface,
@@ -97,6 +101,8 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
                     lit,
                     pockets.firstX() + (i % pockets.columns()) * pockets.pitch(),
                     pockets.firstY() - (i / pockets.columns()) * pockets.pitch(),
+                    pockets.half(),
+                    edgeDepth,
                     centreDepth);
         }
         for (int i = 0; i < stock.size(); i++) {
@@ -141,16 +147,18 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
             int light,
             float x,
             float y,
+            float half,
+            float edge,
             float depth) {
         for (int side = 0; side < 4; side++) {
-            float ax = side == 0 || side == 3 ? -3 : 3;
-            float ay = side < 2 ? -3 : 3;
+            float ax = side == 0 || side == 3 ? -half : half;
+            float ay = side < 2 ? -half : half;
             int next = (side + 1) % 4;
-            float bx = next == 0 || next == 3 ? -3 : 3;
-            float by = next < 2 ? -3 : 3;
+            float bx = next == 0 || next == 3 ? -half : half;
+            float by = next < 2 ? -half : half;
             vertex(out, pose, sprite, light, x, y, depth);
-            vertex(out, pose, sprite, light, x + ax, y + ay, 1.85F);
-            vertex(out, pose, sprite, light, x + bx, y + by, 1.85F);
+            vertex(out, pose, sprite, light, x + ax, y + ay, edge);
+            vertex(out, pose, sprite, light, x + bx, y + by, edge);
             vertex(out, pose, sprite, light, x, y, depth);
         }
     }

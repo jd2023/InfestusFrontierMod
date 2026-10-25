@@ -1,0 +1,52 @@
+{
+  "textures": {
+    "skin": "infestusfrontier:block/item_capsule_skin",
+    "bone": "infestusfrontier:block/item_capsule_bone",
+    "flesh": "infestusfrontier:block/item_capsule_flesh",
+    "lining": "infestusfrontier:block/item_capsule_lining",
+    "particle": "infestusfrontier:block/item_capsule_skin"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        14,
+        0
+      ],
+      "to": [
+        2,
+        16,
+        2
+      ],
+      "faces": {
+        "west": {
+          "texture": "#bone",
+          "uv": [
+            0.0,
+            0.0,
+            2,
+            2
+          ]
+        },
+        "up": {
+          "texture": "#bone",
+          "uv": [
+            0.0,
+            0.0,
+            2,
+            2
+          ]
+        },
+        "north": {
+          "texture": "#bone",
+          "uv": [
+            14,
+            0.0,
+            16.0,
+            2
+          ]
+        }
+      }
+    }
+  ]
+}
