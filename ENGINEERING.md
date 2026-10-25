@@ -148,6 +148,7 @@ Before implementation, the story states: the work unit, who shares the budget (d
 |---|---|
 | Sample collection | One death offers one sample to one destination. At most 64 offers per server tick. No kill log |
 | Capsule UI page | 16 compartments plus 36 player slots, at most 16 pages. A page pins one body; split, merge or unload invalidates it. Page changes open a fresh container ID after ten ticks, with an empty cursor. Counts inspect at most 256 compartments per viewer per broadcast; vanilla syncs changed slots and four integers |
+| Capsule facing | Placement checks at most six loaded neighbors, preferring the clicked support. Formation and storage recovery count at most 64 already validated members; it syncs changed block states only, with no extra persisted state or ticking work |
 | Capsule membrane | At most 347 baked elements per cell or inventory model. Four pouches per exposed front, four triangles each. Nine-second client breath with 0.12-pixel amplitude; no extra packets, server ticks, neighbor scans or persistent state |
 | Sample UI page | 16 species rows, 48 quality counts, 2 changed pages per second per viewer |
 | Portable supply | 4 transactions per wearer per second, 64 per server tick in total |

@@ -331,7 +331,7 @@
   "tooltip.infestusfrontier.item_capsule.held": "%s × %s",
   "entry.infestusfrontier.circulation.item_capsule.name": "Item Capsule",
   "entry.infestusfrontier.circulation.item_capsule.description": "A cocoon that grows into one store",
-  "entry.infestusfrontier.circulation.item_capsule.use": "Each cell holds four item kinds, up to 16 stacks each: 1024 of most things. Grow whole rows and layers into a box, up to 4 on a side. Every cell opens the same store in pages of 16 compartments, including the stock hidden inside. Put down carried items before changing pages. Shift-click inserts into the whole store. Hoppers, pipes and Mouths also reach every compartment, filling matching kinds first. Breaking a cell carries its own items with it.",
+  "entry.infestusfrontier.circulation.item_capsule.use": "Each cell holds four item kinds, up to 16 stacks each: 1024 of most things. Grow a box up to 4 on a side; added cells share its front. Every cell opens the same store in pages of 16 compartments, including the stock hidden inside. Put down carried items before changing pages. Shift-click inserts into the whole store. Hoppers, pipes and Mouths also reach every compartment, filling matching kinds first. Breaking a cell carries its own items with it.",
   "entry.infestusfrontier.circulation.item_capsule.craft": "A chest, two Membrane Sheets and a Spore Culture.",
   "gui.infestusfrontier.item_capsule.previous": "Previous",
   "gui.infestusfrontier.item_capsule.next": "Next",

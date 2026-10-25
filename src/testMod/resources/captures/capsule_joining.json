@@ -1,0 +1,75 @@
+{
+  "commands": [
+    "tick freeze",
+    "fill -6 -61 -6 18 -54 12 air",
+    "fill -6 -62 -6 18 -62 12 grass_block",
+    "kill @e[type=item]",
+    "setblock 0 -61 2 infestusfrontier:item_capsule[facing=west]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:100}]}",
+    "setblock 0 -61 3 infestusfrontier:item_capsule[facing=north]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:120}]}",
+    "setblock 1 -61 2 infestusfrontier:item_capsule[facing=north]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:101}]}",
+    "setblock 1 -61 3 infestusfrontier:item_capsule[facing=north]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:121}]}",
+    "setblock 2 -61 2 infestusfrontier:item_capsule[facing=north]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:102}]}",
+    "setblock 2 -61 3 infestusfrontier:item_capsule[facing=west]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:122}]}",
+    "setblock 0 -60 2 infestusfrontier:item_capsule[facing=north]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:110}]}",
+    "setblock 0 -60 3 infestusfrontier:item_capsule[facing=north]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:130}]}",
+    "setblock 1 -60 2 infestusfrontier:item_capsule[facing=north]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:111}]}",
+    "setblock 1 -60 3 infestusfrontier:item_capsule[facing=west]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:131}]}",
+    "setblock 2 -60 2 infestusfrontier:item_capsule[facing=west]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:112}]}",
+    "setblock 2 -60 3 infestusfrontier:item_capsule[facing=north]{body:[0,-61,2,2,-60,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:132}]}",
+    "setblock 7 -61 2 infestusfrontier:item_capsule[facing=south]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:100}]}",
+    "setblock 7 -61 3 infestusfrontier:item_capsule[facing=east]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:120}]}",
+    "setblock 8 -61 2 infestusfrontier:item_capsule[facing=east]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:101}]}",
+    "setblock 8 -61 3 infestusfrontier:item_capsule[facing=east]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:121}]}",
+    "setblock 7 -60 2 infestusfrontier:item_capsule[facing=east]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:110}]}",
+    "setblock 7 -60 3 infestusfrontier:item_capsule[facing=east]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:130}]}",
+    "setblock 8 -60 2 infestusfrontier:item_capsule[facing=east]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:111}]}",
+    "setblock 8 -60 3 infestusfrontier:item_capsule[facing=south]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:131}]}",
+    "setblock 7 -59 2 infestusfrontier:item_capsule[facing=east]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:120}]}",
+    "setblock 7 -59 3 infestusfrontier:item_capsule[facing=south]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:140}]}",
+    "setblock 8 -59 2 infestusfrontier:item_capsule[facing=south]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:121}]}",
+    "setblock 8 -59 3 infestusfrontier:item_capsule[facing=east]{body:[7,-61,2,8,-59,3],stock:[{slot:0,item:{id:\"minecraft:bone\"},count:141}]}",
+    "tick unfreeze"
+  ],
+  "views": [
+    {
+      "name": "wide_front",
+      "x": 4.6,
+      "y": -60,
+      "z": -0.5,
+      "yaw": 32,
+      "pitch": 18
+    },
+    {
+      "name": "wide_close",
+      "x": 1.5,
+      "y": -61,
+      "z": -0.3,
+      "yaw": 0,
+      "pitch": 12
+    },
+    {
+      "name": "wide_back",
+      "x": -1.5,
+      "y": -60,
+      "z": 7,
+      "yaw": 215,
+      "pitch": 18
+    },
+    {
+      "name": "tall_front",
+      "x": 12,
+      "y": -59,
+      "z": 0.5,
+      "yaw": 60,
+      "pitch": 18
+    },
+    {
+      "name": "tall_back",
+      "x": 4,
+      "y": -59,
+      "z": 6,
+      "yaw": 235,
+      "pitch": 18
+    }
+  ]
+}

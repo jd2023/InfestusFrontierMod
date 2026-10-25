@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.storage;
 
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -26,12 +27,11 @@ final class Capsules {
         @Override
         public void formed(List<ItemCapsuleBlockEntity> members, Box body) {
             attach(members.get(0).getLevel(), members);
-            for (ItemCapsuleBlockEntity member : members) show(member, body);
         }
 
         @Override
         public void alone(ItemCapsuleBlockEntity cell) {
-            show(cell, cell.body());
+            show(cell, cell.body(), cell.getBlockState().getValue(ItemCapsuleBlock.FACING));
         }
     };
 
@@ -49,6 +49,10 @@ final class Capsules {
     private static CapsuleBody attach(Level level, List<ItemCapsuleBlockEntity> members) {
         CapsuleBody store = new CapsuleBody(level, members);
         for (ItemCapsuleBlockEntity member : members) member.attach(store);
+        if (!level.isClientSide) {
+            Direction front = front(members);
+            for (ItemCapsuleBlockEntity member : members) show(member, member.body(), front);
+        }
         return store;
     }
 
@@ -61,10 +65,24 @@ final class Capsules {
         return !stack.isEmpty() && (carried == null || carried.isEmpty());
     }
 
-    private static void show(ItemCapsuleBlockEntity cell, Box body) {
+    /** A body has one front. The most common facing wins; ties use the first matching cell in body order. */
+    private static Direction front(List<ItemCapsuleBlockEntity> members) {
+        int[] counts = new int[4];
+        for (ItemCapsuleBlockEntity member : members)
+            counts[member.getBlockState().getValue(ItemCapsuleBlock.FACING).get2DDataValue()]++;
+        Direction front = members.getFirst().getBlockState().getValue(ItemCapsuleBlock.FACING);
+        for (ItemCapsuleBlockEntity member : members) {
+            Direction candidate = member.getBlockState().getValue(ItemCapsuleBlock.FACING);
+            if (counts[candidate.get2DDataValue()] > counts[front.get2DDataValue()]) front = candidate;
+        }
+        return front;
+    }
+
+    private static void show(ItemCapsuleBlockEntity cell, Box body, Direction front) {
         Level level = cell.getLevel();
         if (level == null) return;
-        BlockState shown = ItemCapsuleBlock.shaped(cell.getBlockState(), cell.getBlockPos(), body);
+        BlockState shown = ItemCapsuleBlock.shaped(cell.getBlockState(), cell.getBlockPos(), body)
+                .setValue(ItemCapsuleBlock.FACING, front);
         if (shown != cell.getBlockState()) level.setBlock(cell.getBlockPos(), shown, Block.UPDATE_CLIENTS);
     }
 }

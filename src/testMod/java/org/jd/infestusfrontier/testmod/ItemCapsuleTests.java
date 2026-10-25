@@ -327,6 +327,90 @@ public final class ItemCapsuleTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void buildingRowsAndLayersFromDifferentSidesKeepsOneFront(GameTestHelper h) {
+        Player builder = EcologyTests.holding(h, GameType.CREATIVE, StorageModule.ITEM_CAPSULE_ITEM.get(), 64);
+        List<BlockPos> order = List.of(
+                cell(2, 0, 2),
+                cell(1, 0, 2),
+                cell(1, 0, 1),
+                cell(2, 0, 1),
+                cell(2, 1, 1),
+                cell(1, 1, 1),
+                cell(1, 1, 2),
+                cell(2, 1, 2));
+        for (int i = 0; i < order.size(); i++) {
+            BlockPos pos = order.get(i);
+            if (pos.getY() == Y) h.setBlock(pos.below(), Blocks.STONE);
+            builder.setYRot((i % 4) * 90);
+            h.placeAt(builder, builder.getMainHandItem(), pos.below(), Direction.UP);
+            h.assertValueEqual(
+                    h.getBlockState(pos).getValue(ItemCapsuleBlock.FACING),
+                    Direction.NORTH,
+                    "adding a row or layer inherits the capsule front before formation");
+        }
+        h.runAfterDelay(FORMED, () -> {
+            for (BlockPos pos : order) {
+                h.assertValueEqual(
+                        h.getBlockState(pos).getValue(ItemCapsuleBlock.FACING),
+                        Direction.NORTH,
+                        "all eight cells keep one front");
+                h.assertValueEqual(items(h, pos).getSlots(), 32, "every cell reaches the whole deep body");
+            }
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void existingMixedFacingBodiesRepairTheirFrontWithoutMovingStock(GameTestHelper h) {
+        body(h, 1, 3, 1, 2, 2);
+        h.runAfterDelay(FORMED, () -> {
+            store(h, cell(1, 0, 1)).insert(stack(Items.BONE, 1500), false);
+            for (BlockPos pos : List.of(cell(1, 0, 1), cell(2, 1, 2), cell(3, 0, 2)))
+                h.setBlock(pos, h.getBlockState(pos).setValue(ItemCapsuleBlock.FACING, Direction.WEST));
+            // Reloaded saved cells normalize their facing through the on-load formation path.
+            for (int x = 1; x <= 3; x++)
+                for (int y = 0; y < 2; y++)
+                    for (int z = 1; z <= 2; z++) {
+                        BlockEntity member = h.getBlockEntity(cell(x, y, z));
+                        CompoundTag saved =
+                                member.saveWithFullMetadata(h.getLevel().registryAccess());
+                        BlockEntity restored = BlockEntity.loadStatic(
+                                member.getBlockPos(),
+                                member.getBlockState(),
+                                saved,
+                                h.getLevel().registryAccess());
+                        h.assertTrue(restored != null, "saved capsule restores as a new block entity");
+                        h.getLevel().removeBlockEntity(member.getBlockPos());
+                        h.getLevel().setBlockEntity(restored);
+                        restored.onLoad();
+                    }
+            h.assertValueEqual(
+                    store(h, cell(3, 1, 2)).count(stack(Items.BONE, 1)),
+                    1500,
+                    "a store recovered before its scheduled tick keeps every item");
+            h.assertValueEqual(
+                    h.getBlockState(cell(1, 0, 1)).getValue(ItemCapsuleBlock.FACING),
+                    Direction.NORTH,
+                    "recovering the shared store also aligns its front");
+        });
+        h.runAfterDelay(FORMED * 2, () -> {
+            for (int x = 1; x <= 3; x++)
+                for (int y = 0; y < 2; y++)
+                    for (int z = 1; z <= 2; z++) {
+                        BlockPos pos = cell(x, y, z);
+                        h.assertValueEqual(
+                                h.getBlockState(pos).getValue(ItemCapsuleBlock.FACING),
+                                Direction.NORTH,
+                                "loaded cells agree with the body's main front");
+                        h.assertValueEqual(items(h, pos).getSlots(), 48, "three wide, two tall, two deep stays joined");
+                    }
+            h.assertValueEqual(store(h, cell(3, 1, 2)).count(stack(Items.BONE, 1)), 1500, "repair preserves stock");
+            h.assertValueEqual(carried(h, cell(1, 0, 1)).get(0).getCount(), 1024, "the first cell keeps its own stock");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void aSavedCellLoadsBackWithMoreThanAStackAndAnUnreadableOneKeepsItsBytes(GameTestHelper h) {
         body(h, 1, 2, 1, 1, 1);
         h.runAfterDelay(FORMED, () -> {

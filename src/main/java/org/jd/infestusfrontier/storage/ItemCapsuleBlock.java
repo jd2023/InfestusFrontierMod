@@ -65,9 +65,20 @@ public final class ItemCapsuleBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
-    /** The front faces the player who places it. */
+    /** A new body faces its builder; added cells inherit a neighbor, preferring the clicked support. */
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Level level = context.getLevel();
+        Direction support = context.getClickedFace().getOpposite();
+        Direction[] sides = Direction.values();
+        for (int i = -1; i < sides.length; i++) {
+            Direction side = i < 0 ? support : sides[i];
+            if (i >= 0 && side == support) continue;
+            BlockPos neighbor = context.getClickedPos().relative(side);
+            if (!level.hasChunkAt(neighbor)) continue;
+            BlockState state = level.getBlockState(neighbor);
+            if (state.is(this)) return defaultBlockState().setValue(FACING, state.getValue(FACING));
+        }
         return defaultBlockState()
                 .setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
