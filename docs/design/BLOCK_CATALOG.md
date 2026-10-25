@@ -128,7 +128,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Baseline:** One batch requires 1200 loaded server ticks (60 seconds at 20 TPS). Each incubation or water choice reduces its base requirement by 10%, capped at 30% after three choices; round water down to whole mB. This gives pure L3 incubation 840 ticks or pure L3 water costs of 70/35 mB. These are calculated initial tuning values, not playtest timings. The Bowl holds nine item slots, one 2000 mB water tank and one 2000 BU biomass tank so whole buckets fit without discarding a remainder. It performs no export and pauses when its substrate is absent. Recipes and quantities are owned by Items.
 
 ### T0-03 — Digestive Sac
-- **Does:** Converts unwanted organic matter into the first usable biomass. Food-rich inputs give more than woody scraps; mineral blocks are not food.
+- **Does:** A stomach: a bean-shaped sac with a window of glowing green acid and a thick-lipped mouth on its gullet. It converts unwanted organic matter into the first usable biomass; while it digests it squeezes, the acid sloshes and it gurgles. Food-rich inputs give more than woody scraps; mineral blocks are not food.
 - **Input → output:** Item Catalog's starter/native feed recipes → biomass with their exact water costs. No mineral feed or unlisted fish/leaf recipe; future fibrous diets require explicit recipes.
 - **Create:** 1 Organ Bud + 2 rotten flesh + 1 bowl.
 - **Growth:** Choose processing speed or biomass recovery. Elastic Gel treatment accepts fibrous leaves; add Intake/Output Mouths for a continuous feed line. It stops accepting batches when output has no room.

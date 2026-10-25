@@ -232,10 +232,10 @@ class OrganMotionTest(unittest.TestCase):
                 self.assertEqual(bone['parent'], 'stem')
                 self.assertGreaterEqual(bone['pivot'][1], top)
 
-    def test_digestive_rings_do_not_separate_vertically(self):
+    def test_digestive_sac_squeezes_sideways_so_the_gullet_stays_seated(self):
         for animation in animations('digestive_sac').values():
-            for bone in ('belly_low', 'belly_mid', 'belly_high', 'gland'):
-                for scale in animation['bones'][bone]['scale'].values():
+            for bone in ('belly', 'gullet'):
+                for scale in animation['bones'].get(bone, {}).get('scale', {}).values():
                     self.assertEqual(scale[1], 1)
 
     def test_junction_bottom_port_keeps_its_foot_on_the_foundation(self):

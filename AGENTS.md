@@ -30,7 +30,7 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 
 ## Running work
 
-The builder runs from one session: the owner states the goal; the builder implements in a git worktree, runs `bash scripts/verify.sh`, commits as the owner, spawns a fresh reviewer on the commits (`Review commits <from>..<to>. Follow REVIEW.md.`), repairs the findings, and pushes on `APPROVED`. The owner pastes nothing between runs and plays the build when a milestone's organs are in. A sprint file in `docs/sprints/` is written only when a milestone needs a plan the owner will read; a change needs no story. Art keeps its queue: `Do art story ART-004 from docs/sprints/ART.md. Follow AGENTS.md.`
+The builder runs from one session: the owner states the goal; the builder implements in the main checkout on `v4` (no worktrees; the owner's uncommitted files are never staged), runs `bash scripts/verify.sh`, commits as the owner, spawns a fresh reviewer on the commits (`Review commits <from>..<to>. Follow REVIEW.md.`), repairs the findings, and pushes on `APPROVED`. The owner pastes nothing between runs and plays the build when a milestone's organs are in. A sprint file in `docs/sprints/` is written only when a milestone needs a plan the owner will read; a change needs no story. Art keeps its queue: `Do art story ART-004 from docs/sprints/ART.md. Follow AGENTS.md.`
 
 ## Two rules that stop a story
 

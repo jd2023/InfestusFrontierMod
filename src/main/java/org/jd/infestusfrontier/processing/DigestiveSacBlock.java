@@ -2,6 +2,10 @@ package org.jd.infestusfrontier.processing;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -35,7 +39,7 @@ public final class DigestiveSacBlock extends BaseEntityBlock {
     public static final BooleanProperty WORKING = BooleanProperty.create("working");
 
     private static final MapCodec<DigestiveSacBlock> CODEC = simpleCodec(DigestiveSacBlock::new);
-    private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 14, 15);
+    private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 15, 15);
 
     DigestiveSacBlock(Properties properties) {
         super(properties);
@@ -60,6 +64,29 @@ public final class DigestiveSacBlock extends BaseEntityBlock {
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         return Organs.hasFoundation(context.getLevel(), context.getClickedPos()) ? defaultBlockState() : null;
+    }
+
+    /**
+     * While it digests, bubbles pop in its mouth now and then and it gurgles, from the client's block ticks as
+     * vanilla's furnace shows its fire. The mouth is the model's, 15 px up and 1.5 px off the middle (art/gen_digestive_sac.py).
+     */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(WORKING)) return;
+        double x = pos.getX() + 0.5 + 1.5 / 16.0 + (random.nextDouble() - 0.5) * 0.15;
+        double y = pos.getY() + 15.2 / 16.0;
+        double z = pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.15;
+        if (random.nextDouble() < 0.4) level.addParticle(ParticleTypes.BUBBLE_POP, x, y, z, 0.0, 0.02, 0.0);
+        if (random.nextDouble() < 0.06)
+            level.playLocalSound(
+                    x,
+                    y,
+                    z,
+                    SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT,
+                    SoundSource.BLOCKS,
+                    0.5F,
+                    0.6F + random.nextFloat() * 0.2F,
+                    false);
     }
 
     @Override

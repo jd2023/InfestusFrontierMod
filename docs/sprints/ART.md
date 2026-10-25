@@ -34,7 +34,7 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Models | Visual checks |
 |---|---|
 | Culture Bowl | Pool stays inside its walls; bubbles form independently at the surface |
-| Digestive Sac | Ring seams stay joined during contraction; mouth and nodules stay attached |
+| Digestive Sac | Reads as a stomach: the acid window is the cue, the body stays quiet; the gullet stays seated while the sac squeezes; mouth and glands stay attached |
 | Biomass Bladder | Empty is empty; all fill levels stay inside the membrane; frame has no overlapping faces |
 | Membrane Rack | Skin stays between posts; the droplet resets while invisible |
 | Bone Loom, Awakening Cradle | Ribs and lobes clear their contents through the working cycle |
