@@ -110,8 +110,8 @@ class ArmorTest(unittest.TestCase):
                 model = json.loads((ASSETS / 'models/item' / f'{name}_{piece}.json').read_text())
                 self.assertEqual(set(model['textures']), {'layer0', 'layer1'})
                 for suffix in ('', '_overlay'):
-                    img = Image.open(ASSETS / 'textures/item' / f'{name}_{piece}{suffix}.png')
-                    self.assertEqual(img.size, (32, 32))
+                    with Image.open(ASSETS / 'textures/item' / f'{name}_{piece}{suffix}.png') as img:
+                        self.assertEqual(img.size, (32, 32))
                 both = Image.alpha_composite(Image.open(ASSETS / 'textures/item' / f'{name}_{piece}.png').convert('RGBA'),
                                              Image.open(ASSETS / 'textures/item' / f'{name}_{piece}_overlay.png').convert('RGBA'))
                 self.assertGreater(sum(1 for p in both.getdata() if p[3]), 150, f'{name} {piece} icon is too small')

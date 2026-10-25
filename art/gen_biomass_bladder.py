@@ -93,7 +93,7 @@ def textures(uv):
 
 def animations():
     out = {'idle': (IDLE, True, {
-        'membrane': {'scale': sampled(IDLE, 0.1, lambda t: [0.985 + 0.01 * wave(t, IDLE), 1, 0.985 + 0.01 * wave(t, IDLE)])},
+        'membrane': {'scale': sampled(IDLE, 0.1, lambda t: [0.97 + 0.01 * wave(t, IDLE), 1, 0.97 + 0.01 * wave(t, IDLE)])},
     })}
     for n, level in enumerate(LEVELS):
         out['fill_%d' % n] = (IDLE, True, {

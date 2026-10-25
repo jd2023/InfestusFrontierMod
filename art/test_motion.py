@@ -82,6 +82,13 @@ class OrganMotionTest(unittest.TestCase):
                                          'faces': ('west', 'east', 'down', 'up', 'north', 'south')})
             self.assertEqual(coplanar_faces(elements), [], path.name)
 
+    def test_no_geckolib_model_has_faces_fighting_for_depth(self):
+        """Parallel faces closer than a tenth of a pixel flicker; organ models draw both sides of every face."""
+        import geo_audit
+        for path in sorted((ASSETS / 'geo/block').glob('*.geo.json')):
+            model = path.name.removesuffix('.geo.json')
+            self.assertEqual(geo_audit.audit(model), [], model)
+
     def test_storage_parts_and_items_have_no_overlapping_face_planes(self):
         for folder in ('block', 'item'):
             for prefix in ('item_capsule', 'reservoir_cell'):

@@ -19,8 +19,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -52,6 +54,23 @@ public final class BioFurnaceTests {
     private static final int STAGE0_TICKS = 320;
     private static final int STAGE1_TICKS = 240;
     private static final String RAW_IRON_RECIPE = "minecraft:iron_ingot_from_smelting_raw_iron";
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aWorkingFurnaceLightsItsSurroundingsAsAVanillaFurnaceDoes(GameTestHelper h) {
+        placeFurnace(h);
+        h.assertValueEqual(h.getBlockState(FURNACE).getLightEmission(), 0, "an idle furnace gives no light");
+        load(h, Items.RAW_IRON, 1);
+        load(h, StorageModule.BIOMASS_BUCKET.get(), 1);
+        h.succeedWhen(() -> {
+            BlockState state = h.getBlockState(FURNACE);
+            h.assertTrue(state.getValue(BatchOrganBlock.WORKING), "the furnace works");
+            h.assertValueEqual(state.getLightEmission(), 13, "a working furnace gives a lit vanilla furnace's light");
+            h.assertValueEqual(
+                    h.getLevel().getBrightness(LightLayer.BLOCK, h.absolutePos(FURNACE.north())),
+                    12,
+                    "the block in front of it is lit");
+        });
+    }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 400)
     public static void rawIronAndFortyBiomassSmeltAnIngotInSixteenSeconds(GameTestHelper h) {

@@ -51,11 +51,11 @@ def textures(uv):
 
 def animations():
     idle = {
-        'skin': {'scale': sampled(IDLE, 0.1, lambda t: [0.98 + 0.01 * wave(t, IDLE), 0.98 + 0.01 * wave(t, IDLE, 0.3), 1])},
+        'skin': {'scale': sampled(IDLE, 0.1, lambda t: [0.96 + 0.01 * wave(t, IDLE), 0.96 + 0.01 * wave(t, IDLE, 0.3), 1])},
         'drop': {'scale': sampled(IDLE, 0.1, lambda t: [0, 0, 0])},
     }
     working = {
-        'skin': {'scale': sampled(WORKING, 0.05, lambda t: [0.97 + 0.025 * wave(t, WORKING), 0.97 - 0.025 * wave(t, WORKING), 1])},
+        'skin': {'scale': sampled(WORKING, 0.05, lambda t: [0.95 + 0.02 * wave(t, WORKING), 0.95 - 0.02 * wave(t, WORKING), 1])},
         'drop': {
             'position': sampled(WORKING, 0.05, lambda t: [0, -2.0 * min(1, (t / WORKING / 0.8) ** 2), 0]),
             'scale': sampled(WORKING, 0.05, lambda t: [drop_size(t / WORKING)] * 3),

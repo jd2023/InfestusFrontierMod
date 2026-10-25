@@ -51,10 +51,10 @@ BONES = [
     ]),
     ('belly_high', 'root', [0, 11, 0], [('belly_high', [-4, 11, -4], [8, 2, 8], None)]),
     ('mouth', 'belly_high', [0, 13, 0], [('pit', [-2, 13, -2], [4, 1, 4], None)]),
-    ('lip_north', 'mouth', [0, 13, -3], [('lip_long', [-3, 13, -3], [6, 1, 1], None)]),
-    ('lip_south', 'mouth', [0, 13, 3], [('lip_long', [-3, 13, 2], [6, 1, 1], None)]),
-    ('lip_west', 'mouth', [-3, 13, 0], [('lip_short', [-3, 13, -2], [1, 1, 4], None)]),
-    ('lip_east', 'mouth', [3, 13, 0], [('lip_short', [2, 13, -2], [1, 1, 4], None)]),
+    ('lip_north', 'mouth', [0, 13, -3], [('lip_long', [-3, 13, -3.2], [6, 1, 1], None)]),
+    ('lip_south', 'mouth', [0, 13, 3], [('lip_long', [-3, 13, 2.2], [6, 1, 1], None)]),
+    ('lip_west', 'mouth', [-3, 13, 0], [('lip_short', [-3.2, 13, -2], [1, 1, 4], None)]),
+    ('lip_east', 'mouth', [3, 13, 0], [('lip_short', [2.2, 13, -2], [1, 1, 4], None)]),
 ]
 LIPS = {'lip_north': ([-1, 0, 0]), 'lip_south': ([1, 0, 0]), 'lip_west': ([0, 0, 1]), 'lip_east': ([0, 0, -1])}
 

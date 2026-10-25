@@ -110,15 +110,18 @@ CENTRE = (0.0, 15.0)
 OPENING = (-4, 2, 4, 28)  # x0, y0, x1, y1 between the lips
 # flaps: name, origin, size, the pivot at its outer corner, the twist it turns as it shrinks there
 FLAPS = [
-    ('flap_tl', [-4.125, 15.125, -0.5], [5, 13, 1], [-4, 28, 0], 20),
-    ('flap_tr', [-0.875, 15.25, -0.75], [5, 13, 1], [4, 28, 0], -20),
-    ('flap_bl', [-4.25, 1.875, -0.6], [5, 15, 1], [-4, 2, 0], -20),
-    ('flap_br', [-0.75, 1.75, -0.85], [5, 15, 1], [4, 2, 0], 20),
+    ('flap_tl', [-4.125, 15.125, -0.35], [5, 13, 1], [-4, 28, 0], 20),
+    ('flap_tr', [-0.875, 15.25, -0.65], [5, 13, 1], [4, 28, 0], -20),
+    ('flap_bl', [-4.375, 1.875, -0.5], [5, 15, 1], [-4, 2, 0], -20),
+    ('flap_br', [-0.625, 1.75, -0.8], [5, 15, 1], [4, 2, 0], 20),
 ]
 OPEN_SCALE = 0.08
 # raised folds on each flap's front, radiating from the pucker: degrees from the vertical, length
-RIDGES = ((12, 12), (38, 6))
-RIDGE_Z = -1.35
+RIDGES = ((12, 10), (38, 6))  # the long ridge stops short of the corner fillets
+RIDGE_Z = -1.12  # the fillets' faces are at -1
+RIDGE_STEP = 0.11
+# which depth slots each flap's two ridges take, chosen so each ridge's back can land inside its own flap
+RIDGE_SLOTS = {'flap_tl': (0, 1), 'flap_bl': (2, 6), 'flap_tr': (3, 7), 'flap_br': (4, 5)}
 SHUT, IDLE = 0.5, 6.5
 # the safer doors a graft hardens the Sphincter Door into, as it hardens the wall tiers
 TOUGH = [(66, 18, 32), (96, 30, 46), (128, 48, 62), (160, 74, 84), (190, 108, 110)]
@@ -170,16 +173,20 @@ def bones(variant):
         cubes = [(name, origin, size, None)]
         side = 1 if name.endswith('r') else -1  # +x for the flaps on the right of the model
         up = name[5] == 't'
-        for angle, length in RIDGES:
+        for k, (angle, length) in enumerate(RIDGES):
             # the cube runs from the centre along +y (top flaps) or -y (bottom ones) and turns out into its flap;
             # geo turns about +z clockwise as seen from the front
             y0 = CENTRE[1] if up else CENTRE[1] - length
             turn = side * angle if up else -side * angle
-            cubes.append(('ridge_%d' % length, [CENTRE[0] - 0.5, y0, RIDGE_Z], [1, length, 1],
-                          ([0, 0, -turn], [CENTRE[0], CENTRE[1], RIDGE_Z])))
+            # every ridge stands at its own depth slot, in front of every flap and clear of the corner fillets, so no
+            # two ridges and no ridge and flap or fillet share a plane; its back lands inside its own flap
+            z = RIDGE_Z - RIDGE_STEP * RIDGE_SLOTS[name][k]
+            depth = next(d for d in (1, 2) if origin[2] + 0.1 <= z + d <= origin[2] + size[2] - 0.1)
+            cubes.append(('ridge_%d_%d' % (length, round(-z * 100)), [CENTRE[0] - 0.5, y0, z], [1, length, depth],
+                          ([0, 0, -turn], [CENTRE[0], CENTRE[1], z])))
         out.append((name, 'root', pivot, cubes))
     # the pucker where the flaps meet, standing in front of and behind them; it shrinks away as the doorway dilates
-    out.append(('pucker', 'root', [0, 15, 0], [('pucker', [-1, 14, -1.5], [2, 2, 3], None)]))
+    out.append(('pucker', 'root', [0, 15, 0], [('pucker', [-1, 14, -2.4], [2, 2, 4], None)]))
     return out
 
 
@@ -252,11 +259,13 @@ def animations(model_bones):
     twists = {name: twist for name, _, _, _, twist in FLAPS}
     closed = {f: {'scale': sampled(IDLE, 0.25, lambda t, i=i: [1 + 0.012 * wave(t, IDLE, i * 0.4)] * 3)}
               for i, f in enumerate(flaps)}
-    opened = {f: {'rotation': {'0.0': [0, 0, twists[f]]}, 'scale': {'0.0': [OPEN_SCALE] * 3}} for f in flaps}
+    # the flaps shrink in width and height but keep their depth, so their layers never close up into one plane
+    shrunk = [OPEN_SCALE, OPEN_SCALE, 1]
+    opened = {f: {'rotation': {'0.0': [0, 0, twists[f]]}, 'scale': {'0.0': shrunk}} for f in flaps}
     opening = {f: {'rotation': {'0.0': [0, 0, 0], str(SHUT): [0, 0, twists[f]]},
-                   'scale': {'0.0': [1, 1, 1], str(SHUT): [OPEN_SCALE] * 3}} for f in flaps}
+                   'scale': {'0.0': [1, 1, 1], str(SHUT): shrunk}} for f in flaps}
     closing = {f: {'rotation': {'0.0': [0, 0, twists[f]], str(SHUT): [0, 0, 0]},
-                   'scale': {'0.0': [OPEN_SCALE] * 3, str(SHUT): [1, 1, 1]}} for f in flaps}
+                   'scale': {'0.0': shrunk, str(SHUT): [1, 1, 1]}} for f in flaps}
     closed['pucker'] = {'scale': {'0.0': [1, 1, 1]}}
     opened['pucker'] = {'scale': {'0.0': [0, 0, 0]}}
     opening['pucker'] = {'scale': {'0.0': [1, 1, 1], str(SHUT / 2): [0, 0, 0]}}

@@ -158,7 +158,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Growth:** Choose speed or biomass economy. Ferrocyte Paste treatment produces reinforced plates using additional prepared iron; adding frame blocks increases batch size, not mineral yield.
 
 ### T0-07 — Bio-Furnace
-- **Does:** A small stomach-like furnace. Initially slower and more fuel-hungry than a vanilla furnace, but it accumulates permanent processing experience.
+- **Does:** A living kiln: a charred carapace whose seams glow with heat, a deep firebox mouth with bone fangs over banked coals, a flesh chimney. While it smelts, fire rises behind the fangs, it lights its surroundings as a lit vanilla furnace does (light 13), and flames and smoke come from its mouth and chimney. Initially slower and more fuel-hungry than a vanilla furnace, but it accumulates permanent processing experience.
 - **Input → output:** A normal smelting ingredient + biomass → its normal smelting result. Starting target: 16 seconds per item; no free ore multiplication or extra XP from recooking outputs.
 - **Create:** 1 furnace + 1 Organ Bud + 2 Membrane Sheets.
 - **Growth:** Choose speed or biomass economy at each level. L1 permits a Char Gland Feed treatment for solid-fuel feeding; Hearth Lungs improve combustion. Mouths automate loading; a T3 Thermal Mantle enables hotter recipes on this same core.

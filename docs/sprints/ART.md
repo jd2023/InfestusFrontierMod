@@ -17,7 +17,7 @@ Quality bar. The owner rejects anything below it, and a sprint is not done while
 - One light direction, top-left, across every texture. Soft shading, no flat fills, no dithering noise, no outlines inside a block face.
 - An item icon is one object with a silhouette that reads at hotbar size, a thin dark outline, and a highlight on the lit side.
 - An organ item's icon sits centred in its slot: its visual centroid within 1.5 px of the slot centre, nothing drawn outside the 16 px square. The gate measures it on the organs hotbar capture; the numbers live in the item model's `display.gui`.
-- A model has one bone per moving part. At rest no cube of one bone sits inside a cube of another bone, except plates named as layered. Every loop closes: the last key equals the first pose, and a rotating channel ends at a multiple of 360. No channel moves faster than 720 degrees per second. Emissive parts have a glowmask. Model textures are 64x64 per model; living armor growth sheets are 128x64 (both sets' growths share one texel per unit, as the vanilla armor layers do).
+- A model has one bone per moving part. At rest no cube of one bone sits inside a cube of another bone, except plates named as layered. Every loop closes: the last key equals the first pose, and a rotating channel ends at a multiple of 360. No channel moves faster than 720 degrees per second. Emissive parts have a glowmask. No two parallel faces of different cubes overlap closer than a tenth of a pixel, facing either way, in any pose (`art/geo_audit.py`; organ models draw both sides of every face). Model textures are 64x64 per model; living armor growth sheets are 128x64 (both sets' growths share one texel per unit, as the vanilla armor layers do).
 - Model sources are `.bbmodel` files committed under `art/`, openable in Blockbench; the shipped `geo` and `animation` JSON are exported from them. The first model story also adds the lint that measures the four rules above.
 - Evidence for a texture: `build/art/<name>-tiled.png` and the captures. For a model: front, side, back, dark and an animation frame sheet.
 
@@ -38,7 +38,7 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Biomass Bladder | Empty is empty; all fill levels stay inside the membrane; frame has no overlapping faces |
 | Membrane Rack | Skin stays between posts; the droplet resets while invisible |
 | Bone Loom, Awakening Cradle | Ribs and lobes clear their contents through the working cycle |
-| Bio-Furnace | All three stages; glow, ridges, throats and chimneys remain distinct |
+| Bio-Furnace | All three stages; reads as a furnace from across a room, day and night: dark body, hot mouth and seams, fire and light only while it works; the fangs, coals, chimney, buttresses, bellows and second chimney remain distinct |
 | Activation Cyst, Seed Pouch | Chambers, neck, rim and throat follow their supporting tissue |
 | Planting Proboscis, Harvest Corolla | Moving parts remain attached; petals clear the heart; tips clear the floor |
 | Compost Gland | Distinct scrap hopper and fertilizer outlet, with a slow compression cycle |

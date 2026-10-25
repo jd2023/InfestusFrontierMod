@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.processing;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -98,6 +99,12 @@ public class BatchOrganBlock extends BaseEntityBlock {
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         return Organs.hasFoundation(context.getLevel(), context.getClickedPos()) ? defaultBlockState() : null;
+    }
+
+    /** A smelting organ burns, and shows it as a vanilla furnace does. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (kind.book() instanceof BatchBook.Smelting) FurnaceFire.animate(state, level, pos, random);
     }
 
     @Override
