@@ -73,6 +73,8 @@ def poses(anims, every=False):
 
 
 def world_cubes(geo, anim, t):
+    """Every cube in the game's space at time t. GeckoLib mirrors a model in x as it bakes it: pivots and cube origins
+    are mirrored (an origin x becomes -(x + width)) and rotations about x and y negated (see rotation)."""
     bones = {b['name']: b for b in geo['bones']}
     matrices = {}
 
@@ -88,7 +90,8 @@ def world_cubes(geo, anim, t):
         if isinstance(scale, (int, float)):
             scale = [scale] * 3
         pos = channel(ch['position'], t) if 'position' in ch else [0, 0, 0]
-        local = affine(bone.get('pivot', [0, 0, 0]), rot, scale, [-pos[0], pos[1], pos[2]])
+        px, py, pz = bone.get('pivot', [0, 0, 0])
+        local = affine([-px, py, pz], rot, scale, [-pos[0], pos[1], pos[2]])
         parent = bone.get('parent')
         matrices[name] = (matrix(parent) if parent else np.eye(4)) @ local
         return matrices[name]
@@ -100,9 +103,14 @@ def world_cubes(geo, anim, t):
             continue
         for i, cube in enumerate(bone.get('cubes', [])):
             inf = cube.get('inflate', 0)
-            lo = np.array(cube['origin'], dtype=float) - inf
+            ox, oy, oz = cube['origin']
+            lo = np.array([-(ox + cube['size'][0]), oy, oz], dtype=float) - inf
             hi = lo + np.array(cube['size'], dtype=float) + 2 * inf
-            cm = m @ (affine(cube['pivot'], cube['rotation']) if 'rotation' in cube else np.eye(4))
+            turn = None
+            if 'rotation' in cube:
+                cx, cy, cz = cube['pivot']
+                turn = affine([-cx, cy, cz], cube['rotation'])
+            cm = m @ (turn if turn is not None else np.eye(4))
             if abs(np.linalg.det(cm[:3, :3])) < 1e-9:
                 continue
             out.append((f'{name}[{i}]', cm, lo, hi))

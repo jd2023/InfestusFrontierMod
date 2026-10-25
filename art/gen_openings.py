@@ -175,7 +175,7 @@ def bones(variant):
         up = name[5] == 't'
         for k, (angle, length) in enumerate(RIDGES):
             # the cube runs from the centre along +y (top flaps) or -y (bottom ones) and turns out into its flap;
-            # geo turns about +z clockwise as seen from the front
+            # GeckoLib mirrors x as it bakes, so in the game a turn about +z is anticlockwise as seen from the front
             y0 = CENTRE[1] if up else CENTRE[1] - length
             turn = side * angle if up else -side * angle
             # every ridge stands at its own depth slot, in front of every flap and clear of the corner fillets, so no
@@ -183,7 +183,7 @@ def bones(variant):
             z = RIDGE_Z - RIDGE_STEP * RIDGE_SLOTS[name][k]
             depth = next(d for d in (1, 2) if origin[2] + 0.1 <= z + d <= origin[2] + size[2] - 0.1)
             cubes.append(('ridge_%d_%d' % (length, round(-z * 100)), [CENTRE[0] - 0.5, y0, z], [1, length, depth],
-                          ([0, 0, -turn], [CENTRE[0], CENTRE[1], z])))
+                          ([0, 0, turn], [CENTRE[0], CENTRE[1], z])))
         out.append((name, 'root', pivot, cubes))
     # the pucker where the flaps meet, standing in front of and behind them; it shrinks away as the doorway dilates
     out.append(('pucker', 'root', [0, 15, 0], [('pucker', [-1, 14, -2.4], [2, 2, 4], None)]))

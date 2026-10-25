@@ -52,8 +52,9 @@ BONES = [
     ]),
     ('pulse', 'cocoon', [0, 6.5, 0], [('pulse', [-2.5, 4.5, -2.5], [5, 4, 5], None)]),
 ]
-# outward lean of each petal at rest, as (axis, sign): rotating by +sign degrees about the axis opens it
-OPEN = {'petal_n': (0, 1), 'petal_s': (0, -1), 'petal_w': (2, 1), 'petal_e': (2, -1)}
+# outward lean of each petal at rest, as (axis, sign): rotating by +sign degrees about the axis opens it, in the
+# game's space (GeckoLib mirrors x, so the west and east signs differ from the file's)
+OPEN = {'petal_n': (0, 1), 'petal_s': (0, -1), 'petal_w': (2, -1), 'petal_e': (2, 1)}
 
 
 def textures(uv):
