@@ -69,8 +69,15 @@ final class CaptureClient {
      * Runs before every scenario's own commands, so nothing carries over from the scenario before: not the inventory,
      * not the night, not an item lying on the ground that the player would pick up.
      */
-    private static final List<String> RESET =
-            List.of("tick unfreeze", "clear @s", "kill @e[type=item]", "time set noon", "weather clear");
+    /** Every scenario starts from the same state, whatever the one before it changed. */
+    private static final List<String> RESET = List.of(
+            "tick unfreeze",
+            "clear @s",
+            "kill @e[type=item]",
+            "time set noon",
+            "weather clear",
+            "gamemode creative @s",
+            "difficulty peaceful");
 
     private final Path outputDir;
     private final List<Scenario> scenarios;
