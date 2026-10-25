@@ -3,11 +3,12 @@ package org.jd.infestusfrontier.storage;
 import java.util.Arrays;
 import java.util.Optional;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
@@ -15,101 +16,127 @@ import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.foundation.menu.OrganMenu;
 import org.jd.infestusfrontier.ui.Sheet;
 
-/**
- * The capsule screen's server half: the cell's own four compartments and the body's size and use as synced ints.
- * Shift-click from the inventory puts the stack into the whole body by its rules; shift-click on a compartment moves a
- * stack at a time into the inventory.
- */
+/** Sixteen compartments of one shared body. Each page has a fresh menu id and an immutable slot mapping. */
 public final class ItemCapsuleMenu extends OrganMenu {
-    private static final int SIZE_X = 0;
-    private static final int SIZE_Y = 1;
-    private static final int SIZE_Z = 2;
-    private static final int USED = 3;
-    private static final int COMPARTMENTS = ItemCapsuleBlockEntity.COMPARTMENTS;
+    public static final int PAGE_SIZE = 16;
+    public static final int PREVIOUS = 0;
+    public static final int NEXT = 1;
+    static final int COLUMNS = 8;
+    static final int PITCH = 20;
+    static final int STRIPS = 2;
+    static final int GRID_Y = 36;
+    static final int BUTTON_Y = 82;
+    private final Page page;
+    private final long pageAfter;
 
-    private final Optional<ItemCapsuleBlockEntity> cell;
+    private record Page(Optional<ItemCapsuleBlockEntity> cell, Optional<CapsuleBody> body, int number) {
+        static Page server(ItemCapsuleBlockEntity cell, int number) {
+            return new Page(Optional.of(cell), Capsules.of(cell), number);
+        }
 
-    /** Server side. */
+        Optional<CapsuleBody> usable() {
+            return body.filter(CapsuleBody::isUsable);
+        }
+    }
+
     ItemCapsuleMenu(int id, Inventory inventory, ItemCapsuleBlockEntity cell) {
-        this(
-                id,
-                inventory,
-                new CompartmentSlot.Source() {
-                    @Override
-                    public ItemStack get(int compartment) {
-                        return cell.held(compartment);
-                    }
-
-                    @Override
-                    public void set(int compartment, ItemStack stack) {
-                        cell.put(compartment, stack);
-                    }
-
-                    @Override
-                    public boolean accepts(int compartment, ItemStack stack) {
-                        return cell.accepts(compartment, stack);
-                    }
-                },
-                reading(
-                        () -> cell.body().sizeX(),
-                        () -> cell.body().sizeY(),
-                        () -> cell.body().sizeZ(),
-                        () -> Capsules.of(cell).map(CapsuleBody::used).orElse(0)),
-                at(cell),
-                Optional.of(cell));
+        this(id, inventory, Page.server(cell, 0), at(cell));
     }
 
-    /** Client side. The position arrives as extra data; the compartments arrive as slot updates. */
     public ItemCapsuleMenu(int id, Inventory inventory, RegistryFriendlyByteBuf extra) {
-        this(id, inventory, copy(), new SimpleContainerData(4), at(inventory, extra), Optional.empty());
+        this(id, inventory, at(inventory, extra), extra.readableBytes() > 0 ? extra.readVarInt() : 0);
     }
 
-    private ItemCapsuleMenu(
-            int id,
-            Inventory inventory,
-            CompartmentSlot.Source source,
-            ContainerData data,
-            ContainerLevelAccess access,
-            Optional<ItemCapsuleBlockEntity> cell) {
-        super(StorageModule.ITEM_CAPSULE_MENU.get(), id, access, StorageModule.ITEM_CAPSULE.get(), data);
-        this.cell = cell;
-        SimpleContainer shared = new SimpleContainer(COMPARTMENTS);
-        for (int compartment = 0; compartment < COMPARTMENTS; compartment++)
+    private ItemCapsuleMenu(int id, Inventory inventory, ContainerLevelAccess access, int number) {
+        this(id, inventory, new Page(Optional.empty(), Optional.empty(), number), access);
+    }
+
+    private ItemCapsuleMenu(int id, Inventory inventory, Page page, ContainerLevelAccess access) {
+        super(
+                StorageModule.ITEM_CAPSULE_MENU.get(),
+                id,
+                access,
+                StorageModule.ITEM_CAPSULE.get(),
+                page.cell().isEmpty()
+                        ? new SimpleContainerData(4)
+                        : reading(
+                                () -> page.cell().orElseThrow().body().sizeX(),
+                                () -> page.cell().orElseThrow().body().sizeY(),
+                                () -> page.cell().orElseThrow().body().sizeZ(),
+                                () -> page.usable().map(CapsuleBody::used).orElse(0)));
+        this.page = page;
+        pageAfter = inventory.player.level().getGameTime() + 10;
+        ItemStack[] copy = new ItemStack[PAGE_SIZE];
+        Arrays.fill(copy, ItemStack.EMPTY);
+        CompartmentSlot.Source source = new CompartmentSlot.Source() {
+            private int bodySlot(int slot) {
+                return page.number() * PAGE_SIZE + slot;
+            }
+
+            @Override
+            public ItemStack get(int slot) {
+                return page.cell().isEmpty()
+                        ? copy[slot]
+                        : page.usable().map(body -> body.stack(bodySlot(slot))).orElse(ItemStack.EMPTY);
+            }
+
+            @Override
+            public void set(int slot, ItemStack stack) {
+                if (page.cell().isEmpty()) copy[slot] = stack.copy();
+                else page.usable().ifPresent(body -> body.put(bodySlot(slot), stack));
+            }
+
+            @Override
+            public boolean accepts(int slot, ItemStack stack) {
+                return page.cell().isEmpty()
+                        || page.usable()
+                                .map(body -> body.accepts(bodySlot(slot), stack))
+                                .orElse(false);
+            }
+
+            @Override
+            public boolean active(int slot) {
+                return bodySlot(slot) < compartments();
+            }
+        };
+        SimpleContainer shared = new SimpleContainer(PAGE_SIZE);
+        for (int slot = 0; slot < PAGE_SIZE; slot++)
             addSlot(new CompartmentSlot(
                     source,
                     shared,
-                    compartment,
-                    Sheet.SLOT_X + compartment * (Sheet.SLOT.width() + Sheet.GAP),
-                    Sheet.SLOT_Y));
-        addPlayer(inventory, 0);
+                    slot,
+                    Sheet.LEFT_X + 1 + slot % COLUMNS * PITCH,
+                    GRID_Y + 1 + slot / COLUMNS * PITCH));
+        addPlayer(inventory, STRIPS);
     }
 
-    /** The client's copy of the compartments; the server decides what fits, this only shows it. */
-    private static CompartmentSlot.Source copy() {
-        ItemStack[] held = new ItemStack[COMPARTMENTS];
-        Arrays.fill(held, ItemStack.EMPTY);
-        return new CompartmentSlot.Source() {
-            @Override
-            public ItemStack get(int compartment) {
-                return held[compartment];
-            }
-
-            @Override
-            public void set(int compartment, ItemStack stack) {
-                held[compartment] = stack;
-            }
-
-            @Override
-            public boolean accepts(int compartment, ItemStack stack) {
-                return held[compartment].isEmpty() || ItemStack.isSameItemSameComponents(held[compartment], stack);
-            }
-        };
+    /** The server rechecks the standing body and refuses page changes while anything is on the cursor. */
+    @Override
+    public boolean clickMenuButton(Player player, int button) {
+        if (!(player instanceof ServerPlayer server)
+                || player.containerMenu != this
+                || !stillValid(player)
+                || !getCarried().isEmpty()
+                || player.level().getGameTime() < pageAfter) return false;
+        int next = page.number() + (button == NEXT ? 1 : button == PREVIOUS ? -1 : 0);
+        if (next == page.number() || next < 0 || next >= pages()) return false;
+        ItemCapsuleBlockEntity cell = page.cell().orElseThrow();
+        server.openMenu(
+                new SimpleMenuProvider(
+                        (id, inventory, user) ->
+                                new ItemCapsuleMenu(id, inventory, new Page(page.cell(), page.body(), next), at(cell)),
+                        cell.getDisplayName()),
+                extra -> {
+                    extra.writeBlockPos(cell.getBlockPos());
+                    extra.writeVarInt(next);
+                });
+        return true;
     }
 
-    /** Drags and hotbar swaps would move more than a stack at once, so compartments refuse them. */
     @Override
     public void clicked(int slot, int button, ClickType type, Player player) {
-        if (type == ClickType.SWAP && slot >= 0 && slot < COMPARTMENTS) return;
+        if (page.cell().isPresent() && (player.containerMenu != this || !stillValid(player))) return;
+        if (slot >= 0 && slot < PAGE_SIZE && (!getSlot(slot).isActive() || type == ClickType.SWAP)) return;
         super.clicked(slot, button, type, player);
     }
 
@@ -120,32 +147,34 @@ public final class ItemCapsuleMenu extends OrganMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
+        if (index < 0 || index >= slots.size() || player.containerMenu != this || !stillValid(player))
+            return ItemStack.EMPTY;
         Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
-        if (index < COMPARTMENTS) {
+        if (!slot.isActive() || !slot.hasItem()) return ItemStack.EMPTY;
+        if (index < PAGE_SIZE) {
             ItemStack held = slot.getItem();
             ItemStack moving = held.copyWithCount(Math.min(held.getCount(), held.getMaxStackSize()));
             int before = moving.getCount();
-            moveItemStackTo(moving, COMPARTMENTS, slots.size(), true);
+            moveItemStackTo(moving, PAGE_SIZE, slots.size(), true);
             int moved = before - moving.getCount();
             if (moved == 0) return ItemStack.EMPTY;
             slot.remove(moved);
             return held.copyWithCount(moved);
         }
-        Optional<CapsuleBody> body = cell.flatMap(Capsules::of);
+        Optional<CapsuleBody> body = page.usable();
         if (body.isEmpty()) return ItemStack.EMPTY;
         ItemStack stack = slot.getItem();
         ItemStack rest = body.get().insert(stack, false);
-        if (rest.getCount() == stack.getCount()) return ItemStack.EMPTY;
-        slot.set(rest);
+        if (rest.getCount() != stack.getCount()) slot.set(rest);
         return ItemStack.EMPTY;
     }
 
-    /** The cell itself must still stand there: a cell broken and placed again is another cell. */
     @Override
     public boolean stillValid(Player player) {
         return super.stillValid(player)
-                && cell.map(standing -> !standing.isRemoved()).orElse(true);
+                && (page.cell().isEmpty()
+                        || page.cell().filter(cell -> !cell.isRemoved()).isPresent()
+                                && page.usable().isPresent());
     }
 
     @Override
@@ -159,22 +188,30 @@ public final class ItemCapsuleMenu extends OrganMenu {
     }
 
     int sizeX() {
-        return synced(SIZE_X);
+        return synced(0);
     }
 
     int sizeY() {
-        return synced(SIZE_Y);
+        return synced(1);
     }
 
     int sizeZ() {
-        return synced(SIZE_Z);
+        return synced(2);
     }
 
     int compartments() {
-        return sizeX() * sizeY() * sizeZ() * COMPARTMENTS;
+        return sizeX() * sizeY() * sizeZ() * ItemCapsuleBlockEntity.COMPARTMENTS;
     }
 
     int used() {
-        return synced(USED);
+        return synced(3);
+    }
+
+    int page() {
+        return page.number();
+    }
+
+    int pages() {
+        return Math.max(1, (compartments() + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 }

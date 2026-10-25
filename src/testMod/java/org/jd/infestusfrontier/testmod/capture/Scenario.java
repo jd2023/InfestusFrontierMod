@@ -44,7 +44,8 @@ record Scenario(String name, List<String> commands, List<View> views) {
             List<String> icons,
             int frames,
             int frameTicks,
-            Optional<String> trigger) {
+            Optional<String> trigger,
+            Optional<Integer> menuButton) {
         boolean opensScreen() {
             return use.isPresent() || inventory || book.isPresent();
         }
@@ -112,7 +113,8 @@ record Scenario(String name, List<String> commands, List<View> views) {
                         v.has("icons") ? icons(v.getAsJsonArray("icons")) : List.of(),
                         frames,
                         frameTicks,
-                        v.has("trigger") ? Optional.of(v.get("trigger").getAsString()) : Optional.empty()));
+                        v.has("trigger") ? Optional.of(v.get("trigger").getAsString()) : Optional.empty(),
+                        v.has("menuButton") ? Optional.of(v.get("menuButton").getAsInt()) : Optional.empty()));
             }
             return new Scenario(name, List.copyOf(commands), List.copyOf(views));
         }

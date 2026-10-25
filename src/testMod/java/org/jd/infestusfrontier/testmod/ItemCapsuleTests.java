@@ -50,6 +50,7 @@ import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.ItemCapsuleBlock;
+import org.jd.infestusfrontier.storage.ItemCapsuleMenu;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.CapsuleStock;
 import org.jd.infestusfrontier.storage.api.ItemStore;
@@ -428,11 +429,64 @@ public final class ItemCapsuleTests {
             menu.clicked(0, 0, ClickType.QUICK_MOVE, player);
             h.assertTrue(menu.getSlot(0).getItem().isEmpty(), "shift-click empties it into the inventory");
             h.assertValueEqual(player.getInventory().countItem(Items.COBBLESTONE), 200, "all of it");
-            int inventorySlot = 4 + 27; // the first hotbar slot after the compartments and the inventory rows
+            int inventorySlot = ItemCapsuleMenu.PAGE_SIZE + 27;
             player.getInventory().setItem(0, stack(Items.DIRT, 40));
             menu.clicked(inventorySlot, 0, ClickType.QUICK_MOVE, player);
             h.assertValueEqual(store(h, cell(2, 0, 1)).count(stack(Items.DIRT, 1)), 40, "shift-click fills the body");
             h.assertTrue(player.getInventory().getItem(0).isEmpty(), "from the hand");
+            player.closeContainer();
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void everyCellOpensTheWholeStoreAndPagesReachHiddenCompartments(GameTestHelper h) {
+        body(h, 1, 2, 1, 2, 2);
+        MenuPlayer player = new MenuPlayer(h.getLevel());
+        AbstractContainerMenu[] first = new AbstractContainerMenu[1];
+        MenuPlayer other = new MenuPlayer(h.getLevel());
+        h.runAfterDelay(FORMED, () -> {
+            store(h, cell(1, 0, 1)).insert(stack(Items.COBBLESTONE, 16 * 1024), false);
+            store(h, cell(1, 0, 1)).insert(stack(Items.BONE, 200), false);
+            BlockPos at = h.absolutePos(cell(2, 1, 2));
+            player.moveTo(at.getX() + 0.5, at.getY(), at.getZ() - 1.5);
+            player.openMenu((MenuProvider) h.getBlockEntity(cell(2, 1, 2)), at);
+            first[0] = player.containerMenu;
+            BlockPos front = h.absolutePos(cell(1, 0, 1));
+            other.moveTo(front.getX() + 0.5, front.getY(), front.getZ() - 1.5);
+            other.openMenu((MenuProvider) h.getBlockEntity(cell(1, 0, 1)), front);
+            h.assertFalse(first[0].clickMenuButton(player, ItemCapsuleMenu.NEXT), "page changes wait ten ticks");
+            h.assertTrue(first[0].getSlot(0).getItem().is(Items.COBBLESTONE), "rear cell opens body page one");
+            h.assertValueEqual(first[0].getSlot(15).getItem().getCount(), 1024, "sixteen shared compartments");
+        });
+        h.runAfterDelay(FORMED + 12, () -> {
+            first[0].setCarried(stack(Items.DIRT, 3));
+            h.assertFalse(
+                    first[0].clickMenuButton(player, ItemCapsuleMenu.NEXT), "put carried items down before paging");
+            first[0].setCarried(ItemStack.EMPTY);
+            h.assertFalse(first[0].clickMenuButton(player, 99), "unknown page intent refused");
+            h.assertTrue(first[0].clickMenuButton(player, ItemCapsuleMenu.NEXT), "next page opens");
+            AbstractContainerMenu next = player.containerMenu;
+            h.assertFalse(next.clickMenuButton(player, ItemCapsuleMenu.PREVIOUS), "new page shares the delay");
+            h.assertTrue(
+                    other.containerMenu.clickMenuButton(other, ItemCapsuleMenu.NEXT), "another cell reaches page two");
+            h.assertTrue(next != first[0], "new menu prevents stale clicks from targeting another page");
+            h.assertTrue(next.getSlot(0).getItem().is(Items.BONE), "page two exposes the deep stock");
+            first[0].clicked(0, 0, ClickType.PICKUP, player);
+            h.assertTrue(first[0].getCarried().isEmpty(), "closed page refuses a late click");
+            next.clicked(0, 0, ClickType.PICKUP, player);
+            h.assertValueEqual(next.getCarried().getCount(), 64, "shared compartment still takes one stack");
+            h.assertValueEqual(store(h, cell(1, 0, 1)).count(stack(Items.BONE, 1)), 136, "one owner of deep stock");
+            other.containerMenu.clicked(0, 0, ClickType.PICKUP, other);
+            h.assertValueEqual(other.containerMenu.getCarried().getCount(), 64, "second viewer withdraws once");
+            h.assertValueEqual(next.getSlot(0).getItem().getCount(), 72, "both viewers see the same balance");
+            other.containerMenu.clicked(0, 0, ClickType.PICKUP, other);
+            other.closeContainer();
+            next.clicked(0, 0, ClickType.PICKUP, player);
+            h.destroyBlock(cell(1, 0, 1));
+            h.assertFalse(next.stillValid(player), "a body change invalidates the open page");
+            next.clicked(0, 0, ClickType.PICKUP, player);
+            h.assertTrue(next.getCarried().isEmpty(), "split body cannot be read through stale slots");
             player.closeContainer();
             h.succeed();
         });

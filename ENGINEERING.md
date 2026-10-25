@@ -147,6 +147,8 @@ Before implementation, the story states: the work unit, who shares the budget (d
 | Rule from the design | Limit |
 |---|---|
 | Sample collection | One death offers one sample to one destination. At most 64 offers per server tick. No kill log |
+| Capsule UI page | 16 compartments plus 36 player slots, at most 16 pages. A page pins one body; split, merge or unload invalidates it. Page changes open a fresh container ID after ten ticks, with an empty cursor. Counts inspect at most 256 compartments per viewer per broadcast; vanilla syncs changed slots and four integers |
+| Capsule membrane | At most 347 baked elements per cell or inventory model. Four pouches per exposed front, four triangles each. Nine-second client breath with 0.12-pixel amplitude; no extra packets, server ticks, neighbor scans or persistent state |
 | Sample UI page | 16 species rows, 48 quality counts, 2 changed pages per second per viewer |
 | Portable supply | 4 transactions per wearer per second, 64 per server tick in total |
 | Death preservation | Looks at the 4 worn pieces once. One loaded-endpoint lookup per piece. No retry queue |
@@ -184,6 +186,7 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 A view may request `frames` (1–96) and `frameTicks` (1–20, default 4) for a timed
 sequence at the same camera position. The first image keeps the view name; later
 images add `_001`, `_002`, and so on. The report records actual capture timestamps.
+An optional `menuButton` sends one vanilla menu button after the screen settles, then waits for a fresh container ID before capturing a paginated screen.
 An optional `trigger` command runs once when the camera is ready, immediately before
 the first frame. Door sequences use it to capture redstone opening and closing.
 The verifier checks every frame. `art/gen_motion_captures.py` owns the organ motion

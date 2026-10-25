@@ -91,6 +91,8 @@ final class CaptureClient {
     private boolean frameReady;
     private int readyFrames;
     private boolean resized;
+    private int buttonMenu = -1;
+    private int buttonTick;
 
     CaptureClient(Path outputDir, List<Scenario> scenarios) {
         this.outputDir = outputDir;
@@ -322,6 +324,18 @@ final class CaptureClient {
                 ? minecraft.screen != null
                 : minecraft.screen instanceof AbstractContainerScreen<?>;
         if (view.opensScreen() ? !screenOpen || ticksInStage < MOVE_TICKS : minecraft.screen != null) return;
+        if (view.menuButton().isPresent()) {
+            if (!(minecraft.screen instanceof AbstractContainerScreen<?> screen)) return;
+            if (buttonMenu < 0) {
+                if (ticksInStage < 25) return;
+                buttonMenu = screen.getMenu().containerId;
+                buttonTick = ticksInStage;
+                minecraft.gameMode.handleInventoryButtonClick(
+                        buttonMenu, view.menuButton().get());
+                return;
+            }
+            if (screen.getMenu().containerId == buttonMenu || ticksInStage < buttonTick + 10) return;
+        }
         // Trigger a state change only after the camera is ready, so the sequence includes its transition.
         if (sequenceFrame == 0) view.trigger().ifPresent(command -> FlatWorld.command(minecraft, command));
         enter(Stage.GRABBING);
@@ -365,6 +379,7 @@ final class CaptureClient {
     }
 
     private void advance(Minecraft minecraft) {
+        buttonMenu = -1;
         if (minecraft.screen instanceof AbstractContainerScreen<?> && minecraft.player != null)
             minecraft.player.closeContainer();
         else if (minecraft.screen != null) minecraft.setScreen(null);

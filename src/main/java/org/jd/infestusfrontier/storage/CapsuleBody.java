@@ -75,6 +75,18 @@ final class CapsuleBody {
         return slot % ItemCapsuleBlockEntity.COMPARTMENTS;
     }
 
+    /** A hand edits one of the body's compartments under the cell's existing admission rules. */
+    boolean accepts(int slot, ItemStack stack) {
+        return isUsable() && holds(slot) && cell(slot).accepts(compartment(slot), stack);
+    }
+
+    void put(int slot, ItemStack stack) {
+        if (!isUsable() || !holds(slot)) return;
+        if (!stack.isEmpty()
+                && (!accepts(slot, stack) || stack.getCount() > Compartments.limit(stack.getMaxStackSize()))) return;
+        cell(slot).put(compartment(slot), stack);
+    }
+
     /** What slot {@code slot} holds, with its whole count; a copy. */
     ItemStack stack(int slot) {
         return holds(slot) ? cell(slot).held(compartment(slot)) : ItemStack.EMPTY;

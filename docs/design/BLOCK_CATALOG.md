@@ -271,7 +271,7 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Add cells for capacity; Thermal Lining permits hot liquids. Partitioned installations use separate tanks, so a water route cannot contaminate the lava supply.
 
 ### T1-09 — Item Capsule
-- **Does:** Stores a small number of item types in a fleshy cabinet: four compartments a cell, one kind each, up to 16 stacks of it. The front shows each compartment's icon and count; joined capsules in one full box, up to 4 on a side, form one store with more compartments.
+- **Does:** Stores item types in a delicate membrane cocoon: four compartments a cell, one kind each, up to 16 stacks of it. The front shows each compartment's icon and count; joined capsules in one full box, up to 4 on a side, form one store with more compartments. Any cell opens the whole store in pages of 16 compartments, including stock inside deep bodies. Thin ivory ribs mark only exterior edges; shallow pouches breathe together while icons and counts stay still.
 - **Input → output:** Inserted items → the same items through hand access, hoppers, Mouths or Item Veins.
 - **Create:** 1 chest + 2 Membrane Sheets + 1 Spore Culture.
 - **Growth:** Add neighboring capsules for capacity. Skeletal Graft treatment improves compression of stackable items but does not merge different equipment histories. Display icons can be hidden per capsule.

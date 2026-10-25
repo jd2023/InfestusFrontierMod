@@ -19,6 +19,10 @@ final class CompartmentSlot extends Slot {
         void set(int compartment, ItemStack stack);
 
         boolean accepts(int compartment, ItemStack stack);
+
+        default boolean active(int compartment) {
+            return true;
+        }
     }
 
     private final Source source;
@@ -62,7 +66,17 @@ final class CompartmentSlot extends Slot {
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        return source.accepts(getContainerSlot(), stack);
+        return isActive() && source.accepts(getContainerSlot(), stack);
+    }
+
+    @Override
+    public boolean isActive() {
+        return source.active(getContainerSlot());
+    }
+
+    @Override
+    public boolean mayPickup(Player player) {
+        return isActive();
     }
 
     @Override
