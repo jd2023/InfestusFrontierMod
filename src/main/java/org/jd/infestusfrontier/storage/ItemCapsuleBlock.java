@@ -31,7 +31,7 @@ import org.jd.infestusfrontier.core.storage.Box;
 import org.jd.infestusfrontier.organ.api.Organs;
 
 /**
- * One cell of an Item Capsule (BLOCK_CATALOG T1-09): a fleshy cabinet of four compartments whose front, toward
+ * One cell of an Item Capsule (BLOCK_CATALOG T1-09): a membrane cocoon of four compartments whose front, toward
  * {@link #FACING}, shows what they hold. Touching cells form one store only as a full rectangular box
  * ({@link org.jd.infestusfrontier.core.storage.Body}); the six side properties say which faces join a cell of the same
  * body, so walls and ribs show only where the body ends. Any hand opens the screen, sneaking builds against it.

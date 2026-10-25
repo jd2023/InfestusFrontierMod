@@ -105,6 +105,8 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
 
     /** What the front shows: a copy of each compartment. */
     List<ItemStack> shown() {
+        if (getBlockState().getValue(ItemCapsuleBlock.JOINED.get(getBlockState().getValue(ItemCapsuleBlock.FACING))))
+            return List.of();
         return Arrays.stream(held).map(ItemStack::copy).toList();
     }
 

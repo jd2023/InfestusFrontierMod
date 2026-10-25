@@ -88,6 +88,20 @@ class OrganMotionTest(unittest.TestCase):
                 for path in (ASSETS / 'models' / folder).glob(prefix + '*.json'):
                     self.assertEqual(coplanar_faces(json.loads(path.read_text()).get('elements', [])), [], str(path))
 
+    def test_capsule_join_masks_reach_each_world_edge(self):
+        import gen_item_capsule as capsule
+        direction = {'west': (0, 0), 'east': (0, 16), 'down': (1, 0),
+                     'up': (1, 16), 'north': (2, 0), 'south': (2, 16)}
+        for side, neighbors in capsule.ADJACENT.items():
+            axis, plane = direction[side]
+            surface = 0.3125 if plane == 0 else 15.6875
+            for bit, neighbor in enumerate(neighbors):
+                along, edge = direction[neighbor]
+                faces = [e for e in capsule.wall(side, 1 << bit) if side in e['faces']
+                         and abs(e['from' if plane == 0 else 'to'][axis] - surface) < 1e-6]
+                extent = min(e['from'][along] for e in faces) if edge == 0 else max(e['to'][along] for e in faces)
+                self.assertEqual(extent, edge, (side, neighbor))
+
     def test_attached_parts_inherit_their_support_motion(self):
         for model, child, parent in (
                 ('seed_pouch', 'neck', 'sack'), ('seed_pouch', 'rim', 'neck'),

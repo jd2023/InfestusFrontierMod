@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.foundation.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.util.List;
 import java.util.function.Function;
@@ -9,9 +10,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -42,11 +47,14 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
     private final DirectionProperty facing;
     private final Function<T, List<ItemStack>> shown;
     private final Pockets pockets;
+    private final ResourceLocation lining;
 
-    private FrontStockRenderer(DirectionProperty facing, Function<T, List<ItemStack>> shown, Pockets pockets) {
+    private FrontStockRenderer(
+            DirectionProperty facing, Function<T, List<ItemStack>> shown, Pockets pockets, ResourceLocation lining) {
         this.facing = facing;
         this.shown = shown;
         this.pockets = pockets;
+        this.lining = lining;
     }
 
     /** Draws the stock of every block entity of {@code type}; call it on the client only. */
@@ -55,18 +63,19 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
             Supplier<? extends BlockEntityType<T>> type,
             DirectionProperty facing,
             Function<T, List<ItemStack>> shown,
-            Pockets pockets) {
+            Pockets pockets,
+            ResourceLocation lining) {
         modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(
-                type.get(), context -> new FrontStockRenderer<T>(facing, shown, pockets)));
+                type.get(), context -> new FrontStockRenderer<T>(facing, shown, pockets, lining)));
     }
 
     @Override
     public void render(T block, float partialTick, PoseStack poses, MultiBufferSource buffers, int light, int overlay) {
         List<ItemStack> stock = shown.apply(block);
-        if (stock.stream().allMatch(ItemStack::isEmpty)) return;
+        if (stock.isEmpty()) return;
         Direction front = block.getBlockState().getValue(facing);
         Level level = block.getLevel();
-        int lit = level == null
+        int lit = level == null || !level.isLoaded(block.getBlockPos().relative(front))
                 ? light
                 : LevelRenderer.getLightColor(level, block.getBlockPos().relative(front));
         Minecraft minecraft = Minecraft.getInstance();
@@ -74,6 +83,22 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
         poses.pushPose();
         poses.translate(0.5, 0.5, 0.5);
         poses.mulPose(Axis.YP.rotationDegrees(-front.toYRot())); // the front now faces +z, the viewer's right is +x
+        TextureAtlasSprite sprite =
+                minecraft.getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(lining);
+        VertexConsumer surface = buffers.getBuffer(Sheets.solidBlockSheet());
+        // A shared nine-second breath keeps joined pouches in phase, without packets or ticking entities.
+        double phase = level == null ? 0 : ((level.getGameTime() % 180) + partialTick) * Math.PI * 2 / 180;
+        float centreDepth = 1.5F + 0.12F * (float) Math.sin(phase);
+        for (int i = 0; i < stock.size(); i++) {
+            membrane(
+                    surface,
+                    poses.last(),
+                    sprite,
+                    lit,
+                    pockets.firstX() + (i % pockets.columns()) * pockets.pitch(),
+                    pockets.firstY() - (i / pockets.columns()) * pockets.pitch(),
+                    centreDepth);
+        }
         for (int i = 0; i < stock.size(); i++) {
             ItemStack stack = stock.get(i);
             if (stack.isEmpty()) continue;
@@ -107,5 +132,42 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
             poses.popPose();
         }
         poses.popPose();
+    }
+    /** Four triangles bow the lining while its edge, icons and counts stay fixed. Coordinates are block pixels. */
+    private static void membrane(
+            VertexConsumer out,
+            PoseStack.Pose pose,
+            TextureAtlasSprite sprite,
+            int light,
+            float x,
+            float y,
+            float depth) {
+        for (int side = 0; side < 4; side++) {
+            float ax = side == 0 || side == 3 ? -3 : 3;
+            float ay = side < 2 ? -3 : 3;
+            int next = (side + 1) % 4;
+            float bx = next == 0 || next == 3 ? -3 : 3;
+            float by = next < 2 ? -3 : 3;
+            vertex(out, pose, sprite, light, x, y, depth);
+            vertex(out, pose, sprite, light, x + ax, y + ay, 1.85F);
+            vertex(out, pose, sprite, light, x + bx, y + by, 1.85F);
+            vertex(out, pose, sprite, light, x, y, depth);
+        }
+    }
+
+    private static void vertex(
+            VertexConsumer out,
+            PoseStack.Pose pose,
+            TextureAtlasSprite sprite,
+            int light,
+            float x,
+            float y,
+            float depth) {
+        out.addVertex(pose, (x - 8) / 16, (y - 8) / 16, (8 - depth) / 16)
+                .setColor(255, 255, 255, 255)
+                .setUv(sprite.getU(x / 16), sprite.getV(1 - y / 16))
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(light)
+                .setNormal(pose, 0, 0, 1);
     }
 }

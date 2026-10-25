@@ -340,3 +340,13 @@ Files: src/main/resources/assets/infestusfrontier/textures/item/{membrane_window
 
 - Two 32x32 icons, `--size 32 --colors 0`, one family with the treatment icons. Membrane Window: a small square of pale pink translucent membrane with red veins in a thin ivory bone frame. Sphincter Door: a closed iris of six overlapping pink membrane petals spiralling into a dark centre, ringed by a muscular red rim.
 - Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background. The placeholders are flat two-tone discs; the window block and the door model come from art/gen_openings.py and are not part of this story.
+
+### Item Capsule cocoon surface
+
+The capsule uses `item_capsule_membrane.png` for its quiet outer skin and lips. `reservoir_bone.png` supplies the thin exterior ribs; `item_capsule_lining.png` supplies the dark pouch floors. `art/gen_item_capsule.py` owns the multipart geometry. The exterior wall masks continue across joined cells and retreat only at body edges. Four pouches per exposed front breathe on a shared nine-second cycle; their icons and counts stay fixed.
+
+Original bitmap made with built-in image generation, without a reference image. Export with `scripts/texture.py --size 64 --colors 96`.
+
+Prompt: "Original seamless square opaque game material texture for a delicate living storage cocoon in a voxel game, to downsample to 64x64. Orthographic flat material swatch filling the entire canvas edge to edge, no object, no border, no text. Soft dusty mauve and muted rose membrane with broad gently flowing diagonal silk-like tissue folds, restrained cream-pink highlights from upper left, sparse extremely fine dark muted plum veins embedded beneath smooth skin. Quiet low-contrast surface with large calm areas, thin supple biological membrane, subtly fibrous. Organic hand-painted game texture, elegant and delicate, no chunky flesh lobes, no gore, no holes, no metal, no scales, no busy noise, no strong repeated motif. Seamlessly tileable across both axes with matching opposite edges. One continuous material, no panels or framing."
+
+Evidence: `build/art/item_capsule_membrane-tiled.png` and the `item_capsule` captures: single cell, wide/tall face, deep body, rotated 4×4×4 body, shared pages and nine-second breath.

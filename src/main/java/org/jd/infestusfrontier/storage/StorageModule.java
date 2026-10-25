@@ -234,7 +234,8 @@ public final class StorageModule {
                     ITEM_CAPSULE_ENTITY,
                     ItemCapsuleBlock.FACING,
                     ItemCapsuleBlockEntity::shown,
-                    new FrontStockRenderer.Pockets(2, 4.75F, 11.25F, 6.5F, 3.5F, 1.7F));
+                    new FrontStockRenderer.Pockets(2, 4F, 12F, 8F, 3.5F, 1.1F),
+                    ResourceLocation.fromNamespaceAndPath("infestusfrontier", "block/item_capsule_lining"));
             // the liquid stops inside the membrane panes, above the fleshy base and under the lid
             JoinedTankRenderer.register(
                     modBus,

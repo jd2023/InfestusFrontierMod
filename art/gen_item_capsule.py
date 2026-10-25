@@ -1,96 +1,107 @@
-"""The Item Capsule cell: the pocket lining texture, the part models, the multipart blockstate and the item model.
+"""The Item Capsule cell: the part models, the multipart blockstate and the item model.
 
     python3 art/gen_item_capsule.py
 
-A body of cells reads as one fleshy cabinet. Every part shows only where the body ends: a flesh wall on each face that
+A body of cells reads as one delicate storage cocoon. Every part shows only where the body ends: a flesh wall on each face that
 joins no cell, the front on the facing side instead of its wall, and a bone rib along every edge between two such
-faces. The front is a bone frame around four recessed pockets lined with dark flesh; the block entity renderer draws
-each compartment's icon and count in its pocket. The walls and ribs share the Reservoir's flesh and bone, so the two
-stores read as one organism. Walls sit half a pixel inside the block; ribs run along three axes with three different
+faces. The front has four shallow clipped pouches with thin membrane lips; the block entity renderer draws
+each compartment's icon and count in its pocket. A dedicated quiet membrane wraps the body; fine ivory ribs mark only outer edges. Walls retreat at exposed edges; ribs run along three axes with three different
 cross-sections, so no two faces share a plane where parts meet.
 """
 import json
-import math
-import random
 
-from PIL import Image
+from gen_reservoir import (ITEMS, MODELS, NS, STATES, box, turned)
 
-from gen_reservoir import (ITEMS, MODELS, NS, SIZE, STATES, TEXTURES, box, fbm, lit, ramp, turned)
-
-LINING = [(16, 4, 10), (32, 9, 20), (52, 16, 32), (78, 28, 46), (112, 50, 66), (150, 84, 96)]
 DIRECTIONS = ['north', 'east', 'south', 'west', 'up', 'down']
 HORIZONTAL = ['north', 'east', 'south', 'west']
 TEXTURE_MAP = {
-    'flesh': NS + 'reservoir_flesh',
+    'flesh': NS + 'item_capsule_membrane',
     'bone': NS + 'reservoir_bone',
     'lining': NS + 'item_capsule_lining',
-    'particle': NS + 'reservoir_flesh',
+    'particle': NS + 'item_capsule_membrane',
 }
 
-# the frame around the pockets, in pixels across the front: a 2 pixel border and a 1 pixel cross
-BORDER = 2.0
-DIVIDER = (7.5, 8.5)
-FRAME_DEPTH = (0.5, 2.0)  # the frame's face and the pocket floor, behind the block's front face
-LINING_DEPTH = 2.5
+# Uniform eight-pixel pocket spacing continues across cell boundaries.
+ADJACENT = {
+    'north': ('west', 'east', 'down', 'up'), 'south': ('east', 'west', 'down', 'up'),
+    'west': ('south', 'north', 'down', 'up'), 'east': ('north', 'south', 'down', 'up'),
+    'up': ('west', 'east', 'north', 'south'), 'down': ('west', 'east', 'south', 'north'),
+}
 
 
-def lining():
-    """Dark wet flesh: soft vertical folds, a faint mottle and a sheen on the fold crowns."""
-    folds = fbm(71, [(4, 1.0), (8, 0.45)])
-    mottle = fbm(73, [(16, 1.0), (32, 0.5)])
-    height = [[0.9 * math.sin(math.tau * (x / SIZE * 3 + 0.6 * folds(x, y))) + 0.25 * mottle(x, y)
-               for x in range(SIZE)] for y in range(SIZE)]
-    light = lit(height, 1.2)
-    img = Image.new('RGBA', (SIZE, SIZE))
-    for y in range(SIZE):
-        for x in range(SIZE):
-            l = light[(x, y)]
-            t = 0.12 + 0.5 * l + 0.12 * mottle(x + 7, y + 3)
-            if l > 0.92:
-                t += 0.2 * (l - 0.92) / 0.08
-            img.putpixel((x, y), ramp(LINING, t) + (255,))
-    img.save(TEXTURES / 'item_capsule_lining.png', optimize=True)
+def orient(element, side):
+    if side in HORIZONTAL:
+        return turned(element, HORIZONTAL.index(side))
+    def point(p):
+        x,y,z = p
+        return (x, 16-z, y) if side == 'up' else (x, z, 16-y)
+    corners = [point(p) for p in (element['from'], element['to'])]
+    lo = [min(p[k] for p in corners) for k in range(3)]
+    hi = [max(p[k] for p in corners) for k in range(3)]
+    mapped = {'north':'up','south':'down','up':'south','down':'north','east':'east','west':'west'} if side == 'up' else {'north':'down','south':'up','up':'north','down':'south','east':'east','west':'west'}
+    return box(lo,hi,'flesh',[mapped[d] for d in element['faces']])
 
 
-def wall(side):
-    """A flesh plate half a pixel inside the face, showing only its outer side."""
-    lo, hi = {
-        'north': ((0, 0, 0.5), (16, 16, 1.5)),
-        'south': ((0, 0, 14.5), (16, 16, 15.5)),
-        'west': ((0.5, 0, 0), (1.5, 16, 16)),
-        'east': ((14.5, 0, 0), (15.5, 16, 16)),
-        'down': ((0, 0.5, 0), (16, 1.5, 16)),
-        'up': ((0, 14.5, 0), (16, 15.5, 16)),
-    }[side]
-    return [box(lo, hi, 'flesh', [side], cull=[side])]
+def wall(side, mask):
+    """Only the body's outer edges turn inward; stepped surfaces have closed risers."""
+    def bands(low_joined, high_joined):
+        low = [(0, 1.4375, 0)] if low_joined else [(0.5, 0.9375, 0.75), (0.9375, 1.4375, 0.35)]
+        high = [(14.5625, 16, 0)] if high_joined else [(14.5625, 15.0625, 0.35), (15.0625, 15.5, 0.75)]
+        return low + [(1.4375, 14.5625, 0)] + high
+    patches = [(u0,v0,u1,v1,0.3125+max(du,dv))
+               for u0,u1,du in bands(mask & 1, mask & 2)
+               for v0,v1,dv in bands(mask & 4, mask & 8)]
+    elements = [box((x0,y0,z),(x1,y1,2.5),'flesh',['north']) for x0,y0,x1,y1,z in patches]
+    for x0,y0,x1,y1,z in patches:
+        for a,b,c,d,other in patches:
+            if z == other: continue
+            near, far = min(z,other), max(z,other)
+            if x1 == a and y0 == b and y1 == d and min(y1,14.9375) > max(y0,1.0625):
+                elements.append(box((x1,max(y0,1.0625),near),(x1,min(y1,14.9375),far),'flesh',['east' if z < other else 'west']))
+            if y1 == b and x0 == a and x1 == c and min(x1,14.9375) > max(x0,1.0625):
+                elements.append(box((max(x0,1.0625),y1,near),(min(x1,14.9375),y1,far),'flesh',['up' if z < other else 'down']))
+    return [orient(e,side) for e in elements]
+
+
+def pocket(x, y, radius):
+    """A clipped-corner pouch centered in an eight-pixel module."""
+    dx, dy = abs(x - 4), abs(y - 4)
+    return max(dx, dy) <= radius and dx + dy <= 2 * radius - 1
 
 
 def front_north():
-    """The front on the north side: a bone frame, its inner sides lining the pockets, over a dark floor."""
-    z0, z1 = FRAME_DEPTH
-    a, b = DIVIDER
-    inner = ['north', 'east', 'west', 'up', 'down']
-    pieces = [
-        ((0, 0), (BORDER, 16)), ((16 - BORDER, 0), (16, 16)),  # the side borders
-        ((BORDER, 0), (16 - BORDER, BORDER)), ((BORDER, 16 - BORDER), (16 - BORDER, 16)),  # bottom and top
-        ((a, BORDER), (b, 16 - BORDER)),  # the upright of the cross
-        ((BORDER, a), (a, b)), ((b, a), (16 - BORDER, b)),  # its arms
-    ]
-    elements = []
-    for (x0, y0), (x1, y1) in pieces:
-        # a face on the block's outer edge would only stick out past the side walls
-        faces = [f for f in inner if not ((f == 'west' and x0 == 0) or (f == 'east' and x1 == 16)
-                                          or (f == 'down' and y0 == 0) or (f == 'up' and y1 == 16))]
-        elements.append(box((x0, y0, z0), (x1, y1, z1), 'bone', faces))
-    elements.append(box((0, 0, z1), (16, 16, LINING_DEPTH), 'lining', ['north']))
+    """Thin membrane lips around four shallow pouches; no per-cell border or bone cross."""
+    runs = []
+    for row in range(32):
+        y = row * 0.5
+        line = []
+        for col in range(32):
+            x = col * 0.5
+            px, py = (x + 0.25) % 8, (y + 0.25) % 8
+            line.append(None if pocket(px, py, 2.75) else 0.55 if pocket(px, py, 3.25) else 0.9)
+        start = 0
+        while start < 32:
+            end = start + 1
+            while end < 32 and line[end] == line[start]: end += 1
+            if line[start] is not None:
+                runs.append([start * 0.5, y, end * 0.5, y + 0.5, line[start]])
+            start = end
+    merged = []
+    for x0, y0, x1, y1, depth in runs:
+        previous = next((r for r in merged if r[0] == x0 and r[2] == x1 and r[3] == y0 and r[4] == depth), None)
+        if previous is not None: previous[3] = y1
+        else: merged.append([x0,y0,x1,y1,depth])
+    elements = [box((x0,y0,depth), (x1,y1,1.75), 'flesh', ['north'] + (['west'] if x0 > 0 else []) + (['east'] if x1 < 16 else []) + (['down'] if y0 > 0 else []) + (['up'] if y1 < 16 else []))
+                for x0,y0,x1,y1,depth in merged]
+    elements.append(box((0,0,1.9), (16,16,2.0), 'lining', ['north']))
     return elements
 
 
 # per axis of a rib: its core and its cross bars, measured inward from the edge; three axes, three sizes
 SECTIONS = {
-    'y': ((-0.25, 1.75), (-0.4375, 1.9375), (0.25, 1.25)),
-    'x': ((-0.1875, 1.6875), (-0.375, 1.875), (0.3125, 1.1875)),
-    'z': ((-0.125, 1.625), (-0.3125, 1.8125), (0.375, 1.125)),
+    'y': ((0.40, 1.10), (0.28, 1.22), (0.60, 0.85)),
+    'x': ((0.42, 1.12), (0.30, 1.24), (0.62, 0.83)),
+    'z': ((0.44, 1.14), (0.32, 1.26), (0.64, 0.81)),
 }
 FACE_AXIS = {'north': 'z', 'south': 'z', 'west': 'x', 'east': 'x', 'down': 'y', 'up': 'y'}
 FAR = {'south', 'east', 'up'}
@@ -121,7 +132,7 @@ def rib(f, g):
 
 
 def parts():
-    out = {f'wall_{d}': wall(d) for d in DIRECTIONS}
+    out = {f'wall_{d}_{mask}': wall(d, mask) for d in DIRECTIONS for mask in range(16)}
     north = front_north()
     for quarter, d in enumerate(HORIZONTAL):
         out[f'front_{d}'] = [turned(e, quarter) for e in north]
@@ -144,12 +155,13 @@ def write_blockstate():
         return {'model': NS + 'item_capsule_' + name}
     parts = [{'apply': apply('core')}]
     for d in DIRECTIONS:
+        for mask in range(16):
+            when = {d: 'false', **{adjacent: str(bool(mask & (1 << i))).lower() for i, adjacent in enumerate(ADJACENT[d])}}
+            if d in HORIZONTAL:
+                when['facing'] = '|'.join(o for o in HORIZONTAL if o != d)
+            parts.append({'when': when, 'apply': apply(f'wall_{d}_{mask}')})
         if d in HORIZONTAL:
-            others = '|'.join(o for o in HORIZONTAL if o != d)
-            parts.append({'when': {d: 'false', 'facing': others}, 'apply': apply(f'wall_{d}')})
             parts.append({'when': {d: 'false', 'facing': d}, 'apply': apply(f'front_{d}')})
-        else:
-            parts.append({'when': {d: 'false'}, 'apply': apply(f'wall_{d}')})
     for f, g in EDGES:
         parts.append({'when': {f: 'false', g: 'false'}, 'apply': apply(f'rib_{f}_{g}')})
     (STATES / 'item_capsule.json').write_text(json.dumps({'multipart': parts}, indent=2) + '\n')
@@ -157,7 +169,7 @@ def write_blockstate():
 
 def write_item(models):
     """A lone cell facing north: its walls, its front and all twelve ribs."""
-    names = ['front_north'] + [f'wall_{d}' for d in DIRECTIONS if d != 'north'] + [f'rib_{f}_{g}' for f, g in EDGES]
+    names = ['front_north'] + [f'wall_{d}_0' for d in DIRECTIONS if d != 'north'] + [f'rib_{f}_{g}' for f, g in EDGES]
     elements = [json.loads(json.dumps(e)) for name in names for e in models[name]]
     for element in elements:
         for spec in element['faces'].values():
@@ -178,13 +190,11 @@ def write_item(models):
 
 
 def main():
-    random.seed(0)
-    lining()
     models = parts()
     write_parts(models)
     write_blockstate()
     write_item(models)
-    print('item_capsule: 1 texture, %d part models, 1 blockstate, 1 item model' % (len(models) + 1))
+    print('item_capsule: %d part models, 1 blockstate, 1 item model' % (len(models) + 1))
 
 
 if __name__ == '__main__':
