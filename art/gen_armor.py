@@ -4,15 +4,17 @@
 
 Each set is a vanilla armor set with growths on top. The base is two 64x32 layers in the vanilla humanoid armor
 layout, so vanilla dye, trims and the glint fall on it as on any armor; growths are separate parts on the six bones,
-with their own 128x128 box-UV sheet, written to assets/infestusfrontier/armor/<set>.json for
+with their own 128x64 box-UV sheet, written to assets/infestusfrontier/armor/<set>.json for
 foundation/render/ArmorGrowths. Every texel is painted from its 3D position on the body, so patterns run on across
 cube edges. Transparent texels are holes: the face, the hands and seams between plates show the wearer's skin.
 
 Dormant flesh is the raw start: hide panels of rotten flesh sewn with sinew, a cowl, bandage wraps on the limbs,
 folded hide pads on the shoulders, a rope belt and bone toggles. Plain, but built with care. The Awakened set is
-alive: wine-red membrane with veins, a bone rib cage over the chest with a breathing olive pore, a vertebral ridge and
-a dorsal sac, a heavy brow and crest, a bone pauldron on the right shoulder and a pored one on the left, bone bands,
-knee caps, shin plates and heel spurs. Membrane growths take the dye; bone and pores keep their colours.
+alive: dark wine membrane in shaded muscle bands with wandering veins and wet glints, skin showing between the limb
+bands, a bone rib cage over the chest with a breathing olive heart-pore, belly plates that breathe in turn, a
+vertebral ridge and a dorsal sac, a stepped brow and crest spines, membrane shingles down each shoulder (bone claws
+on the right, a cluster of pores on the left), bracers, knee caps, shin plates, clawed toe caps and heel spurs.
+Limb bands wrap three sides and stop short of the other leg or the torso. Membrane growths take the dye; bone and pores keep their colours.
 
 The icons are the pieces themselves: each slot's base boxes and growths, rendered from a three-quarter view with the
 same textures, so an icon can never drift from what is worn. Dyed texels go to layer0 (tinted like leather), the rest
@@ -25,7 +27,6 @@ legs (-2,0,-2) about (-1.9,12,0) and (1.9,12,0). The outer armor (hood, thorax, 
 """
 import json
 import math
-import random
 from pathlib import Path
 
 from PIL import Image
@@ -33,16 +34,17 @@ from PIL import Image
 ASSETS = Path('src/main/resources/assets/infestusfrontier')
 NS = 'infestusfrontier'
 SHEET = 128
+SHEET_H = 64  # growth sheets: 128 wide, 64 high
 
 # --- palettes ---
 HIDE = [(34, 16, 14), (60, 28, 22), (90, 44, 34), (118, 62, 46), (146, 84, 62), (172, 110, 82)]
 HIDE_PALE = [(56, 36, 28), (86, 58, 44), (114, 82, 62), (142, 108, 82), (166, 134, 104)]
 ROT = [(46, 50, 28), (68, 74, 38), (92, 98, 52), (116, 120, 70)]
 SINEW = [(30, 16, 12), (72, 46, 32), (118, 88, 62), (160, 132, 96)]
-MEMBRANE = [(26, 6, 14), (48, 12, 26), (72, 22, 40), (98, 36, 56), (126, 56, 74), (158, 86, 100)]
-VEIN = (54, 8, 24)
-CAPILLARY = (150, 52, 72)
-IVORY = [(78, 64, 50), (118, 100, 78), (156, 138, 108), (190, 176, 142), (218, 208, 176)]
+MEMBRANE = [(20, 7, 13), (38, 13, 23), (58, 21, 33), (80, 33, 45), (106, 50, 62), (136, 76, 86), (176, 120, 124)]
+VEIN = (30, 4, 12)
+CAPILLARY = (148, 46, 64)
+IVORY = [(58, 46, 36), (96, 80, 62), (136, 118, 92), (172, 156, 124), (204, 192, 160), (226, 218, 190)]
 OLIVE = [(38, 44, 16), (64, 74, 26), (94, 106, 40), (128, 138, 64), (166, 172, 100)]
 CLEAR = (0, 0, 0, 0)
 
@@ -128,7 +130,26 @@ LAYER_SLOTS = {1: {'head': 'head', 'hat': 'head', 'body': 'chest', 'right_arm': 
                2: {'body': 'legs', 'right_leg': 'legs'}}
 
 
-def base_layer(paint, layer):
+def wander(img, rect, colour, highlight, length, seed):
+    """A vein: a wandering line down a face, drawn only over painted texels, a lighter capillary beside it."""
+    x0, y0, w, h = rect
+    rng = hash3(x0, y0, w * 31 + h, seed)
+    x = x0 + int(rng * w)
+    y = y0 + int(hash3(x0, y0, 7, seed) * max(1, h // 3))
+    px = img.load()
+    for i in range(length):
+        if not (x0 <= x < x0 + w and y0 <= y < y0 + h):
+            break
+        if px[x, y][3]:
+            px[x, y] = colour + (255,)
+            if highlight and x + 1 < x0 + w and px[x + 1, y][3] and i % 3 == 0:
+                px[x + 1, y] = highlight + (255,)
+        step = hash3(x, y, i, seed + 1)
+        x += -1 if step < 0.25 else 1 if step > 0.75 else 0
+        y += 1
+
+
+def base_layer(paint, layer, veins=None):
     img = Image.new('RGBA', (64, 32), CLEAR)
     for bone, slot in LAYER_SLOTS[layer].items():
         spec = BONES[bone]
@@ -139,6 +160,8 @@ def base_layer(paint, layer):
                     colour = paint(slot, bone, face, x, y, z, s, t, fw, fh)
                     if colour:
                         img.putpixel((fx + s, fy + t), colour if len(colour) == 4 else colour + (255,))
+            if veins and face not in ('up', 'down') and fw >= 4 and fh >= 4:
+                veins(img, (fx, fy, fw, fh), bone, face)
     return img
 
 
@@ -199,10 +222,10 @@ class Growths:
             cubes[i]['uv'] = [x, y]
             x += fw + 1
             shelf = max(shelf, fh)
-        assert y + shelf <= SHEET, 'growths overflow the sheet'
+        assert y + shelf <= SHEET_H, 'growths overflow the sheet'
 
     def paint(self, painters):
-        img = Image.new('RGBA', (SHEET, SHEET), CLEAR)
+        img = Image.new('RGBA', (SHEET, SHEET_H), CLEAR)
         for part in self.parts:
             px, py, pz = part['pivot']
             bx, by, bz = BONES['right_arm' if part['bone'] == 'left_arm' else
@@ -217,6 +240,8 @@ class Growths:
                             colour = painters[part['material']](face, x + bx, y + by, z + bz, s, t, fw, fh, size)
                             if colour:
                                 img.putpixel((fx + s, fy + t), colour if len(colour) == 4 else colour + (255,))
+                    if part['material'] == 'plate' and face in ('front', 'back', 'right', 'left') and fw >= 3 and fh >= 2:
+                        wander(img, (fx, fy, fw, fh), VEIN, None, fh, fx * 7 + fy)
         return img
 
     def json(self, name):
@@ -225,7 +250,28 @@ class Growths:
             out = {k: v for k, v in p.items() if k != 'material'}
             out['cubes'] = [{k: v for k, v in c.items() if not (k == 'mirror' and not v)} for c in p['cubes']]
             parts.append(out)
-        return {'texture': f'{NS}:textures/models/armor/{name}_growths.png', 'size': [SHEET, SHEET], 'parts': parts}
+        return {'texture': f'{NS}:textures/models/armor/{name}_growths.png', 'size': [SHEET, SHEET_H], 'parts': parts}
+
+
+def band(g, slot, bone, y, h, material, out=0.2, **kw):
+    """A band round a limb on three sides, front, back and outer side, standing `out` off the base shell. On the
+    inner side it stops 0.1 short of the middle between the legs, or of the torso's shell beside an arm, so it never
+    reaches the other leg or into the body; its plates keep whole sizes."""
+    lo, hi = shell(bone, slot)
+    right = bone.startswith('right')
+    leg = bone.endswith('leg')
+    # legs stop short of the middle; arms short of the torso's shell (arm units: the torso's side is at x 0)
+    inner = (1.8 if leg else -0.1) if right else (-1.8 if leg else 0.1)
+    outer = lo[0] if right else hi[0]
+    width = math.ceil(abs(inner - outer))
+    x0 = inner - width if right else inner
+    depth = math.ceil(hi[2] - lo[2])
+    zc = (lo[2] + hi[2]) / 2
+    side_x = outer - out - 1 if right else outer + out
+    cubes = [((x0, y, lo[2] - out - 1), (width, h, 1), 0.0, False),
+             ((x0, y, hi[2] + out), (width, h, 1), 0.0, False),
+             ((side_x, y, zc - depth / 2), (1, h, depth), 0.0, False)]
+    g.add(slot, bone, cubes, material, **kw)
 
 
 def shell(bone, slot):
@@ -341,18 +387,19 @@ def dormant_growths():
     g.add('chest', 'body', [((-3.5, 2, -3.5), (3, 4, 1), 0.0, False)], 'patch', dyed=True)
     for arm, x0 in (('right_arm', -3), ('left_arm', -1)):
         g.add('chest', arm, [((x0, 6, -2), (4, 3, 4), 0.55, False)], 'wrap', dyed=True)
-        g.add('chest', arm, [((x0, 5, -2), (4, 1, 4), 1.2, False)], 'cord')
+        band(g, 'chest', arm, 4.5, 1, 'cord')
     # legwraps: a rope belt with a knot, a wrap below each knee
     g.add('legs', 'body', [((-4.5, 10.5, -2.5), (9, 1, 5), 0.6, False)], 'cord')
     g.add('legs', 'body', [((-2.5, 10, -3.9), (2, 2, 1), 0.0, False)], 'knot')
     for leg in ('right_leg', 'left_leg'):
-        g.add('legs', leg, [((-2.5, 5, -2.5), (5, 1, 5), 0.3, False)], 'cord')
-        g.add('legs', leg, [((-1.5, 3.5, -3.1), (3, 2, 1), 0.0, False)], 'patch', dyed=True)
+        band(g, 'legs', leg, 5, 1, 'cord')
+        g.add('legs', leg, [((-1.5, 3, -3.1), (3, 2, 1), 0.0, False)], 'patch', dyed=True)
     # treads: wrapped feet, a toe pad and a bone toggle at the ankle
     for leg in ('right_leg', 'left_leg'):
-        g.add('feet', leg, [((-3, 8.5, -3), (6, 1, 6), 0.3, False)], 'cord')
-        g.add('feet', leg, [((-2.5, 11, -3.9), (5, 2, 1), 0.0, False)], 'hide', dyed=True)
-        g.add('feet', leg, [((-0.5, 9.5, -3.75), (1, 1, 1), 0.0, False)], 'toggle')
+        band(g, 'feet', leg, 8.5, 1, 'cord')
+        g.add('feet', leg, [((-2.25 if leg == 'right_leg' else -1.75, 11, -3.9), (4, 2, 1), 0.0, False)], 'hide',
+              dyed=True)
+        g.add('feet', leg, [((-0.5, 9.75, -4.1), (1, 1, 1), 0.0, False)], 'toggle')
     return g
 
 
@@ -418,8 +465,10 @@ def awakened_base(slot, bone, face, x, y, z, s, t, w, h):
     r = (y + (0.5 if bone == 'right_leg' else 0)) % period
     band = 0.0 if face in ('up', 'down') else (0.13 if r < 1 else -0.15 if r > period - 1 else 0.0)
     lobe = fbm3(x, y, z, seed, 0.3)
-    fibre = 0.025 if (s + (t // 3)) % 2 == 0 else -0.025
-    v = 0.4 + 0.1 * lobe + band + fibre + edge_light(face, s, t, w, h)
+    fibre = 0.02 if (s + (t // 3)) % 2 == 0 else -0.02
+    v = 0.36 + 0.12 * lobe + band + fibre + edge_light(face, s, t, w, h)
+    if r < 1 and face not in ('up', 'down') and hash3(int(x * 2), int(y * 2), int(z * 2), seed) > 0.86:
+        v += 0.3  # a wet glint on the swell of a band
     colour = ramp(MEMBRANE, v)
     # between limb bands the membrane parts on the sides and back, and the skin shows
     if bone in ('right_arm', 'right_leg') and face in ('right', 'left', 'back') and r > period - 1 \
@@ -436,6 +485,10 @@ def awakened_base(slot, bone, face, x, y, z, s, t, w, h):
     if bone == 'right_arm' and 3.5 < y <= 4.5:
         colour = ramp(MEMBRANE, 0.72)
     return colour
+
+
+def awakened_veins(img, rect, bone, face):
+    wander(img, rect, VEIN, CAPILLARY, rect[3], rect[0] * 13 + rect[1] * 7 + len(face))
 
 
 def awakened_growths():
@@ -462,10 +515,10 @@ def awakened_growths():
         g.add('chest', 'body', [((-0.5 - width, y, -3.7), (width, 1, 1), 0.0, False)], 'bone')
         g.add('chest', 'body', [((0.5, y, -3.7), (width, 1, 1), 0.0, False)], 'bone')
     g.add('chest', 'body', [((-1, -1, -0.5), (2, 2, 1), 0.0, False)], 'pore', pivot=(2.5, 4.5, -3.75),
-          breath=0.22)
+          breath=0.35)
     for i, y in enumerate((8, 9.5, 11)):
         g.add('chest', 'body', [((-3.5, -0.5, -0.5), (7, 1, 1), 0.0, False)], 'plate', dyed=True,
-              pivot=(0, y + 0.5, -3.3 - i * 0.1), breath=0.05, lag=0.6 + i * 0.3)
+              pivot=(0, y + 0.5, -3.3 - i * 0.1), breath=0.14, lag=0.6 + i * 0.5)
     for y in (0.5, 2.5, 4.5, 6.5, 8.5):
         g.add('chest', 'body', [((-1, y, 3), (2, 1, 1), 0.0, False)], 'bone')
     for x in (-4.5, 1.5):
@@ -486,41 +539,46 @@ def awakened_growths():
         g.add('chest', 'left_arm', [((-sz / 2, -sz, -sz / 2), (sz, sz, sz), 0.0, False)], 'pore',
               pivot=(x, -3.5, z), breath=0.3, lag=0.4 + i * 0.7)
     for arm, x0 in (('right_arm', -3), ('left_arm', -1)):
-        g.add('chest', arm, [((x0, 1.5, -2), (4, 2, 4), 1.3, False)], 'plate', dyed=True)
+        band(g, 'chest', arm, 1.5, 2, 'plate', out=0.3, dyed=True)
         g.add('chest', arm, [((x0, 5.5, -2), (4, 3, 4), 0.45, False)], 'sleeve', dyed=True)
         g.add('chest', arm, [((x0, 6, -2), (4, 1, 4), 0.8, False)], 'bone')
     # legwraps: a sinew belt, two shingled thigh rings, a small bone knee cap
     g.add('legs', 'body', [((-4, 10.5, -2), (8, 1, 4), 0.9, False)], 'bone')
     for leg in ('right_leg', 'left_leg'):
-        g.add('legs', leg, [((-2, 0.5, -2), (4, 2, 4), 0.75, False)], 'plate', dyed=True)
-        g.add('legs', leg, [((-2, 2.5, -2), (4, 1, 4), 0.95, False)], 'plate', dyed=True)
+        band(g, 'legs', leg, 0.5, 2, 'plate', out=0.2, dyed=True)
+        band(g, 'legs', leg, 2.5, 1, 'plate', out=0.45, dyed=True)
         g.add('legs', leg, [((-1, 4.25, -3.1), (2, 2, 1), 0.0, False)], 'bone')
-        g.add('legs', leg, [((-2, 7, -2), (4, 1, 4), 0.75, False)], 'plate', dyed=True)
+        band(g, 'legs', leg, 7, 1, 'plate', out=0.2, dyed=True)
     # treads: shin shingles, an ankle ring, a membrane toe cap with three bone claws, a heel spur
     for leg in ('right_leg', 'left_leg'):
         g.add('feet', leg, [((-1.5, 6.25, -3.75), (3, 2, 1), 0.0, False)], 'plate', dyed=True)
         g.add('feet', leg, [((-1, 8, -3.9), (2, 1, 1), 0.0, False)], 'bone')
-        g.add('feet', leg, [((-2, 9.25, -2), (4, 1, 4), 1.25, False)], 'plate', dyed=True)
-        g.add('feet', leg, [((-2.5, 11, -3.8), (5, 2, 1), 0.0, False)], 'plate', dyed=True)
-        for x in (-2, -0.5, 1):
-            g.add('feet', leg, [((x, 12, -4.8), (1, 1, 1), 0.0, False)], 'bone')
+        band(g, 'feet', leg, 9.25, 1, 'plate', out=0.3, dyed=True)
+        toe = -2.25 if leg == 'right_leg' else -1.75
+        g.add('feet', leg, [((toe, 11, -3.8), (4, 2, 1), 0.0, False)], 'plate', dyed=True)
+        for dx in (0, 1.5, 3):
+            g.add('feet', leg, [((toe + dx, 12, -4.8), (1, 1, 1), 0.0, False)], 'bone')
         g.add('feet', leg, [((-0.5, 10.5, 2.9), (1, 1, 2), 0.0, False)], 'bone')
     return g
 
 
 def awakened_painters():
     def bone(face, x, y, z, s, t, w, h, size):
-        v = 0.55 + 0.18 * fbm3(x, y, z, 51, 1.2) + edge_light(face, s, t, w, h)
+        v = 0.5 + 0.22 * fbm3(x, y, z, 51, 0.9) + edge_light(face, s, t, w, h)
         if (s == 0 or s == w - 1) and face in ('front', 'back') and w > 2:
             v -= 0.1
+        long_ = max(w, h) >= 4
+        if long_ and ((h >= w and t % 3 == 2) or (w > h and s % 3 == 2)):
+            v -= 0.12  # growth lines across a long bone
         return ramp(IVORY, v)
 
     def plate(face, x, y, z, s, t, w, h, size):
-        v = 0.42 + 0.25 * fbm3(x, y, z, 53, 0.8) + edge_light(face, s, t, w, h)
-        c = ramp(MEMBRANE, v)
+        v = 0.4 + 0.16 * fbm3(x, y, z, 53, 0.8) + edge_light(face, s, t, w, h)
         if t == 0 and face not in ('up', 'down'):
-            c = ramp(MEMBRANE, 0.85)  # a pale growth rim on the top edge
-        return c
+            v = 0.74 + (0.12 if hash3(int(x * 3), int(y), int(z * 3), 54) > 0.7 else 0)  # a wet pale rim
+        if face == 'up':
+            v += 0.1
+        return ramp(MEMBRANE, v)
 
     def pore(face, x, y, z, s, t, w, h, size):
         centre = (s in (w // 2 - (w % 2 == 0), w // 2)) and (t in (h // 2 - (h % 2 == 0), h // 2))
@@ -530,7 +588,7 @@ def awakened_painters():
 
     def sleeve(face, x, y, z, s, t, w, h, size):
         if face in ('up', 'down'):
-            return None  # a living bracer round the bare forearm, open at both ends
+            return ramp(MEMBRANE, 0.12)  # the bracer's dark rim where it grips the forearm
         v = 0.4 + 0.2 * fbm3(x, y, z, 57, 0.8) + (0.12 if t == 0 else -0.14 if t == h - 1 else 0)
         return ramp(MEMBRANE, v)
 
@@ -756,8 +814,8 @@ def icon(set_name, piece, slot, layer_imgs, growth_img, growths):
 PIECES = (('hood', 'head'), ('thorax', 'chest'), ('legwraps', 'legs'), ('treads', 'feet'))
 
 
-def write_set(name, base_paint, growths, painters):
-    layers = {n: base_layer(base_paint, n) for n in (1, 2)}
+def write_set(name, base_paint, growths, painters, veins=None):
+    layers = {n: base_layer(base_paint, n, veins) for n in (1, 2)}
     armor = ASSETS / 'textures/models/armor'
     for n, img in layers.items():
         img.save(armor / f'{name}_layer_{n}.png', optimize=True)
@@ -774,7 +832,7 @@ def write_set(name, base_paint, growths, painters):
 
 def main():
     d = write_set('dormant', dormant_base, dormant_growths(), dormant_painters())
-    a = write_set('awakened', awakened_base, awakened_growths(), awakened_painters())
+    a = write_set('awakened', awakened_base, awakened_growths(), awakened_painters(), awakened_veins)
     print(f'armor: dormant {d} growth cubes, awakened {a}; layers, growth sheets, growth files and icons')
 
 

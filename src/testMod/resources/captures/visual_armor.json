@@ -10,8 +10,21 @@
     "summon armor_stand 3 -60 3 {Tags:[\"visual_audit\"],NoGravity:1b,ShowArms:1b,NoBasePlate:1b,ArmorItems:[{id:\"infestusfrontier:awakened_treads\",count:1,components:{\"minecraft:trim\":{pattern:\"minecraft:coast\",material:\"minecraft:gold\"},\"minecraft:enchantment_glint_override\":true}},{id:\"infestusfrontier:awakened_legwraps\",count:1,components:{\"minecraft:trim\":{pattern:\"minecraft:coast\",material:\"minecraft:gold\"},\"minecraft:enchantment_glint_override\":true}},{id:\"infestusfrontier:awakened_thorax\",count:1,components:{\"minecraft:trim\":{pattern:\"minecraft:coast\",material:\"minecraft:gold\"},\"minecraft:enchantment_glint_override\":true}},{id:\"infestusfrontier:awakened_hood\",count:1,components:{\"minecraft:trim\":{pattern:\"minecraft:coast\",material:\"minecraft:gold\"},\"minecraft:enchantment_glint_override\":true}}],Rotation:[180f,0f],Pose:{LeftArm:[-35f,0f,-15f],RightArm:[-70f,0f,15f],LeftLeg:[-20f,0f,0f],RightLeg:[20f,0f,0f]}}",
     "difficulty easy",
     "kill @e[type=zombie,tag=visual_audit]",
-    "summon zombie 5 -60 3 {Tags:[\"visual_audit\"],NoAI:1b,PersistenceRequired:1b,Silent:1b,Rotation:[180f,0f],ArmorItems:[{id:\"infestusfrontier:awakened_treads\",count:1},{id:\"infestusfrontier:awakened_legwraps\",count:1},{id:\"infestusfrontier:awakened_thorax\",count:1},{id:\"infestusfrontier:awakened_hood\",count:1}],ArmorDropChances:[0f,0f,0f,0f]}",
-    "summon zombie -5 -60 3 {Tags:[\"visual_audit\"],NoAI:1b,PersistenceRequired:1b,Silent:1b,IsBaby:1b,Rotation:[180f,0f],ArmorItems:[{id:\"infestusfrontier:dormant_treads\",count:1},{id:\"infestusfrontier:dormant_legwraps\",count:1},{id:\"infestusfrontier:dormant_thorax\",count:1},{id:\"infestusfrontier:dormant_hood\",count:1}],ArmorDropChances:[0f,0f,0f,0f]}"
+    "summon zombie 5 -60 3 {Tags:[\"visual_audit\"],Glowing:1b,NoAI:1b,PersistenceRequired:1b,Silent:1b,Rotation:[180f,0f],ArmorItems:[{id:\"infestusfrontier:awakened_treads\",count:1},{id:\"infestusfrontier:awakened_legwraps\",count:1},{id:\"infestusfrontier:awakened_thorax\",count:1},{id:\"infestusfrontier:awakened_hood\",count:1}],ArmorDropChances:[0f,0f,0f,0f]}",
+    "summon zombie -5 -60 3 {Tags:[\"visual_audit\"],NoAI:1b,PersistenceRequired:1b,Silent:1b,IsBaby:1b,Rotation:[180f,0f],ArmorItems:[{id:\"infestusfrontier:dormant_treads\",count:1},{id:\"infestusfrontier:dormant_legwraps\",count:1},{id:\"infestusfrontier:dormant_thorax\",count:1},{id:\"infestusfrontier:dormant_hood\",count:1}],ArmorDropChances:[0f,0f,0f,0f]}",
+    "gamemode survival @s",
+    "item replace entity @s armor.head with infestusfrontier:awakened_hood",
+    "item replace entity @s armor.chest with infestusfrontier:awakened_thorax",
+    "item replace entity @s armor.legs with infestusfrontier:awakened_legwraps",
+    "item replace entity @s armor.feet with infestusfrontier:awakened_treads",
+    "item replace entity @s hotbar.0 with infestusfrontier:dormant_hood",
+    "item replace entity @s hotbar.1 with infestusfrontier:dormant_thorax[minecraft:dyed_color={rgb:4890623}]",
+    "item replace entity @s hotbar.2 with infestusfrontier:dormant_legwraps",
+    "item replace entity @s hotbar.3 with infestusfrontier:dormant_treads",
+    "item replace entity @s hotbar.4 with infestusfrontier:awakened_hood",
+    "item replace entity @s hotbar.5 with infestusfrontier:awakened_thorax",
+    "item replace entity @s hotbar.6 with infestusfrontier:awakened_legwraps",
+    "item replace entity @s hotbar.7 with infestusfrontier:awakened_treads"
   ],
   "views": [
     {
@@ -79,6 +92,16 @@
       "pitch": 10,
       "frames": 20,
       "frameTicks": 4
+    },
+    {
+      "name": "inventory",
+      "x": 0.5,
+      "y": -59.4,
+      "z": -4.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "inventory": true
     }
   ]
 }

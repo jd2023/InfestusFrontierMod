@@ -23,6 +23,15 @@ def shell(bone, slot):
     return (x - inflate, y - inflate, z - inflate), (x + w + inflate, y + h + inflate, z + d + inflate)
 
 
+WORLD = {'head': (0, 0, 0), 'body': (0, 0, 0), 'right_arm': (-5, 2, 0), 'left_arm': (5, 2, 0),
+         'right_leg': (-1.9, 12, 0), 'left_leg': (1.9, 12, 0)}
+
+
+def world_shell(bone, slot):
+    lo, hi = shell(bone, slot)
+    return [lo[i] + WORLD[bone][i] for i in range(3)], [hi[i] + WORLD[bone][i] for i in range(3)]
+
+
 def growths(name):
     return json.loads((ASSETS / 'armor' / f'{name}.json').read_text())
 
@@ -65,6 +74,35 @@ class ArmorTest(unittest.TestCase):
                         for c in (clo[axis], chi[axis]):
                             for s in (lo[axis], hi[axis]):
                                 self.assertFalse(overlap and abs(c - s) < 1e-6, (name, part['slot'], part['bone'], cube))
+
+    def test_no_growth_reaches_into_another_bone(self):
+        """A growth may not cross into another bone further than its own base shell does (vanilla's shells already
+        overlap at the hips and shoulders), and growths on different bones never overlap: otherwise the legs merge
+        into one slab at rest and the parts cut through each other in a stride."""
+        eps = 1e-6
+        for name in SETS:
+            boxes = []
+            for part in growths(name)['parts']:
+                for cube in part['cubes']:
+                    inf = cube.get('inflate', 0)
+                    lo = [WORLD[part['bone']][i] + part['pivot'][i] + cube['origin'][i] - inf for i in range(3)]
+                    hi = [lo[i] + cube['size'][i] + 2 * inf for i in range(3)]
+                    boxes.append((part['slot'], part['bone'], lo, hi))
+            for slot, bone, lo, hi in boxes:
+                own = world_shell(bone, slot)
+                for other in SLOT_BONES[slot] - {bone}:
+                    olo, ohi = world_shell(other, slot)
+                    ilo = [max(lo[i], olo[i]) for i in range(3)]
+                    ihi = [min(hi[i], ohi[i]) for i in range(3)]
+                    if all(ihi[i] - ilo[i] > eps for i in range(3)):
+                        inside = all(ilo[i] >= own[0][i] - eps and ihi[i] <= own[1][i] + eps for i in range(3))
+                        self.assertTrue(inside, f'{name} {slot} {bone} growth {lo}..{hi} reaches into {other}')
+            for i, (slot, bone, lo, hi) in enumerate(boxes):
+                for slot2, bone2, lo2, hi2 in boxes[i + 1:]:
+                    if slot2 != slot or bone2 == bone:
+                        continue
+                    overlap = all(min(hi[k], hi2[k]) - max(lo[k], lo2[k]) > eps for k in range(3))
+                    self.assertFalse(overlap, f'{name} {slot}: {bone} growth {lo}..{hi} overlaps {bone2} {lo2}..{hi2}')
 
     def test_every_piece_has_a_dyed_and_a_plain_icon_layer(self):
         for name in SETS:

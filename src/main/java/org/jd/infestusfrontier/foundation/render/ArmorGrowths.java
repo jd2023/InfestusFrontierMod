@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.logging.LogUtils;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
+import org.slf4j.Logger;
 
 /**
  * The growths of one armor set, read from {@code assets/<ns>/armor/<set>.json}, which {@code art/gen_armor.py}
@@ -57,7 +59,7 @@ final class ArmorGrowths {
     record Breather(ModelPart part, float depth, float lag) {}
 
     /** One slot's baked roots, dyed and plain, and the parts that breathe. */
-    record Slot(Map<Bone, ModelPart> dyed, Map<Bone, ModelPart> plain, List<Breather> breathers) {
+    record Slot(Map<Bone, ModelPart> dyed, Map<Bone, ModelPart> plain, List<Breather> breathers, boolean empty) {
         ModelPart root(boolean isDyed, Bone bone) {
             return (isDyed ? dyed : plain).get(bone);
         }
@@ -65,16 +67,25 @@ final class ArmorGrowths {
 
     record Set(ResourceLocation texture, Map<EquipmentSlot, Slot> bySlot) {}
 
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private ArmorGrowths() {}
 
+    /**
+     * The set's growths, or none when its file is missing or broken (a resource pack may replace it): the armor then
+     * draws as plain vanilla armor and the problem is logged, never a crash on the render thread.
+     */
     static Set load(ResourceManager resources, ResourceLocation id) {
         ResourceLocation file = id.withPath(path -> "armor/" + path + ".json");
-        JsonObject json;
         try (Reader reader = resources.openAsReader(file)) {
-            json = JsonParser.parseReader(reader).getAsJsonObject();
-        } catch (IOException e) {
-            throw new IllegalStateException("Missing armor growths " + file, e);
+            return parse(JsonParser.parseReader(reader).getAsJsonObject());
+        } catch (IOException | RuntimeException e) {
+            LOGGER.warn("Armor growths {} could not be read; the armor draws without them", file, e);
+            return new Set(file, Map.of());
         }
+    }
+
+    private static Set parse(JsonObject json) {
         JsonArray size = json.getAsJsonArray("size");
         int width = size.get(0).getAsInt();
         int height = size.get(1).getAsInt();
@@ -89,7 +100,10 @@ final class ArmorGrowths {
         List<Breather> breathers = new ArrayList<>();
         Map<Bone, ModelPart> dyed = bake(parts, slot, true, width, height, breathers);
         Map<Bone, ModelPart> plain = bake(parts, slot, false, width, height, breathers);
-        return new Slot(dyed, plain, List.copyOf(breathers));
+        boolean empty = true;
+        for (JsonElement element : parts)
+            if (element.getAsJsonObject().get("slot").getAsString().equals(slot.getName())) empty = false;
+        return new Slot(dyed, plain, List.copyOf(breathers), empty);
     }
 
     private static Map<Bone, ModelPart> bake(
