@@ -52,7 +52,7 @@ import org.slf4j.Logger;
 
 /**
  * Owner of item, fluid and biomass balances. Ships the biomass fluid, its bucket, the Biomass Bladder, the Reservoir
- * cell and the Item Capsule.
+ * cell, the Capsule Stem and its Item Capsule pods.
  */
 public final class StorageModule {
     static final Logger LOGGER = LogUtils.getLogger();
@@ -152,17 +152,37 @@ public final class StorageModule {
             MENUS.register("reservoir_cell", () -> IMenuTypeExtension.create(ReservoirCellMenu::new));
     static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ReservoirCellRecipe>> RESERVOIR_CELL_RECIPE =
             RECIPE_SERIALIZERS.register("reservoir_cell", ReservoirCellRecipe.Serializer::new);
+    /** The stem the pods grow on: tissue, which breaks to Dead Tissue and regrows from its root. */
+    public static final DeferredBlock<CapsuleStemBlock> CAPSULE_STEM = BLOCKS.registerBlock(
+            "capsule_stem",
+            CapsuleStemBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_RED)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.BLOCK)
+                    .isViewBlocking((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false));
+
+    public static final DeferredItem<BlockItem> CAPSULE_STEM_ITEM = ITEMS.registerSimpleBlockItem(CAPSULE_STEM);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CapsuleStemBlockEntity>> CAPSULE_STEM_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "capsule_stem",
+                    () -> BlockEntityType.Builder.of(CapsuleStemBlockEntity::new, CAPSULE_STEM.get())
+                            .build(null));
     public static final DeferredBlock<ItemCapsuleBlock> ITEM_CAPSULE = BLOCKS.registerBlock(
             "item_capsule",
             ItemCapsuleBlock::new,
             BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_PINK)
-                    .strength(1.5F)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion()
                     .pushReaction(PushReaction.BLOCK)
-                    .isViewBlocking((state, level, pos) -> false));
-    public static final DeferredItem<BlockItem> ITEM_CAPSULE_ITEM =
+                    .isViewBlocking((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false));
+    public static final DeferredItem<OrganItem> ITEM_CAPSULE_ITEM =
             ITEMS.register("item_capsule", () -> new ItemCapsuleItem(ITEM_CAPSULE.get(), new Item.Properties()));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemCapsuleBlockEntity>> ITEM_CAPSULE_ENTITY =
             BLOCK_ENTITIES.register(
@@ -180,7 +200,7 @@ public final class StorageModule {
                     "biomass_tank",
                     builder -> builder.persistent(BiomassCodecs.TANK).networkSynchronized(BiomassCodecs.TANK_STREAM));
 
-    /** The compartments a capsule cell carries on its item when broken and placed again. */
+    /** The compartment and grade a pod carries on its item when broken and placed again. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<CapsuleStock>> CAPSULE_STOCK =
             COMPONENTS.registerComponentType(
                     "capsule_stock",
@@ -219,7 +239,13 @@ public final class StorageModule {
                     RESERVOIR_CELL_ENTITY.get(),
                     (cell, side) -> BiomassFluids.handler(cell));
             event.registerBlockEntity(
-                    Capabilities.ItemHandler.BLOCK, ITEM_CAPSULE_ENTITY.get(), (cell, side) -> new CapsuleItems(cell));
+                    Capabilities.ItemHandler.BLOCK,
+                    ITEM_CAPSULE_ENTITY.get(),
+                    (pod, side) -> new CapsuleItems(() -> Stems.of(pod)));
+            event.registerBlockEntity(
+                    Capabilities.ItemHandler.BLOCK,
+                    CAPSULE_STEM_ENTITY.get(),
+                    (cell, side) -> new CapsuleItems(() -> Stems.of(cell)));
         });
         if (FMLEnvironment.dist == Dist.CLIENT) {
             OrganRenderers.register(modBus, "biomass_bladder", BIOMASS_BLADDER_ENTITY, BIOMASS_BLADDER_ITEM);
@@ -228,14 +254,17 @@ public final class StorageModule {
                 event.register(RESERVOIR_CELL_MENU.get(), ReservoirCellScreen::new);
                 event.register(ITEM_CAPSULE_MENU.get(), ItemCapsuleScreen::new);
             });
-            // four pockets on the front, two by two, each icon over its count; art/gen_item_capsule.py POCKETS
-            FrontStockRenderer.register(
+            // one pocket on the pod's outer face, the icon over its count; art/gen_item_capsule.py POCKET
+            OrganRenderers.register(
                     modBus,
+                    "item_capsule",
                     ITEM_CAPSULE_ENTITY,
-                    ItemCapsuleBlock.FACING,
-                    ItemCapsuleBlockEntity::shown,
-                    new FrontStockRenderer.Pockets(2, 4.5F, 11.5F, 7F, 3.5F, 2.6F, 2.5F, 4F),
-                    ResourceLocation.fromNamespaceAndPath("infestusfrontier", "block/item_capsule_lining"));
+                    ITEM_CAPSULE_ITEM,
+                    FrontStockRenderer.overlay(
+                            ItemCapsuleBlock.FACING,
+                            ItemCapsuleBlockEntity::shown,
+                            new FrontStockRenderer.Pockets(1, 8F, 9.0F, 7F, 5.5F, 0.3F, 4F, 0.95F),
+                            ResourceLocation.fromNamespaceAndPath("infestusfrontier", "block/item_capsule_lining")));
             // the liquid stops inside the membrane panes, above the fleshy base and under the lid
             JoinedTankRenderer.register(
                     modBus,

@@ -1,0 +1,138 @@
+{
+  "commands": [
+    "tick freeze",
+    "fill -10 -61 -8 14 -50 10 air",
+    "fill -10 -62 -8 14 -62 10 grass_block",
+    "kill @e[type=item]",
+    "advancement grant @s through infestusfrontier:contact/biomass_bladder",
+    "advancement grant @s only infestusfrontier:acquired/capsule_stem",
+    "give @s infestusfrontier:item_capsule",
+    "give @s infestusfrontier:capsule_stem",
+    "setblock 0 -62 6 infestusfrontier:mouth[mode=intake]",
+    "setblock 0 -61 6 infestusfrontier:capsule_stem[part=root]{root:[I;0,-61,6],plan:{seed:7L,cells:[{x:0,y:0,z:0,part:\"root\",side:-1,parent:-1,trunk:0,tier:0}],pods:[]},grow:40}",
+    "setblock 5 -61 6 infestusfrontier:item_capsule[facing=north,grade=2]{stock:{held:[{slot:0,item:{id:\"minecraft:wheat\"},count:1200}],grade:2}}",
+    "setblock -5 -61 6 infestusfrontier:item_capsule[facing=north,grade=1]{stock:{held:[{slot:0,item:{id:\"minecraft:bone\"},count:300}],grade:1}}",
+    "setblock -7 -61 6 infestusfrontier:item_capsule[facing=north]{stock:{held:[{slot:0,item:{id:\"minecraft:wheat_seeds\"},count:40}],grade:0}}",
+    "tick unfreeze",
+    "time set noon",
+    "time set noon",
+    "data merge block 0 -60 5 {stock:{held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:64}],grade:0}}",
+    "data merge block -1 -60 6 {stock:{held:[{slot:0,item:{id:\"minecraft:cobblestone\"},count:512}],grade:0}}",
+    "data merge block 1 -59 6 {stock:{held:[{slot:0,item:{id:\"minecraft:wheat\"},count:200}],grade:0}}",
+    "data merge block 0 -58 5 {stock:{held:[{slot:0,item:{id:\"minecraft:bone\"},count:48}],grade:0}}",
+    "time set noon"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 0.5,
+      "y": -58.5,
+      "z": 0.0,
+      "yaw": 0,
+      "pitch": 8
+    },
+    {
+      "name": "corner",
+      "x": -4.5,
+      "y": -58.5,
+      "z": 1.5,
+      "yaw": -45,
+      "pitch": 12
+    },
+    {
+      "name": "display",
+      "x": 0.5,
+      "y": -59.6,
+      "z": 2.8,
+      "yaw": 0,
+      "pitch": 10
+    },
+    {
+      "name": "back",
+      "x": 0.5,
+      "y": -58.5,
+      "z": 12.5,
+      "yaw": 180,
+      "pitch": 8
+    },
+    {
+      "name": "top",
+      "x": 0.5,
+      "y": -52.5,
+      "z": 4.5,
+      "yaw": 0,
+      "pitch": 70
+    },
+    {
+      "name": "root",
+      "x": 0.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20
+    },
+    {
+      "name": "grades",
+      "x": -1.0,
+      "y": -60.3,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 12
+    },
+    {
+      "name": "far",
+      "x": 0.5,
+      "y": -58.0,
+      "z": -6.0,
+      "yaw": 0,
+      "pitch": 6
+    },
+    {
+      "name": "hotbar",
+      "x": 0.5,
+      "y": -58.5,
+      "z": 0.0,
+      "yaw": 0,
+      "pitch": 8,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:item_capsule",
+        "infestusfrontier:capsule_stem"
+      ]
+    },
+    {
+      "name": "screen",
+      "x": 0.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "use": [
+        0,
+        -61,
+        6
+      ]
+    },
+    {
+      "name": "book_item_capsule",
+      "x": 0.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "book": "infestusfrontier:circulation/item_capsule"
+    },
+    {
+      "name": "breath",
+      "x": 0.5,
+      "y": -59.6,
+      "z": 2.8,
+      "yaw": 0,
+      "pitch": 10,
+      "frames": 24,
+      "frameTicks": 4
+    }
+  ]
+}

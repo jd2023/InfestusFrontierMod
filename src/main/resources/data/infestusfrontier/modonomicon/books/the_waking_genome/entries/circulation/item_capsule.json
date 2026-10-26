@@ -20,6 +20,10 @@
       {
         "type": "modonomicon:advancement",
         "advancement_id": "infestusfrontier:acquired/item_capsule"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/capsule_stem"
       }
     ]
   },
@@ -30,8 +34,13 @@
       "text": "entry.infestusfrontier.circulation.item_capsule.use"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.item_capsule.grow.title",
+      "text": "entry.infestusfrontier.circulation.item_capsule.grow"
+    },
+    {
       "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:item_capsule",
+      "recipe_id_1": "infestusfrontier:capsule_stem",
       "text": "entry.infestusfrontier.circulation.item_capsule.craft"
     }
   ]

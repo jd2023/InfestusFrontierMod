@@ -12,7 +12,7 @@ import org.jd.infestusfrontier.foundation.screen.Well;
 import org.jd.infestusfrontier.ui.PartRow;
 import org.jd.infestusfrontier.ui.Sheet;
 
-/** A page of the entire cocoon, reached from any cell, with fixed wells and ordinary inventory controls. */
+/** A page of the whole tree's store, reached from any cell or pod, with fixed wells and ordinary inventory controls. */
 final class ItemCapsuleScreen extends OrganScreen<ItemCapsuleMenu> {
     private static final String KEY = "gui.infestusfrontier.item_capsule.";
     private final List<Well> wells = new ArrayList<>();
@@ -35,8 +35,7 @@ final class ItemCapsuleScreen extends OrganScreen<ItemCapsuleMenu> {
                 Sheet.LEFT_X,
                 Sheet.LABEL_Y - 3,
                 Sheet.RIGHT_EDGE - Sheet.LEFT_X,
-                () -> Component.translatable(
-                        KEY + "body", menu.sizeX(), menu.sizeY(), menu.sizeZ(), menu.used(), menu.compartments()),
+                () -> Component.translatable(KEY + "body", menu.compartments(), menu.used()),
                 () -> Component.translatable(KEY + "body.story")));
         for (int slot = 0; slot < ItemCapsuleMenu.PAGE_SIZE; slot++) {
             int y = ItemCapsuleMenu.GRID_Y + slot / ItemCapsuleMenu.COLUMNS * ItemCapsuleMenu.PITCH;

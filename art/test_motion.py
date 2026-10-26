@@ -82,6 +82,14 @@ class OrganMotionTest(unittest.TestCase):
                                          'faces': ('west', 'east', 'down', 'up', 'north', 'south')})
             self.assertEqual(coplanar_faces(elements), [], path.name)
 
+    def test_every_organ_model_stands_in_its_block(self):
+        """A block's model spans y 0..16 from its floor; nothing hangs below the block (tall organs rise past it)."""
+        for path in sorted((ASSETS / 'geo/block').glob('*.geo.json')):
+            for bone in geometry(path.name.removesuffix('.geo.json'))['bones']:
+                for cube in bone.get('cubes', []):
+                    self.assertGreaterEqual(cube['origin'][1], -0.5, path.name)
+                    self.assertLessEqual(cube['origin'][1] + cube['size'][1], 32, path.name)
+
     def test_no_geckolib_model_has_faces_fighting_for_depth(self):
         """Parallel faces closer than a tenth of a pixel flicker; organ models draw both sides of every face."""
         import geo_audit
@@ -91,31 +99,30 @@ class OrganMotionTest(unittest.TestCase):
 
     def test_storage_parts_and_items_have_no_overlapping_face_planes(self):
         for folder in ('block', 'item'):
-            for prefix in ('item_capsule', 'reservoir_cell'):
+            for prefix in ('capsule_stem', 'reservoir_cell'):
                 for path in (ASSETS / 'models' / folder).glob(prefix + '*.json'):
                     self.assertEqual(coplanar_faces(json.loads(path.read_text()).get('elements', [])), [], str(path))
 
-    def test_capsule_bodies_have_no_faces_fighting_across_parts(self):
-        """Every part a joined body draws, cell by cell; parts may meet edge to edge but never share a face plane."""
-        parts = json.loads((ASSETS / 'blockstates/item_capsule.json').read_text())['multipart']
-        steps = {'west': (-1, 0, 0), 'east': (1, 0, 0), 'down': (0, -1, 0), 'up': (0, 1, 0),
-                 'north': (0, 0, -1), 'south': (0, 0, 1)}
-        for size, facing in (((1, 1, 1), 'north'), ((2, 1, 1), 'south'), ((1, 2, 2), 'west'), ((2, 2, 3), 'east')):
-            cells = [(x, y, z) for x in range(size[0]) for y in range(size[1]) for z in range(size[2])]
-            elements = []
-            for cell in cells:
-                state = {'facing': facing}
-                for side, step in steps.items():
-                    state[side] = str(tuple(c + d for c, d in zip(cell, step)) in cells).lower()
-                for part in parts:
-                    if not all(state[k] in v.split('|') for k, v in part.get('when', {}).items()):
-                        continue
-                    name = part['apply']['model'].split(':')[1]
-                    for element in json.loads((ASSETS / 'models' / (name + '.json')).read_text()).get('elements', []):
-                        element['from'] = [a + 16 * c for a, c in zip(element['from'], cell)]
-                        element['to'] = [a + 16 * c for a, c in zip(element['to'], cell)]
-                        elements.append(element)
-            self.assertEqual(coplanar_faces(elements), [], (size, facing))
+    def test_stem_parts_share_no_face_planes(self):
+        """A stem's parts stacked as they grow, a branch beside them and a collar on a cell, never share a face plane."""
+        parts = json.loads((ASSETS / 'blockstates/capsule_stem.json').read_text())['multipart']
+        column = [((0, 0, 0), {'part': 'root', 'collar': 'false', 'facing': 'north'}),
+                  ((0, 1, 0), {'part': 'trunk', 'collar': 'true', 'facing': 'north'}),
+                  ((0, 2, 0), {'part': 'trunk', 'collar': 'false', 'facing': 'north'}),
+                  ((1, 2, 0), {'part': 'branch', 'collar': 'false', 'facing': 'north'}),
+                  ((1, 3, 0), {'part': 'bud', 'collar': 'true', 'facing': 'north'}),
+                  ((0, 3, 0), {'part': 'bud', 'collar': 'false', 'facing': 'north'})]
+        elements = []
+        for cell, state in column:
+            for part in parts:
+                if not all(state[k] in v.split('|') for k, v in part.get('when', {}).items()):
+                    continue
+                name = part['apply']['model'].split(':')[1]
+                for element in json.loads((ASSETS / 'models' / (name + '.json')).read_text()).get('elements', []):
+                    element['from'] = [a + 16 * c for a, c in zip(element['from'], cell)]
+                    element['to'] = [a + 16 * c for a, c in zip(element['to'], cell)]
+                    elements.append(element)
+        self.assertEqual(coplanar_faces(elements), [])
 
     def test_attached_parts_inherit_their_support_motion(self):
         for model, child, parent in (

@@ -5,21 +5,21 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
+import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.storage.api.CapsuleStock;
 
 /**
- * The capsule cell as an item. It carries the compartments it was broken with, one to a stack, lists them in its
- * tooltip, fits in no container item, and spills them in whole stacks when the item itself is destroyed, as a shulker
- * box does.
+ * The pod as an item. It carries the compartment and grade it was broken with, one to a stack, lists them in its
+ * tooltip, fits in no container item, and spills its items in whole stacks when the item itself is destroyed, as a
+ * shulker box does.
  */
-final class ItemCapsuleItem extends BlockItem {
+final class ItemCapsuleItem extends OrganItem {
     ItemCapsuleItem(Block block, Properties properties) {
-        super(block, properties);
+        super(block, properties, "idle", "grade_0");
     }
 
     @Override
@@ -37,6 +37,10 @@ final class ItemCapsuleItem extends BlockItem {
                 tooltip.add(Component.translatable(
                                 "tooltip.infestusfrontier.item_capsule.held", held.getCount(), held.getHoverName())
                         .withStyle(ChatFormatting.GRAY));
+        if (carried.grade() > 0)
+            tooltip.add(Component.translatable(
+                            "tooltip.infestusfrontier.item_capsule.grade", CapsuleStock.stacks(carried.grade()))
+                    .withStyle(ChatFormatting.GRAY));
     }
 
     @Override

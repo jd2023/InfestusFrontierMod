@@ -5,13 +5,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
@@ -21,15 +21,12 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 /**
  * The stock a block holds, drawn on its front as inventory icons in a grid of pockets with each count under its icon,
- * read from what the block entity syncs. Lit by the block in front. Nothing is decided here. A module calls
- * {@link #register} on the client only, so no client class is named where a dedicated server loads.
+ * read from what the block entity syncs. Lit by the block in front. Nothing is decided here. A module makes one with
+ * {@link #of} on the client only, so no client class is named where a dedicated server loads.
  */
 public final class FrontStockRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
     /**
@@ -60,16 +57,13 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
         this.lining = lining;
     }
 
-    /** Draws the stock of every block entity of {@code type}; call it on the client only. */
-    public static <T extends BlockEntity> void register(
-            IEventBus modBus,
-            Supplier<? extends BlockEntityType<T>> type,
-            DirectionProperty facing,
-            Function<T, List<ItemStack>> shown,
-            Pockets pockets,
-            ResourceLocation lining) {
-        modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(
-                type.get(), context -> new FrontStockRenderer<T>(facing, shown, pockets, lining)));
+    /**
+     * The stock {@code shown} gives, as an overlay for an organ's renderer
+     * ({@code OrganRenderers.register}); made here so no module names a client class in a signature of its own.
+     */
+    public static <T extends BlockEntity> Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<T>> overlay(
+            DirectionProperty facing, Function<T, List<ItemStack>> shown, Pockets pockets, ResourceLocation lining) {
+        return context -> new FrontStockRenderer<>(facing, shown, pockets, lining);
     }
 
     @Override
@@ -94,6 +88,7 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
         float edgeDepth = pockets.floor() - 0.05F;
         float centreDepth = pockets.floor() - 0.45F + 0.12F * (float) Math.sin(phase);
         for (int i = 0; i < stock.size(); i++) {
+            if (stock.get(i).isEmpty()) continue;
             membrane(
                     surface,
                     poses.last(),

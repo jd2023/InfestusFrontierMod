@@ -1,0 +1,75 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "part": "root"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/capsule_stem_root"
+      }
+    },
+    {
+      "when": {
+        "part": "trunk"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/capsule_stem_trunk"
+      }
+    },
+    {
+      "when": {
+        "part": "bud"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/capsule_stem_bud"
+      }
+    },
+    {
+      "when": {
+        "part": "branch",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/capsule_stem_branch"
+      }
+    },
+    {
+      "when": {
+        "part": "branch",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/capsule_stem_branch",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "part": "branch",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/capsule_stem_branch",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "part": "branch",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/capsule_stem_branch",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "collar": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/capsule_stem_collar"
+      }
+    }
+  ]
+}

@@ -1,73 +1,75 @@
 package org.jd.infestusfrontier.storage;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.storage.api.ItemStore;
 
 /**
- * A capsule cell's item handler: the whole body's store, found again on every call, so a pipe that keeps the handler
- * never holds a stale body. A slot takes only what {@link CapsuleBody#insert(int, ItemStack, boolean)} allows and
- * gives at most a stack at a time. While part of the body is out of reach, or the cell is unreadable, it has no slots.
+ * The item handler of a pod or a stem cell: the whole tree's store, found again on every call, so a pipe that keeps
+ * the handler never holds a stale tree. A slot takes only what {@link CapsuleTree#insert(int, ItemStack, boolean)}
+ * allows and gives at most a stack at a time. While the pod is unreadable it has no slots; a tree with a chunk out
+ * of reach serves the pods still in reach and is read again on every call until the chunk is back.
  */
 final class CapsuleItems implements IItemHandler, ItemStore {
-    private final ItemCapsuleBlockEntity cell;
+    private final Supplier<Optional<CapsuleTree>> store;
 
-    CapsuleItems(ItemCapsuleBlockEntity cell) {
-        this.cell = cell;
+    CapsuleItems(Supplier<Optional<CapsuleTree>> store) {
+        this.store = store;
     }
 
-    private Optional<CapsuleBody> body() {
-        return Capsules.of(cell);
+    private Optional<CapsuleTree> tree() {
+        return store.get();
     }
 
     @Override
     public int getSlots() {
-        return body().map(CapsuleBody::slots).orElse(0);
+        return tree().map(CapsuleTree::slots).orElse(0);
     }
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return body().map(body -> body.stack(slot)).orElse(ItemStack.EMPTY);
+        return tree().map(tree -> tree.stack(slot)).orElse(ItemStack.EMPTY);
     }
 
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        return body().map(body -> body.insert(slot, stack, simulate)).orElse(stack);
+        return tree().map(tree -> tree.insert(slot, stack, simulate)).orElse(stack);
     }
 
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return body().map(body -> body.extract(slot, amount, simulate)).orElse(ItemStack.EMPTY);
+        return tree().map(tree -> tree.extract(slot, amount, simulate)).orElse(ItemStack.EMPTY);
     }
 
     @Override
     public int getSlotLimit(int slot) {
-        return body().map(body -> body.limit(slot)).orElse(0);
+        return tree().map(tree -> tree.limit(slot)).orElse(0);
     }
 
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
-        return body().map(body -> body.fits(slot, stack)).orElse(false);
+        return tree().map(tree -> tree.fits(slot, stack)).orElse(false);
     }
 
     @Override
     public int count(ItemStack like) {
-        return body().map(body -> body.count(like)).orElse(0);
+        return tree().map(tree -> tree.count(like)).orElse(0);
     }
 
     @Override
     public ItemStack insert(ItemStack stack, boolean simulate) {
-        return body().map(body -> body.insert(stack, simulate)).orElse(stack);
+        return tree().map(tree -> tree.insert(stack, simulate)).orElse(stack);
     }
 
     @Override
     public long stored() {
-        return body().map(CapsuleBody::stored).orElse(0L);
+        return tree().map(CapsuleTree::stored).orElse(0L);
     }
 
     @Override
     public long capacity() {
-        return body().map(CapsuleBody::capacity).orElse(0L);
+        return tree().map(CapsuleTree::capacity).orElse(0L);
     }
 }

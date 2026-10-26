@@ -64,7 +64,7 @@ public final class OrganTests {
         surgeon.setOnGround(true);
         List<Block> organs = new ArrayList<>();
         BuiltInRegistries.BLOCK.getTagOrEmpty(Organs.ORGANS).forEach(holder -> organs.add(holder.value()));
-        h.assertValueEqual(organs.size(), 19, "nineteen organs");
+        h.assertValueEqual(organs.size(), 20, "twenty organs");
         for (String id : List.of(
                 "digestive_sac",
                 "biomass_bladder",
@@ -103,7 +103,7 @@ public final class OrganTests {
                     organ + " comes out whole, not " + drops);
         }
         for (Block outside : List.of(
-                StorageModule.ITEM_CAPSULE.get(),
+                StorageModule.CAPSULE_STEM.get(),
                 EcologyModule.LIVING_SUBSTRATE.get(),
                 LogisticsModule.MOUTH.get(),
                 LogisticsModule.BIOMASS_VEIN.get()))

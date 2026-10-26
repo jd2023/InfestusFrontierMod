@@ -1,0 +1,261 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "stem": "infestusfrontier:block/capsule_stem_stem",
+    "root": "infestusfrontier:block/capsule_stem_root",
+    "bone": "infestusfrontier:block/capsule_stem_bone",
+    "particle": "infestusfrontier:block/capsule_stem_stem"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        16,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#stem",
+          "uv": [
+            4,
+            0.0,
+            12,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#stem",
+          "uv": [
+            4,
+            0.0,
+            12,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#stem",
+          "uv": [
+            4,
+            0.0,
+            12,
+            16.0
+          ]
+        },
+        "east": {
+          "texture": "#stem",
+          "uv": [
+            4,
+            0.0,
+            12,
+            16.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        0,
+        3
+      ],
+      "to": [
+        5,
+        16,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bone",
+          "uv": [
+            11,
+            0.0,
+            12,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#bone",
+          "uv": [
+            4,
+            0.0,
+            5,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#bone",
+          "uv": [
+            3,
+            0.0,
+            4,
+            16.0
+          ]
+        },
+        "east": {
+          "texture": "#bone",
+          "uv": [
+            12,
+            0.0,
+            13,
+            16.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        11,
+        0,
+        3
+      ],
+      "to": [
+        12,
+        16,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bone",
+          "uv": [
+            4,
+            0.0,
+            5,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#bone",
+          "uv": [
+            11,
+            0.0,
+            12,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#bone",
+          "uv": [
+            3,
+            0.0,
+            4,
+            16.0
+          ]
+        },
+        "east": {
+          "texture": "#bone",
+          "uv": [
+            12,
+            0.0,
+            13,
+            16.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        0,
+        12
+      ],
+      "to": [
+        5,
+        16,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bone",
+          "uv": [
+            11,
+            0.0,
+            12,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#bone",
+          "uv": [
+            4,
+            0.0,
+            5,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#bone",
+          "uv": [
+            12,
+            0.0,
+            13,
+            16.0
+          ]
+        },
+        "east": {
+          "texture": "#bone",
+          "uv": [
+            3,
+            0.0,
+            4,
+            16.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        11,
+        0,
+        12
+      ],
+      "to": [
+        12,
+        16,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bone",
+          "uv": [
+            4,
+            0.0,
+            5,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#bone",
+          "uv": [
+            11,
+            0.0,
+            12,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#bone",
+          "uv": [
+            12,
+            0.0,
+            13,
+            16.0
+          ]
+        },
+        "east": {
+          "texture": "#bone",
+          "uv": [
+            3,
+            0.0,
+            4,
+            16.0
+          ]
+        }
+      }
+    }
+  ]
+}

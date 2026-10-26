@@ -1,7 +1,12 @@
 package org.jd.infestusfrontier.integration.geckolib;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -24,8 +29,21 @@ public final class OrganRenderers {
 
     public static <B extends BlockEntity & GeoBlockEntity, I extends Item & GeoItem> void register(
             IEventBus modBus, String name, Supplier<BlockEntityType<B>> blockEntity, Supplier<I> item) {
-        modBus.addListener((EntityRenderersEvent.RegisterRenderers event) ->
-                event.registerBlockEntityRenderer(blockEntity.get(), context -> new BlockRenderer<>(name)));
+        register(modBus, name, blockEntity, item, context -> null);
+    }
+
+    /**
+     * As {@link #register(IEventBus, String, Supplier, Supplier)}, with {@code overlay} drawn after the model each
+     * frame: what the organ shows beside its model, such as the stock on a pod's face.
+     */
+    public static <B extends BlockEntity & GeoBlockEntity, I extends Item & GeoItem> void register(
+            IEventBus modBus,
+            String name,
+            Supplier<BlockEntityType<B>> blockEntity,
+            Supplier<I> item,
+            Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<B>> overlay) {
+        modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(
+                blockEntity.get(), context -> new BlockRenderer<>(name, 1, overlay.apply(context))));
         modBus.addListener((RegisterClientExtensionsEvent event) -> event.registerItem(
                 new IClientItemExtensions() {
                     // Made on first use: the renderer needs the client's resources to be ready.
@@ -52,15 +70,29 @@ public final class OrganRenderers {
 
     private static final class BlockRenderer<B extends BlockEntity & GeoBlockEntity> extends GeoBlockRenderer<B> {
         private final int height;
-
-        BlockRenderer(String name) {
-            this(name, 1);
-        }
+        private final BlockEntityRenderer<B> overlay;
 
         BlockRenderer(String name, int height) {
+            this(name, height, null);
+        }
+
+        BlockRenderer(String name, int height, BlockEntityRenderer<B> overlay) {
             super(new OrganModel<>(name));
             this.height = height;
+            this.overlay = overlay;
             addRenderLayer(new GlowmaskLayer<>(this, ((OrganModel<B>) getGeoModel()).glowmask()));
+        }
+
+        @Override
+        public void render(
+                B blockEntity,
+                float partialTick,
+                PoseStack poses,
+                MultiBufferSource buffers,
+                int packedLight,
+                int packedOverlay) {
+            super.render(blockEntity, partialTick, poses, buffers, packedLight, packedOverlay);
+            if (overlay != null) overlay.render(blockEntity, partialTick, poses, buffers, packedLight, packedOverlay);
         }
 
         @Override

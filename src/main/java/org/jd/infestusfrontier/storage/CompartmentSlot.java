@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.core.storage.Compartments;
+import org.jd.infestusfrontier.storage.api.CapsuleStock;
 
 /**
  * A menu slot over one capsule compartment, which may hold more than a stack. It shows the whole count, takes at most
@@ -22,6 +23,11 @@ final class CompartmentSlot extends Slot {
 
         default boolean active(int compartment) {
             return true;
+        }
+
+        /** The most of a kind stacking to {@code maxStackSize} the compartment holds. */
+        default int limit(int compartment, int maxStackSize) {
+            return Compartments.limit(CapsuleStock.stacks(CapsuleStock.LAST_GRADE), maxStackSize);
         }
     }
 
@@ -81,11 +87,11 @@ final class CompartmentSlot extends Slot {
 
     @Override
     public int getMaxStackSize() {
-        return Compartments.limit(64);
+        return source.limit(getContainerSlot(), 64);
     }
 
     @Override
     public int getMaxStackSize(ItemStack stack) {
-        return Compartments.limit(stack.getMaxStackSize());
+        return source.limit(getContainerSlot(), stack.getMaxStackSize());
     }
 }

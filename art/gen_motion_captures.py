@@ -8,7 +8,7 @@ from pathlib import Path
 
 OUT = Path('src/testMod/resources/captures')
 MODELS = ('culture_bowl', 'digestive_sac', 'membrane_rack', 'bone_loom', 'awakening_cradle',
-          'activation_cyst', 'planting_proboscis', 'harvest_corolla', 'compost_gland', 'seed_pouch')
+          'activation_cyst', 'planting_proboscis', 'harvest_corolla', 'compost_gland', 'seed_pouch', 'item_capsule')
 
 
 def scene(name, left, right, frames=48):
@@ -32,7 +32,7 @@ def scene(name, left, right, frames=48):
 
 def main():
     for model in MODELS:
-        suffix = '' if model == 'seed_pouch' else '[working=true]'
+        suffix = '' if model in ('seed_pouch', 'item_capsule') else '[working=true]'
         scene(model, model, model + suffix)
     for stage in range(3):
         scene(f'furnace_{stage}', f'bio_furnace[stage={stage}]', f'bio_furnace[stage={stage},working=true]')
@@ -70,21 +70,48 @@ def door():
 
 
 def armor():
-    commands = ['kill @e[type=armor_stand,tag=visual_audit]', 'fill -8 -61 -4 8 -54 10 air',
-                'fill -8 -62 -4 8 -61 10 grass_block', 'kill @e[type=item]']
-    for x, kind in ((-1, 'dormant'), (1, 'awakened')):
-        items = ','.join('{id:"infestusfrontier:' + kind + '_' + piece + '",count:1}'
-                         for piece in ('treads', 'legwraps', 'thorax', 'hood'))
-        commands.append(f'summon armor_stand {x} -60 3 '
-                        '{Tags:["visual_audit"],NoGravity:1b,ShowArms:1b,NoBasePlate:1b,'
-                        f'ArmorItems:[{items}],Rotation:[180f,0f],'
-                        'Pose:{LeftArm:[-35f,0f,-15f],RightArm:[-70f,0f,15f],LeftLeg:[-20f,0f,0f],RightLeg:[20f,0f,0f]}}')
-    spec = {'commands': commands, 'views': [
-        {'name': 'front', 'x': 0.5, 'y': -59.4, 'z': -1.5, 'yaw': 0, 'pitch': 16},
+    """The armor audit (S04 F15): dormant and awakened stands, a dyed set and a trimmed glinting set, an adult and a
+    baby zombie wearing them, the player in a worn set with every piece in the hotbar; close, breath and inventory
+    views. Kept here in full so regenerating the scenes never loses what the audit shows."""
+    commands = [
+        'kill @e[type=armor_stand,tag=visual_audit]',
+        'fill -8 -61 -4 8 -54 10 air',
+        'fill -8 -62 -4 8 -61 10 grass_block',
+        'kill @e[type=item]',
+        'summon armor_stand -1 -60 3 {Tags:["visual_audit"],NoGravity:1b,ShowArms:1b,NoBasePlate:1b,ArmorItems:[{id:"infestusfrontier:dormant_treads",count:1},{id:"infestusfrontier:dormant_legwraps",count:1},{id:"infestusfrontier:dormant_thorax",count:1},{id:"infestusfrontier:dormant_hood",count:1}],Rotation:[180f,0f],Pose:{LeftArm:[-35f,0f,-15f],RightArm:[-70f,0f,15f],LeftLeg:[-20f,0f,0f],RightLeg:[20f,0f,0f]}}',
+        'summon armor_stand 1 -60 3 {Tags:["visual_audit"],NoGravity:1b,ShowArms:1b,NoBasePlate:1b,ArmorItems:[{id:"infestusfrontier:awakened_treads",count:1},{id:"infestusfrontier:awakened_legwraps",count:1},{id:"infestusfrontier:awakened_thorax",count:1},{id:"infestusfrontier:awakened_hood",count:1}],Rotation:[180f,0f],Pose:{LeftArm:[-35f,0f,-15f],RightArm:[-70f,0f,15f],LeftLeg:[-20f,0f,0f],RightLeg:[20f,0f,0f]}}',
+        'summon armor_stand -3 -60 3 {Tags:["visual_audit"],NoGravity:1b,ShowArms:1b,NoBasePlate:1b,ArmorItems:[{id:"infestusfrontier:dormant_treads",count:1,components:{"minecraft:dyed_color":{rgb:4890623}}},{id:"infestusfrontier:dormant_legwraps",count:1,components:{"minecraft:dyed_color":{rgb:4890623}}},{id:"infestusfrontier:dormant_thorax",count:1,components:{"minecraft:dyed_color":{rgb:4890623}}},{id:"infestusfrontier:dormant_hood",count:1,components:{"minecraft:dyed_color":{rgb:4890623}}}],Rotation:[180f,0f],Pose:{LeftArm:[-35f,0f,-15f],RightArm:[-70f,0f,15f],LeftLeg:[-20f,0f,0f],RightLeg:[20f,0f,0f]}}',
+        'summon armor_stand 3 -60 3 {Tags:["visual_audit"],NoGravity:1b,ShowArms:1b,NoBasePlate:1b,ArmorItems:[{id:"infestusfrontier:awakened_treads",count:1,components:{"minecraft:trim":{pattern:"minecraft:coast",material:"minecraft:gold"},"minecraft:enchantment_glint_override":true}},{id:"infestusfrontier:awakened_legwraps",count:1,components:{"minecraft:trim":{pattern:"minecraft:coast",material:"minecraft:gold"},"minecraft:enchantment_glint_override":true}},{id:"infestusfrontier:awakened_thorax",count:1,components:{"minecraft:trim":{pattern:"minecraft:coast",material:"minecraft:gold"},"minecraft:enchantment_glint_override":true}},{id:"infestusfrontier:awakened_hood",count:1,components:{"minecraft:trim":{pattern:"minecraft:coast",material:"minecraft:gold"},"minecraft:enchantment_glint_override":true}}],Rotation:[180f,0f],Pose:{LeftArm:[-35f,0f,-15f],RightArm:[-70f,0f,15f],LeftLeg:[-20f,0f,0f],RightLeg:[20f,0f,0f]}}',
+        'difficulty easy',
+        'kill @e[type=zombie,tag=visual_audit]',
+        'summon zombie 5 -60 3 {Tags:["visual_audit"],Glowing:1b,NoAI:1b,PersistenceRequired:1b,Silent:1b,Rotation:[180f,0f],ArmorItems:[{id:"infestusfrontier:awakened_treads",count:1},{id:"infestusfrontier:awakened_legwraps",count:1},{id:"infestusfrontier:awakened_thorax",count:1},{id:"infestusfrontier:awakened_hood",count:1}],ArmorDropChances:[0f,0f,0f,0f]}',
+        'summon zombie -5 -60 3 {Tags:["visual_audit"],NoAI:1b,PersistenceRequired:1b,Silent:1b,IsBaby:1b,Rotation:[180f,0f],ArmorItems:[{id:"infestusfrontier:dormant_treads",count:1},{id:"infestusfrontier:dormant_legwraps",count:1},{id:"infestusfrontier:dormant_thorax",count:1},{id:"infestusfrontier:dormant_hood",count:1}],ArmorDropChances:[0f,0f,0f,0f]}',
+        'gamemode survival @s',
+        'item replace entity @s armor.head with infestusfrontier:awakened_hood',
+        'item replace entity @s armor.chest with infestusfrontier:awakened_thorax',
+        'item replace entity @s armor.legs with infestusfrontier:awakened_legwraps',
+        'item replace entity @s armor.feet with infestusfrontier:awakened_treads',
+        'item replace entity @s hotbar.0 with infestusfrontier:dormant_hood',
+        'item replace entity @s hotbar.1 with infestusfrontier:dormant_thorax[minecraft:dyed_color={rgb:4890623}]',
+        'item replace entity @s hotbar.2 with infestusfrontier:dormant_legwraps',
+        'item replace entity @s hotbar.3 with infestusfrontier:dormant_treads',
+        'item replace entity @s hotbar.4 with infestusfrontier:awakened_hood',
+        'item replace entity @s hotbar.5 with infestusfrontier:awakened_thorax',
+        'item replace entity @s hotbar.6 with infestusfrontier:awakened_legwraps',
+        'item replace entity @s hotbar.7 with infestusfrontier:awakened_treads',
+    ]
+    views = [
+        {'name': 'front', 'x': 0.5, 'y': -59.2, 'z': -4.5, 'yaw': 0, 'pitch': 10},
         {'name': 'back', 'x': 0.5, 'y': -59.4, 'z': 7.5, 'yaw': 180, 'pitch': 16},
-        {'name': 'side', 'x': 4.5, 'y': -59.4, 'z': 3.0, 'yaw': 90, 'pitch': 16},
-    ]}
-    (OUT / 'visual_armor.json').write_text(json.dumps(spec, indent=2) + '\n')
+        {'name': 'side', 'x': -1.2, 'y': -59.1, 'z': 0.9, 'yaw': -40, 'pitch': 12},
+        {'name': 'close_awakened', 'x': 1.5, 'y': -59.0, 'z': 0.6, 'yaw': 0, 'pitch': 12},
+        {'name': 'close_dormant', 'x': -0.5, 'y': -59.0, 'z': 0.6, 'yaw': 0, 'pitch': 12},
+        {'name': 'zombie_adult', 'x': 5.0, 'y': -59.0, 'z': 0.4, 'yaw': 0, 'pitch': 10},
+        {'name': 'zombie_baby', 'x': -5.0, 'y': -59.5, 'z': 0.6, 'yaw': 0, 'pitch': 10},
+        {'name': 'breath', 'x': 1.5, 'y': -59.0, 'z': 0.9, 'yaw': 0, 'pitch': 10, 'frames': 20, 'frameTicks': 4},
+        {'name': 'inventory', 'x': 0.5, 'y': -59.4, 'z': -4.5, 'yaw': 0, 'pitch': 10, 'gui': True, 'inventory': True},
+    ]
+    (OUT / 'visual_armor.json').write_text(json.dumps({'commands': commands, 'views': views}, indent=2) + '\n')
 
 
 def static_details():

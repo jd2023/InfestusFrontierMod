@@ -116,7 +116,7 @@ public final class DiscoveryDataTests {
                 "fuel_papilla",
                 "filter_valve",
                 "reservoir_cell",
-                "item_capsule",
+                "capsule_stem",
                 "surgical_blade",
                 "membrane_window",
                 "sphincter_door",

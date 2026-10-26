@@ -22,40 +22,53 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jd.infestusfrontier.core.storage.Box;
 import org.jd.infestusfrontier.core.storage.Compartments;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.storage.api.CapsuleStock;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * One Item Capsule cell: its own {@value CapsuleStock#COMPARTMENTS} compartments and the box of the body it belongs
- * to. The compartments stay in the cell, so a broken cell carries exactly them; the body's one store is
- * {@link CapsuleBody}, shared by its cells while it stands. Clients get the compartments for the front.
+ * One Item Capsule, the pod of a Capsule Stem: its own {@value #COMPARTMENTS} compartment of one kind, its grade and
+ * the root of the stem it hangs on, if any. The compartment stays in the pod, so a broken pod carries exactly it; the
+ * tree's one store is {@link CapsuleTree}, shared by its pods while it stands. Clients get the compartment and the
+ * grade for the front.
  */
-final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, Bodies.Cell {
-    static final int COMPARTMENTS = CapsuleStock.COMPARTMENTS;
+final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlockEntity {
+    static final int COMPARTMENTS = 1;
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    private static final List<RawAnimation> GRADES = List.of(
+            RawAnimation.begin().thenLoop("grade_0"),
+            RawAnimation.begin().thenLoop("grade_1"),
+            RawAnimation.begin().thenLoop("grade_2"));
 
-    private record Saved(CapsuleStock stock, Optional<Box> body) {}
+    private record Saved(CapsuleStock stock, Optional<BlockPos> root) {}
 
     private static final MapCodec<Saved> SAVED = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     CapsuleStock.CODEC
                             .optionalFieldOf("stock", CapsuleStock.EMPTY)
                             .forGetter(Saved::stock),
-                    Bodies.BOX.optionalFieldOf("body").forGetter(Saved::body))
+                    BlockPos.CODEC.optionalFieldOf("root").forGetter(Saved::root))
             .apply(instance, Saved::new));
 
+    private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     private final ItemStack[] held = new ItemStack[COMPARTMENTS];
-    private Box body;
+    private int grade;
+    private Optional<BlockPos> root = Optional.empty();
     private Optional<CompoundTag> unreadable = Optional.empty();
-    /** The store of the body while it stands; dropped whenever the body or the cell's state changes. */
-    private @Nullable CapsuleBody store;
+    /** The store of the tree while it stands; dropped whenever the tree or the pod's state changes. */
+    private @Nullable CapsuleTree store;
 
     ItemCapsuleBlockEntity(BlockPos pos, BlockState state) {
         super(StorageModule.ITEM_CAPSULE_ENTITY.get(), pos, state);
         Arrays.fill(held, ItemStack.EMPTY);
-        body = Bodies.single(pos);
+        grade = state.getValue(ItemCapsuleBlock.GRADE);
     }
 
     /** What a compartment holds, with its whole count; a copy. */
@@ -70,6 +83,10 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
 
     int count(int compartment) {
         return held[compartment].getCount();
+    }
+
+    int grade() {
+        return grade;
     }
 
     /** Sets a compartment to {@code stack}, its kind and its whole count; an empty stack empties it. */
@@ -93,25 +110,33 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     /**
-     * Whether a hand may put {@code stack} into {@code compartment}: a kind the capsule takes, into its own
-     * compartment, or into an empty one when no other compartment of this cell holds it.
+     * Whether a hand may put {@code stack} into {@code compartment}: a kind a capsule takes, into its own compartment,
+     * or into an empty one when no other compartment of this pod holds it.
      */
     boolean accepts(int compartment, ItemStack stack) {
-        if (unreadable.isPresent() || !Capsules.takes(stack)) return false;
+        if (unreadable.isPresent() || !Stems.takes(stack)) return false;
         if (!held[compartment].isEmpty()) return holds(compartment, stack);
         for (int other = 0; other < COMPARTMENTS; other++) if (holds(other, stack)) return false;
         return true;
     }
 
+    /** The pod grows a grade: more stacks of its kind. False at the last grade. */
+    boolean grow() {
+        if (grade >= CapsuleStock.LAST_GRADE) return false;
+        grade++;
+        if (level != null)
+            level.setBlock(worldPosition, getBlockState().setValue(ItemCapsuleBlock.GRADE, grade), Block.UPDATE_ALL);
+        changed();
+        return true;
+    }
+
     /** What the front shows: a copy of each compartment. */
     List<ItemStack> shown() {
-        if (getBlockState().getValue(ItemCapsuleBlock.JOINED.get(getBlockState().getValue(ItemCapsuleBlock.FACING))))
-            return List.of();
         return Arrays.stream(held).map(ItemStack::copy).toList();
     }
 
     CapsuleStock stock() {
-        return new CapsuleStock(List.of(held));
+        return new CapsuleStock(List.of(held), grade);
     }
 
     private void changed() {
@@ -121,12 +146,12 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 
-    @Nullable CapsuleBody store() {
+    @Nullable CapsuleTree store() {
         return store;
     }
 
-    /** Joins this cell to the body's store {@code next}; the store it had before stops answering. */
-    void attach(CapsuleBody next) {
+    /** Joins this pod to the store {@code next}; the store it had before stops answering. */
+    void attach(CapsuleTree next) {
         if (store != null && store != next) store.close();
         store = next;
     }
@@ -136,20 +161,20 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
         store = null;
     }
 
-    @Override
-    public Box body() {
-        return body;
+    /** The root of the stem this pod hangs on, as last known; {@link Stems#of} checks it still stands. */
+    Optional<BlockPos> root() {
+        return root;
     }
 
-    @Override
-    public void setBody(Box next) {
-        body = next;
+    /** The pod now hangs on the stem rooted at {@code pos}, or on none. */
+    void hangOn(Optional<BlockPos> pos) {
+        if (root.equals(pos)) return;
+        root = pos;
         detach();
         setChanged();
     }
 
-    @Override
-    public boolean isReadable() {
+    boolean isReadable() {
         return unreadable.isEmpty();
     }
 
@@ -159,15 +184,15 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
         return true;
     }
 
-    /** Every cell looks at its body once it is back, as a Reservoir cell does. */
+    /** A pod back in reach tells its root, so the tree's store is read again with it. */
     @Override
     public void onLoad() {
         super.onLoad();
         if (level != null && !level.isClientSide)
-            level.scheduleTick(worldPosition, getBlockState().getBlock(), Bodies.FORM_TICKS);
+            root.flatMap(pos -> Stems.rootAt(level, pos)).ifPresent(CapsuleStemBlockEntity::touch);
     }
 
-    /** A cell that goes with its chunk takes the body's store with it; the rest refuse until it forms again. */
+    /** A pod that goes with its chunk takes the tree's store with it; the rest refuse until it is read again. */
     @Override
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
@@ -181,14 +206,21 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     private static Optional<String> check(Saved saved) {
-        for (ItemStack stack : saved.stock().held())
-            if (!stack.isEmpty() && !Capsules.takes(stack)) return Optional.of("a capsule that holds " + stack);
+        if (saved.stock().held().size() > COMPARTMENTS)
+            return Optional.of(saved.stock().held().size() + " compartments in a pod of " + COMPARTMENTS);
+        for (ItemStack stack : saved.stock().held()) {
+            if (!stack.isEmpty() && !Stems.takes(stack)) return Optional.of("a capsule that holds " + stack);
+            int limit = Compartments.limit(CapsuleStock.stacks(saved.stock().grade()), stack.getMaxStackSize());
+            if (stack.getCount() > limit) return Optional.of(stack.getCount() + " " + stack + " is past a compartment");
+        }
         return Optional.empty();
     }
 
     private void restore(CapsuleStock stock) {
+        Arrays.fill(held, ItemStack.EMPTY);
         List<ItemStack> stacks = stock.held();
-        for (int i = 0; i < COMPARTMENTS; i++) held[i] = stacks.get(i);
+        for (int i = 0; i < Math.min(COMPARTMENTS, stacks.size()); i++) held[i] = stacks.get(i);
+        grade = stock.grade();
     }
 
     @Override
@@ -198,23 +230,18 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
         Optional<Saved> read = Persistence.read(
                 SAVED, tag, registries, StorageModule.LOGGER, "Item Capsule", ItemCapsuleBlockEntity::check);
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
-        Arrays.fill(held, ItemStack.EMPTY);
-        read.ifPresent(saved -> restore(saved.stock()));
-        body = read.flatMap(Saved::body)
-                .filter(box -> Bodies.holds(box, worldPosition))
-                .orElse(Bodies.single(worldPosition));
+        restore(read.map(Saved::stock).orElse(CapsuleStock.EMPTY));
+        root = read.flatMap(Saved::root);
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (unreadable.isPresent()) tag.merge(unreadable.get());
-        else
-            Persistence.write(
-                    SAVED, new Saved(stock(), body.single() ? Optional.empty() : Optional.of(body)), registries, tag);
+        else Persistence.write(SAVED, new Saved(stock(), root), registries, tag);
     }
 
-    /** Clients get the compartments for the front, never the body or unreadable bytes. */
+    /** Clients get the compartment and grade for the front, never the root or unreadable bytes. */
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
@@ -236,17 +263,17 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
         super.collectImplicitComponents(components);
         if (unreadable.isPresent())
             components.set(OrganModule.UNREADABLE_SAVE.get(), unreadable.get().copy());
-        else if (!isEmpty()) {
+        else if (!stock().isBare()) {
             components.set(StorageModule.CAPSULE_STOCK.get(), stock());
-            components.set(DataComponents.MAX_STACK_SIZE, 1); // each carries its own compartments
+            components.set(DataComponents.MAX_STACK_SIZE, 1); // each carries its own compartment
         }
     }
 
-    /** Carried compartments that fail their check are kept as unreadable bytes, never replaced. */
+    /** Carried stock that fails its check is kept as unreadable bytes, never replaced. */
     @Override
     protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
-        input.get(DataComponents.MAX_STACK_SIZE); // read, so the cell does not keep it: it is set again while it holds
+        input.get(DataComponents.MAX_STACK_SIZE); // read, so the pod does not keep it: it is set again while it holds
         CompoundTag kept = input.get(OrganModule.UNREADABLE_SAVE.get());
         if (kept != null) {
             unreadable = Optional.of(kept.copy());
@@ -254,7 +281,7 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
         }
         CapsuleStock carried = input.getOrDefault(StorageModule.CAPSULE_STOCK.get(), CapsuleStock.EMPTY);
         Saved saved = new Saved(carried, Optional.empty());
-        Optional<String> problem = check(saved).or(() -> overfull(carried));
+        Optional<String> problem = check(saved);
         if (problem.isPresent()) {
             StorageModule.LOGGER.warn("Item Capsule keeps unreadable carried state: {}", problem.get());
             unreadable = Optional.of(
@@ -262,22 +289,33 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
             return;
         }
         restore(carried);
+        if (level != null && getBlockState().getValue(ItemCapsuleBlock.GRADE) != grade)
+            level.setBlock(worldPosition, getBlockState().setValue(ItemCapsuleBlock.GRADE, grade), Block.UPDATE_ALL);
         if (store != null) store.touch();
     }
 
-    /** A carried value is checked as the saved one is, since it never passed the codec's limits. */
-    private static Optional<String> overfull(CapsuleStock stock) {
-        for (ItemStack stack : stock.held())
-            if (stack.getCount() > Compartments.limit(stack.getMaxStackSize()))
-                return Optional.of(stack.getCount() + " " + stack + " is past a compartment");
-        return Optional.empty();
-    }
-
-    /** The compartments travel as a component; the body never leaves its place. */
+    /** The stock travels as a component; the root never leaves its place. */
     @Override
     public void removeComponentsFromTag(CompoundTag tag) {
         tag.remove("stock");
-        tag.remove("body");
+        tag.remove("root");
+    }
+
+    /** The client plays the pod's breath and the look of its grade; nothing else is sent for them. */
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "state", 0, state -> state.setAndContinue(IDLE)));
+        controllers.add(new AnimationController<>(
+                this,
+                "grade",
+                0,
+                state -> state.setAndContinue(
+                        GRADES.get(state.getAnimatable().getBlockState().getValue(ItemCapsuleBlock.GRADE)))));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableCache;
     }
 
     @Override
@@ -287,6 +325,6 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        return new ItemCapsuleMenu(id, inventory, this);
+        return new ItemCapsuleMenu(id, inventory, this, () -> Stems.of(this));
     }
 }
