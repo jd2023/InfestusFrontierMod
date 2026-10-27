@@ -67,7 +67,7 @@ public final class ItemCapsuleMenu extends OrganMenu {
                                 () -> page.usable().map(CapsuleTree::slots).orElse(0),
                                 () -> page.usable().map(CapsuleTree::used).orElse(0),
                                 () -> rootOf(page)
-                                        .map(CapsuleStemBlockEntity::fed)
+                                        .map(root -> Math.min(root.fed(), root.nextCost(root.getLevel())))
                                         .orElse(0),
                                 () -> rootOf(page)
                                         .map(root -> root.nextCost(root.getLevel()))

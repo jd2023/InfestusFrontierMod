@@ -332,7 +332,7 @@
   "gui.infestusfrontier.item_capsule.growth.story": "Bone meal on any cell feeds the root. A growth at the first level costs one; each level up costs twice as much, thirty-two at the sixth. A lost cell or pod is regrown first, at its level's cost.",
   "gui.infestusfrontier.item_capsule.grown": "Nothing more to grow",
   "gui.infestusfrontier.item_capsule.pod.treatment": "Treatment",
-  "gui.infestusfrontier.item_capsule.pod.treatment.story": "A Skeletal Graft put here grows the pod a grade: sixteen stacks, then thirty-two. Spare grafts come back when the screen closes.",
+  "gui.infestusfrontier.item_capsule.pod.treatment.story": "A Skeletal Graft put here grows the pod a grade: sixteen stacks, then thirty-two. Spare grafts come back when the screen closes; at the last grade a shift-clicked graft is stored like any item.",
   "gui.infestusfrontier.item_capsule.pod.holds": "Holds",
   "gui.infestusfrontier.item_capsule.pod.grade": "Grade %s · %s stacks",
   "gui.infestusfrontier.item_capsule.pod.fill": "%s / %s held",

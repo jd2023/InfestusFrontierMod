@@ -65,7 +65,7 @@ import org.jd.infestusfrontier.storage.api.CapsuleStock;
 import org.jd.infestusfrontier.storage.api.ItemStore;
 
 /**
- * Capsule Stems: a planted root grows trunk cells and pods from bone meal, one growth a bone meal, never where
+ * Capsule Stems: a planted root grows trunk cells and pods from bone meal, dearer each level, never where
  * nothing fits; a tree is one store reached from any cell or pod, filling a kind's own pod before an empty one; a
  * broken cell orphans the pods above it until bone meal regrows it in place, dearer each level; a pod opens only
  * itself, with a treatment well; a broken root kills the stem, each
@@ -620,6 +620,38 @@ public final class CapsuleStemTests {
                 5,
                 "the bytes come back as they were");
         h.succeed();
+    }
+
+    /** The check a grown cell makes of its root when it is back in reach, fired by hand on every cell. */
+    private static void recheck(GameTestHelper h) {
+        for (BlockPos stem : stems(h))
+            h.getLevel().scheduleTick(h.absolutePos(stem), StorageModule.CAPSULE_STEM.get(), 1);
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void anUnreadableRootsTreeAndAPlanlessRootStandInertThroughTheCellsCheck(GameTestHelper h) {
+        plant(h, FORKING);
+        for (int i = 0; i < 12; i++) grow(h);
+        int cells = stems(h).size();
+        int pods = pods(h).size();
+        h.assertTrue(cells >= 3 && pods >= 2, "a tree with cells and pods");
+        BlockEntity root = h.getBlockEntity(ROOT);
+        CompoundTag saved = root.saveWithFullMetadata(h.getLevel().registryAccess());
+        ListTag planned = saved.getCompound("plan").getList("cells", 10);
+        CompoundTag bad = planned.getCompound(1).copy();
+        bad.putInt("parent", 5);
+        planned.set(1, bad);
+        root.loadWithComponents(saved, h.getLevel().registryAccess());
+        BlockPos loose = ROOT.west(5);
+        h.setBlock(loose.below(), EcologyModule.LIVING_SUBSTRATE.get());
+        h.setBlock(loose, StorageModule.CAPSULE_STEM.get()); // a root without data, as /setblock makes it
+        recheck(h);
+        h.runAfterDelay(5, () -> {
+            h.assertValueEqual(stems(h).size(), cells + 1, "every cell stands, the plan-less root with them");
+            h.assertValueEqual(pods(h).size(), pods, "every pod hangs on");
+            h.assertTrue(isStem(h, loose), "a root without a plan is inert, not dead");
+            h.succeed();
+        });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")

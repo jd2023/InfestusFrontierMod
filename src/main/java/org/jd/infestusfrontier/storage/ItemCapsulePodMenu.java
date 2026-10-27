@@ -32,7 +32,7 @@ public final class ItemCapsulePodMenu extends OrganMenu {
     /** The compartment well leads the parts row; the treatment well stands a label's width to its right. */
     static final int COMPARTMENT_X = Sheet.FIRST_PART_X;
 
-    static final int SPACER = 14;
+    static final int SPACER = 20;
     static final int TREATMENT_X = COMPARTMENT_X + Sheet.SLOT.width() + Sheet.GAP + SPACER + Sheet.GAP;
     /** One body strip under the parts row, for the grade and fill lines. */
     static final int STRIPS = 1;

@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.storage;
 
 import com.mojang.serialization.MapCodec;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -149,21 +150,27 @@ public final class CapsuleStemBlock extends BaseEntityBlock implements Bonemeala
     }
 
     /**
-     * A root pays growth it owes, or dies when its foundation is gone. A grown cell checks its root: gone, or
-     * replaced by a root whose plan does not hold the cell, the cell sheds its pods and dies, leaving Dead Tissue;
-     * while the root's chunk is out of reach nothing can be told, so the cell asks again later
-     * ({@link CapsuleStemBlockEntity#RECHECK_TICKS}).
+     * A root pays growth it owes, or dies when its foundation is gone. A grown cell checks its root: no stem cell
+     * there, or a readable one that is not this tree's root or whose plan does not hold the cell, and the cell sheds
+     * its pods and dies, leaving Dead Tissue. Nothing can be told while the root's chunk is out of reach, so the
+     * cell asks again later ({@link CapsuleStemBlockEntity#RECHECK_TICKS}); nor from a root whose data did not
+     * read, which keeps its bytes and its tree; a cell without a plan that names itself (a root set without data)
+     * stands inert.
      */
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!(level.getBlockEntity(pos) instanceof CapsuleStemBlockEntity cell)) return;
         if (!state.canSurvive(level, pos)) level.destroyBlock(pos, true);
-        else if (!cell.isReadable()) return;
         else if (cell.isRoot()) cell.payPending(level);
+        else if (!cell.isReadable() || cell.rootPos().equals(pos)) return;
         else if (!level.hasChunkAt(cell.rootPos())) level.scheduleTick(pos, this, CapsuleStemBlockEntity.RECHECK_TICKS);
-        else if (cell.root().filter(root -> root.owns(pos)).isEmpty()) {
-            shedPods(level, pos, cell.rootPos());
-            level.destroyBlock(pos, true);
+        else {
+            Optional<CapsuleStemBlockEntity> named = Stems.cellAt(level, cell.rootPos());
+            if (named.isPresent() && !named.get().isReadable()) return;
+            if (named.filter(root -> root.isRoot() && root.owns(pos)).isEmpty()) {
+                shedPods(level, pos, cell.rootPos());
+                level.destroyBlock(pos, true);
+            }
         }
     }
 
