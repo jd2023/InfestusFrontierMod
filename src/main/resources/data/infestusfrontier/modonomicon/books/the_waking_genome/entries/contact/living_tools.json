@@ -1,0 +1,59 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.living_tools.name",
+  "description": "entry.infestusfrontier.contact.living_tools.description",
+  "icon": "infestusfrontier:living_pick",
+  "x": 4,
+  "y": 0,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/awakening_cradle"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/dormant_pick"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.living_tools.name",
+      "text": "entry.infestusfrontier.contact.living_tools.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:dormant_pick",
+      "recipe_id_2": "infestusfrontier:dormant_hatchet",
+      "text": "entry.infestusfrontier.contact.living_tools.craft"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:awakening/pick",
+      "title1": "item.infestusfrontier.living_pick"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.living_tools.mend_title",
+      "text": "entry.infestusfrontier.contact.living_tools.mend"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.living_tools.contractile_title",
+      "text": "entry.infestusfrontier.contact.living_tools.contractile"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:awakening/contractile_pick",
+      "title1": "item.infestusfrontier.living_tool.mutation.contractile_title"
+    }
+  ]
+}

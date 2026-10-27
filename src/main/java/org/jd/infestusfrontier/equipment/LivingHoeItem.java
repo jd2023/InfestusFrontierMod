@@ -1,0 +1,28 @@
+package org.jd.infestusfrontier.equipment;
+
+import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+
+/** A Living Hoe (ITEM_CATALOG I016): a vanilla hoe of the living tier that carries a biomass reserve, mends from it while carried; a hoe takes no Contractile graft. */
+final class LivingHoeItem extends HoeItem {
+    LivingHoeItem(Properties properties) {
+        super(LivingTiers.LIVING, properties);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        LivingTools.describe(stack, tooltip);
+        super.appendHoverText(stack, context, tooltip, flag);
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, level, entity, slot, selected);
+        LivingTools.mend(stack, level, entity);
+    }
+}

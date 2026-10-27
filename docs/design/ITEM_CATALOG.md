@@ -119,8 +119,8 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I012 | Sample Pouch | Craft 2 Membrane Sheets + 1 string + 1 Sealing Resin → 1 | Standalone sample collection; capacities and upgrades below. No armor required. |
 | I013 | Dormant Hood / Thorax / Legwraps / Treads | Four distinct armor items: 5 / 8 / 7 / 4 rotten flesh in vanilla armor silhouettes | One piece awakened in Cradle using Culture, Membrane Sheet and 100 BU. |
 | I014 | Living Hood / Thorax / Legwraps / Treads | Awaken the corresponding existing dormant piece; empty fuel, preserved wear percentage | Four persistent equipment identities; full material and mutation tree in Armor Evolution. Frame variants are item data, not dozens of interchangeable crafting products. |
-| I015 | Dormant Pick / Hatchet / Spade / Hoe | Familiar tool patterns with Bone Plates as heads and sticks as handles; proposed durability/harvest limits require the tool specification | Manual work; awaken one in Cradle using Culture, Sheet and 100 BU. |
-| I016 | Living Pick / Hatchet / Spade / Hoe | Awaken corresponding I015 tool | Persistent tool counterparts. Mineral fusion must respect real harvest tier; area/precision branches remain proposed, not approved damage or yield rules. |
+| I015 | Dormant Pick / Hatchet / Spade / Hoe | Craft in the vanilla tool patterns, Bone Plates for heads and sticks for handles | Manual work: digs what a stone tool digs, 96 blocks before it is gone, mended with Bone Plates on an anvil. The Cradle wakes one with a Spore Culture and 100 BU, as it wakes armor. |
+| I016 | Living Pick / Hatchet / Spade / Hoe | Awaken the corresponding I015 tool; as worn as it went in | Persistent tool counterparts: the same harvest tier as stone until mineral fusion, 256 blocks, a 40 BU reserve filled at a Bladder, and self-mending from it, four points a second, one BU each; no material repair on an anvil. One permanent branch by a graft in the Cradle (Living tools below); further branches remain proposed. |
 | I017 | Dormant Fang | 2 Bone Plates + 1 stick → 1 | Basic weak melee weapon; same cradle awakening route as tools. |
 | I018 | Living Fang | Awaken I017 | Base for separately designed piercing/control weapon branches. |
 | I050 | Skeletal Graft | Activation Cyst: 1 Bone Plate + 1 Binder + 25 BU → 1 | Hardens one Living Wall into a Ribbed Wall, or a Sphincter Door into a Clenched Door; later reinforces one cell or permitted organ skeleton. The plate is not duplicated. |
@@ -149,6 +149,14 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I037 | Route Imprint | Probe copies a bounded configuration onto 1 paper + 1 Synaptic Gel | Applies port/route settings to compatible owned tissue; never contains items, power, research or chunk-loading permission. |
 
 Early Lumen treatment is made in the Bowl; all T1 transport treatments use the Cyst. Its own construction requires only a Bud, Sheets and a Plate, so a first Cyst needs no transport graft. A player can hand-feed it before automating it.
+
+### Living tools
+
+One branch per tool, taken once in the Awakening Cradle and never removed; the tool keeps its wear and reserve.
+
+| Branch | Preparation in the Cradle | Effect |
+|---|---|---|
+| Contractile | Living Pick, Hatchet or Spade + 1 Contractile Fiber + 200 BU, 30 s | Each block the tool mines, it also breaks the eight round it on the struck face, those it is the right tool for and only as the player would break them, for 2 BU each from its reserve; dry, it mines one block. A hoe takes no branch. |
 
 ### Temporary construction tool
 

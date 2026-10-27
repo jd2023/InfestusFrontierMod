@@ -11,8 +11,13 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -40,9 +45,11 @@ import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
 
 /**
- * Armor piece identity and fuel. Four dormant pieces are crafted from rotten flesh (G0 in ARMOR_EVOLUTION.md); the
+ * Armor and tool identity and fuel. Four dormant pieces are crafted from rotten flesh (G0 in ARMOR_EVOLUTION.md); the
  * Cradle awakens each into its awakened form (G1), which carries a {@link #RESERVE} of biomass. The Fuel Papilla
- * fills that reserve from the ground.
+ * fills that reserve from the ground. Four dormant tools are crafted from Bone Plates (ITEM_CATALOG I015); the Cradle
+ * wakes each into its living form (I016), which carries the same reserve, mends from it and takes one
+ * {@link #TOOL_MUTATION} by a graft in the Cradle.
  */
 public final class EquipmentModule {
     static final Logger LOGGER = LogUtils.getLogger();
@@ -70,6 +77,11 @@ public final class EquipmentModule {
             COMPONENTS.registerComponentType(
                     "biomass_reserve",
                     builder -> builder.persistent(BiomassCodecs.TANK).networkSynchronized(BiomassCodecs.TANK_STREAM));
+    /** The branch a living tool has taken; absent on a tool that has none. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ToolMutation>> TOOL_MUTATION =
+            COMPONENTS.registerComponentType(
+                    "tool_mutation",
+                    builder -> builder.persistent(ToolMutation.CODEC).networkSynchronized(ToolMutation.STREAM_CODEC));
 
     public static final DeferredHolder<ArmorMaterial, ArmorMaterial> DORMANT =
             MATERIALS.register("dormant", () -> material("dormant", 0, 1, 1, 0));
@@ -105,6 +117,46 @@ public final class EquipmentModule {
             awakened("awakened_legwraps", ArmorItem.Type.LEGGINGS);
     public static final DeferredItem<ArmorItem> AWAKENED_TREADS = awakened("awakened_treads", ArmorItem.Type.BOOTS);
 
+    // the tools, with the stone tools' attack and speed figures
+    public static final DeferredItem<PickaxeItem> DORMANT_PICK = ITEMS.register(
+            "dormant_pick",
+            () -> new PickaxeItem(
+                    LivingTiers.DORMANT,
+                    new Item.Properties().attributes(PickaxeItem.createAttributes(LivingTiers.DORMANT, 1.0F, -2.8F))));
+    public static final DeferredItem<AxeItem> DORMANT_HATCHET = ITEMS.register(
+            "dormant_hatchet",
+            () -> new AxeItem(
+                    LivingTiers.DORMANT,
+                    new Item.Properties().attributes(AxeItem.createAttributes(LivingTiers.DORMANT, 7.0F, -3.2F))));
+    public static final DeferredItem<ShovelItem> DORMANT_SPADE = ITEMS.register(
+            "dormant_spade",
+            () -> new ShovelItem(
+                    LivingTiers.DORMANT,
+                    new Item.Properties().attributes(ShovelItem.createAttributes(LivingTiers.DORMANT, 1.5F, -3.0F))));
+    public static final DeferredItem<HoeItem> DORMANT_HOE = ITEMS.register(
+            "dormant_hoe",
+            () -> new HoeItem(
+                    LivingTiers.DORMANT,
+                    new Item.Properties().attributes(HoeItem.createAttributes(LivingTiers.DORMANT, -1.0F, -2.0F))));
+    public static final DeferredItem<PickaxeItem> LIVING_PICK = ITEMS.register(
+            "living_pick",
+            () -> new LivingPickItem(living(PickaxeItem.createAttributes(LivingTiers.LIVING, 1.0F, -2.8F))));
+    public static final DeferredItem<AxeItem> LIVING_HATCHET = ITEMS.register(
+            "living_hatchet",
+            () -> new LivingHatchetItem(living(AxeItem.createAttributes(LivingTiers.LIVING, 7.0F, -3.2F))));
+    public static final DeferredItem<ShovelItem> LIVING_SPADE = ITEMS.register(
+            "living_spade",
+            () -> new LivingSpadeItem(living(ShovelItem.createAttributes(LivingTiers.LIVING, 1.5F, -3.0F))));
+    public static final DeferredItem<HoeItem> LIVING_HOE = ITEMS.register(
+            "living_hoe", () -> new LivingHoeItem(living(HoeItem.createAttributes(LivingTiers.LIVING, -1.0F, -2.0F))));
+
+    /** The dormant tools in the catalog's order. */
+    public static final List<DeferredItem<? extends Item>> DORMANT_TOOLS =
+            List.of(DORMANT_PICK, DORMANT_HATCHET, DORMANT_SPADE, DORMANT_HOE);
+    /** The living tools in the same order. */
+    public static final List<DeferredItem<? extends Item>> LIVING_TOOLS =
+            List.of(LIVING_PICK, LIVING_HATCHET, LIVING_SPADE, LIVING_HOE);
+
     private EquipmentModule() {}
 
     private static ArmorMaterial material(String layer, int hood, int thorax, int legwraps, int treads) {
@@ -129,6 +181,13 @@ public final class EquipmentModule {
                 name,
                 () -> new ArmorItem(
                         DORMANT, type, new Item.Properties().durability(type.getDurability(DORMANT_DURABILITY))));
+    }
+
+    /** A living tool's properties: its attributes and an empty reserve. */
+    private static Item.Properties living(ItemAttributeModifiers attributes) {
+        return new Item.Properties()
+                .attributes(attributes)
+                .component(RESERVE.get(), BiomassTank.empty(RESERVE_CAPACITY));
     }
 
     private static DeferredItem<ArmorItem> awakened(String name, ArmorItem.Type type) {
@@ -186,7 +245,11 @@ public final class EquipmentModule {
                     AWAKENED_HOOD,
                     AWAKENED_THORAX,
                     AWAKENED_LEGWRAPS,
-                    AWAKENED_TREADS);
+                    AWAKENED_TREADS,
+                    LIVING_PICK,
+                    LIVING_HATCHET,
+                    LIVING_SPADE,
+                    LIVING_HOE);
             event.registerBlockEntity(BiomassCapabilities.BLOCK, FUEL_PAPILLA_ENTITY.get(), (papilla, side) -> papilla);
             event.registerBlockEntity(
                     Capabilities.FluidHandler.BLOCK,

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "#",
+    "|",
+    "|"
+  ],
+  "key": {
+    "#": {
+      "item": "infestusfrontier:bone_plate"
+    },
+    "|": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "infestusfrontier:dormant_spade",
+    "count": 1
+  }
+}

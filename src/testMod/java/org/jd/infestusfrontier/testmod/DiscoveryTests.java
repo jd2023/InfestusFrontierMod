@@ -112,6 +112,7 @@ public final class DiscoveryTests {
                 "awakening_cradle",
                 "bio_furnace",
                 "dormant_pieces",
+                "living_tools",
                 "speak_to_an_organ",
                 "surgical_blade",
                 "living_wall",
@@ -181,6 +182,7 @@ public final class DiscoveryTests {
                 "awakening_cradle",
                 "bio_furnace",
                 "dormant_pieces",
+                "living_tools",
                 "speak_to_an_organ",
                 "surgical_blade",
                 "living_wall",
@@ -212,7 +214,9 @@ public final class DiscoveryTests {
                 "awakening_cradle",
                 "bio_furnace",
                 "dormant_thorax",
-                "awakened_thorax"))
+                "awakened_thorax",
+                "dormant_pick",
+                "living_pick"))
             h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");
         h.succeed();
     }

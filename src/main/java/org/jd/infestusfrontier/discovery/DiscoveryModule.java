@@ -105,6 +105,8 @@ public final class DiscoveryModule {
                                 EquipmentModule.AWAKENED_THORAX,
                                 EquipmentModule.AWAKENED_LEGWRAPS,
                                 EquipmentModule.AWAKENED_TREADS)) output.accept(piece.get());
+                        for (var tool : EquipmentModule.DORMANT_TOOLS) output.accept(tool.get());
+                        for (var tool : EquipmentModule.LIVING_TOOLS) output.accept(tool.get());
                         output.accept(InteractionModule.SYNAPTIC_PROBE.get());
                         output.accept(InteractionModule.SURGICAL_BLADE.get());
                     })

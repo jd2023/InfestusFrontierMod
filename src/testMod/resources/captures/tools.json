@@ -1,0 +1,49 @@
+{
+  "commands": [
+    "fill -8 -60 -2 12 -54 10 air",
+    "fill -8 -61 -2 12 -61 10 grass_block",
+    "fill -2 -61 1 4 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "fill 0 -60 4 2 -58 4 stone",
+    "setblock 1 -59 4 iron_ore",
+    "kill @e[type=item]",
+    "item replace entity @s hotbar.0 with infestusfrontier:dormant_pick",
+    "item replace entity @s hotbar.1 with infestusfrontier:dormant_hatchet",
+    "item replace entity @s hotbar.2 with infestusfrontier:dormant_spade",
+    "item replace entity @s hotbar.3 with infestusfrontier:dormant_hoe",
+    "item replace entity @s hotbar.4 with infestusfrontier:living_pick",
+    "item replace entity @s hotbar.5 with infestusfrontier:living_hatchet",
+    "item replace entity @s hotbar.6 with infestusfrontier:living_spade",
+    "item replace entity @s hotbar.7 with infestusfrontier:living_hoe",
+    "item replace entity @s hotbar.8 with infestusfrontier:living_pick[infestusfrontier:tool_mutation=\"contractile\",infestusfrontier:biomass_reserve={stored:28,reserved:0,capacity:40}]"
+  ],
+  "views": [
+    {
+      "name": "hotbar",
+      "x": 1.5,
+      "y": -60,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:dormant_pick",
+        "infestusfrontier:dormant_hatchet",
+        "infestusfrontier:dormant_spade",
+        "infestusfrontier:dormant_hoe",
+        "infestusfrontier:living_pick",
+        "infestusfrontier:living_hatchet",
+        "infestusfrontier:living_spade",
+        "infestusfrontier:living_hoe"
+      ]
+    },
+    {
+      "name": "held",
+      "x": 1.5,
+      "y": -60,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true
+    }
+  ]
+}

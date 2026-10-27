@@ -1,0 +1,20 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "awakening_cradle",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:dormant_hoe"
+    },
+    {
+      "item": "infestusfrontier:spore_culture"
+    }
+  ],
+  "water": 0,
+  "biomass": 100,
+  "result": {
+    "id": "infestusfrontier:living_hoe",
+    "count": 1
+  },
+  "ticks": 600,
+  "keeps_wear": true
+}

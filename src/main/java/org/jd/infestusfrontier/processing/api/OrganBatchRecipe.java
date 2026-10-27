@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -37,7 +38,8 @@ public record OrganBatchRecipe(
         Biomass biomass,
         ItemStack result,
         int ticks,
-        boolean keepsWear)
+        boolean keepsWear,
+        List<DataComponentType<?>> keeps)
         implements Recipe<RecipeInput> {
     public static final int MAX_INGREDIENTS = 9;
     public static final MapCodec<OrganBatchRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -50,7 +52,11 @@ public record OrganBatchRecipe(
                     BiomassCodecs.BIOMASS.fieldOf("biomass").forGetter(OrganBatchRecipe::biomass),
                     ItemStack.CODEC.fieldOf("result").forGetter(OrganBatchRecipe::result),
                     Codec.intRange(1, Integer.MAX_VALUE).fieldOf("ticks").forGetter(OrganBatchRecipe::ticks),
-                    Codec.BOOL.optionalFieldOf("keeps_wear", false).forGetter(OrganBatchRecipe::keepsWear))
+                    Codec.BOOL.optionalFieldOf("keeps_wear", false).forGetter(OrganBatchRecipe::keepsWear),
+                    DataComponentType.CODEC
+                            .listOf()
+                            .optionalFieldOf("keeps", List.of())
+                            .forGetter(OrganBatchRecipe::keeps))
             .apply(instance, OrganBatchRecipe::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, OrganBatchRecipe> STREAM_CODEC =
             ByteBufCodecs.fromCodecWithRegistries(CODEC.codec());
@@ -94,10 +100,17 @@ public record OrganBatchRecipe(
 
     /**
      * The result for these inputs: a copy of {@link #result}, carrying the first damaged input's wear when the recipe
-     * {@link #keepsWear}, so an awakened piece is as worn as the dormant one it came from.
+     * {@link #keepsWear}, so an awakened piece is as worn as the dormant one it came from, and each component the
+     * recipe {@link #keeps} from the first input that has it, so a grafted tool keeps its reserve.
      */
     public ItemStack resultFor(List<ItemStack> inputs) {
         ItemStack made = result.copy();
+        for (DataComponentType<?> type : keeps)
+            for (ItemStack input : inputs)
+                if (!input.isEmpty() && input.has(type)) {
+                    keep(made, input, type);
+                    break;
+                }
         if (!keepsWear || !made.isDamageableItem()) return made;
         for (ItemStack input : inputs) {
             if (input.isEmpty() || !input.isDamageableItem()) continue;
@@ -105,6 +118,10 @@ public record OrganBatchRecipe(
             return made;
         }
         return made;
+    }
+
+    private static <T> void keep(ItemStack to, ItemStack from, DataComponentType<T> type) {
+        to.set(type, from.get(type));
     }
 
     /**
