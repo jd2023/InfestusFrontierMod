@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -37,9 +38,10 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * One cell of a Capsule Stem (BLOCK_CATALOG T1-09): the planted root, a trunk cell, a bud or a branch. Only the root
- * is placed; the rest grow from bone meal on any cell, pods with them. Any cell opens the tree's screen. A cell is
- * tissue: broken, it leaves Dead Tissue and is regrown from the root's plan; a root broken kills its tree, cell by
- * cell from the bottom, and its pods stand on alone with their contents.
+ * is placed, on an organ foundation ({@link Organs#FOUNDATIONS}); the rest grow from bone meal on any cell, pods
+ * with them. Any cell opens the tree's screen. A cell is tissue: broken, it leaves Dead Tissue and is regrown from
+ * the root's plan; a root broken, or left without its foundation, kills its tree, cell by cell from the bottom, and
+ * each dying cell sheds its pods as items with their contents.
  */
 public final class CapsuleStemBlock extends BaseEntityBlock implements BonemealableBlock {
     public static final EnumProperty<StemPart> PART = EnumProperty.create("part", StemPart.class);
@@ -127,15 +129,49 @@ public final class CapsuleStemBlock extends BaseEntityBlock implements Bonemeala
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
+    /** A root stands on an organ foundation; grown cells stand on the tree. */
+    @Override
+    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        return state.getValue(PART) != StemPart.ROOT
+                || level.getBlockState(pos.below()).is(Organs.FOUNDATIONS);
+    }
+
+    /** A root whose foundation goes dies on the next tick. */
+    @Override
+    protected BlockState updateShape(
+            BlockState state,
+            Direction direction,
+            BlockState neighborState,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos neighborPos) {
+        if (direction == Direction.DOWN && !state.canSurvive(level, pos)) level.scheduleTick(pos, this, 1);
+        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+    }
+
     /**
-     * A root pays growth it owes; a cell whose root is gone, or replaced by a root whose plan does not hold it, dies,
-     * leaving Dead Tissue.
+     * A root pays growth it owes, or dies when its foundation is gone; a cell whose root is gone, or replaced by a
+     * root whose plan does not hold it, sheds its pods and dies, leaving Dead Tissue.
      */
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!(level.getBlockEntity(pos) instanceof CapsuleStemBlockEntity cell)) return;
-        if (cell.isRoot()) cell.payPending(level);
-        else if (cell.root().filter(root -> root.owns(pos)).isEmpty()) level.destroyBlock(pos, true);
+        if (!state.canSurvive(level, pos)) level.destroyBlock(pos, true);
+        else if (cell.isRoot()) cell.payPending(level);
+        else if (cell.root().filter(root -> root.owns(pos)).isEmpty()) {
+            shedPods(level, pos, cell.rootPos());
+            level.destroyBlock(pos, true);
+        }
+    }
+
+    /** The pods hanging on the cell at {@code pos} for the tree rooted at {@code root} drop as items, whole. */
+    private static void shedPods(ServerLevel level, BlockPos pos, BlockPos root) {
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            BlockPos at = pos.relative(side);
+            if (level.getBlockEntity(at) instanceof ItemCapsuleBlockEntity pod
+                    && pod.getBlockState().getValue(ItemCapsuleBlock.FACING) == side
+                    && pod.root().filter(root::equals).isPresent()) level.destroyBlock(at, true);
+        }
     }
 
     /** The client has no plan, so it swings at every cell; the server decides. */

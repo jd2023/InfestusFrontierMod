@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -37,7 +38,26 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
      * front face; the breathing membrane is drawn just in front of that floor.
      */
     public record Pockets(
-            int columns, float firstX, float firstY, float pitch, float icon, float depth, float half, float floor) {}
+            int columns, float firstX, float firstY, float pitch, float icon, float depth, float half, float floor) {
+        /**
+         * These pockets on a front scaled by {@code scale} about the point {@code x}, {@code y} pixels from the
+         * block's left and bottom and {@code depth} pixels behind its front face, as a model scaled about that point
+         * moves and shrinks them. The icons keep their distance from the floor, since the membrane's bow does not
+         * scale; the text keeps its height.
+         */
+        public Pockets scaled(float scale, float x, float y, float aboutDepth) {
+            float scaledFloor = aboutDepth + (floor - aboutDepth) * scale;
+            return new Pockets(
+                    columns,
+                    x + (firstX - x) * scale,
+                    y + (firstY - y) * scale,
+                    pitch * scale,
+                    icon * scale,
+                    scaledFloor - (floor - depth),
+                    half * scale,
+                    scaledFloor);
+        }
+    }
 
     /** Text height in block pixels. */
     private static final float TEXT = 1.5F;
@@ -46,11 +66,14 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
 
     private final DirectionProperty facing;
     private final Function<T, List<ItemStack>> shown;
-    private final Pockets pockets;
+    private final Function<T, Pockets> pockets;
     private final ResourceLocation lining;
 
     private FrontStockRenderer(
-            DirectionProperty facing, Function<T, List<ItemStack>> shown, Pockets pockets, ResourceLocation lining) {
+            DirectionProperty facing,
+            Function<T, List<ItemStack>> shown,
+            Function<T, Pockets> pockets,
+            ResourceLocation lining) {
         this.facing = facing;
         this.shown = shown;
         this.pockets = pockets;
@@ -63,13 +86,35 @@ public final class FrontStockRenderer<T extends BlockEntity> implements BlockEnt
      */
     public static <T extends BlockEntity> Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<T>> overlay(
             DirectionProperty facing, Function<T, List<ItemStack>> shown, Pockets pockets, ResourceLocation lining) {
-        return context -> new FrontStockRenderer<>(facing, shown, pockets, lining);
+        return context -> new FrontStockRenderer<>(facing, shown, block -> pockets, lining);
+    }
+
+    /**
+     * As {@link #overlay(DirectionProperty, Function, Pockets, ResourceLocation)}, for a block whose model is scaled
+     * by {@code scale} of the block about the point {@code aboutX}, {@code aboutY} pixels from its left and bottom
+     * and {@code aboutDepth} pixels behind its front: the pockets, given at scale 1, follow the model.
+     */
+    public static <T extends BlockEntity> Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<T>> overlay(
+            DirectionProperty facing,
+            Function<T, List<ItemStack>> shown,
+            Pockets pockets,
+            ToDoubleFunction<T> scale,
+            float aboutX,
+            float aboutY,
+            float aboutDepth,
+            ResourceLocation lining) {
+        return context -> new FrontStockRenderer<>(
+                facing,
+                shown,
+                block -> pockets.scaled((float) scale.applyAsDouble(block), aboutX, aboutY, aboutDepth),
+                lining);
     }
 
     @Override
     public void render(T block, float partialTick, PoseStack poses, MultiBufferSource buffers, int light, int overlay) {
         List<ItemStack> stock = shown.apply(block);
         if (stock.isEmpty()) return;
+        Pockets pockets = this.pockets.apply(block);
         Direction front = block.getBlockState().getValue(facing);
         Level level = block.getLevel();
         int lit = level == null || !level.isLoaded(block.getBlockPos().relative(front))

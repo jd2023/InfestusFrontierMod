@@ -281,7 +281,10 @@ final class CapsuleStemBlockEntity extends BlockEntity implements MenuProvider {
         return true;
     }
 
-    /** The root is leaving: its cells die from the bottom up, each on its own tick; its pods stand on alone. */
+    /**
+     * The root is leaving: its cells die from the bottom up, each on its own tick, shedding its pods as items as it
+     * goes ({@link CapsuleStemBlock#tick}); a pod whose cell is already gone drops now.
+     */
     void dies(ServerLevel level) {
         if (!isRoot()) return;
         StemPlan plan = plan();
@@ -291,8 +294,11 @@ final class CapsuleStemBlockEntity extends BlockEntity implements MenuProvider {
         }
         for (StemPlan.Pod pod : plan.pods()) {
             BlockPos pos = at(pod);
-            if (level.hasChunkAt(pos) && level.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity standing)
-                standing.hangOn(Optional.empty());
+            if (standing(level, pod.cell())
+                    || !level.hasChunkAt(pos)
+                    || !(level.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity orphan)
+                    || orphan.root().filter(worldPosition::equals).isEmpty()) continue;
+            level.destroyBlock(pos, true);
         }
         touch();
     }

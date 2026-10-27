@@ -254,7 +254,9 @@ public final class StorageModule {
                 event.register(RESERVOIR_CELL_MENU.get(), ReservoirCellScreen::new);
                 event.register(ITEM_CAPSULE_MENU.get(), ItemCapsuleScreen::new);
             });
-            // one pocket on the pod's outer face, the icon over its count; art/gen_item_capsule.py POCKET
+            // one pocket in the socket on the pod's outer face, the icon over its count, at full grade: the socket
+            // floor 4.5 px behind the front, 8 px wide; the body scales about its back, 13.5 px behind the front
+            // (art/gen_item_capsule.py FLOOR, BACK)
             OrganRenderers.register(
                     modBus,
                     "item_capsule",
@@ -263,7 +265,11 @@ public final class StorageModule {
                     FrontStockRenderer.overlay(
                             ItemCapsuleBlock.FACING,
                             ItemCapsuleBlockEntity::shown,
-                            new FrontStockRenderer.Pockets(1, 8F, 9.0F, 7F, 5.5F, 0.3F, 4F, 0.95F),
+                            new FrontStockRenderer.Pockets(1, 8F, 8F, 7F, 5.5F, 3.8F, 4F, 4.5F),
+                            ItemCapsuleBlockEntity::scale,
+                            8F,
+                            8F,
+                            13.5F,
                             ResourceLocation.fromNamespaceAndPath("infestusfrontier", "block/item_capsule_lining")));
             // the liquid stops inside the membrane panes, above the fleshy base and under the lid
             JoinedTankRenderer.register(

@@ -45,10 +45,25 @@ public final class ItemCapsuleBlock extends BaseEntityBlock {
     public static final IntegerProperty GRADE = IntegerProperty.create("grade", 0, CapsuleStock.LAST_GRADE);
 
     private static final MapCodec<ItemCapsuleBlock> CODEC = simpleCodec(ItemCapsuleBlock::new);
-    private static final VoxelShape[] SHAPES = {
-        Block.box(3, 3, 3, 13, 13, 13), Block.box(2, 2, 2, 14, 14, 14), Block.box(1, 1, 1, 15, 15, 15)
+    /**
+     * The pod's body at each grade with its neck to the stem, by grade then {@link Direction#get2DDataValue}: the
+     * model's hull, crown and keel scaled about the hull's back (art/gen_item_capsule.py GRADES, BACK).
+     */
+    private static final VoxelShape[][] SHAPES = {
+        facings(3.5, 3, 5.5, 12.5, 13, 16), facings(3, 2, 4, 13, 14, 16), facings(2, 1, 2.5, 14, 15, 16)
     };
+
     private static final int GRAFT_PARTICLES = 8;
+
+    /** A box given for a pod facing north, turned for each horizontal facing, by {@link Direction#get2DDataValue}. */
+    private static VoxelShape[] facings(double x0, double y0, double z0, double x1, double y1, double z1) {
+        VoxelShape[] shapes = new VoxelShape[4];
+        shapes[Direction.NORTH.get2DDataValue()] = Block.box(x0, y0, z0, x1, y1, z1);
+        shapes[Direction.SOUTH.get2DDataValue()] = Block.box(16 - x1, y0, 16 - z1, 16 - x0, y1, 16 - z0);
+        shapes[Direction.EAST.get2DDataValue()] = Block.box(16 - z1, y0, x0, 16 - z0, y1, x1);
+        shapes[Direction.WEST.get2DDataValue()] = Block.box(z0, y0, 16 - x1, z1, y1, 16 - x0);
+        return shapes;
+    }
 
     ItemCapsuleBlock(Properties properties) {
         super(properties);
@@ -73,7 +88,7 @@ public final class ItemCapsuleBlock extends BaseEntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return SHAPES[state.getValue(GRADE)];
+        return SHAPES[state.getValue(GRADE)][state.getValue(FACING).get2DDataValue()];
     }
 
     /** True when {@code pos} is a trunk cell of a stem a pod may hang on, through its face {@code face}. */

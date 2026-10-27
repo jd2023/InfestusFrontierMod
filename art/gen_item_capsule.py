@@ -1,14 +1,16 @@
-"""Item Capsule: the pod of a Capsule Stem. A plump squared seed pod of dark plum hide with muted salmon folds, its
-flat outer face toward the player (where the stock renderer draws what it holds), hung on a short fleshy neck that a
-bone collar grips where it meets the stem, with a bone shelf under the neck. The pod breathes; its grade sets its
-size: a young pod is small, each graft swells it toward the stem, its face staying put.
+"""Item Capsule: the pod of a Capsule Stem. A plump squared seed pod of dark plum hide with muted salmon creases,
+its outer face a socket of dark wet flesh (where the stock renderer draws what it holds, inside the rim), hung on
+a short fleshy neck that a bone collar grips where it meets the stem, with a bone shelf under the neck reaching the
+stem's collar. The pod breathes; its grade sets its size: a young pod is small and hugs the stem, each graft swells
+it outward.
 
     python3 art/gen_item_capsule.py
 
 Front is north (-Z), the pod's outer face; the neck runs south into the stem's block. The block spans y 0..16, so
-the pod sits about y 8, where the stem's collar and the stock renderer's membrane are. The `body` bone scales with
-the grade about the face's centre (grade_0..2) while its child `flesh` breathes, so the two never fight over one bone.
-It also paints `textures/block/item_capsule_lining.png`, the dark membrane the stock renderer draws over the face.
+the pod sits about y 8, where the stem's collar is. The `body` bone scales with the grade about the hull's back
+(grade_0..2), so the pod grows away from the stem and its socket floor moves with it; `FrontStockRenderer` scales
+its pocket about the same point (StorageModule). The child `flesh` breathes about the socket floor, so the membrane
+drawn there never fights the flesh. It also paints `textures/block/item_capsule_lining.png`, the membrane.
 """
 from pathlib import Path
 
@@ -18,6 +20,7 @@ from organ_model import Painter, faces, flat, islands, pack, sampled, wave, writ
 
 SHEET = 128
 BREATH = 5.0
+# the body's scale a grade; ItemCapsuleBlockEntity.SCALES and ItemCapsuleBlock's shapes follow these
 GRADES = (0.72, 0.86, 1.0)
 POD = [(34, 13, 18), (56, 20, 28), (80, 32, 40), (104, 46, 52), (124, 58, 62)]
 SALMON = [(148, 76, 66), (192, 112, 94), (222, 146, 120)]
@@ -27,36 +30,46 @@ LINING = [(16, 6, 10), (28, 10, 16), (44, 18, 26), (70, 30, 40)]
 FACE = [(22, 8, 12), (40, 14, 20), (60, 24, 30), (84, 36, 42)]
 
 MID = 8
+# the hull's back, which the grade scales about: 13.5 pixels behind the block's front
+BACK = 5.5
+# the socket floor, which the breath scales about: 4.5 pixels behind the block's front at full grade
+FLOOR = -3.5
+RIM = 2
 BONES = [
     ('root', None, [0, MID, 0], []),
-    # the neck into the stem, a shelf of bone under it and the collar that grips it at the stem
+    # the neck into the stem, a shelf of bone under it to the stem's collar, and the collar that grips it there
     ('neck', 'root', [0, MID, 5], [
         ('neck', [-2, MID - 2, 1.5], [4, 4, 10], None),
-        ('shelf', [-2, MID - 4.5, 1.5], [4, 2, 7], None),
+        ('shelf', [-1.5, MID - 3.7, 2], [3, 2, 8], None),
     ]),
     ('collar', 'root', [0, MID, 9], [('collar', [-3, MID - 3, 8.5], [6, 6, 2], None)]),
-    # the pod: scaled by grade about the centre of its face, so the face stays where the stock is drawn
-    ('body', 'root', [0, MID, -6.5], []),
-    ('flesh', 'body', [0, MID, -6.5], [
-        ('hull', [-6, MID - 6, -5.5], [12, 12, 11], None),
-        ('crown', [-5, MID + 6, -4.5], [10, 1, 8], None),
-        ('keel', [-5, MID - 7, -4.5], [10, 1, 8], None),
-        ('face', [-4, MID - 4, -6.5], [8, 8, 1], None),
-        ('shoulder', [-4, MID - 4, 5.5], [8, 8, 1], None),
+    # the pod: scaled by grade about its back, so it grows outward from the stem
+    ('body', 'root', [0, MID, BACK], []),
+    ('flesh', 'body', [0, MID, FLOOR], [
+        ('hull', [-6, MID - 6, FLOOR], [12, 12, 9], None),
+        ('crown', [-5, MID + 6, FLOOR + 1], [10, 1, 7], None),
+        ('keel', [-5, MID - 7, FLOOR + 1], [10, 1, 7], None),
+        # the rim round the socket: its inner faces are the socket's walls
+        ('brow', [-6, MID + 4, FLOOR - RIM], [12, RIM, RIM], None),
+        ('chin', [-6, MID - 6, FLOOR - RIM], [12, RIM, RIM], None),
+        ('cheek_w', [-6, MID - 4, FLOOR - RIM], [RIM, 8, RIM], None),
+        ('cheek_e', [4, MID - 4, FLOOR - RIM], [RIM, 8, RIM], None),
+        ('shoulder', [-4, MID - 4, BACK], [8, 8, 1], None),
     ]),
 ]
+# the socket's walls: the face of each rim cube that looks into it
+WALLS = {'brow': 'down', 'chin': 'up', 'cheek_w': 'east', 'cheek_e': 'west'}
 
 
-def folds(p, rect, streaks):
-    """Muted salmon folds: short diagonal streaks of hide pushed up, a crease beside each."""
+def creases(p, rect, lines):
+    """Muted salmon creases: short shallow wrinkles of hide pushed up, a shadow under each, no two in a line."""
     x0, y0, w, h = rect
-    for sx, sy, length in streaks:
+    for sx, sy, length, slope in lines:
         for i in range(length):
-            x, y = sx + i, sy + i
-            if 0 <= x < w - 2 and 0 <= y < h:
-                p.put(rect, x, y, SALMON[2 if i in (1, 2) else 1])
-                p.put(rect, x + 1, y, SALMON[0 if i in (0, length - 1) else 1])
-                p.put(rect, x + 2, y, POD[0])
+            x, y = sx + i, sy + (i * slope) // 2
+            if 0 <= x < w and 0 <= y < h - 1:
+                p.put(rect, x, y, SALMON[2 if 0 < i < length - 1 else 1])
+                p.put(rect, x, y + 1, POD[0])
 
 
 def textures(uv):
@@ -64,28 +77,35 @@ def textures(uv):
     sizes = islands(BONES)
     rects = {name: faces(sizes[name], uv[name]) for name in sizes}
     for face, rect in rects['hull'].items():
+        if face == 'north':
+            # the socket floor: quiet dark wet flesh under the membrane
+            p.ramp(rect, FACE, flat(0.35), grain=0.03, mottle=0.2)
+            continue
         p.ramp(rect, POD, flat(0.72 if face == 'up' else 0.3 if face == 'down' else 0.55), grain=0.05, mottle=0.35)
         if face in ('west', 'east'):
-            folds(p, rect, [(1, 1, 5), (6, 5, 4)])
+            creases(p, rect, [(1, 2, 4, 1), (4, 6, 3, -1), (2, 9, 3, 1)])
         elif face in ('up', 'down'):
-            folds(p, rect, [(2, 2, 4), (7, 4, 3)])
+            creases(p, rect, [(2, 1, 4, 1), (7, 3, 3, -1), (3, 6, 4, 1)])
         elif face == 'south':
-            folds(p, rect, [(3, 2, 4)])
+            creases(p, rect, [(2, 0, 3, 1), (7, 10, 3, -1)])
     for name in ('crown', 'keel'):
         for face, rect in rects[name].items():
             p.ramp(rect, POD, flat(0.8 if face == 'up' else 0.25 if face == 'down' else 0.5), grain=0.05, mottle=0.3)
+    for name, wall in WALLS.items():
+        for face, rect in rects[name].items():
+            if face == wall:
+                p.ramp(rect, FACE, flat(0.55), grain=0.03, mottle=0.2)
+            else:
+                p.ramp(rect, POD, flat(0.78 if face == 'up' else 0.35 if face == 'down' else 0.62), grain=0.05, mottle=0.3)
     for face, rect in rects['shoulder'].items():
         p.ramp(rect, POD, flat(0.4), grain=0.04, mottle=0.3)
-    for face, rect in rects['face'].items():
-        # the face: a slightly lighter rim round the quiet dark hide the membrane sits on
-        p.ramp(rect, FACE, lambda x, y, w, h: 0.75 if x in (0, w - 1) or y in (0, h - 1) else 0.45, grain=0.03, mottle=0.2)
     for face, rect in rects['neck'].items():
         p.ramp(rect, STEM, lambda x, y, w, h: 0.55 - 0.2 * (x % 2 == 0), grain=0.03, mottle=0.1)
     for name in ('shelf', 'collar'):
         for face, rect in rects[name].items():
             p.ramp(rect, BONE, lambda x, y, w, h, face=face: (0.8 if face == 'up' else 0.55) - 0.15 * ((x + 2 * y) % 5 == 0),
                    grain=0.03, mottle=0.1)
-    return p, rects['hull']['north']
+    return p, rects['hull']['south']
 
 
 def still(scale):

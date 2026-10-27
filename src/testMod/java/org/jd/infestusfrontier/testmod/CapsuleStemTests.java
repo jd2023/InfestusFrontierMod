@@ -84,7 +84,9 @@ public final class CapsuleStemTests {
 
     private CapsuleStemTests() {}
 
+    /** A root on Living Substrate, as a planted one must be. */
     private static void plant(GameTestHelper h, long seed) {
+        h.setBlock(ROOT.below(), EcologyModule.LIVING_SUBSTRATE.get());
         CapsuleStemBlock.plant(h.getLevel(), h.absolutePos(ROOT), seed);
     }
 
@@ -344,7 +346,8 @@ public final class CapsuleStemTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
-    public static void aBrokenRootKillsTheStemFromTheBottomAndLeavesThePodsStanding(GameTestHelper h) {
+    public static void aBrokenRootKillsTheStemFromTheBottomAndShedsItsPodsAsItems(GameTestHelper h) {
+        for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) h.setBlock(new BlockPos(x, 0, z), Blocks.STONE);
         plant(h, FORKING);
         growAll(h);
         List<BlockPos> pods = pods(h);
@@ -352,15 +355,40 @@ public final class CapsuleStemTests {
         store(h, ROOT).insert(stack(Items.BONE, 100), false);
         h.getLevel().destroyBlock(h.absolutePos(ROOT), true);
         h.assertValueEqual(stems(h).size(), cells - 1, "the rest stand for a moment");
+        h.assertValueEqual(pods(h).size(), pods.size(), "with their pods");
         h.runAfterDelay(4 * cells + 10, () -> {
             h.assertValueEqual(stems(h).size(), 0, "the stem is dead");
-            h.assertValueEqual(pods(h).size(), pods.size(), "every pod stands");
-            int bones = 0;
-            for (BlockPos pod : pods) {
-                h.assertValueEqual(items(h, pod).getSlots(), 1, "each on its own");
-                bones += store(h, pod).count(stack(Items.BONE, 1));
+            h.assertValueEqual(pods(h).size(), 0, "no pod stands");
+            int capsules = 0, bones = 0;
+            for (ItemEntity drop : h.getEntities(EntityType.ITEM)) {
+                ItemStack item = drop.getItem();
+                if (!item.is(StorageModule.ITEM_CAPSULE_ITEM.get())) continue;
+                capsules += item.getCount();
+                CapsuleStock carried = item.get(StorageModule.CAPSULE_STOCK.get());
+                if (carried != null)
+                    for (ItemStack held : carried.held()) if (held.is(Items.BONE)) bones += held.getCount();
             }
+            h.assertValueEqual(capsules, pods.size(), "every pod dropped as an item");
             h.assertValueEqual(bones, 100, "with their items");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void aRootPlantsOnlyOnAFoundationAndDiesWithIt(GameTestHelper h) {
+        h.setBlock(ROOT.below(), Blocks.STONE);
+        Player builder = EcologyTests.holding(h, GameType.SURVIVAL, StorageModule.CAPSULE_STEM_ITEM.get(), 1);
+        h.placeAt(builder, builder.getMainHandItem(), ROOT.below(), Direction.UP);
+        h.assertFalse(isStem(h, ROOT), "no root on stone");
+        h.setBlock(ROOT.below(), EcologyModule.LIVING_SUBSTRATE.get());
+        h.placeAt(builder, builder.getMainHandItem(), ROOT.below(), Direction.UP);
+        h.assertTrue(isStem(h, ROOT), "a root on Living Substrate");
+        h.assertTrue(grow(h) && grow(h), "which grows");
+        int cells = stems(h).size();
+        h.setBlock(ROOT.below(), Blocks.AIR);
+        h.runAfterDelay(4 * cells + 10, () -> {
+            h.assertValueEqual(stems(h).size(), 0, "the tree dies with its foundation");
+            h.assertValueEqual(pods(h).size(), 0, "and sheds its pod");
             h.succeed();
         });
     }

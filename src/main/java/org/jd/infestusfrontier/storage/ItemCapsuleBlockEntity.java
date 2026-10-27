@@ -89,6 +89,14 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
         return grade;
     }
 
+    /** How large the model draws the pod's body at each grade: art/gen_item_capsule.py GRADES. */
+    static final float[] SCALES = {0.72F, 0.86F, 1F};
+
+    /** The scale of the pod's body at its grade, for the stock drawn in its socket. */
+    double scale() {
+        return SCALES[getBlockState().getValue(ItemCapsuleBlock.GRADE)];
+    }
+
     /** Sets a compartment to {@code stack}, its kind and its whole count; an empty stack empties it. */
     void put(int compartment, ItemStack stack) {
         held[compartment] = stack.copy();

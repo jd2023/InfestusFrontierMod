@@ -170,6 +170,7 @@
     "fill 53 -61 -36 55 -61 -35 infestusfrontier:living_substrate[stage=mature]",
     "fill 53 -60 -36 55 -59 -35 infestusfrontier:reservoir_cell{tank:{stored:2500,reserved:0,capacity:4000},body:[53,-60,-36,55,-59,-35]}",
     "setblock 56 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Reservoir\"','\"twelve cells\"','\"one tank\"','\"bucket any cell\"']}}",
+    "setblock 76 -61 -36 infestusfrontier:living_substrate[stage=mature]",
     "setblock 76 -60 -36 infestusfrontier:capsule_stem[part=root]{root:[I;76,-60,-36],plan:{seed:7L,cells:[{x:0,y:0,z:0,part:\"root\",side:-1,parent:-1,trunk:0,tier:0}],pods:[]},grow:40}",
     "setblock 79 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Capsule Stem\"','\"bone meal grows\"','\"pods: one kind\"','\"each, 8 stacks\"']}}",
     "give @s infestusfrontier:capsule_stem 2",
