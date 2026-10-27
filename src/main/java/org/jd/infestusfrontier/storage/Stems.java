@@ -18,19 +18,27 @@ import org.jd.infestusfrontier.storage.api.CapsuleStock;
 final class Stems {
     private Stems() {}
 
-    /** The store of {@code pod}'s tree, or of the pod alone; empty while the pod is unreadable or out of reach. */
+    /**
+     * The store of {@code pod}'s tree, or of the pod alone; empty while the pod is unreadable or out of reach. A pod
+     * whose root stands in a chunk out of reach is served alone, over a span that names the root's chunk, so it is
+     * read again on every use until the root is back; a pod whose root is gone, or whose tree does not reach it,
+     * lets go of the root and stands alone.
+     */
     static Optional<CapsuleTree> of(ItemCapsuleBlockEntity pod) {
         Level level = pod.getLevel();
         if (level == null || !pod.isReadable()) return Optional.empty();
         CapsuleTree store = pod.store();
         if (store != null && store.isUsable() && store.whole()) return Optional.of(store);
-        Optional<CapsuleStemBlockEntity> root = pod.root().flatMap(pos -> rootAt(level, pos));
-        if (root.isPresent()) {
-            Optional<CapsuleTree> tree = root.get().tree();
+        Optional<BlockPos> rootPos = pod.root();
+        if (rootPos.isPresent() && level.hasChunkAt(rootPos.get())) {
+            Optional<CapsuleTree> tree = rootAt(level, rootPos.get()).flatMap(CapsuleStemBlockEntity::tree);
             if (tree.isPresent() && pod.store() == tree.get()) return tree;
             pod.hangOn(Optional.empty());
+            rootPos = Optional.empty();
         }
-        return Optional.of(new CapsuleTree(level, List.of(pod), List.of(pod.getBlockPos())));
+        List<BlockPos> span =
+                rootPos.map(root -> List.of(pod.getBlockPos(), root)).orElse(List.of(pod.getBlockPos()));
+        return Optional.of(new CapsuleTree(level, List.of(pod), span));
     }
 
     /** The store of the tree {@code cell} belongs to; empty while its root is gone or part of the tree out of reach. */

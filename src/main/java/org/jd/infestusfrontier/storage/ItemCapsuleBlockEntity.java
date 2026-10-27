@@ -331,8 +331,9 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
         return getBlockState().getBlock().getName();
     }
 
+    /** A pod opens only itself; the tree's screen is the stem cells'. */
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-        return new ItemCapsuleMenu(id, inventory, this, () -> Stems.of(this));
+        return new ItemCapsulePodMenu(id, inventory, this);
     }
 }

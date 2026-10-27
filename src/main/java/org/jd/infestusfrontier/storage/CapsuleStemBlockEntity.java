@@ -27,23 +27,31 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * One cell of a Capsule Stem. Every cell knows its root; the root alone keeps the tree's {@link StemPlan} and makes
- * the tree's store from the pods it reaches through standing cells. Growth happens here: a bone meal asks the root
- * for its next growth, which first regrows a planned cell or pod that is missing, then grows the plan one step. A
- * root may also be loaded with growth owed ({@code grow} in its saved data), which it pays on its first tick.
+ * the tree's store from the pods it reaches through standing cells. Growth happens here: a bone meal feeds the root
+ * toward its next growth, which first regrows a planned cell or pod that is missing, then grows the plan one step;
+ * a growth costs one bone meal at the first level and twice as much each level up ({@link #cost}). A root may also
+ * be loaded with growth owed ({@code grow} in its saved data), which it pays free on its first tick.
  */
 final class CapsuleStemBlockEntity extends BlockEntity implements MenuProvider {
     private static final int GROWTH_PARTICLES = 10;
     /** Ticks a cell waits to die after its root is gone, per cell up the plan, so a dead tree falls from the bottom. */
     static final int DEATH_TICKS = 3;
+    /** The most bone meal a root may hold toward a growth: the dearest growth, at the top of the plan. */
+    static final int MOST_FED = cost(StemPlan.MAX_HEIGHT);
+    /** Ticks a loaded cell waits before asking again whether its root stands, while the root's chunk is out of reach. */
+    static final int RECHECK_TICKS = 100;
 
-    private record Saved(BlockPos root, Optional<StemPlan> plan, int grow) {}
+    private record Saved(BlockPos root, Optional<StemPlan> plan, int grow, int fed) {}
 
     private static final MapCodec<Saved> SAVED = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     BlockPos.CODEC.fieldOf("root").forGetter(Saved::root),
                     StemCodecs.PLAN.optionalFieldOf("plan").forGetter(Saved::plan),
                     com.mojang.serialization.Codec.intRange(0, 256)
                             .optionalFieldOf("grow", 0)
-                            .forGetter(Saved::grow))
+                            .forGetter(Saved::grow),
+                    com.mojang.serialization.Codec.intRange(0, MOST_FED)
+                            .optionalFieldOf("fed", 0)
+                            .forGetter(Saved::fed))
             .apply(instance, Saved::new));
 
     /** One growth: a planned cell or pod to regrow, or a new step of the plan. */
@@ -64,6 +72,9 @@ final class CapsuleStemBlockEntity extends BlockEntity implements MenuProvider {
     private BlockPos root;
     private Optional<StemPlan> plan = Optional.empty();
     private int pending;
+    /** Bone meal fed toward the next growth. */
+    private int fed;
+
     private Optional<CompoundTag> unreadable = Optional.empty();
     private @Nullable CapsuleTree tree;
 
@@ -88,6 +99,11 @@ final class CapsuleStemBlockEntity extends BlockEntity implements MenuProvider {
 
     boolean isRoot() {
         return plan.isPresent() && root.equals(worldPosition);
+    }
+
+    /** False for a cell whose saved data did not read: it keeps its bytes, grows nothing and is never judged dead. */
+    boolean isReadable() {
+        return unreadable.isEmpty();
     }
 
     /** The root of this cell's tree, while it stands: this cell, or the one it names. */
@@ -191,11 +207,66 @@ final class CapsuleStemBlockEntity extends BlockEntity implements MenuProvider {
                 .map(Growth::step);
     }
 
-    /** Grows the tree by one: regrows what is missing first, else one step of the plan. False when nothing fits. */
+    /** The level of what a growth grows: how far above the root. */
+    private int level(Growth growth) {
+        if (growth.step().isPresent())
+            return switch (growth.step().get()) {
+                case StemPlan.Step.Grow grow -> grow.cell().y();
+                case StemPlan.Step.Sprout sprout -> sprout.pod().y();
+            };
+        return growth.cell() >= 0
+                ? plan().cells().get(growth.cell()).y()
+                : plan().pods().get(growth.pod()).y();
+    }
+
+    /** The bone meal a growth at {@code level} costs: one at the first level, twice as much each level up. */
+    static int cost(int level) {
+        return 1 << Math.max(0, level - 1);
+    }
+
+    int cost(Growth growth) {
+        return cost(level(growth));
+    }
+
+    int fed() {
+        return fed;
+    }
+
+    /** What the next growth costs, or 0 when nothing is missing and nothing more fits. */
+    int nextCost(LevelReader level) {
+        return nextGrowth(level).map(this::cost).orElse(0);
+    }
+
+    /**
+     * One bone meal toward the next growth, which happens when its cost is met. False, and nothing taken, when
+     * nothing is missing and nothing more fits.
+     */
+    boolean feed(ServerLevel level) {
+        Optional<Growth> next = nextGrowth(level);
+        if (next.isEmpty()) return false;
+        fed++;
+        int cost = cost(next.get());
+        if (fed < cost) {
+            setChanged();
+            return true;
+        }
+        fed -= cost;
+        grow(level, next.get());
+        return true;
+    }
+
+    /**
+     * Grows the tree by one, free of bone meal: regrows what is missing first, else one step of the plan. False when
+     * nothing fits. Growth owed from data is paid this way.
+     */
     boolean grow(ServerLevel level) {
         Optional<Growth> next = nextGrowth(level);
         if (next.isEmpty()) return false;
-        Growth growth = next.get();
+        grow(level, next.get());
+        return true;
+    }
+
+    private void grow(ServerLevel level, Growth growth) {
         int cell = growth.cell(), pod = growth.pod();
         if (growth.step().isPresent()) {
             plan = Optional.of(plan().with(growth.step().get()));
@@ -207,7 +278,6 @@ final class CapsuleStemBlockEntity extends BlockEntity implements MenuProvider {
         BlockPos grown = cell >= 0 ? growCell(level, cell) : growPod(level, pod);
         touch();
         level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, grown, GROWTH_PARTICLES);
-        return true;
     }
 
     private BlockPos growCell(ServerLevel level, int index) {
@@ -314,13 +384,19 @@ final class CapsuleStemBlockEntity extends BlockEntity implements MenuProvider {
         return pending > 0;
     }
 
+    /**
+     * A root back in reach reads its tree again and pays growth it owes. A grown cell back in reach checks its root
+     * on the next tick ({@link CapsuleStemBlock#tick}): a root that died while the cell was out of reach could not
+     * tell it, so the cell finds out now, or keeps asking while the root's chunk is out of reach.
+     */
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && !level.isClientSide && isRoot()) {
+        if (level == null || level.isClientSide) return;
+        if (isRoot()) {
             touch();
             if (pending > 0) level.scheduleTick(worldPosition, StorageModule.CAPSULE_STEM.get(), 1);
-        }
+        } else level.scheduleTick(worldPosition, StorageModule.CAPSULE_STEM.get(), 1);
     }
 
     @Override
@@ -347,13 +423,14 @@ final class CapsuleStemBlockEntity extends BlockEntity implements MenuProvider {
         root = read.map(Saved::root).orElse(worldPosition);
         plan = read.flatMap(Saved::plan);
         pending = read.map(Saved::grow).orElse(0);
+        fed = read.map(Saved::fed).orElse(0);
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (unreadable.isPresent()) tag.merge(unreadable.get());
-        else Persistence.write(SAVED, new Saved(root, plan, pending), registries, tag);
+        else Persistence.write(SAVED, new Saved(root, plan, pending, fed), registries, tag);
     }
 
     @Override

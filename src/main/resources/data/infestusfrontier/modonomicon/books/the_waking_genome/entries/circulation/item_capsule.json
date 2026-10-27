@@ -39,6 +39,11 @@
       "text": "entry.infestusfrontier.circulation.item_capsule.grow"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.item_capsule.loss.title",
+      "text": "entry.infestusfrontier.circulation.item_capsule.loss"
+    },
+    {
       "type": "modonomicon:crafting_recipe",
       "recipe_id_1": "infestusfrontier:capsule_stem",
       "text": "entry.infestusfrontier.circulation.item_capsule.craft"

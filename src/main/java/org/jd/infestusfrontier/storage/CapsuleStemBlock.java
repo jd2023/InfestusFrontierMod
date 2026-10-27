@@ -132,8 +132,7 @@ public final class CapsuleStemBlock extends BaseEntityBlock implements Bonemeala
     /** A root stands on an organ foundation; grown cells stand on the tree. */
     @Override
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        return state.getValue(PART) != StemPart.ROOT
-                || level.getBlockState(pos.below()).is(Organs.FOUNDATIONS);
+        return state.getValue(PART) != StemPart.ROOT || Organs.hasFoundation(level, pos);
     }
 
     /** A root whose foundation goes dies on the next tick. */
@@ -150,27 +149,36 @@ public final class CapsuleStemBlock extends BaseEntityBlock implements Bonemeala
     }
 
     /**
-     * A root pays growth it owes, or dies when its foundation is gone; a cell whose root is gone, or replaced by a
-     * root whose plan does not hold it, sheds its pods and dies, leaving Dead Tissue.
+     * A root pays growth it owes, or dies when its foundation is gone. A grown cell checks its root: gone, or
+     * replaced by a root whose plan does not hold the cell, the cell sheds its pods and dies, leaving Dead Tissue;
+     * while the root's chunk is out of reach nothing can be told, so the cell asks again later
+     * ({@link CapsuleStemBlockEntity#RECHECK_TICKS}).
      */
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!(level.getBlockEntity(pos) instanceof CapsuleStemBlockEntity cell)) return;
         if (!state.canSurvive(level, pos)) level.destroyBlock(pos, true);
+        else if (!cell.isReadable()) return;
         else if (cell.isRoot()) cell.payPending(level);
+        else if (!level.hasChunkAt(cell.rootPos())) level.scheduleTick(pos, this, CapsuleStemBlockEntity.RECHECK_TICKS);
         else if (cell.root().filter(root -> root.owns(pos)).isEmpty()) {
             shedPods(level, pos, cell.rootPos());
             level.destroyBlock(pos, true);
         }
     }
 
-    /** The pods hanging on the cell at {@code pos} for the tree rooted at {@code root} drop as items, whole. */
+    /**
+     * The pods hanging on the cell at {@code pos} drop as items, whole: those that name the tree rooted at
+     * {@code root} and those that name no root any more, having let go of it while it was gone. A pod of another
+     * tree stays.
+     */
     private static void shedPods(ServerLevel level, BlockPos pos, BlockPos root) {
         for (Direction side : Direction.Plane.HORIZONTAL) {
             BlockPos at = pos.relative(side);
+            if (!level.hasChunkAt(at)) continue;
             if (level.getBlockEntity(at) instanceof ItemCapsuleBlockEntity pod
                     && pod.getBlockState().getValue(ItemCapsuleBlock.FACING) == side
-                    && pod.root().filter(root::equals).isPresent()) level.destroyBlock(at, true);
+                    && pod.root().map(root::equals).orElse(true)) level.destroyBlock(at, true);
         }
     }
 
@@ -189,9 +197,10 @@ public final class CapsuleStemBlock extends BaseEntityBlock implements Bonemeala
         return true;
     }
 
+    /** One bone meal fed to the root; it grows when the next growth's cost is met. */
     @Override
     public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
-        Stems.cellAt(level, pos).flatMap(CapsuleStemBlockEntity::root).ifPresent(root -> root.grow(level));
+        Stems.cellAt(level, pos).flatMap(CapsuleStemBlockEntity::root).ifPresent(root -> root.feed(level));
     }
 
     /** Bone meal goes to its own use, which grows the tree; any other item opens the tree's screen. */

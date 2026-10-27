@@ -125,6 +125,20 @@
       ]
     },
     {
+      "name": "pod_screen",
+      "x": 0.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "use": [
+        0,
+        -60,
+        5
+      ]
+    },
+    {
       "name": "book_item_capsule",
       "x": 0.5,
       "y": -60.4,

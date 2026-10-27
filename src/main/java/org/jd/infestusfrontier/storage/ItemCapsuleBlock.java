@@ -37,8 +37,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * An Item Capsule (BLOCK_CATALOG T1-09): the pod of a Capsule Stem, one kind of item in bulk, its outer face toward
  * {@link #FACING} showing what it holds. A stem grows pods on its trunk cells; a pod pressed by hand on a trunk cell
- * joins that tree, anywhere else it stands alone. A hand with items puts them in, a sneaking empty hand takes a stack
- * out, any other hand opens the tree's screen. A Skeletal Graft grows the pod a grade, doubling what it holds.
+ * joins that tree, anywhere else it stands alone. Any hand opens the pod's own screen ({@link ItemCapsulePodMenu}):
+ * a stack in or out and a treatment well; the stem's cells open the whole tree. A Skeletal Graft, used on the pod or
+ * put in its well, grows the pod a grade, doubling what it holds.
  */
 public final class ItemCapsuleBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -163,10 +164,7 @@ public final class ItemCapsuleBlock extends BaseEntityBlock {
         return super.playerWillDestroy(level, pos, state, player);
     }
 
-    /**
-     * A Skeletal Graft grows the pod a grade. Items the pod takes go in, as many as fit; a hand with items the pod
-     * refuses opens the screen, as any other item does.
-     */
+    /** A Skeletal Graft used on the pod grows it a grade; any other hand opens the pod's own screen. */
     @Override
     protected ItemInteractionResult useItemOn(
             ItemStack stack,
@@ -176,40 +174,23 @@ public final class ItemCapsuleBlock extends BaseEntityBlock {
             Player player,
             InteractionHand hand,
             BlockHitResult hit) {
-        if (stack.isEmpty()
-                || stack.is(Organs.READERS)
-                || !(level.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity pod))
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        if (stack.is(EcologyModule.SKELETAL_GRAFT.get())) {
-            if (pod.grade() >= CapsuleStock.LAST_GRADE || !player.mayBuild())
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (stack.is(EcologyModule.SKELETAL_GRAFT.get())
+                && player.mayBuild()
+                && level.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity pod
+                && pod.grade() < CapsuleStock.LAST_GRADE) {
             if (level.isClientSide) return ItemInteractionResult.SUCCESS;
             pod.grow();
             level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, pos, GRAFT_PARTICLES);
             if (!player.getAbilities().instabuild) stack.shrink(1);
             return ItemInteractionResult.CONSUME;
         }
-        Optional<CapsuleTree> tree = Stems.of(pod);
-        if (tree.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        int slot = tree.get().slotOf(pod);
-        ItemStack rest = tree.get().insert(slot, stack, level.isClientSide);
-        if (rest.getCount() == stack.getCount()) return Organs.openScreen(stack, level, pos, player);
-        if (!level.isClientSide) player.setItemInHand(hand, rest);
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return Organs.openScreen(stack, level, pos, player);
     }
 
-    /** A sneaking empty hand takes a stack out of this pod; any other empty hand opens the tree's screen. */
+    /** An empty hand opens the pod's own screen; the trunk opens the whole tree's. */
     @Override
     protected InteractionResult useWithoutItem(
             BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!player.isSecondaryUseActive() || !(level.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity pod))
-            return Organs.openScreen(level, pos, player).result();
-        Optional<CapsuleTree> tree = Stems.of(pod);
-        if (tree.isEmpty()) return InteractionResult.PASS;
-        int slot = tree.get().slotOf(pod);
-        ItemStack taken = tree.get().extract(slot, Integer.MAX_VALUE, level.isClientSide);
-        if (taken.isEmpty()) return InteractionResult.PASS;
-        if (!level.isClientSide) player.getInventory().placeItemBackInInventory(taken);
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return Organs.openScreen(level, pos, player).result();
     }
 }

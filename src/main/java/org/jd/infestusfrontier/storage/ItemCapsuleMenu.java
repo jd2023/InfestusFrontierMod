@@ -20,8 +20,8 @@ import org.jd.infestusfrontier.foundation.menu.OrganMenu;
 import org.jd.infestusfrontier.ui.Sheet;
 
 /**
- * Sixteen compartments of one tree's store, opened from any of its cells or pods, or of one pod on its own. Each page
- * has a fresh menu id and an immutable slot mapping.
+ * Sixteen compartments of one tree's store, opened from any of its stem cells, with the root's bone meal toward its
+ * next growth. Each page has a fresh menu id and an immutable slot mapping. A pod opens {@link ItemCapsulePodMenu}.
  */
 public final class ItemCapsuleMenu extends OrganMenu {
     public static final int PAGE_SIZE = 16;
@@ -29,9 +29,10 @@ public final class ItemCapsuleMenu extends OrganMenu {
     public static final int NEXT = 1;
     static final int COLUMNS = 8;
     static final int PITCH = 20;
-    static final int STRIPS = 2;
+    static final int STRIPS = 3;
     static final int GRID_Y = 36;
     static final int BUTTON_Y = 82;
+    static final int GROWTH_Y = BUTTON_Y + 22;
     private final Page page;
     private final long pageAfter;
 
@@ -61,10 +62,16 @@ public final class ItemCapsuleMenu extends OrganMenu {
                 access,
                 page.organ().map(organ -> organ.getBlockState().getBlock()).orElse(StorageModule.ITEM_CAPSULE.get()),
                 page.organ().isEmpty()
-                        ? new SimpleContainerData(2)
+                        ? new SimpleContainerData(4)
                         : reading(
                                 () -> page.usable().map(CapsuleTree::slots).orElse(0),
-                                () -> page.usable().map(CapsuleTree::used).orElse(0)));
+                                () -> page.usable().map(CapsuleTree::used).orElse(0),
+                                () -> rootOf(page)
+                                        .map(CapsuleStemBlockEntity::fed)
+                                        .orElse(0),
+                                () -> rootOf(page)
+                                        .map(root -> root.nextCost(root.getLevel()))
+                                        .orElse(0)));
         this.page = page;
         pageAfter = inventory.player.level().getGameTime() + 10;
         ItemStack[] copy = new ItemStack[PAGE_SIZE];
@@ -119,6 +126,15 @@ public final class ItemCapsuleMenu extends OrganMenu {
                     Sheet.LEFT_X + 1 + slot % COLUMNS * PITCH,
                     GRID_Y + 1 + slot / COLUMNS * PITCH));
         addPlayer(inventory, STRIPS);
+    }
+
+    /** The root of the tree the page was opened from, while the organ is a standing stem cell. */
+    private static Optional<CapsuleStemBlockEntity> rootOf(Page page) {
+        return page.organ()
+                .filter(CapsuleStemBlockEntity.class::isInstance)
+                .map(CapsuleStemBlockEntity.class::cast)
+                .filter(cell -> cell.getLevel() != null)
+                .flatMap(CapsuleStemBlockEntity::root);
     }
 
     /** The server rechecks the standing tree and refuses page changes while anything is on the cursor. */
@@ -206,6 +222,16 @@ public final class ItemCapsuleMenu extends OrganMenu {
 
     int used() {
         return synced(1);
+    }
+
+    /** Bone meal the root holds toward its next growth. */
+    int fed() {
+        return synced(2);
+    }
+
+    /** What the next growth costs; 0 when nothing is missing and nothing more fits. */
+    int cost() {
+        return synced(3);
     }
 
     int page() {

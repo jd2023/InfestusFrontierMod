@@ -191,6 +191,9 @@ public final class StorageModule {
                             .build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<ItemCapsuleMenu>> ITEM_CAPSULE_MENU =
             MENUS.register("item_capsule", () -> IMenuTypeExtension.create(ItemCapsuleMenu::new));
+    /** One pod's own screen, opened from the pod; cells open the tree's. */
+    public static final DeferredHolder<MenuType<?>, MenuType<ItemCapsulePodMenu>> ITEM_CAPSULE_POD_MENU =
+            MENUS.register("item_capsule_pod", () -> IMenuTypeExtension.create(ItemCapsulePodMenu::new));
     /** Blocks a Reservoir cell may also stand on: pumps that fill it from below. */
     public static final TagKey<Block> RESERVOIR_SUPPORTS = TagKey.create(
             Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "reservoir_supports"));
@@ -253,6 +256,7 @@ public final class StorageModule {
                 event.register(BIOMASS_BLADDER_MENU.get(), BiomassBladderScreen::new);
                 event.register(RESERVOIR_CELL_MENU.get(), ReservoirCellScreen::new);
                 event.register(ITEM_CAPSULE_MENU.get(), ItemCapsuleScreen::new);
+                event.register(ITEM_CAPSULE_POD_MENU.get(), ItemCapsulePodScreen::new);
             });
             // one pocket in the socket on the pod's outer face, the icon over its count, at full grade: the socket
             // floor 4.5 px behind the front, 8 px wide; the body scales about its back, 13.5 px behind the front
