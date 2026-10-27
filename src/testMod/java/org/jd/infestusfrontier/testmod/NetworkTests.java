@@ -32,10 +32,13 @@ public final class NetworkTests {
         FluidStack fluid = BiomassFluids.of(Biomass.of(250));
         h.assertValueEqual(port.fill(fluid, IFluidHandler.FluidAction.SIMULATE), 250, "admitted simulated offer");
         int remaining = 0;
-        while (level.getCapability(Capabilities.FluidHandler.BLOCK, vein, Direction.WEST)
-                        .fill(fluid, IFluidHandler.FluidAction.SIMULATE)
-                > 0) remaining++;
-        h.assertValueEqual(remaining, 63, "simulation spent one shared admission");
+        while (remaining < 65 && port.fill(fluid, IFluidHandler.FluidAction.SIMULATE) > 0) remaining++;
+        h.assertValueEqual(remaining, 63, "each simulation on the retained handler spends admission");
+        h.assertValueEqual(
+                level.getCapability(Capabilities.FluidHandler.BLOCK, vein, Direction.WEST)
+                        .fill(fluid, IFluidHandler.FluidAction.SIMULATE),
+                0,
+                "a new handler shares the exhausted admission budget");
         h.assertValueEqual(
                 port.fill(fluid, IFluidHandler.FluidAction.EXECUTE),
                 250,
@@ -92,9 +95,33 @@ public final class NetworkTests {
                 .thenExecute(() -> {
                     h.assertValueEqual(port.fill(fluid, IFluidHandler.FluidAction.EXECUTE), 250, "first transfer");
                     level.getDataStorage().save();
+                    net.neoforged.neoforge.common.IOUtilities.waitUntilIOWorkerComplete();
                     for (int x = first + 1; x < last; x++) level.setChunkForced(x, z, false);
                 })
                 .thenWaitUntil(() -> h.assertFalse(level.hasChunkAt(start.east(64)), "middle unloaded"))
+                .thenExecute(() -> {
+                    var registries = level.registryAccess();
+                    var factory = new net.minecraft.world.level.saveddata.SavedData.Factory<>(
+                            () -> LogisticsModule.restoreNetworks(new net.minecraft.nbt.CompoundTag(), registries),
+                            LogisticsModule::restoreNetworks);
+                    var disk = new net.minecraft.world.level.storage.DimensionDataStorage(
+                            level.getServer()
+                                    .getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT)
+                                    .resolve("data")
+                                    .toFile(),
+                            level.getServer().getFixerUpper(),
+                            registries);
+                    var restored = disk.get(factory, "infestusfrontier_networks");
+                    h.assertTrue(restored != null, "topology was read from the saved dimension file");
+                    h.assertTrue(
+                            restored != level.getDataStorage().get(factory, "infestusfrontier_networks"),
+                            "restored topology has no in-memory graph from before the save");
+                    level.getDataStorage().set("infestusfrontier_networks", restored);
+                })
+                .thenWaitUntil(() -> h.assertValueEqual(
+                        port.fill(fluid, IFluidHandler.FluidAction.SIMULATE),
+                        250,
+                        "disk-restored connections rebuild across the unloaded middle"))
                 .thenExecute(() -> {
                     h.assertValueEqual(
                             port.fill(fluid, IFluidHandler.FluidAction.EXECUTE),

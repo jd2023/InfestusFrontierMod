@@ -150,19 +150,17 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
             level.scheduleTick(worldPosition, getBlockState().getBlock(), PULSE_TICKS);
     }
 
-    /** One pulse: recover a remainder, then perform one new transfer. Called from the block's scheduled tick. */
+    /** One pulse recovers a remainder or performs one new transfer. */
     void pulse() {
         if (level == null || level.isClientSide || unreadable.isPresent()) return;
         boolean output = mode().gives();
         if (!output && remainder.isEmpty()) return;
-        long now = level.getGameTime();
         if (!NetworkWork.take((ServerLevel) level)) {
             schedule(RETRY_TICKS + 1);
             return;
         }
         offers = OFFERS;
-        boolean worked = deliverRemainder();
-        if (output && remainder.isEmpty()) worked |= extract();
+        boolean worked = remainder.isEmpty() ? output && extract() : deliverRemainder();
         if (output || !remainder.isEmpty()) schedule(worked ? PULSE_TICKS : RETRY_TICKS);
     }
 

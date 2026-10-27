@@ -58,6 +58,7 @@ final class NetworkFluid implements IFluidHandler {
                     && p.tick() == now
                     && p.fill() == fill
                     && (requested.isEmpty() || FluidStack.isSameFluidSameComponents(requested, p.fluid())));
+            if (offer.isPresent() && action.simulate() && !NetworkWork.take(level)) return FluidStack.EMPTY;
             if (offer.isEmpty()) {
                 prepared = Optional.empty();
                 if (!NetworkWork.take(level)) return FluidStack.EMPTY;

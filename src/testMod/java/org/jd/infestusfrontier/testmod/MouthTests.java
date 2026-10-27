@@ -255,7 +255,11 @@ public final class MouthTests {
         });
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "mouth_remainder",
+            timeoutTicks = 200)
     public static void aRetainedRemainderSurvivesReloadAndIsDeliveredOnce(GameTestHelper h) {
         store(h, cell(1), new ItemStack(Items.BONE, 8));
         store(h, cell(8));
@@ -269,6 +273,10 @@ public final class MouthTests {
                 BlockEntity.loadStatic(h.absolutePos(cell(1)), h.getBlockState(cell(1)), saved, registries);
         h.getLevel().removeBlockEntity(h.absolutePos(cell(1)));
         h.getLevel().setBlockEntity(restored);
+        BlockPos sender = h.absolutePos(cell(1));
+        h.getLevel().getBlockState(sender).tick(h.getLevel(), sender, h.getLevel().random);
+        h.assertValueEqual(count(h, cell(8), Items.BONE), 8, "one pulse delivers only the remainder");
+        h.assertValueEqual(count(h, cell(1), Items.BONE), 8, "fresh extraction waits for another pulse");
         h.runAfterDelay(100, () -> {
             h.assertValueEqual(count(h, cell(8), Items.BONE), 16, "remainder and source delivered exactly once");
             h.assertValueEqual(count(h, cell(1), Items.BONE), 0, "source empty");
