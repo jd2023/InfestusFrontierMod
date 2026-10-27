@@ -121,8 +121,8 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I014 | Living Hood / Thorax / Legwraps / Treads | Awaken the corresponding existing dormant piece; empty fuel, preserved wear percentage | Four persistent equipment identities; full material and mutation tree in Armor Evolution. Frame variants are item data, not dozens of interchangeable crafting products. |
 | I015 | Dormant Pick / Hatchet / Spade / Hoe | Craft in the vanilla tool patterns, Bone Plates for heads and sticks for handles | Manual work: digs what a stone tool digs, 96 blocks before it is gone, mended with Bone Plates on an anvil. The Cradle wakes one with a Spore Culture and 100 BU, as it wakes armor. |
 | I016 | Living Pick / Hatchet / Spade / Hoe | Awaken the corresponding I015 tool; as worn as it went in | Persistent tool counterparts: the same harvest tier as stone until mineral fusion, 256 blocks, a 40 BU reserve filled at a Bladder, and self-mending from it, four points a second, one BU each; no material repair on an anvil. One permanent branch by a graft in the Cradle (Living tools below); further branches remain proposed. |
-| I017 | Dormant Fang | 2 Bone Plates + 1 stick → 1 | Basic weak melee weapon; same cradle awakening route as tools. |
-| I018 | Living Fang | Awaken I017 | Base for separately designed piercing/control weapon branches. |
+| I017 | Dormant Fang | 2 Bone Plates + 1 stick → 1 | Basic weak melee weapon: a wooden sword's bite (2 + the bone tier's 1), 96 strikes, mended with Bone Plates on an anvil; the same Cradle awakening as the tools. |
+| I018 | Living Fang | Awaken I017; as worn as it went in | 2 + 1.5 bite, 256 strikes, the tools' 40 BU reserve and self-mending. Base for the weapon branches: Grasping below is the first; piercing and the I038 bodies remain separately designed. |
 | I050 | Skeletal Graft | Activation Cyst: 1 Bone Plate + 1 Binder + 25 BU → 1 | Hardens one Living Wall into a Ribbed Wall, or a Sphincter Door into a Clenched Door; later reinforces one cell or permitted organ skeleton. The plate is not duplicated. |
 | I131 | Calcifying Graft | Activation Cyst: 4 Bone Plates + 1 Binder + 200 BU → 1 | Hardens one Ribbed Wall into a Calcified Wall, which no explosion breaks, or a Clenched Door into a Calcified Door. |
 | I051 | Mutation Graft | Host rank I at T0; genetic/higher grafts from T2. Typed family under “Mutation grafts” below. | Installed once; target, equipment slot and rank are explicit. An installed armor graft cannot be extracted. |
@@ -157,6 +157,7 @@ One branch per tool, taken once in the Awakening Cradle and never removed; the t
 | Branch | Preparation in the Cradle | Effect |
 |---|---|---|
 | Contractile | Living Pick, Hatchet or Spade + 1 Contractile Fiber + 200 BU, 30 s | Each block the tool mines, it also breaks the eight round it on the struck face, those it is the right tool for and only as the player would break them, for 2 BU each from its reserve; dry, it mines one block. A hoe takes no branch. |
+| Grasping | Living Fang + 1 Contractile Fiber + 200 BU, 30 s | Each hit grips its target: Slowness II for three seconds, for 2 BU from the reserve; dry, the fang only cuts. |
 
 ### Temporary construction tool
 

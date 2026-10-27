@@ -7,6 +7,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +26,8 @@ import org.jd.infestusfrontier.equipment.api.Reserves;
 /**
  * What every living tool does besides its vanilla work: it shows its reserve and its branch, mends itself from the
  * reserve once a second while a player carries it, and, grafted Contractile, breaks the blocks around the one it
- * mines through the player's own block breaking, each paid from the reserve.
+ * mines through the player's own block breaking, each paid from the reserve; a fang grafted Grasping grips what it
+ * hits.
  */
 final class LivingTools {
     /** A carried tool mends on the ticks that are a multiple of this. */
@@ -89,6 +92,20 @@ final class LivingTools {
         } finally {
             SPREADING.set(false);
         }
+    }
+
+    /**
+     * A Grasping fang that has hurt {@code target} grips it: Slowness {@link LivingTool#GRIP_LEVEL} for
+     * {@link LivingTool#GRIP_TICKS} ticks, {@link LivingTool#GRIP_COST} BU from the reserve; a dry fang only cuts.
+     */
+    static void grip(ItemStack stack, LivingEntity target) {
+        if (target.level().isClientSide || stack.get(EquipmentModule.TOOL_MUTATION.get()) != ToolMutation.GRASPING)
+            return;
+        Optional<BiomassTank> reserve = Reserves.of(stack);
+        if (reserve.isEmpty() || !LivingTool.grips(reserve.get().stored().units())) return;
+        if (!spend(stack, Biomass.of(LivingTool.GRIP_COST))) return;
+        target.addEffect(
+                new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, LivingTool.GRIP_TICKS, LivingTool.GRIP_LEVEL));
     }
 
     /** Takes {@code amount} from the tool's reserve; false, taking nothing, when it has less. */

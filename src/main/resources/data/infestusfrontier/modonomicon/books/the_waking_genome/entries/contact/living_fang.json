@@ -1,0 +1,53 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.living_fang.name",
+  "description": "entry.infestusfrontier.contact.living_fang.description",
+  "icon": "infestusfrontier:living_fang",
+  "x": 3,
+  "y": 3,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/living_tools"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/dormant_fang"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.living_fang.name",
+      "text": "entry.infestusfrontier.contact.living_fang.use"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:dormant_fang",
+      "text": "entry.infestusfrontier.contact.living_fang.craft"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:awakening/fang",
+      "title1": "item.infestusfrontier.living_fang"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.living_fang.grasping_title",
+      "text": "entry.infestusfrontier.contact.living_fang.grasping"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:awakening/grasping_fang",
+      "title1": "item.infestusfrontier.living_tool.mutation.grasping_title"
+    }
+  ]
+}

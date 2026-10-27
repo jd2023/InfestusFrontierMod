@@ -17,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.SoundType;
@@ -49,7 +50,7 @@ import org.slf4j.Logger;
  * Cradle awakens each into its awakened form (G1), which carries a {@link #RESERVE} of biomass. The Fuel Papilla
  * fills that reserve from the ground. Four dormant tools are crafted from Bone Plates (ITEM_CATALOG I015); the Cradle
  * wakes each into its living form (I016), which carries the same reserve, mends from it and takes one
- * {@link #TOOL_MUTATION} by a graft in the Cradle.
+ * {@link #TOOL_MUTATION} by a graft in the Cradle; the Dormant and Living Fang (I017, I018) are the same for a blade.
  */
 public final class EquipmentModule {
     static final Logger LOGGER = LogUtils.getLogger();
@@ -150,12 +151,21 @@ public final class EquipmentModule {
     public static final DeferredItem<HoeItem> LIVING_HOE = ITEMS.register(
             "living_hoe", () -> new LivingHoeItem(living(HoeItem.createAttributes(LivingTiers.LIVING, -1.0F, -2.0F))));
 
-    /** The dormant tools in the catalog's order. */
+    // the fangs: a weak blade, a wooden sword's bite when dormant
+    public static final DeferredItem<SwordItem> DORMANT_FANG = ITEMS.register(
+            "dormant_fang",
+            () -> new SwordItem(
+                    LivingTiers.DORMANT,
+                    new Item.Properties().attributes(SwordItem.createAttributes(LivingTiers.DORMANT, 2, -2.4F))));
+    public static final DeferredItem<SwordItem> LIVING_FANG = ITEMS.register(
+            "living_fang", () -> new LivingFangItem(living(SwordItem.createAttributes(LivingTiers.LIVING, 2, -2.4F))));
+
+    /** The dormant tools and the fang in the catalog's order. */
     public static final List<DeferredItem<? extends Item>> DORMANT_TOOLS =
-            List.of(DORMANT_PICK, DORMANT_HATCHET, DORMANT_SPADE, DORMANT_HOE);
-    /** The living tools in the same order. */
+            List.of(DORMANT_PICK, DORMANT_HATCHET, DORMANT_SPADE, DORMANT_HOE, DORMANT_FANG);
+    /** The living tools and the fang in the same order. */
     public static final List<DeferredItem<? extends Item>> LIVING_TOOLS =
-            List.of(LIVING_PICK, LIVING_HATCHET, LIVING_SPADE, LIVING_HOE);
+            List.of(LIVING_PICK, LIVING_HATCHET, LIVING_SPADE, LIVING_HOE, LIVING_FANG);
 
     private EquipmentModule() {}
 
@@ -249,7 +259,8 @@ public final class EquipmentModule {
                     LIVING_PICK,
                     LIVING_HATCHET,
                     LIVING_SPADE,
-                    LIVING_HOE);
+                    LIVING_HOE,
+                    LIVING_FANG);
             event.registerBlockEntity(BiomassCapabilities.BLOCK, FUEL_PAPILLA_ENTITY.get(), (papilla, side) -> papilla);
             event.registerBlockEntity(
                     Capabilities.FluidHandler.BLOCK,

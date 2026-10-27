@@ -6,12 +6,14 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 
 /**
- * The permanent branch a living tool has taken (ITEM_CATALOG I016): one per tool, installed by a graft in the Cradle,
- * never removed. Carried on the item as {@link EquipmentModule#TOOL_MUTATION}.
+ * The permanent branch a living tool or fang has taken (ITEM_CATALOG I016, I018): one per item, installed by a
+ * graft in the Cradle, never removed. Carried on the item as {@link EquipmentModule#TOOL_MUTATION}.
  */
 public enum ToolMutation implements StringRepresentable {
-    /** Contractile Fiber: the tool breaks the blocks around the one it mines, {@code SPREAD_COST} BU each. */
-    CONTRACTILE("contractile");
+    /** Contractile Fiber on a tool: it breaks the blocks around the one it mines, {@code SPREAD_COST} BU each. */
+    CONTRACTILE("contractile"),
+    /** Contractile Fiber on a fang: a hit grips its target, slowing it, {@code GRIP_COST} BU each. */
+    GRASPING("grasping");
 
     public static final Codec<ToolMutation> CODEC = StringRepresentable.fromEnum(ToolMutation::values);
     public static final StreamCodec<RegistryFriendlyByteBuf, ToolMutation> STREAM_CODEC =

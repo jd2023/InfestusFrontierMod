@@ -16,12 +16,23 @@ public final class LivingTool {
     public static final int SPREAD = 8;
     /** BU a Contractile tool pays for each block it breaks beside the mined one. */
     public static final int SPREAD_COST = 2;
+    /** BU a Grasping fang pays for each hit that grips. */
+    public static final int GRIP_COST = 2;
+    /** Ticks a gripped target stays slowed. */
+    public static final int GRIP_TICKS = 60;
+    /** The slowness level of a grip: II, as a vanilla effect counts from 0. */
+    public static final int GRIP_LEVEL = 1;
 
     private LivingTool() {}
 
     /** The points a tool worn by {@code damage} mends this second from a reserve of {@code stored} BU. */
     public static int mend(int damage, int stored) {
         return Math.max(0, Math.min(MEND_PER_SECOND, Math.min(damage, stored)));
+    }
+
+    /** Whether a reserve of {@code stored} BU pays for one grip. */
+    public static boolean grips(int stored) {
+        return stored >= GRIP_COST;
     }
 
     /** How many blocks beside the mined one a reserve of {@code stored} BU pays for, at most {@link #SPREAD}. */

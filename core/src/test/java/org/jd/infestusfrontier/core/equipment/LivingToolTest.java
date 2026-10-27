@@ -26,6 +26,14 @@ class LivingToolTest {
     }
 
     @Test
+    void aGraspingFangGripsWhileItCanPay() {
+        assertEquals(false, LivingTool.grips(0));
+        assertEquals(false, LivingTool.grips(1));
+        assertEquals(true, LivingTool.grips(2));
+        assertEquals(true, LivingTool.grips(40));
+    }
+
+    @Test
     void aLivingToolOutlastsADormantOne() {
         assertEquals(96, LivingTool.DORMANT_USES);
         assertEquals(256, LivingTool.LIVING_USES);

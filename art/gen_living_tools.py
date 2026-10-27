@@ -1,4 +1,5 @@
-"""Icons for the eight bone tools (ITEM_CATALOG I015, I016): Dormant and Living Pick, Hatchet, Spade and Hoe.
+"""Icons for the bone tools and the fang (ITEM_CATALOG I015 to I018): Dormant and Living Pick, Hatchet, Spade, Hoe and
+Fang.
 
     python3 art/gen_living_tools.py
 
@@ -34,7 +35,10 @@ HEADS = {
     'hatchet': [(-1.6, -0.4), (0.6, -0.4), (2.0, -3.6), (0.4, -4.8), (-2.3, -4.0), (-1.9, -1.4)],
     'spade': [(-1.3, -2.3), (1.6, -2.3), (3.3, 0.0), (1.6, 2.3), (-1.3, 2.3)],
     'hoe': [(-0.6, -0.7), (1.1, -0.7), (1.1, 0.7), (1.3, 0.7), (1.3, 4.6), (0.1, 4.6), (0.1, 0.7), (-0.6, 0.7)],
+    # a long curved tooth along the handle, hooked toward its left, with a bone guard across the top of the grip
+    'fang': [(-0.8, -1.2), (0.4, -1.2), (2.4, -1.4), (4.2, -1.0), (5.4, 0.2), (4.6, 0.6), (3.0, 0.2), (1.2, 0.3), (-0.8, 0.5)],
 }
+GUARDS = {'fang': [(-1.0, -1.8), (-0.2, -1.8), (-0.2, 1.4), (-1.0, 1.4)]}  # the guard across the grip
 POLLS = {'hatchet': [(-1.5, -0.4), (0.5, -0.4), (0.5, 1.5), (-1.5, 1.5)]}  # the hatchet's flat back
 
 
@@ -101,6 +105,8 @@ def icon(tool, living):
     draw.polygon(scaled([to_xy(u, v) for u, v in HEADS[tool]]), fill=255)
     if tool in POLLS:
         draw.polygon(scaled([to_xy(u, v) for u, v in POLLS[tool]]), fill=255)
+    if tool in GUARDS:
+        draw.polygon(scaled([to_xy(u, v) for u, v in GUARDS[tool]]), fill=255)
     layers = [shade(handle, SINEW if living else STICK), shade(head_mask, BONE, FLUSH if living else None)]
     art = Image.new('RGBA', (big, big), (0, 0, 0, 0))
     for layer in layers:
@@ -145,7 +151,7 @@ def main():
     for tool in HEADS:
         for state, living in (('dormant', False), ('living', True)):
             icon(tool, living).save(OUT / f'{state}_{tool}.png')
-    print('living tools: 8 icons')
+    print('living tools: 10 icons')
 
 
 if __name__ == '__main__':

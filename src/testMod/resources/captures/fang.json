@@ -1,0 +1,38 @@
+{
+  "commands": [
+    "fill -8 -60 -2 12 -54 10 air",
+    "fill -8 -61 -2 12 -61 10 grass_block",
+    "fill -2 -61 1 4 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "kill @e[type=item]",
+    "difficulty easy",
+    "kill @e[type=husk,tag=visual_fang]",
+    "summon husk 1 -60 4 {Tags:[\"visual_fang\"],NoAI:1b,PersistenceRequired:1b,Silent:1b,Rotation:[180f,0f],active_effects:[{id:\"minecraft:slowness\",amplifier:1b,duration:600,show_particles:1b}]}",
+    "item replace entity @s hotbar.0 with infestusfrontier:dormant_fang",
+    "item replace entity @s hotbar.1 with infestusfrontier:living_fang",
+    "item replace entity @s hotbar.8 with infestusfrontier:living_fang[infestusfrontier:tool_mutation=\"grasping\",infestusfrontier:biomass_reserve={stored:30,reserved:0,capacity:40}]"
+  ],
+  "views": [
+    {
+      "name": "hotbar",
+      "x": 1.5,
+      "y": -60,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:dormant_fang",
+        "infestusfrontier:living_fang"
+      ]
+    },
+    {
+      "name": "held",
+      "x": 1.5,
+      "y": -60,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true
+    }
+  ]
+}
