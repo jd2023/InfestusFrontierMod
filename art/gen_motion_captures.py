@@ -8,7 +8,8 @@ from pathlib import Path
 
 OUT = Path('src/testMod/resources/captures')
 MODELS = ('culture_bowl', 'digestive_sac', 'membrane_rack', 'bone_loom', 'awakening_cradle',
-          'activation_cyst', 'planting_proboscis', 'harvest_corolla', 'compost_gland', 'seed_pouch', 'item_capsule')
+          'activation_cyst', 'planting_proboscis', 'harvest_corolla', 'compost_gland', 'seed_pouch', 'item_capsule',
+          'spine_sentry')
 
 
 # Views an organ's identity pass added to its scene, kept here so regenerating the scenes never loses them: a close

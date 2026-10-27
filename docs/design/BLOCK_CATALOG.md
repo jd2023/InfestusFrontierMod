@@ -766,10 +766,10 @@ cells use the strongest funded effect, not summed strength or double charging.
 - **Growth:** Rabbit-genome graft favors recovery after movement; livestock genomes permit controlled pen care. It heals injuries; it neither produces samples nor awards genome coverage.
 
 ### T2-30 — Spine Sentry
-- **Does:** A short-range ground-defense organ. It guards an approach with aimed physical spines rather than serving as another flying-target bloom.
-- **Input → output:** Bones or grown Bone Plates + biomass → fired spines and damage to permitted visible targets.
+- **Does:** A short-range ground-defense organ, the colony's spine crawler: a rooted lash on a flesh mound that swings round and strikes the nearest hostile it can see within six blocks (three up or down), three hearts a strike, once a second. Players, villagers and animals are never struck. Rooted on a foundation like every organ.
+- **Input → output:** Biomass, 10 BU a strike from a 1000 BU tank fed by bucket, vein or Junction → strikes; what a creature it kills drops goes into its eight wells before it can fall, and only what does not fit falls. Hoppers, output Mouths and Yield Lobes take the wells; nothing fills them. Dry, or with no empty well left, it rests and looks again every two seconds; biomass arriving wakes it.
 - **Create:** 1 Organ Bud + 1 crossbow + 2 Bone Plates.
-- **Growth:** Choose reload rate or biomass economy. Cactus mutation adds contact deterrence; skeleton DNA adds a piercing specialization. Shot material is not recovered as profitable automatic drops.
+- **Growth:** Choose reach or biomass economy. Cactus mutation adds contact deterrence; skeleton DNA adds a piercing specialization. A kill by the organ gives no experience and none of the drops that only a player's kill gives.
 
 ### T2-31 — Fusion Chrysalis
 - **Does:** Fuses prepared signatures, carriers and stock into one target-specific graft before installation. It cannot replace a chamber's treatment space.

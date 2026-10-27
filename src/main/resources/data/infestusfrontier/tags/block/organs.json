@@ -19,6 +19,7 @@
     "infestusfrontier:sensor_polyp",
     "infestusfrontier:feeding_lobe",
     "infestusfrontier:yield_lobe",
-    "infestusfrontier:filter_valve"
+    "infestusfrontier:filter_valve",
+    "infestusfrontier:spine_sentry"
   ]
 }

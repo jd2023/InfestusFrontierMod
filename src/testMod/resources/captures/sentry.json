@@ -1,0 +1,67 @@
+{
+  "commands": [
+    "fill -8 -60 -2 12 -54 10 air",
+    "fill -8 -61 -2 12 -61 10 grass_block",
+    "fill -2 -61 1 4 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "kill @e[type=item]",
+    "difficulty easy",
+    "kill @e[type=zoglin,tag=visual_sentry]",
+    "setblock 1 -60 3 infestusfrontier:spine_sentry[working=true]{tank:{stored:800,reserved:0,capacity:1000},items:{Size:8,Items:[{Slot:0,id:\"minecraft:rotten_flesh\",count:7},{Slot:1,id:\"minecraft:bone\",count:3}]}}",
+    "summon zoglin 4 -60 3 {Tags:[\"visual_sentry\"],NoAI:1b,PersistenceRequired:1b,Silent:1b,Rotation:[90f,0f]}",
+    "give @s infestusfrontier:spine_sentry 1"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 1.5,
+      "y": -60,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 20,
+      "frames": 12,
+      "frameTicks": 4
+    },
+    {
+      "name": "corner",
+      "x": -1.5,
+      "y": -59.5,
+      "z": 0.5,
+      "yaw": -40,
+      "pitch": 25
+    },
+    {
+      "name": "close",
+      "x": 1.5,
+      "y": -59.6,
+      "z": 1.2,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "hotbar",
+      "x": 1.5,
+      "y": -60,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:spine_sentry"
+      ]
+    },
+    {
+      "name": "screen",
+      "x": 1.5,
+      "y": -60,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 30,
+      "gui": true,
+      "use": [
+        1,
+        -60,
+        3
+      ]
+    }
+  ]
+}

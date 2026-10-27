@@ -15,6 +15,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.control.ControlModule;
 import org.jd.infestusfrontier.cultivation.CultivationModule;
+import org.jd.infestusfrontier.defense.DefenseModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.equipment.EquipmentModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
@@ -107,6 +108,7 @@ public final class DiscoveryModule {
                                 EquipmentModule.AWAKENED_TREADS)) output.accept(piece.get());
                         for (var tool : EquipmentModule.DORMANT_TOOLS) output.accept(tool.get());
                         for (var tool : EquipmentModule.LIVING_TOOLS) output.accept(tool.get());
+                        output.accept(DefenseModule.SPINE_SENTRY_ITEM.get());
                         output.accept(InteractionModule.SYNAPTIC_PROBE.get());
                         output.accept(InteractionModule.SURGICAL_BLADE.get());
                     })

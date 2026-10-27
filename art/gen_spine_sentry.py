@@ -1,11 +1,11 @@
 """Spine Sentry (BLOCK_CATALOG T2-30): a rooted lash. A muscular flesh mound on a root foot carries a bone socket from
 which a jointed spine rises, three plated segments and a black thorn, coiled upright like a cobra. Idle it sways;
-working it sweeps round the block, whipping down at what stands near, once a pulse.
+working it swings wide from side to side, whipping down at what stands near, once a pulse.
 
     python3 art/gen_spine_sentry.py
 
-The spine has no aim: the sweep turns a full circle each working cycle while the segments lash out and back, so from
-any side the organ is seen striking. Front is north (-Z).
+The spine has no aim: the sweep swings a hundred degrees each way each working cycle while the segments lash out and
+back, so from most sides the organ is seen striking. Front is north (-Z).
 
 Rotation about x in the file: positive tips a part's top toward the front (north), as art/geo_audit.py poses it.
 """
@@ -96,8 +96,8 @@ def animations():
         return sampled(WORKING, 0.05, lambda t: [COIL[part] + (LASH[part] - COIL[part]) * squeeze(t, WORKING, lag), 0, 0])
 
     working = {
-        # a full turn a cycle; the rotation ends at 360, where the loop closes
-        'sweep': {'rotation': sampled(WORKING, 0.05, lambda t: [0, 360 * (t / WORKING), 0])},
+        # a wide swing from side to side, a hundred degrees each way, back where it started each cycle
+        'sweep': {'rotation': sampled(WORKING, 0.05, lambda t: [0, 100 * wave(t, WORKING), 0])},
         'seg_a': {'rotation': lash('seg_a')},
         'seg_b': {'rotation': lash('seg_b')},
         'seg_c': {'rotation': lash('seg_c')},
