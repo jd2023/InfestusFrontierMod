@@ -331,7 +331,7 @@
   "tooltip.infestusfrontier.item_capsule.held": "%s × %s",
   "entry.infestusfrontier.circulation.item_capsule.name": "Item Capsule",
   "entry.infestusfrontier.circulation.item_capsule.description": "A stem that grows pods, each a store of one kind",
-  "entry.infestusfrontier.circulation.item_capsule.use": "Plant a Capsule Stem on Living Substrate and bone meal it: the stem rises, forks once and grows pods on its trunk, two to four a tier, up to six tiers and sixteen pods. A pod holds one kind of item, eight stacks when young; its face shows the kind and the count. Any cell or pod opens the whole stem; hoppers, pipes and Mouths at the root reach every pod, filling a kind's own pod before an empty one. A hand with items fills a pod, a sneaking empty hand takes a stack out.",
+  "entry.infestusfrontier.circulation.item_capsule.use": "Plant a Capsule Stem on Living Substrate or a ground organ and bone meal it: the stem rises, forks once and grows pods on its trunk, two to four a tier, up to six tiers and sixteen pods. A pod holds one kind of item, eight stacks when young; its face shows the kind and the count. Any cell or pod opens the whole stem; hoppers, pipes and Mouths at the root reach every pod, filling a kind's own pod before an empty one. A hand with items fills a pod, a sneaking empty hand takes a stack out.",
   "entry.infestusfrontier.circulation.item_capsule.craft": "A chest, two Membrane Sheets and a Spore Culture make a stem. Pods grow; none is crafted.",
   "gui.infestusfrontier.item_capsule.previous": "Previous",
   "gui.infestusfrontier.item_capsule.next": "Next",

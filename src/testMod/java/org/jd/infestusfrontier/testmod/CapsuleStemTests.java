@@ -68,8 +68,9 @@ import org.jd.infestusfrontier.storage.api.ItemStore;
 /**
  * Capsule Stems: a planted root grows trunk cells and pods from bone meal, one growth a bone meal, never where
  * nothing fits; a tree is one store reached from any cell or pod, filling a kind's own pod before an empty one; a
- * broken cell orphans the pods above it until bone meal regrows it in place; a broken root kills the stem and leaves
- * the pods standing; a broken pod carries its stock and a replanted one rejoins; grafts grow a pod's grade; saves
+ * broken cell orphans the pods above it until bone meal regrows it in place; a broken root kills the stem, each
+ * dying cell shedding its pods as items; a root plants only on a foundation and dies with it; a broken pod carries
+ * its stock and a replanted one rejoins; grafts grow a pod's grade; saves
  * keep plans and stock past a stack and unreadable ones keep their bytes; Mouths and the Sensor Polyp read the whole
  * tree; the screen moves a stack at a time. Roots stand at (8, 2, 8).
  */
