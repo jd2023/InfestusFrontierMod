@@ -10,7 +10,6 @@ import net.minecraft.gametest.framework.BeforeBatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestSequence;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -369,11 +368,10 @@ public final class M3RouteTests {
             LOGGER.info("INFESTUS_M3_DONE start={} end={} gained={}", start, last, last - start);
         }
 
-        /** Every biomass the base holds: Reservoir, Sac, organs, pump and vein packets. */
+        /** Every biomass the base holds: Reservoir, Sac, organs and pump. */
         private int total() {
             int sum = reservoir();
             for (BlockPos pos : List.of(SAC, PLANTER_A, COROLLA, PLANTER_B, FURNACE, PUMP)) sum += stored(pos);
-            for (BlockPos vein : BIOMASS_VEINS) sum += stored(vein);
             return sum;
         }
 
@@ -397,10 +395,9 @@ public final class M3RouteTests {
             IItemHandler corolla = items(h, COROLLA);
             for (int slot = 0; slot < corolla.getSlots(); slot++)
                 if (corolla.getStackInSlot(slot).is(Items.WHEAT)) return false;
-            return h.getBlockEntity(LOBE.below())
+            return !h.getBlockEntity(LOBE.below())
                     .saveWithoutMetadata(h.getLevel().registryAccess())
-                    .getList("packets", Tag.TAG_COMPOUND)
-                    .isEmpty();
+                    .contains("remainder");
         }
 
         private int standing() {

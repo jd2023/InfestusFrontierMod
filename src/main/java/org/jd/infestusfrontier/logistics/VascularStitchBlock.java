@@ -25,8 +25,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -132,24 +130,6 @@ public final class VascularStitchBlock extends Block {
         return state;
     }
 
-    /** The fluid side of an end: a passage to the vein cell at the other end. Null on every other face. */
-    static @Nullable IFluidHandler fluid(Level level, BlockPos pos, BlockState state, @Nullable Direction side) {
-        Carrier carrier = state.getValue(Routes.CARRIER);
-        if (side == null || !carrier.isFluid() || !ends(state).contains(side)) return null;
-        return new Passage(carrier, () -> beyond(level, pos, side));
-    }
-
-    /** The handler a fill entering the stitch at {@code pos} through the end {@code entry} reaches at the other end. */
-    private static @Nullable IFluidHandler beyond(Level level, BlockPos pos, Direction entry) {
-        if (!level.hasChunkAt(pos)) return null;
-        BlockState state = level.getBlockState(pos);
-        if (!(state.getBlock() instanceof VascularStitchBlock) || !ends(state).contains(entry)) return null;
-        Direction out = entry == vertical(state) ? state.getValue(FACING) : vertical(state);
-        BlockPos far = pos.relative(out);
-        if (!level.hasChunkAt(far) || !holds(level.getBlockState(far), state.getValue(Routes.CARRIER))) return null;
-        return level.getCapability(Capabilities.FluidHandler.BLOCK, far, out.getOpposite());
-    }
-
     @Override
     protected BlockState rotate(BlockState state, Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
@@ -203,17 +183,23 @@ public final class VascularStitchBlock extends Block {
 
     /** Its capabilities and its item network come and go with it; NeoForge's caches and the Mouths must hear. */
     @Override
+    protected void neighborChanged(
+            BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean moved) {
+        LogisticsModule.routesChanged(level, pos);
+    }
+
+    @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState old, boolean moved) {
         if (level.isClientSide || old == state) return;
         level.invalidateCapabilities(pos);
-        if (state.getValue(Routes.CARRIER) == Carrier.ITEM) LogisticsModule.routesChanged(level);
+        LogisticsModule.routesChanged(level, pos);
     }
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState next, boolean moved) {
         if (!level.isClientSide && !state.is(next.getBlock())) {
             level.invalidateCapabilities(pos);
-            if (state.getValue(Routes.CARRIER) == Carrier.ITEM) LogisticsModule.routesChanged(level);
+            LogisticsModule.routesChanged(level, pos);
         }
         super.onRemove(state, level, pos, next, moved);
     }

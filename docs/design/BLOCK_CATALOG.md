@@ -218,6 +218,193 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Create:** Grow in the Culture Bowl, or craft 1 Spore Culture + 2 rotten flesh + 1 bone meal.
 - **Growth:** Applying the remaining ingredients of a listed organ recipe is an alternative to crafting that organ as an item. Failed or incomplete grafts leave the bud intact.
 
+## Logistics requirements
+
+### Scope and acceptance
+
+Items, liquids (including biomass) and gases must support large automated bases
+without resource loss, duplication, hidden chunk loading or unbounded server work.
+These are target requirements, not a statement that the current implementation
+already meets them. Numerical values marked **proposed** need measurement and
+play testing. Gas support does not imply that ordinary Fluid Veins accept gases.
+
+Veins establish passive network access. Producers offer resources and consumers
+request them through loaded endpoints; storage owns every balance. Transfers are
+direct, without per-cell buffers or travel simulation. Layout establishes
+connectivity, not a fluid simulation. Distance-based throughput or loss is deferred.
+Optional long-distance links may later join separate local networks. Basic local automation needs
+neither helper creatures nor a relay organ. The shared engineering constraints are
+in [Engineering: performance limits](../../ENGINEERING.md#performance-limits).
+
+### Resource identity and ownership
+
+| Carrier | Required behavior |
+|---|---|
+| Items | Preserve item identity, count and every data component. Honor sided insertion/extraction, filters, priorities and source reserves. Unstackable items remain unstackable. |
+| Liquids | Preserve fluid identity, components and quantity. Biomass remains a distinct resource. Each tank holds one compatible liquid; passive passages hold none. A tank changes selection only after draining or recovering its previous contents. |
+| Gases | Use explicitly compatible sealed passages and vessels. Preserve gas identity and quantity plus any defined thermal state. Different gases, fresh steam, spent steam and condensate cannot silently substitute for one another. |
+
+- Every stored or in-flight resource has exactly one authoritative owner. Route
+  caches and reservations contain references and claims, never extra balances.
+- Check destination acceptance before extraction. Any extracted amount remains in
+  bounded, saved transit storage until delivered or explicitly recovered. A failed
+  or partial delivery keeps its remainder; an expired reservation cannot erase it.
+- Concurrent sources cannot overfill a destination or spend the same reserve twice.
+  Reservations must be bounded and released on completion, cancellation or invalidation.
+- Ordinary transfer conserves resources. Conversion, condensation, venting, fuel
+  use and thermal loss occur only under an explicit operating rule with an accounted
+  output or sink. Packet size, retries and reloads cannot alter that accounting.
+- Normal dismantling recovers contents exactly once through bounded storage or the
+  block's recovery behavior. Hazardous destruction follows the existing containment
+  rules. Invalid or old saves retain recoverable data and refuse unsafe operation.
+- Standard NeoForge handlers remain the interoperability boundary. Respect exposed
+  sides and contents; do not bypass another mod's storage rules. Unsupported media
+  or handler behavior must fail without guessing a conversion.
+
+### Routing, branches and loops
+
+- Routes follow connected, compatible, open faces. Floors, walls, ceilings and
+  stitches obey the same connectivity rules. Crossing passages remain independent.
+- Search visits each logical passage at most once per discovery. Cycles terminate;
+  recursive flood fills and searches proportional to the whole world are forbidden.
+- Route toward an eligible destination with capacity. A dead-end branch must not
+  permanently trap a packet merely because returning requires reversing direction.
+- A loop with no accepting consumer settles into a blocked state. It must not move
+  the same contents forever, generate pressure or earn organ growth counts.
+- Full loops and branches apply backpressure. Keep contents and stop admitting new
+  transfers when transit capacity is exhausted. No automatic deletion or venting.
+- Honor configured priority first; equal-priority destinations and competing sources
+  receive fair service. Resource priorities may deliberately starve lower priorities;
+  server scheduling must not starve a network merely because it ticks later.
+- Validate the current network version before committing delivery. Topology, port, filter,
+  compatibility and destination changes invalidate the affected routing decisions.
+- Exceeding a network limit must produce an explicit refusal. Do not silently use
+  a truncated search as though it described the complete network. Held resources
+  remain recoverable while the network is corrected.
+
+### Chunk boundaries, saves and restart
+
+- Crossing a chunk border requires no special block. Previously discovered passive
+  connections remain usable while their chunks are unloaded. Unknown unloaded
+  terrain cannot establish a connection. This deliberately trusts last-known topology.
+- Consumers, producers and storage must be loaded to participate. No resource
+  operation reaches an unloaded block entity, including another half of a chest or
+  an unloaded member of a storage body.
+- Transport creates no chunk tickets. Paid chunk loading remains a separate service
+  with its own limits and upkeep; a relay is not an implicit chunk loader.
+- Persist observed connections separately from inventory state. A topology cache is
+  never a second copy of storage. Bound observation count and all derived caches.
+- Loading a known chunk invalidates affected graph results. Revalidation reads its
+  current blocks only after they are available. Incomplete discovery retries within
+  the shared budget when previously unknown terrain becomes available.
+- Unloading an endpoint pauses its participation. A source keeps untransferred stock;
+  any undelivered remainder stays saved at its owning endpoint. Other loaded portions
+  of the network remain usable.
+- Loading resumes through the normal work budget. It does not replay missed pulses,
+  release an unlimited backlog or turn elapsed offline time into completed travel.
+- Use vanilla and NeoForge lifecycle and persistence mechanisms. Normal restart
+  conservation is required; abrupt-process crash behavior must be tested and its
+  recovery limits stated without claiming cross-chunk atomic saving the engine
+  does not provide.
+
+### Server work and limits
+
+- Share topology discovery within a network. Changes invalidate affected networks,
+  rather than every network in the dimension. Cache memory and lifecycle are bounded.
+- Separate network size from work per tick. Rebuilds are incremental and consume a
+  shared budget; invalid routes remain paused until a safe result is available.
+- Bound discovery visits, endpoint offers, inventory slot reads, transfers, retry
+  queues, reservations and saved transit contents. Include indirect handler work in
+  measurements. A cap on Mouth pulses alone does not bound all transport costs.
+- Items, liquids and gases all use shared admission budgets. Dimension budgets sit
+  beneath a server-wide ceiling so activity in more dimensions cannot bypass it.
+- Under overload, fairly defer work and expose the reason. Do not lose resources,
+  grow an unbounded queue or retry every rejected operation on every tick.
+- Empty passive conduits do no recurring server work. Blocked networks sleep until
+  a relevant change, with a bounded slow retry for external handlers that cannot
+  notify changes. Fluid circulation is not an idle behavior.
+- Client animation follows actual activity with bounded updates and particles.
+  Decorative pulses do not require extra server simulation or resource packets.
+
+| Limit | Target |
+|---|---|
+| Local network size | **Proposed:** 1,024 logical cells per connected local network, counting endpoints and each isolated crossing passage. Not a radius or a per-Mouth allowance. |
+| Long-distance span | **Proposed:** up to 256 connected artery blocks per link, measured along the actual path. |
+| Work admission | Before implementation, specify numeric per-tick server and dimension ceilings for discovery, offers and transfer work; validate them with the stress fixtures below. |
+| Transit and endpoint state | Before implementation, specify finite packet counts, item stack limits, liquid/gas capacities, reservation counts and expiry behavior for each transport organ. |
+| Configuration | Server-controlled values within tested bounds. Reducing a limit blocks new admission and preserves existing contents; it never truncates saved contents. |
+
+Do not raise network size by simply increasing a synchronous flood-fill constant.
+Transport upgrades can raise throughput or efficiency within the shared budget;
+they cannot remove the budget or duplicate capacity at a branch.
+
+### Gas, heat and pressure
+
+- Gas pressure is finite vessel/process state, not a world fluid-dynamics simulation.
+  Pressure, volume, throughput and server work limits are separate quantities.
+- Pumps and pressure sources consume their specified input. A booster cannot create
+  gas, thermal energy or useful pressure by circulating the same contents.
+- Every hot or pressurized route must meet the medium's seal, temperature and pressure
+  rating, including crossings, stitches, valves, buffers and relay endpoints.
+- Refuse incompatible input before extraction. Ordinary cold-liquid tissue cannot
+  become a gas or lava route merely because both use a fluid capability.
+- Losses and phase changes use bounded integer accounting with carried remainders.
+  Splitting a transfer into smaller packets must not avoid loss or manufacture output.
+- Condensate has finite retained capacity and a declared drain. A blocked drain
+  stops affected transfers; it does not discard water or refill the gas source.
+- Relief is an explicit configured operation, with visible discharged quantity.
+  Full output, unloading or server overload is not permission to vent contents.
+- Steam rates, pressure thresholds, condensate and rupture behavior remain owned by
+  [Thermal and spatial operating recipes](ITEM_CATALOG.md#thermal-and-spatial-operating-recipes).
+  This section does not introduce additional losses or replace those values.
+
+### Proposed long-distance transport
+
+**Vascular Relay** is a proposed organ, with recipe, progression and final name
+still to be defined. A pair connects separate local networks through a visible
+artery. It transfers between them without merging their discovery graphs.
+
+- Each endpoint has explicit intake/output configuration and a small saved buffer.
+  One link carries one configured carrier; liquids and gases obey medium isolation.
+- Artery cells are passive. Transit is owned by the endpoints, not by a ticking
+  storage buffer in every intervening block. The physical path is still validated.
+- Chained links remain separate bounded networks. Relays cannot recursively discover
+  an unlimited network or reset a limit inside one connected component.
+- Both endpoints must be loaded; previously discovered passive artery connections
+  follow the same unloaded-topology policy. Broken or full links pause and retain shipments. Initial links stay within one dimension.
+- Throughput is limited by the endpoints and route rating. Transfers obey backpressure; distance-dependent latency is optional future tuning. More relays cannot bypass shared server work ceilings.
+- **Proposed:** charge biomass for completed transport work, with exact rate and
+  rounding defined before implementation. Idle and failed attempts do not repeatedly
+  charge. Gas compression and thermal costs remain separately accounted.
+- The existing Vascular Junction serves local pumping. A later booster must provide
+  a measurable throughput or pressure service, not merely reset a distance counter.
+
+### Diagnostics and acceptance tests
+
+The probe or organ UI must distinguish: disconnected, destination full, filter
+refused, incompatible medium, endpoint unloaded, unknown connection, network too large, rebuilding,
+waiting for server budget, transit full, and missing pressure/heat/condensate service.
+Show network size versus limit, held contents, rated throughput and current flow.
+Gas vessels also show the relevant pressure and temperature state. An unloaded
+destination is not displayed as an empty inventory.
+
+| Fixture | Required evidence |
+|---|---|
+| Lines, branches, rings and dead ends for every carrier | Correct delivery; no infinite search, idle circulation, permanent dead-end trap or duplicated resource. Full rings recover after capacity returns. |
+| Crossings and stitches | Correct face connectivity and isolation, including vertical routes and chunk borders. |
+| Limits | At, below and above each limit; branching cannot silently hide a previously reachable destination. Configuration reductions retain contents. |
+| Chunk lifecycle | Unload source, destination and middle path separately. Loaded endpoints still transfer across known unloaded connections. Unknown unloaded paths refuse. Reload changed topology before transfer; create no tickets. |
+| Persistence and removal | Full server save/restart with mixed in-flight contents; break/replace endpoints; corrupt saves; interrupted-process recovery characterized separately. |
+| Competition | Multiple sources, players and networks compete for full destinations and scarce budget. Verify reservations, priority, fair scheduling and exact balances. |
+| Gas and thermal service | Incompatible medium, inadequate lining, full condensate, blocked relief, pressure limits and packet-size rounding. Account every conversion and declared loss. |
+| Dense base | **Proposed:** 256, 1,024 and 4,096 total conduit cells across valid networks, plus a 10,000-cell overload fixture; 16, 64 and 256 active endpoints. Exercise idle, flowing, blocked, topology churn and repeated chunk transitions. |
+| Sustained load | **Proposed:** 30-minute runs across multiple active dimensions. Record hardware, JVM settings, fixture layout, throughput, baseline and added median/p95/p99 server tick time, allocation/GC and retained memory. No growing queues or memory after settling. |
+
+Set an explicit incremental tick-time budget on the reference server before
+qualification. Average TPS alone is insufficient: report latency spikes and useful
+throughput under contention. A proposed larger range is accepted only after these
+tests, not from an operation-count estimate or comparison with another mod.
+
 ## T1 — Circulation: farms, transport and expandable storage
 
 The colony can feed several organs automatically. Upgrades here use T0 products; a genome laboratory is not required for basic logistics.

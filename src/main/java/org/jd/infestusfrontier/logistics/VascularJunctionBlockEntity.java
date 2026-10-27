@@ -44,14 +44,14 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
  * One 1000 mB tank locked to the fluid it holds, and the pump: every {@value #PULSE_TICKS} ticks it drains up to
- * {@value #PACKET_MB} from each intake neighbour and fills each outlet neighbour with as much. A water source
+ * {@value #TRANSFER_MB} from each intake neighbour and fills each outlet neighbour with as much. A water source
  * block beside an intake counts, by the vanilla bucket pickup. When a pulse moves nothing it waits
  * {@value #RETRY_TICKS} ticks. It works only rooted on a foundation.
  */
 final class VascularJunctionBlockEntity extends BlockEntity
         implements BiomassHandler, MenuProvider, GeoBlockEntity, PortSwitch {
     static final int CAPACITY_MB = 1000;
-    static final int PACKET_MB = 250;
+    static final int TRANSFER_MB = 250;
     static final int PULSE_TICKS = 4;
     static final int RETRY_TICKS = 20;
     private static final int HOT_KELVIN = 500;
@@ -138,6 +138,10 @@ final class VascularJunctionBlockEntity extends BlockEntity
     static void serverTick(Level level, BlockPos pos, BlockState state, VascularJunctionBlockEntity junction) {
         if (junction.unreadable.isPresent() || !Organs.hasFoundation(level, pos)) return;
         if (--junction.nextTry > 0) return;
+        if (!NetworkWork.take((net.minecraft.server.level.ServerLevel) level)) {
+            junction.nextTry = RETRY_TICKS + 1;
+            return;
+        }
         junction.nextTry = junction.pump(level, pos) ? PULSE_TICKS : RETRY_TICKS;
     }
 
@@ -153,7 +157,7 @@ final class VascularJunctionBlockEntity extends BlockEntity
         BlockPos next = pos.relative(side);
         if (!level.hasChunkAt(next)) return false;
         IFluidHandler source = level.getCapability(Capabilities.FluidHandler.BLOCK, next, side.getOpposite());
-        int amount = PACKET_MB;
+        int amount = TRANSFER_MB;
         if (source == null) {
             BlockState there = level.getBlockState(next);
             if (!(there.getBlock() instanceof BucketPickup pickup)
@@ -169,7 +173,7 @@ final class VascularJunctionBlockEntity extends BlockEntity
         if (!level.hasChunkAt(next)) return false;
         IFluidHandler target = level.getCapability(Capabilities.FluidHandler.BLOCK, next, side.getOpposite());
         if (target == null) return false;
-        return !FluidUtil.tryFluidTransfer(target, tank, PACKET_MB, true).isEmpty();
+        return !FluidUtil.tryFluidTransfer(target, tank, TRANSFER_MB, true).isEmpty();
     }
 
     @Override

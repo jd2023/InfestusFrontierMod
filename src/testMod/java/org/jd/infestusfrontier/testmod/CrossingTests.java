@@ -33,6 +33,7 @@ import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.logistics.MouthBlock;
 import org.jd.infestusfrontier.logistics.MouthMode;
 import org.jd.infestusfrontier.logistics.VeinBlock;
+import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 
@@ -45,7 +46,7 @@ import org.jd.infestusfrontier.storage.api.BiomassFluids;
 @PrefixGameTestTemplate(false)
 public final class CrossingTests {
     private static final int Y = 1;
-    private static final int PACKET = 250;
+    private static final int TRANSFER = 250;
 
     private CrossingTests() {}
 
@@ -55,23 +56,14 @@ public final class CrossingTests {
     public static void theGraftTurnsAnIdleSealedVeinIntoACrossingOfItsCarrier(GameTestHelper h) {
         BlockPos biomass = new BlockPos(1, Y, 1);
         BlockPos unsealed = new BlockPos(3, Y, 1);
-        BlockPos busy = new BlockPos(5, Y, 1);
         BlockPos item = new BlockPos(7, Y, 1);
         h.setBlock(biomass, LogisticsModule.BIOMASS_VEIN.get());
         h.setBlock(unsealed, LogisticsModule.FLUID_VEIN.get());
-        h.setBlock(busy, LogisticsModule.BIOMASS_VEIN.get());
         h.setBlock(item, LogisticsModule.ITEM_VEIN.get());
-        h.assertValueEqual(
-                port(h, busy, Direction.WEST).fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE),
-                PACKET,
-                "a packet waits in the cell");
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, LogisticsModule.SEPTUM_CROSSING_ITEM.get(), 4);
         EcologyTests.use(h, player, unsealed, Direction.UP);
-        EcologyTests.use(h, player, busy, Direction.UP);
         h.assertBlockPresent(LogisticsModule.FLUID_VEIN.get(), unsealed);
-        h.assertBlockPresent(LogisticsModule.BIOMASS_VEIN.get(), busy);
-        h.assertValueEqual(LogisticsTests.biomassIn(h, busy), PACKET, "the waiting packet is kept");
-        h.assertValueEqual(player.getMainHandItem().getCount(), 4, "nothing spent on an unsealed or a busy cell");
+        h.assertValueEqual(player.getMainHandItem().getCount(), 4, "nothing spent on an unsealed cell");
         EcologyTests.use(h, player, biomass, Direction.UP);
         EcologyTests.use(h, player, item, Direction.NORTH);
         h.assertBlockPresent(LogisticsModule.SEPTUM_CROSSING.get(), biomass);
@@ -105,18 +97,18 @@ public final class CrossingTests {
         h.assertTrue(port(h, crossing, Direction.UP) == null, "no passage through the septum's own faces");
         IFluidHandler west = port(h, new BlockPos(1, Y, 3), Direction.WEST);
         IFluidHandler north = port(h, new BlockPos(3, Y, 1), Direction.NORTH);
-        for (int packet = 0; packet < 2; packet++)
+        for (int transfer = 0; transfer < 2; transfer++)
             h.runAtTickTime(
-                    1 + packet * 12,
+                    1 + transfer * 12,
                     () -> h.assertValueEqual(
-                            west.fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE), PACKET, "west took it"));
+                            west.fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE), TRANSFER, "west took it"));
         h.runAtTickTime(
                 2,
                 () -> h.assertValueEqual(
-                        north.fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE), PACKET, "north took it"));
+                        north.fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE), TRANSFER, "north took it"));
         h.runAtTickTime(90, () -> {
-            h.assertValueEqual(stored(h, east), 2 * PACKET, "both west packets went straight on east");
-            h.assertValueEqual(stored(h, south), PACKET, "the north packet went straight on south");
+            h.assertValueEqual(stored(h, east), 2 * TRANSFER, "both west transfers went straight on east");
+            h.assertValueEqual(stored(h, south), TRANSFER, "the north transfer went straight on south");
             h.succeed();
         });
     }
@@ -127,16 +119,18 @@ public final class CrossingTests {
         BlockPos far = crossing.east();
         h.setBlock(crossing, crossing(LogisticsModule.FLUID_VEIN.get(), Direction.Axis.Y));
         h.setBlock(far, LogisticsModule.FLUID_VEIN.get().defaultBlockState().setValue(VeinBlock.SEALED, true));
+        h.setBlock(far.above(), ProcessingModule.CULTURE_BOWL.get());
         IFluidHandler entry = port(h, crossing, Direction.WEST);
         h.assertValueEqual(
-                entry.fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE),
+                entry.fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE),
                 0,
                 "a fluid crossing never passes biomass");
         h.assertValueEqual(
-                entry.fill(new FluidStack(Fluids.WATER, PACKET), IFluidHandler.FluidAction.EXECUTE),
-                PACKET,
+                entry.fill(new FluidStack(Fluids.WATER, TRANSFER), IFluidHandler.FluidAction.EXECUTE),
+                TRANSFER,
                 "water passes");
-        h.assertValueEqual(port(h, far, null).getFluidInTank(0).getAmount(), PACKET, "and arrives in the cell beyond");
+        h.assertValueEqual(
+                port(h, far.above(), null).getFluidInTank(0).getAmount(), TRANSFER, "the endpoint holds the water");
         h.assertValueEqual(entry.getFluidInTank(0).getAmount(), 0, "the crossing itself holds nothing");
         h.succeed();
     }
@@ -163,16 +157,18 @@ public final class CrossingTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void aFillPassesAtMostEightCrossingsInARow(GameTestHelper h) {
-        // a row of nine crossings before one tank passes; a row of ten does not
+    public static void aNetworkPassesLongCrossingChainsWithoutRecursiveForwarding(GameTestHelper h) {
+        // Both chains are ordinary passive network components.
         BlockPos near = row(h, 1, 9);
         BlockPos far = row(h, 3, 10);
         h.assertValueEqual(
-                port(h, near, Direction.WEST).fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE),
-                PACKET,
+                port(h, near, Direction.WEST).fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE),
+                TRANSFER,
                 "nine pass");
         h.assertValueEqual(
-                port(h, far, Direction.WEST).fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE), 0, "ten refuse");
+                port(h, far, Direction.WEST).fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE),
+                TRANSFER,
+                "ten pass without a forwarding-depth limit");
         h.succeed();
     }
 
@@ -231,9 +227,9 @@ public final class CrossingTests {
         h.assertFalse(level.hasChunkAt(edge.east()), "the far chunk starts unloaded");
         IFluidHandler crossing = level.getCapability(Capabilities.FluidHandler.BLOCK, edge, Direction.WEST);
         h.assertValueEqual(
-                crossing.fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE), 0, "the crossing passes nothing");
+                crossing.fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE), 0, "the crossing passes nothing");
         IFluidHandler stitch = level.getCapability(Capabilities.FluidHandler.BLOCK, above, Direction.DOWN);
-        h.assertValueEqual(stitch.fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE), 0, "nor does the stitch");
+        h.assertValueEqual(stitch.fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE), 0, "nor does the stitch");
         h.assertFalse(level.hasChunkAt(edge.east()), "and nothing loaded the far chunk");
         h.succeed();
     }
@@ -259,16 +255,16 @@ public final class CrossingTests {
                         && h.getBlockState(high).getValue(PipeBlock.WEST),
                 "both cells link toward the stitch");
         h.assertValueEqual(
-                port(h, low, Direction.WEST).fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE),
-                PACKET,
+                port(h, low, Direction.WEST).fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE),
+                TRANSFER,
                 "into the low cell");
         h.assertValueEqual(
-                port(h, high2, Direction.WEST).fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE),
-                PACKET,
+                port(h, high2, Direction.WEST).fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE),
+                TRANSFER,
                 "into the high cell");
         h.runAtTickTime(40, () -> {
-            h.assertValueEqual(stored(h, top), PACKET, "the packet climbed the step");
-            h.assertValueEqual(stored(h, bottom), PACKET, "the packet came down the step");
+            h.assertValueEqual(stored(h, top), TRANSFER, "the transfer climbed the step");
+            h.assertValueEqual(stored(h, bottom), TRANSFER, "the transfer came down the step");
             h.succeed();
         });
     }
@@ -285,11 +281,11 @@ public final class CrossingTests {
         BlockPos tank = lower.below();
         h.setBlock(tank, StorageModule.BIOMASS_BLADDER.get());
         h.assertValueEqual(
-                port(h, upper, Direction.WEST).fill(biomass(PACKET), IFluidHandler.FluidAction.EXECUTE),
-                PACKET,
+                port(h, upper, Direction.WEST).fill(biomass(TRANSFER), IFluidHandler.FluidAction.EXECUTE),
+                TRANSFER,
                 "into the upper cell");
         h.runAtTickTime(40, () -> {
-            h.assertValueEqual(stored(h, tank), PACKET, "the packet crossed the step overhead");
+            h.assertValueEqual(stored(h, tank), TRANSFER, "the transfer crossed the step overhead");
             h.succeed();
         });
     }

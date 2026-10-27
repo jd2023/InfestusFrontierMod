@@ -14,12 +14,10 @@ import org.jd.infestusfrontier.foundation.Refusals;
 
 /**
  * The Septum Crossing as a graft: used on a vein cell, it turns the cell into a crossing of the vein's carrier whose
- * clicked face shows both lumens. A Fluid Vein must be sealed first, and a cell still holding a packet refuses, since
- * a crossing holds nothing. Breaking the crossing gives back the vein and the graft.
+ * clicked face shows both lumens. A Fluid Vein must be sealed first.
  */
 final class SeptumCrossingItem extends Item {
     static final Refusal UNSEALED = new Refusal("logistics.unsealed");
-    static final Refusal CARRYING = new Refusal("logistics.carrying");
     private static final int GROWTH_PARTICLES = 10;
 
     SeptumCrossingItem(Properties properties) {
@@ -35,8 +33,6 @@ final class SeptumCrossingItem extends Item {
         if (level.isClientSide) return InteractionResult.SUCCESS;
         Player player = context.getPlayer();
         if (!state.getValue(VeinBlock.SEALED)) return refuse(player, UNSEALED);
-        if (level.getBlockEntity(target) instanceof VeinBlockEntity cell && !cell.isEmpty())
-            return refuse(player, CARRYING);
         BlockState crossing = LogisticsModule.SEPTUM_CROSSING
                 .get()
                 .defaultBlockState()

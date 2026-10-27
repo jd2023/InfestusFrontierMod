@@ -92,7 +92,7 @@ public final class MouthBlock extends BaseEntityBlock {
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState old, boolean moved) {
         if (level.isClientSide) return;
-        if (!old.is(this) || old.getValue(MODE) != state.getValue(MODE)) LogisticsModule.routesChanged(level);
+        if (!old.is(this) || old.getValue(MODE) != state.getValue(MODE)) LogisticsModule.routesChanged(level, pos);
         // the block entity still holds the old state here, so the new state decides whether pulses start
         if (state.getValue(MODE).gives() && !level.getBlockTicks().hasScheduledTick(pos, this))
             level.scheduleTick(pos, this, MouthBlockEntity.PULSE_TICKS);
@@ -111,8 +111,8 @@ public final class MouthBlock extends BaseEntityBlock {
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState next, boolean moved) {
         if (!state.is(next.getBlock())) {
-            if (level.getBlockEntity(pos) instanceof MouthBlockEntity mouth) mouth.dropPackets();
-            if (!level.isClientSide) LogisticsModule.routesChanged(level);
+            if (level.getBlockEntity(pos) instanceof MouthBlockEntity mouth) mouth.dropRemainder();
+            if (!level.isClientSide) LogisticsModule.routesChanged(level, pos);
         }
         super.onRemove(state, level, pos, next, moved);
     }

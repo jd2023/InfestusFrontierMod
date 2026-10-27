@@ -15,5 +15,10 @@ public final class LogisticsCapabilities {
     public static final BlockCapability<MenuProvider, @Nullable Void> MOUTH_SCREEN = BlockCapability.createVoid(
             ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "mouth_screen"), MenuProvider.class);
 
+    public static final BlockCapability<NetworkStatus, @Nullable Direction> NETWORK_STATUS =
+            BlockCapability.createSided(
+                    ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "network_status"),
+                    NetworkStatus.class);
+
     private LogisticsCapabilities() {}
 }

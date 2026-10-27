@@ -151,9 +151,7 @@ public final class FilterValveBlock extends HorizontalDirectionalBlock {
         BlockPos store = pos.relative(facing);
         if (!level.hasChunkAt(store)) return null;
         Block faced = level.getBlockState(store).getBlock();
-        if (faced instanceof FilterValveBlock
-                || faced instanceof SeptumCrossingBlock
-                || faced instanceof VascularStitchBlock) return null;
+        if (faced instanceof FilterValveBlock || Routes.isRoute(level.getBlockState(store))) return null;
         return level.getCapability(Capabilities.FluidHandler.BLOCK, store, facing.getOpposite());
     }
 

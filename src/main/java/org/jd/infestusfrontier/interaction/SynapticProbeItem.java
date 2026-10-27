@@ -56,6 +56,18 @@ final class SynapticProbeItem extends Item {
             player.displayClientMessage(ports.cycle(context.getClickedFace()), true);
             return InteractionResult.CONSUME;
         }
+        var network = level.getCapability(LogisticsCapabilities.NETWORK_STATUS, pos, context.getClickedFace());
+        if (network != null) {
+            if (!level.isClientSide && player != null)
+                player.displayClientMessage(
+                        Component.translatable(
+                                "infestusfrontier.status.network",
+                                Component.translatable("infestusfrontier.status.network." + network.state()),
+                                network.cells(),
+                                network.limit()),
+                        true);
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
         BiomassHandler handler = level.getCapability(BiomassCapabilities.BLOCK, pos, null);
         if (handler == null) return InteractionResult.PASS;
         if (level.isClientSide) return InteractionResult.SUCCESS;

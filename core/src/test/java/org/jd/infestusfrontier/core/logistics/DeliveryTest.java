@@ -6,24 +6,23 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class DeliveryTest {
-    private static Delivery.Destination<String> d(String id, int priority, int distance) {
-        return new Delivery.Destination<>(id, priority, distance);
+    private static Delivery.Destination<String> d(String id, int priority) {
+        return new Delivery.Destination<>(id, priority);
     }
 
     @Test
-    void priorityBeatsDistance() {
-        assertEquals(
-                List.of("far-high", "near-low"), Delivery.order(List.of(d("near-low", 0, 1), d("far-high", 2, 9)), 0));
+    void priorityBeatsDiscoveryOrder() {
+        assertEquals(List.of("far-high", "near-low"), Delivery.order(List.of(d("near-low", 0), d("far-high", 2)), 0));
     }
 
     @Test
-    void nearerComesFirstAtEqualPriority() {
-        assertEquals(List.of("a", "b"), Delivery.order(List.of(d("b", 0, 5), d("a", 0, 2)), 0));
+    void equalPriorityStartsInDiscoveryOrder() {
+        assertEquals(List.of("b", "a"), Delivery.order(List.of(d("b", 0), d("a", 0)), 0));
     }
 
     @Test
     void equalDestinationsTakeTurns() {
-        var group = List.of(d("a", 0, 3), d("b", 0, 3), d("c", 0, 3), d("z", -1, 1));
+        var group = List.of(d("a", 0), d("b", 0), d("c", 0), d("z", -1));
         assertEquals(List.of("a", "b", "c", "z"), Delivery.order(group, 0));
         assertEquals(List.of("b", "c", "a", "z"), Delivery.order(group, 1));
         assertEquals(List.of("c", "a", "b", "z"), Delivery.order(group, 5));

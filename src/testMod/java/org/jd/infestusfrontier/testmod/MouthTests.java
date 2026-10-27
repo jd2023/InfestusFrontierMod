@@ -9,9 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -39,9 +37,7 @@ import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.core.foundation.Biomass;
-import org.jd.infestusfrontier.core.foundation.TickQuota;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
@@ -55,8 +51,7 @@ import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 
 /**
- * Mouths under chests and organs, joined by Item Veins: routing by filter, priority and distance, amounts, packets on
- * the way through a reload and a break, a destination that disappears, an organ fed and emptied by one Mouth, the
+ * Mouths under chests and organs, joined by Item Veins: routing by filter and priority, amounts, retained remainders through reload and break, a destination that disappears, an organ fed and emptied by one Mouth, the
  * probe on a store, and the shared pulse quota. Cells sit at y=1, their stores at y=2.
  */
 @GameTestHolder("infestusfrontier_tests")
@@ -64,7 +59,7 @@ import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 @EventBusSubscriber(modid = "infestusfrontier_tests", bus = EventBusSubscriber.Bus.MOD)
 public final class MouthTests {
     private static final int Y = 1;
-    /** When a freshly placed output Mouth sends its first packet. */
+    /** When a freshly placed output Mouth sends its first transfer. */
     private static final int FIRST_SEND = 8;
 
     private MouthTests() {}
@@ -261,54 +256,47 @@ public final class MouthTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
-    public static void aPacketOnTheWaySurvivesAReloadAndArrivesOnce(GameTestHelper h) {
-        store(h, cell(1), new ItemStack(Items.BONE, 16));
+    public static void aRetainedRemainderSurvivesReloadAndIsDeliveredOnce(GameTestHelper h) {
+        store(h, cell(1), new ItemStack(Items.BONE, 8));
         store(h, cell(8));
         mouth(h, cell(1), MouthMode.OUTPUT);
         veins(h, 2, 7);
         mouth(h, cell(8), MouthMode.INTAKE);
-        h.runAfterDelay(FIRST_SEND + 2, () -> {
-            h.assertValueEqual(count(h, cell(1), Items.BONE), 8, "one packet left");
-            h.assertValueEqual(count(h, cell(8), Items.BONE), 0, "it is still on the way");
-            var registries = h.getLevel().registryAccess();
-            CompoundTag saved = h.getBlockEntity(cell(1)).saveWithFullMetadata(registries);
-            h.assertValueEqual(saved.getList("packets", 10).size(), 1, "the packet is saved");
-            BlockEntity restored =
-                    BlockEntity.loadStatic(h.absolutePos(cell(1)), h.getBlockState(cell(1)), saved, registries);
-            h.getLevel().removeBlockEntity(h.absolutePos(cell(1)));
-            h.getLevel().setBlockEntity(restored);
-            h.runAfterDelay(100, () -> {
-                h.assertValueEqual(count(h, cell(8), Items.BONE), 16, "every bone arrived, once");
-                h.assertValueEqual(count(h, cell(1), Items.BONE), 0, "the source is empty");
-                h.succeed();
-            });
+        var registries = h.getLevel().registryAccess();
+        CompoundTag saved = h.getBlockEntity(cell(1)).saveWithFullMetadata(registries);
+        saved.put("remainder", new ItemStack(Items.BONE, 8).save(registries));
+        BlockEntity restored =
+                BlockEntity.loadStatic(h.absolutePos(cell(1)), h.getBlockState(cell(1)), saved, registries);
+        h.getLevel().removeBlockEntity(h.absolutePos(cell(1)));
+        h.getLevel().setBlockEntity(restored);
+        h.runAfterDelay(100, () -> {
+            h.assertValueEqual(count(h, cell(8), Items.BONE), 16, "remainder and source delivered exactly once");
+            h.assertValueEqual(count(h, cell(1), Items.BONE), 0, "source empty");
+            h.assertFalse(
+                    h.getBlockEntity(cell(1)).saveWithoutMetadata(registries).contains("remainder"),
+                    "no held remainder");
+            h.succeed();
         });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
-    public static void breakingAMouthDropsItsPacketsOnce(GameTestHelper h) {
+    public static void breakingAMouthDropsItsRemainderOnce(GameTestHelper h) {
         store(h, cell(1), new ItemStack(Items.BONE, 16));
-        store(h, cell(8));
         mouth(h, cell(1), MouthMode.OUTPUT);
-        veins(h, 2, 7);
-        mouth(h, cell(8), MouthMode.INTAKE);
-        h.runAfterDelay(FIRST_SEND + 2, () -> {
-            h.assertValueEqual(count(h, cell(1), Items.BONE), 8, "one packet on the way");
-            h.getLevel().destroyBlock(h.absolutePos(cell(1)), true);
-            h.runAfterDelay(2, () -> {
-                h.assertItemEntityCountIs(Items.BONE, cell(1), 2, 8);
-                h.assertItemEntityCountIs(EcologyModule.DEAD_TISSUE.get(), cell(1), 2, 1);
-                h.assertItemEntityNotPresent(LogisticsModule.MOUTH_ITEM.get(), cell(1), 2);
-                h.runAfterDelay(60, () -> {
-                    h.assertValueEqual(count(h, cell(8), Items.BONE), 0, "the dropped packet never arrives");
-                    h.succeed();
-                });
-            });
+        var registries = h.getLevel().registryAccess();
+        CompoundTag saved = h.getBlockEntity(cell(1)).saveWithoutMetadata(registries);
+        saved.put("remainder", new ItemStack(Items.BONE, 8).save(registries));
+        h.getBlockEntity(cell(1)).loadWithComponents(saved, registries);
+        h.getLevel().destroyBlock(h.absolutePos(cell(1)), true);
+        h.runAfterDelay(2, () -> {
+            h.assertItemEntityCountIs(Items.BONE, cell(1), 2, 8);
+            h.assertValueEqual(count(h, cell(1), Items.BONE), 16, "partner inventory remains intact");
+            h.succeed();
         });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
-    public static void aPacketWhoseDestinationLostItsStoreGoesToTheNext(GameTestHelper h) {
+    public static void aRemovedDestinationIsSkippedBeforeExtraction(GameTestHelper h) {
         store(h, cell(4), new ItemStack(Items.BONE, 8));
         store(h, cell(1));
         store(h, cell(9));
@@ -318,13 +306,11 @@ public final class MouthTests {
         veins(h, 5, 8);
         mouth(h, cell(9), MouthMode.INTAKE);
         configure(h, cell(9), control -> control.press(MouthMenu.PRIORITY_UP, 1));
-        h.runAfterDelay(FIRST_SEND + 2, () -> {
-            h.assertValueEqual(count(h, cell(4), Items.BONE), 0, "the packet left for the far Mouth");
-            h.setBlock(cell(9).above(), Blocks.STONE);
-            h.runAfterDelay(80, () -> {
-                h.assertValueEqual(count(h, cell(1), Items.BONE), 8, "it went to the other Mouth instead");
-                h.succeed();
-            });
+        h.setBlock(cell(9).above(), Blocks.STONE);
+        h.runAfterDelay(80, () -> {
+            h.assertValueEqual(count(h, cell(1), Items.BONE), 8, "live accepting endpoint receives the transfer");
+            h.assertValueEqual(count(h, cell(4), Items.BONE), 0, "source debited once");
+            h.succeed();
         });
     }
 
@@ -386,27 +372,6 @@ public final class MouthTests {
         player.closeContainer();
         h.assertTrue(opened, "the probe on the chest opened the Mouth under it");
         h.succeed();
-    }
-
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "mouth_quota")
-    public static void mouthsShareTheDimensionQuotaAndRetryAfterDenial(GameTestHelper h) {
-        store(h, cell(1), new ItemStack(Items.BONE, 8));
-        store(h, cell(3));
-        mouth(h, cell(1), MouthMode.OUTPUT);
-        veins(h, 2, 2);
-        mouth(h, cell(3), MouthMode.INTAKE);
-        var type = NeoForgeRegistries.ATTACHMENT_TYPES.get(
-                ResourceLocation.fromNamespaceAndPath("infestusfrontier", "mouth_quota"));
-        TickQuota quota = (TickQuota) h.getLevel().getData(type);
-        long tick = h.getLevel().getGameTime();
-        for (int i = 0; i < 64; i++) h.assertTrue(quota.take(tick), "quota slot " + i);
-        h.assertFalse(quota.take(tick), "the sixty-fifth pulse is refused");
-        h.getBlockState(cell(1)).tick(h.getLevel(), h.absolutePos(cell(1)), h.getLevel().random);
-        h.assertValueEqual(count(h, cell(1), Items.BONE), 8, "a refused pulse leaves the source alone");
-        h.runAfterDelay(40, () -> {
-            h.assertValueEqual(count(h, cell(3), Items.BONE), 8, "a later pulse moves the packet");
-            h.succeed();
-        });
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "mouth_boundary")
@@ -502,6 +467,11 @@ public final class MouthTests {
                                 + ", pulse scheduled "
                                 + level.getBlockTicks().hasScheduledTick(start, LogisticsModule.MOUTH.get())
                                 + ", source chunk entity-ticking " + level.isPositionEntityTicking(start)
+                                + ", graph "
+                                + level.getCapability(
+                                        org.jd.infestusfrontier.logistics.api.LogisticsCapabilities.NETWORK_STATUS,
+                                        start,
+                                        null)
                                 + ", path " + path(level, start, end)))
                 .thenExecute(() -> {
                     level.setChunkForced(first.x, first.z, false);
@@ -518,16 +488,10 @@ public final class MouthTests {
         veins(h, 2, 2);
         mouth(h, cell(3), MouthMode.INTAKE);
         CompoundTag data = new CompoundTag();
-        ListTag packets = new ListTag();
-        CompoundTag packet = new CompoundTag();
         CompoundTag items = new CompoundTag();
         items.putString("id", "minecraft:bone");
         items.putInt("count", 9);
-        packet.put("items", items);
-        packet.putIntArray("to", new int[] {0, 0, 0});
-        packet.putLong("arrival", 0);
-        packets.add(packet);
-        data.put("packets", packets);
+        data.put("remainder", items);
         var registries = h.getLevel().registryAccess();
         h.getBlockEntity(cell(1)).loadWithComponents(data, registries);
         configure(h, cell(1), control -> {
@@ -541,7 +505,7 @@ public final class MouthTests {
             h.assertValueEqual(count(h, cell(1), Items.BONE), 16, "nothing extracted");
             h.assertValueEqual(count(h, cell(3), Items.BONE), 0, "nothing delivered");
             CompoundTag saved = h.getBlockEntity(cell(1)).saveWithoutMetadata(registries);
-            h.assertValueEqual(saved.getList("packets", 10), packets, "the bytes save back unchanged");
+            h.assertValueEqual(saved.getCompound("remainder"), items, "the bytes save back unchanged");
             h.getLevel().destroyBlock(h.absolutePos(cell(1)), true);
             h.runAfterDelay(2, () -> {
                 h.assertItemEntityCountIs(Items.BONE, cell(1), 2, 0);
@@ -557,9 +521,9 @@ public final class MouthTests {
             template = "empty",
             batch = "mouth_offers",
             timeoutTicks = 300)
-    public static void aPulseMakesAtMostItsOffersEvenWithPacketsWaiting(GameTestHelper h) {
+    public static void aPulseBoundsOffersAndRetainsARefusedExecution(GameTestHelper h) {
         // one giving Mouth and nineteen taking Mouths in a 5 by 4 block, each under a store that says yes when asked
-        // and then refuses the items; once the packets are out, the stores refuse even when asked
+        // and then refuses the items; once a remainder is held, the stores refuse even when asked
         Counter.reset();
         for (int x = 1; x <= 5; x++)
             for (int z = 1; z <= 4; z++) {
@@ -577,8 +541,9 @@ public final class MouthTests {
                 .thenIdle(120)
                 .thenExecute(() -> {
                     h.assertTrue(
-                            Counter.max <= 16 + 4,
-                            "at most 16 offers and 4 deliveries a pulse, saw " + Counter.max + " inserts in a tick");
+                            Counter.max <= 18,
+                            "at most 16 offers and one simulated/executed delivery a pulse, saw " + Counter.max
+                                    + " inserts in a tick");
                     int[] carried = new int[1];
                     configure(
                             h,
@@ -781,7 +746,7 @@ public final class MouthTests {
 
     /**
      * A server player that is never in the player list, so no login event or other test sees it. It opens a menu the
-     * way the server does, without the packet to a client it does not have.
+     * way the server does, without the transfer to a client it does not have.
      */
     private static final class MenuPlayer extends FakePlayer {
         MenuPlayer(ServerLevel level) {

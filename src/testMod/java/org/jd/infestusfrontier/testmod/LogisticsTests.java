@@ -102,10 +102,8 @@ public final class LogisticsTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
-    public static void aFullDestinationHoldsThePacketAndTheVeinResumesWhenRoomReturns(GameTestHelper h) {
-        BlockPos cell = new BlockPos(1, Y, 1);
-        BlockPos next = new BlockPos(2, Y, 1);
-        BlockPos tank = next.above();
+    public static void aFullDestinationRefusesAndThePassiveNetworkResumesWhenRoomReturns(GameTestHelper h) {
+        BlockPos cell = new BlockPos(1, Y, 1), next = cell.east(), tank = next.above();
         h.setBlock(cell, LogisticsModule.BIOMASS_VEIN.get());
         h.setBlock(next, LogisticsModule.BIOMASS_VEIN.get());
         h.setBlock(tank, StorageModule.BIOMASS_BLADDER.get());
@@ -114,33 +112,31 @@ public final class LogisticsTests {
                 h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(cell), Direction.UP);
         h.assertValueEqual(
                 port.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE),
-                250,
-                "a packet goes in from above");
-        h.assertValueEqual(
-                port.fill(BiomassFluids.of(Biomass.of(100)), IFluidHandler.FluidAction.EXECUTE),
                 0,
-                "a full cell takes no more");
-        h.runAfterDelay(30, () -> {
-            h.assertValueEqual(
-                    biomassIn(h, cell) + biomassIn(h, next), 250, "the packet waits in the vein before the full tank");
-            h.assertValueEqual(ProcessingTests.handler(h, tank).tank().stored().units(), 4000, "the tank stays full");
-            IFluidHandler out =
-                    h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(tank), Direction.UP);
-            out.drain(1000, IFluidHandler.FluidAction.EXECUTE);
-            h.runAfterDelay(VeinBlock.RETRY_TICKS + 10, () -> {
-                h.assertValueEqual(
-                        ProcessingTests.handler(h, tank).tank().stored().units(),
-                        3250,
-                        "the packet arrived once there was room");
-                h.assertValueEqual(biomassIn(h, cell) + biomassIn(h, next), 0, "the vein is empty again");
-                h.succeed();
-            });
-        });
+                "full destination refuses");
+        h.assertTrue(
+                h.getLevel().getBlockEntity(h.absolutePos(cell)) == null
+                        && h.getLevel().getBlockEntity(h.absolutePos(next)) == null,
+                "passive cells have no storage or block entity");
+        IFluidHandler out =
+                h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(tank), Direction.UP);
+        out.drain(1000, IFluidHandler.FluidAction.EXECUTE);
+        h.assertValueEqual(
+                port.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.SIMULATE),
+                250,
+                "room is visible immediately");
+        h.assertValueEqual(biomassIn(h, tank), 3000, "simulation changes nothing");
+        h.assertValueEqual(
+                port.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE),
+                250,
+                "direct transfer");
+        h.assertValueEqual(biomassIn(h, tank), 3250, "destination owns every transferred unit");
+        h.succeed();
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 200)
     public static void aForkServesItsArmsInTurn(GameTestHelper h) {
-        // packets enter the fork from the west; one arm leads north, one south, each to a tank on its last cell
+        // transfers enter the fork from the west; one arm leads north, one south, each to a tank on its last cell
         BlockPos fork = new BlockPos(2, Y, 2);
         BlockPos north = fork.north();
         BlockPos south = fork.south();
@@ -149,13 +145,13 @@ public final class LogisticsTests {
         h.setBlock(south.above(), StorageModule.BIOMASS_BLADDER.get());
         IFluidHandler entry =
                 h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(fork), Direction.WEST);
-        for (int packet = 0; packet < 4; packet++)
+        for (int transfer = 0; transfer < 4; transfer++)
             h.runAtTickTime(
-                    1 + packet * 12,
+                    1 + transfer * 12,
                     () -> h.assertValueEqual(
                             entry.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE),
                             250,
-                            "the fork took the packet"));
+                            "the fork took the transfer"));
         h.runAtTickTime(80, () -> {
             h.assertValueEqual(
                     ProcessingTests.handler(h, north.above()).tank().stored().units(), 500, "north half");
@@ -187,9 +183,11 @@ public final class LogisticsTests {
         IFluidHandler entry = h.getLevel()
                 .getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(route.getFirst()), Direction.WEST);
         h.assertValueEqual(
-                entry.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE), 250, "one packet in");
+                entry.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE),
+                250,
+                "one transfer in");
         h.runAtTickTime(60, () -> {
-            h.assertValueEqual(ProcessingTests.handler(h, tank).tank().stored().units(), 250, "the packet came down");
+            h.assertValueEqual(ProcessingTests.handler(h, tank).tank().stored().units(), 250, "the transfer came down");
             h.succeed();
         });
     }
@@ -234,10 +232,7 @@ public final class LogisticsTests {
         h.assertFalse(h.getBlockState(vein).getValue(VeinBlock.SEALED), "unsealed at first");
         IFluidHandler unsealed =
                 h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(vein), Direction.UP);
-        h.assertValueEqual(
-                unsealed.fill(new FluidStack(Fluids.WATER, 100), IFluidHandler.FluidAction.EXECUTE),
-                0,
-                "an unsealed vein carries nothing");
+        h.assertTrue(unsealed == null, "an unsealed vein exposes no network access");
         Player sealer = EcologyTests.holding(h, GameType.SURVIVAL, LogisticsModule.SEALING_RESIN.get(), 1);
         EcologyTests.use(h, sealer, vein, Direction.UP);
         h.assertTrue(h.getBlockState(vein).getValue(VeinBlock.SEALED), "sealed");
@@ -272,7 +267,7 @@ public final class LogisticsTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void aBrokenCellDiesWithItsPacket(GameTestHelper h) {
+    public static void aBrokenPassiveCellLeavesDeadTissue(GameTestHelper h) {
         BlockPos cell = new BlockPos(1, Y, 1);
         h.setBlock(cell, LogisticsModule.BIOMASS_VEIN.get());
         h.getLevel()

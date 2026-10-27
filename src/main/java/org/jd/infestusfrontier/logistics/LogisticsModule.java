@@ -28,7 +28,6 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
-import org.jd.infestusfrontier.core.foundation.TickQuota;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
@@ -53,12 +52,11 @@ public final class LogisticsModule {
 
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
             DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, InfestusFrontier.MOD_ID);
-    /** Mouth pulses admitted per dimension per tick. */
-    static final DeferredHolder<AttachmentType<?>, AttachmentType<TickQuota>> MOUTH_QUOTA = ATTACHMENTS.register(
-            "mouth_quota", () -> AttachmentType.builder(() -> new TickQuota(64)).build());
-
-    static final DeferredHolder<AttachmentType<?>, AttachmentType<RouteEpoch>> ROUTE_EPOCH = ATTACHMENTS.register(
-            "route_epoch", () -> AttachmentType.builder(RouteEpoch::new).build());
+    static final DeferredHolder<AttachmentType<?>, AttachmentType<NetworkWork>> NETWORK_WORK = ATTACHMENTS.register(
+            "network_work", () -> AttachmentType.builder(NetworkWork::new).build());
+    static final DeferredHolder<AttachmentType<?>, AttachmentType<NetworkWork>> SERVER_WORK = ATTACHMENTS.register(
+            "server_network_work",
+            () -> AttachmentType.builder(NetworkWork::new).build());
     public static final DeferredBlock<MouthBlock> MOUTH = BLOCKS.registerBlock(
             "mouth",
             MouthBlock::new,
@@ -111,12 +109,6 @@ public final class LogisticsModule {
     public static final DeferredItem<BlockItem> BIOMASS_VEIN_ITEM = ITEMS.registerSimpleBlockItem(BIOMASS_VEIN);
     public static final DeferredItem<BlockItem> FLUID_VEIN_ITEM = ITEMS.registerSimpleBlockItem(FLUID_VEIN);
     public static final DeferredItem<BlockItem> ITEM_VEIN_ITEM = ITEMS.registerSimpleBlockItem(ITEM_VEIN);
-    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VeinBlockEntity>> VEIN_ENTITY =
-            BLOCK_ENTITIES.register(
-                    "vein",
-                    () -> BlockEntityType.Builder.of(VeinBlockEntity::new, BIOMASS_VEIN.get(), FLUID_VEIN.get())
-                            .build(null));
-
     /** Two passages of one carrier through one cell, grafted onto a vein; it holds nothing. */
     public static final DeferredBlock<SeptumCrossingBlock> SEPTUM_CROSSING = BLOCKS.registerBlock(
             "septum_crossing",
@@ -208,8 +200,55 @@ public final class LogisticsModule {
         MENUS.register(modBus);
         COMPONENTS.register(modBus);
         ATTACHMENTS.register(modBus);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                (net.neoforged.neoforge.event.tick.LevelTickEvent.Post event) -> {
+                    if (event.getLevel() instanceof net.minecraft.server.level.ServerLevel server)
+                        NetworkTopology.get(server).advance(server);
+                });
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                (net.neoforged.neoforge.event.level.ChunkEvent.Load event) -> {
+                    if (event.getLevel() instanceof net.minecraft.server.level.ServerLevel server)
+                        NetworkTopology.get(server).chunkLoaded(event.getChunk().getPos());
+                });
         modBus.addListener((RegisterCapabilitiesEvent event) -> {
-            event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, VEIN_ENTITY.get(), VeinBlockEntity::fluidPort);
+            event.registerBlock(
+                    LogisticsCapabilities.NETWORK_STATUS,
+                    (level, pos, state, entity, side) -> {
+                        if (!(level instanceof net.minecraft.server.level.ServerLevel server))
+                            return new org.jd.infestusfrontier.logistics.api.NetworkStatus(
+                                    "rebuilding", 0, NetworkTopology.MAX_CELLS);
+                        return NetworkTopology.get(server)
+                                .network(server, pos, state.getBlock() instanceof MouthBlock ? null : side)
+                                .map(c -> new org.jd.infestusfrontier.logistics.api.NetworkStatus(
+                                        c.status().name().toLowerCase(java.util.Locale.ROOT),
+                                        c.nodes().size(),
+                                        NetworkTopology.MAX_CELLS))
+                                .orElseGet(() -> new org.jd.infestusfrontier.logistics.api.NetworkStatus(
+                                        "rebuilding", 0, NetworkTopology.MAX_CELLS));
+                    },
+                    BIOMASS_VEIN.get(),
+                    FLUID_VEIN.get(),
+                    ITEM_VEIN.get(),
+                    MOUTH.get(),
+                    SEPTUM_CROSSING.get(),
+                    VASCULAR_STITCH.get());
+            event.registerBlock(
+                    Capabilities.FluidHandler.BLOCK,
+                    (level, pos, state, entity, side) -> level instanceof net.minecraft.server.level.ServerLevel server
+                                    && NetworkTopology.tissue(state)
+                                            .filter(t -> t.carrier().isFluid()
+                                                    && (side == null
+                                                            ? state.getBlock() instanceof VeinBlock
+                                                            : t.passages().stream()
+                                                                    .anyMatch(mask ->
+                                                                            (mask & NetworkTopology.bit(side)) != 0)))
+                                            .isPresent()
+                            ? new NetworkFluid(server, pos, side)
+                            : null,
+                    BIOMASS_VEIN.get(),
+                    FLUID_VEIN.get(),
+                    SEPTUM_CROSSING.get(),
+                    VASCULAR_STITCH.get());
             event.registerBlockEntity(LogisticsCapabilities.MOUTH_SCREEN, MOUTH_ENTITY.get(), (mouth, none) -> mouth);
             event.registerBlock(
                     Capabilities.FluidHandler.BLOCK,
@@ -223,21 +262,9 @@ public final class LogisticsModule {
                     FEEDING_LOBE.get(),
                     YIELD_LOBE.get());
             event.registerBlock(
-                    Capabilities.FluidHandler.BLOCK,
-                    (level, pos, state, entity, side) -> SeptumCrossingBlock.fluid(level, pos, state, side),
-                    SEPTUM_CROSSING.get());
-            event.registerBlock(
                     LogisticsCapabilities.PORT_SWITCH,
                     (level, pos, state, entity, side) -> SeptumCrossingBlock.ports(level, pos),
                     SEPTUM_CROSSING.get());
-            event.registerBlock(
-                    Capabilities.FluidHandler.BLOCK,
-                    (level, pos, state, entity, side) -> VascularStitchBlock.fluid(level, pos, state, side),
-                    VASCULAR_STITCH.get());
-            event.registerBlockEntity(
-                    BiomassCapabilities.BLOCK,
-                    VEIN_ENTITY.get(),
-                    (vein, side) -> vein.carrier() == Carrier.BIOMASS ? vein : null);
             event.registerBlockEntity(
                     Capabilities.FluidHandler.BLOCK,
                     VASCULAR_JUNCTION_ENTITY.get(),
@@ -256,9 +283,18 @@ public final class LogisticsModule {
         }
     }
 
-    /** A cell of some item network in {@code level} was placed or removed, or a Mouth's routing changed. */
-    static void routesChanged(Level level) {
-        level.getData(ROUTE_EPOCH).changed();
+    /** A local topology or endpoint change invalidates only dependent components. */
+    static void routesChanged(Level level, net.minecraft.core.BlockPos pos) {
+        if (level instanceof net.minecraft.server.level.ServerLevel server) {
+            NetworkTopology.get(server).changed(pos);
+            level.invalidateCapabilities(pos);
+        }
+    }
+
+    /** Persistence entry point for the dimension's connection knowledge. Inventories are never included. */
+    public static net.minecraft.world.level.saveddata.SavedData restoreNetworks(
+            net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        return NetworkTopology.load(tag, registries);
     }
 
     /** The veins, for anyone listing them. */
