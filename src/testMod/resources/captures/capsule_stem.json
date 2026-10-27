@@ -9,6 +9,8 @@
     "give @s infestusfrontier:item_capsule",
     "give @s infestusfrontier:capsule_stem",
     "setblock 0 -62 6 infestusfrontier:mouth[mode=intake]",
+    "setblock 8 -62 2 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 8 -61 2 infestusfrontier:capsule_stem[part=root]",
     "setblock 0 -61 6 infestusfrontier:capsule_stem[part=root]{root:[I;0,-61,6],plan:{seed:7L,cells:[{x:0,y:0,z:0,part:\"root\",side:-1,parent:-1,trunk:0,tier:0}],pods:[]},grow:40}",
     "setblock 5 -61 6 infestusfrontier:item_capsule[facing=north,grade=2]{stock:{held:[{slot:0,item:{id:\"minecraft:wheat\"},count:1200}],grade:2}}",
     "setblock -5 -61 6 infestusfrontier:item_capsule[facing=north,grade=1]{stock:{held:[{slot:0,item:{id:\"minecraft:bone\"},count:300}],grade:1}}",
@@ -62,6 +64,14 @@
       "z": 4.5,
       "yaw": 0,
       "pitch": 70
+    },
+    {
+      "name": "planted",
+      "x": 8.5,
+      "y": -58.6,
+      "z": -0.8,
+      "yaw": 0,
+      "pitch": 42
     },
     {
       "name": "root",
