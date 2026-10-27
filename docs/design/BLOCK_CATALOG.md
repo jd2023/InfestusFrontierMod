@@ -418,7 +418,7 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Growth:** Choose batch speed or biomass economy. Intake/Output Mouths automate it; one recipe mode at a time. Bowl-compatible recipes run faster, but give the same yield.
 
 ### T1-31 — Planting Proboscis
-- **Does:** Plants one supplied seed, sapling or cutting into a selected eligible empty growing cell, then stops or waits for another ready cell. Separate from growth and harvesting.
+- **Does:** Plants one supplied seed, sapling or cutting into a selected eligible empty growing cell, then stops or waits for another ready cell. Separate from growth and harvesting. A seed weevil: a bronze beetle on a root foot, grooved wing covers under a see-through sac of seeds, red bulging eyes, and a long jointed rostrum that hovers over the bed cell to its north (the organ is never turned) and, while it works, stabs a seed into it.
 - **Input → output:** Real planting stock from its slot/Seed Pouch + biomass + a valid prepared site → one planted crop/tree. Failed placement consumes neither seed nor biomass.
 - **Create:** 1 Organ Bud + 1 wooden hoe + 1 Rooting Gel + 1 Membrane Sheet.
 - **Growth:** Choose planting rate or biomass economy. A graft supports submerged planting; a shared Seed Pouch can feed several planters with species filters. Plot and occupancy checks prevent planting a sapling inside a mature canopy or replacing a player block.

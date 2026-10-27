@@ -27,9 +27,22 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 public final class OrganRenderers {
     private OrganRenderers() {}
 
+    /** The space a model fills, relative to its block: one block, unless the registration says otherwise. */
+    private static final AABB BLOCK = new AABB(0, 0, 0, 1, 1, 1);
+
     public static <B extends BlockEntity & GeoBlockEntity, I extends Item & GeoItem> void register(
             IEventBus modBus, String name, Supplier<BlockEntityType<B>> blockEntity, Supplier<I> item) {
-        register(modBus, name, blockEntity, item, context -> null);
+        register(modBus, name, blockEntity, item, BLOCK, context -> null);
+    }
+
+    /**
+     * As {@link #register(IEventBus, String, Supplier, Supplier)} for a model that reaches past its block:
+     * {@code extent} is the space it fills in any pose, relative to the block, so it is not culled while only the part
+     * outside the block is in view.
+     */
+    public static <B extends BlockEntity & GeoBlockEntity, I extends Item & GeoItem> void register(
+            IEventBus modBus, String name, Supplier<BlockEntityType<B>> blockEntity, Supplier<I> item, AABB extent) {
+        register(modBus, name, blockEntity, item, extent, context -> null);
     }
 
     /**
@@ -42,8 +55,18 @@ public final class OrganRenderers {
             Supplier<BlockEntityType<B>> blockEntity,
             Supplier<I> item,
             Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<B>> overlay) {
+        register(modBus, name, blockEntity, item, BLOCK, overlay);
+    }
+
+    private static <B extends BlockEntity & GeoBlockEntity, I extends Item & GeoItem> void register(
+            IEventBus modBus,
+            String name,
+            Supplier<BlockEntityType<B>> blockEntity,
+            Supplier<I> item,
+            AABB extent,
+            Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<B>> overlay) {
         modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(
-                blockEntity.get(), context -> new BlockRenderer<>(name, 1, overlay.apply(context))));
+                blockEntity.get(), context -> new BlockRenderer<>(name, extent, overlay.apply(context))));
         modBus.addListener((RegisterClientExtensionsEvent event) -> event.registerItem(
                 new IClientItemExtensions() {
                     // Made on first use: the renderer needs the client's resources to be ready.
@@ -64,21 +87,18 @@ public final class OrganRenderers {
      */
     public static <B extends BlockEntity & GeoBlockEntity> void registerBlock(
             IEventBus modBus, String name, Supplier<BlockEntityType<B>> blockEntity, int height) {
-        modBus.addListener((EntityRenderersEvent.RegisterRenderers event) ->
-                event.registerBlockEntityRenderer(blockEntity.get(), context -> new BlockRenderer<>(name, height)));
+        AABB extent = new AABB(0, 0, 0, 1, height, 1);
+        modBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(
+                blockEntity.get(), context -> new BlockRenderer<>(name, extent, null)));
     }
 
     private static final class BlockRenderer<B extends BlockEntity & GeoBlockEntity> extends GeoBlockRenderer<B> {
-        private final int height;
+        private final AABB extent;
         private final BlockEntityRenderer<B> overlay;
 
-        BlockRenderer(String name, int height) {
-            this(name, height, null);
-        }
-
-        BlockRenderer(String name, int height, BlockEntityRenderer<B> overlay) {
+        BlockRenderer(String name, AABB extent, BlockEntityRenderer<B> overlay) {
             super(new OrganModel<>(name));
-            this.height = height;
+            this.extent = extent;
             this.overlay = overlay;
             addRenderLayer(new GlowmaskLayer<>(this, ((OrganModel<B>) getGeoModel()).glowmask()));
         }
@@ -97,7 +117,7 @@ public final class OrganRenderers {
 
         @Override
         public AABB getRenderBoundingBox(B blockEntity) {
-            return new AABB(blockEntity.getBlockPos()).expandTowards(0, height - 1, 0);
+            return extent.move(blockEntity.getBlockPos());
         }
     }
 

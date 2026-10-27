@@ -11,6 +11,28 @@ MODELS = ('culture_bowl', 'digestive_sac', 'membrane_rack', 'bone_loom', 'awaken
           'activation_cyst', 'planting_proboscis', 'harvest_corolla', 'compost_gland', 'seed_pouch', 'item_capsule')
 
 
+# Views an organ's identity pass added to its scene, kept here so regenerating the scenes never loses them: a close
+# front view of both blocks and a corner view, the identity cues at full size.
+EXTRA = {
+    'activation_cyst': [
+        {'name': 'close', 'x': 0.5, 'y': -59.3, 'z': 1.6, 'yaw': 0, 'pitch': 22},
+        {'name': 'corner', 'x': -1.0, 'y': -59.2, 'z': 1.5, 'yaw': -35, 'pitch': 25},
+    ],
+    'planting_proboscis': [
+        # the stroke close up, a little over one working cycle, so the snout is seen unfolding and stabbing the bed
+        {'name': 'close', 'x': 0.5, 'y': -59.3, 'z': 1.4, 'yaw': 0, 'pitch': 28, 'frames': 12, 'frameTicks': 4},
+        {'name': 'corner', 'x': -1.2, 'y': -59.2, 'z': 1.4, 'yaw': -38, 'pitch': 25},
+        # low from the side over one working cycle: the rostrum's stab in profile, the sac on the back, the legs
+        {'name': 'low', 'x': 3.2, 'y': -59.8, 'z': 2.2, 'yaw': 65, 'pitch': 8, 'frames': 12, 'frameTicks': 4},
+        # standing on the bed cell in front (a player set inside a block crawls, which drops the eye to the bed), looking
+        # down, the view's far edge 39 degrees south of straight down: the organ's block column lies wholly outside the
+        # view (its nearest corner is 43 degrees off) while the rostrum's tip, at z 2.55 and lower, lies inside, so the
+        # tip draws only because the renderer's extent, not the block, is what is culled
+        {'name': 'bed', 'x': 1.5, 'y': -60.0, 'z': 1.5, 'yaw': 0, 'pitch': 86},
+    ],
+}
+
+
 def scene(name, left, right, frames=48):
     # Move while ticks run so the server tracks the fixture's chunks before freezing.
     spec = {
@@ -25,7 +47,7 @@ def scene(name, left, right, frames=48):
             {'name': 'motion', 'x': 0.5, 'y': -59.5, 'z': 0, 'yaw': 0, 'pitch': 22, 'frames': frames, 'frameTicks': 4},
             {'name': 'back', 'x': 0.5, 'y': -59.5, 'z': 7, 'yaw': 180, 'pitch': 22},
             {'name': 'side', 'x': 4.5, 'y': -59.5, 'z': 3.5, 'yaw': 90, 'pitch': 22},
-        ],
+        ] + EXTRA.get(name, []),
     }
     (OUT / f'motion_{name}.json').write_text(json.dumps(spec, indent=2) + '\n')
 

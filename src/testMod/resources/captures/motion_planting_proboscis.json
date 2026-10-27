@@ -35,6 +35,42 @@
       "z": 3.5,
       "yaw": 90,
       "pitch": 22
+    },
+    {
+      "name": "close",
+      "x": 0.5,
+      "y": -59.3,
+      "z": 1.4,
+      "yaw": 0,
+      "pitch": 28,
+      "frames": 12,
+      "frameTicks": 4
+    },
+    {
+      "name": "corner",
+      "x": -1.2,
+      "y": -59.2,
+      "z": 1.4,
+      "yaw": -38,
+      "pitch": 25
+    },
+    {
+      "name": "low",
+      "x": 3.2,
+      "y": -59.8,
+      "z": 2.2,
+      "yaw": 65,
+      "pitch": 8,
+      "frames": 12,
+      "frameTicks": 4
+    },
+    {
+      "name": "bed",
+      "x": 1.5,
+      "y": -60.0,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 86
     }
   ]
 }

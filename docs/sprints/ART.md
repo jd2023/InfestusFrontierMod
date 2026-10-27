@@ -41,7 +41,8 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Awakening Cradle | Reads as something being brought to life: the glowing cocoon is the cue; closed petals clear the cocoon and its pulse, open ones stay inside the block |
 | Bio-Furnace | All three stages; reads as a furnace from across a room, day and night: dark body, hot mouth and seams, fire and light only while it works; the fangs, coals, chimney, buttresses, bellows and second chimney remain distinct |
 | Activation Cyst, Seed Pouch | Chambers, neck, rim and throat follow their supporting tissue |
-| Planting Proboscis, Harvest Corolla | Moving parts remain attached; petals clear the heart; tips clear the floor |
+| Planting Proboscis | Reads as a seed weevil: the long rostrum over the bed in front and the sac of seeds on its back are the cues; the stab reaches the bed and the seed is left in it; the rostrum never enters the head; legs and claws stay on the slab (`motion_planting_proboscis`: close, corner and low views) |
+| Harvest Corolla | Moving parts remain attached; petals clear the heart; tips clear the floor |
 | Compost Gland | Distinct scrap hopper and fertilizer outlet, with a slow compression cycle |
 | Vascular Junction | All six faces in all three modes; bottom port stays on the foundation |
 | Reservoir | Joined bodies, exterior corners, fill surfaces and inventory models |

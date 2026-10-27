@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -144,7 +145,14 @@ public final class CultivationModule {
         });
         if (FMLEnvironment.dist == Dist.CLIENT) {
             OrganRenderers.register(modBus, "seed_pouch", SEED_POUCH_ENTITY, SEED_POUCH_ITEM);
-            OrganRenderers.register(modBus, "planting_proboscis", PLANTING_PROBOSCIS_ENTITY, PLANTING_PROBOSCIS_ITEM);
+            // the rostrum reaches half a block north past the face, over the bed in front, and a fifth into it at the
+            // stab
+            OrganRenderers.register(
+                    modBus,
+                    "planting_proboscis",
+                    PLANTING_PROBOSCIS_ENTITY,
+                    PLANTING_PROBOSCIS_ITEM,
+                    new AABB(0, -0.25, -0.6, 1, 1, 1));
             OrganRenderers.register(modBus, "harvest_corolla", HARVEST_COROLLA_ENTITY, HARVEST_COROLLA_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(SEED_POUCH_MENU.get(), SeedPouchScreen::new);
