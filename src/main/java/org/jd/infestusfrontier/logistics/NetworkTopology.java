@@ -59,7 +59,8 @@ final class NetworkTopology extends SavedData {
             if (passages.size() == 1) {
                 int mask = passages.getFirst();
                 return mask == 63
-                        || Integer.bitCount(mask) == 2
+                        || Integer.bitCount(mask & (bit(Direction.DOWN) | bit(Direction.UP))) == 1
+                                && Integer.bitCount(mask) == 2
                         || carrier == Carrier.ITEM && mask == (63 ^ bit(Direction.UP));
             }
             Set<Integer> axes = Set.of(

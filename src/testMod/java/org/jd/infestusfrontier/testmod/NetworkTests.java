@@ -1,5 +1,7 @@
 package org.jd.infestusfrontier.testmod;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -172,7 +174,8 @@ public final class NetworkTests {
                 () -> LogisticsModule.restoreNetworks(new CompoundTag(), registries), LogisticsModule::restoreNetworks);
         var original = level.getDataStorage().get(factory, "infestusfrontier_networks");
         try {
-            for (int[] masks : new int[][] {{1}, {7}, {63, 63}, {3, 5}, {63 ^ (1 << Direction.UP.ordinal())}, {63}}) {
+            for (int[] masks :
+                    new int[][] {{1}, {3}, {20}, {7}, {63, 63}, {3, 5}, {63 ^ (1 << Direction.UP.ordinal())}, {63}}) {
                 CompoundTag entry = new CompoundTag();
                 entry.putIntArray("pos", new int[] {vein.getX(), vein.getY(), vein.getZ()});
                 CompoundTag tissue = new CompoundTag();
@@ -202,12 +205,57 @@ public final class NetworkTests {
         h.succeed();
     }
 
+    @GameTest(template = "empty", batch = "network_valid_topology")
+    public static void everyExistingTissueLayoutLoadsWithoutLockingTheNetwork(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
+        level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
+        ListTag entries = new ListTag();
+        for (String carrier : List.of("BIOMASS", "FLUID", "ITEM")) {
+            List<int[]> layouts = new ArrayList<>();
+            layouts.add(new int[] {63});
+            for (Direction vertical : List.of(Direction.UP, Direction.DOWN))
+                for (Direction horizontal : Direction.Plane.HORIZONTAL)
+                    layouts.add(new int[] {(1 << vertical.ordinal()) | (1 << horizontal.ordinal())});
+            layouts.add(new int[] {3, 12});
+            layouts.add(new int[] {3, 48});
+            layouts.add(new int[] {12, 48});
+            if (carrier.equals("ITEM")) layouts.add(new int[] {63 ^ (1 << Direction.UP.ordinal())});
+            for (int[] layout : layouts) {
+                CompoundTag entry = new CompoundTag();
+                entry.putIntArray("pos", new int[] {2000 + entries.size(), 80, 2000});
+                CompoundTag tissue = new CompoundTag();
+                tissue.putString("carrier", carrier);
+                tissue.putIntArray("passages", layout);
+                entry.put("tissue", tissue);
+                entries.add(entry);
+            }
+        }
+        CompoundTag saved = new CompoundTag();
+        saved.put("connections", entries);
+        var registries = level.registryAccess();
+        var factory = new SavedData.Factory<>(
+                () -> LogisticsModule.restoreNetworks(new CompoundTag(), registries), LogisticsModule::restoreNetworks);
+        var original = level.getDataStorage().get(factory, "infestusfrontier_networks");
+        try {
+            var restored = LogisticsModule.restoreNetworks(saved, registries);
+            level.getDataStorage().set("infestusfrontier_networks", restored);
+            var status = level.getCapability(LogisticsCapabilities.NETWORK_STATUS, vein, Direction.WEST);
+            h.assertValueEqual(status.state(), "ready", "all legitimate saved layouts are readable");
+            ListTag roundTrip = restored.save(new CompoundTag(), registries).getList("connections", 10);
+            for (var entry : entries) h.assertTrue(roundTrip.contains(entry), "each legitimate layout survives");
+        } finally {
+            level.getDataStorage().set("infestusfrontier_networks", original);
+        }
+        h.succeed();
+    }
+
     @GameTest(template = "empty", batch = "network_ring")
     public static void aLiquidRingHasNoStorageAndTransfersDirectlyToALoadedEndpoint(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos origin = h.absolutePos(new BlockPos(2, 2, 2));
         for (BlockPos offset :
-                java.util.List.of(BlockPos.ZERO, new BlockPos(1, 0, 0), new BlockPos(1, 0, 1), new BlockPos(0, 0, 1))) {
+                List.of(BlockPos.ZERO, new BlockPos(1, 0, 0), new BlockPos(1, 0, 1), new BlockPos(0, 0, 1))) {
             BlockPos cell = origin.offset(offset);
             level.setBlockAndUpdate(cell, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
             h.assertTrue(level.getBlockEntity(cell) == null, "passive cell");
