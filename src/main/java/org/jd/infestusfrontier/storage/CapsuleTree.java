@@ -1,9 +1,15 @@
 package org.jd.infestusfrontier.storage;
 
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackLinkedSet;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import org.jd.infestusfrontier.core.storage.Compartments;
@@ -16,9 +22,17 @@ import org.jd.infestusfrontier.storage.api.CapsuleStock;
  * slots. Callers reach it through {@link Stems#of}, which uses it only while {@link #isUsable}. Items go by
  * {@link Compartments}: a kind fills its own compartments before it opens an empty one, each compartment holding as
  * many stacks as its pod's grade allows. What a kind's compartments hold is read once per change of the store, so a
- * hopper trying every slot reads the tree once.
+ * hopper trying every slot reads the tree once; so is the ledger of {@link #kinds}, which every viewer reads.
  */
 final class CapsuleTree {
+    /** The ledger's order: the name a player reads, then the item's id, damage and components, so it holds still. */
+    private static final Comparator<ItemStack> BY_NAME = Comparator.comparing(
+                    (ItemStack stack) -> stack.getHoverName().getString(), String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(
+                    stack -> BuiltInRegistries.ITEM.getKey(stack.getItem()).toString())
+            .thenComparingInt(ItemStack::getDamageValue)
+            .thenComparingInt(stack -> stack.getComponents().hashCode());
+
     private final List<ItemCapsuleBlockEntity> members;
     private final Level level;
     /** The chunks the tree's plan spans, members or not: a planned pod coming back into reach reopens the store. */
@@ -30,6 +44,8 @@ final class CapsuleTree {
     private int readVersion = -1;
     private ItemStack readKind = ItemStack.EMPTY;
     private int[] read = new int[0];
+    private int kindsVersion = -1;
+    private List<ItemStack> kinds = List.of();
 
     CapsuleTree(Level level, List<ItemCapsuleBlockEntity> members, List<BlockPos> span) {
         this.level = level;
@@ -193,6 +209,61 @@ final class CapsuleTree {
         int total = 0;
         for (int count : counts(like)) if (count > 0) total += count;
         return total;
+    }
+
+    /**
+     * The ledger: every kind the tree holds, once, with its whole count over every compartment, in {@link #BY_NAME}
+     * order. Built once per change of the store; the stacks are shared, so callers copy before they edit.
+     */
+    List<ItemStack> kinds() {
+        if (slots() == 0) return List.of();
+        if (kindsVersion != version) {
+            Object2IntMap<ItemStack> totals = new Object2IntLinkedOpenCustomHashMap<>(ItemStackLinkedSet.TYPE_AND_TAG);
+            for (int slot = 0; slot < slots(); slot++) {
+                ItemStack held = pod(slot).held(compartment(slot));
+                if (!held.isEmpty()) totals.mergeInt(held, held.getCount(), Integer::sum);
+            }
+            List<ItemStack> sorted = new ArrayList<>(totals.size());
+            for (Object2IntMap.Entry<ItemStack> entry : totals.object2IntEntrySet())
+                sorted.add(entry.getKey().copyWithCount(entry.getIntValue()));
+            sorted.sort(BY_NAME);
+            kinds = List.copyOf(sorted);
+            kindsVersion = version;
+        }
+        return kinds;
+    }
+
+    /** Entry {@code index} of the ledger, a copy; empty past the last kind. */
+    ItemStack kind(int index) {
+        List<ItemStack> all = kinds();
+        return index >= 0 && index < all.size() ? all.get(index).copy() : ItemStack.EMPTY;
+    }
+
+    /** How many more of {@code kind} the tree takes where its rules put them; 0 for a kind it refuses. */
+    int room(ItemStack kind) {
+        if (kind.isEmpty() || slots() == 0 || !Stems.takes(kind)) return 0;
+        int room = 0;
+        for (int taken : Compartments.plan(counts(kind), limits(kind), Integer.MAX_VALUE)) room += taken;
+        return room;
+    }
+
+    /**
+     * Takes up to {@code amount} of {@code kind} out of the compartments holding it, the last first, so a kind draws
+     * together into its first compartments as it is taken; what was taken.
+     */
+    ItemStack take(ItemStack kind, int amount) {
+        if (kind.isEmpty() || amount <= 0) return ItemStack.EMPTY;
+        int[] counts = counts(kind);
+        int left = amount;
+        int taken = 0;
+        for (int slot = counts.length - 1; slot >= 0 && left > 0; slot--) {
+            if (counts[slot] <= 0) continue;
+            int part = Math.min(left, counts[slot]);
+            pod(slot).take(compartment(slot), part);
+            left -= part;
+            taken += part;
+        }
+        return taken == 0 ? ItemStack.EMPTY : kind.copyWithCount(taken);
     }
 
     long stored() {

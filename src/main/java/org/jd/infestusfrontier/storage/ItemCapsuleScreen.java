@@ -1,23 +1,25 @@
 package org.jd.infestusfrontier.storage;
 
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import org.jd.infestusfrontier.foundation.screen.OrganScreen;
+import org.jd.infestusfrontier.foundation.screen.Scrollbar;
 import org.jd.infestusfrontier.foundation.screen.Tally;
-import org.jd.infestusfrontier.foundation.screen.Well;
+import org.jd.infestusfrontier.foundation.screen.Wells;
+import org.jd.infestusfrontier.ui.Bounds;
 import org.jd.infestusfrontier.ui.PartRow;
 import org.jd.infestusfrontier.ui.Sheet;
+import org.jetbrains.annotations.Nullable;
 
-/** A page of the whole tree's store, reached from any stem cell, with fixed wells, page buttons and the growth line. */
+/**
+ * The whole tree's ledger, reached from any stem cell: three rows of kinds with a scrollbar beside them, the pods
+ * line and the growth line under them. The wheel over the view and the bar scrolls; the menu decides the row.
+ */
 final class ItemCapsuleScreen extends OrganScreen<ItemCapsuleMenu> {
     private static final String KEY = "gui.infestusfrontier.item_capsule.";
-    private final List<Well> wells = new ArrayList<>();
-    private Button previous;
-    private Button next;
+    private Scrollbar scrollbar;
 
     ItemCapsuleScreen(ItemCapsuleMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, ItemCapsuleMenu.STRIPS);
@@ -30,40 +32,25 @@ final class ItemCapsuleScreen extends OrganScreen<ItemCapsuleMenu> {
 
     @Override
     protected void addParts(PartRow row) {
-        wells.clear();
+        PartRow ledger = new PartRow(Sheet.LEFT_X, Sheet.GAP, Sheet.RIGHT_EDGE);
+        add(new Wells(
+                ledger,
+                ItemCapsuleMenu.GRID,
+                menu.slots.subList(0, ItemCapsuleMenu.VIEW),
+                Component.translatable(KEY + "held")));
+        scrollbar = add(new Scrollbar(
+                ledger.place(Sheet.SCROLL_TRACK.width()),
+                ItemCapsuleMenu.GRID_Y,
+                menu::shownRow,
+                menu::lastRow,
+                this::scrollTo,
+                () -> Component.translatable(KEY + "held.story")));
         add(new Tally(
                 Sheet.LEFT_X,
-                Sheet.LABEL_Y - 3,
+                ItemCapsuleMenu.BODY_Y,
                 Sheet.RIGHT_EDGE - Sheet.LEFT_X,
                 () -> Component.translatable(KEY + "body", menu.compartments(), menu.used()),
                 () -> Component.translatable(KEY + "body.story")));
-        for (int slot = 0; slot < ItemCapsuleMenu.PAGE_SIZE; slot++) {
-            int y = ItemCapsuleMenu.GRID_Y + slot / ItemCapsuleMenu.COLUMNS * ItemCapsuleMenu.PITCH;
-            wells.add(add(new Well(
-                    Sheet.LEFT_X + slot % ItemCapsuleMenu.COLUMNS * ItemCapsuleMenu.PITCH,
-                    y,
-                    y,
-                    menu.getSlot(slot),
-                    Component.empty())));
-        }
-        previous = button(
-                Sheet.LEFT_X,
-                ItemCapsuleMenu.BUTTON_Y,
-                Component.translatable(KEY + "previous"),
-                b -> send(ItemCapsuleMenu.PREVIOUS));
-        next = button(
-                Sheet.RIGHT_EDGE - Sheet.BUTTON.width(),
-                ItemCapsuleMenu.BUTTON_Y,
-                Component.translatable(KEY + "next"),
-                b -> send(ItemCapsuleMenu.NEXT));
-        previous.setTooltip(Tooltip.create(Component.translatable(KEY + "page.story")));
-        next.setTooltip(Tooltip.create(Component.translatable(KEY + "page.story")));
-        add(new Tally(
-                66,
-                ItemCapsuleMenu.BUTTON_Y + 4,
-                44,
-                () -> Component.translatable(KEY + "page", menu.page() + 1, menu.pages()),
-                () -> Component.translatable(KEY + "page.story")));
         add(new Tally(
                 Sheet.LEFT_X,
                 ItemCapsuleMenu.GROWTH_Y,
@@ -72,24 +59,37 @@ final class ItemCapsuleScreen extends OrganScreen<ItemCapsuleMenu> {
                         ? Component.translatable(KEY + "growth", menu.fed(), menu.cost())
                         : Component.translatable(KEY + "grown"),
                 () -> Component.translatable(KEY + "growth.story")));
-        updateControls();
     }
 
-    private void send(int id) {
-        if (minecraft != null && minecraft.gameMode != null)
-            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id);
+    /** Asks the server for a view from {@code row}; the menu keeps the row asked for until the server shows it. */
+    private void scrollTo(int row) {
+        if (menu.scrollTo(row) && minecraft != null && minecraft.gameMode != null)
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, menu.shownRow());
     }
 
+    /** A click on a cell is neither predicted nor sent while the server has yet to show the row asked for. */
     @Override
-    protected void containerTick() {
-        super.containerTick();
-        updateControls();
+    protected void slotClicked(@Nullable Slot slot, int slotId, int mouseButton, ClickType type) {
+        if (slot != null && slot.index < ItemCapsuleMenu.VIEW && menu.pending()) return;
+        super.slotClicked(slot, slotId, mouseButton, type);
     }
 
-    private void updateControls() {
-        previous.active = menu.page() > 0 && menu.getCarried().isEmpty();
-        next.active = menu.page() + 1 < menu.pages() && menu.getCarried().isEmpty();
-        for (int slot = 0; slot < wells.size(); slot++)
-            wells.get(slot).visible = menu.getSlot(slot).isActive();
+    /** The wheel over the view or the bar moves the view a row. */
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        Bounds view = ItemCapsuleMenu.GRID.bounds();
+        if (scrollY != 0
+                && isHovering(view.x(), view.y(), Sheet.RIGHT_EDGE - view.x(), view.height(), mouseX, mouseY)) {
+            scrollbar.scrollBy(scrollY > 0 ? -1 : 1);
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    /** A container screen keeps drags from its widgets; the thumb gets its own. */
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (scrollbar.dragging()) return scrollbar.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 }

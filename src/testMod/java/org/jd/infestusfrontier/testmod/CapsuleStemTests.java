@@ -729,12 +729,175 @@ public final class CapsuleStemTests {
         menu.clicked(0, 0, ClickType.QUICK_MOVE, player);
         h.assertTrue(menu.getSlot(0).getItem().isEmpty(), "shift-click empties it into the inventory");
         h.assertValueEqual(player.getInventory().countItem(Items.COBBLESTONE), 200, "all of it");
-        int inventorySlot = ItemCapsuleMenu.PAGE_SIZE + 27;
+        int inventorySlot = ItemCapsuleMenu.VIEW + 27;
         player.getInventory().setItem(0, stack(Items.DIRT, 40));
         menu.clicked(inventorySlot, 0, ClickType.QUICK_MOVE, player);
         h.assertValueEqual(store(h, ROOT).count(stack(Items.DIRT, 1)), 40, "shift-click fills the tree");
         h.assertTrue(player.getInventory().getItem(0).isEmpty(), "from the hand");
-        h.assertFalse(menu.clickMenuButton(player, ItemCapsuleMenu.NEXT), "one page holds every pod");
+        h.assertFalse(menu.clickMenuButton(player, 1), "one view holds every kind");
+        player.closeContainer();
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void theLedgerCountsAKindOverItsPodsAndSortsByName(GameTestHelper h) {
+        plant(h, FORKING);
+        growAll(h);
+        ItemStore store = store(h, ROOT);
+        h.assertTrue(store.insert(stack(Items.WATER_BUCKET, 9), false).isEmpty(), "nine buckets go in");
+        h.assertTrue(store.insert(stack(Items.BONE, 100), false).isEmpty(), "a hundred bones");
+        h.assertTrue(store.insert(stack(Items.APPLE, 3), false).isEmpty(), "three apples");
+        MenuPlayer player = new MenuPlayer(h.getLevel());
+        BlockPos at = h.absolutePos(ROOT);
+        player.moveTo(at.getX() + 0.5, at.getY(), at.getZ() - 1.5);
+        player.openMenu((MenuProvider) h.getBlockEntity(ROOT), at);
+        ItemCapsuleMenu menu = (ItemCapsuleMenu) player.containerMenu;
+        h.assertValueEqual(menu.used(), 4, "eight buckets fill a young pod; the ninth opens another");
+        h.assertValueEqual(menu.kinds(), 3, "three kinds");
+        h.assertTrue(menu.getSlot(0).getItem().is(Items.APPLE), "Apple first");
+        h.assertTrue(menu.getSlot(1).getItem().is(Items.BONE), "Bone second");
+        h.assertTrue(menu.getSlot(2).getItem().is(Items.WATER_BUCKET), "Water Bucket last");
+        h.assertValueEqual(menu.getSlot(2).getItem().getCount(), 9, "one entry counts both pods");
+        h.assertTrue(menu.getSlot(3).getItem().isEmpty(), "then the open entry");
+        menu.clicked(2, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().is(Items.WATER_BUCKET), "a click takes a bucket");
+        h.assertValueEqual(menu.getCarried().getCount(), 1, "one, as buckets do not stack");
+        h.assertValueEqual(menu.getSlot(2).getItem().getCount(), 8, "eight left");
+        h.assertValueEqual(menu.used(), 3, "taken from the last pod, which empties");
+        menu.clicked(2, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().isEmpty(), "the bucket goes back");
+        h.assertValueEqual(menu.getSlot(2).getItem().getCount(), 9, "nine again");
+        menu.setCarried(stack(Items.DIRT, 5));
+        menu.clicked(1, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().is(Items.DIRT) && menu.getCarried().getCount() == 5, "dirt on bones: nothing");
+        h.assertValueEqual(menu.getSlot(1).getItem().getCount(), 100, "the bones stay");
+        menu.clicked(3, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().isEmpty(), "dirt on the open entry goes in");
+        h.assertValueEqual(store.count(stack(Items.DIRT, 1)), 5, "into the tree");
+        h.assertTrue(menu.getSlot(2).getItem().is(Items.DIRT), "and sorts into place");
+        h.assertTrue(menu.getSlot(3).getItem().is(Items.WATER_BUCKET), "before the buckets");
+        player.closeContainer();
+        h.succeed();
+    }
+
+    /** Presses empty pod items on the free sides of trunk cells until the tree has {@code wanted} pods. */
+    private static void pressPods(GameTestHelper h, int wanted) {
+        Player builder = EcologyTests.holding(h, GameType.SURVIVAL, StorageModule.ITEM_CAPSULE_ITEM.get(), 64);
+        for (BlockPos cell : stems(h)) {
+            if (h.getBlockState(cell).getValue(CapsuleStemBlock.PART) == StemPart.ROOT) continue;
+            for (Direction side : Direction.Plane.HORIZONTAL) {
+                if (pods(h).size() >= wanted) return;
+                if (!h.getBlockState(cell.relative(side)).isAir()) continue;
+                h.placeAt(builder, builder.getMainHandItem(), cell, side);
+            }
+        }
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void theViewScrollsARowAtATimeAndNeverPastTheOpenEntry(GameTestHelper h) {
+        plant(h, FORKING);
+        growAll(h);
+        pressPods(h, 25);
+        h.assertValueEqual(pods(h).size(), 25, "sixteen grown and nine pressed");
+        Item[] kinds = {
+            Items.STONE,
+            Items.DIRT,
+            Items.SAND,
+            Items.GRAVEL,
+            Items.OAK_LOG,
+            Items.OAK_PLANKS,
+            Items.COBBLESTONE,
+            Items.APPLE,
+            Items.BREAD,
+            Items.BONE,
+            Items.STRING,
+            Items.FEATHER,
+            Items.FLINT,
+            Items.COAL,
+            Items.IRON_INGOT,
+            Items.GOLD_INGOT,
+            Items.REDSTONE,
+            Items.LAPIS_LAZULI,
+            Items.EMERALD,
+            Items.DIAMOND,
+            Items.STICK,
+            Items.WHEAT,
+            Items.WHEAT_SEEDS,
+            Items.SUGAR,
+            Items.PAPER
+        };
+        ItemStore store = store(h, ROOT);
+        for (Item kind : kinds) h.assertTrue(store.insert(stack(kind, 1), false).isEmpty(), "a pod for " + kind);
+        MenuPlayer player = new MenuPlayer(h.getLevel());
+        BlockPos at = h.absolutePos(ROOT);
+        player.moveTo(at.getX() + 0.5, at.getY(), at.getZ() - 1.5);
+        player.openMenu((MenuProvider) h.getBlockEntity(ROOT), at);
+        ItemCapsuleMenu menu = (ItemCapsuleMenu) player.containerMenu;
+        h.assertValueEqual(menu.kinds(), 25, "twenty-five kinds");
+        h.assertValueEqual(menu.lastRow(), 1, "with the open entry they take four rows; one scrolls");
+        ItemStack ninth = menu.getSlot(8).getItem().copy();
+        ItemStack last = menu.getSlot(ItemCapsuleMenu.VIEW - 1).getItem().copy();
+        h.assertFalse(ninth.isEmpty() || last.isEmpty(), "the first view is full of kinds");
+        h.assertTrue(menu.clickMenuButton(player, 1), "the view moves a row");
+        h.assertValueEqual(menu.shownRow(), 1, "to the second");
+        h.assertTrue(ItemStack.isSameItemSameComponents(menu.getSlot(0).getItem(), ninth), "the ninth kind leads");
+        h.assertTrue(ItemStack.isSameItemSameComponents(menu.getSlot(15).getItem(), last), "the twenty-fourth kind");
+        h.assertFalse(menu.getSlot(16).getItem().isEmpty(), "the twenty-fifth");
+        h.assertTrue(menu.getSlot(17).getItem().isEmpty(), "then the open entry");
+        h.assertFalse(menu.clickMenuButton(player, 9), "no row past the last");
+        h.assertValueEqual(menu.shownRow(), 1, "still the second");
+        h.assertTrue(menu.clickMenuButton(player, 0), "back to the top");
+        h.assertTrue(ItemStack.isSameItemSameComponents(menu.getSlot(8).getItem(), ninth), "as it was");
+        player.closeContainer();
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aShiftClickStopsAtItsKindThoughTheNextIsTheSameItem(GameTestHelper h) {
+        plant(h, FORKING);
+        growAll(h);
+        ItemStore store = store(h, ROOT);
+        ItemStack worn = new ItemStack(Items.IRON_PICKAXE);
+        worn.setDamageValue(10);
+        h.assertTrue(store.insert(new ItemStack(Items.IRON_PICKAXE), false).isEmpty(), "a new pick goes in");
+        h.assertTrue(store.insert(worn, false).isEmpty(), "and a worn one");
+        MenuPlayer player = new MenuPlayer(h.getLevel());
+        BlockPos at = h.absolutePos(ROOT);
+        player.moveTo(at.getX() + 0.5, at.getY(), at.getZ() - 1.5);
+        player.openMenu((MenuProvider) h.getBlockEntity(ROOT), at);
+        AbstractContainerMenu menu = player.containerMenu;
+        h.assertTrue(
+                menu.getSlot(0).getItem().is(Items.IRON_PICKAXE)
+                        && menu.getSlot(1).getItem().is(Items.IRON_PICKAXE),
+                "two kinds of one item sort side by side");
+        menu.clicked(0, 0, ClickType.QUICK_MOVE, player);
+        h.assertValueEqual(player.getInventory().countItem(Items.IRON_PICKAXE), 1, "one pick moves");
+        h.assertValueEqual(store.count(worn), 1, "the other kind stays");
+        player.closeContainer();
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aClickOnAKindTheViewerWasNotShownIsRefused(GameTestHelper h) {
+        plant(h, FORKING);
+        growAll(h);
+        ItemStore store = store(h, ROOT);
+        store.insert(stack(Items.BONE, 10), false);
+        MenuPlayer player = new MenuPlayer(h.getLevel());
+        BlockPos at = h.absolutePos(ROOT);
+        player.moveTo(at.getX() + 0.5, at.getY(), at.getZ() - 1.5);
+        player.openMenu((MenuProvider) h.getBlockEntity(ROOT), at);
+        AbstractContainerMenu menu = player.containerMenu;
+        h.assertTrue(menu.getSlot(0).getItem().is(Items.BONE), "the viewer was shown bones first");
+        store.insert(stack(Items.APPLE, 4), false);
+        h.assertTrue(menu.getSlot(0).getItem().is(Items.APPLE), "apples sort before them");
+        menu.clicked(0, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().isEmpty(), "a click on the cell is refused until the viewer sees apples");
+        h.assertValueEqual(store.count(stack(Items.APPLE, 1)), 4, "nothing moved");
+        menu.broadcastChanges();
+        menu.clicked(0, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().is(Items.APPLE), "shown, they are taken");
+        h.assertValueEqual(menu.getCarried().getCount(), 4, "all four");
         player.closeContainer();
         h.succeed();
     }
@@ -775,7 +938,7 @@ public final class CapsuleStemTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void theClientRefusesToSwapAnotherKindIntoAnOccupiedCompartment(GameTestHelper h) {
+    public static void theClientRefusesAnotherKindOverAnEntryAndHoldsClicksWhileScrolling(GameTestHelper h) {
         MenuPlayer player = new MenuPlayer(h.getLevel());
         RegistryFriendlyByteBuf extra =
                 new RegistryFriendlyByteBuf(Unpooled.buffer(), h.getLevel().registryAccess());
@@ -786,16 +949,31 @@ public final class CapsuleStemTests {
         } finally {
             extra.release();
         }
-        menu.setData(0, 2);
+        menu.setData(ItemCapsuleMenu.KINDS_DATA, 2);
         menu.getSlot(0).set(stack(Items.COBBLESTONE, 200));
         menu.setCarried(stack(Items.DIRT, 3));
-        h.assertFalse(menu.getSlot(0).mayPlace(menu.getCarried()), "client refuses a different occupied kind");
+        h.assertFalse(menu.getSlot(0).mayPlace(menu.getCarried()), "client refuses a different kind over an entry");
         menu.clicked(0, 0, ClickType.PICKUP, player);
         h.assertTrue(menu.getCarried().is(Items.DIRT), "prediction keeps the cursor kind");
         h.assertValueEqual(menu.getCarried().getCount(), 3, "prediction keeps the cursor count");
-        h.assertValueEqual(menu.getSlot(0).getItem().getCount(), 200, "prediction keeps the compartment count");
+        h.assertValueEqual(menu.getSlot(0).getItem().getCount(), 200, "prediction keeps the entry count");
         h.assertTrue(menu.getSlot(0).mayPlace(stack(Items.COBBLESTONE, 1)), "matching kinds still fit");
-        h.assertTrue(menu.getSlot(1).mayPlace(stack(Items.DIRT, 1)), "empty compartments still fit");
+        h.assertTrue(menu.getSlot(2).mayPlace(stack(Items.DIRT, 1)), "the open entry takes anything");
+        h.assertFalse(menu.scrollTo(1), "two kinds fit one view: nothing to scroll");
+        menu.setData(ItemCapsuleMenu.KINDS_DATA, 30);
+        h.assertValueEqual(menu.lastRow(), 1, "thirty kinds scroll one row");
+        h.assertTrue(menu.scrollTo(1), "the client asks for the second row");
+        h.assertTrue(menu.pending(), "and waits for the server to show it");
+        menu.setCarried(ItemStack.EMPTY);
+        menu.clicked(0, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().isEmpty(), "a click on an entry waits with it");
+        menu.setData(ItemCapsuleMenu.ROW_DATA, 1);
+        h.assertFalse(menu.pending(), "the server shows the row");
+        menu.clicked(0, 0, ClickType.PICKUP, player);
+        h.assertValueEqual(menu.getCarried().getCount(), 64, "and the click goes through");
+        h.assertFalse(menu.scrollTo(5), "no row past the last");
+        menu.setData(ItemCapsuleMenu.KINDS_DATA, 2);
+        h.assertValueEqual(menu.shownRow(), 0, "fewer kinds pull the row asked for back into range");
         h.succeed();
     }
 

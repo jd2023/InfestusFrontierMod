@@ -20,6 +20,9 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   176,96  52x16    button, disabled (sunken, grey)
   176,112 44x12    progress vein, empty
   176,128 44x12    progress vein, full (the screen draws its left part)
+  176,160 54x8     trough, empty; 176,170 the same full (the screen draws its left part)
+  238,0   12x54    scroll groove beside three rows of wells at the inventory pitch
+  238,56  12x15    scroll thumb, a chitin plate with grip ridges; 238,72 the same greyed when nothing scrolls
   2,190   32x32 organ emblems, seven to a row at a 34 px pitch, rows 34 apart: Sac, Bladder, Bowl, Rack, Loom,
                    Cradle, Furnace; then Cyst and Compost on the second row
 
@@ -63,6 +66,10 @@ POOL = [(168, 196, 150), (206, 224, 182), (236, 244, 220)]
 BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
 TROUGH_EMPTY = (176, 160, 54, 8)
 TROUGH_FULL = (176, 170, 54, 8)
+SCROLL_TRACK = (238, 0, 12, 54)
+SCROLL_THUMB = (238, 56)
+SCROLL_THUMB_OFF = (238, 72)
+THUMB_SIZE = (12, 15)
 WATER = [(28, 58, 118), (58, 118, 198), (120, 188, 240), (204, 236, 255)]
 # where screens write: title, slot labels, tank label and amount, inventory label; and the emblem column
 TEXT = [(6, 4, 164, 12), (40, 24, 130, 10), (118, 8, 52, 10), (118, 60, 52, 10), (6, 70, 164, 12), (6, 25, 36, 36)]
@@ -192,6 +199,58 @@ def trough(img):
             if j == h - 1:
                 full = WATER[0]
             put(img, TROUGH_FULL[0] + i, TROUGH_FULL[1] + j, full)
+
+
+def groove_mask(i, j, w, h):
+    """A vertical capsule: the scroll groove's bed."""
+    r = w / 2
+    cy = min(max(j + 0.5, r), h - r)
+    return math.hypot(i + 0.5 - r, j + 0.5 - cy) <= r
+
+
+def scroll(img):
+    """A sunken vertical groove, dark on its lit side's edge and pale on the far one, ribbed faintly; and the thumbs."""
+    x0, y0, w, h = SCROLL_TRACK
+    bed = lambda i, j: groove_mask(i - 1, j - 1, w - 2, h - 2)  # one pixel of rim inside the sprite
+    for j in range(h):
+        for i in range(w):
+            if bed(i, j):
+                continue
+            if any(bed(i + di, j + dj) for di in (-1, 0, 1) for dj in (-1, 0, 1)):
+                put(img, x0 + i, y0 + j, OUTLINE if i < w / 2 else IVORY[3])
+    for j in range(h):
+        for i in range(w):
+            if not bed(i, j):
+                continue
+            colour = mix(WELL, PIT, 0.6) if i < 3 else WELL
+            if j % 6 == 3 and 3 <= i < w - 2:
+                colour = mix(colour, PIT, 0.45)
+            put(img, x0 + i, y0 + j, colour)
+    thumb(img, SCROLL_THUMB, False)
+    thumb(img, SCROLL_THUMB_OFF, True)
+
+
+def thumb(img, origin, disabled):
+    """A chitin plate lit from the upper left with two grip ridges across it; grey and flat when disabled."""
+    w, h = THUMB_SIZE
+    pale, mid, dark = (GREY[2], GREY[1], GREY[0]) if disabled else (IVORY[3], IVORY[2], IVORY[0])
+    for j in range(h):
+        for i in range(w):
+            if i in (0, w - 1) and j in (0, h - 1):
+                continue
+            if i == 0 or j == 0 or i == w - 1 or j == h - 1:
+                colour = OUTLINE if disabled else mix(OUTLINE, FLESH[1], 0.4)
+            elif i == 1 or j == 1:
+                colour = pale
+            elif i == w - 2 or j == h - 2:
+                colour = dark
+            else:
+                colour = mid
+            if 3 <= i <= w - 4 and j in (5, 9):
+                colour = dark
+            elif 3 <= i <= w - 4 and j in (6, 10):
+                colour = pale
+            put(img, origin[0] + i, origin[1] + j, colour)
 
 
 def nodule(img, x, y, w, h):
@@ -552,6 +611,7 @@ def main():
     well(img, SLOT[0], SLOT[1], 18, 18, WELL, 1099)
     progress(img)
     trough(img)
+    scroll(img)
     strip(img)
     tank(img)
     emblems(img)

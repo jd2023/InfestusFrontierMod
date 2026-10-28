@@ -27,6 +27,12 @@ public final class Sheet {
     public static final Bounds TROUGH_EMPTY = new Bounds(176, 160, 54, 8);
 
     public static final Bounds TROUGH_FULL = new Bounds(176, 170, 54, 8);
+    /** The groove of a scrollbar beside three rows of wells at the inventory's pitch; the thumb rides inside it. */
+    public static final Bounds SCROLL_TRACK = new Bounds(238, 0, 12, 54);
+
+    public static final Bounds SCROLL_THUMB = new Bounds(238, 56, 12, 15);
+    /** The thumb while there is nothing to scroll. */
+    public static final Bounds SCROLL_THUMB_OFF = new Bounds(238, 72, 12, 15);
     /** Eighteen rows of panel body with both frame sides; stacked at {@link #SPLIT_Y} to make a taller panel. */
     public static final Bounds BODY_STRIP = new Bounds(0, 168, 176, 18);
     /** Where the panel splits: rows above hold the organ's parts, rows from here hold the player inventory. */
@@ -145,6 +151,9 @@ public final class Sheet {
                 VEIN_FULL,
                 TROUGH_EMPTY,
                 TROUGH_FULL,
+                SCROLL_TRACK,
+                SCROLL_THUMB,
+                SCROLL_THUMB_OFF,
                 BODY_STRIP,
                 emblem(0),
                 emblem(1),
