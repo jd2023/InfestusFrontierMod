@@ -1,11 +1,18 @@
 package org.jd.infestusfrontier.testmod;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gametest.framework.GameTestInfo;
+import net.minecraft.gametest.framework.GameTestListener;
+import net.minecraft.gametest.framework.GameTestRunner;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
@@ -169,38 +176,12 @@ public final class NetworkTests {
         BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
         level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
         level.setBlockAndUpdate(vein.east(), StorageModule.BIOMASS_BLADDER.get().defaultBlockState());
-        var registries = level.registryAccess();
-        var factory = new SavedData.Factory<>(
-                () -> LogisticsModule.restoreNetworks(new CompoundTag(), registries), LogisticsModule::restoreNetworks);
-        var original = level.getDataStorage().get(factory, "infestusfrontier_networks");
-        try {
-            for (int[] masks :
-                    new int[][] {{1}, {3}, {20}, {7}, {63, 63}, {3, 5}, {63 ^ (1 << Direction.UP.ordinal())}, {63}}) {
-                CompoundTag entry = new CompoundTag();
-                entry.putIntArray("pos", new int[] {vein.getX(), vein.getY(), vein.getZ()});
-                CompoundTag tissue = new CompoundTag();
-                tissue.putString("carrier", "BIOMASS");
-                tissue.putIntArray("passages", masks);
-                entry.put("tissue", tissue);
-                ListTag entries = new ListTag();
-                entries.add(entry);
-                if (masks.length == 1 && masks[0] == 63) entries.add(entry.copy());
-                CompoundTag saved = new CompoundTag();
-                saved.put("connections", entries);
-                var restored = LogisticsModule.restoreNetworks(saved, registries);
-                level.getDataStorage().set("infestusfrontier_networks", restored);
-                var status = level.getCapability(LogisticsCapabilities.NETWORK_STATUS, vein, Direction.WEST);
-                h.assertValueEqual(status.state(), "unavailable", "corrupt topology reports refusal");
-                IFluidHandler port = level.getCapability(Capabilities.FluidHandler.BLOCK, vein, Direction.WEST);
-                h.assertValueEqual(
-                        port.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE),
-                        0,
-                        "refused transfer");
-                h.assertValueEqual(
-                        restored.save(new CompoundTag(), registries), saved, "original malformed save kept whole");
-            }
-        } finally {
-            level.getDataStorage().set("infestusfrontier_networks", original);
+        for (int[] masks :
+                new int[][] {{1}, {3}, {20}, {7}, {63, 63}, {3, 5}, {63 ^ (1 << Direction.UP.ordinal())}, {63}}) {
+            CompoundTag saved = topologyAt(vein, masks);
+            ListTag entries = saved.getList("connections", 10);
+            if (masks.length == 1 && masks[0] == 63) entries.add(entries.get(0).copy());
+            assertRefusedTopology(h, vein, saved);
         }
         h.succeed();
     }
@@ -233,21 +214,114 @@ public final class NetworkTests {
         }
         CompoundTag saved = new CompoundTag();
         saved.put("connections", entries);
-        var registries = level.registryAccess();
-        var factory = new SavedData.Factory<>(
-                () -> LogisticsModule.restoreNetworks(new CompoundTag(), registries), LogisticsModule::restoreNetworks);
-        var original = level.getDataStorage().get(factory, "infestusfrontier_networks");
-        try {
-            var restored = LogisticsModule.restoreNetworks(saved, registries);
-            level.getDataStorage().set("infestusfrontier_networks", restored);
+        withTopology(h, saved, restored -> {
             var status = level.getCapability(LogisticsCapabilities.NETWORK_STATUS, vein, Direction.WEST);
             h.assertValueEqual(status.state(), "ready", "all legitimate saved layouts are readable");
-            ListTag roundTrip = restored.save(new CompoundTag(), registries).getList("connections", 10);
+            ListTag roundTrip =
+                    restored.save(new CompoundTag(), level.registryAccess()).getList("connections", 10);
             for (var entry : entries) h.assertTrue(roundTrip.contains(entry), "each legitimate layout survives");
-        } finally {
-            level.getDataStorage().set("infestusfrontier_networks", original);
+        });
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "network_unknown_schema")
+    public static void unknownSavedFieldsArePreservedAndRefused(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
+        level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
+        level.setBlockAndUpdate(vein.east(), StorageModule.BIOMASS_BLADDER.get().defaultBlockState());
+        for (int location = 0; location < 4; location++) {
+            CompoundTag saved = topologyAt(vein, 63);
+            CompoundTag entry = saved.getList("connections", 10).getCompound(0);
+            CompoundTag target = switch (location) {
+                case 1 -> entry;
+                case 2 -> entry.getCompound("tissue");
+                default -> saved;
+            };
+            target.putString("future_rule", "must not be ignored");
+            if (location == 3) saved.remove("connections");
+            h.assertValueEqual(saveAndReload(h, saved), saved, "unknown fields survive actual disk save and reload");
+            assertRefusedTopology(h, vein, saved);
         }
         h.succeed();
+    }
+
+    private static CompoundTag saveAndReload(GameTestHelper h, CompoundTag saved) {
+        try {
+            var directory = Files.createTempDirectory("infestus-network-schema-");
+            try {
+                var registries = h.getLevel().registryAccess();
+                var fixer = h.getLevel().getServer().getFixerUpper();
+                var factory = new SavedData.Factory<>(
+                        () -> LogisticsModule.restoreNetworks(new CompoundTag(), registries),
+                        LogisticsModule::restoreNetworks);
+                var storage = new DimensionDataStorage(directory.toFile(), fixer, registries);
+                var data = LogisticsModule.restoreNetworks(saved, registries);
+                data.setDirty();
+                storage.set("topology", data);
+                storage.save();
+                IOUtilities.waitUntilIOWorkerComplete();
+                var reopened = new DimensionDataStorage(directory.toFile(), fixer, registries);
+                var loaded = reopened.get(factory, "topology");
+                h.assertTrue(loaded != null, "topology file exists and loads");
+                return loaded.save(new CompoundTag(), registries);
+            } finally {
+                IOUtilities.waitUntilIOWorkerComplete();
+                Files.deleteIfExists(directory.resolve("topology.dat"));
+                Files.delete(directory);
+            }
+        } catch (IOException error) {
+            throw new UncheckedIOException(error);
+        }
+    }
+
+    private static CompoundTag topologyAt(BlockPos pos, int... masks) {
+        CompoundTag entry = new CompoundTag();
+        entry.putIntArray("pos", new int[] {pos.getX(), pos.getY(), pos.getZ()});
+        CompoundTag tissue = new CompoundTag();
+        tissue.putString("carrier", "BIOMASS");
+        tissue.putIntArray("passages", masks);
+        entry.put("tissue", tissue);
+        ListTag entries = new ListTag();
+        entries.add(entry);
+        CompoundTag saved = new CompoundTag();
+        saved.put("connections", entries);
+        return saved;
+    }
+
+    private static void assertRefusedTopology(GameTestHelper h, BlockPos vein, CompoundTag saved) {
+        withTopology(h, saved, restored -> {
+            h.assertValueEqual(
+                    restored.save(new CompoundTag(), h.getLevel().registryAccess()),
+                    saved,
+                    "the entire unreadable save is preserved");
+            var status = h.getLevel().getCapability(LogisticsCapabilities.NETWORK_STATUS, vein, Direction.WEST);
+            h.assertValueEqual(status.state(), "unavailable", "unreadable topology reports refusal");
+            IFluidHandler port = h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, vein, Direction.WEST);
+            h.assertValueEqual(
+                    port.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE),
+                    0,
+                    "unreadable topology transfers nothing");
+            h.assertValueEqual(
+                    restored.save(new CompoundTag(), h.getLevel().registryAccess()),
+                    saved,
+                    "refused operations leave the unreadable save unchanged");
+        });
+    }
+
+    private static void withTopology(GameTestHelper h, CompoundTag saved, Consumer<SavedData> check) {
+        var registries = h.getLevel().registryAccess();
+        var storage = h.getLevel().getDataStorage();
+        var factory = new SavedData.Factory<>(
+                () -> LogisticsModule.restoreNetworks(new CompoundTag(), registries), LogisticsModule::restoreNetworks);
+        var original = storage.computeIfAbsent(factory, "infestusfrontier_networks");
+        try {
+            var restored = LogisticsModule.restoreNetworks(saved, registries);
+            storage.set("infestusfrontier_networks", restored);
+            check.accept(restored);
+        } finally {
+            storage.set("infestusfrontier_networks", original);
+        }
     }
 
     @GameTest(template = "empty", batch = "network_ring")
@@ -281,7 +355,7 @@ public final class NetworkTests {
         BlockPos start = new BlockPos(320002, 80, 320008);
         BlockPos end = start.east(128);
         int first = new ChunkPos(start).x, last = new ChunkPos(end).x, z = new ChunkPos(start).z;
-        for (int x = first; x <= last; x++) level.setChunkForced(x, z, true);
+        forceChunks(h, first, last, z, z);
         for (int x = 0; x <= 128; x++)
             level.setBlockAndUpdate(
                     start.east(x), LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
@@ -328,6 +402,14 @@ public final class NetworkTests {
                             250,
                             "known connection works while middle is unloaded");
                     h.assertFalse(level.hasChunkAt(start.east(64)), "transfer did not load the middle");
+                })
+                .thenIdle(21)
+                .thenExecute(() -> {
+                    h.assertValueEqual(
+                            port.fill(fluid, IFluidHandler.FluidAction.EXECUTE),
+                            250,
+                            "unchanged unloaded connections stay ready beyond the retry interval");
+                    h.assertFalse(level.hasChunkAt(start.east(64)), "idle network did not load the middle");
                     level.setChunkForced(first + 4, z, true);
                 })
                 .thenWaitUntil(() -> h.assertTrue(level.hasChunkAt(start.east(64)), "middle loaded"))
@@ -340,8 +422,7 @@ public final class NetworkTests {
                             "broken route cannot use stale connectivity");
                     IFluidHandler tank =
                             level.getCapability(Capabilities.FluidHandler.BLOCK, end.above(), Direction.DOWN);
-                    h.assertValueEqual(tank.getFluidInTank(0).getAmount(), 500, "no duplication or loss");
-                    for (int x = first; x <= last; x++) level.setChunkForced(x, z, false);
+                    h.assertValueEqual(tank.getFluidInTank(0).getAmount(), 750, "no duplication or loss");
                 })
                 .thenSucceed();
     }
@@ -396,7 +477,7 @@ public final class NetworkTests {
         ServerLevel level = h.getLevel();
         BlockPos base = new BlockPos(400000, 80, 400000);
         int chunkX = new ChunkPos(base).x, chunkZ = new ChunkPos(base).z;
-        for (int x = 0; x < 10; x++) for (int z = 0; z < 2; z++) level.setChunkForced(chunkX + x, chunkZ + z, true);
+        forceChunks(h, chunkX, chunkX + 9, chunkZ, chunkZ + 1);
         IFluidHandler[] ports = new IFluidHandler[4];
         for (int group = 0; group < 4; group++) {
             BlockPos root = base.east(group * 40);
@@ -440,9 +521,34 @@ public final class NetworkTests {
                     IFluidHandler tank =
                             level.getCapability(Capabilities.FluidHandler.BLOCK, base.above(), Direction.DOWN);
                     h.assertValueEqual(tank.getFluidInTank(0).getAmount(), 250, "held contents survive refusal");
-                    for (int x = 0; x < 10; x++)
-                        for (int z = 0; z < 2; z++) level.setChunkForced(chunkX + x, chunkZ + z, false);
                 })
                 .thenSucceed();
+    }
+    /** Tickets owned by this fixture are released on both success and failure. */
+    private static void forceChunks(GameTestHelper h, int minX, int maxX, int minZ, int maxZ) {
+        h.testInfo.addListener(new GameTestListener() {
+            private void release() {
+                for (int x = minX; x <= maxX; x++)
+                    for (int z = minZ; z <= maxZ; z++) h.getLevel().setChunkForced(x, z, false);
+            }
+
+            @Override
+            public void testStructureLoaded(GameTestInfo test) {}
+
+            @Override
+            public void testPassed(GameTestInfo test, GameTestRunner runner) {
+                release();
+            }
+
+            @Override
+            public void testFailed(GameTestInfo test, GameTestRunner runner) {
+                release();
+            }
+
+            @Override
+            public void testAddedForRerun(GameTestInfo oldTest, GameTestInfo newTest, GameTestRunner runner) {}
+        });
+        for (int x = minX; x <= maxX; x++)
+            for (int z = minZ; z <= maxZ; z++) h.getLevel().setChunkForced(x, z, true);
     }
 }

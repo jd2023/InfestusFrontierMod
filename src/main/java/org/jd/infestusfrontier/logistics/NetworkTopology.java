@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
@@ -83,11 +84,11 @@ final class NetworkTopology extends SavedData {
     private final Map<BlockPos, Tissue> known = new HashMap<>();
     private final Map<Long, Set<Node>> watchers = new HashMap<>();
     private final NetworkIndex<Node> graph = new NetworkIndex<>(MAX_CELLS, MAX_KNOWN, 256);
-    private Optional<Tag> unreadable = Optional.empty();
+    private Optional<CompoundTag> unreadable = Optional.empty();
     private int watched;
     private boolean observationRefused;
-    private final Set<Node> frontierNodes = new HashSet<>();
-    private final Map<NetworkIndex.Component<Node>, Long> frontierRetries = new IdentityHashMap<>();
+    private final Map<Node, Set<Long>> frontierChunks = new HashMap<>();
+    private final Map<NetworkIndex.Component<Node>, Long> unavailableRetries = new IdentityHashMap<>();
     private final Set<Long> loading = new HashSet<>();
     private final Map<NetworkIndex.Component<Node>, Integer> turns = new IdentityHashMap<>();
 
@@ -231,15 +232,9 @@ final class NetworkTopology extends SavedData {
             if (entry != null && (faces & bit(entry)) == 0) continue;
             Node node = new Node(pos.immutable(), tissue.get().carrier(), faces);
             Optional<NetworkIndex.Component<Node>> result = graph.request(node);
-            if (result.isPresent()
-                    && (result.get().status() == NetworkIndex.Status.UNAVAILABLE
-                            || result.get().nodes().stream().anyMatch(frontierNodes::contains))) {
-                if (frontierRetries.size() >= 256) frontierRetries.clear();
-                long retry = frontierRetries.computeIfAbsent(result.get(), ignored -> level.getGameTime() + 20);
-                if (level.getGameTime() >= retry) {
-                    graph.invalidate(node);
-                    result = graph.request(node);
-                }
+            if (result.isPresent() && shouldRefresh(level, result.get())) {
+                graph.invalidate(node);
+                result = graph.request(node);
             }
             if (result.isEmpty()) {
                 NetworkWork.discovered(
@@ -251,6 +246,19 @@ final class NetworkTopology extends SavedData {
         return Optional.empty();
     }
 
+    private boolean shouldRefresh(ServerLevel level, NetworkIndex.Component<Node> component) {
+        if (component.status() == NetworkIndex.Status.UNAVAILABLE) {
+            if (unavailableRetries.size() >= 256) unavailableRetries.clear();
+            long retry = unavailableRetries.computeIfAbsent(component, ignored -> level.getGameTime() + 20);
+            return level.getGameTime() >= retry;
+        }
+        if (component.status() != NetworkIndex.Status.READY) return false;
+        for (Node node : component.nodes())
+            for (long chunk : frontierChunks.getOrDefault(node, Set.of()))
+                if (level.hasChunk(ChunkPos.getX(chunk), ChunkPos.getZ(chunk))) return true;
+        return false;
+    }
+
     private NetworkIndex.Links<Node> links(ServerLevel level, Node node) {
         observationRefused = false;
         Optional<Tissue> here = observe(level, node.pos());
@@ -258,14 +266,14 @@ final class NetworkTopology extends SavedData {
                 || here.get().carrier() != node.carrier()
                 || !here.get().passages().contains(node.faces())) return new NetworkIndex.Links<>(false, List.of());
         watch(node.pos(), node);
-        frontierNodes.remove(node);
+        Set<Long> missingChunks = new HashSet<>();
         List<Node> links = new ArrayList<>();
         List<Port> ports = new ArrayList<>();
         for (Direction side : Direction.values()) {
             if ((node.faces() & bit(side)) == 0) continue;
             BlockPos next = node.pos().relative(side);
             watch(next, node);
-            if (!level.hasChunkAt(next) && !known.containsKey(next)) frontierNodes.add(node);
+            if (!level.hasChunkAt(next) && !known.containsKey(next)) missingChunks.add(ChunkPos.asLong(next));
             Optional<Tissue> other = observe(level, next);
             if (other.isEmpty()) {
                 if (node.carrier().isFluid()
@@ -282,6 +290,8 @@ final class NetworkTopology extends SavedData {
             for (int faces : other.get().passages())
                 if ((faces & bit(side.getOpposite())) != 0) links.add(new Node(next, node.carrier(), faces));
         }
+        if (missingChunks.isEmpty()) frontierChunks.remove(node);
+        else frontierChunks.put(node, Set.copyOf(missingChunks));
         boundaries.put(node, List.copyOf(ports));
         return new NetworkIndex.Links<>(!observationRefused, links);
     }
@@ -303,8 +313,8 @@ final class NetworkTopology extends SavedData {
             capabilityWatches.clear();
             dirtyEndpoints.clear();
             turns.clear();
-            frontierNodes.clear();
-            frontierRetries.clear();
+            frontierChunks.clear();
+            unavailableRetries.clear();
             watched = 0;
         }
         refreshEndpoints(level, 2048);
@@ -351,8 +361,26 @@ final class NetworkTopology extends SavedData {
         }
     }
 
+    private static boolean knownFields(CompoundTag tag) {
+        if (!Set.of("connections").containsAll(tag.getAllKeys())) return false;
+        Tag entries = tag.get("connections");
+        if (entries == null) return true;
+        if (!(entries instanceof ListTag list) || list.size() > MAX_KNOWN) return false;
+        for (Tag value : list) {
+            if (!(value instanceof CompoundTag entry) || !entry.getAllKeys().equals(Set.of("pos", "tissue")))
+                return false;
+            if (!(entry.get("tissue") instanceof CompoundTag tissue)
+                    || !tissue.getAllKeys().equals(Set.of("carrier", "passages"))) return false;
+        }
+        return true;
+    }
+
     static NetworkTopology load(CompoundTag tag, HolderLookup.Provider registries) {
         NetworkTopology data = new NetworkTopology();
+        if (!knownFields(tag)) {
+            data.unreadable = Optional.of(tag.copy());
+            return data;
+        }
         Tag entries = tag.get("connections");
         if (entries == null) return data;
         Observed.CODEC
@@ -365,13 +393,13 @@ final class NetworkTopology extends SavedData {
                 })
                 .ifPresentOrElse(
                         list -> list.forEach(entry -> data.known.put(entry.pos(), entry.tissue())),
-                        () -> data.unreadable = Optional.of(entries.copy()));
+                        () -> data.unreadable = Optional.of(tag.copy()));
         return data;
     }
 
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        if (unreadable.isPresent()) tag.put("connections", unreadable.get().copy());
+        if (unreadable.isPresent()) tag.merge(unreadable.get().copy());
         else
             tag.put(
                     "connections",
