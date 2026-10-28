@@ -15,6 +15,11 @@ MODELS = ('culture_bowl', 'digestive_sac', 'membrane_rack', 'bone_loom', 'awaken
 # Views an organ's identity pass added to its scene, kept here so regenerating the scenes never loses them: a close
 # front view of both blocks and a corner view, the identity cues at full size.
 EXTRA = {
+    'bone_loom': [
+        # the ribcage close up over one working cycle: the ribs clench, the shuttle crosses the plate
+        {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 4},
+        {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
+    ],
     'activation_cyst': [
         {'name': 'close', 'x': 0.5, 'y': -59.3, 'z': 1.6, 'yaw': 0, 'pitch': 22},
         {'name': 'corner', 'x': -1.0, 'y': -59.2, 'z': 1.5, 'yaw': -35, 'pitch': 25},

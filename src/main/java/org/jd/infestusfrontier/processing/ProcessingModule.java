@@ -108,7 +108,7 @@ public final class ProcessingModule {
             0,
             Biomass.of(1000),
             0,
-            Block.box(1, 0, 1, 15, 12, 15),
+            Block.box(1, 0, 1, 15, 15, 15),
             OrganEffects.NONE,
             () -> ProcessingModule.BONE_LOOM.get(),
             () -> ProcessingModule.BONE_LOOM_ENTITY.get(),

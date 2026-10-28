@@ -90,6 +90,47 @@ class OrganMotionTest(unittest.TestCase):
                     self.assertGreaterEqual(cube['origin'][1], -0.5, path.name)
                     self.assertLessEqual(cube['origin'][1] + cube['size'][1], 32, path.name)
 
+    # Organs that reach past their block's side faces on purpose, with the furthest point they may reach: the
+    # Proboscis' rostrum and the Sentry's lash work on the blocks round them behind widened culling boxes, a pod hugs
+    # its stem, and the Bio-Furnace's buttresses and the Cyst's chambers stand a little proud (older models).
+    SIDEWAYS_REACH = {'planting_proboscis': 16.5, 'spine_sentry': 12.75, 'item_capsule': 11.5, 'bio_furnace': 8.6,
+                      'activation_cyst': 8.1}
+
+    def test_every_organ_model_stays_inside_its_block_sideways(self):
+        """No cube reaches past the block's side faces (x and z within -8..8) in any keyframe of any clip, unless the
+        organ is listed above with the reach its design needs; a sliver of bone emerging from a neighbour's face is a
+        defect a player sees."""
+        import geo_audit
+        import numpy as np
+        for path in sorted((ASSETS / 'geo/block').glob('*.geo.json')):
+            model = path.name.removesuffix('.geo.json')
+            limit = self.SIDEWAYS_REACH.get(model, 8.0)
+            geo = geometry(model)
+            anims = animations(model)
+            for clip, t in geo_audit.poses(anims):
+                for name, m, lo, hi in geo_audit.world_cubes(geo, anims[clip] if clip else None, t):
+                    corners = np.array([[x, y, z, 1] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
+                    world = (m @ corners.T).T[:, :3]
+                    reach = max(abs(world[:, 0]).max(), abs(world[:, 2]).max())
+                    self.assertLessEqual(reach, limit + 1e-6, (model, name, clip, t))
+
+    def test_bone_loom_shuttle_keeps_clear_of_the_ribs(self):
+        """The shuttle's stroke and lift never put a corner of the slug or needle inside a rib, nor a rib's corner inside
+        them, in any keyframe of the working clip; a rib tip sinking into the glowing slug shows at close range."""
+        import geo_audit
+        import numpy as np
+        geo = geometry('bone_loom')
+        anim = animations('bone_loom')['working']
+        for _, t in geo_audit.poses({'working': anim}, every=True):
+            cubes = geo_audit.world_cubes(geo, anim, t)
+            shuttle = [c for c in cubes if c[0].startswith('shuttle')]
+            ribs = [c for c in cubes if c[0].startswith('rib_')]
+            for group, others in ((shuttle, ribs), (ribs, shuttle)):
+                for name, m, lo, hi in group:
+                    for corner in ((x, y, z) for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])):
+                        point = (m @ np.array([*corner, 1]))[:3]
+                        self.assertFalse(geo_audit.inside(point, others), (name, t))
+
     def test_no_geckolib_model_has_faces_fighting_for_depth(self):
         """Parallel faces closer than a tenth of a pixel flicker; organ models draw both sides of every face."""
         import geo_audit

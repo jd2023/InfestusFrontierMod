@@ -37,7 +37,7 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Digestive Sac | Reads as a stomach: the acid window is the cue, the body stays quiet; the gullet stays seated while the sac squeezes; mouth and glands stay attached |
 | Biomass Bladder | Empty is empty; all fill levels stay inside the membrane; frame has no overlapping faces |
 | Membrane Rack | Skin stays between posts; the droplet resets while invisible |
-| Bone Loom | Ribs clear their contents through the working cycle |
+| Bone Loom | Reads as a ribcage loom: curved ribs gripping a plate woven in unequal strips is the cue; the ribs breathe and clench without parting from the mound; the shuttle stays on its strip and clear of the ribs (`motion_bone_loom` close, corner, back) |
 | Awakening Cradle | Reads as something being brought to life: the glowing cocoon is the cue; closed petals clear the cocoon and its pulse, open ones stay inside the block |
 | Bio-Furnace | All three stages; reads as a furnace from across a room, day and night: dark body, hot mouth and seams, fire and light only while it works; the fangs, coals, chimney, buttresses, bellows and second chimney remain distinct |
 | Activation Cyst, Seed Pouch | Chambers, neck, rim and throat follow their supporting tissue |
