@@ -4,26 +4,42 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.LevelResource;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.IOUtilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
+import org.jd.infestusfrontier.logistics.MouthBlock;
+import org.jd.infestusfrontier.logistics.MouthMode;
+import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
+@EventBusSubscriber(modid = "infestusfrontier_tests", bus = EventBusSubscriber.Bus.MOD)
 public final class NetworkTests {
     private NetworkTests() {}
 
     @GameTest(template = "empty", batch = "network_budget")
-    public static void allCarriersShareAdmissionAndSimulationReservesItsExecution(GameTestHelper h) {
+    public static void fluidHandlersShareAdmissionAndSimulationReservesItsExecution(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
         level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
@@ -39,14 +55,150 @@ public final class NetworkTests {
                         .fill(fluid, IFluidHandler.FluidAction.SIMULATE),
                 0,
                 "a new handler shares the exhausted admission budget");
+        level.invalidateCapabilities(vein.east());
         h.assertValueEqual(
                 port.fill(fluid, IFluidHandler.FluidAction.EXECUTE),
                 250,
-                "execution honors admission after quota is full");
+                "endpoint capability invalidation preserves admitted execution after quota is full");
         h.assertValueEqual(
                 port.fill(fluid, IFluidHandler.FluidAction.EXECUTE), 0, "no second execution on the same admission");
         IFluidHandler tank = level.getCapability(Capabilities.FluidHandler.BLOCK, vein.east(), Direction.WEST);
         h.assertValueEqual(tank.getFluidInTank(0).getAmount(), 250, "exactly one transfer");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "network_mixed_budget")
+    public static void fluidAdmissionAlsoBoundsMouthsAndResetsNextTick(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
+        level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
+        level.setBlockAndUpdate(vein.east(), StorageModule.BIOMASS_BLADDER.get().defaultBlockState());
+        BlockPos sender = h.absolutePos(new BlockPos(2, 1, 6));
+        BlockPos receiver = sender.east(2);
+        level.setBlockAndUpdate(
+                sender, LogisticsModule.MOUTH.get().defaultBlockState().setValue(MouthBlock.MODE, MouthMode.OUTPUT));
+        level.setBlockAndUpdate(sender.east(), LogisticsModule.ITEM_VEIN.get().defaultBlockState());
+        level.setBlockAndUpdate(receiver, LogisticsModule.MOUTH.get().defaultBlockState());
+        level.setBlockAndUpdate(sender.above(), Blocks.CHEST.defaultBlockState());
+        level.setBlockAndUpdate(receiver.above(), Blocks.CHEST.defaultBlockState());
+        var source = (ChestBlockEntity) level.getBlockEntity(sender.above());
+        var destination = (ChestBlockEntity) level.getBlockEntity(receiver.above());
+        source.setItem(0, new ItemStack(Items.BONE, 8));
+        IFluidHandler port = level.getCapability(Capabilities.FluidHandler.BLOCK, vein, Direction.WEST);
+        for (int n = 0; n < 64; n++)
+            h.assertValueEqual(
+                    port.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.SIMULATE),
+                    250,
+                    "fluid admission");
+        level.getBlockState(sender).tick(level, sender, level.random);
+        h.assertValueEqual(source.getItem(0).getCount(), 8, "Mouth cannot bypass fluid work admission");
+        h.assertTrue(destination.isEmpty(), "refusal leaves destination unchanged");
+        h.runAfterDelay(1, () -> {
+            level.getBlockState(sender).tick(level, sender, level.random);
+            h.assertTrue(source.isEmpty(), "new tick admits the Mouth");
+            h.assertValueEqual(destination.getItem(0).getCount(), 8, "exactly one transfer after budget reset");
+            h.succeed();
+        });
+    }
+
+    @SubscribeEvent
+    public static void dynamicFluidPort(RegisterCapabilitiesEvent event) {
+        event.registerBlock(
+                Capabilities.FluidHandler.BLOCK,
+                (level, pos, state, entity, side) -> {
+                    if (!level.hasChunkAt(pos.above())
+                            || !level.hasChunkAt(pos.east())
+                            || !level.getBlockState(pos.above()).is(Blocks.REDSTONE_BLOCK)
+                            || !level.getBlockState(pos.east()).is(StorageModule.BIOMASS_BLADDER.get())) return null;
+                    return level.getCapability(Capabilities.FluidHandler.BLOCK, pos.east(), Direction.WEST);
+                },
+                Blocks.GOLD_BLOCK);
+    }
+
+    @GameTest(template = "empty", batch = "network_dynamic")
+    public static void capabilityInvalidationDiscoversAnEndpointWithoutNeighborUpdates(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
+        BlockPos endpoint = vein.east();
+        level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
+        level.setBlockAndUpdate(endpoint, Blocks.GOLD_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(
+                endpoint.east(), StorageModule.BIOMASS_BLADDER.get().defaultBlockState());
+        IFluidHandler port = level.getCapability(Capabilities.FluidHandler.BLOCK, vein, Direction.WEST);
+        FluidStack fluid = BiomassFluids.of(Biomass.of(250));
+        h.assertValueEqual(port.fill(fluid, IFluidHandler.FluidAction.SIMULATE), 0, "absent endpoint discovered");
+        level.setBlock(endpoint.above(), Blocks.REDSTONE_BLOCK.defaultBlockState(), 2);
+        level.invalidateCapabilities(endpoint);
+        h.assertValueEqual(
+                port.fill(fluid, IFluidHandler.FluidAction.EXECUTE), 250, "new capability becomes reachable");
+        level.setBlock(endpoint.above(), Blocks.AIR.defaultBlockState(), 2);
+        level.invalidateCapabilities(endpoint);
+        h.assertValueEqual(port.fill(fluid, IFluidHandler.FluidAction.EXECUTE), 0, "removed capability refuses");
+        IFluidHandler tank = level.getCapability(Capabilities.FluidHandler.BLOCK, endpoint.east(), Direction.WEST);
+        h.assertValueEqual(tank.getFluidInTank(0).getAmount(), 250, "only the accepted operation changed storage");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "network_offer_size")
+    public static void repeatedSimulationUsesTheNewAmountForFillAndDrain(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
+        level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
+        level.setBlockAndUpdate(vein.east(), StorageModule.BIOMASS_BLADDER.get().defaultBlockState());
+        IFluidHandler port = level.getCapability(Capabilities.FluidHandler.BLOCK, vein, Direction.WEST);
+        IFluidHandler tank = level.getCapability(Capabilities.FluidHandler.BLOCK, vein.east(), Direction.WEST);
+        FluidStack fluid = BiomassFluids.of(Biomass.of(250));
+        h.assertValueEqual(port.fill(fluid.copyWithAmount(1), IFluidHandler.FluidAction.SIMULATE), 1, "small offer");
+        h.assertValueEqual(port.fill(fluid, IFluidHandler.FluidAction.SIMULATE), 250, "larger offer recomputed");
+        h.assertTrue(tank.getFluidInTank(0).isEmpty(), "simulation leaves storage empty");
+        h.assertValueEqual(port.fill(fluid, IFluidHandler.FluidAction.EXECUTE), 250, "matching fill");
+        h.assertValueEqual(port.drain(1, IFluidHandler.FluidAction.SIMULATE).getAmount(), 1, "small drain offer");
+        h.assertValueEqual(
+                port.drain(250, IFluidHandler.FluidAction.SIMULATE).getAmount(), 250, "larger drain recomputed");
+        h.assertValueEqual(tank.getFluidInTank(0).getAmount(), 250, "drain simulation leaves storage unchanged");
+        h.assertValueEqual(port.drain(250, IFluidHandler.FluidAction.EXECUTE).getAmount(), 250, "matching drain");
+        h.assertTrue(tank.getFluidInTank(0).isEmpty(), "no duplication or loss");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "network_invalid_topology")
+    public static void invalidLayoutsAndDuplicatePositionsPreserveTheirSaveAndRefuseUse(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
+        level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
+        level.setBlockAndUpdate(vein.east(), StorageModule.BIOMASS_BLADDER.get().defaultBlockState());
+        var registries = level.registryAccess();
+        var factory = new SavedData.Factory<>(
+                () -> LogisticsModule.restoreNetworks(new CompoundTag(), registries), LogisticsModule::restoreNetworks);
+        var original = level.getDataStorage().get(factory, "infestusfrontier_networks");
+        try {
+            for (int[] masks : new int[][] {{1}, {7}, {63, 63}, {3, 5}, {63 ^ (1 << Direction.UP.ordinal())}, {63}}) {
+                CompoundTag entry = new CompoundTag();
+                entry.putIntArray("pos", new int[] {vein.getX(), vein.getY(), vein.getZ()});
+                CompoundTag tissue = new CompoundTag();
+                tissue.putString("carrier", "BIOMASS");
+                tissue.putIntArray("passages", masks);
+                entry.put("tissue", tissue);
+                ListTag entries = new ListTag();
+                entries.add(entry);
+                if (masks.length == 1 && masks[0] == 63) entries.add(entry.copy());
+                CompoundTag saved = new CompoundTag();
+                saved.put("connections", entries);
+                var restored = LogisticsModule.restoreNetworks(saved, registries);
+                level.getDataStorage().set("infestusfrontier_networks", restored);
+                var status = level.getCapability(LogisticsCapabilities.NETWORK_STATUS, vein, Direction.WEST);
+                h.assertValueEqual(status.state(), "unavailable", "corrupt topology reports refusal");
+                IFluidHandler port = level.getCapability(Capabilities.FluidHandler.BLOCK, vein, Direction.WEST);
+                h.assertValueEqual(
+                        port.fill(BiomassFluids.of(Biomass.of(250)), IFluidHandler.FluidAction.EXECUTE),
+                        0,
+                        "refused transfer");
+                h.assertValueEqual(
+                        restored.save(new CompoundTag(), registries), saved, "original malformed save kept whole");
+            }
+        } finally {
+            level.getDataStorage().set("infestusfrontier_networks", original);
+        }
         h.succeed();
     }
 
@@ -95,18 +247,18 @@ public final class NetworkTests {
                 .thenExecute(() -> {
                     h.assertValueEqual(port.fill(fluid, IFluidHandler.FluidAction.EXECUTE), 250, "first transfer");
                     level.getDataStorage().save();
-                    net.neoforged.neoforge.common.IOUtilities.waitUntilIOWorkerComplete();
+                    IOUtilities.waitUntilIOWorkerComplete();
                     for (int x = first + 1; x < last; x++) level.setChunkForced(x, z, false);
                 })
                 .thenWaitUntil(() -> h.assertFalse(level.hasChunkAt(start.east(64)), "middle unloaded"))
                 .thenExecute(() -> {
                     var registries = level.registryAccess();
-                    var factory = new net.minecraft.world.level.saveddata.SavedData.Factory<>(
-                            () -> LogisticsModule.restoreNetworks(new net.minecraft.nbt.CompoundTag(), registries),
+                    var factory = new SavedData.Factory<>(
+                            () -> LogisticsModule.restoreNetworks(new CompoundTag(), registries),
                             LogisticsModule::restoreNetworks);
-                    var disk = new net.minecraft.world.level.storage.DimensionDataStorage(
+                    var disk = new DimensionDataStorage(
                             level.getServer()
-                                    .getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT)
+                                    .getWorldPath(LevelResource.ROOT)
                                     .resolve("data")
                                     .toFile(),
                             level.getServer().getFixerUpper(),
@@ -148,26 +300,25 @@ public final class NetworkTests {
 
     @GameTest(template = "empty", batch = "network_persistence")
     public static void connectionKnowledgeRoundTripsAndCorruptionKeepsTheEntireSave(GameTestHelper h) {
-        var entries = new net.minecraft.nbt.ListTag();
-        var entry = new net.minecraft.nbt.CompoundTag();
+        var entries = new ListTag();
+        var entry = new CompoundTag();
         entry.putIntArray("pos", new int[] {16, 80, 0});
-        var tissue = new net.minecraft.nbt.CompoundTag();
+        var tissue = new CompoundTag();
         tissue.putString("carrier", "BIOMASS");
         tissue.putIntArray("passages", new int[] {63});
         entry.put("tissue", tissue);
         entries.add(entry);
-        var saved = new net.minecraft.nbt.CompoundTag();
+        var saved = new CompoundTag();
         saved.put("connections", entries);
         var registries = h.getLevel().registryAccess();
         var restored = LogisticsModule.restoreNetworks(saved, registries);
-        h.assertValueEqual(
-                restored.save(new net.minecraft.nbt.CompoundTag(), registries), saved, "valid topology survives");
+        h.assertValueEqual(restored.save(new CompoundTag(), registries), saved, "valid topology survives");
         var bad = entry.copy();
         bad.getCompound("tissue").putString("carrier", "UNKNOWN");
         entries.add(bad);
         restored = LogisticsModule.restoreNetworks(saved, registries);
         h.assertValueEqual(
-                restored.save(new net.minecraft.nbt.CompoundTag(), registries),
+                restored.save(new CompoundTag(), registries),
                 saved,
                 "corrupt list preserved whole, not partially accepted");
         h.succeed();
@@ -214,35 +365,25 @@ public final class NetworkTests {
         }
         FluidStack fluid = BiomassFluids.of(Biomass.of(250));
         boolean[] filled = new boolean[4];
-        long[] nanos = {0};
         h.startSequence()
                 .thenWaitUntil(() -> {
-                    long started = System.nanoTime();
                     for (int group = 0; group < 4; group++)
                         if (!filled[group])
                             filled[group] = ports[group].fill(fluid, IFluidHandler.FluidAction.EXECUTE) == 250;
-                    nanos[0] += System.nanoTime() - started;
                     for (boolean done : filled)
                         h.assertTrue(done, "all four networks become available within bounded discovery");
                 })
                 .thenExecute(() -> {
-                    System.out.println(
-                            "4096 passive cells, cumulative endpoint request time: " + nanos[0] / 1_000_000.0 + " ms");
                     for (int group = 0; group < 4; group++) {
                         var status = level.getCapability(
-                                org.jd.infestusfrontier.logistics.api.LogisticsCapabilities.NETWORK_STATUS,
-                                base.east(group * 40),
-                                Direction.WEST);
+                                LogisticsCapabilities.NETWORK_STATUS, base.east(group * 40), Direction.WEST);
                         h.assertValueEqual(status.cells(), 1024, "complete component size");
                     }
                     level.setBlockAndUpdate(
                             base.west(), LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
                 })
                 .thenWaitUntil(() -> {
-                    var status = level.getCapability(
-                            org.jd.infestusfrontier.logistics.api.LogisticsCapabilities.NETWORK_STATUS,
-                            base,
-                            Direction.WEST);
+                    var status = level.getCapability(LogisticsCapabilities.NETWORK_STATUS, base, Direction.WEST);
                     h.assertValueEqual(status.state(), "too_large", "oversized graph explicitly refuses");
                 })
                 .thenExecute(() -> {

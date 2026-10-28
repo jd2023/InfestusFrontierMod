@@ -72,8 +72,7 @@ class NetworkIndexTest {
         NetworkIndex<Integer> graph = new NetworkIndex<>(1024, 8192, 256);
         for (int group = 0; group < 4; group++) graph.request(group * 1024);
         int visited = 0;
-        long started = System.nanoTime();
-        while (graph.queued() > 0) {
+        for (int step = 0; step < 32; step++) {
             int used = graph.advance(128, n -> {
                 int start = (n / 1024) * 1024;
                 return new NetworkIndex.Links<>(true, List.of(start + (n + 1) % 1024, start + (n + 1023) % 1024));
@@ -85,8 +84,6 @@ class NetworkIndexTest {
         for (int n = 0; n < 4096; n++)
             assertEquals(1024, graph.request(n).orElseThrow().nodes().size());
         assertEquals(0, graph.queued());
-        System.out.println(
-                "4096-node discovery and cached lookup: " + (System.nanoTime() - started) / 1_000_000.0 + " ms");
     }
 
     @Test

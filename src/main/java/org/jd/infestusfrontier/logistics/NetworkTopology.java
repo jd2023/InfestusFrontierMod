@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.ICapabilityInvalidationListener;
 import org.jd.infestusfrontier.core.logistics.NetworkIndex;
 
 /** Saved knowledge of passive connections; contains no inventory or block-entity references. */
@@ -52,6 +54,22 @@ final class NetworkTopology extends SavedData {
                                 .forGetter(Tissue::carrier),
                         Codec.intRange(1, 63).listOf(1, 2).fieldOf("passages").forGetter(Tissue::passages))
                 .apply(i, Tissue::new));
+
+        boolean valid() {
+            if (passages.size() == 1) {
+                int mask = passages.getFirst();
+                return mask == 63
+                        || Integer.bitCount(mask) == 2
+                        || carrier == Carrier.ITEM && mask == (63 ^ bit(Direction.UP));
+            }
+            Set<Integer> axes = Set.of(
+                    bit(Direction.DOWN) | bit(Direction.UP),
+                    bit(Direction.NORTH) | bit(Direction.SOUTH),
+                    bit(Direction.WEST) | bit(Direction.EAST));
+            return passages.size() == 2
+                    && !passages.getFirst().equals(passages.getLast())
+                    && passages.stream().allMatch(axes::contains);
+        }
     }
 
     private record Observed(BlockPos pos, Tissue tissue) {
@@ -85,6 +103,58 @@ final class NetworkTopology extends SavedData {
 
     private final Map<Node, List<Port>> boundaries = new HashMap<>();
     private final Map<NetworkIndex.Component<Node>, List<Port>> endpoints = new IdentityHashMap<>();
+    private final Map<BlockPos, EndpointWatch> capabilityWatches = new HashMap<>();
+    private final Set<BlockPos> dirtyEndpoints = new LinkedHashSet<>();
+
+    private final class EndpointWatch implements ICapabilityInvalidationListener {
+        private final BlockPos pos;
+
+        EndpointWatch(BlockPos pos) {
+            this.pos = pos.immutable();
+        }
+
+        @Override
+        public boolean onInvalidate() {
+            if (capabilityWatches.get(pos) != this) return false;
+            dirtyEndpoints.add(pos);
+            return true;
+        }
+    }
+
+    private void watchEndpoint(ServerLevel level, BlockPos pos) {
+        if (capabilityWatches.containsKey(pos)) return;
+        if (capabilityWatches.size() >= MAX_KNOWN) {
+            observationRefused = true;
+            return;
+        }
+        EndpointWatch watch = new EndpointWatch(pos);
+        capabilityWatches.put(watch.pos, watch);
+        level.registerCapabilityListener(watch.pos, watch);
+    }
+
+    /** Capability changes refresh boundaries without discarding topology or admitted fluid offers. */
+    private void refreshEndpoints(ServerLevel level, int maximum) {
+        int budget = NetworkWork.discovery(level, maximum);
+        int used = 0;
+        // One queue entry and at most six adjacent passages share the discovery allowance.
+        while (!dirtyEndpoints.isEmpty() && budget - used >= 7) {
+            BlockPos pos = dirtyEndpoints.iterator().next();
+            dirtyEndpoints.remove(pos);
+            used++;
+            for (Direction side : Direction.values()) {
+                BlockPos adjacent = pos.relative(side);
+                Tissue tissue = known.get(adjacent);
+                if (tissue == null || !tissue.carrier().isFluid()) continue;
+                for (int faces : tissue.passages()) {
+                    if ((faces & bit(side.getOpposite())) == 0) continue;
+                    links(level, new Node(adjacent, tissue.carrier(), faces));
+                    used++;
+                }
+            }
+        }
+        if (used > 0) endpoints.clear();
+        NetworkWork.discovered(level, used);
+    }
 
     List<Port> endpoints(NetworkIndex.Component<Node> component) {
         List<Port> ports = endpoints.get(component);
@@ -150,7 +220,10 @@ final class NetworkTopology extends SavedData {
 
     Optional<NetworkIndex.Component<Node>> network(ServerLevel level, BlockPos pos, Direction entry) {
         refreshLoaded(level);
-        if (unreadable.isPresent() || !level.hasChunkAt(pos)) return Optional.empty();
+        if (unreadable.isPresent())
+            return Optional.of(new NetworkIndex.Component<>(NetworkIndex.Status.UNAVAILABLE, List.of()));
+        refreshEndpoints(level, 64);
+        if (!level.hasChunkAt(pos)) return Optional.empty();
         Optional<Tissue> tissue = observe(level, pos);
         if (tissue.isEmpty()) return Optional.empty();
         for (int faces : tissue.get().passages()) {
@@ -196,8 +269,12 @@ final class NetworkTopology extends SavedData {
             if (other.isEmpty()) {
                 if (node.carrier().isFluid()
                         && level.hasChunkAt(next)
-                        && level.getCapability(Capabilities.FluidHandler.BLOCK, next, side.getOpposite()) != null)
-                    ports.add(new Port(next, side.getOpposite()));
+                        && !level.getBlockState(next).isAir()) {
+                    // A currently absent capability may appear without a block or neighbor update.
+                    watchEndpoint(level, next);
+                    if (level.getCapability(Capabilities.FluidHandler.BLOCK, next, side.getOpposite()) != null)
+                        ports.add(new Port(next, side.getOpposite()));
+                }
                 continue;
             }
             if (other.get().carrier() != node.carrier()) continue;
@@ -217,16 +294,19 @@ final class NetworkTopology extends SavedData {
         refreshLoaded(level);
         if (unreadable.isPresent()) return;
         // Watch entries have the same finite lifecycle as the discovery cache.
-        if (watched > MAX_KNOWN * 4 || boundaries.size() > MAX_KNOWN) {
+        if (watched > MAX_KNOWN * 4 || boundaries.size() > MAX_KNOWN || capabilityWatches.size() >= MAX_KNOWN) {
             graph.clear();
             watchers.clear();
             boundaries.clear();
             endpoints.clear();
+            capabilityWatches.clear();
+            dirtyEndpoints.clear();
             turns.clear();
             frontierNodes.clear();
             frontierRetries.clear();
             watched = 0;
         }
+        refreshEndpoints(level, 2048);
         int budget = NetworkWork.discovery(level, 2048);
         NetworkWork.discovered(level, graph.advance(budget, node -> links(level, node)));
     }
@@ -278,6 +358,10 @@ final class NetworkTopology extends SavedData {
                 .listOf(0, MAX_KNOWN)
                 .parse(NbtOps.INSTANCE, entries)
                 .result()
+                .filter(list -> {
+                    Set<BlockPos> positions = new HashSet<>();
+                    return list.stream().allMatch(entry -> entry.tissue().valid() && positions.add(entry.pos()));
+                })
                 .ifPresentOrElse(
                         list -> list.forEach(entry -> data.known.put(entry.pos(), entry.tissue())),
                         () -> data.unreadable = Optional.of(entries.copy()));

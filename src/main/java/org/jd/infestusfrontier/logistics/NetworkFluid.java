@@ -54,14 +54,14 @@ final class NetworkFluid implements IFluidHandler {
             if (found.isEmpty() || found.get().status() != NetworkIndex.Status.READY) return FluidStack.EMPTY;
             NetworkIndex.Component<NetworkTopology.Node> network = found.get();
             long now = level.getGameTime();
-            Optional<Offer> offer = prepared.filter(p -> p.network() == network
+            Optional<Offer> offer = prepared.filter(p -> action.execute()
+                    && p.network() == network
                     && p.tick() == now
                     && p.fill() == fill
                     && (requested.isEmpty() || FluidStack.isSameFluidSameComponents(requested, p.fluid())));
-            if (offer.isPresent() && action.simulate() && !NetworkWork.take(level)) return FluidStack.EMPTY;
             if (offer.isEmpty()) {
-                prepared = Optional.empty();
                 if (!NetworkWork.take(level)) return FluidStack.EMPTY;
+                prepared = Optional.empty();
                 List<NetworkTopology.Port> ports = topology.endpoints(network);
                 int size = ports.size();
                 int start = size == 0 ? 0 : Math.floorMod(topology.turn(network), size);
@@ -92,21 +92,7 @@ final class NetworkFluid implements IFluidHandler {
             Offer selected = offer.orElseThrow();
             FluidStack amount = selected.fluid()
                     .copyWithAmount(Math.min(maximum, selected.fluid().getAmount()));
-            if (action.simulate()) {
-                IFluidHandler live = target(selected.port());
-                if (live == null) {
-                    prepared = Optional.empty();
-                    return FluidStack.EMPTY;
-                }
-                FluidStack fresh = fill
-                        ? amount.copyWithAmount(live.fill(amount, FluidAction.SIMULATE))
-                        : live.drain(amount, FluidAction.SIMULATE);
-                if (fresh.isEmpty()) prepared = Optional.empty();
-                else
-                    prepared =
-                            Optional.of(new Offer(selected.port(), fresh.copy(), fill, now, network, selected.next()));
-                return fresh;
-            }
+            if (action.simulate()) return amount;
             prepared = Optional.empty();
             IFluidHandler handler = target(selected.port());
             if (handler == null) return FluidStack.EMPTY;
