@@ -26,9 +26,14 @@ public final class NetworkIndex<N> {
         }
     }
 
-    public record Component<N>(Status status, List<N> nodes) {
+    public record Component<N>(Status status, List<N> nodes, long completedAt) {
         public Component {
             nodes = List.copyOf(nodes);
+        }
+
+        /** Failed discovery waits from completion; cached callers cannot reset its deadline. */
+        public boolean retryDue(long now, int delay) {
+            return status == Status.UNAVAILABLE && (now < completedAt || now - completedAt >= delay);
         }
     }
 
@@ -59,7 +64,7 @@ public final class NetworkIndex<N> {
     }
 
     /** Expands at most budget nodes, across all waiting networks. Returns expansions used. */
-    public int advance(int budget, Function<N, Links<N>> links) {
+    public int advance(int budget, long now, Function<N, Links<N>> links) {
         int used = 0;
         while (used < budget) {
             if (origin.isEmpty()) {
@@ -74,7 +79,7 @@ public final class NetworkIndex<N> {
             Links<N> next = links.apply(node);
             used++;
             if (!next.available()) {
-                finish(Status.UNAVAILABLE);
+                finish(Status.UNAVAILABLE, now);
                 continue;
             }
             boolean overflow = false;
@@ -86,14 +91,14 @@ public final class NetworkIndex<N> {
                 }
                 frontier.addLast(neighbor);
             }
-            if (overflow) finish(Status.TOO_LARGE);
-            else if (frontier.isEmpty()) finish(Status.READY);
+            if (overflow) finish(Status.TOO_LARGE, now);
+            else if (frontier.isEmpty()) finish(Status.READY, now);
         }
         return used;
     }
 
-    private void finish(Status status) {
-        Component<N> result = new Component<>(status, new ArrayList<>(seen));
+    private void finish(Status status, long now) {
+        Component<N> result = new Component<>(status, new ArrayList<>(seen), now);
         if (weight + seen.size() > cacheLimit) {
             cache.clear();
             dependencies.clear();

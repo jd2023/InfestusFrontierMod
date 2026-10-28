@@ -88,7 +88,6 @@ final class NetworkTopology extends SavedData {
     private int watched;
     private boolean observationRefused;
     private final Map<Node, Set<Long>> frontierChunks = new HashMap<>();
-    private final Map<NetworkIndex.Component<Node>, Long> unavailableRetries = new IdentityHashMap<>();
     private final Set<Long> loading = new HashSet<>();
     private final Map<NetworkIndex.Component<Node>, Integer> turns = new IdentityHashMap<>();
 
@@ -223,7 +222,8 @@ final class NetworkTopology extends SavedData {
     Optional<NetworkIndex.Component<Node>> network(ServerLevel level, BlockPos pos, Direction entry) {
         refreshLoaded(level);
         if (unreadable.isPresent())
-            return Optional.of(new NetworkIndex.Component<>(NetworkIndex.Status.UNAVAILABLE, List.of()));
+            return Optional.of(
+                    new NetworkIndex.Component<>(NetworkIndex.Status.UNAVAILABLE, List.of(), level.getGameTime()));
         refreshEndpoints(level, 64);
         if (!level.hasChunkAt(pos)) return Optional.empty();
         Optional<Tissue> tissue = observe(level, pos);
@@ -238,7 +238,9 @@ final class NetworkTopology extends SavedData {
             }
             if (result.isEmpty()) {
                 NetworkWork.discovered(
-                        level, graph.advance(NetworkWork.discovery(level, 64), next -> links(level, next)));
+                        level,
+                        graph.advance(
+                                NetworkWork.discovery(level, 64), level.getGameTime(), next -> links(level, next)));
                 result = graph.request(node);
             }
             return result;
@@ -247,11 +249,7 @@ final class NetworkTopology extends SavedData {
     }
 
     private boolean shouldRefresh(ServerLevel level, NetworkIndex.Component<Node> component) {
-        if (component.status() == NetworkIndex.Status.UNAVAILABLE) {
-            if (unavailableRetries.size() >= 256) unavailableRetries.clear();
-            long retry = unavailableRetries.computeIfAbsent(component, ignored -> level.getGameTime() + 20);
-            return level.getGameTime() >= retry;
-        }
+        if (component.status() == NetworkIndex.Status.UNAVAILABLE) return component.retryDue(level.getGameTime(), 20);
         if (component.status() != NetworkIndex.Status.READY) return false;
         for (Node node : component.nodes())
             for (long chunk : frontierChunks.getOrDefault(node, Set.of()))
@@ -314,12 +312,11 @@ final class NetworkTopology extends SavedData {
             dirtyEndpoints.clear();
             turns.clear();
             frontierChunks.clear();
-            unavailableRetries.clear();
             watched = 0;
         }
         refreshEndpoints(level, 2048);
         int budget = NetworkWork.discovery(level, 2048);
-        NetworkWork.discovered(level, graph.advance(budget, node -> links(level, node)));
+        NetworkWork.discovered(level, graph.advance(budget, level.getGameTime(), node -> links(level, node)));
     }
 
     /** No world reads: safe even before the loaded chunk has reached FULL status. */
