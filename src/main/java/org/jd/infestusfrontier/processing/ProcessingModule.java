@@ -170,7 +170,7 @@ public final class ProcessingModule {
             1000,
             Biomass.ZERO,
             0,
-            Block.box(1, 0, 1, 15, 12, 15),
+            Block.box(1, 0, 1, 15, 13, 15),
             OrganEffects.NONE,
             () -> ProcessingModule.COMPOST_GLAND.get(),
             () -> ProcessingModule.COMPOST_GLAND_ENTITY.get(),

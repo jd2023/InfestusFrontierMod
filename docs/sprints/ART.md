@@ -44,7 +44,7 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Planting Proboscis | Reads as a seed weevil: the long rostrum over the bed in front and the sac of seeds on its back are the cues; the stab reaches the bed and the seed is left in it; the rostrum never enters the head; legs and claws stay on the slab (`motion_planting_proboscis`: close, corner and low views) |
 | Harvest Corolla | Moving parts remain attached; petals clear the heart; tips clear the floor |
 | Spine Sentry | Reads as a rooted lash: the plated spine coiled over the mound is the cue; working, it swings from side to side and whips out without the segments parting; the thorn clears the mound (`motion_spine_sentry`, `sentry`: a zoglin beside it, the store screen) |
-| Compost Gland | Distinct scrap hopper and fertilizer outlet, with a slow compression cycle |
+| Compost Gland | Reads as a fermentation gut of the mod's flesh: the gaping maw of scraps above and the meal-crusted spout below are the cues; the belly churns in a wave without its plates parting; the flanks swell at rest; the crumb of meal shows only while the spout presses, at its largest in `close_008` (`motion_compost_gland` close, corner, back) |
 | Vascular Junction | All six faces in all three modes; bottom port stays on the foundation |
 | Reservoir | Joined bodies, exterior corners, fill surfaces and inventory models |
 | Capsule Stem, Item Capsule | `capsule_stem`: a grown tree with a fork, pods with stock on their faces, three grades, the root's screen; `motion_item_capsule`: the pod breathes |
