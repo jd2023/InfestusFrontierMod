@@ -15,6 +15,7 @@ import net.minecraft.gametest.framework.GameTestListener;
 import net.minecraft.gametest.framework.GameTestRunner;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -50,6 +51,7 @@ public final class NetworkTests {
     @GameTest(template = "empty", batch = "network_budget")
     public static void fluidHandlersShareAdmissionAndSimulationReservesItsExecution(GameTestHelper h) {
         ServerLevel level = h.getLevel();
+        resetWorkAdmission(level);
         BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
         level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
         level.setBlockAndUpdate(vein.east(), StorageModule.BIOMASS_BLADDER.get().defaultBlockState());
@@ -79,6 +81,7 @@ public final class NetworkTests {
     @GameTest(template = "empty", batch = "network_mixed_budget")
     public static void fluidAdmissionAlsoBoundsMouthsAndResetsNextTick(GameTestHelper h) {
         ServerLevel level = h.getLevel();
+        resetWorkAdmission(level);
         BlockPos vein = h.absolutePos(new BlockPos(2, 2, 2));
         level.setBlockAndUpdate(vein, LogisticsModule.BIOMASS_VEIN.get().defaultBlockState());
         level.setBlockAndUpdate(vein.east(), StorageModule.BIOMASS_BLADDER.get().defaultBlockState());
@@ -108,6 +111,16 @@ public final class NetworkTests {
             h.assertValueEqual(destination.getItem(0).getCount(), 8, "exactly one transfer after budget reset");
             h.succeed();
         });
+    }
+
+    /** Earlier batches may finish in this same server tick; each quota test needs a fresh allowance. */
+    private static void resetWorkAdmission(ServerLevel level) {
+        level.removeData(net.neoforged.neoforge.registries.NeoForgeRegistries.ATTACHMENT_TYPES.get(
+                ResourceLocation.fromNamespaceAndPath("infestusfrontier", "network_work")));
+        level.getServer()
+                .overworld()
+                .removeData(net.neoforged.neoforge.registries.NeoForgeRegistries.ATTACHMENT_TYPES.get(
+                        ResourceLocation.fromNamespaceAndPath("infestusfrontier", "server_network_work")));
     }
 
     @SubscribeEvent
