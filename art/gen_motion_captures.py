@@ -35,6 +35,11 @@ EXTRA = {
         {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30},
         {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
     ],
+    'spine_sentry': [
+        # the working lash close up over one strike, barbs on its back, and the idle mound from a corner
+        {'name': 'close', 'x': 1.5, 'y': -59.0, 'z': 1.0, 'yaw': 0, 'pitch': 25, 'frames': 10, 'frameTicks': 2},
+        {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
+    ],
     'activation_cyst': [
         {'name': 'close', 'x': 0.5, 'y': -59.3, 'z': 1.6, 'yaw': 0, 'pitch': 22},
         {'name': 'corner', 'x': -1.0, 'y': -59.2, 'z': 1.5, 'yaw': -35, 'pitch': 25},

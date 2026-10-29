@@ -58,7 +58,7 @@ def throat(name):
 
 def lobe(sx, sz):
     """A chamber bulging from one vertical edge of the body: two diamonds, the upper one swelling further out, both
-    turned so their corners point out and leaning outward, so the chamber reads rounded; their tops are shaded dark."""
+    turned so their corners point out and leaning outward, so the chamber reads rounded; their tops a step darker."""
     lean = [-sz * LEAN, 45, sx * LEAN]  # turned corner-out and leaning out, so no face of it lies level with a lip's
     return [('lobe_low', [sx * 4.05 - 2, 3, sz * 4.05 - 2], [4, 3, 4], (lean, [sx * 4.05, 3, sz * 4.05])),
             ('lobe_up', [sx * 4.75 - 1.5, 5.75, sz * 4.75 - 1.5], [3, 3, 3], (lean, [sx * 4.75, 5.75, sz * 4.75]))]
@@ -88,9 +88,9 @@ def textures(uv):
             if face == 'down' and name == 'body':
                 p.ramp(rect, ROOT, flat(0.4), grain=0.05, mottle=0.14)
                 continue
-            # taut dark muscle, lit from above in soft blotches; the chambers' tops stay dark, so no cap catches light
+            # taut dark muscle, lit from above in soft blotches; the chambers' tops a step darker, so no cap catches light
             lobe = name.startswith('lobe')
-            p.ramp(rect, HEART, lambda x, y, w, h: (0.25 if lobe and face == 'up' else 0.4 * skin(x, y, w, h) + 0.45 * ball(x, y, w, h) + (0.08 if lobe else 0)), grain=0.04, mottle=0.35)
+            p.ramp(rect, HEART, lambda x, y, w, h: (0.4 if lobe and face == 'up' else 0.4 * skin(x, y, w, h) + 0.45 * ball(x, y, w, h) + (0.08 if lobe else 0)), grain=0.04, mottle=0.35)
             if face not in ('up', 'down'):
                 vessels(p, rect, 2 if name == 'body' else 1)
     for name in sizes:
