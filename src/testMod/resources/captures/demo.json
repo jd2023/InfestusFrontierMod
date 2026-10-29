@@ -256,17 +256,33 @@
     "setblock 102 -60 -34 infestusfrontier:vascular_junction[south=intake,down=outlet]",
     "setblock 104 -60 -40 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Reference Base\"','\"corolla to Sac,\"','\"Reservoir, valve,\"','\"back to organs\"']}}",
     "setblock 101 -60 -38 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Water\"','\"pool Junction to\"','\"Fluid Veins that\"','\"fork under beds\"']}}",
-    "setblock 112 -60 -38 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Restart Reserve\"','\"valve keeps 1000\"','\"furnace smelts\"','\"on the surplus\"']}}"
+    "setblock 112 -60 -38 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Restart Reserve\"','\"valve keeps 1000\"','\"furnace smelts\"','\"on the surplus\"']}}",
+    "difficulty easy",
+    "fill 0 -61 -44 6 -61 -42 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 2 -60 -44 infestusfrontier:spine_sentry{tank:{stored:1000,reserved:0,capacity:1000}}",
+    "setblock 4 -60 -44 infestusfrontier:aerocyte_bloom{tank:{stored:1000,reserved:0,capacity:1000}}",
+    "setblock 0 -60 -44 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Spine Sentry\"','\"Ground defence\"','\"Biomass powered\"','\"Stores loot\"']}}",
+    "setblock 6 -60 -44 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Aerocyte Bloom\"','\"Air defence\"','\"Biomass powered\"','\"Fires spores\"']}}",
+    "setblock 3 -60 -42 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:zoglin_spawn_egg\",count:16},{Slot:1,id:\"minecraft:ghast_spawn_egg\",count:4},{Slot:2,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:3,id:\"infestusfrontier:biomass_bucket\",count:1}]}",
+    "setblock 3 -60 -41 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Defence supplies\"','\"Target eggs\"','\"Buckets: refuel\"','\"Open for loot\"']}}"
   ],
   "views": [
     {
       "name": "start",
-      "x": 2.5,
+      "x": 3.5,
       "y": -60,
-      "z": -39.5,
+      "z": -48.5,
       "yaw": 0,
       "pitch": 10,
       "gui": true
+    },
+    {
+      "name": "defence",
+      "x": 3.5,
+      "y": -60,
+      "z": -48.5,
+      "yaw": 0,
+      "pitch": 10
     },
     {
       "name": "inventory",
