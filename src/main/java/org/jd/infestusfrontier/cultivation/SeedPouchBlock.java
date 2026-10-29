@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class SeedPouchBlock extends BaseEntityBlock {
     private static final MapCodec<SeedPouchBlock> CODEC = simpleCodec(SeedPouchBlock::new);
-    private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 12, 14);
+    private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 15, 15);
 
     SeedPouchBlock(Properties properties) {
         super(properties);

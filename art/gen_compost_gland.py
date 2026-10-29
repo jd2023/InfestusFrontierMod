@@ -6,7 +6,8 @@ meal-crusted spout below are the cues: what goes in and what comes out.
     python3 art/gen_compost_gland.py
 
 The belly is a core with eight flank plates, the lower ones tilted out at the top and the upper ones tilted in,
-so the body swells at its waist with no ledges. Idle: the belly breathes and its flanks swell and sink in turn.
+so the body swells at its waist with no ledges (an art test pins the waist); the front's lower halves pinch in round
+the spout. GeckoLib mirrors the file's x and negates rotations about x (art/geo_audit.py), hence the signs. Idle: the belly breathes and its flanks swell and sink in turn.
 Working: the belly churns in a wave from the core out, the lips clench, the spout presses and a crumb of meal
 grows out of it, drops and fades. Front is north (-Z).
 """
@@ -36,18 +37,19 @@ def flank(side):
         x = -6.5 if side == 'w' else 4.5
         sign = -1 if side == 'w' else 1
         return (f'flank_{side}', 'core', [sign * 5, 5.75, 0], [
-            ('plate_side', [x, 2, -4], [2, 4, 8], ([0, 0, -sign * TILT], [sign * 4.5, 2, 0])),
-            ('plate_side_up', [x, 5.5, -3.5], [2, 4, 7], ([0, 0, sign * TILT], [sign * 4.5, 9.5, 0])),
+            ('plate_side', [x, 2, -4], [2, 4, 8], ([0, 0, sign * TILT], [sign * 4.5, 2, 0])),
+            ('plate_side_up', [x, 5.5, -3.5], [2, 4, 7], ([0, 0, -sign * TILT], [sign * 4.5, 9.5, 0])),
         ])
     z = -6.5 if side == 'n' else 4.5
     sign = -1 if side == 'n' else 1
-    cubes = [('plate_fb_up', [-3.5, 5.5, z], [7, 4, 2], ([-sign * TILT, 0, 0], [0, 9.5, sign * 4.5]))]
+    cubes = [('plate_fb_up', [-3.5, 5.5, z], [7, 4, 2], ([sign * TILT, 0, 0], [0, 9.5, sign * 4.5]))]
     if side == 'n':
-        # the front's lower plate is split so the spout shows between its halves
+        # the front's lower plate is split so the spout shows between its halves, which pinch in round it, clear
+        # of the crumb of meal it presses out
         cubes += [('plate_fb_half', [-4.5, 2, z], [3, 4, 2], ([sign * TILT, 0, 0], [0, 2, sign * 4.5])),
                   ('plate_fb_half', [1.5, 2, z], [3, 4, 2], ([sign * TILT, 0, 0], [0, 2, sign * 4.5]))]
     else:
-        cubes.append(('plate_fb', [-4, 2, z], [8, 4, 2], ([sign * TILT, 0, 0], [0, 2, sign * 4.5])))
+        cubes.append(('plate_fb', [-4, 2, z], [8, 4, 2], ([-sign * TILT, 0, 0], [0, 2, sign * 4.5])))
     return (f'flank_{side}', 'core', [0, 5.75, sign * 5], cubes)
 
 

@@ -114,6 +114,30 @@ class OrganMotionTest(unittest.TestCase):
                     reach = max(abs(world[:, 0]).max(), abs(world[:, 2]).max())
                     self.assertLessEqual(reach, limit + 1e-6, (model, name, clip, t))
 
+    # Sacs whose body swells at its waist: model -> (body bones, foot height, waist height, shoulder height)
+    WAISTS = {'seed_pouch': (('sack', 'lobe_w', 'lobe_e'), 2.5, 5.5, 9.0),
+              'compost_gland': (('core', 'flank_w', 'flank_e', 'flank_n', 'flank_s'), 2.5, 5.75, 9.0)}
+
+    def test_sacs_swell_at_the_waist(self):
+        """At rest the body reaches further from the centre at its waist than at its foot or its shoulders: plates
+        tilted the wrong way (GeckoLib mirrors x and negates rotations about x) make an hourglass instead."""
+        import geo_audit
+        import numpy as np
+        for model, (bones, foot, waist, shoulder) in self.WAISTS.items():
+            points = []
+            for name, m, lo, hi in geo_audit.world_cubes(geometry(model), None, 0):
+                if name.split('[')[0] in bones:
+                    grid = np.stack(np.meshgrid(*[np.linspace(lo[i], hi[i], 9) for i in range(3)]), -1).reshape(-1, 3)
+                    points.append((m @ np.c_[grid, np.ones(len(grid))].T).T[:, :3])
+            points = np.concatenate(points)
+
+            def reach(y):
+                band = points[abs(points[:, 1] - y) < 0.25]
+                return max(abs(band[:, 0]).max(), abs(band[:, 2]).max())
+
+            self.assertGreater(reach(waist), reach(foot) + 0.2, model)
+            self.assertGreater(reach(waist), reach(shoulder) + 0.2, model)
+
     def test_bone_loom_shuttle_keeps_clear_of_the_ribs(self):
         """The shuttle's stroke and lift never put a corner of the slug or needle inside a rib, nor a rib's corner inside
         them, in any keyframe of the working clip; a rib tip sinking into the glowing slug shows at close range."""
