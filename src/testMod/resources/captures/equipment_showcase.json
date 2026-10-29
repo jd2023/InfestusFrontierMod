@@ -213,6 +213,66 @@
       "frames": 3,
       "frameTicks": 20,
       "trigger": "item replace entity @s weapon.mainhand with minecraft:iron_sword"
+    },
+    {
+      "name": "dormant_pick",
+      "x": -7,
+      "y": -60,
+      "z": 3,
+      "yaw": 0,
+      "pitch": 8,
+      "gui": true,
+      "frames": 3,
+      "frameTicks": 20,
+      "trigger": "item replace entity @s weapon.mainhand with infestusfrontier:dormant_pick"
+    },
+    {
+      "name": "dormant_hatchet",
+      "x": -7,
+      "y": -60,
+      "z": 3,
+      "yaw": 0,
+      "pitch": 8,
+      "gui": true,
+      "frames": 3,
+      "frameTicks": 20,
+      "trigger": "item replace entity @s weapon.mainhand with infestusfrontier:dormant_hatchet"
+    },
+    {
+      "name": "dormant_spade",
+      "x": -7,
+      "y": -60,
+      "z": 3,
+      "yaw": 0,
+      "pitch": 8,
+      "gui": true,
+      "frames": 3,
+      "frameTicks": 20,
+      "trigger": "item replace entity @s weapon.mainhand with infestusfrontier:dormant_spade"
+    },
+    {
+      "name": "dormant_hoe",
+      "x": -7,
+      "y": -60,
+      "z": 3,
+      "yaw": 0,
+      "pitch": 8,
+      "gui": true,
+      "frames": 3,
+      "frameTicks": 20,
+      "trigger": "item replace entity @s weapon.mainhand with infestusfrontier:dormant_hoe"
+    },
+    {
+      "name": "dormant_fang",
+      "x": -7,
+      "y": -60,
+      "z": 3,
+      "yaw": 0,
+      "pitch": 8,
+      "gui": true,
+      "frames": 3,
+      "frameTicks": 20,
+      "trigger": "item replace entity @s weapon.mainhand with infestusfrontier:dormant_fang"
     }
   ]
 }

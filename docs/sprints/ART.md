@@ -354,23 +354,28 @@ Evidence: the `capsule_stem` capture: a seed-7 tree grown from data (`grow:40`) 
 
 ## Living equipment icons
 
-Five living items share ivory bone heads, burgundy sinew grips, pink tendons and a dark plum outline. The dormant icons remain bone on plain wood. Contractile Pick, Hatchet and Spade have thicker purple muscle and broad pale-violet contraction bands. Grasping Fang has three large backward-facing hooks and a purple grip. The hoe has no mutation. The `infestusfrontier:tool_mutation` item predicate selects the four variants.
+Five living items share ivory bone heads, burgundy sinew grips, pink tendons and a dark plum outline. The dormant icons share the living heads and use dry bone, plain walnut wood and a small tan binding at the joint. Contractile Pick, Hatchet and Spade have thicker purple muscle and broad pale-violet contraction bands. Grasping Fang has three large backward-facing hooks and a purple grip. The hoe has no mutation. The `infestusfrontier:tool_mutation` item predicate selects the four variants.
 
-All nine sources are original image-model artwork. Export each with `python3 scripts/texture.py <source> src/main/resources/assets/infestusfrontier/textures/item/<name>.png --size 30 --colors 0`, then paste that RGBA image at `(1, 1)` on a transparent 32x32 canvas, without a paste mask so alpha is preserved. This leaves a transparent pixel around the icon. Sources stay outside the repository, under `/home/etf/.codex/generated_images/01a1864b-612e-7030-9aee-75498ce7e660/`. `art/gen_living_tools.py` writes only dormant icons.
+All fourteen sources are original image-model artwork. Export each with `python3 scripts/texture.py <source> src/main/resources/assets/infestusfrontier/textures/item/<name>.png --size 30 --colors 0`, then paste that RGBA image at `(1, 1)` on a transparent 32x32 canvas, without a paste mask so alpha is preserved. After padding, set alpha below 128 to 0 and alpha at least 128 to 255. The binary edge avoids translucent fringes on held-item geometry, and the padding leaves a transparent pixel around the icon. Sources stay outside the repository, under `/home/etf/.codex/generated_images/01a1864b-612e-7030-9aee-75498ce7e660/`.
 
 | Shipped name | Source file |
 |---|---|
+| `dormant_pick` | `exec-662888f8-543d-4067-ba57-110bc9d905ea.png` |
+| `dormant_hatchet` | `exec-04c9378f-1af2-4b60-b51b-85ce389089df.png` |
+| `dormant_spade` | `exec-0cf9dcf6-9b5f-4ed0-8a9c-4cabf4b8ee50.png` |
+| `dormant_hoe` | `exec-883209de-8632-4d2d-8a7c-1bdc8f947fb7.png` |
+| `dormant_fang` | `exec-2194b770-0b66-4667-8181-9b204d6e9855.png` |
 | `living_pick` | `exec-8c80b491-5e22-42d6-baa8-f80659acbb6d.png` |
 | `living_hatchet` | `exec-c216f760-5368-458e-b626-fb9382c9fa27.png` |
 | `living_spade` | `exec-28e23695-5cd2-495a-b6d4-b9daf0e25b52.png` |
-| `living_hoe` | `exec-2e6eaed5-8c08-4c2e-bc14-6a689eacdfb1.png` |
+| `living_hoe` | `exec-cf0fbad2-2085-4d72-8421-8a2e1ba42aca.png` |
 | `living_fang` | `exec-f7ad27eb-7123-46a1-8f4b-55f684996833.png` |
 | `living_pick_contractile` | `exec-e6d0e945-7362-470f-8c31-05ab5cbfa25b.png` |
 | `living_hatchet_contractile` | `exec-a1bc7000-7898-46eb-a85f-1cff3b0942ad.png` |
 | `living_spade_contractile` | `exec-96e7077e-aa37-4e4b-bf63-f6dff842229c.png` |
 | `living_fang_grasping` | `exec-d51ec080-e25d-4efd-a072-2191106b6601.png` |
 
-Prompt contract: one isolated original biological Minecraft inventory icon, diagonal grip bottom-left and head top-right, broad chunky shading legible at 32 pixels, ivory lit upper-left and tan shadows, burgundy muscle, thin dark plum outline, true alpha, clear margin, no metal, jewel, text, scene or ground shadow. Pick: two hooked bone prongs. Hatchet: one broad crescent blade and a short blunt poll. Spade: pointed shoulder-blade scoop along the shaft. Hoe: one short blade at a right angle to the shaft. Fang: a long curved tooth blade and a short grip. Generate the Pick first and use it as the family reference for the other four. Each Contractile edit preserves its head and adds thick purple muscle and three broad pale-violet tendon bands; use the mutated Pick as their colour reference. The Grasping edit preserves the Fang and adds three broad backward hooks to the lower blade edge and a purple tendon grip.
+Prompt contract: one isolated original biological Minecraft inventory icon, diagonal grip bottom-left and head top-right, broad chunky shading legible at 32 pixels, ivory lit upper-left and tan shadows, burgundy muscle, thin dark plum outline, true alpha, clear margin, no metal, jewel, text, scene or ground shadow. Pick: two hooked bone prongs. Hatchet: one broad crescent blade and a short blunt poll. Spade: pointed shoulder-blade scoop along the shaft. Hoe: one thick flat blade at a right angle to the shaft, no opposite prong, with three broad muscle sections on the living handle. Fang: a long curved tooth blade and a short grip. Generate the Pick first and use it as the family reference for the other four. Each Contractile edit preserves its head and adds thick purple muscle and three broad pale-violet tendon bands; use the mutated Pick as their colour reference. The Grasping edit preserves the Fang and adds three broad backward hooks to the lower blade edge and a purple tendon grip. For each dormant precursor, preserve the living head and replace all muscle with a plain walnut shaft and a small dry tan binding only at the joint; remove decorative bands and pommels, keep broad matte ivory/tan bone shading, and preserve the same upper-left light. Dormant Fang keeps a long smooth tooth blade and a short grip.
 
 Evidence: `equipment_showcase` captures the tools and mutations held in game. Compare silhouette, transparent edges and mutation colour at hotbar size; the Grasping Fang must show its hooked edge.
 
