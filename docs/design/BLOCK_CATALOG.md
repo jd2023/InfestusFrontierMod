@@ -829,7 +829,7 @@ Costs are gameplay tuning; ticket counts still require a loaded-factory soak tes
 
 ### T2-16 — Aerocyte Bloom
 - **Does:** Air defense: tracks a selected hostile flying target and fires a single visible green biological pellet. It needs a clear shot and does not target everything through walls.
-- **Input → output:** Biomass from its reserve or a vein → attacks on configured flying hostiles. No loose mob-farm reward stream is created by unattended defense.
+- **Input → output:** Biomass from its 1000 BU reserve or a vein → attacks on tagged flying hostiles (phantoms, ghasts and blazes initially). Kills collect into eight output slots; only overflow falls. It rests while dry or full. Pellets expire after 40 ticks, cannot be recovered and never load chunks.
 - **Create:** 1 Organ Bud + 1 bow + 2 Bone Plates + 1 spider eye.
 - **Growth:** Choose reload speed or biomass economy. Skeleton-genome mutation trades rate of fire for range; blaze-genome mutation changes ammunition resistance at higher cost. Boss damage remains bounded by the encounter's defenses.
 
@@ -860,7 +860,7 @@ the target's ordinary defenses. Distances are blocks; damage is health points.
 | Organ | Range | Paid operation | Initial effect |
 |---|---|---|---|
 | Aerocyte Bloom | 24 | 5 BU, one shot per 40 ticks | One green projectile; 4 damage to an eligible flying hostile |
-| Spine Sentry | 16 | 2 BU + 1 Grown Spine, one shot per 40 ticks | One projectile; 4 damage to an eligible ground hostile |
+| Spine Sentry | 6 horizontally, 3 vertically | 10 BU, one lash per 20 ticks | 6 damage to a visible hostile; collects drops in eight slots and rests when full |
 | Repellent Crown | 8 | 5 BU + 1 Scent Concentrate per 40-tick pulse | Susceptible hostiles request a reachable local escape path; influence expires after 40 ticks |
 | Lure Polyp | 8 | 5 BU + 1 Scent Concentrate per 40-tick pulse | One idle hostile approaches a reachable adjacent cell for at most 40 ticks; an existing attack target wins |
 | Restraining Tissue | Contact | 2 BU per target per 20 ticks | 20% movement reduction for 20 ticks; overlapping cells do not stack or double-charge |
@@ -953,8 +953,8 @@ cells use the strongest funded effect, not summed strength or double charging.
 - **Growth:** Rabbit-genome graft favors recovery after movement; livestock genomes permit controlled pen care. It heals injuries; it neither produces samples nor awards genome coverage.
 
 ### T2-30 — Spine Sentry
-- **Does:** A short-range ground-defense organ, the colony's spine crawler: a rooted lash on a flesh mound that swings round and strikes the nearest hostile it can see within six blocks (three up or down), three hearts a strike, once a second. Players, villagers and animals are never struck. Rooted on a foundation like every organ.
-- **Input → output:** Biomass, 10 BU a strike from a 1000 BU tank fed by bucket, vein or Junction → strikes; what a creature it kills drops goes into its eight wells before it can fall, and only what does not fit falls. Hoppers, output Mouths and Yield Lobes take the wells; nothing fills them. Dry, or with no empty well left, it rests and looks again every two seconds; biomass arriving wakes it.
+- **Does:** A short-range ground-defense organ: a rooted lash on a flesh mound that swings round and strikes the nearest hostile it can see within six blocks (three up or down), three hearts a strike, once a second. Players, villagers and animals are never struck. Rooted on a foundation like every organ.
+- **Input → output:** Biomass, 10 BU a strike from a 1000 BU tank fed by bucket, vein or Junction → strikes; what a creature it kills drops goes into its eight wells before it can fall, and only what does not fit falls. Hoppers, output Mouths and Yield Lobes take the wells; nothing fills them. Dry, or with no room left in its wells, it rests and looks again every two seconds; biomass arriving wakes it.
 - **Create:** 1 Organ Bud + 1 crossbow + 2 Bone Plates.
 - **Growth:** Choose reach or biomass economy. Cactus mutation adds contact deterrence; skeleton DNA adds a piercing specialization. A kill by the organ gives no experience and none of the drops that only a player's kill gives.
 

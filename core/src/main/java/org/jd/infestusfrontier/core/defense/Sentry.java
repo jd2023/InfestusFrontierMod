@@ -23,21 +23,14 @@ public final class Sentry {
     /** Slots of the store the kills' drops go to. */
     public static final int STORE_SLOTS = 8;
 
+    public static final int SCAN_LIMIT = 128;
+    public static final int SIGHT_LIMIT = 16;
+
     private Sentry() {}
 
-    /** Whether a tank holding {@code stored} BU pays one strike. */
-    public static boolean pays(int stored) {
-        return stored >= COST;
-    }
-
-    /** Whether a store with {@code emptySlots} empty slots can keep what a kill drops. */
-    public static boolean keeps(int emptySlots) {
-        return emptySlots > 0;
-    }
-
-    /** Whether the organ strikes: it must pay and keep. */
-    public static boolean works(int stored, int emptySlots) {
-        return pays(stored) && keeps(emptySlots);
+    /** Both defenders need enough biomass for their shot and at least one slot with room. */
+    public static boolean works(int stored, int availableSlots, int cost) {
+        return stored >= cost && availableSlots > 0;
     }
 
     /** Whether a point {@code dx, dy, dz} from the organ's centre lies within reach. */

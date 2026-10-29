@@ -165,7 +165,7 @@
   "entry.infestusfrontier.circulation.spine_sentry.description": "A rooted lash that guards the colony",
   "entry.infestusfrontier.circulation.spine_sentry.use": "Place it on Living Substrate and feed it biomass by bucket or vein. Every second it lashes the nearest hostile it can see within six blocks and three up or down, three hearts a strike, for 10 BU. Players, villagers and animals are never struck. Dry, it rests; biomass arriving wakes it.",
   "entry.infestusfrontier.circulation.spine_sentry.kept_title": "What it keeps",
-  "entry.infestusfrontier.circulation.spine_sentry.kept": "What a creature it kills drops goes into its eight wells before it can fall; only what does not fit falls. A hopper, a Mouth set to output or a Yield Lobe takes the wells; nothing fills them. With no empty well left it rests until a well is emptied.",
+  "entry.infestusfrontier.circulation.spine_sentry.kept": "What a creature it kills drops goes into its eight wells before it can fall; only what does not fit falls. A hopper, a Mouth set to output or a Yield Lobe takes the wells; nothing fills them. With no room left in its wells it rests until items are taken out.",
   "entry.infestusfrontier.circulation.spine_sentry.craft": "An Organ Bud, a crossbow and two Bone Plates.",
   "block.infestusfrontier.awakening_cradle": "Awakening Cradle",
   "gui.infestusfrontier.awakening_cradle.piece": "Piece, culture",
@@ -391,5 +391,14 @@
   "infestusfrontier.status.network.ready": "connected",
   "infestusfrontier.status.network.rebuilding": "discovering or waiting for budget",
   "infestusfrontier.status.network.too_large": "too large; split the network",
-  "infestusfrontier.status.network.unavailable": "unavailable; topology changed or knowledge limit reached"
+  "infestusfrontier.status.network.unavailable": "unavailable; topology changed or knowledge limit reached",
+  "block.infestusfrontier.aerocyte_bloom": "Aerocyte Bloom",
+  "entity.infestusfrontier.spore_pellet": "Spore Pellet",
+  "death.attack.infestusfrontier.spore": "%1$s was struck by an Aerocyte Bloom",
+  "entry.infestusfrontier.circulation.aerocyte_bloom.name": "Aerocyte Bloom",
+  "entry.infestusfrontier.circulation.aerocyte_bloom.description": "A spore crown against flying hostiles",
+  "entry.infestusfrontier.circulation.aerocyte_bloom.use": "Root it on Living Substrate with clear space above its crown. Feed biomass by bucket or vein. Every two seconds it fires one green pellet at a visible phantom, ghast or blaze within 24 blocks, spending 5 BU. A hit deals two hearts. Walls block shots; players, pets and ground hostiles are safe.",
+  "entry.infestusfrontier.circulation.aerocyte_bloom.kept_title": "Fuel and loot",
+  "entry.infestusfrontier.circulation.aerocyte_bloom.kept": "Its 1000 BU tank feeds the shots. Kills collect into eight wells; only overflow falls. Output Mouths and Yield Lobes take the loot. Dry or full, the Bloom rests. Pellets vanish on impact or after two seconds, cannot be recovered, and never load chunks. Ordinary mob defences still apply.",
+  "entry.infestusfrontier.circulation.aerocyte_bloom.craft": "An Organ Bud, a bow, two Bone Plates and a spider eye form its crown."
 }

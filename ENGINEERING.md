@@ -15,6 +15,7 @@ bash scripts/verify.sh                      # the gate; log in build/verificatio
 ./gradlew runClient -PwithJei -PwithCurios  # with the optional mods
 ./gradlew runServer                         # dedicated server in runs/server
 bash scripts/demo.sh                        # fresh demo world with every feature on show, in runs/demo
+bash scripts/demo.sh -PdemoScene=equipment_showcase # living equipment and sentry, ready to play
 ```
 
 Output: `build/libs/infestusfrontier-0.1.0-dev.1.jar`. It holds the mod, `core` and `ui`. It never holds the test mod.
@@ -146,6 +147,7 @@ Before implementation, the story states: the work unit, who shares the budget (d
 
 | Rule from the design | Limit |
 |---|---|
+| Defence | At most 32 defence scans per server tick, shared across dimensions. A scan inspects at most 128 living entities and tests sight to at most 16 candidates; every ray refuses unloaded chunk crossings. Denied scans retry after 5–24 ticks without spending. Stores keep eight slots; unreadable saves remain opaque. Aerocyte pellets live at most 40 loaded ticks and share the scan admission for spawning (at most 1280 new pellets over that interval); projectile position updates are at most once per ten ticks per tracked entity |
 | Sample collection | One death offers one sample to one destination. At most 64 offers per server tick. No kill log |
 | Capsule pod UI | 2 organ slots plus 36 player slots, pinned to one pod; a graft in the treatment well grows the pod at once, at most two grades, the rest stays in the well and returns on close |
 | Network topology | 1,024 logical cells per component; 65,536 observed positions and 65,536 endpoint capability watches per dimension; 256 waiting discovery origins. Oversized components refuse instead of exposing a truncated result. Known unloaded tissue uses saved topology, never saved inventories |

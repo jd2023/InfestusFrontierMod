@@ -260,6 +260,21 @@ public final class LivingToolTests {
         return player;
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aContractilePickDoesNotSpreadFromDirt(GameTestHelper h) {
+        BlockPos centre = new BlockPos(2, 2, 3);
+        h.setBlock(centre, Blocks.DIRT);
+        h.setBlock(centre.above(), Blocks.STONE);
+        ItemStack pick = new ItemStack(EquipmentModule.LIVING_PICK.get());
+        pick.set(EquipmentModule.TOOL_MUTATION.get(), ToolMutation.CONTRACTILE);
+        fill(pick, 40);
+        ServerPlayer player = miner(h, pick, new BlockPos(2, 1, 0), centre);
+        h.assertTrue(player.gameMode.destroyBlock(h.absolutePos(centre)), "dirt breaks normally");
+        h.assertBlockPresent(Blocks.STONE, centre.above());
+        h.assertValueEqual(Reserves.of(pick).orElseThrow().stored(), Biomass.of(40), "no spread paid");
+        h.succeed();
+    }
+
     private static void fill(ItemStack tool, int units) {
         BiomassTank reserve = Reserves.of(tool).orElseThrow();
         tool.set(EquipmentModule.RESERVE.get(), ((Outcome.Done<BiomassTank>) reserve.fill(Biomass.of(units))).value());

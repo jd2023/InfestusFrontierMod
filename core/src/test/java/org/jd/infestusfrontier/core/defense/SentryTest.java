@@ -8,10 +8,12 @@ import org.junit.jupiter.api.Test;
 class SentryTest {
     @Test
     void aSentryStrikesOnlyWhileItCanPayAndKeep() {
-        assertTrue(Sentry.works(10, 1), "ten BU and a free slot");
-        assertFalse(Sentry.works(9, 8), "nine BU is not a strike");
-        assertFalse(Sentry.works(1000, 0), "a full store stops it");
-        assertTrue(Sentry.works(1000, 8));
+        assertTrue(Sentry.works(10, 1, Sentry.COST), "ten BU and a free slot");
+        assertFalse(Sentry.works(9, 8, Sentry.COST), "nine BU is not a strike");
+        assertFalse(Sentry.works(1000, 0, Sentry.COST), "a full store stops it");
+        assertTrue(Sentry.works(1000, 8, Sentry.COST));
+        assertTrue(Sentry.works(5, 1, 5), "a bloom pays five BU");
+        assertFalse(Sentry.works(4, 1, 5));
     }
 
     @Test

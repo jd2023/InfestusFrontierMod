@@ -1,0 +1,43 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.aerocyte_bloom.name",
+  "description": "entry.infestusfrontier.circulation.aerocyte_bloom.description",
+  "icon": "infestusfrontier:aerocyte_bloom",
+  "x": 7,
+  "y": 2,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/yield_lobe"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/aerocyte_bloom"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.aerocyte_bloom.name",
+      "text": "entry.infestusfrontier.circulation.aerocyte_bloom.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.aerocyte_bloom.kept_title",
+      "text": "entry.infestusfrontier.circulation.aerocyte_bloom.kept"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:aerocyte_bloom",
+      "text": "entry.infestusfrontier.circulation.aerocyte_bloom.craft"
+    }
+  ]
+}

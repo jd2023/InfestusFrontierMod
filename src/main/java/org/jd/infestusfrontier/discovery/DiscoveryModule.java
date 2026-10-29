@@ -109,6 +109,7 @@ public final class DiscoveryModule {
                         for (var tool : EquipmentModule.DORMANT_TOOLS) output.accept(tool.get());
                         for (var tool : EquipmentModule.LIVING_TOOLS) output.accept(tool.get());
                         output.accept(DefenseModule.SPINE_SENTRY_ITEM.get());
+                        output.accept(DefenseModule.AEROCYTE_BLOOM_ITEM.get());
                         output.accept(InteractionModule.SYNAPTIC_PROBE.get());
                         output.accept(InteractionModule.SURGICAL_BLADE.get());
                     })

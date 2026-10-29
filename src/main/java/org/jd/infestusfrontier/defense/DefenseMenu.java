@@ -14,14 +14,15 @@ import org.jd.infestusfrontier.foundation.menu.OrganMenu;
 import org.jd.infestusfrontier.ui.Sheet;
 
 /** The server half of the sentry's screen: its store, take-only, in two rows of four, and the tank. */
-public final class SpineSentryMenu extends OrganMenu {
+public final class DefenseMenu extends OrganMenu {
     static final int ROW = 4;
     private static final int STORED = 0;
     private static final int CAPACITY = 1;
 
     /** Server side. */
-    SpineSentryMenu(int id, Inventory inventory, SpineSentryBlockEntity sentry) {
+    DefenseMenu(int id, Inventory inventory, DefenseOrganBlockEntity sentry) {
         this(
+                sentry.kind(),
                 id,
                 inventory,
                 sentry.store(),
@@ -32,13 +33,24 @@ public final class SpineSentryMenu extends OrganMenu {
     }
 
     /** Client side. */
-    public SpineSentryMenu(int id, Inventory inventory, RegistryFriendlyByteBuf extra) {
-        this(id, inventory, new ItemStackHandler(Sentry.STORE_SLOTS), new SimpleContainerData(2), at(inventory, extra));
+    DefenseMenu(DefenseKind kind, int id, Inventory inventory, RegistryFriendlyByteBuf extra) {
+        this(
+                kind,
+                id,
+                inventory,
+                new ItemStackHandler(Sentry.STORE_SLOTS),
+                new SimpleContainerData(2),
+                at(inventory, extra));
     }
 
-    private SpineSentryMenu(
-            int id, Inventory inventory, IItemHandler store, ContainerData data, ContainerLevelAccess access) {
-        super(DefenseModule.SPINE_SENTRY_MENU.get(), id, access, DefenseModule.SPINE_SENTRY.get(), data);
+    private DefenseMenu(
+            DefenseKind kind,
+            int id,
+            Inventory inventory,
+            IItemHandler store,
+            ContainerData data,
+            ContainerLevelAccess access) {
+        super(kind.menuType(), id, access, kind.block(), data);
         for (int slot = 0; slot < Sentry.STORE_SLOTS; slot++) {
             int x = Sheet.SLOT_X + (slot % ROW) * (Sheet.SLOT.width() + Sheet.GAP);
             int y = slot < ROW ? Sheet.SLOT_Y : Sheet.ROW2_SLOT_Y;

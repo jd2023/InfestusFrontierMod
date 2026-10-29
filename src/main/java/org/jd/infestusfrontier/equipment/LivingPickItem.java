@@ -33,7 +33,7 @@ final class LivingPickItem extends PickaxeItem {
     @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miner) {
         boolean mined = super.mineBlock(stack, level, state, pos, miner);
-        LivingTools.spread(stack, level, pos, miner);
+        LivingTools.spread(stack, level, pos, state, miner);
         return mined;
     }
 }

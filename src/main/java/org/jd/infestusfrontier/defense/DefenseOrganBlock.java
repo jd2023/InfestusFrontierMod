@@ -27,16 +27,20 @@ import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The Spine Sentry's block: an organ on a foundation whose {@code working} shows the lash sweeping. Buckets move
+ * A rooted defender whose {@code working} state drives its attack animation. Buckets move
  * biomass; anything else opens the store's screen; sneaking builds against it.
  */
-public final class SpineSentryBlock extends BaseEntityBlock {
+public final class DefenseOrganBlock extends BaseEntityBlock {
     public static final BooleanProperty WORKING = BooleanProperty.create("working");
-    private static final MapCodec<SpineSentryBlock> CODEC = simpleCodec(SpineSentryBlock::new);
+    private final MapCodec<DefenseOrganBlock> codec;
+    private final DefenseKind kind;
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 14, 14);
+    private static final VoxelShape AIR_SHAPE = Block.box(1, 0, 1, 15, 28, 15);
 
-    SpineSentryBlock(Properties properties) {
+    DefenseOrganBlock(DefenseKind kind, Properties properties) {
         super(properties);
+        this.kind = kind;
+        this.codec = simpleCodec(p -> new DefenseOrganBlock(kind, p));
         registerDefaultState(stateDefinition.any().setValue(WORKING, false));
     }
 
@@ -46,8 +50,8 @@ public final class SpineSentryBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected MapCodec<SpineSentryBlock> codec() {
-        return CODEC;
+    protected MapCodec<DefenseOrganBlock> codec() {
+        return codec;
     }
 
     @Override
@@ -57,7 +61,7 @@ public final class SpineSentryBlock extends BaseEntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return SHAPE;
+        return kind == DefenseKind.AIR ? AIR_SHAPE : SHAPE;
     }
 
     @Override
@@ -67,19 +71,19 @@ public final class SpineSentryBlock extends BaseEntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new SpineSentryBlockEntity(pos, state);
+        return new DefenseOrganBlockEntity(kind, pos, state);
     }
 
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
             Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide) return null;
-        return createTickerHelper(type, DefenseModule.SPINE_SENTRY_ENTITY.get(), SpineSentryBlockEntity::serverTick);
+        return createTickerHelper(type, kind.entityType(), DefenseOrganBlockEntity::serverTick);
     }
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof SpineSentryBlockEntity sentry)
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof DefenseOrganBlockEntity sentry)
             sentry.dropItems(level, pos);
         super.onRemove(state, level, pos, newState, movedByPiston);
     }

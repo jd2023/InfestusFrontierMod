@@ -1,0 +1,90 @@
+{
+  "commands": [
+    "fill -8 -60 -2 12 -50 18 air",
+    "fill -8 -61 -2 12 -61 18 grass_block",
+    "fill -2 -61 1 4 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "kill @e[type=item]",
+    "kill @e[tag=visual_air]",
+    "difficulty easy",
+    "setblock 1 -60 3 infestusfrontier:aerocyte_bloom[working=true]{tank:{stored:800,reserved:0,capacity:1000}}",
+    "summon ghast 1 -52 13 {Tags:[\"visual_air\"],NoAI:1b,NoGravity:1b,PersistenceRequired:1b,Silent:1b}",
+    "effect give @e[tag=visual_air] minecraft:resistance infinite 4 true",
+    "give @s infestusfrontier:aerocyte_bloom"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 1.5,
+      "y": -60,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 8,
+      "frames": 16,
+      "frameTicks": 3
+    },
+    {
+      "name": "back",
+      "x": 1.5,
+      "y": -60,
+      "z": 7,
+      "yaw": 180,
+      "pitch": 8,
+      "trigger": "tp @e[tag=visual_air] 0 -52 1000",
+      "frames": 2,
+      "frameTicks": 12
+    },
+    {
+      "name": "close",
+      "x": 1.5,
+      "y": -60,
+      "z": 1,
+      "yaw": 0,
+      "pitch": 0
+    },
+    {
+      "name": "corner",
+      "x": -1,
+      "y": -59,
+      "z": 0.5,
+      "yaw": -40,
+      "pitch": 15
+    },
+    {
+      "name": "idle",
+      "x": -1,
+      "y": -59,
+      "z": 0.5,
+      "yaw": -40,
+      "pitch": 15,
+      "trigger": "data merge block 1 -60 3 {tank:{stored:0,reserved:0,capacity:1000}}",
+      "frames": 2,
+      "frameTicks": 12
+    },
+    {
+      "name": "screen",
+      "x": 1.5,
+      "y": -60,
+      "z": 1,
+      "yaw": 0,
+      "pitch": 0,
+      "gui": true,
+      "use": [
+        1,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "hotbar",
+      "x": 1.5,
+      "y": -60,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 8,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:aerocyte_bloom"
+      ]
+    }
+  ]
+}

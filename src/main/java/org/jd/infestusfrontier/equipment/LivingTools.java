@@ -66,9 +66,11 @@ final class LivingTools {
      * for, as its player would break them one by one (drops, wear, events and protections included), while its
      * reserve pays {@link LivingTool#SPREAD_COST} BU for each. Nothing spreads from those breaks.
      */
-    static void spread(ItemStack stack, Level level, BlockPos pos, LivingEntity miner) {
+    static void spread(ItemStack stack, Level level, BlockPos pos, BlockState mined, LivingEntity miner) {
         if (level.isClientSide
                 || SPREADING.get()
+                || !stack.isCorrectToolForDrops(mined)
+                || stack.getDestroySpeed(mined) <= 1.0F
                 || !(miner instanceof ServerPlayer player)
                 || stack.get(EquipmentModule.TOOL_MUTATION.get()) != ToolMutation.CONTRACTILE) return;
         Optional<BiomassTank> reserve = Reserves.of(stack);

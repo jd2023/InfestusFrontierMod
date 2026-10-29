@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "minecraft:bow"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "minecraft:spider_eye"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:aerocyte_bloom",
+    "count": 1
+  }
+}

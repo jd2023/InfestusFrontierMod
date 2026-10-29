@@ -143,7 +143,8 @@ public final class DiscoveryTests {
                 "item_capsule",
                 "septum_crossing",
                 "vascular_stitch",
-                "spine_sentry"))
+                "spine_sentry",
+                "aerocyte_bloom"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();
@@ -222,7 +223,8 @@ public final class DiscoveryTests {
                 "living_pick",
                 "dormant_fang",
                 "living_fang",
-                "spine_sentry"))
+                "spine_sentry",
+                "aerocyte_bloom"))
             h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");
         h.succeed();
     }

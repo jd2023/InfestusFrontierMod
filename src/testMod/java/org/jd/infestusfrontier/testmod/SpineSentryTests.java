@@ -20,7 +20,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.defense.Sentry;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.defense.DefenseModule;
-import org.jd.infestusfrontier.defense.SpineSentryBlock;
+import org.jd.infestusfrontier.defense.DefenseOrganBlock;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
@@ -49,12 +49,12 @@ public final class SpineSentryTests {
         h.runAfterDelay(
                 5,
                 () -> h.assertTrue(
-                        h.getBlockState(ORGAN).getValue(SpineSentryBlock.WORKING), "shown working after the strike"));
+                        h.getBlockState(ORGAN).getValue(DefenseOrganBlock.WORKING), "shown working after the strike"));
         h.runAfterDelay(Sentry.PULSE_TICKS + 5, () -> {
             h.assertFalse(prey.isAlive(), "the zoglin is lashed dead");
             h.assertValueEqual(tank(h).stored(), Biomass.of(1000 - Sentry.COST), "10 BU a strike");
             h.assertFalse(
-                    h.getBlockState(ORGAN).getValue(SpineSentryBlock.WORKING), "and resting once nothing is left");
+                    h.getBlockState(ORGAN).getValue(DefenseOrganBlock.WORKING), "and resting once nothing is left");
             int kept = 0;
             for (ItemStack stack : stored(h)) if (stack.is(Items.ROTTEN_FLESH)) kept += stack.getCount();
             h.assertTrue(kept >= 1, "its rotten flesh is in the store, not on the ground");
@@ -74,21 +74,39 @@ public final class SpineSentryTests {
         float health = prey.getHealth();
         h.runAfterDelay(Sentry.RETRY_TICKS + 5, () -> {
             h.assertValueEqual(prey.getHealth(), health, "nine BU buys no lash");
-            h.assertFalse(h.getBlockState(ORGAN).getValue(SpineSentryBlock.WORKING), "shown resting");
+            h.assertFalse(h.getBlockState(ORGAN).getValue(DefenseOrganBlock.WORKING), "shown resting");
             feed(h, 500);
             ItemStack[] full = new ItemStack[Sentry.STORE_SLOTS];
-            java.util.Arrays.fill(full, new ItemStack(Items.COBBLESTONE));
+            java.util.Arrays.fill(full, new ItemStack(Items.COBBLESTONE, 64));
             setStore(h, full);
         });
         h.runAfterDelay(Sentry.RETRY_TICKS * 2 + 10, () -> {
             h.assertValueEqual(prey.getHealth(), health, "a full store stops the lash");
             ItemStack[] freed = new ItemStack[Sentry.STORE_SLOTS];
-            java.util.Arrays.fill(freed, new ItemStack(Items.COBBLESTONE));
+            java.util.Arrays.fill(freed, new ItemStack(Items.COBBLESTONE, 64));
             freed[0] = ItemStack.EMPTY;
             setStore(h, freed);
         });
         h.runAfterDelay(Sentry.RETRY_TICKS * 3 + 15, () -> {
             h.assertTrue(prey.getHealth() < health, "one well freed, it lashes again");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void aSentryStacksLootIntoOccupiedWells(GameTestHelper h) {
+        plant(h, 1000);
+        ItemStack[] wells = new ItemStack[Sentry.STORE_SLOTS];
+        java.util.Arrays.fill(wells, new ItemStack(Items.COBBLESTONE, 64));
+        wells[0] = new ItemStack(Items.ROTTEN_FLESH, 1);
+        setStore(h, wells);
+        Zoglin prey = h.spawn(EntityType.ZOGLIN, new BlockPos(7, 2, 4));
+        prey.setNoAi(true);
+        prey.setHealth(Sentry.DAMAGE);
+        h.runAfterDelay(Sentry.PULSE_TICKS + 5, () -> {
+            h.assertFalse(prey.isAlive(), "an occupied well with room does not stop the lash");
+            h.assertTrue(stored(h).getFirst().getCount() > 1, "loot stacks into the occupied well");
+            h.assertTrue(h.getEntities(EntityType.ITEM, ORGAN, 8.0).isEmpty(), "no loot spills");
             h.succeed();
         });
     }
@@ -135,7 +153,7 @@ public final class SpineSentryTests {
     public static void whatDoesNotFitFallsOnceAndNothingIsDoubled(GameTestHelper h) {
         plant(h, 1000);
         ItemStack[] wells = new ItemStack[Sentry.STORE_SLOTS];
-        java.util.Arrays.fill(wells, new ItemStack(Items.COBBLESTONE));
+        java.util.Arrays.fill(wells, new ItemStack(Items.COBBLESTONE, 64));
         wells[5] = ItemStack.EMPTY;
         setStore(h, wells);
         Zoglin prey = h.spawn(EntityType.ZOGLIN, new BlockPos(7, 2, 4));
@@ -185,6 +203,42 @@ public final class SpineSentryTests {
                 .orElseThrow(() -> new net.minecraft.gametest.framework.GameTestAssertException("no sentry item"));
         var tank = organ.get(StorageModule.TANK.get());
         h.assertTrue(tank != null && tank.stored().equals(Biomass.of(500)), "the item carries its 500 BU");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void biomassWakesARestingSentryWithinOnePulse(GameTestHelper h) {
+        plant(h, 0);
+        Zoglin prey = h.spawn(EntityType.ZOGLIN, new BlockPos(7, 2, 4));
+        prey.setNoAi(true);
+        float health = prey.getHealth();
+        h.runAfterDelay(5, () -> {
+            h.assertValueEqual(prey.getHealth(), health, "dry organ rests");
+            feed(h, Sentry.COST);
+        });
+        h.runAfterDelay(5 + Sentry.PULSE_TICKS, () -> {
+            h.assertValueEqual(prey.getHealth(), health - Sentry.DAMAGE, "fuel wakes it within a pulse");
+            h.assertValueEqual(tank(h).stored(), Biomass.of(0), "one strike paid");
+            h.succeed();
+        });
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aMalformedStoreStaysOpaqueInsteadOfResizingTheMenu(GameTestHelper h) {
+        plant(h, 500);
+        var sentry = h.getBlockEntity(ORGAN);
+        var registries = h.getLevel().registryAccess();
+        var saved = sentry.saveWithoutMetadata(registries);
+        var items = new net.minecraft.nbt.CompoundTag();
+        items.putInt("Size", 1);
+        saved.put("items", items);
+        sentry.loadWithComponents(saved, registries);
+        h.assertValueEqual(stored(h).size(), Sentry.STORE_SLOTS, "the runtime store remains bounded");
+        h.assertValueEqual(sentry.saveWithoutMetadata(registries).getCompound("items"), items, "raw store preserved");
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        h.assertTrue(
+                ((net.minecraft.world.MenuProvider) sentry).createMenu(1, player.getInventory(), player) == null,
+                "an invalid save cannot open an unsafe menu");
         h.succeed();
     }
 

@@ -351,3 +351,33 @@ Files: src/main/resources/assets/infestusfrontier/textures/item/{membrane_window
 Owner, 2026-10-25: three box capsules rejected as not organic; the storage stem concept chosen ("It looks good"). `art/gen_capsule_stem.py` owns the stem's static parts and sixteen-texel textures: a squared maroon column with a dark transport groove down every face and two ivory strips up its north and south faces, a stepped root foot, a bud at a trunk's top, a branch elbow where the trunk forks (its horizontal piece reaching back into the parent's block) and a bone collar on any cell that carries pods. `art/gen_item_capsule.py` owns the pod as a GeckoLib organ: a plump squared hull of dark plum hide with short muted salmon creases, a socket of dark flesh in its outer face behind a two-pixel rim, a fleshy neck into the stem's block gripped by a bone collar over a bone shelf that reaches the stem's collar. `grade_0..2` scale the `body` bone about the hull's back (0.72, 0.86, 1), so a young pod hugs the stem and grows outward; `FrontStockRenderer` draws the stock in the socket as an overlay of the organ renderer, its pocket scaled about the same point (`Pockets.scaled`), so membrane and icon stay inside the rim at every grade and show no sliver from the side; the child `flesh` breathes about the socket floor so the membrane never fights it. The generator also paints `item_capsule_lining`, the membrane under the icon. Owner, 2026-10-26, from play: the first look had the membrane a pixel high and floating off a face that shrank with the grade (young pods read as black boxes), the creases chained into one diagonal seam, the shelf stopped short of the collar, and young pods stood off the stem on a long neck; all five fixed here. Stem parts stacked, branched and collared share no face plane (`test_stem_parts_share_no_face_planes`).
 
 Evidence: the `capsule_stem` capture: a seed-7 tree grown from data (`grow:40`) with its fork, pods showing stock, three standalone grades, the root's screen, the hotbar icons and a breath; `motion_item_capsule`.
+
+## Living equipment icons
+
+Five living items share ivory bone heads, burgundy sinew grips, pink tendons and a dark plum outline. The dormant icons remain bone on plain wood. Contractile Pick, Hatchet and Spade have thicker purple muscle and broad pale-violet contraction bands. Grasping Fang has three large backward-facing hooks and a purple grip. The hoe has no mutation. The `infestusfrontier:tool_mutation` item predicate selects the four variants.
+
+All nine sources are original image-model artwork. Export each with `python3 scripts/texture.py <source> src/main/resources/assets/infestusfrontier/textures/item/<name>.png --size 30 --colors 0`, then paste that RGBA image at `(1, 1)` on a transparent 32x32 canvas, without a paste mask so alpha is preserved. This leaves a transparent pixel around the icon. Sources stay outside the repository, under `/home/etf/.codex/generated_images/01a1864b-612e-7030-9aee-75498ce7e660/`. `art/gen_living_tools.py` writes only dormant icons.
+
+| Shipped name | Source file |
+|---|---|
+| `living_pick` | `exec-8c80b491-5e22-42d6-baa8-f80659acbb6d.png` |
+| `living_hatchet` | `exec-c216f760-5368-458e-b626-fb9382c9fa27.png` |
+| `living_spade` | `exec-28e23695-5cd2-495a-b6d4-b9daf0e25b52.png` |
+| `living_hoe` | `exec-2e6eaed5-8c08-4c2e-bc14-6a689eacdfb1.png` |
+| `living_fang` | `exec-f7ad27eb-7123-46a1-8f4b-55f684996833.png` |
+| `living_pick_contractile` | `exec-e6d0e945-7362-470f-8c31-05ab5cbfa25b.png` |
+| `living_hatchet_contractile` | `exec-a1bc7000-7898-46eb-a85f-1cff3b0942ad.png` |
+| `living_spade_contractile` | `exec-96e7077e-aa37-4e4b-bf63-f6dff842229c.png` |
+| `living_fang_grasping` | `exec-d51ec080-e25d-4efd-a072-2191106b6601.png` |
+
+Prompt contract: one isolated original biological Minecraft inventory icon, diagonal grip bottom-left and head top-right, broad chunky shading legible at 32 pixels, ivory lit upper-left and tan shadows, burgundy muscle, thin dark plum outline, true alpha, clear margin, no metal, jewel, text, scene or ground shadow. Pick: two hooked bone prongs. Hatchet: one broad crescent blade and a short blunt poll. Spade: pointed shoulder-blade scoop along the shaft. Hoe: one short blade at a right angle to the shaft. Fang: a long curved tooth blade and a short grip. Generate the Pick first and use it as the family reference for the other four. Each Contractile edit preserves its head and adds thick purple muscle and three broad pale-violet tendon bands; use the mutated Pick as their colour reference. The Grasping edit preserves the Fang and adds three broad backward hooks to the lower blade edge and a purple tendon grip.
+
+Evidence: `equipment_showcase` captures the tools and mutations held in game. Compare silhouette, transparent edges and mutation colour at hotbar size; the Grasping Fang must show its hooked edge.
+
+## Aerocyte Bloom
+
+`art/gen_aerocyte_bloom.py` writes the model, Blockbench source, atlas, break particle and `idle`/`working` clips. A burgundy rooted bulb narrows into a muscle stalk. Above it, four ivory petals open around a mint spore bladder and upward throat. The root remains still; a four-second idle breath gently changes the bladder and petals. The two-second working pulse squeezes the bladder and opens the petals. All parts stay inside the block sideways; the highest resting point is 27.2 pixels.
+
+The v3 Aerocyte Bloom supplies the anatomical reference and ivory/burgundy/mint palette. Geometry, UVs, textures and looped keyframes are newly generated through the v4 shared organ pipeline. No v3 asset file is copied. The material source prompt is retained in v3 `art/defense/AEROCYTE.md`; the v4 generator defines its own pixel ramps and veins.
+
+Capture checks: the mint bladder must be visible between the four petals from ground level; the throat must read as a dark opening from above; no petal crosses another or detaches from the cup through the working pulse. The defensive shot leaves the nozzle at block centre, 1.75 blocks above the floor.

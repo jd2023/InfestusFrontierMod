@@ -116,7 +116,7 @@ neoForge {
             sourceSet = sourceSets.testMod
             gameDirectory = project.file('runs/demo')
             loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
-            systemProperty 'infestusfrontier.demo.scene', 'demo'
+            systemProperty 'infestusfrontier.demo.scene', providers.gradleProperty('demoScene').getOrElse('demo')
             jvmArgument '-Xmx3G'
         }
     }

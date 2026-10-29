@@ -1,12 +1,9 @@
-"""Icons for the bone tools and the fang (ITEM_CATALOG I015 to I018): Dormant and Living Pick, Hatchet, Spade, Hoe and
-Fang.
+"""Dormant bone tool icons (ITEM_CATALOG I015, I017).
 
     python3 art/gen_living_tools.py
 
-Each icon is one tool on a diagonal handle, drawn as smooth shapes at four times the size and brought down to 32
-pixels, in the light of every other icon: top-left lit, a dark rim round the silhouette. A dormant tool is a bone
-head on a bare stick. A living tool's stick is wrapped in red sinew with a pale vein, a green bead where the sinew
-meets the head, and the bone itself has taken a faint pink flush along its edge.
+Living and mutated icons are image-model exports documented in docs/sprints/ART.md.
+This generator writes only the five dormant bone-on-stick icons.
 """
 import math
 from pathlib import Path
@@ -17,10 +14,6 @@ OUT = Path('src/main/resources/assets/infestusfrontier/textures/item')
 SIZE, SUPER = 32, 4
 BONE = ((240, 228, 204), (206, 186, 150), (150, 126, 90))
 STICK = ((138, 98, 56), (100, 68, 38), (62, 40, 22))
-SINEW = ((222, 134, 124), (170, 64, 74), (108, 32, 46))
-VEIN = (244, 196, 188)
-BEAD = (128, 196, 96)
-FLUSH = (214, 120, 128)
 RIM = (46, 32, 22)
 
 # the handle runs from the bottom-left corner up to the head
@@ -62,7 +55,7 @@ def stroke(a, b, width):
     return [(a[0] + nx, a[1] + ny), (b[0] + nx, b[1] + ny), (b[0] - nx, b[1] - ny), (a[0] - nx, a[1] - ny)]
 
 
-def shade(mask, ramp, flush=None):
+def shade(mask, ramp):
     """Fills mask (an L image at SUPER scale) with the ramp lit from the top-left: light, mid, then dark toward the
     bottom-right, a one-texel highlight on the lit edge and a darker band on the shaded edge."""
     big = SIZE * SUPER
@@ -89,13 +82,11 @@ def shade(mask, ramp, flush=None):
                 else:
                     k = k * 2
                 colour = tuple(int(a[i] + (b[i] - a[i]) * k) for i in range(3))
-            if flush and dark and (x + y) % (3 * SUPER) < SUPER:
-                colour = flush
             pix[x, y] = colour + (255,)
     return out
 
 
-def icon(tool, living):
+def icon(tool):
     big = SIZE * SUPER
     foot, head = scaled([FOOT])[0], scaled([HEAD])[0]
     handle = Image.new('L', (big, big), 0)
@@ -107,22 +98,10 @@ def icon(tool, living):
         draw.polygon(scaled([to_xy(u, v) for u, v in POLLS[tool]]), fill=255)
     if tool in GUARDS:
         draw.polygon(scaled([to_xy(u, v) for u, v in GUARDS[tool]]), fill=255)
-    layers = [shade(handle, SINEW if living else STICK), shade(head_mask, BONE, FLUSH if living else None)]
+    layers = [shade(handle, STICK), shade(head_mask, BONE)]
     art = Image.new('RGBA', (big, big), (0, 0, 0, 0))
     for layer in layers:
         art.alpha_composite(layer)
-    if living:
-        detail = ImageDraw.Draw(art)
-        # the sinew wrap: pale vein threads crossing the handle, and a green bead at the head
-        for k in range(1, 7):
-            f = k / 7
-            cx, cy = foot[0] + (head[0] - foot[0]) * f, foot[1] + (head[1] - foot[1]) * f
-            a = (cx - V[0] * 0.75 * SUPER * 2, cy - V[1] * 0.75 * SUPER * 2)
-            b = (cx + V[0] * 0.75 * SUPER * 2, cy + V[1] * 0.75 * SUPER * 2)
-            detail.line([a, b], fill=VEIN + (255,), width=SUPER)
-        bead = scaled([to_xy(-1.2, 0)])[0]
-        r = 0.7 * SUPER * SIZE / 16
-        detail.ellipse([bead[0] - r, bead[1] - r, bead[0] + r, bead[1] + r], fill=BEAD + (255,))
     small = art.resize((SIZE, SIZE), Image.LANCZOS)
     return rim(small)
 
@@ -149,9 +128,8 @@ def rim(img):
 
 def main():
     for tool in HEADS:
-        for state, living in (('dormant', False), ('living', True)):
-            icon(tool, living).save(OUT / f'{state}_{tool}.png')
-    print('living tools: 10 icons')
+        icon(tool).save(OUT / f'dormant_{tool}.png')
+    print('dormant tools: 5 icons')
 
 
 if __name__ == '__main__':

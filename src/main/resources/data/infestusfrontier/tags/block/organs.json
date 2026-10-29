@@ -20,6 +20,7 @@
     "infestusfrontier:feeding_lobe",
     "infestusfrontier:yield_lobe",
     "infestusfrontier:filter_valve",
-    "infestusfrontier:spine_sentry"
+    "infestusfrontier:spine_sentry",
+    "infestusfrontier:aerocyte_bloom"
   ]
 }

@@ -219,6 +219,16 @@ public final class EquipmentModule {
         BLOCK_ENTITIES.register(modBus);
         MENUS.register(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            modBus.addListener((net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) ->
+                    event.enqueueWork(() -> {
+                        for (Item item : List.of(
+                                LIVING_PICK.get(), LIVING_HATCHET.get(), LIVING_SPADE.get(), LIVING_FANG.get())) {
+                            net.minecraft.client.renderer.item.ItemProperties.register(
+                                    item,
+                                    ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "tool_mutation"),
+                                    (stack, level, entity, seed) -> stack.has(TOOL_MUTATION.get()) ? 1.0F : 0.0F);
+                        }
+                    }));
             modBus.addListener((RegisterMenuScreensEvent event) ->
                     event.register(FUEL_PAPILLA_MENU.get(), FuelPapillaScreen::new));
             LivingArmor.register(
