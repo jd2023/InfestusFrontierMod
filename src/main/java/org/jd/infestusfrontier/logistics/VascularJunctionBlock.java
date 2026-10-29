@@ -39,7 +39,7 @@ public final class VascularJunctionBlock extends BaseEntityBlock {
     public static final Map<Direction, EnumProperty<Port>> PORT = ports();
 
     private static final MapCodec<VascularJunctionBlock> CODEC = simpleCodec(VascularJunctionBlock::new);
-    private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 14, 14);
+    private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 15, 15);
 
     private static Map<Direction, EnumProperty<Port>> ports() {
         Map<Direction, EnumProperty<Port>> ports = new EnumMap<>(Direction.class);

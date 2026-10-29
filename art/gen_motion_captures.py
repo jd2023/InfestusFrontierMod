@@ -25,6 +25,11 @@ EXTRA = {
         {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 8},
         {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
     ],
+    'junction_intake': [
+        # the heart close up over its beat and the mouths' pulses
+        {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 6},
+        {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
+    ],
     'activation_cyst': [
         {'name': 'close', 'x': 0.5, 'y': -59.3, 'z': 1.6, 'yaw': 0, 'pitch': 22},
         {'name': 'corner', 'x': -1.0, 'y': -59.2, 'z': 1.5, 'yaw': -35, 'pitch': 25},

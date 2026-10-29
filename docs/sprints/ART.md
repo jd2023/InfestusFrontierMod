@@ -45,7 +45,7 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Harvest Corolla | Moving parts remain attached; petals clear the heart; tips clear the floor |
 | Spine Sentry | Reads as a rooted lash: the plated spine coiled over the mound is the cue; working, it swings from side to side and whips out without the segments parting; the thorn clears the mound (`motion_spine_sentry`, `sentry`: a zoglin beside it, the store screen) |
 | Compost Gland | Reads as a fermentation gut of the mod's flesh: the gaping maw of scraps above and the meal-crusted spout below are the cues; the belly churns in a wave without its plates parting; the flanks swell at rest; the crumb of meal shows only while the spout presses, at its largest in `close_008` (`motion_compost_gland` close, corner, back) |
-| Vascular Junction | All six faces in all three modes; bottom port stays on the foundation |
+| Vascular Junction | Reads as a heart: the lobed body that beats and the lipped sphincters are the cues; all six rings in all three modes gape, pucker and shrink without their lips parting; the bottom ring stays on the foundation (`motion_junction_intake` close, corner; `motion_junction_closed`, `motion_junction_outlet`) |
 | Reservoir | Joined bodies, exterior corners, fill surfaces and inventory models |
 | Capsule Stem, Item Capsule | `capsule_stem`: a grown tree with a fork, pods with stock on their faces, three grades, the root's screen; `motion_item_capsule`: the pod breathes |
 | Bud, veins, Mouth, lobes, cultivation, Polyp, Valve, Papilla | Existing static scenes plus `visual_static`: front/back views, recessed surfaces and connections |
