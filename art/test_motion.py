@@ -198,6 +198,13 @@ class OrganMotionTest(unittest.TestCase):
                 for path in (ASSETS / 'models' / folder).glob(prefix + '*.json'):
                     self.assertEqual(coplanar_faces(json.loads(path.read_text()).get('elements', [])), [], str(path))
 
+    def test_stem_parts_are_closed_when_seen_from_below_or_exposed(self):
+        faces = {'north', 'south', 'west', 'east', 'up', 'down'}
+        for part in ('root', 'trunk', 'bud', 'branch', 'collar'):
+            model = json.loads((ASSETS / 'models/block' / f'capsule_stem_{part}.json').read_text())
+            for index, element in enumerate(model['elements']):
+                self.assertEqual(set(element['faces']), faces, (part, index))
+
     def test_stem_parts_share_no_face_planes(self):
         """A stem's parts stacked as they grow, a branch beside them and a collar on a cell, never share a face plane."""
         parts = json.loads((ASSETS / 'blockstates/capsule_stem.json').read_text())['multipart']

@@ -81,9 +81,8 @@ def textures():
 
 
 def column(y0, y1):
-    """The core and its four strips from y0 to y1, closed on top: a root or trunk whose next cell is not grown yet,
-    or lost, shows a capped column, never a hollow one; under a grown cell the caps lie inside its core."""
-    faces = SIDES + ['up']
+    """Closed core and strips: every cell stays solid when exposed by growth or a missing neighbor."""
+    faces = ALL
     out = [box((4, y0, 4), (12, y1, 12), 'stem', faces)]
     for (x0, z0), (x1, z1) in STRIPS:
         out.append(box((x0, y0, z0), (x1, y1, z1), 'bone', faces))
@@ -93,7 +92,7 @@ def column(y0, y1):
 def root():
     return column(4, 16) + [
         box((0, 0, 0), (16, 2, 16), 'root', ALL),
-        box((2, 2, 2), (14, 4, 14), 'root', ['up'] + SIDES),
+        box((2, 2, 2), (14, 4, 14), 'root', ALL),
     ]
 
 
@@ -103,19 +102,19 @@ def trunk():
 
 def bud():
     return column(0, 12) + [
-        box((5, 12, 5), (11, 14, 11), 'stem', ['up'] + SIDES),
-        box((6, 14, 6), (10, 16, 10), 'bone', ['up'] + SIDES),
+        box((5, 12, 5), (11, 14, 11), 'stem', ALL),
+        box((6, 14, 6), (10, 16, 10), 'bone', ALL),
     ]
 
 
 def branch():
     """Facing north: grown out of a parent to the south, whose core it reaches back into, then rising."""
     out = column(4, 16)
-    out.append(box((5, 4, 12), (11, 12, 20), 'stem', ['up', 'down', 'west', 'east']))
+    out.append(box((5, 4, 12), (11, 12, 20), 'stem', ALL))
     for (x0, z0), (x1, z1) in (((4, 13), (5, 20)), ((11, 13), (12, 20))):
-        out.append(box((x0, 12, z0), (x1, 13, z1), 'bone', ['up', 'west', 'east']))
-        out.append(box((x0, 3, z0), (x1, 4, z1), 'bone', ['down', 'west', 'east']))
-    out.append(box((3, 5, 13), (13, 7, 19), 'bone', ['up', 'down', 'west', 'east']))
+        out.append(box((x0, 12, z0), (x1, 13, z1), 'bone', ALL))
+        out.append(box((x0, 3, z0), (x1, 4, z1), 'bone', ALL))
+    out.append(box((3, 5, 13), (13, 7, 19), 'bone', ALL))
     return out
 
 

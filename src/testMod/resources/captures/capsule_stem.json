@@ -58,6 +58,22 @@
       "pitch": 8
     },
     {
+      "name": "underside",
+      "x": -2.5,
+      "y": -62.0,
+      "z": 3.0,
+      "yaw": -40,
+      "pitch": -45
+    },
+    {
+      "name": "underside_back",
+      "x": 3.5,
+      "y": -62.0,
+      "z": 9.5,
+      "yaw": 140,
+      "pitch": -45
+    },
+    {
       "name": "top",
       "x": 0.5,
       "y": -52.5,
