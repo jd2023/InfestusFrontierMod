@@ -19,12 +19,13 @@ SAMPLES = 5
 
 
 def rotation(degrees):
-    """GeckoLib turns a bone or cube about z, then y, then x, with x and y negated from the Bedrock file."""
+    """GeckoLib's pose stack multiplies by z, then y, then x (RenderUtil.rotateMatrixAroundBone and ...AroundCube), so
+    a vertex is turned about x first, then y, then z; x and y are negated from the Bedrock file."""
     x, y, z = np.radians([-degrees[0], -degrees[1], degrees[2]])
     rx = np.array([[1, 0, 0], [0, np.cos(x), -np.sin(x)], [0, np.sin(x), np.cos(x)]])
     ry = np.array([[np.cos(y), 0, np.sin(y)], [0, 1, 0], [-np.sin(y), 0, np.cos(y)]])
     rz = np.array([[np.cos(z), -np.sin(z), 0], [np.sin(z), np.cos(z), 0], [0, 0, 1]])
-    return rx @ ry @ rz
+    return rz @ ry @ rx
 
 
 def affine(pivot, rot=(0, 0, 0), scale=(1, 1, 1), offset=(0, 0, 0)):

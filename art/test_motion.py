@@ -138,6 +138,36 @@ class OrganMotionTest(unittest.TestCase):
             self.assertGreater(reach(waist), reach(foot) + 0.2, model)
             self.assertGreater(reach(waist), reach(shoulder) + 0.2, model)
 
+    def test_bladder_holds_its_feed_inside_and_its_ribs_outside(self):
+        """Walking out from the bladder's axis past a point of the biomass at any level, one meets the sac (membrane, a
+        rib or the collar); walking out past the outer face of a bone rib, one meets no membrane; with the sac at either
+        extreme of its breath. So the level stays inside and no bone is seen only through the membrane."""
+        import geo_audit
+        import numpy as np
+        geo, anims = geometry('biomass_bladder'), animations('biomass_bladder')
+
+        def covered(point, membrane):
+            out = np.array([point[0], 0, point[2]])
+            out = out / np.linalg.norm(out)
+            return any(geo_audit.inside(point + out * s, membrane) for s in np.arange(0.0, 8.0, 0.05))
+
+        for t in (0.0, 2.0, 6.0):
+            cubes = geo_audit.world_cubes(geo, anims['idle'], t)
+            membrane = [c for c in cubes if c[0].startswith('membrane')]
+            sac = [c for c in cubes if c[0].startswith(('membrane', 'ribs', 'cap'))]
+            for _, m, lo, hi in (c for c in cubes if c[0].startswith('ribs')):
+                for f in (0.2, 0.5, 0.8):
+                    # the corner of the rib that faces away from the axis, a little way along its length
+                    corners = [(m @ np.array([x, lo[1] + f * (hi[1] - lo[1]), z, 1]))[:3] for x in (lo[0], hi[0]) for z in (lo[2], hi[2])]
+                    outer = max(corners, key=lambda c: np.hypot(c[0], c[2]))
+                    self.assertFalse(covered(outer + 0.01 * np.array([outer[0], 0, outer[2]]), membrane), ('rib behind membrane', t, outer))
+            for level in range(1, 5):
+                _, m, lo, hi = [c for c in geo_audit.world_cubes(geo, anims['fill_%d' % level], 0) if c[0].startswith('fluid')][0]
+                for corner in ((x, y, z) for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])):
+                    point = (m @ np.array([*corner, 1]))[:3]
+                    if point[1] > 3.25:  # above the cup's floor
+                        self.assertTrue(covered(point, sac), ('biomass past the sac', t, level, point))
+
     def test_bone_loom_shuttle_keeps_clear_of_the_ribs(self):
         """The shuttle's stroke and lift never put a corner of the slug or needle inside a rib, nor a rib's corner inside
         them, in any keyframe of the working clip; a rib tip sinking into the glowing slug shows at close range."""

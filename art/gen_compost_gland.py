@@ -40,16 +40,17 @@ def flank(side):
             ('plate_side', [x, 2, -4], [2, 4, 8], ([0, 0, sign * TILT], [sign * 4.5, 2, 0])),
             ('plate_side_up', [x, 5.5, -3.5], [2, 4, 7], ([0, 0, -sign * TILT], [sign * 4.5, 9.5, 0])),
         ])
-    z = -6.5 if side == 'n' else 4.5
+    # the front and back plates sink half a pixel into the core, as the side plates do, so no wedge opens behind them
+    z = -6 if side == 'n' else 4
     sign = -1 if side == 'n' else 1
-    cubes = [('plate_fb_up', [-3.5, 5.5, z], [7, 4, 2], ([sign * TILT, 0, 0], [0, 9.5, sign * 4.5]))]
+    cubes = [('plate_fb_up', [-3.5, 5.5, z], [7, 4, 2], ([sign * TILT, 0, 0], [0, 9.5, sign * 4]))]
     if side == 'n':
         # the front's lower plate is split so the spout shows between its halves, which pinch in round it, clear
         # of the crumb of meal it presses out
-        cubes += [('plate_fb_half', [-4.5, 2, z], [3, 4, 2], ([sign * TILT, 0, 0], [0, 2, sign * 4.5])),
-                  ('plate_fb_half', [1.5, 2, z], [3, 4, 2], ([sign * TILT, 0, 0], [0, 2, sign * 4.5]))]
+        cubes += [('plate_fb_half', [-4.5, 2, z], [3, 4, 2], ([sign * TILT, 0, 0], [0, 2, sign * 4])),
+                  ('plate_fb_half', [1.5, 2, z], [3, 4, 2], ([sign * TILT, 0, 0], [0, 2, sign * 4]))]
     else:
-        cubes.append(('plate_fb', [-4, 2, z], [8, 4, 2], ([-sign * TILT, 0, 0], [0, 2, sign * 4.5])))
+        cubes.append(('plate_fb', [-4, 2, z], [8, 4, 2], ([-sign * TILT, 0, 0], [0, 2, sign * 4])))
     return (f'flank_{side}', 'core', [0, 5.75, sign * 5], cubes)
 
 
