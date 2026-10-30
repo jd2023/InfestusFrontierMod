@@ -35,7 +35,7 @@ class LivingToolTest {
 
     @Test
     void aLivingToolOutlastsADormantOne() {
-        assertEquals(96, LivingTool.DORMANT_USES);
+        assertEquals(12, LivingTool.DORMANT_USES);
         assertEquals(256, LivingTool.LIVING_USES);
     }
 }

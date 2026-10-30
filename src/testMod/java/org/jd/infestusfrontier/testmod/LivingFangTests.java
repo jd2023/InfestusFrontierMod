@@ -52,8 +52,8 @@ public final class LivingFangTests {
         h.assertTrue(recipe.isPresent(), "two plates over a stick craft");
         ItemStack made = recipe.get().value().assemble(input, h.getLevel().registryAccess());
         h.assertTrue(made.is(EquipmentModule.DORMANT_FANG.get()), "a Dormant Fang");
-        h.assertValueEqual(made.getMaxDamage(), LivingTool.DORMANT_USES, "96 strikes");
-        h.assertValueEqual(attackDamage(made), 3.0, "a wooden sword's bite: two for the blade, one for the bone tier");
+        h.assertValueEqual(made.getMaxDamage(), LivingTool.DORMANT_USES, "12 strikes");
+        h.assertValueEqual(attackDamage(made), 2.0, "less than a wooden sword's bite of three");
         h.assertTrue(Reserves.of(made).isEmpty(), "a dormant fang holds nothing");
         h.succeed();
     }
@@ -63,7 +63,7 @@ public final class LivingFangTests {
         h.setBlock(GROUND, EcologyModule.LIVING_SUBSTRATE.get());
         h.setBlock(ORGAN, ProcessingModule.AWAKENING_CRADLE.get());
         ItemStack worn = new ItemStack(EquipmentModule.DORMANT_FANG.get());
-        worn.setDamageValue(24);
+        worn.setDamageValue(3);
         Player loader = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
         loader.setItemInHand(InteractionHand.MAIN_HAND, worn);
         EcologyTests.use(h, loader, ORGAN, Direction.UP);

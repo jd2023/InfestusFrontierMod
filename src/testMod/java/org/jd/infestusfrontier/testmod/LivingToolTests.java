@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -48,7 +49,7 @@ public final class LivingToolTests {
     private static final int AWAKENING_TICKS = 600;
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void platesOnASticksMakeADormantPickThatDigsLikeStone(GameTestHelper h) {
+    public static void platesOnASticksMakeADormantPickThatDigsWorseThanWood(GameTestHelper h) {
         List<ItemStack> grid = new java.util.ArrayList<>();
         for (char c : ("###" + " | " + " | ").toCharArray())
             grid.add(
@@ -60,12 +61,50 @@ public final class LivingToolTests {
         h.assertTrue(recipe.isPresent(), "three plates over a stick craft");
         ItemStack made = recipe.get().value().assemble(input, h.getLevel().registryAccess());
         h.assertTrue(made.is(EquipmentModule.DORMANT_PICK.get()), "a Dormant Pick");
-        h.assertValueEqual(made.getMaxDamage(), LivingTool.DORMANT_USES, "96 blocks");
-        h.assertTrue(made.isCorrectToolForDrops(Blocks.IRON_ORE.defaultBlockState()), "digs iron ore as stone does");
-        h.assertFalse(made.isCorrectToolForDrops(Blocks.DIAMOND_ORE.defaultBlockState()), "not diamond ore");
+        h.assertValueEqual(made.getMaxDamage(), LivingTool.DORMANT_USES, "12 blocks");
+        h.assertTrue(made.isCorrectToolForDrops(Blocks.STONE.defaultBlockState()), "digs stone as wood does");
+        h.assertFalse(made.isCorrectToolForDrops(Blocks.IRON_ORE.defaultBlockState()), "not iron ore");
+        h.assertTrue(made.getDestroySpeed(Blocks.STONE.defaultBlockState()) < 2.0F, "slower than a wooden pick");
+        h.assertTrue(
+                made.getMaxDamage() < new ItemStack(Items.WOODEN_PICKAXE).getMaxDamage(), "wears sooner than wood");
         h.assertFalse(made.isCorrectToolForDrops(Blocks.DIRT.defaultBlockState()), "a pick is no spade");
         h.assertTrue(Reserves.of(made).isEmpty(), "a dormant tool holds nothing");
         h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void everyDormantToolIsWeakerAndShorterLivedThanItsWoodenKin(GameTestHelper h) {
+        List<Item> wooden = List.of(
+                Items.WOODEN_PICKAXE, Items.WOODEN_AXE, Items.WOODEN_SHOVEL, Items.WOODEN_HOE, Items.WOODEN_SWORD);
+        for (int i = 0; i < wooden.size(); i++) {
+            ItemStack dormant =
+                    new ItemStack(EquipmentModule.DORMANT_TOOLS.get(i).get());
+            ItemStack wood = new ItemStack(wooden.get(i));
+            String name = dormant.getItem().getDescriptionId();
+            h.assertTrue(dormant.getMaxDamage() < wood.getMaxDamage() / 2, name + " breaks in under half the uses");
+            h.assertTrue(
+                    modifier(dormant, Attributes.ATTACK_DAMAGE) < modifier(wood, Attributes.ATTACK_DAMAGE),
+                    name + " hits softer");
+            h.assertTrue(
+                    modifier(dormant, Attributes.ATTACK_SPEED) <= modifier(wood, Attributes.ATTACK_SPEED),
+                    name + " swings no faster");
+            h.assertTrue(
+                    dormant.getEnchantmentValue() < wood.getEnchantmentValue(), name + " takes worse enchantments");
+        }
+        h.assertTrue(
+                new ItemStack(EquipmentModule.DORMANT_PICK.get()).getDestroySpeed(Blocks.STONE.defaultBlockState())
+                        < new ItemStack(Items.WOODEN_PICKAXE).getDestroySpeed(Blocks.STONE.defaultBlockState()),
+                "a dormant pick digs slower than wood");
+        h.succeed();
+    }
+
+    private static double modifier(
+            ItemStack stack, net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute) {
+        double[] sum = {0};
+        stack.forEachModifier(net.minecraft.world.entity.EquipmentSlot.MAINHAND, (a, m) -> {
+            if (a.equals(attribute)) sum[0] += m.amount();
+        });
+        return sum[0];
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 700)
@@ -73,7 +112,7 @@ public final class LivingToolTests {
         h.setBlock(GROUND, EcologyModule.LIVING_SUBSTRATE.get());
         h.setBlock(ORGAN, ProcessingModule.AWAKENING_CRADLE.get());
         ItemStack worn = new ItemStack(EquipmentModule.DORMANT_HATCHET.get());
-        worn.setDamageValue(48); // half worn
+        worn.setDamageValue(6); // half worn
         Player loader = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
         loader.setItemInHand(InteractionHand.MAIN_HAND, worn);
         EcologyTests.use(h, loader, ORGAN, Direction.UP);

@@ -118,27 +118,27 @@ public final class EquipmentModule {
             awakened("awakened_legwraps", ArmorItem.Type.LEGGINGS);
     public static final DeferredItem<ArmorItem> AWAKENED_TREADS = awakened("awakened_treads", ArmorItem.Type.BOOTS);
 
-    // the tools, with the stone tools' attack and speed figures
+    // Dormant tools hit softer than wood and swing no faster; living tools keep their attack and speed figures.
     public static final DeferredItem<PickaxeItem> DORMANT_PICK = ITEMS.register(
             "dormant_pick",
             () -> new PickaxeItem(
                     LivingTiers.DORMANT,
-                    new Item.Properties().attributes(PickaxeItem.createAttributes(LivingTiers.DORMANT, 1.0F, -2.8F))));
+                    new Item.Properties().attributes(PickaxeItem.createAttributes(LivingTiers.DORMANT, 0.0F, -2.8F))));
     public static final DeferredItem<AxeItem> DORMANT_HATCHET = ITEMS.register(
             "dormant_hatchet",
             () -> new AxeItem(
                     LivingTiers.DORMANT,
-                    new Item.Properties().attributes(AxeItem.createAttributes(LivingTiers.DORMANT, 7.0F, -3.2F))));
+                    new Item.Properties().attributes(AxeItem.createAttributes(LivingTiers.DORMANT, 3.0F, -3.2F))));
     public static final DeferredItem<ShovelItem> DORMANT_SPADE = ITEMS.register(
             "dormant_spade",
             () -> new ShovelItem(
                     LivingTiers.DORMANT,
-                    new Item.Properties().attributes(ShovelItem.createAttributes(LivingTiers.DORMANT, 1.5F, -3.0F))));
+                    new Item.Properties().attributes(ShovelItem.createAttributes(LivingTiers.DORMANT, 0.5F, -3.0F))));
     public static final DeferredItem<HoeItem> DORMANT_HOE = ITEMS.register(
             "dormant_hoe",
             () -> new HoeItem(
                     LivingTiers.DORMANT,
-                    new Item.Properties().attributes(HoeItem.createAttributes(LivingTiers.DORMANT, -1.0F, -2.0F))));
+                    new Item.Properties().attributes(HoeItem.createAttributes(LivingTiers.DORMANT, -1.0F, -3.0F))));
     public static final DeferredItem<PickaxeItem> LIVING_PICK = ITEMS.register(
             "living_pick",
             () -> new LivingPickItem(living(PickaxeItem.createAttributes(LivingTiers.LIVING, 1.0F, -2.8F))));
@@ -151,7 +151,7 @@ public final class EquipmentModule {
     public static final DeferredItem<HoeItem> LIVING_HOE = ITEMS.register(
             "living_hoe", () -> new LivingHoeItem(living(HoeItem.createAttributes(LivingTiers.LIVING, -1.0F, -2.0F))));
 
-    // the fangs: a weak blade, a wooden sword's bite when dormant
+    // the fangs: a dormant blade bites less than a wooden sword
     public static final DeferredItem<SwordItem> DORMANT_FANG = ITEMS.register(
             "dormant_fang",
             () -> new SwordItem(

@@ -1,13 +1,13 @@
 package org.jd.infestusfrontier.core.equipment;
 
 /**
- * The living tools' arithmetic (ITEM_CATALOG I015, I016): a dormant bone tool wears out fast; woken, it lasts longer
+ * The living tools' arithmetic (ITEM_CATALOG I015, I016): a dormant bone tool breaks within a dozen blocks, far sooner than a wooden one (59); woken, it lasts longer
  * and mends itself from the biomass it carries; a Contractile graft lets it break the blocks around the one it mines,
  * each for a price from the same reserve.
  */
 public final class LivingTool {
     /** Blocks a dormant tool breaks before it is gone. */
-    public static final int DORMANT_USES = 96;
+    public static final int DORMANT_USES = 12;
     /** Blocks a living tool breaks before it is gone, if it is never fed. */
     public static final int LIVING_USES = 256;
     /** Points of wear a carried living tool mends in one second, one BU each. */
