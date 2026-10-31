@@ -13,7 +13,7 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 
 - Work on branch `v4`. Push only to `origin/v4`.
 - Never push to `main`. Never force-push. Never create a remote, a tag or a release.
-- The commit author is the repository owner. Local git config already sets it. Do not change it.
+- Every commit, including ktask checkpoints, must use `Illya Yalovyy <yalovoy@gmail.com>` ([IllyaYalovyy](https://github.com/IllyaYalovyy)) as its author. Verify the effective author before committing. Never substitute a tool identity. Preserve this identity in local git config and runner settings.
 - No `Co-Authored-By` lines. No "Generated with" lines. No agent or model names in commits.
 - Commit message: one imperative line under 72 characters. Add a body only when the diff does not explain itself.
 - Stage files by name. Never `git add -A`. Never commit `build/`, `runs/`, `.ktask/` or IDE files.
@@ -31,6 +31,12 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 ## Running work
 
 The builder runs from one session: the owner states the goal; the builder implements in the main checkout on `v4` (no worktrees; the owner's uncommitted files are never staged), runs `bash scripts/verify.sh`, commits as the owner, spawns a fresh reviewer on the commits (`Review commits <from>..<to>. Follow REVIEW.md.`), repairs the findings, and pushes on `APPROVED`. The owner pastes nothing between runs and plays the build when a milestone's organs are in. A sprint file in `docs/sprints/` is written only when a milestone needs a plan the owner will read; a change needs no story. Art keeps its queue: `Do art story ART-004 from docs/sprints/ART.md. Follow AGENTS.md.`
+
+## Feature completion
+
+- A task that adds a block, organ or item also updates the playable demo launched by `scripts/demo.sh`. Add a labeled, usable exhibit to the appropriate scenario under `src/testMod/resources/captures/`; update `scripts/demo.sh` when launch behavior needs to change. The default demo must make the new content discoverable without commands.
+- Keep the in-game book current in the same task. Add or update its entry, recipes, prerequisites and discovery links to match shipped behavior. Changes to existing content also update affected book text and demo exhibits.
+- Include demo and book files in the task's scope and acceptance criteria. Verify the demo exhibit and book entry through the existing capture workflow. A feature is incomplete while either is missing or stale. Separate book tasks are for broader editorial work, not deferred documentation of new content.
 
 ## Two rules that stop a story
 
