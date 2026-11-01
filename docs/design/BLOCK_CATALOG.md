@@ -3,6 +3,13 @@
 Proposed recipes and stage assignments. **Create** lists construction ingredients;
 **Assembly** lists component types. Consumable preparation: [Items](ITEM_CATALOG.md).
 
+**Shipped or proposed.** The sprint record ([S04](../sprints/S04.md)) lists what ships.
+Entries not listed there are proposals. The next milestone, the
+[automated mineral workshop](../../ROADMAP.md#next-milestone--the-automated-mineral-workshop),
+is proposed: T1-09's Mixed Craw and Larder, T1-41 Shaping Palm, T2-23 Mineral Gizzard
+and T2-24 Washing Kidney, each marked *Milestone* below. Everything else in T2 stays
+later work.
+
 **T0–T9 are catalog groupings**, not player or base ranks. Operation requires the entry's materials, physical structure, native bed and supplies; there is no additional colony-level permission gate. **Organ level** is earned by using that particular organ; upgrading other organs does not change it. Unless an entry says otherwise, an active organ gains one count per completed batch, not per tick or failed attempt. L0 starts at zero counts; L1, L2 and L3 start at 32, 128 and 512 counts respectively. At those thresholds, choose one improvement from that organ's **Growth** options. Each choice gives +10% to the selected property, at most three choices total. New functions require the listed mutation or physical addition; levels alone do not add every function.
 
 Normal dismantling of an organ preserves its counts, level, chosen improvements and mutations in the dropped block. In a multiblock, the core carries this history; breaking a wall does not copy it. Upgrading an existing core preserves its history. Passive walls, floors and conduits do not earn processing levels. Normal dismantling and invalid additions retain contents in recovered storage or remaining cells. Destructive failures follow the separate containment rules below.
@@ -89,6 +96,24 @@ The root presents **one existing block and stops**. It does not identify an ore 
 
 Dust ratios and conservation: [Items](ITEM_CATALOG.md#ore-dust-and-recovery).
 Compare throughput, recovery, energy per product and footprint independently.
+
+**First release (milestone).** No Work Bed, root, polyp or jaw. The player mines iron, gold
+and copper by hand, stores raw items in a pod, a Craw or a chest, and the line runs
+from there:
+
+```text
+raw items in a store → Mouth → Feeding Lobe → Mineral Gizzard → Yield Lobe → Mouth
+                                                     │                          ├→ dust → Bio-Furnace → ingots
+                                                     │                          ├→ Tailings → store, or Kidney
+                                                     │                          └→ Rock Residue → store, or craft
+                              Washing Kidney (optional) ← Tailings (4 units)
+```
+
+Dust ratios, costs, waste buffers and the comparison with direct smelting and Fortune:
+[Items](ITEM_CATALOG.md#first-release-the-automated-mineral-workshop). The build
+choices are three: smelt raw items directly and skip the line; run the Gizzard alone
+for dust that waits for later smelters; add a Kidney for one more dust per item at
+the price of water, time, biomass and a settling cycle.
 
 ### Reuse beyond mining
 
@@ -461,7 +486,13 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Does:** Item storage grown as a tree. The Capsule Stem is planted as one root cell on an organ foundation (Living Substrate or a ground organ) and grows from bone meal fed to any cell, a growth at the first level costing one bone meal and each level up twice as much (thirty-two at the sixth): the trunk rises, from tier one up each tier grows two to four Item Capsule pods on its free sides, never on a side the tier below used, and at a drawn tier of three to five the trunk forks once into a second trunk; at most six tiers and sixteen pods. The root draws every choice from its seed and keeps the plan, so a tree is unique, regrows what it lost before it grows on, and refuses bone meal where nothing fits. The stem holds nothing; a pod holds one kind of item, eight stacks of it when young, its outer face showing the kind and count. The whole tree is one store: any stem cell opens it as one list of the kinds it holds, a kind's pods counted together, sorted by name and scrolled past twenty-three kinds, with the root's bone meal toward its next growth; a pod opens only itself, one compartment for a quick stack in or out and a treatment well; hoppers, Mouths and Item Veins at the root or any cell reach every pod, a kind filling its own pod before it opens an empty one.
 - **Input → output:** Inserted items → the same items through hand access, hoppers, Mouths or Item Veins.
 - **Create:** Capsule Stem: 1 chest + 2 Membrane Sheets + 1 Spore Culture. Pods grow; none is crafted.
-- **Growth:** Bone meal grows the stem, dearer each level (1, 2, 4, 8, 16, 32); a lost cell or pod is regrown first at its level's cost. A Skeletal Graft on a pod, or in its treatment well, grows it a grade, doubling what it holds: sixteen stacks, then thirty-two. Later mutations (void excess, glow, the mixed Craw and the Larder pod) are their own features.
+- **Growth:** Bone meal grows the stem, dearer each level (1, 2, 4, 8, 16, 32); a lost cell or pod is regrown first at its level's cost. A Skeletal Graft on a pod, or in its treatment well, grows it a grade, doubling what it holds: sixteen stacks, then thirty-two. Mutations of a pod, each in the treatment well: the Mixed Craw and the Larder below (milestone). Void excess and glow stay later features.
+- **Mixed Craw (milestone).** Put 1 Elastic Gel in the treatment well of an **empty** bulk pod. The pod keeps its grade and becomes a Craw: 4 compartments, each one kind, each holding 1, 2 or 4 stacks at grade 0, 1 or 2. Its total is 4, 8 or 16 stacks, half of a bulk pod's 8, 16 or 32; one kind is held at a quarter of the depth. A stack is the kind's own stack size, so an unstackable kind is 1, 2 or 4 items. A Skeletal Graft grades a Craw as it grades a pod. The change is one way: no item turns a Craw back, and the gel is not returned. A pod with any item refuses the gel and says so.
+- **Larder (milestone).** Put 1 Sealing Resin in the treatment well of an **empty** Mixed Craw. It keeps its grade and becomes a Larder: 3 compartments of the Craw's depth (3, 6 or 12 stacks), each with a **label** and a **reserve**. A Larder costs a kind and a quarter of the Craw's room, and what it protects is dead stock to every automatic consumer. One way, like the Craw.
+- **Larder rules.** The label is set by the first item a compartment takes, or by clicking an item on its label, and it stays when the compartment empties; only the pod's screen clears it, and only while empty. A labelled compartment accepts its kind alone, from every path, and the tree reads an empty labelled compartment as holding another kind for every other item. The reserve is a count from 0 up to the compartment's limit, stepped on the pod's screen through the Mouth's amounts (0, 1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 4096, capped at the limit). **Every external extraction keeps the reserve:** a hopper, a Mouth, an Item Vein, a pipe or another mod through the item handler, the Shaping Palm's supply link, and any later indexed or ordered request. They see `count − reserve` (never below 0) and nothing less. The rule lives in `CapsuleTree.extract` and `CapsuleTree.take`, the two places every one of those paths passes, so no path can forget it. Insertion is never limited by a reserve. Two Larders holding one kind protect the sum of their reserves.
+- **Manual withdrawal.** In a Larder's screen a click on a compartment takes only the unreserved part, as a hopper would. A **Withdraw reserve** button beside the reserve takes up to one stack of the reserved part into the player's cursor and leaves the reserve setting unchanged. Nothing else takes the reserved part: the tree's ledger shows "held (reserved)" and never withdraws it. A broken pod, a shed pod and a Creative break keep stock, labels and reserves whole in the pod.
+- **Against a Mouth's amount.** A Mouth's amount lives on that Mouth, counts the partner's total of a kind, and stops only that Mouth; a hopper, another Mouth or another mod still empties the store. A Larder's reserve lives in the store, belongs to one compartment, and stops every external path; only a player at the screen overrides it. They combine: a reserve under an output Mouth's amount keeps the larger of the two.
+- **State and bounds.** A pod saves its kind of pod (`bulk`, `craw`, `larder`), its compartments, and for a Larder a label and a reserve each. Old pods load as bulk. Unknown fields keep the pod unreadable, as for any saved state. Limits: [Engineering](../../ENGINEERING.md#performance-limits). The screen of a Craw has 4 compartment slots and the treatment well, a Larder's 3 and the well, beside the 36 player slots; a Larder's adds a label clear and a reserve step per compartment and the Withdraw reserve button.
 - **Loss:** The stem is tissue: a broken cell leaves Dead Tissue and orphans the pods above it, each a store of its own, until the next bone meal regrows the cell in place and they rejoin. A pod is an organ: it comes out whole with its stock and grade and can be pressed back on a trunk cell, where it rejoins the plan. A broken root, or a root whose foundation is dug away, kills the stem cell by cell from the bottom; each dying cell sheds its pods as items with their stock and grade, so nothing is lost and nothing is left floating.
 - **Storage boundary:** Vanilla containers stay fully supported: Mouths work with any standard item inventory. The tree is the store the colony knows natively: Mouths read its counts directly and its reserves hold inside it.
 
@@ -663,6 +694,18 @@ The colony can feed several organs automatically. Upgrades here use T0 products;
 - **Input → output:** A creature standing on it → redstone power 15. No biomass.
 - **Create:** Craft the graft from 1 Synaptic Gel + 1 spider eye and use it on an exposed mature substrate cell. Grown, never placed: broken, it dies into Dead Tissue.
 - **Growth:** Mobs press it too, so a receptor outside a Clenched Door lets zombies in; where the receptors go is part of planning a base. Later mutations could count weight or admit only the colony's own.
+
+### T1-41 — Shaping Palm
+- **Status:** Milestone, proposed. Nothing ships yet. Owner module: `processing`; the organ is a batch organ kind with its own 3×3 grid. Evolves in three stages on one block, history kept.
+- **Does:** A hand-sized organ with a real 3×3 ingredient grid that keeps what is put in it, then reaches one explicitly linked store, then repeats one chosen vanilla crafting recipe on its own. It adds no recipes. It runs the vanilla crafting recipes of the game and of other mods through `RecipeType.CRAFTING`, with their own inputs, outputs and remainders.
+- **Create:** 1 Organ Bud + 1 crafting table + 2 Membrane Sheets + 1 Bone Plate. Stands on an organ foundation. Guide: after the Item Capsule (T1-09) and the Bone Loom (T0-06).
+- **Stage 1, the Palm.** Nine grid slots (vanilla stack sizes) and one result slot, in the vanilla crafting layout. The grid is **retained**: closing the screen keeps it, a broken organ carries it, a save keeps it. A click on the result is one vanilla craft by the player (shift: as many as the grid holds, stopping at an inventory that cannot take the result). Each craft consumes one of each non-empty slot and applies the recipe's remainders exactly as the crafting table does: a remainder goes to its emptied slot, otherwise into the player's inventory; if neither has room the craft is refused unchanged. No biomass, no wait, no organ count. It counts as the player's craft for recipe unlock, statistics and advancements. This is the manual recovery path for the stages below.
+- **Stage 2, Reach.** Use 1 Contractile Fiber on the Palm. It gains one **supply link**: the Synaptic Probe used on the Palm and then on a block in the same dimension, within 8 blocks, in a loaded chunk, that has an item handler (a chest, a Capsule Stem cell or pod, another mod's storage). The link is a position and is saved. Three screen actions use it, each at most 9 grid slots and 64 store slots of work: **Restock** tops every non-empty grid slot up to a stack from the store; **Return** moves the grid to the store; **Store result** moves the result slot to it. Extraction keeps every Larder reserve. A link to an unloaded, broken, out-of-range or handler-less target refuses with its reason and changes nothing; the Palm never searches for storage.
+- **Stage 3, Rote.** Use 1 Synaptic Gel on a Palm that has Reach. The Palm gains **Select**: it records the grid as a pattern, nine item kinds with their positions, the recipe id it resolved and the result it assembled. Select refuses a special recipe (`Recipe.isSpecial()`: dyeing, repair, map and firework recipes whose result depends on the inputs), an empty result, a pattern with more than 3 kinds of remainder, and a grid that matches no recipe. A Palm holds one pattern. Select again replaces it, and only when no cycle is under way.
+- **The cycle (stage 3).** A cycle starts by itself when: every pattern slot holds its recorded kind (same item and components), the recipe still resolves to the recorded id, the assembled result still equals the recorded one, the tray has room for the result and for every remainder, and the Palm holds 10 BU. It takes one of each pattern slot, the 10 BU and 40 ticks (2 s), then puts the result and the remainders in the tray. The tray is 1 result slot and 3 remainder slots. A change of recipe (a data reload) or result pauses the Palm with "recipe changed" and discards nothing. A cycle in the middle of a save resumes from its saved remaining ticks and its held inputs; the products appear once.
+- **Physical services.** Inputs: a Feeding Lobe or a hopper (the Palm joins `feeding_hosts`) fills a grid slot only with that slot's pattern kind, and the supply link restocks the grid at the end of each cycle, at most one restock a cycle. Outputs: a Yield Lobe or a hopper (the Palm joins `yield_hosts`) takes the result and the remainders, never the grid. The Palm serves 1 + its stage of each lobe, as every organ does.
+- **Bounds.** Work, state and retry limits: [Engineering](../../ENGINEERING.md#performance-limits), row Shaping Palm. Unreadable saved state is kept as bytes and refuses commands.
+- **Growth:** Not in the milestone: the organ records its completed cycles, and the L1–L3 choices (cycle time, biomass) come later. Request Cortex (T4-12) builds on a stage-3 Palm and adds recursive orders; the milestone has none.
 
 ## T2 — Directed mutation: genomes, specialized organs and planned excavation
 
@@ -911,16 +954,20 @@ cells use the strongest funded effect, not summed strength or double charging.
 - **Growth:** A Synaptic Gel treatment adds a pause point; luminous graft marks shaft edges. Changing a plan shows its new extent before work resumes, including a one-block-wide strip option.
 
 ### T2-23 — Mineral Gizzard
-- **Does:** Grinds supplied mineral material into concentrate. It neither extracts a world block nor performs the Work Bed's intact-block reaction. Its coarse residue is an output of grinding, not a second automatic recovery process.
-- **Input → output:** Supported raw ore OR Mineral Fragments from a fractured treated block + biomass → source-specific concentrate and rock residue according to that input's recipe. Fragments have their own single recovery allowance, not a second raw-ore multiplier. Separate no-bonus granulation prepares ingots, diamonds and obsidian for fusion; Washing Kidney cleans those portions.
-- **Create:** 1 Organ Bud + 1 iron pickaxe + 2 Bone Plates + 2 flint.
-- **Growth:** Choose grinding speed or biomass economy. Add a Steam Muscle for bulk batches; a Faceted Chitin treatment permits harder ores. Concentrate carries the mineral amount recovered from its original input, not an unlimited multiplication opportunity.
+- **Status:** Milestone, proposed. Owner modules: `mineral` for items and parcels, `processing` for the batch organ kind. Nothing ships yet.
+- **Does:** Grinds supplied raw iron, gold or copper into dust. It neither extracts a world block nor performs the Work Bed's intact-block reaction. Its coarse residue is an output of grinding, not a second automatic recovery process.
+- **Input → output:** 1 raw item + 20 BU, 8 s → 4 dust of its metal + 1 Mineral Tailings (4 units) + 1 Rock Residue. Slots, tanks and tray: [Items](ITEM_CATALOG.md#first-release-the-automated-mineral-workshop). Later: Mineral Fragments from a fractured treated block have their own single recovery allowance, and separate no-bonus granulation prepares ingots, diamonds and obsidian for fusion.
+- **Create:** 1 Organ Bud + 1 iron pickaxe + 2 Bone Plates + 2 flint. Stands on an organ foundation. Guide: after SR2 and the Bone Loom. No genome, electricity or Kidney.
+- **Batches:** The one batch lifecycle of `OrganWork`. `organ_batch` gains up to three results (dust, Tailings, Rock Residue) and a reserved-tray rule: a batch starts only when every result fits. Feeding and Yield Lobes and hoppers serve it; it joins `feeding_hosts` and `yield_hosts`.
+- **Growth:** Not in the milestone: batches are counted; the speed-or-economy choice comes later. Add a Steam Muscle for bulk batches; a Faceted Chitin treatment permits harder ores. Dust carries the mineral amount recovered from its original input, not an unlimited multiplication opportunity.
 
 ### T2-24 — Washing Kidney
-- **Does:** Washes crushed ore before smelting. The player chooses a simple dry furnace route or more recovery with a water supply and waste handling.
-- **Input → output:** A four-unit Mineral Tailings parcel + water → one Washed Concentrate plus a three-unit residual parcel, at the Item Catalog cost. Wash water goes to a separate dirty-fluid output. Its starter filtration mode also cleans generator process water at the Item Catalog rate; that mode needs no ore or genome. Non-ore granulation washes one real mineral portion without a recovery multiplier.
-- **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 sand + 1 glass bottle.
-- **Growth:** Choose washing speed or water economy. Elastic Gel treatment improves fine-particle capture; a later Ion Separator recovers selected tailings. Full waste output stops new batches.
+- **Status:** Milestone, proposed. Nothing ships yet.
+- **Does:** Washes the Gizzard's Tailings. The player chooses a simple route with no washing or more dust with a water supply and waste handling.
+- **Input → output:** 1 Tailings (4 units) + 250 mB clean water + 30 BU, 8 s → 1 dust of its metal + 1 Tailings (3 units); 250 mB dirty water stays in the Kidney's own dirty tank. When that tank cannot take 250 mB more, the Kidney settles: 1000 mB dirty water + 20 BU, 20 s → 1 Rock Residue. A full dirty tank, a full tray or a Tailings of 3 units refuses a wash and names the cause. Dirty water has no item, bucket, block, vein or pipe.
+- **Create:** 1 Organ Bud + 2 Membrane Sheets + 1 sand + 1 glass bottle. Stands on an organ foundation. Guide: after the Gizzard, with no electricity and no genome. Its ore mode needs only biomass and clean water; the generator-water filtration mode below belongs to T4-01.
+- **Later modes:** A starter filtration mode cleans generator process water at the Item Catalog rate with electricity; that mode needs no ore or genome. Non-ore granulation washes one real mineral portion without a recovery multiplier.
+- **Growth:** Not in the milestone. Later: choose washing speed or water economy. Elastic Gel treatment improves fine-particle capture; a later Ion Separator recovers selected tailings.
 
 ### T2-25 — Feeding Trough
 - **Does:** Supplies an assigned livestock pen from stored food, with a target population and a breeding reserve. The player chooses food production or animal growth as the pen's priority.
@@ -1176,9 +1223,9 @@ Bioelectric organs make exact sampling, coordinated production and larger excava
 - **Growth:** Add panels for more rows or a route diagram. Dyes set the skin color, while warning shapes and text remain distinguishable without relying on color alone.
 
 ### T4-12 — Request Cortex
-- **Does:** Requests a finished item from a connected workshop, arranging recipes through the existing veins and organs. Storage access and crafting are separate functions.
+- **Does:** Requests a finished item from a connected workshop, arranging recipes through the existing veins and organs. Storage access and crafting are separate functions. Not in the automated mineral workshop milestone, whose Palm repeats one recipe; recursive orders are this organ's job.
 - **Input → output:** A requested item/count + available stock + registered organ recipes + power → reserved work orders and delivered products, or a list of missing ingredients.
-- **Create:** 1 Scheduler Ganglion + 1 crafting table + 1 amethyst cluster + 1 Item Capsule.
+- **Create:** 1 Scheduler Ganglion + 1 Shaping Palm with Rote (T1-41) + 1 amethyst cluster + 1 Item Capsule.
 - **Growth:** Add Archive Lobes for more recipe/order slots and Item Capsules for pending inputs. A furnace order still needs fuel, output space and the right physical furnace upgrades; the cortex cannot simulate the machine away.
 
 ### T4-13 — Strata Maw

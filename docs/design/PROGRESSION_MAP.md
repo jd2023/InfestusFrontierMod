@@ -76,6 +76,14 @@ raising its stalk to retain a walkway.
 Invalid additions wait outside the valid body without erasing its contents.
 Fuel Papilla fills worn pieces from stored supply.
 
+**Specialized storage and crafting (proposed milestone).** Mutate an empty pod into a
+Mixed Craw (four kinds at half a bulk pod's depth in total) and a Craw into a Larder
+(three labelled kinds, each with a reserve that every automatic extraction keeps).
+Use a Shaping Palm as a crafting table that keeps its grid; link it to one store; then
+let it repeat one chosen recipe on biomass through Feeding and Yield Lobes. Each step
+keeps the hand path. See [Blocks](BLOCK_CATALOG.md#t1-09--item-capsule-and-capsule-stem)
+and [T1-41](BLOCK_CATALOG.md#t1-41--shaping-palm). Recursive orders wait for the Request Cortex.
+
 **Control:** protect seed/restart reserves, then distribute surplus. Full destinations
 pause suppliers. Reflex Knot and Selector Ganglion use ready/held/blocked states;
 one-tick timing is unnecessary for correctness.
@@ -127,10 +135,20 @@ production; Ration Kitchen for meals before surplus is allocated to digestion.
 access steps, light and output storage. Walk the result to explore a cavern or
 address a refused face.
 
-**Mineral workshop:** Grasping Root moves one intact specimen to Work Bed;
+**Raw-ore recovery (proposed milestone, after the colony runs).** Mine iron, gold or
+copper by hand. Feed raw items to a Mineral Gizzard for four dust each; optionally
+wash its Tailings in a Washing Kidney for one more dust at the cost of water, time,
+biomass and a settling cycle; smelt four dust per ingot in the Bio-Furnace. The Kidney
+needs no electricity and no genome. Dirty water, Rock Residue and Tailings have
+finite buffers and a sink at this stage; a full buffer pauses the line. Direct
+smelting stays cheaper per ingot; the dust waits for later smelters. Numbers:
+[Items](ITEM_CATALOG.md#first-release-the-automated-mineral-workshop). Leaching,
+intact extraction, planned mines and the Separator come after it.
+
+**Later mineral workshop:** Grasping Root moves one intact specimen to Work Bed;
 Reaction Polyp treats it; Fracture Jaw creates held fragments; Collection Cilia
-exports to Mineral Gizzard, Washing Kidney and Bio-Furnace. Hand mining can bypass
-treatment. Multiple beds may share an applicator or fracture head.
+exports to Mineral Gizzard, Washing Kidney and Bio-Furnace. Hand mining and the
+raw-ore recovery above remain valid without treatment. Multiple beds may share an applicator or fracture head.
 
 **Optional courier:** assign a nursery worker to collect held Work Bed results and
 deliver them to a capsule along waypoints. One courier can share several separated

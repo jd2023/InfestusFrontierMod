@@ -193,10 +193,10 @@ The projector refuses when no slot, valid support or armor fuel is available.
 | I054 | Protein Culture Feed | Cyst: 1 raw fish or rotten flesh + 1 Nutrient Mash + 50 mB water → 2 | Animal-stock recipes, larvae. Not edible player food. |
 | I055 | Expedition Ration | Ration Kitchen: 1 cooked beef + 1 baked potato + 1 carrot → 1 ration | Proposed 10 hunger, 12 saturation; real food for player or Feeding Lobe. No extra potion effect. |
 | I056 | Travel Ration | Kitchen: 1 bread + 1 cooked fish + 1 honey bottle → 1, returning bottle | Proposed 8 hunger, 10 saturation; lighter farm recipe, not free speed mutation. |
-| I057 | Mineral Concentrate | Gizzard's base four-unit recovered fraction | Release to four matching dust; no second ore-input processing. |
-| I058 | Washed Concentrate | Kidney/Separator's one-unit recovered fraction | Release to one matching dust; no residual recovery allowance. |
-| I059 | Mineral Tailings | Gizzard's four-unit residual parcel, reduced by Kidney/Separator | Recover only the remaining metal at its declared processing stage. |
-| I060 | Rock Residue | Gizzard's accounted non-mineral fraction | Building aggregate or deliberate disposal, not a second ore product or organic biomass feed. |
+| I057 | Mineral Concentrate | Later (Separator and Vat path): the Gizzard's four-unit recovered fraction held as an item | The first release does not make it: the Gizzard releases its four dust inside the batch. |
+| I058 | Washed Concentrate | Later: the Separator's one-unit recovered fraction | The first release does not make it: the Kidney releases its one dust inside the batch. |
+| I059 | Mineral Tailings | Gizzard: 1 per raw item, 4 residual units. Kidney: replaces it with a 3-unit parcel | Data component `parcel {metal, units}`. Stockpiled for the later Separator, or discarded for 1 Rock Residue. Not smeltable, not a dust source in the first release. |
+| I060 | Rock Residue | Gizzard: 1 per raw item. Kidney: 1 per 1000 mB dirty water settled | Stacks to 64. Shapeless craft: 2 Rock Residue → 1 cobblestone. Never ore, dust, biomass feed or fertilizer. |
 | I061 | Washed Iron / Gold / Diamond / Obsidian Portion | Four distinct forms: corresponding ingot/gem/block → Gizzard granulation → Kidney with 100 mB water | One cleaned portion and 100 mB spent wash per source item. Fusion media below, no yield multiplier. |
 | I103 | Mineral Workpiece | Work Bed wraps one idle intact/conditioned mineral specimen with 1 Membrane Sheet → one unstackable workpiece | Another Work Bed unwraps the same target and returns that one Sheet into reserved space. Item Veins, capsules and couriers can carry it. Fixed source/state fields; not a placeable fresh ore item or an arbitrary block-entity container. Wrapping grants no processing counts. |
 | I107 | Mineral Penetrant | Cyst, SR2: 1 Digestive Enzyme + 1 Filter Membrane + 100 mB water + 50 BU → 2 doses | Reaction Polyp consumes one dose per eligible intact ore specimen; not interchangeable with host-rock Leaching Nodules. |
@@ -352,16 +352,16 @@ foreign ores are not admitted as recovery inputs.
 
 | Operation / required assembly | Input per operation | Output | Cost / loaded time |
 |---|---|---|---|
-| Gizzard, base | 1 input unit or its fractured I108 parcel | 1 I057 (4 recovered units) + 1 I059 tailings parcel (4 residual units) + 1 I060 residue | 20 BU / 8 s |
-| Kidney washing | 1 tailings parcel with 4 residual units + 250 mB water | 1 I058 + parcel with 3 residual units + 250 mB dirty water | 30 BU / 8 s |
-| Separator, base | Parcel with 3 residual units + 1 Leaching Nodule + 250 mB water | 1 I058 + parcel with 2 residual units + 250 mB dirty water | 60 BU + 2000 BE / 12 s |
+| Gizzard, base | 1 input unit or its fractured I108 parcel | 4 matching dust + 1 I059 tailings parcel (4 residual units) + 1 I060 residue | 20 BU / 8 s |
+| Kidney washing | 1 tailings parcel with 4 residual units + 250 mB water | 1 matching dust + parcel with 3 residual units + 250 mB dirty water | 30 BU / 8 s |
+| Separator, base (later) | Parcel with 3 residual units + 1 Leaching Nodule + 250 mB water | 1 I058 + parcel with 2 residual units + 250 mB dirty water | 60 BU + 2000 BE / 12 s |
 | Separator, Auric precision service | Parcel with 2 residual units + 2 Leaching Nodules + 500 mB water | 1 I058 + parcel with 1 residual unit + 500 mB dirty water | 120 BU + 8000 BE / 20 s |
 | Separator, precision and Mantle heat | Parcel with 1 residual unit + 4 Leaching Nodules + 1 Thermal Lining + 1000 mB water | 1 I058 + 1 mineral-depleted I060 residue + 1000 mB dirty water | 240 BU + 32000 BE / 40 s |
-| Gizzard, concentrate release | 1 I057 or 1 I058 | 4 or 1 matching dust respectively | No extra fuel / 1 s |
+| Concentrate release (later) | 1 I057 or 1 I058 | 4 or 1 matching dust respectively | No extra fuel / 1 s |
 
 Residual units and metal are immutable recipe-state fields on I059, not a second
 ore item or a freely editable counter. Each operation replaces its input parcel;
-reject insufficient/wrong residual state. I057/I058 contain only their recovered
+reject insufficient/wrong residual state. A later I057/I058 contains only its recovered
 fraction; releasing it consumes the concentrate, never creates more tailings.
 Treating an intact Work Bed ore with I107 makes its fractured parcel eligible for
 Kidney washing; raw-input Gizzard parcels already permit washing. Treatment
@@ -370,7 +370,7 @@ but their residue is inert. All mineral waste remains in reserved outputs.
 
 | Smelting assembly | Dust / ingot | Additional cost per ingot | Loaded time |
 |---|---|---|---|
-| Bio-Furnace | 4 | 40 BU | 16 s |
+| Bio-Furnace | 4 | 40 BU | 16 s, 12 s and 8 s at the furnace's first, second and third stage |
 | Furnace + Nether Thermal Mantle | 3 | 80 BU + 250 mB steam | 20 s |
 | Mantle + Steam Muscle + supplied electrical port | 2 | 160 BU + 500 mB steam + 8000 BE | 30 s |
 | Previous assembly + isolated Separator precision service | 1 | 320 BU + 1000 mB steam + 32000 BE + 1 Thermal Lining | 45 s |
@@ -382,6 +382,106 @@ Chamber; its host must be L1. It grants access to the listed recipes, not passiv
 yield. The Separator servicing a smelter cannot simultaneously process tailings.
 Kidney process-water filtration is a separate recipe: 100 mB dirty water +
 1000 BE, 5 s → 100 mB clean water, without consuming a mineral parcel or filter.
+
+### First release: the automated mineral workshop
+
+Status: **proposed; nothing here ships yet.** What ships today is vanilla smelting
+in the Bio-Furnace, the Capsule Stem and the Mouths. Starting values until play
+testing confirms them. Roadmap scope: [ROADMAP](../../ROADMAP.md#next-milestone--the-automated-mineral-workshop).
+
+Scope: iron, gold and copper raw items that the player mined or looted by hand;
+the Gizzard; the optional Kidney washing; finite waste; the Bio-Furnace smelting
+dust. Out of scope: Leaching, intact extraction and treatment (Work Bed, Grasping
+Root, Reaction Polyp, Fracture Jaw), planned mines, genetics, thermal and electrical
+upgrades, the Separator, concentrate items.
+
+**Inputs.** Raw iron, raw gold and raw copper, one item each. Not inputs: ore
+blocks, raw-metal blocks (unpack them by the vanilla 1:9 recipe first), Nether gold
+ore, nuggets, ingots, tools, armor and foreign ores. Fortune raw items are raw items.
+
+**Chain per raw item.** Water comes from the organ's own tank, biomass from its own
+tank; both are filled by hand or by veins.
+
+| Step | Organ | Takes | Gives | Biomass | Water | Time |
+|---|---|---|---|---|---|---|
+| Grind | Mineral Gizzard | 1 raw item | 4 dust + 1 Mineral Tailings (4 units) + 1 Rock Residue | 20 BU | 0 | 8 s |
+| Wash (optional) | Washing Kidney | 1 Tailings (4 units) | 1 dust + 1 Tailings (3 units) | 30 BU | 250 mB clean; 250 mB dirty is kept | 8 s |
+| Settle | Washing Kidney | 1000 mB dirty water | 1 Rock Residue | 20 BU | 0 | 20 s |
+| Smelt | Bio-Furnace | 4 dust of one metal | 1 ingot, plus the vanilla experience of that metal's raw-item recipe once | 40 BU | 0 | 16 s, 12 s, 8 s by furnace stage |
+
+Four dust per raw item, one more with washing, four dust per ingot. An unwashed
+raw item makes exactly one ingot. A washed one makes five dust: one ingot and one
+dust left for the next four washed items. Dust has the metal's identity only. It
+carries no record of the organ that made it.
+
+**Buffers (per organ, all saved).**
+
+| Organ | Input | Tanks | Output tray (a batch starts only if every product fits) |
+|---|---|---|---|
+| Gizzard | 1 slot, 64 raw items of one kind | 1000 BU | 1 slot of dust (64), 1 of Tailings (64), 1 of Rock Residue (64) |
+| Kidney | 1 slot, 64 Tailings of 4 units | 1000 BU; 1000 mB clean water; 1000 mB dirty water | same three slots; Tailings of 3 units |
+
+The Gizzard fills its dust slot after 16 grinds and then waits for a Yield Lobe, a
+hopper or a Mouth. The Kidney settles before it washes again as soon as the dirty
+tank cannot take 250 mB more. Its steady cycle is 4 washes and 1 settle: 52 s,
+1000 mB water, 140 BU, 4 dust and 1 Rock Residue for 4 Tailings. The Kidney is slower
+than the Gizzard (13 s against 8 s per raw item), so a washing line wants a second
+Kidney or accepts unwashed stock. Dirty water exists only inside the Kidney. It has
+no bucket, no block, no vein and no way into the world.
+
+**Waste and its sinks.** Each waste has a finite buffer and a sink obtainable with
+the organs above. No future machine and no world dumping is assumed.
+
+| Waste | Buffer | Sink |
+|---|---|---|
+| Dirty water | 1000 mB in the Kidney | Settle into Rock Residue (above). Nothing else drains it; it never becomes clean water in this release. |
+| Rock Residue | Output slot of each organ (64); then any pod, Craw or chest | Shapeless craft 2 Rock Residue → 1 cobblestone; or vanilla lava, cactus or a void the player owns. |
+| Tailings (4 or 3 units) | Output slot (64); then any pod, Craw or chest | Keep for the later Separator, or craft 1 Tailings → 1 Rock Residue. The residual units are lost, never turned into dust. |
+
+A full buffer pauses the organ and names the cause on its screen and probe
+("residue tray full", "dirty water full", "tailings tray full"). Nothing is dropped
+and nothing is deleted without an explicit craft.
+
+**Against direct smelting and vanilla mining.** Per ore block mined, average:
+raw items per block are 1 for iron and gold, 2–5 (3.5) for copper. Fortune I, II
+and III multiply the count by 1.33, 1.75 and 2.2 on average. Direct smelting is 1
+ingot per raw item at 40 BU.
+
+| Metal | Raw per block | Direct smelting | Workshop, unwashed | Workshop, washed | Fortune III, direct | Fortune III, washed |
+|---|---|---|---|---|---|---|
+| Iron | 1 | 1.00 | 1.00 | 1.25 | 2.20 | 2.75 |
+| Gold | 1 | 1.00 | 1.00 | 1.25 | 2.20 | 2.75 |
+| Copper | 3.5 | 3.50 | 3.50 | 4.38 | 7.70 | 9.63 |
+
+| Cost per ingot | Direct | Unwashed | Washed |
+|---|---|---|---|
+| Biomass | 40 BU | 60 BU | 84 BU |
+| Loaded organ time | 16 s | 24 s | 33 s (settling included) |
+| Water | 0 | 0 | 200 mB |
+
+The first release never beats direct smelting on biomass or time and never beats
+Fortune. Its value is hands-free flow from a store to ingots, the washing bonus for
+a player who has water and waste space, and dust that waits for the later smelting
+upgrades (3, 2, then 1 dust per ingot). Washed iron under a 3-dust smelter is 1.67
+ingots per raw item, on top of Fortune.
+
+**Closed paths.**
+- No recipe makes dust, Tailings or Rock Residue from an ingot, nugget, block, tool,
+  armor or ore block. No recipe makes a raw item from dust or an ingot.
+- Dust cannot be crafted back into Tailings, and no recipe raises residual units.
+  The Kidney takes only a Tailings of 4 units. It refuses 3 units, another metal's
+  parcel and any stack without the `parcel` component.
+- A batch takes its input, water and biomass at its start and holds its products
+  until they fit. A save in the middle, a broken organ or an unloaded chunk keeps the
+  one batch; the products appear once.
+- Tailings and Rock Residue are not Sac feed, fertilizer or smelting input.
+- Washed Portions of ingots and gems (I061) are a different item family. They
+  never give yield-eligible dust.
+
+**Smelting data.** The Bio-Furnace gets `organ_batch` recipes for its organ id, one
+per metal: four dust of that metal in its one slot, 40 BU, 320 ticks at its first stage;
+the furnace scales ticks to 240 and 160 at its second and third stage, as for vanilla smelting.
+The vanilla smelting book keeps working beside them.
 
 ### Plant graft traits
 
