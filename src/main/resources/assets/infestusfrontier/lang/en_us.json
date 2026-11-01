@@ -171,7 +171,7 @@
   "gui.infestusfrontier.awakening_cradle.piece": "Piece, culture",
   "entry.infestusfrontier.contact.dormant_pieces.name": "Dormant Pieces",
   "entry.infestusfrontier.contact.dormant_pieces.description": "Flesh shaped like armor",
-  "entry.infestusfrontier.contact.dormant_pieces.use": "Rotten flesh in the shape of a helmet, chestplate, leggings or boots makes a dormant piece. It is weak and holds nothing. The Cradle wakes it.",
+  "entry.infestusfrontier.contact.dormant_pieces.use": "Craft rotten flesh in armor shapes. Dormant pieces have lower protection, durability, and enchantability than leather. Toughness and knockback resistance are both zero, matching leather. They hold nothing. The Cradle wakes them.",
   "entry.infestusfrontier.contact.awakening_cradle.name": "Awakening Cradle",
   "entry.infestusfrontier.contact.awakening_cradle.description": "Wake a dormant piece",
   "entry.infestusfrontier.contact.awakening_cradle.use": "Place it on Living Substrate. Put in a dormant piece, a Spore Culture and a bucket of biomass. It starts on its own. Thirty seconds and 100 BU later the piece is awake, as worn as it went in, with an empty reserve of 40 BU. Any other item opens the screen.",

@@ -51,6 +51,40 @@ public final class EquipmentTests {
         h.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void everyDormantPieceIsWeakerThanItsLeatherCounterpart(GameTestHelper h) {
+        List<Item> dormant = List.of(
+                EquipmentModule.DORMANT_HOOD.get(),
+                EquipmentModule.DORMANT_THORAX.get(),
+                EquipmentModule.DORMANT_LEGWRAPS.get(),
+                EquipmentModule.DORMANT_TREADS.get());
+        List<ArmorItem> leather = List.of(
+                (ArmorItem) Items.LEATHER_HELMET,
+                (ArmorItem) Items.LEATHER_CHESTPLATE,
+                (ArmorItem) Items.LEATHER_LEGGINGS,
+                (ArmorItem) Items.LEATHER_BOOTS);
+        for (int i = 0; i < dormant.size(); i++) {
+            ArmorItem piece = (ArmorItem) dormant.get(i);
+            ArmorItem reference = leather.get(i);
+            String name = piece.toString();
+            h.assertTrue(piece.getDefense() < reference.getDefense(), name + " protects less than leather");
+            h.assertTrue(
+                    new ItemStack(piece).getMaxDamage() < new ItemStack(reference).getMaxDamage(),
+                    name + " wears out sooner than leather");
+            h.assertTrue(
+                    piece.getMaterial().value().enchantmentValue()
+                            < reference.getMaterial().value().enchantmentValue(),
+                    name + " takes enchantments worse than leather");
+            // leather has none of these; a dormant piece must not have any either
+            h.assertTrue(piece.getToughness() <= reference.getToughness(), name + " toughness above leather");
+            h.assertTrue(
+                    piece.getMaterial().value().knockbackResistance()
+                            <= reference.getMaterial().value().knockbackResistance(),
+                    name + " knockback resistance above leather");
+        }
+        h.succeed();
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 700)
     public static void theCradleWakesAPieceAsWornAsItWentIn(GameTestHelper h) {
         h.setBlock(GROUND, EcologyModule.LIVING_SUBSTRATE.get());
