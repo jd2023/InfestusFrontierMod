@@ -66,6 +66,8 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
 
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     static final Refusal NO_SLOT = new Refusal("processing.no_slot");
+    /** The {@link #blocked()} bit for a batch that waits because the dirty tank cannot take its dirty water. */
+    static final int DIRTY_FULL = 1 << BatchOrganContents.MAX_OUTPUTS;
 
     private static final MapCodec<BatchOrganContents> SAVED = BatchOrganContents.CODEC.fieldOf("contents");
 
@@ -75,13 +77,19 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
     private final ItemStackHandler output;
     private final FluidTank water;
     private BiomassTank biomass;
+    /** Dirty water: a count in this organ alone. It is in no fluid handler, so no pipe, bucket or vein can reach it. */
+    private int dirty;
+
     private OrganHistory history = OrganHistory.NONE;
     private Optional<OrganBatch> batch = Optional.empty();
     private Optional<UUID> feeder = Optional.empty();
     private float experience;
     /** True while something changed since the last look for a recipe, so a tick looks again at most once per change. */
     private boolean retry = true;
-    /** Bit {@code n} is set while result {@code n} of a batch ready to start or to finish has no room in its output slot. */
+    /**
+     * Bit {@code n} is set while a batch ready to start or to finish has no room for its result in output slot
+     * {@code n}; {@link #DIRTY_FULL} while a washing batch has no room for its dirty water.
+     */
     private int blocked;
 
     BatchOrganBlockEntity(BatchOrganKind kind, BlockPos pos, BlockState state) {
@@ -136,6 +144,11 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         return water;
     }
 
+    /** The dirty water held, in mB. */
+    int dirty() {
+        return dirty;
+    }
+
     ItemStackHandler ingredients() {
         return ingredients;
     }
@@ -188,8 +201,11 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
 
     boolean isEmpty() {
         if (unreadable.isPresent()) return false; // the kept bytes are contents too
-        if (batch.isPresent() || water.getFluidAmount() > 0 || !biomass.stored().isZero() || !outputEmpty())
-            return false;
+        if (batch.isPresent()
+                || water.getFluidAmount() > 0
+                || dirty > 0
+                || !biomass.stored().isZero()
+                || !outputEmpty()) return false;
         for (int slot = 0; slot < kind.slots(); slot++)
             if (!ingredients.getStackInSlot(slot).isEmpty()) return false;
         return true;
@@ -239,10 +255,11 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         if (organ.batch.isEmpty() && organ.retry) organ.start();
         if (organ.batch.isEmpty()) return;
         organ.batch = OrganWork.tick(organ.batch, finished -> {
-            organ.blocked = organ.full(finished.results());
+            organ.blocked = organ.full(finished.slot(), finished.results());
             if (organ.blocked != 0) return false; // no room: wait
             List<ItemStack> results = finished.results();
-            for (int slot = 0; slot < results.size(); slot++) organ.output.insertItem(slot, results.get(slot), false);
+            for (int n = 0; n < results.size(); n++)
+                organ.output.insertItem(finished.slot() + n, results.get(n), false);
             organ.history = organ.history.completed();
             organ.experience = Math.min(BatchOrganContents.MAX_EXPERIENCE, organ.experience + finished.experience());
             OrganWork.completed(level, organ.kind.blockId(), finished);
@@ -251,19 +268,23 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         organ.setChanged();
     }
 
-    /** The output slots that cannot take their result of {@code results}, one bit each; all of them when there are too many. */
-    private int full(List<ItemStack> results) {
-        if (results.size() > output.getSlots()) return (1 << output.getSlots()) - 1;
+    /**
+     * The output slots that cannot take their result of {@code results}, which start at output slot {@code first},
+     * one bit each; all of them when there are too many.
+     */
+    private int full(int first, List<ItemStack> results) {
+        if (first + results.size() > output.getSlots()) return (1 << output.getSlots()) - 1;
         int full = 0;
-        for (int slot = 0; slot < results.size(); slot++)
-            if (!output.insertItem(slot, results.get(slot), true).isEmpty()) full |= 1 << slot;
+        for (int n = 0; n < results.size(); n++)
+            if (!output.insertItem(first + n, results.get(n), true).isEmpty()) full |= 1 << (first + n);
         return full;
     }
 
     /**
      * Starts the first batch of the book the slots, the water and the biomass can pay for and whose result fits the
      * output: takes what the plan says, leaves the rest for the next batch, and spends the water and the biomass now.
-     * Looks again only after the next change.
+     * A washing batch also needs room in the dirty tank for the dirty water it makes, or that much dirty water to
+     * take; both change the tank at the start. Looks again only after the next change.
      */
     private void start() {
         retry = false;
@@ -272,20 +293,25 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         for (int slot = 0; slot < kind.slots(); slot++) held.add(ingredients.getStackInSlot(slot));
         int waiting = 0;
         for (BatchBook.Plan plan : kind.book().plans(level, held, history)) {
-            if (water.getFluidAmount() < plan.waterMb() || !biomass.stored().atLeast(plan.biomass())) continue;
-            int full = full(plan.results());
-            if (full != 0) { // no room for these results: the batch waits, whole
-                if (waiting == 0) waiting = full;
+            if (water.getFluidAmount() < plan.waterMb()
+                    || !biomass.stored().atLeast(plan.biomass())
+                    || dirty < plan.dirtyIn()) continue;
+            int full = full(plan.slot(), plan.results());
+            if (dirty - plan.dirtyIn() + plan.dirtyOut() > kind.dirtyMb()) full |= DIRTY_FULL;
+            if (full != 0) { // no room for these results or this dirty water: the batch waits, whole
+                waiting |= full;
                 continue;
             }
             blocked = 0;
             for (int slot = 0; slot < kind.slots(); slot++) ingredients.extractItem(slot, plan.take()[slot], false);
             water.drain(plan.waterMb(), IFluidHandler.FluidAction.EXECUTE);
+            dirty += plan.dirtyOut() - plan.dirtyIn();
             biomass = ((Outcome.Done<BiomassTank>) biomass.drain(plan.biomass())).value();
             batch = Optional.of(new OrganBatch(
                     Batch.start(plan.id(), plan.ticks()),
                     plan.results().get(0),
                     plan.results().subList(1, plan.results().size()),
+                    plan.slot(),
                     feeder,
                     plan.experience()));
             setChanged();
@@ -382,7 +408,8 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
         List<ItemStack> made = new ArrayList<>();
         for (int slot = 0; slot < output.getSlots(); slot++)
             made.add(output.getStackInSlot(slot).copy());
-        return new BatchOrganContents(held, made, water.getFluidAmount(), biomass, history, batch, feeder, experience);
+        return new BatchOrganContents(
+                held, made, water.getFluidAmount(), biomass, history, batch, feeder, experience, dirty);
     }
 
     /** Why {@code saved} cannot be installed as a whole, or empty when it fits together. */
@@ -393,10 +420,13 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
             return Optional.of(saved.ingredients().size() + " ingredient slots");
         if (saved.outputs().size() > kind.outputs())
             return Optional.of(saved.outputs().size() + " output slots");
-        if (saved.batch().isPresent() && saved.batch().get().results().size() > kind.outputs())
+        if (saved.batch().isPresent()
+                && saved.batch().get().slot() + saved.batch().get().results().size() > kind.outputs())
             return Optional.of(
-                    "a running batch of " + saved.batch().get().results().size() + " results");
+                    "a running batch of " + saved.batch().get().results().size() + " results from slot "
+                            + saved.batch().get().slot());
         if (saved.waterMb() > kind.waterMb()) return Optional.of(saved.waterMb() + " mB of water");
+        if (saved.dirtyMb() > kind.dirtyMb()) return Optional.of(saved.dirtyMb() + " mB of dirty water");
         if (saved.batch().isPresent() && saved.history().completedBatches() == Integer.MAX_VALUE)
             return Optional.of("a running batch that history cannot count");
         return Optional.empty();
@@ -411,6 +441,7 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
             output.setStackInSlot(slot, slot < made.size() ? made.get(slot) : ItemStack.EMPTY);
         water.setFluid(saved.waterMb() > 0 ? new FluidStack(Fluids.WATER, saved.waterMb()) : FluidStack.EMPTY);
         biomass = saved.biomass();
+        dirty = saved.dirtyMb();
         history = saved.history();
         batch = saved.batch();
         feeder = saved.feeder();

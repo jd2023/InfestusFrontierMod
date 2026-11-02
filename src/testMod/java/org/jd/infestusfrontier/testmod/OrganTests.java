@@ -64,7 +64,7 @@ public final class OrganTests {
         surgeon.setOnGround(true);
         List<Block> organs = new ArrayList<>();
         BuiltInRegistries.BLOCK.getTagOrEmpty(Organs.ORGANS).forEach(holder -> organs.add(holder.value()));
-        h.assertValueEqual(organs.size(), 23, "twenty-three organs");
+        h.assertValueEqual(organs.size(), 24, "twenty-four organs");
         for (String id : List.of(
                 "digestive_sac",
                 "biomass_bladder",
@@ -77,6 +77,7 @@ public final class OrganTests {
                 "activation_cyst",
                 "compost_gland",
                 "mineral_gizzard",
+                "washing_kidney",
                 "vascular_junction",
                 "reservoir_cell",
                 "seed_pouch",

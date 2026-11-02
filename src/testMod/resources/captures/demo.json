@@ -280,6 +280,35 @@
     "summon item_frame 57 -60 -28 {Facing:1b,Fixed:1b,Item:{id:\"infestusfrontier:mineral_tailings\",count:1,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:4}}}}",
     "summon item_frame 58 -60 -28 {Facing:1b,Fixed:1b,Item:{id:\"infestusfrontier:rock_residue\",count:1}}",
     "setblock 56 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Dust, Tailings\"','\"Rock Residue\"','\"what a grind\"','\"leaves\"']}}",
+    "fill 64 -61 -29 64 -61 -27 stone",
+    "fill 63 -60 -29 63 -60 -27 stone",
+    "setblock 64 -60 -30 stone",
+    "setblock 64 -60 -26 stone",
+    "setblock 65 -60 -29 stone",
+    "setblock 65 -60 -27 stone",
+    "fill 64 -60 -29 64 -60 -27 water",
+    "fill 65 -61 -28 68 -61 -28 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 65 -60 -28 infestusfrontier:vascular_junction[west=intake,east=outlet]",
+    "setblock 66 -60 -28 infestusfrontier:washing_kidney[working=true]{contents:{ingredients:[{id:\"infestusfrontier:mineral_tailings\",count:3,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:4}}}],outputs:[{id:\"infestusfrontier:iron_dust\",count:3},{id:\"infestusfrontier:mineral_tailings\",count:3,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:3}}},{id:\"infestusfrontier:rock_residue\",count:1}],water:500,dirty:500,biomass:{stored:900,reserved:0,capacity:1000},history:{completed_batches:6},batch:{batch:{recipe:\"infestusfrontier:washing/iron\",ticks_required:160,ticks_done:70},result:{id:\"infestusfrontier:iron_dust\",count:1},byproducts:[{id:\"infestusfrontier:mineral_tailings\",count:1,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:3}}}]}}}",
+    "setblock 66 -59 -28 hopper[facing=down]",
+    "setblock 66 -58 -28 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:mineral_tailings\",count:32,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:4}}},{Slot:1,id:\"infestusfrontier:mineral_tailings\",count:16,components:{\"infestusfrontier:parcel\":{metal:\"gold\",units:4}}}]}",
+    "setblock 67 -60 -28 infestusfrontier:vascular_junction[east=intake,west=outlet]",
+    "setblock 68 -60 -28 infestusfrontier:reservoir_cell{tank:{stored:2000,reserved:0,capacity:2000},body:[68,-60,-28,68,-60,-28]}",
+    "setblock 66 -61 -27 infestusfrontier:mouth[mode=output]",
+    "setblock 66 -60 -27 infestusfrontier:yield_lobe[facing=north]",
+    "fill 67 -61 -27 70 -61 -27 infestusfrontier:item_vein",
+    "setblock 71 -61 -27 infestusfrontier:mouth[mode=intake]",
+    "setblock 71 -60 -27 chest[facing=north]",
+    "setblock 62 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Water Pool\"','\"three sources\"','\"Junction drinks\"','\"never runs dry\"']}}",
+    "setblock 67 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Washing Kidney\"','\"Tailings, hopper\"','\"1 dust a wash\"','\"dirty tank settles\"']}}",
+    "setblock 69 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Biomass Store\"','\"Reservoir and\"','\"Junction feed\"','\"the Kidney\"']}}",
+    "setblock 71 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Wash Results\"','\"Mouths collect\"','\"dust, Tailings\"','\"and Residue\"']}}",
+    "summon item_frame 73 -60 -28 {Facing:1b,Fixed:1b,Item:{id:\"infestusfrontier:iron_dust\",count:1}}",
+    "summon item_frame 74 -60 -28 {Facing:1b,Fixed:1b,Item:{id:\"infestusfrontier:mineral_tailings\",count:1,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:3}}}}",
+    "summon item_frame 75 -60 -28 {Facing:1b,Fixed:1b,Item:{id:\"infestusfrontier:rock_residue\",count:1}}",
+    "setblock 74 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Washed Tailings\"','\"3 units: not\"','\"washed again\"','\"\"']}}",
+    "item replace entity @s inventory.15 with infestusfrontier:washing_kidney 2",
+    "item replace entity @s inventory.16 with infestusfrontier:mineral_tailings[infestusfrontier:parcel={metal:\"iron\",units:4}] 16",
     "item replace entity @s inventory.12 with raw_gold 16",
     "item replace entity @s inventory.13 with raw_copper 16",
     "item replace entity @s inventory.14 with infestusfrontier:mineral_gizzard 2",
@@ -1220,6 +1249,36 @@
       "pitch": 38
     },
     {
+      "name": "kidney_line",
+      "x": 66.5,
+      "y": -58.4,
+      "z": -33.0,
+      "yaw": 0,
+      "pitch": 33
+    },
+    {
+      "name": "kidney_screen",
+      "x": 66.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        66,
+        -60,
+        -28
+      ]
+    },
+    {
+      "name": "kidney_items",
+      "x": 74.0,
+      "y": -58.5,
+      "z": -31.5,
+      "yaw": 0,
+      "pitch": 38
+    },
+    {
       "x": 2.5,
       "y": -60,
       "z": -39.5,
@@ -1273,6 +1332,50 @@
       "name": "book_mineral_gizzard_line",
       "book": "infestusfrontier:circulation/mineral_gizzard",
       "page": 8
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_washing_kidney",
+      "book": "infestusfrontier:circulation/washing_kidney",
+      "page": 0
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_washing_kidney_washing",
+      "book": "infestusfrontier:circulation/washing_kidney",
+      "page": 2
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_washing_kidney_settling",
+      "book": "infestusfrontier:circulation/washing_kidney",
+      "page": 4
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_washing_kidney_pause",
+      "book": "infestusfrontier:circulation/washing_kidney",
+      "page": 6
     }
   ]
 }

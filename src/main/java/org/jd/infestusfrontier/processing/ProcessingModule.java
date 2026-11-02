@@ -167,6 +167,28 @@ public final class ProcessingModule {
             () -> ProcessingModule.MINERAL_GIZZARD_ENTITY.get(),
             () -> ProcessingModule.MINERAL_GIZZARD_MENU.get());
 
+    /**
+     * The Washing Kidney: one Tailings slot, biomass, 1000 mB of clean water and 1000 mB of dirty water, on a two-strip
+     * panel. Its tray is the Gizzard's: dust, Tailings, Rock Residue. A wash starts only when its dust and Tailings
+     * fit and the dirty tank can take 250 mB more; a settle needs room for its Rock Residue and turns a full dirty tank
+     * into it.
+     */
+    static final BatchOrganKind KIDNEY = new BatchOrganKind(
+            "washing_kidney",
+            new BatchBook.Data("washing_kidney"),
+            Growth.NONE,
+            1,
+            BatchOrganContents.MAX_OUTPUTS,
+            1000,
+            1000,
+            Biomass.of(1000),
+            2,
+            Block.box(1, 0, 1, 15, 12, 15),
+            OrganEffects.NONE,
+            () -> ProcessingModule.WASHING_KIDNEY.get(),
+            () -> ProcessingModule.WASHING_KIDNEY_ENTITY.get(),
+            () -> ProcessingModule.WASHING_KIDNEY_MENU.get());
+
     /** The Activation Cyst: three ingredient slots, water and biomass, on a two-strip panel; the treatments come from it. */
     static final BatchOrganKind CYST = new BatchOrganKind(
             "activation_cyst",
@@ -248,6 +270,14 @@ public final class ProcessingModule {
             batchEntity(GIZZARD, () -> ProcessingModule.MINERAL_GIZZARD.get());
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> MINERAL_GIZZARD_MENU =
             batchMenu(GIZZARD, () -> ProcessingModule.MINERAL_GIZZARD_MENU.get());
+
+    public static final DeferredBlock<Block> WASHING_KIDNEY = batchOrgan(KIDNEY, MapColor.COLOR_LIGHT_BLUE);
+    public static final DeferredItem<OrganItem> WASHING_KIDNEY_ITEM =
+            ITEMS.register("washing_kidney", () -> new OrganItem(WASHING_KIDNEY.get(), new Item.Properties(), "idle"));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> WASHING_KIDNEY_ENTITY =
+            batchEntity(KIDNEY, () -> ProcessingModule.WASHING_KIDNEY.get());
+    public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> WASHING_KIDNEY_MENU =
+            batchMenu(KIDNEY, () -> ProcessingModule.WASHING_KIDNEY_MENU.get());
 
     public static final DeferredBlock<Block> ACTIVATION_CYST = batchOrgan(CYST, MapColor.COLOR_PURPLE);
     public static final DeferredItem<OrganItem> ACTIVATION_CYST_ITEM = ITEMS.register(
@@ -343,6 +373,7 @@ public final class ProcessingModule {
             OrganRenderers.register(modBus, "awakening_cradle", AWAKENING_CRADLE_ENTITY, AWAKENING_CRADLE_ITEM);
             OrganRenderers.register(modBus, "bio_furnace", BIO_FURNACE_ENTITY, BIO_FURNACE_ITEM);
             OrganRenderers.register(modBus, "mineral_gizzard", MINERAL_GIZZARD_ENTITY, MINERAL_GIZZARD_ITEM);
+            OrganRenderers.register(modBus, "washing_kidney", WASHING_KIDNEY_ENTITY, WASHING_KIDNEY_ITEM);
             OrganRenderers.register(modBus, "activation_cyst", ACTIVATION_CYST_ENTITY, ACTIVATION_CYST_ITEM);
             OrganRenderers.register(modBus, "compost_gland", COMPOST_GLAND_ENTITY, COMPOST_GLAND_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
@@ -353,6 +384,7 @@ public final class ProcessingModule {
                 event.register(AWAKENING_CRADLE_MENU.get(), AwakeningCradleScreen::new);
                 event.register(BIO_FURNACE_MENU.get(), BioFurnaceScreen::new);
                 event.register(MINERAL_GIZZARD_MENU.get(), MineralGizzardScreen::new);
+                event.register(WASHING_KIDNEY_MENU.get(), WashingKidneyScreen::new);
                 event.register(ACTIVATION_CYST_MENU.get(), ActivationCystScreen::new);
                 event.register(COMPOST_GLAND_MENU.get(), CompostGlandScreen::new);
             });
@@ -372,6 +404,7 @@ public final class ProcessingModule {
                     AWAKENING_CRADLE_ENTITY,
                     BIO_FURNACE_ENTITY,
                     MINERAL_GIZZARD_ENTITY,
+                    WASHING_KIDNEY_ENTITY,
                     ACTIVATION_CYST_ENTITY,
                     COMPOST_GLAND_ENTITY)) {
                 event.registerBlockEntity(BiomassCapabilities.BLOCK, entity.get(), (organ, side) -> organ);

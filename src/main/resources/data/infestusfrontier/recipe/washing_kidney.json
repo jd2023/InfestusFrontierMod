@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "minecraft:sand"
+    },
+    {
+      "item": "minecraft:glass_bottle"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:washing_kidney",
+    "count": 1
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "washing_kidney",
+  "ingredients": [
+    {
+      "type": "neoforge:components",
+      "items": "infestusfrontier:mineral_tailings",
+      "components": {
+        "infestusfrontier:parcel": {
+          "metal": "copper",
+          "units": 4
+        }
+      },
+      "strict": false
+    }
+  ],
+  "water": 250,
+  "biomass": 30,
+  "result": {
+    "id": "infestusfrontier:copper_dust",
+    "count": 1
+  },
+  "byproducts": [
+    {
+      "id": "infestusfrontier:mineral_tailings",
+      "count": 1,
+      "components": {
+        "infestusfrontier:parcel": {
+          "metal": "copper",
+          "units": 3
+        }
+      }
+    }
+  ],
+  "ticks": 160,
+  "dirty_out": 250
+}

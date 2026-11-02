@@ -111,6 +111,7 @@ public final class DiscoveryDataTests {
                 "harvest_corolla",
                 "compost_gland",
                 "mineral_gizzard",
+                "washing_kidney",
                 "rock_residue_to_cobblestone",
                 "tailings_to_rock_residue",
                 "feeding_lobe",

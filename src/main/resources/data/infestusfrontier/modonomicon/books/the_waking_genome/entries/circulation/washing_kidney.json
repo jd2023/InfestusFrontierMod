@@ -1,0 +1,75 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.washing_kidney.name",
+  "description": "entry.infestusfrontier.circulation.washing_kidney.description",
+  "icon": "infestusfrontier:washing_kidney",
+  "x": 6,
+  "y": 2,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/mineral_gizzard"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/mineral_gizzard"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/washing_kidney"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.circulation.washing_kidney.name",
+      "images": [
+        "infestusfrontier:textures/book/washing_kidney.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.circulation.washing_kidney.description"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.washing_kidney.name",
+      "text": "entry.infestusfrontier.circulation.washing_kidney.use"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:washing/iron",
+      "title1": "item.infestusfrontier.mineral_tailings.iron",
+      "recipe_id_2": "infestusfrontier:washing/gold",
+      "title2": "item.infestusfrontier.mineral_tailings.gold"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:washing/copper",
+      "title1": "item.infestusfrontier.mineral_tailings.copper",
+      "recipe_id_2": "infestusfrontier:settling",
+      "title2": "entry.infestusfrontier.circulation.washing_kidney.settle"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.washing_kidney.wash",
+      "text": "entry.infestusfrontier.circulation.washing_kidney.once"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.washing_kidney.settle",
+      "text": "entry.infestusfrontier.circulation.washing_kidney.waste"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.circulation.washing_kidney.pause"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:washing_kidney",
+      "text": "entry.infestusfrontier.circulation.washing_kidney.craft"
+    }
+  ]
+}

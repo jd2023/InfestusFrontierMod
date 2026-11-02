@@ -195,7 +195,7 @@ The projector refuses when no slot, valid support or armor fuel is available.
 | I056 | Travel Ration | Kitchen: 1 bread + 1 cooked fish + 1 honey bottle → 1, returning bottle | Proposed 8 hunger, 10 saturation; lighter farm recipe, not free speed mutation. |
 | I057 | Mineral Concentrate | Later (Separator and Vat path): the Gizzard's four-unit recovered fraction held as an item | The first release does not make it: the Gizzard releases its four dust inside the batch. |
 | I058 | Washed Concentrate | Later: the Separator's one-unit recovered fraction | The first release does not make it: the Kidney releases its one dust inside the batch. |
-| I059 | Mineral Tailings | Gizzard: 1 per raw item, 4 residual units. Kidney: replaces it with a 3-unit parcel | Data component `parcel {metal, units}`. Stockpiled for the later Separator, or discarded for 1 Rock Residue. Not smeltable, not a dust source in the first release. |
+| I059 | Mineral Tailings | Gizzard: 1 per raw item, 4 residual units. Kidney: replaces it with a 3-unit parcel | Data component `parcel {metal, units}`. Stockpiled for the later Separator, or discarded for 1 Rock Residue. Not smeltable. A Tailings of 4 units gives one dust in the Kidney, once; one of 3 units gives nothing. |
 | I060 | Rock Residue | Gizzard: 1 per raw item. Kidney: 1 per 1000 mB dirty water settled | Stacks to 64. Shapeless craft: 2 Rock Residue → 1 cobblestone. Never ore, dust, biomass feed or fertilizer. |
 | I061 | Washed Iron / Gold / Diamond / Obsidian Portion | Four distinct forms: corresponding ingot/gem/block → Gizzard granulation → Kidney with 100 mB water | One cleaned portion and 100 mB spent wash per source item. Fusion media below, no yield multiplier. |
 | I103 | Mineral Workpiece | Work Bed wraps one idle intact/conditioned mineral specimen with 1 Membrane Sheet → one unstackable workpiece | Another Work Bed unwraps the same target and returns that one Sheet into reserved space. Item Veins, capsules and couriers can carry it. Fixed source/state fields; not a placeable fresh ore item or an arbitrary block-entity container. Wrapping grants no processing counts. |
@@ -385,9 +385,9 @@ Kidney process-water filtration is a separate recipe: 100 mB dirty water +
 
 ### First release: the automated mineral workshop
 
-Status: **the Gizzard, the three dusts, Mineral Tailings, Rock Residue, the two waste
-crafts and dust smelting in the Bio-Furnace ship** (sprint record F33). The Washing
-Kidney, its settle step, the Larder and the Palm are proposed. Starting values until
+Status: **the Gizzard, the Washing Kidney with its settle step, the three dusts,
+Mineral Tailings, Rock Residue, the two waste crafts and dust smelting in the
+Bio-Furnace ship** (sprint records F33, F34). The Larder and the Palm are proposed. Starting values until
 play testing confirms them. Roadmap scope: [ROADMAP](../../ROADMAP.md#next-milestone--the-automated-mineral-workshop).
 
 Scope: iron, gold and copper raw items that the player mined or looted by hand;
@@ -407,7 +407,7 @@ tank; both are filled by hand or by veins.
 |---|---|---|---|---|---|---|
 | Grind | Mineral Gizzard | 1 raw item | 4 dust + 1 Mineral Tailings (4 units) + 1 Rock Residue | 20 BU | 0 | 8 s |
 | Wash (optional) | Washing Kidney | 1 Tailings (4 units) | 1 dust + 1 Tailings (3 units) | 30 BU | 250 mB clean; 250 mB dirty is kept | 8 s |
-| Settle | Washing Kidney | 1000 mB dirty water | 1 Rock Residue | 20 BU | 0 | 20 s |
+| Settle | Washing Kidney | 1000 mB dirty water, no item | 1 Rock Residue | 20 BU | 0 | 20 s |
 | Smelt | Bio-Furnace | 4 dust of one metal | 1 ingot, plus the vanilla experience of that metal's raw-item recipe once | 40 BU | 0 | 16 s, 12 s, 8 s by furnace stage |
 
 Four dust per raw item, one more with washing, four dust per ingot. An unwashed
@@ -425,7 +425,12 @@ carries no record of the organ that made it.
 A tray holds one kind of item: Tailings of another metal, or another metal's dust, wait
 until the tray is emptied. The Gizzard fills its dust slot after 16 grinds and then
 waits for a Yield Lobe or a Mouth (a hopper pulls from a Gizzard only through a lobe). The Kidney settles before it washes again as soon as the dirty
-tank cannot take 250 mB more. Its steady cycle is 4 washes and 1 settle: 52 s,
+tank cannot take 250 mB more. A wash reserves its 250 mB of dirty water when it starts, so
+the tank never holds more than its 1000 mB; a settle takes its 1000 mB when it starts and
+holds its Rock Residue until the residue tray has room. A wash needs room in the dust and
+Tailings trays only (it makes no residue); a settle needs room in the residue tray only.
+Without 250 mB of clean water or 30 BU the Kidney waits, spends nothing and resumes when
+the supply returns; dirty water that never reaches 1000 mB waits for more washes. Its steady cycle is 4 washes and 1 settle: 52 s,
 1000 mB water, 140 BU, 4 dust and 1 Rock Residue for 4 Tailings. The Kidney is slower
 than the Gizzard (13 s against 8 s per raw item), so a washing line wants a second
 Kidney or accepts unwashed stock. Dirty water exists only inside the Kidney. It has

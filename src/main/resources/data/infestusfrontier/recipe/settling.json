@@ -1,0 +1,14 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "washing_kidney",
+  "ingredients": [],
+  "water": 0,
+  "biomass": 20,
+  "result": {
+    "id": "infestusfrontier:rock_residue",
+    "count": 1
+  },
+  "ticks": 400,
+  "dirty_in": 1000,
+  "slot": 2
+}

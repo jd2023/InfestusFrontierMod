@@ -3,16 +3,20 @@
     "fill -8 -60 -2 12 -54 10 air",
     "fill -8 -61 -2 12 -61 10 grass_block",
     "kill @e[type=item]",
-    "fill -4 -61 1 6 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "fill -4 -61 1 12 -61 5 infestusfrontier:living_substrate[stage=mature]",
     "setblock -2 -60 3 infestusfrontier:mineral_gizzard[working=true]{contents:{ingredients:[{id:\"minecraft:raw_gold\",count:9}],outputs:[{id:\"infestusfrontier:gold_dust\",count:12},{id:\"infestusfrontier:mineral_tailings\",count:3,components:{\"infestusfrontier:parcel\":{metal:\"gold\",units:4}}},{id:\"infestusfrontier:rock_residue\",count:3}],water:0,biomass:{stored:700,reserved:0,capacity:1000},history:{completed_batches:3},batch:{batch:{recipe:\"infestusfrontier:grinding/gold\",ticks_required:160,ticks_done:80},result:{id:\"infestusfrontier:gold_dust\",count:4},byproducts:[{id:\"infestusfrontier:mineral_tailings\",count:1,components:{\"infestusfrontier:parcel\":{metal:\"gold\",units:4}}},{id:\"infestusfrontier:rock_residue\",count:1}]}}}",
     "setblock 1 -60 3 infestusfrontier:mineral_gizzard{contents:{ingredients:[{id:\"minecraft:raw_copper\",count:32}],outputs:[{id:\"infestusfrontier:copper_dust\",count:64},{id:\"infestusfrontier:mineral_tailings\",count:16,components:{\"infestusfrontier:parcel\":{metal:\"copper\",units:4}}},{id:\"infestusfrontier:rock_residue\",count:16}],water:0,biomass:{stored:900,reserved:0,capacity:1000},history:{completed_batches:16}}}",
     "setblock 4 -60 3 infestusfrontier:bio_furnace[working=true]{contents:{ingredients:[{id:\"infestusfrontier:iron_dust\",count:9}],outputs:[{id:\"minecraft:iron_ingot\",count:2}],water:0,biomass:{stored:800,reserved:0,capacity:2000},history:{completed_batches:2},batch:{batch:{recipe:\"infestusfrontier:dust_smelting/iron\",ticks_required:320,ticks_done:120},result:{id:\"minecraft:iron_ingot\",count:1},experience:0.7},experience:1.4}}",
+    "setblock 7 -60 3 infestusfrontier:washing_kidney[working=true]{contents:{ingredients:[{id:\"infestusfrontier:mineral_tailings\",count:9,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:4}}}],outputs:[{id:\"infestusfrontier:iron_dust\",count:5},{id:\"infestusfrontier:mineral_tailings\",count:5,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:3}}},{id:\"infestusfrontier:rock_residue\",count:1}],water:250,dirty:750,biomass:{stored:700,reserved:0,capacity:1000},history:{completed_batches:8},batch:{batch:{recipe:\"infestusfrontier:washing/iron\",ticks_required:160,ticks_done:80},result:{id:\"infestusfrontier:iron_dust\",count:1},byproducts:[{id:\"infestusfrontier:mineral_tailings\",count:1,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:3}}}]}}}",
+    "setblock 10 -60 3 infestusfrontier:washing_kidney{contents:{ingredients:[{id:\"infestusfrontier:mineral_tailings\",count:24,components:{\"infestusfrontier:parcel\":{metal:\"gold\",units:4}}}],outputs:[{id:\"infestusfrontier:gold_dust\",count:64},{id:\"infestusfrontier:mineral_tailings\",count:40,components:{\"infestusfrontier:parcel\":{metal:\"gold\",units:3}}},{id:\"infestusfrontier:rock_residue\",count:64}],water:750,dirty:1000,biomass:{stored:900,reserved:0,capacity:1000},history:{completed_batches:60}}}",
     "give @s infestusfrontier:mineral_gizzard 1",
+    "give @s infestusfrontier:washing_kidney 1",
     "give @s infestusfrontier:iron_dust 8",
     "give @s infestusfrontier:gold_dust 8",
     "give @s infestusfrontier:copper_dust 8",
     "give @s infestusfrontier:mineral_tailings[infestusfrontier:parcel={metal:\"iron\",units:4}] 4",
-    "give @s infestusfrontier:rock_residue 8"
+    "give @s infestusfrontier:rock_residue 8",
+    "give @s infestusfrontier:mineral_tailings[infestusfrontier:parcel={metal:\"iron\",units:3}] 4"
   ],
   "views": [
     {
@@ -82,6 +86,42 @@
       ]
     },
     {
+      "name": "kidney_screen",
+      "x": 7.5,
+      "y": -60,
+      "z": 5.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        7,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "full_kidney_screen",
+      "x": 10.5,
+      "y": -60,
+      "z": 5.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        10,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "kidneys",
+      "x": 8.5,
+      "y": -58.5,
+      "z": -0.5,
+      "yaw": 0,
+      "pitch": 35
+    },
+    {
       "name": "hotbar",
       "x": 1.5,
       "y": -58,
@@ -91,6 +131,7 @@
       "gui": true,
       "icons": [
         "infestusfrontier:mineral_gizzard",
+        "infestusfrontier:washing_kidney",
         "infestusfrontier:iron_dust",
         "infestusfrontier:gold_dust",
         "infestusfrontier:copper_dust",

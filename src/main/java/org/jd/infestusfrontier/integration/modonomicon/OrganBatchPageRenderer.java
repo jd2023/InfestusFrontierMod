@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -25,6 +27,8 @@ public final class OrganBatchPageRenderer extends BookRecipePageRenderer<OrganBa
     private static final int ITEMS_Y = 14;
     /** The results of a recipe with byproducts stand in one row after the arrow. */
     private static final int RESULTS_PER_ROW = 3;
+    /** The width a line of needs may take: the page less its inner margin, so a long line wraps before the binding. */
+    private static final int TEXT_WIDTH = BookEntryScreen.PAGE_WIDTH - 20;
 
     public OrganBatchPageRenderer(OrganBatchPage page) {
         super(page);
@@ -75,7 +79,20 @@ public final class OrganBatchPageRenderer extends BookRecipePageRenderer<OrganBa
                     "book.infestusfrontier.organ_batch.biomass",
                     recipe.biomass().units()));
         needs.add(I18n.get("book.infestusfrontier.organ_batch.seconds", recipe.ticks() / 20));
-        int rows = (ingredients.size() + PER_ROW - 1) / PER_ROW;
-        graphics.drawString(font, String.join(", ", needs), x, y + ITEMS_Y + rows * SLOT + 2, ink, false);
+        if (recipe.dirtyIn() > 0) needs.add(I18n.get("book.infestusfrontier.organ_batch.dirty_in", recipe.dirtyIn()));
+        if (recipe.dirtyOut() > 0)
+            needs.add(I18n.get("book.infestusfrontier.organ_batch.dirty_out", recipe.dirtyOut()));
+        int rows = Math.max(
+                Math.max(1, (ingredients.size() + PER_ROW - 1) / PER_ROW),
+                (results.size() + RESULTS_PER_ROW - 1) / RESULTS_PER_ROW);
+        drawWrapped(graphics, String.join(", ", needs), x, y + ITEMS_Y + rows * SLOT + 2, ink);
+    }
+
+    /** Draws {@code text} in lines no wider than {@link #TEXT_WIDTH}, from {@code y}. */
+    private void drawWrapped(GuiGraphics graphics, String text, int x, int y, int ink) {
+        for (FormattedCharSequence part : font.split(FormattedText.of(text), TEXT_WIDTH)) {
+            graphics.drawString(font, part, x, y, ink, false);
+            y += font.lineHeight + 1;
+        }
     }
 }

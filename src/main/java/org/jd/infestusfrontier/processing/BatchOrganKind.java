@@ -13,7 +13,7 @@ import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 
 /**
  * What makes one batch organ differ from another: where its batches come from, how it grows, how many ingredient
- * slots and output slots it has, how much water and biomass it holds, how tall its screen is, its shape and how it shows its work. The Bowl, the Rack, the
+ * slots and output slots it has, how much water, dirty water and biomass it holds, how tall its screen is, its shape and how it shows its work. The Bowl, the Rack, the
  * Loom, the Cradle, the Bio-Furnace and the Cyst are kinds; the block, block entity and menu are shared.
  */
 record BatchOrganKind(
@@ -23,6 +23,7 @@ record BatchOrganKind(
         int slots,
         int outputs,
         int waterMb,
+        int dirtyMb,
         Biomass biomassCapacity,
         int strips,
         VoxelShape shape,
@@ -33,6 +34,40 @@ record BatchOrganKind(
     BatchOrganKind {
         if (outputs < 1 || outputs > BatchOrganContents.MAX_OUTPUTS)
             throw new IllegalArgumentException(id + " has " + outputs + " output slots");
+        if (dirtyMb < 0 || dirtyMb > BatchOrganContents.MAX_DIRTY)
+            throw new IllegalArgumentException(id + " holds " + dirtyMb + " mB of dirty water");
+    }
+
+    /** A kind with several output slots and no dirty water. */
+    BatchOrganKind(
+            String id,
+            BatchBook book,
+            Growth growth,
+            int slots,
+            int outputs,
+            int waterMb,
+            Biomass biomassCapacity,
+            int strips,
+            VoxelShape shape,
+            OrganEffects effects,
+            Supplier<Block> block,
+            Supplier<BlockEntityType<BatchOrganBlockEntity>> entity,
+            Supplier<MenuType<BatchOrganMenu>> menu) {
+        this(
+                id,
+                book,
+                growth,
+                slots,
+                outputs,
+                waterMb,
+                0,
+                biomassCapacity,
+                strips,
+                shape,
+                effects,
+                block,
+                entity,
+                menu);
     }
 
     /** A kind with one output slot. */

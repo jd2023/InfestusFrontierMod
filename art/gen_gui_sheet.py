@@ -24,7 +24,7 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   238,0   12x54    scroll groove beside three rows of wells at the inventory pitch
   238,56  12x15    scroll thumb, a chitin plate with grip ridges; 238,72 the same greyed when nothing scrolls
   2,190   32x32 organ emblems, seven to a row at a 34 px pitch, rows 34 apart: Sac, Bladder, Bowl, Rack, Loom,
-                   Cradle, Furnace; then Cyst, Compost and Gizzard on the second row
+                   Cradle, Furnace; then Cyst, Compost, Gizzard and Kidney on the second row
 
 Every screen writes its title at 8,6, its emblem at 8,27 if it has one, labels at y 26 above
 its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
@@ -60,7 +60,7 @@ BUTTON_OFF = (176, 96)
 BUTTON_SIZE = (52, 16)
 VEIN_EMPTY = (176, 112, 44, 12)
 VEIN_FULL = (176, 128, 44, 12)
-EMBLEMS = [(2 + 34 * (i % 7), 190 + 34 * (i // 7)) for i in range(10)]
+EMBLEMS = [(2 + 34 * (i % 7), 190 + 34 * (i // 7)) for i in range(11)]
 EMBLEM = 32
 POOL = [(168, 196, 150), (206, 224, 182), (236, 244, 220)]
 BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
@@ -612,8 +612,34 @@ def emblem_gizzard(img, ox, oy):
                 put(img, ox + x, oy + y, OUTLINE if d > 0.8 else mix(tint, IVORY[3], 0.4) if dy < -0.2 else tint)
 
 
+def emblem_kidney(img, ox, oy):
+    """Two blue-grey bean lobes side by side under a pale clean drop on the left and a murky one on the right."""
+    LOBE = [(44, 54, 72), (74, 90, 110), (110, 130, 146), (150, 170, 182)]
+    for cx in (10.5, 21.5):
+        for y in range(EMBLEM):
+            for x in range(EMBLEM):
+                dx, dy = (x - cx) / 9.0, (y - 20) / 8.0
+                d = math.hypot(dx, dy)
+                if d > 1.0:
+                    continue
+                if d > 0.88:
+                    colour = OUTLINE
+                else:
+                    colour = LOBE[3] if dx + dy < -0.6 else LOBE[2] if dx + dy < 0.1 else LOBE[1] if dx + dy < 0.7 else LOBE[0]
+                put(img, ox + x, oy + y, colour)
+    for cx, tint in ((9, (112, 190, 214)), (23, (118, 104, 58))):
+        for y in range(2, 14):
+            for x in range(cx - 4, cx + 5):
+                dx, dy = (x - cx) / 4.0, (y - 9) / 6.0
+                top = y < 6 and abs(x - cx) > (y - 1) * 0.9
+                if math.hypot(dx, dy) > 1.0 or top:
+                    continue
+                edge = math.hypot(dx, dy) > 0.8
+                put(img, ox + x, oy + y, OUTLINE if edge else mix(tint, IVORY[3], 0.45) if dx + dy < -0.2 else tint)
+
+
 def emblems(img):
-    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom, emblem_cradle, emblem_furnace, emblem_cyst, emblem_compost, emblem_gizzard)):
+    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom, emblem_cradle, emblem_furnace, emblem_cyst, emblem_compost, emblem_gizzard, emblem_kidney)):
         draw(img, ox, oy)
 
 

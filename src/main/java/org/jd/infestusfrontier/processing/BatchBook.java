@@ -34,7 +34,8 @@ interface BatchBook {
 
     /**
      * One batch about to start: what each slot gives, what the batch costs, what it makes after how many ticks, and the
-     * smelting experience it earns for whoever takes the result. Result {@code n} goes to output slot {@code n}.
+     * smelting experience it earns for whoever takes the result. Result {@code n} goes to output slot {@code slot + n}.
+     * {@code dirtyIn} mB of dirty water leave the organ's dirty tank at the start and {@code dirtyOut} mB enter it.
      */
     record Plan(
             String id,
@@ -43,7 +44,22 @@ interface BatchBook {
             Biomass biomass,
             List<ItemStack> results,
             int ticks,
-            float experience) {}
+            float experience,
+            int dirtyIn,
+            int dirtyOut,
+            int slot) {
+        /** A plan that touches no dirty water and fills the output slots from the first. */
+        Plan(
+                String id,
+                int[] take,
+                int waterMb,
+                Biomass biomass,
+                List<ItemStack> results,
+                int ticks,
+                float experience) {
+            this(id, take, waterMb, biomass, results, ticks, experience, 0, 0, 0);
+        }
+    }
 
     /** The items {@code take} says to take from {@code slots}, as stacks of that count. */
     static List<ItemStack> taken(List<ItemStack> slots, int[] take) {
@@ -97,7 +113,10 @@ interface BatchBook {
                         results(recipe, taken(slots, take.get())),
                         recipe.ticks(),
                         // a data pack may write any number; the organ keeps at most MAX_EXPERIENCE and never a debt
-                        Math.clamp(recipe.experience(), 0, BatchOrganContents.MAX_EXPERIENCE)));
+                        Math.clamp(recipe.experience(), 0, BatchOrganContents.MAX_EXPERIENCE),
+                        recipe.dirtyIn(),
+                        recipe.dirtyOut(),
+                        recipe.slot()));
             }
             return plans;
         }
@@ -166,7 +185,10 @@ interface BatchBook {
                         plan.biomass(),
                         plan.results(),
                         Math.max(1, (int) ((long) plan.ticks() * now / first)),
-                        plan.experience()));
+                        plan.experience(),
+                        plan.dirtyIn(),
+                        plan.dirtyOut(),
+                        plan.slot()));
             return plans;
         }
     }

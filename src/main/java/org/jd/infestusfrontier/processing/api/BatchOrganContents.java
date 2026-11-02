@@ -30,12 +30,27 @@ public record BatchOrganContents(
         OrganHistory history,
         Optional<OrganBatch> batch,
         Optional<UUID> feeder,
-        float experience) {
+        float experience,
+        int dirtyMb) {
     public BatchOrganContents {
         ingredients = ingredients.stream().map(ItemStack::copy).toList();
         outputs = outputs.stream().map(ItemStack::copy).toList();
         if (!(experience >= 0 && experience <= MAX_EXPERIENCE))
             throw new IllegalArgumentException("experience " + experience);
+        if (dirtyMb < 0 || dirtyMb > MAX_DIRTY) throw new IllegalArgumentException("dirty water " + dirtyMb);
+    }
+
+    /** Contents of an organ with no dirty water. */
+    public BatchOrganContents(
+            List<ItemStack> ingredients,
+            List<ItemStack> outputs,
+            int waterMb,
+            BiomassTank biomass,
+            OrganHistory history,
+            Optional<OrganBatch> batch,
+            Optional<UUID> feeder,
+            float experience) {
+        this(ingredients, outputs, waterMb, biomass, history, batch, feeder, experience, 0);
     }
 
     /** Contents of an organ with one output slot. */
@@ -87,7 +102,8 @@ public record BatchOrganContents(
                 && history.equals(that.history)
                 && batch.equals(that.batch)
                 && feeder.equals(that.feeder)
-                && experience == that.experience;
+                && experience == that.experience
+                && dirtyMb == that.dirtyMb;
     }
 
     @Override
@@ -100,7 +116,8 @@ public record BatchOrganContents(
                 history,
                 batch,
                 feeder,
-                experience);
+                experience,
+                dirtyMb);
     }
 
     private static BatchOrganContents read(
@@ -112,15 +129,18 @@ public record BatchOrganContents(
             OrganHistory history,
             Optional<OrganBatch> batch,
             Optional<UUID> feeder,
-            float experience) {
+            float experience,
+            int dirtyMb) {
         List<ItemStack> held = outputs.orElseGet(() -> List.of(output.orElse(ItemStack.EMPTY)));
-        return new BatchOrganContents(ingredients, held, waterMb, biomass, history, batch, feeder, experience);
+        return new BatchOrganContents(ingredients, held, waterMb, biomass, history, batch, feeder, experience, dirtyMb);
     }
 
     /** The most smelting experience an organ keeps for whoever takes its output; what a batch earns beyond it is lost. */
     public static final float MAX_EXPERIENCE = 1000;
     /** The most water any batch organ holds; a kind may hold less. */
     public static final int MAX_WATER = 2000;
+    /** The most dirty water any batch organ holds; a kind may hold less. */
+    public static final int MAX_DIRTY = 2000;
     /** The most ingredient slots any batch organ has; a kind may have fewer. */
     public static final int MAX_SLOTS = 9;
     /** The most output slots any batch organ has: a result and its byproducts. */
@@ -144,7 +164,8 @@ public record BatchOrganContents(
                     UUIDUtil.CODEC.optionalFieldOf("feeder").forGetter(BatchOrganContents::feeder),
                     Codec.floatRange(0, MAX_EXPERIENCE)
                             .optionalFieldOf("experience", 0f)
-                            .forGetter(BatchOrganContents::experience))
+                            .forGetter(BatchOrganContents::experience),
+                    Codec.intRange(0, MAX_DIRTY).optionalFieldOf("dirty", 0).forGetter(BatchOrganContents::dirtyMb))
             .apply(instance, BatchOrganContents::read));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, BatchOrganContents> STREAM_CODEC =

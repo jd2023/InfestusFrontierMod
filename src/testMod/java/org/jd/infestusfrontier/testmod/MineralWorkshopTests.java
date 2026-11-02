@@ -253,8 +253,11 @@ public final class MineralWorkshopTests {
         Set<Item> raws = Set.of(Items.RAW_IRON, Items.RAW_GOLD, Items.RAW_COPPER);
         ItemStack tailings = MineralModule.tailings(Parcel.ground(Metal.IRON));
         int grinds = 0;
+        int washes = 0;
+        int settles = 0;
         int dustSmelts = 0;
         int discards = 0;
+        int tailingsWashes = 0;
         for (RecipeHolder<?> holder : h.getLevel().getRecipeManager().getRecipes()) {
             var recipe = holder.value();
             List<ItemStack> results = new ArrayList<>();
@@ -267,16 +270,22 @@ public final class MineralWorkshopTests {
                 if (dusts.contains(made.getItem()) || made.is(MineralModule.MINERAL_TAILINGS.get())) {
                     h.assertTrue(
                             recipe instanceof OrganBatchRecipe batch
-                                    && batch.organ().equals("mineral_gizzard"),
-                            holder.id() + " makes dust or Tailings outside the Gizzard");
-                    grinds++;
+                                    && (batch.organ().equals("mineral_gizzard")
+                                            || batch.organ().equals("washing_kidney")),
+                            holder.id() + " makes dust or Tailings outside the Gizzard and the Kidney");
+                    if (((OrganBatchRecipe) recipe).organ().equals("mineral_gizzard")) grinds++;
+                    else washes++;
                 }
-                if (made.is(MineralModule.ROCK_RESIDUE.get()))
+                if (made.is(MineralModule.ROCK_RESIDUE.get())) {
                     h.assertTrue(
                             (recipe instanceof OrganBatchRecipe batch
-                                            && batch.organ().equals("mineral_gizzard"))
+                                            && (batch.organ().equals("mineral_gizzard")
+                                                    || batch.organ().equals("washing_kidney")))
                                     || holder.id().getPath().equals("tailings_to_rock_residue"),
                             holder.id() + " makes Rock Residue from something else");
+                    if (recipe instanceof OrganBatchRecipe batch
+                            && batch.organ().equals("washing_kidney")) settles++;
+                }
             }
             if (recipe instanceof OrganBatchRecipe batch && batch.organ().equals("mineral_gizzard")) {
                 h.assertValueEqual(batch.ingredients().size(), 1, holder.id() + " takes one item");
@@ -298,13 +307,20 @@ public final class MineralWorkshopTests {
                 dustSmelts++;
             }
             if (ingredients.stream().anyMatch(i -> i.test(tailings))) {
+                boolean washing = recipe instanceof OrganBatchRecipe batch
+                        && batch.organ().equals("washing_kidney")
+                        && holder.id().getPath().startsWith("washing/");
                 h.assertTrue(
-                        holder.id().getPath().equals("tailings_to_rock_residue"),
-                        holder.id() + " does more with Tailings than discard them");
-                discards++;
+                        washing || holder.id().getPath().equals("tailings_to_rock_residue"),
+                        holder.id() + " does more with Tailings than discard or wash them");
+                if (washing) tailingsWashes++;
+                else discards++;
             }
         }
         h.assertValueEqual(grinds, 6, "three metals, each with a dust and a Tailings result");
+        h.assertValueEqual(washes, 6, "three washes, each with a dust and a Tailings result");
+        h.assertValueEqual(settles, 1, "one settle makes Rock Residue from dirty water");
+        h.assertValueEqual(tailingsWashes, 1, "of the three washes only the iron one takes a fresh iron Tailings");
         h.assertValueEqual(dustSmelts, 3 * 1, "one dust smelt per metal, counted once per dust it takes");
         h.assertValueEqual(discards, 1, "one craft takes Tailings");
         h.succeed();
@@ -388,7 +404,7 @@ public final class MineralWorkshopTests {
         h.succeed();
     }
 
-    private static List<String> tooltipKeys(GameTestHelper h, ItemStack stack) {
+    static List<String> tooltipKeys(GameTestHelper h, ItemStack stack) {
         List<net.minecraft.network.chat.Component> lines = new ArrayList<>();
         stack.getItem()
                 .appendHoverText(
@@ -402,7 +418,7 @@ public final class MineralWorkshopTests {
     }
 
     /** The crafting grid's answer to {@code inputs} laid out in a row: {@code expected}, or no recipe when empty. */
-    private static void craft(GameTestHelper h, List<ItemStack> inputs, Optional<ItemStack> expected) {
+    static void craft(GameTestHelper h, List<ItemStack> inputs, Optional<ItemStack> expected) {
         List<ItemStack> grid = new ArrayList<>(inputs);
         while (grid.size() < 9) grid.add(ItemStack.EMPTY);
         net.minecraft.world.item.crafting.CraftingInput input =
@@ -953,7 +969,7 @@ public final class MineralWorkshopTests {
         };
     }
 
-    private static ItemStack withCount(ItemStack stack, int count) {
+    static ItemStack withCount(ItemStack stack, int count) {
         stack.setCount(count);
         return stack;
     }
@@ -1002,7 +1018,7 @@ public final class MineralWorkshopTests {
     }
 
     /** Replaces what the organ at {@code at} holds. */
-    private static void preset(
+    static void preset(
             GameTestHelper h,
             BlockPos at,
             BatchOrganContents like,
@@ -1022,13 +1038,14 @@ public final class MineralWorkshopTests {
                                                 like.history(),
                                                 batch,
                                                 Optional.empty(),
-                                                like.experience()))
+                                                like.experience(),
+                                                like.dirtyMb()))
                                 .build(),
                         DataComponentPatch.EMPTY);
     }
 
     /** Saves the organ to bytes, reads them into a fresh block entity of the same kind and puts that in its place. */
-    private static void reload(GameTestHelper h, BlockPos at) {
+    static void reload(GameTestHelper h, BlockPos at) {
         var registries = h.getLevel().registryAccess();
         BlockEntity live = h.getBlockEntity(at);
         try {
@@ -1047,23 +1064,23 @@ public final class MineralWorkshopTests {
         }
     }
 
-    private static IItemHandler ports(GameTestHelper h, BlockPos at) {
+    static IItemHandler ports(GameTestHelper h, BlockPos at) {
         return h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(at), Direction.UP);
     }
 
-    private static BatchOrganContents contents(GameTestHelper h, BlockPos at) {
+    static BatchOrganContents contents(GameTestHelper h, BlockPos at) {
         BatchOrganContents contents =
                 h.getBlockEntity(at).collectComponents().get(ProcessingModule.BATCH_CONTENTS.get());
         if (contents == null) h.fail("no organ contents", at);
         return contents;
     }
 
-    private static BatchOrganMenu menu(GameTestHelper h, BlockPos at) {
+    static BatchOrganMenu menu(GameTestHelper h, BlockPos at) {
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
         return (BatchOrganMenu) ((MenuProvider) h.getBlockEntity(at)).createMenu(1, player.getInventory(), player);
     }
 
-    private static void mouth(GameTestHelper h, BlockPos at, MouthMode mode) {
+    static void mouth(GameTestHelper h, BlockPos at, MouthMode mode) {
         h.setBlock(at, LogisticsModule.MOUTH.get().defaultBlockState().setValue(MouthBlock.MODE, mode));
     }
 
@@ -1085,7 +1102,7 @@ public final class MineralWorkshopTests {
         entity.loadWithComponents(tag, registries);
     }
 
-    private static void lobe(GameTestHelper h, BlockPos at, Direction toOrgan) {
+    static void lobe(GameTestHelper h, BlockPos at, Direction toOrgan) {
         BlockState state = LogisticsModule.YIELD_LOBE
                 .get()
                 .defaultBlockState()

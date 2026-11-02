@@ -145,7 +145,8 @@ public final class DiscoveryTests {
                 "vascular_stitch",
                 "spine_sentry",
                 "aerocyte_bloom",
-                "mineral_gizzard"))
+                "mineral_gizzard",
+                "washing_kidney"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();
@@ -167,6 +168,35 @@ public final class DiscoveryTests {
                 recipes,
                 List.of(id("culturing/spore_culture"), id("culturing/organ_bud")),
                 "one page per batch recipe");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void kidneyEntryShowsEveryWashTheSettleAndTheCrafts(GameTestHelper h) {
+        var entry = BookDataManager.get()
+                .getBook(BOOK)
+                .getCategory(id("circulation"))
+                .getEntries()
+                .get(id("circulation/washing_kidney"));
+        h.assertTrue(entry != null, "entry loaded");
+        List<ResourceLocation> shown = new java.util.ArrayList<>();
+        for (var page : entry.getPages())
+            if (page instanceof OrganBatchPage batch) {
+                shown.add(batch.getRecipeId1());
+                if (batch.getRecipeId2() != null) shown.add(batch.getRecipeId2());
+            }
+        h.assertValueEqual(
+                shown,
+                List.of(id("washing/iron"), id("washing/gold"), id("washing/copper"), id("settling")),
+                "one recipe shown for every wash and the settle");
+        for (ResourceLocation recipe : shown)
+            h.assertTrue(
+                    h.getLevel().getRecipeManager().byKey(recipe).isPresent(), "the shown recipe exists: " + recipe);
+        h.assertTrue(
+                entry.getPages().stream()
+                        .anyMatch(page -> page instanceof com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage),
+                "and the craft that makes the Kidney");
+        h.assertTrue(entry.getCondition() instanceof BookOrCondition, "the Kidney unlocks by the Gizzard or by item");
         h.succeed();
     }
 
@@ -266,7 +296,8 @@ public final class DiscoveryTests {
                 "living_fang",
                 "spine_sentry",
                 "aerocyte_bloom",
-                "mineral_gizzard"))
+                "mineral_gizzard",
+                "washing_kidney"))
             h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");
         h.succeed();
     }

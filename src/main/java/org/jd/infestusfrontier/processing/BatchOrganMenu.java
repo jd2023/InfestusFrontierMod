@@ -22,8 +22,8 @@ import org.jd.infestusfrontier.ui.SlotGrid;
 
 /**
  * The server half of every batch organ's screen: the kind's ingredient slots and the output slot backed by the block
- * entity's own handlers and eight synced ints (water, biomass, biomass capacity, progress percent, state, growth
- * stage, batches to the next stage, full outputs). Nothing here decides a batch; the block entity does, and credits it to the player whose click last
+ * entity's own handlers and nine synced ints (water, biomass, biomass capacity, progress percent, state, growth
+ * stage, batches to the next stage, full outputs, dirty water). Nothing here decides a batch; the block entity does, and credits it to the player whose click last
  * changed the ingredients.
  */
 public final class BatchOrganMenu extends OrganMenu {
@@ -38,7 +38,8 @@ public final class BatchOrganMenu extends OrganMenu {
     private static final int STAGE = 5;
     private static final int TO_NEXT = 6;
     private static final int BLOCKED = 7;
-    private static final int SYNCED = 8;
+    private static final int DIRTY = 8;
+    private static final int SYNCED = 9;
 
     private final BatchOrganKind kind;
     private final Optional<BatchOrganBlockEntity> organ;
@@ -60,7 +61,8 @@ public final class BatchOrganMenu extends OrganMenu {
                         organ::state,
                         organ::stage,
                         organ::toNextStage,
-                        organ::blocked),
+                        organ::blocked,
+                        organ::dirty),
                 at(organ),
                 Optional.of(organ));
     }
@@ -192,6 +194,15 @@ public final class BatchOrganMenu extends OrganMenu {
 
     public int water() {
         return synced(WATER);
+    }
+
+    public int dirtyCapacity() {
+        return kind.dirtyMb();
+    }
+
+    /** The dirty water the organ holds, in mB. */
+    public int dirty() {
+        return synced(DIRTY);
     }
 
     @Override

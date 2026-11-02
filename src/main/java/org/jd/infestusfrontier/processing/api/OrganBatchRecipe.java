@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.processing.api;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
@@ -30,7 +31,10 @@ import org.jd.infestusfrontier.storage.api.BiomassCodecs;
  * leaves the rest. Data: {@code recipe/culturing/*.json} with
  * {@code "type": "infestusfrontier:organ_batch"}, {@code organ}, {@code ingredients}, {@code water}, {@code biomass},
  * {@code result}, {@code ticks}. A recipe may also name up to {@link #MAX_BYPRODUCTS} {@code byproducts}, each held in
- * the output slot after the result's, and the {@code experience} a smelting recipe earns.
+ * the output slot after the result's, and the {@code experience} a smelting recipe earns. An organ with a dirty tank
+ * (the Washing Kidney) reads {@code dirty_in}, the dirty water the batch takes from it at its start, and
+ * {@code dirty_out}, the dirty water it adds there at its start; a recipe that takes dirty water may name no
+ * ingredient. {@code slot} puts the first result in a later output slot.
  */
 public record OrganBatchRecipe(
         String organ,
@@ -42,40 +46,84 @@ public record OrganBatchRecipe(
         boolean keepsWear,
         List<DataComponentType<?>> keeps,
         List<ItemStack> byproducts,
-        float experience)
+        float experience,
+        int dirtyIn,
+        int dirtyOut,
+        int slot)
         implements Recipe<RecipeInput> {
     public static final int MAX_INGREDIENTS = 9;
     /** The most results beyond the first: an organ's output tray has at most {@code 1 + MAX_BYPRODUCTS} slots. */
     public static final int MAX_BYPRODUCTS = 2;
 
-    public static final MapCodec<OrganBatchRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    Codec.STRING.fieldOf("organ").forGetter(OrganBatchRecipe::organ),
-                    Ingredient.CODEC_NONEMPTY
-                            .listOf(1, MAX_INGREDIENTS)
-                            .fieldOf("ingredients")
-                            .forGetter(OrganBatchRecipe::ingredients),
-                    Codec.intRange(0, Integer.MAX_VALUE).fieldOf("water").forGetter(OrganBatchRecipe::waterMb),
-                    BiomassCodecs.BIOMASS.fieldOf("biomass").forGetter(OrganBatchRecipe::biomass),
-                    ItemStack.CODEC.fieldOf("result").forGetter(OrganBatchRecipe::result),
-                    Codec.intRange(1, Integer.MAX_VALUE).fieldOf("ticks").forGetter(OrganBatchRecipe::ticks),
-                    Codec.BOOL.optionalFieldOf("keeps_wear", false).forGetter(OrganBatchRecipe::keepsWear),
-                    DataComponentType.CODEC
-                            .listOf()
-                            .optionalFieldOf("keeps", List.of())
-                            .forGetter(OrganBatchRecipe::keeps),
-                    ItemStack.CODEC
-                            .listOf(0, MAX_BYPRODUCTS)
-                            .optionalFieldOf("byproducts", List.of())
-                            .forGetter(OrganBatchRecipe::byproducts),
-                    Codec.floatRange(0, BatchOrganContents.MAX_EXPERIENCE)
-                            .optionalFieldOf("experience", 0f)
-                            .forGetter(OrganBatchRecipe::experience))
-            .apply(instance, OrganBatchRecipe::new));
+    public static final MapCodec<OrganBatchRecipe> CODEC = RecordCodecBuilder.<OrganBatchRecipe>mapCodec(instance ->
+                    instance.group(
+                                    Codec.STRING.fieldOf("organ").forGetter(OrganBatchRecipe::organ),
+                                    Ingredient.CODEC_NONEMPTY
+                                            .listOf(0, MAX_INGREDIENTS)
+                                            .fieldOf("ingredients")
+                                            .forGetter(OrganBatchRecipe::ingredients),
+                                    Codec.intRange(0, Integer.MAX_VALUE)
+                                            .fieldOf("water")
+                                            .forGetter(OrganBatchRecipe::waterMb),
+                                    BiomassCodecs.BIOMASS.fieldOf("biomass").forGetter(OrganBatchRecipe::biomass),
+                                    ItemStack.CODEC.fieldOf("result").forGetter(OrganBatchRecipe::result),
+                                    Codec.intRange(1, Integer.MAX_VALUE)
+                                            .fieldOf("ticks")
+                                            .forGetter(OrganBatchRecipe::ticks),
+                                    Codec.BOOL
+                                            .optionalFieldOf("keeps_wear", false)
+                                            .forGetter(OrganBatchRecipe::keepsWear),
+                                    DataComponentType.CODEC
+                                            .listOf()
+                                            .optionalFieldOf("keeps", List.of())
+                                            .forGetter(OrganBatchRecipe::keeps),
+                                    ItemStack.CODEC
+                                            .listOf(0, MAX_BYPRODUCTS)
+                                            .optionalFieldOf("byproducts", List.of())
+                                            .forGetter(OrganBatchRecipe::byproducts),
+                                    Codec.floatRange(0, BatchOrganContents.MAX_EXPERIENCE)
+                                            .optionalFieldOf("experience", 0f)
+                                            .forGetter(OrganBatchRecipe::experience),
+                                    Codec.intRange(0, BatchOrganContents.MAX_DIRTY)
+                                            .optionalFieldOf("dirty_in", 0)
+                                            .forGetter(OrganBatchRecipe::dirtyIn),
+                                    Codec.intRange(0, BatchOrganContents.MAX_DIRTY)
+                                            .optionalFieldOf("dirty_out", 0)
+                                            .forGetter(OrganBatchRecipe::dirtyOut),
+                                    Codec.intRange(0, BatchOrganContents.MAX_OUTPUTS - 1)
+                                            .optionalFieldOf("slot", 0)
+                                            .forGetter(OrganBatchRecipe::slot))
+                            .apply(instance, OrganBatchRecipe::new))
+            .flatXmap(OrganBatchRecipe::checked, DataResult::success);
     public static final StreamCodec<RegistryFriendlyByteBuf, OrganBatchRecipe> STREAM_CODEC =
             ByteBufCodecs.fromCodecWithRegistries(CODEC.codec());
 
     public OrganBatchRecipe {
         byproducts = byproducts.stream().map(ItemStack::copy).toList();
+    }
+
+    /** A recipe with no dirty water and its results from the first output slot. */
+    public OrganBatchRecipe(
+            String organ,
+            List<Ingredient> ingredients,
+            int waterMb,
+            Biomass biomass,
+            ItemStack result,
+            int ticks,
+            boolean keepsWear,
+            List<DataComponentType<?>> keeps,
+            List<ItemStack> byproducts,
+            float experience) {
+        this(organ, ingredients, waterMb, biomass, result, ticks, keepsWear, keeps, byproducts, experience, 0, 0, 0);
+    }
+
+    /** A recipe with nothing to take is no recipe: a batch needs an ingredient or dirty water, and room for its results. */
+    private static DataResult<OrganBatchRecipe> checked(OrganBatchRecipe recipe) {
+        if (recipe.ingredients.isEmpty() && recipe.dirtyIn == 0)
+            return DataResult.error(() -> "A batch takes an ingredient or dirty water");
+        if (recipe.slot + 1 + recipe.byproducts.size() > BatchOrganContents.MAX_OUTPUTS)
+            return DataResult.error(() -> "The results do not fit the output slots after slot " + recipe.slot);
+        return DataResult.success(recipe);
     }
 
     @Override
@@ -105,6 +153,7 @@ public record OrganBatchRecipe(
      * hold beyond that stays for the next batch.
      */
     public Optional<int[]> plan(List<ItemStack> slots) {
+        if (ingredients.isEmpty()) return Optional.of(new int[slots.size()]);
         List<ItemStack> units = new ArrayList<>();
         List<Integer> from = new ArrayList<>();
         for (int slot = 0; slot < slots.size(); slot++) {

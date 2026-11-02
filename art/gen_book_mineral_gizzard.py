@@ -124,9 +124,9 @@ def draw_polygon(canvas, depth, texture, xy, uvs, z, shade):
         depth[y0:y1 + 1, x0:x1 + 1][visible] = dz[visible]
 
 
-def render_model():
-    geo = json.loads((ASSETS / 'geo/block/mineral_gizzard.geo.json').read_text())['minecraft:geometry'][0]
-    texture = np.array(Image.open(ASSETS / 'textures/block_entity/mineral_gizzard.png').convert('RGBA'))
+def render_model(name='mineral_gizzard'):
+    geo = json.loads((ASSETS / f'geo/block/{name}.geo.json').read_text())['minecraft:geometry'][0]
+    texture = np.array(Image.open(ASSETS / f'textures/block_entity/{name}.png').convert('RGBA'))
     faces = world_faces(geo)
     allp = np.concatenate([f[1] for f in faces])
     px, py, _ = project(allp)
@@ -160,16 +160,16 @@ def pool():
     return img.filter(ImageFilter.GaussianBlur(1.1))
 
 
-def main():
+def plate(name, row, destination):
+    """The guide plate of organ model `name` with the items of `row` laid out in front, written to `destination`."""
     out = Image.new('RGBA', (SIZE, SIZE), (0, 0, 0, 0))
     out.alpha_composite(pool())
-    model = render_model()
+    model = render_model(name)
     out.alpha_composite(model, ((SIZE - model.width) // 2, 6))
-    row = ['iron_dust', 'gold_dust', 'copper_dust', 'mineral_tailings', 'rock_residue']
     x = (SIZE - (len(row) * 34 - 2)) // 2
-    for name in row:
-        icon = Image.open(ASSETS / f'textures/item/{name}.png').convert('RGBA')
-        if name == 'mineral_tailings':
+    for item in row:
+        icon = Image.open(ASSETS / f'textures/item/{item}.png').convert('RGBA')
+        if item == 'mineral_tailings':
             flecks = Image.open(ASSETS / 'textures/item/mineral_tailings_flecks.png').convert('RGBA')
             metal = (198, 200, 206)  # the iron tint, as the client colour handler multiplies it into the grey flecks
             tinted = flecks.copy()
@@ -177,8 +177,12 @@ def main():
             icon.alpha_composite(tinted)
         out.alpha_composite(icon, (x, 150))
         x += 34
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    out.save(OUT, optimize=True)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    out.save(destination, optimize=True)
+
+
+def main():
+    plate('mineral_gizzard', ['iron_dust', 'gold_dust', 'copper_dust', 'mineral_tailings', 'rock_residue'], OUT)
 
 
 if __name__ == '__main__':

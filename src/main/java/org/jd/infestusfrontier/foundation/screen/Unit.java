@@ -7,6 +7,9 @@ public record Unit(String shortKey, String longKey) {
     public static final Unit BIOMASS = new Unit("gui.infestusfrontier.biomass_short", "gui.infestusfrontier.biomass");
     public static final Unit WATER = new Unit("gui.infestusfrontier.water_short", "gui.infestusfrontier.water");
 
+    public static final Unit DIRTY_WATER =
+            new Unit("gui.infestusfrontier.dirty_water_short", "gui.infestusfrontier.dirty_water");
+
     Component shortText(int value) {
         return Component.translatable(shortKey, value);
     }

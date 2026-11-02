@@ -15,16 +15,24 @@ import org.jd.infestusfrontier.core.processing.Batch;
  * A running organ batch: the progress, the results promised to the output slots, who started it and the smelting
  * experience it will earn. The promised results are saved so a recipe that disappears cannot lose a batch whose inputs
  * are already consumed. A value: the results are copied in and out and compared item for item. Result {@code n} goes
- * to output slot {@code n}: the {@code result} first, then the {@code byproducts}.
+ * to output slot {@code slot + n}: the {@code result} first, then the {@code byproducts}.
  */
 public record OrganBatch(
-        Batch batch, ItemStack result, List<ItemStack> byproducts, Optional<UUID> starter, float experience)
+        Batch batch, ItemStack result, List<ItemStack> byproducts, int slot, Optional<UUID> starter, float experience)
         implements RunningBatch<OrganBatch> {
     public OrganBatch {
         result = result.copy();
         byproducts = byproducts.stream().map(ItemStack::copy).toList();
+        if (slot < 0 || slot + 1 + byproducts.size() > BatchOrganContents.MAX_OUTPUTS)
+            throw new IllegalArgumentException("results from slot " + slot);
         if (!(experience >= 0 && experience <= BatchOrganContents.MAX_EXPERIENCE))
             throw new IllegalArgumentException("experience " + experience);
+    }
+
+    /** A batch whose results start at the first output slot. */
+    public OrganBatch(
+            Batch batch, ItemStack result, List<ItemStack> byproducts, Optional<UUID> starter, float experience) {
+        this(batch, result, byproducts, 0, starter, experience);
     }
 
     /** A batch with one result. */
@@ -42,7 +50,7 @@ public record OrganBatch(
         return byproducts.stream().map(ItemStack::copy).toList();
     }
 
-    /** Every result, in output slot order. */
+    /** Every result, in output slot order, the first for output slot {@link #slot()}. */
     public List<ItemStack> results() {
         List<ItemStack> all = new ArrayList<>();
         all.add(result());
@@ -56,6 +64,7 @@ public record OrganBatch(
                 && batch.equals(that.batch)
                 && ItemStack.matches(result, that.result)
                 && ItemStack.listMatches(byproducts, that.byproducts)
+                && slot == that.slot
                 && starter.equals(that.starter)
                 && experience == that.experience;
     }
@@ -66,6 +75,7 @@ public record OrganBatch(
                 batch,
                 ItemStack.hashItemAndComponents(result),
                 ItemStack.hashStackList(byproducts),
+                slot,
                 starter,
                 experience);
     }
@@ -77,6 +87,9 @@ public record OrganBatch(
                             .listOf(0, OrganBatchRecipe.MAX_BYPRODUCTS)
                             .optionalFieldOf("byproducts", List.of())
                             .forGetter(OrganBatch::byproducts),
+                    Codec.intRange(0, BatchOrganContents.MAX_OUTPUTS - 1)
+                            .optionalFieldOf("slot", 0)
+                            .forGetter(OrganBatch::slot),
                     UUIDUtil.CODEC.optionalFieldOf("starter").forGetter(OrganBatch::starter),
                     Codec.floatRange(0, BatchOrganContents.MAX_EXPERIENCE)
                             .optionalFieldOf("experience", 0f)
@@ -85,7 +98,7 @@ public record OrganBatch(
 
     @Override
     public OrganBatch advance() {
-        return new OrganBatch(batch.advance(), result, byproducts, starter, experience);
+        return new OrganBatch(batch.advance(), result, byproducts, slot, starter, experience);
     }
 
     @Override
