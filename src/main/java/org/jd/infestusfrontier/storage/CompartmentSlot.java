@@ -10,7 +10,7 @@ import org.jd.infestusfrontier.storage.api.CapsuleStock;
 
 /**
  * A menu slot over one capsule compartment, which may hold more than a stack. It shows the whole count, takes at most
- * a stack out at a time and takes in up to the compartment's limit. The menu keeps drags and hotbar swaps off it,
+ * a stack out at a time, never the part a Larder's reserve keeps, and takes in up to the compartment's limit. The menu keeps drags and hotbar swaps off it,
  * since vanilla's versions of those assume a slot holds one stack.
  */
 final class CompartmentSlot extends Slot {
@@ -24,6 +24,11 @@ final class CompartmentSlot extends Slot {
 
         default boolean active(int compartment) {
             return true;
+        }
+
+        /** How many of the compartment's items a hand may take out: what a reserve leaves of it. */
+        default int takeable(int compartment) {
+            return get(compartment).getCount();
         }
 
         /** The most of a kind stacking to {@code maxStackSize} the compartment holds. */
@@ -55,7 +60,7 @@ final class CompartmentSlot extends Slot {
     @Override
     public ItemStack remove(int amount) {
         ItemStack held = getItem();
-        int taken = Math.min(Math.min(amount, held.getCount()), held.getMaxStackSize());
+        int taken = Math.min(Math.min(amount, takeable()), held.getMaxStackSize());
         if (taken <= 0) return ItemStack.EMPTY;
         set(held.copyWithCount(held.getCount() - taken));
         return held.copyWithCount(taken);
@@ -83,7 +88,12 @@ final class CompartmentSlot extends Slot {
 
     @Override
     public boolean mayPickup(Player player) {
-        return isActive();
+        return isActive() && takeable() > 0;
+    }
+
+    /** How many a hand may take out of the compartment now: its count less a Larder's reserve. */
+    int takeable() {
+        return Math.min(source.takeable(getContainerSlot()), getItem().getCount());
     }
 
     @Override

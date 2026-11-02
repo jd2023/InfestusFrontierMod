@@ -2,6 +2,7 @@ package org.jd.infestusfrontier.storage;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,6 +39,9 @@ public final class ItemCapsuleMenu extends OrganMenu {
     public static final int KINDS_DATA = 4;
 
     public static final int ROW_DATA = 5;
+    /** The synced ints after the row: how many of each view cell's kind a Larder's reserves keep. */
+    public static final int RESERVED_DATA = 6;
+
     static final int GRID_Y = 36;
     /** The view: three rows of eight wells at the inventory's pitch, from the panel's left margin. */
     static final SlotGrid GRID = new SlotGrid(
@@ -168,16 +172,29 @@ public final class ItemCapsuleMenu extends OrganMenu {
     }
 
     private static ContainerData data(Tree tree, View view) {
-        if (tree.organ().isEmpty()) return new SimpleContainerData(ROW_DATA + 1);
-        return reading(
-                () -> tree.usable().map(CapsuleTree::slots).orElse(0),
-                () -> tree.usable().map(CapsuleTree::used).orElse(0),
-                () -> tree.root()
-                        .map(root -> Math.min(root.fed(), root.nextCost(root.getLevel())))
-                        .orElse(0),
-                () -> tree.root().map(root -> root.nextCost(root.getLevel())).orElse(0),
-                tree::kinds,
-                () -> Ledger.clampRow(view.row, tree.kinds()));
+        if (tree.organ().isEmpty()) return new SimpleContainerData(RESERVED_DATA + VIEW);
+        IntSupplier[] reads = new IntSupplier[RESERVED_DATA + VIEW];
+        reads[0] = () -> tree.usable().map(CapsuleTree::slots).orElse(0);
+        reads[1] = () -> tree.usable().map(CapsuleTree::used).orElse(0);
+        reads[2] = () -> tree.root()
+                .map(root -> Math.min(root.fed(), root.nextCost(root.getLevel())))
+                .orElse(0);
+        reads[3] = () -> tree.root().map(root -> root.nextCost(root.getLevel())).orElse(0);
+        reads[4] = tree::kinds;
+        reads[ROW_DATA] = () -> Ledger.clampRow(view.row, tree.kinds());
+        for (int cell = 0; cell < VIEW; cell++) {
+            int which = cell;
+            reads[RESERVED_DATA + cell] = () -> tree.usable()
+                    .map(store -> store.kindReserved(
+                            Ledger.entry(Ledger.clampRow(view.row, store.kinds().size()), which)))
+                    .orElse(0);
+        }
+        return reading(reads);
+    }
+
+    /** How many of view cell {@code cell}'s kind the Larders' reserves keep, as the server last sent it. */
+    public int reserved(int cell) {
+        return synced(RESERVED_DATA + cell);
     }
 
     /** Keeps the kind each cell shows after the client was sent it. */
@@ -260,7 +277,7 @@ public final class ItemCapsuleMenu extends OrganMenu {
     }
 
     /**
-     * A cell gives a stack of its kind at a time; inventory items go where the tree's rules put them. Vanilla repeats
+     * A cell gives a stack of its kind at a time, never the part a Larder's reserve keeps; inventory items go where the tree's rules put them. Vanilla repeats
      * a shift-click while the cell shows the same item, so a cell whose kind is gone, and now shows the next kind of
      * that item, answers empty: a kind is never taken for another.
      */
@@ -272,7 +289,9 @@ public final class ItemCapsuleMenu extends OrganMenu {
         if (!slot.isActive() || !slot.hasItem()) return ItemStack.EMPTY;
         if (index < VIEW) {
             ItemStack held = slot.getItem();
-            ItemStack moving = held.copyWithCount(Math.min(held.getCount(), held.getMaxStackSize()));
+            int free = held.getCount() - reserved(index);
+            if (free <= 0) return ItemStack.EMPTY; // the reserve is not for the inventory to copy
+            ItemStack moving = held.copyWithCount(Math.min(free, held.getMaxStackSize()));
             int before = moving.getCount();
             moveItemStackTo(moving, VIEW, slots.size(), true);
             int moved = before - moving.getCount();

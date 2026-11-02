@@ -21,6 +21,12 @@ public final class Well extends Part {
         this.label = label;
     }
 
+    /** Shows {@code text} while the well is hovered. */
+    public Well story(Component text) {
+        tip(text);
+        return this;
+    }
+
     private static Bounds place(int x, int labelY, int wellY, Slot slot) {
         if (slot.x != x + 1 || slot.y != wellY + 1)
             throw new IllegalStateException(

@@ -17,12 +17,18 @@ import org.jd.infestusfrontier.core.storage.Compartments;
 
 /**
  * The one store of a standing Capsule Stem: the compartments of the pods its root reaches, in the order they grew, a
- * bulk pod's one or a Mixed Craw's four each; or of one pod standing on its own. Its pods share it while the tree
+ * bulk pod's one, a Mixed Craw's four or a Larder's three each; or of one pod standing on its own. Its pods share it while the tree
  * stands; a pod or stem cell leaving, unloading or loading new state, or a pod mutating, closes it, and a closed store
  * holds no slots. Callers reach it through {@link Stems#of}, which uses it only while {@link #isUsable}. Items go by
  * {@link Compartments}: a kind fills its own compartments before it opens an empty one, each compartment holding as
  * many stacks as its pod's kind and grade allow, so bulk pods and Craws share one count of every kind. What a kind's compartments hold is read once per change of the store, so a
  * hopper trying every slot reads the tree once; so is the ledger of {@link #kinds}, which every viewer reads.
+ *
+ * <p>The tree owns the one rule that keeps a Larder's reserve: {@link #extract} and {@link #take}, the two ways stock
+ * leaves for a hopper, a Mouth, an Item Vein, another mod's pipe or a ledger click, give a compartment's
+ * {@code count − reserve} (never below 0) and nothing more, each time from the counts as they are then, so a
+ * simulation never promises what a competing extraction has since taken. {@link #insert} is never limited by a reserve.
+ * A pod that is not in the store lends nothing and protects nothing; a pod with the tree lends only what it holds.
  */
 final class CapsuleTree {
     /** The ledger's order: the name a player reads, then the item's id, damage and components, so it holds still. */
@@ -51,6 +57,7 @@ final class CapsuleTree {
     private int[] read = new int[0];
     private int kindsVersion = -1;
     private List<ItemStack> kinds = List.of();
+    private int[] kindReserves = new int[0];
 
     CapsuleTree(Level level, List<ItemCapsuleBlockEntity> members, List<BlockPos> span) {
         this.level = level;
@@ -139,6 +146,23 @@ final class CapsuleTree {
         return holds(slot) ? pod(slot).held(compartment(slot)) : ItemStack.EMPTY;
     }
 
+    /** What an external reader sees in slot {@code slot}: the part above its reserve, which may be nothing. */
+    ItemStack visible(int slot) {
+        if (!holds(slot)) return ItemStack.EMPTY;
+        ItemStack held = stack(slot);
+        return held.copyWithCount(pod(slot).automatable(compartment(slot)));
+    }
+
+    /** How many of slot {@code slot}'s items an external extraction may take now; 0 for no slot. */
+    int automatable(int slot) {
+        return holds(slot) ? pod(slot).automatable(compartment(slot)) : 0;
+    }
+
+    /** The reserve of slot {@code slot}; 0 in a pod that keeps none. */
+    int reserve(int slot) {
+        return holds(slot) ? pod(slot).reserve(compartment(slot)) : 0;
+    }
+
     /** The most of a kind stacking to {@code maxStackSize} slot {@code slot} holds; 0 for no slot. */
     int limit(int slot, int maxStackSize) {
         if (!holds(slot)) return 0;
@@ -156,7 +180,9 @@ final class CapsuleTree {
     boolean fits(int slot, ItemStack stack) {
         if (!holds(slot) || !Stems.takes(stack)) return false;
         ItemCapsuleBlockEntity pod = pod(slot);
-        return pod.count(compartment(slot)) == 0 || pod.holds(compartment(slot), stack);
+        return pod.count(compartment(slot)) == 0
+                ? pod.labelAllows(compartment(slot), stack)
+                : pod.holds(compartment(slot), stack);
     }
 
     /** Every slot read for {@code kind}, as {@link Compartments} reads a store: other kind, empty or a count. */
@@ -166,7 +192,11 @@ final class CapsuleTree {
         for (int slot = 0; slot < counts.length; slot++) {
             ItemCapsuleBlockEntity pod = pod(slot);
             int count = pod.count(compartment(slot));
-            counts[slot] = count == 0 ? 0 : pod.holds(compartment(slot), kind) ? count : Compartments.OTHER;
+            if (count == 0)
+                counts[slot] = !pod.labelled(compartment(slot))
+                        ? 0
+                        : pod.labelledFor(compartment(slot), kind) ? Compartments.LABELLED : Compartments.OTHER;
+            else counts[slot] = pod.holds(compartment(slot), kind) ? count : Compartments.OTHER;
         }
         readVersion = version;
         readKind = kind.copyWithCount(1);
@@ -203,22 +233,40 @@ final class CapsuleTree {
         return stack.copyWithCount(stack.getCount() - moved);
     }
 
-    /** Takes up to {@code amount} from a slot, never more than one stack of its kind. */
+    /**
+     * Takes up to {@code amount} from a slot, never more than one stack of its kind and never the slot's reserve. The
+     * answer is read from the slot as it is now, simulated or not.
+     */
     ItemStack extract(int slot, int amount, boolean simulate) {
         if (amount <= 0 || !holds(slot)) return ItemStack.EMPTY;
         ItemCapsuleBlockEntity pod = pod(slot);
         ItemStack held = pod.held(compartment(slot));
-        int taken = Math.min(Math.min(amount, held.getCount()), held.getMaxStackSize());
+        int taken = Math.min(Math.min(amount, pod.automatable(compartment(slot))), held.getMaxStackSize());
         if (taken == 0) return ItemStack.EMPTY;
         if (!simulate) pod.take(compartment(slot), taken);
         return held.copyWithCount(taken);
     }
 
+    /** How many of {@code like}'s kind the tree holds, reserved or not. */
     int count(ItemStack like) {
         if (like.isEmpty()) return 0;
         int total = 0;
         for (int count : counts(like)) if (count > 0) total += count;
         return total;
+    }
+
+    /** How many of {@code like}'s kind an external extraction may take now: what is held above the reserves. */
+    int automatable(ItemStack like) {
+        if (like.isEmpty()) return 0;
+        int[] counts = counts(like);
+        int total = 0;
+        for (int slot = 0; slot < counts.length; slot++) if (counts[slot] > 0) total += automatable(slot);
+        return total;
+    }
+
+    /** How many of {@code like}'s kind the reserves keep: held, and out of every extraction. */
+    int reserved(ItemStack like) {
+        return count(like) - automatable(like);
     }
 
     /**
@@ -229,15 +277,20 @@ final class CapsuleTree {
         if (slots() == 0) return List.of();
         if (kindsVersion != version) {
             Object2IntMap<ItemStack> totals = new Object2IntLinkedOpenCustomHashMap<>(ItemStackLinkedSet.TYPE_AND_TAG);
+            Object2IntMap<ItemStack> kept = new Object2IntLinkedOpenCustomHashMap<>(ItemStackLinkedSet.TYPE_AND_TAG);
             for (int slot = 0; slot < slots(); slot++) {
                 ItemStack held = pod(slot).held(compartment(slot));
-                if (!held.isEmpty()) totals.mergeInt(held, held.getCount(), Integer::sum);
+                if (held.isEmpty()) continue;
+                totals.mergeInt(held, held.getCount(), Integer::sum);
+                kept.mergeInt(held, held.getCount() - automatable(slot), Integer::sum);
             }
             List<ItemStack> sorted = new ArrayList<>(totals.size());
             for (Object2IntMap.Entry<ItemStack> entry : totals.object2IntEntrySet())
                 sorted.add(entry.getKey().copyWithCount(entry.getIntValue()));
             sorted.sort(BY_NAME);
             kinds = List.copyOf(sorted);
+            kindReserves = new int[kinds.size()];
+            for (int i = 0; i < kindReserves.length; i++) kindReserves[i] = kept.getInt(kinds.get(i));
             kindsVersion = version;
         }
         return kinds;
@@ -247,6 +300,12 @@ final class CapsuleTree {
     ItemStack kind(int index) {
         List<ItemStack> all = kinds();
         return index >= 0 && index < all.size() ? all.get(index).copy() : ItemStack.EMPTY;
+    }
+
+    /** How many of ledger entry {@code index} the reserves keep; 0 past the last kind. */
+    int kindReserved(int index) {
+        kinds();
+        return index >= 0 && index < kindReserves.length ? kindReserves[index] : 0;
     }
 
     /** How many more of {@code kind} the tree takes where its rules put them; 0 for a kind it refuses. */
@@ -259,7 +318,8 @@ final class CapsuleTree {
 
     /**
      * Takes up to {@code amount} of {@code kind} out of the compartments holding it, the last first, so a kind draws
-     * together into its first compartments as it is taken; what was taken.
+     * together into its first compartments as it is taken; what was taken. A compartment gives only what is above its
+     * reserve, so this is the same rule as {@link #extract} for every caller.
      */
     ItemStack take(ItemStack kind, int amount) {
         if (kind.isEmpty() || amount <= 0) return ItemStack.EMPTY;
@@ -268,7 +328,8 @@ final class CapsuleTree {
         int taken = 0;
         for (int slot = counts.length - 1; slot >= 0 && left > 0; slot--) {
             if (counts[slot] <= 0) continue;
-            int part = Math.min(left, counts[slot]);
+            int part = Math.min(left, automatable(slot));
+            if (part <= 0) continue;
             pod(slot).take(compartment(slot), part);
             left -= part;
             taken += part;

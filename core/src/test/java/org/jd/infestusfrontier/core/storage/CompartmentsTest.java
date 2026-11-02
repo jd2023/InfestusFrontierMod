@@ -79,4 +79,26 @@ class CompartmentsTest {
         assertEquals(-1, Compartments.opening(new int[] {O, 64, O}, limits(3, 64)));
         assertArrayEquals(new int[] {0, 0, 0}, Compartments.plan(new int[] {O, 64, O}, limits(3, 64), 5));
     }
+
+    @Test
+    void anEmptyCompartmentLabelledForTheKindOpensBeforeAnUnlabelledOne() {
+        int L = Compartments.LABELLED;
+        assertArrayEquals(new int[] {0, 0, 8}, Compartments.plan(new int[] {0, O, L}, limits(3, 64), 8));
+        assertEquals(2, Compartments.opening(new int[] {0, O, L}, limits(3, 64)));
+        assertEquals(64, Compartments.room(new int[] {0, O, L}, limits(3, 64), 2));
+        assertEquals(0, Compartments.room(new int[] {0, O, L}, limits(3, 64), 0));
+    }
+
+    @Test
+    void aLabelledCompartmentFillsAfterTheKindsOwnAndOverflowsToTheNextEmptyOne() {
+        int L = Compartments.LABELLED;
+        assertArrayEquals(new int[] {4, 0, 60, 0}, Compartments.plan(new int[] {60, O, L, 0}, limits(4, 64), 64));
+        assertArrayEquals(new int[] {4, 0, 64, 4}, Compartments.plan(new int[] {60, O, L, 0}, limits(4, 64), 72));
+    }
+
+    @Test
+    void aCompartmentLabelledForAnotherKindTakesNone() {
+        assertArrayEquals(new int[] {0, 0}, Compartments.plan(new int[] {O, O}, limits(2, 64), 10));
+        assertEquals(-1, Compartments.opening(new int[] {O, O}, limits(2, 64)));
+    }
 }

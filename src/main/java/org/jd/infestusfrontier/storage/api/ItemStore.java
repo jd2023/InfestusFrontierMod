@@ -10,6 +10,12 @@ public interface ItemStore {
     /** How many items of {@code like}'s kind, the same item with the same components, the store holds. */
     int count(ItemStack like);
 
+    /**
+     * How many of {@code like}'s kind an extraction may take: {@link #count} less what the store keeps back, as a
+     * Larder's reserves.
+     */
+    int automatable(ItemStack like);
+
     /** Puts {@code stack} where the store's own rules put it and returns what did not fit. {@code stack} is unchanged. */
     ItemStack insert(ItemStack stack, boolean simulate);
 

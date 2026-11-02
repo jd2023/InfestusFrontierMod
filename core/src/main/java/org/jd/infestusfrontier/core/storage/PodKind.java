@@ -5,14 +5,19 @@ import java.util.Optional;
 /**
  * What a Capsule Stem pod is (BLOCK_CATALOG T1-09): a bulk pod, one compartment of 8, 16 or 32 stacks of its kind at
  * grade 0, 1 or 2, or a Mixed Craw, {@value #CRAW_COMPARTMENTS} compartments of one kind each at a quarter of that
- * depth, so its total is half a bulk pod's. A stack is the kind's own stack size.
+ * depth, so its total is half a bulk pod's, or a Larder, {@value #LARDER_COMPARTMENTS} compartments of the Craw's depth
+ * that each carry a label and a reserve. A stack is the kind's own stack size.
  */
 public enum PodKind {
     BULK("bulk", 1, 8),
-    CRAW("craw", 4, 1);
+    CRAW("craw", 4, 1),
+    LARDER("larder", 3, 1);
 
     /** The compartments of a Mixed Craw: the most kinds a pod holds at once. */
     public static final int CRAW_COMPARTMENTS = 4;
+
+    /** The compartments of a Larder. */
+    public static final int LARDER_COMPARTMENTS = 3;
 
     private final String id;
     private final int compartments;
@@ -32,6 +37,11 @@ public enum PodKind {
     /** How many kinds the pod holds at once. */
     public int compartments() {
         return compartments;
+    }
+
+    /** True when each compartment carries a label and a reserve: only a Larder does. */
+    public boolean reserves() {
+        return this == LARDER;
     }
 
     /** Stacks of its kind one compartment holds at {@code grade}: doubled by each grade. */

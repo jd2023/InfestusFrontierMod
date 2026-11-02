@@ -9,13 +9,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
-import org.jd.infestusfrontier.core.storage.PodKind;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.storage.api.CapsuleStock;
 
 /**
- * A pod as an item, bulk or Mixed Craw. It carries the compartments and grade it was broken with, one to a stack, lists them in its
- * tooltip, fits in no container item, and spills its items in whole stacks when the item itself is destroyed, as a
+ * A pod as an item, bulk, Mixed Craw or Larder. It carries the compartments, grade, labels and reserves it was broken
+ * with, one to a stack, lists them in its tooltip, fits in no container item, and spills its items in whole stacks when the item itself is destroyed, as a
  * shulker box does.
  */
 final class ItemCapsuleItem extends OrganItem {
@@ -38,11 +37,24 @@ final class ItemCapsuleItem extends OrganItem {
                 tooltip.add(Component.translatable(
                                 "tooltip.infestusfrontier.item_capsule.held", held.getCount(), held.getHoverName())
                         .withStyle(ChatFormatting.GRAY));
+        for (int slot = 0; slot < carried.marks().size(); slot++) {
+            CapsuleStock.Mark mark = carried.mark(slot);
+            if (mark.isNone()) continue;
+            tooltip.add((mark.label().isEmpty()
+                            ? Component.translatable("tooltip.infestusfrontier.larder.unlabelled", mark.reserve())
+                            : Component.translatable(
+                                    "tooltip.infestusfrontier.larder.label",
+                                    mark.label().getHoverName(),
+                                    mark.reserve()))
+                    .withStyle(ChatFormatting.GRAY));
+        }
         if (carried.grade() > 0)
             tooltip.add(Component.translatable(
-                            carried.kind() == PodKind.CRAW
-                                    ? "tooltip.infestusfrontier.mixed_craw.grade"
-                                    : "tooltip.infestusfrontier.item_capsule.grade",
+                            switch (carried.kind()) {
+                                case BULK -> "tooltip.infestusfrontier.item_capsule.grade";
+                                case CRAW -> "tooltip.infestusfrontier.mixed_craw.grade";
+                                case LARDER -> "tooltip.infestusfrontier.larder.grade";
+                            },
                             carried.kind().stacks(carried.grade()))
                     .withStyle(ChatFormatting.GRAY));
     }

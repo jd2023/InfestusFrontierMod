@@ -1,0 +1,56 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.larder.name",
+  "description": "entry.infestusfrontier.circulation.larder.description",
+  "icon": "infestusfrontier:larder",
+  "x": 5,
+  "y": 3,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/mixed_craw"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/mixed_craw"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/sealing_resin"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/larder"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.larder.name",
+      "text": "entry.infestusfrontier.circulation.larder.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.larder.reserve.title",
+      "text": "entry.infestusfrontier.circulation.larder.reserve"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.larder.withdraw.title",
+      "text": "entry.infestusfrontier.circulation.larder.withdraw"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:activating/sealing_resin",
+      "title1": "item.infestusfrontier.sealing_resin"
+    }
+  ]
+}

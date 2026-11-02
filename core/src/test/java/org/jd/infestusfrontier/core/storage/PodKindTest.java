@@ -32,10 +32,23 @@ class PodKindTest {
     }
 
     @Test
+    void aLarderHoldsThreeKindsAtTheCrawsDepthAndOnlyItKeepsReserves() {
+        assertEquals(PodKind.LARDER_COMPARTMENTS, PodKind.LARDER.compartments());
+        for (int grade = 0; grade <= 2; grade++) {
+            assertEquals(PodKind.CRAW.stacks(grade), PodKind.LARDER.stacks(grade));
+            assertEquals(3 << grade, PodKind.LARDER.totalStacks(grade));
+        }
+        assertTrue(PodKind.LARDER.reserves());
+        assertFalse(PodKind.CRAW.reserves());
+        assertFalse(PodKind.BULK.reserves());
+    }
+
+    @Test
     void kindsAreFoundByTheirSavedName() {
         assertEquals(Optional.of(PodKind.CRAW), PodKind.byId("craw"));
         assertEquals(Optional.of(PodKind.BULK), PodKind.byId("bulk"));
-        assertEquals(Optional.empty(), PodKind.byId("larder"));
+        assertEquals(Optional.of(PodKind.LARDER), PodKind.byId("larder"));
+        assertEquals(Optional.empty(), PodKind.byId("pantry"));
     }
 
     @Test

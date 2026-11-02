@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.core.storage.Compartments;
 import org.jd.infestusfrontier.core.storage.PodKind;
+import org.jd.infestusfrontier.core.storage.Reserves;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.storage.api.CapsuleStock;
@@ -38,8 +39,10 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * One pod of a Capsule Stem: the compartments its {@link PodKind} gives it, a bulk pod's one or a Mixed Craw's four,
- * each of one kind of item, its grade and the root of the stem it hangs on, if any. The compartments stay in the pod,
+ * One pod of a Capsule Stem: the compartments its {@link PodKind} gives it, a bulk pod's one, a Mixed Craw's four or a
+ * Larder's three, each of one kind of item, its grade and the root of the stem it hangs on, if any. A Larder's
+ * compartment also carries a label and a reserve; the pod keeps them, and {@link CapsuleTree} applies the reserve to
+ * every external extraction. The compartments stay in the pod,
  * so a broken pod carries exactly them; the tree's one store is {@link CapsuleTree}, shared by its pods while it
  * stands. The kind of pod is the block's, never changed in place: a mutation replaces the block, which closes the
  * tree's store. Clients get the compartments and the grade for the front.
@@ -63,6 +66,11 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     private final PodKind kind;
     private final ItemStack[] held = new ItemStack[CapsuleStock.COMPARTMENTS];
+    /** A Larder's label of each compartment: one of its kind, or empty. */
+    private final ItemStack[] labels = new ItemStack[CapsuleStock.COMPARTMENTS];
+    /** A Larder's reserve of each compartment; always 0 in a pod that keeps none. */
+    private final int[] reserves = new int[CapsuleStock.COMPARTMENTS];
+
     private int grade;
     private Optional<BlockPos> root = Optional.empty();
     private Optional<CompoundTag> unreadable = Optional.empty();
@@ -77,6 +85,7 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
         super(type, pos, state);
         this.kind = kind;
         Arrays.fill(held, ItemStack.EMPTY);
+        Arrays.fill(labels, ItemStack.EMPTY);
         grade = state.getValue(ItemCapsuleBlock.GRADE);
     }
 
@@ -123,6 +132,7 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
     /** Sets a compartment to {@code stack}, its kind and its whole count; an empty stack empties it. */
     void put(int compartment, ItemStack stack) {
         held[compartment] = stack.copy();
+        label(compartment, stack);
         changed();
     }
 
@@ -130,7 +140,91 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
     void add(int compartment, ItemStack kind, int amount) {
         if (held[compartment].isEmpty()) held[compartment] = kind.copyWithCount(amount);
         else held[compartment].grow(amount);
+        label(compartment, kind);
         changed();
+    }
+
+    /** The first item an unlabelled Larder compartment takes labels it. */
+    private void label(int compartment, ItemStack kind) {
+        if (this.kind.reserves() && labels[compartment].isEmpty() && !kind.isEmpty()) {
+            labels[compartment] = kind.copyWithCount(1);
+            reserves[compartment] = Reserves.clamp(reserves[compartment], reserveLimit(compartment));
+        }
+    }
+
+    /** A Larder compartment's label, or empty; a copy. */
+    ItemStack label(int compartment) {
+        return labels[compartment].copy();
+    }
+
+    /** True when compartment {@code compartment}'s label, if it has one, is {@code like}'s kind. */
+    boolean labelAllows(int compartment, ItemStack like) {
+        return labels[compartment].isEmpty() || ItemStack.isSameItemSameComponents(labels[compartment], like);
+    }
+
+    /** True when the compartment is empty and labelled for {@code like}'s kind. */
+    boolean labelledFor(int compartment, ItemStack like) {
+        return !labels[compartment].isEmpty()
+                && held[compartment].isEmpty()
+                && ItemStack.isSameItemSameComponents(labels[compartment], like);
+    }
+
+    /** True when an empty compartment is labelled, so it takes only that kind. */
+    boolean labelled(int compartment) {
+        return !labels[compartment].isEmpty();
+    }
+
+    /** The reserve of a compartment: what no external extraction takes. */
+    int reserve(int compartment) {
+        return reserves[compartment];
+    }
+
+    /** What an external extraction may take from a compartment now. */
+    int automatable(int compartment) {
+        return Reserves.automatable(held[compartment].getCount(), reserves[compartment]);
+    }
+
+    /** What the reserve keeps in a compartment now: its reserve, or all it holds when that is less. */
+    int reserved(int compartment) {
+        return Reserves.reserved(held[compartment].getCount(), reserves[compartment]);
+    }
+
+    /** The most a reserve of the compartment may be: its limit of the labelled kind, or of a 64-stack kind. */
+    int reserveLimit(int compartment) {
+        ItemStack label = labels[compartment];
+        return Compartments.limit(stacks(), label.isEmpty() ? 64 : label.getMaxStackSize());
+    }
+
+    /**
+     * Labels an empty compartment, or one that already holds {@code like}'s kind, with that kind; a label may be set
+     * again, never over a compartment that holds another kind. False, changing nothing, for a pod that keeps no
+     * labels, a kind a capsule refuses or a compartment that holds another kind.
+     */
+    boolean setLabel(int compartment, ItemStack like) {
+        if (!kind.reserves() || unreadable.isPresent() || like.isEmpty() || !Stems.takes(like)) return false;
+        if (!held[compartment].isEmpty() && !holds(compartment, like)) return false;
+        labels[compartment] = like.copyWithCount(1);
+        reserves[compartment] = Reserves.clamp(reserves[compartment], reserveLimit(compartment));
+        changed();
+        return true;
+    }
+
+    /** Takes the label off a compartment; only while it is empty. False, changing nothing, otherwise. */
+    boolean clearLabel(int compartment) {
+        if (!kind.reserves() || unreadable.isPresent() || !held[compartment].isEmpty()) return false;
+        if (labels[compartment].isEmpty()) return false;
+        labels[compartment] = ItemStack.EMPTY;
+        reserves[compartment] = Reserves.clamp(reserves[compartment], reserveLimit(compartment));
+        changed();
+        return true;
+    }
+
+    /** The reserve moves to the next setting, or the one before it. False for a pod that keeps no reserve. */
+    boolean stepReserve(int compartment, boolean up) {
+        if (!kind.reserves() || unreadable.isPresent()) return false;
+        reserves[compartment] = Reserves.next(reserves[compartment], reserveLimit(compartment), up);
+        changed();
+        return true;
     }
 
     /** Takes {@code amount} out of a compartment. */
@@ -146,7 +240,7 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
      * rules open one.
      */
     boolean accepts(int compartment, ItemStack stack) {
-        if (unreadable.isPresent() || !Stems.takes(stack)) return false;
+        if (unreadable.isPresent() || !Stems.takes(stack) || !labelAllows(compartment, stack)) return false;
         if (!held[compartment].isEmpty()) return holds(compartment, stack);
         int limit = Compartments.limit(stacks(), stack.getMaxStackSize());
         for (int other = 0; other < compartments(); other++)
@@ -170,7 +264,14 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
     }
 
     CapsuleStock stock() {
-        return new CapsuleStock(List.of(Arrays.copyOf(held, compartments())), grade, kind);
+        return new CapsuleStock(List.of(Arrays.copyOf(held, compartments())), grade, kind, marks());
+    }
+
+    private List<CapsuleStock.Mark> marks() {
+        if (!kind.reserves()) return List.of();
+        CapsuleStock.Mark[] marks = new CapsuleStock.Mark[compartments()];
+        for (int i = 0; i < marks.length; i++) marks[i] = new CapsuleStock.Mark(labels[i], reserves[i]);
+        return List.of(marks);
     }
 
     private void changed() {
@@ -224,11 +325,7 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
      * server mutates, so nothing it holds is ever lost or squeezed.
      */
     Optional<String> craw() {
-        if (kind != PodKind.BULK) return Optional.of("not_bulk");
-        if (unreadable.isPresent()) return Optional.of("unreadable");
-        if (!isEmpty()) return Optional.of("not_empty");
-        if (level == null || level.isClientSide || isRemoved()) return Optional.of("no_level");
-        return Optional.empty();
+        return mutable(PodKind.BULK, "not_bulk");
     }
 
     /**
@@ -236,17 +333,41 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
      * removed and the tree reads its store again with the new one. False, changing nothing, when {@link #craw} refuses.
      */
     boolean mutateToCraw() {
-        if (craw().isPresent()) return false;
-        BlockState now = getBlockState();
+        return craw().isEmpty() && replaceWith(StorageModule.MIXED_CRAW.get());
+    }
+
+    /**
+     * Why this Mixed Craw cannot become a Larder now, as the end of a language key under
+     * {@code gui.infestusfrontier.item_capsule.pod.resin.}, or empty when it can: only a readable, empty Craw on a
+     * server mutates, so nothing it holds is ever lost or squeezed.
+     */
+    Optional<String> larder() {
+        return mutable(PodKind.CRAW, "not_craw");
+    }
+
+    /** The Craw becomes a Larder of the same grade, facing and tree. False, changing nothing, when {@link #larder} refuses. */
+    boolean mutateToLarder() {
+        return larder().isEmpty() && replaceWith(StorageModule.LARDER.get());
+    }
+
+    /** The refusal key of a mutation from {@code from}: {@code notFromKey} for another kind, then why this pod is not ready. */
+    private Optional<String> mutable(PodKind from, String notFromKey) {
+        if (kind != from) return Optional.of(notFromKey);
+        if (unreadable.isPresent()) return Optional.of("unreadable");
+        if (!isEmpty()) return Optional.of("not_empty");
+        if (level == null || level.isClientSide || isRemoved()) return Optional.of("no_level");
+        return Optional.empty();
+    }
+
+    /** Replaces this pod's block with {@code target}, keeping its facing, grade and root; the root reads its tree again. */
+    private boolean replaceWith(Block target) {
         Optional<BlockPos> hangs = root;
-        BlockState craw = StorageModule.MIXED_CRAW
-                .get()
-                .defaultBlockState()
-                .setValue(ItemCapsuleBlock.FACING, now.getValue(ItemCapsuleBlock.FACING))
+        BlockState state = target.defaultBlockState()
+                .setValue(ItemCapsuleBlock.FACING, getBlockState().getValue(ItemCapsuleBlock.FACING))
                 .setValue(ItemCapsuleBlock.GRADE, grade);
         Level where = level;
         BlockPos pos = worldPosition;
-        where.setBlock(pos, craw, Block.UPDATE_ALL);
+        where.setBlock(pos, state, Block.UPDATE_ALL);
         if (where.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity mutated) mutated.hangOn(hangs);
         hangs.flatMap(rootPos -> Stems.rootAt(where, rootPos)).ifPresent(CapsuleStemBlockEntity::touch);
         return true;
@@ -278,18 +399,40 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
             return Optional.of("a " + saved.stock().kind().id() + " pod's stock in a " + kind.id() + " pod");
         if (saved.stock().held().size() > compartments())
             return Optional.of(saved.stock().held().size() + " compartments in a pod of " + compartments());
-        for (ItemStack stack : saved.stock().held()) {
+        List<ItemStack> stacks = saved.stock().held();
+        for (ItemStack stack : stacks) {
             if (!stack.isEmpty() && !Stems.takes(stack)) return Optional.of("a capsule that holds " + stack);
             int limit = Compartments.limit(kind.stacks(saved.stock().grade()), stack.getMaxStackSize());
             if (stack.getCount() > limit) return Optional.of(stack.getCount() + " " + stack + " is past a compartment");
+        }
+        CapsuleStock stock = saved.stock();
+        if (stock.marks().size() > compartments()
+                || !kind.reserves() && !stock.marks().isEmpty())
+            return Optional.of(stock.marks().size() + " labels and reserves in a " + kind.id() + " pod");
+        for (int i = 0; kind.reserves() && i < compartments(); i++) {
+            ItemStack label = stock.mark(i).label();
+            ItemStack stack = i < stacks.size() ? stacks.get(i) : ItemStack.EMPTY;
+            if (!label.isEmpty() && !Stems.takes(label)) return Optional.of("a label that is " + label);
+            if (!stack.isEmpty() && !ItemStack.isSameItemSameComponents(label, stack))
+                return Optional.of(stack + " in a compartment labelled " + label);
+            int limit = Compartments.limit(kind.stacks(stock.grade()), label.isEmpty() ? 64 : label.getMaxStackSize());
+            if (stock.mark(i).reserve() > limit)
+                return Optional.of("a reserve of " + stock.mark(i).reserve() + " past a compartment");
         }
         return Optional.empty();
     }
 
     private void restore(CapsuleStock stock) {
         Arrays.fill(held, ItemStack.EMPTY);
+        Arrays.fill(labels, ItemStack.EMPTY);
+        Arrays.fill(reserves, 0);
         List<ItemStack> stacks = stock.held();
         for (int i = 0; i < Math.min(compartments(), stacks.size()); i++) held[i] = stacks.get(i);
+        if (kind.reserves())
+            for (int i = 0; i < compartments(); i++) {
+                labels[i] = stock.mark(i).label();
+                reserves[i] = stock.mark(i).reserve();
+            }
         grade = stock.grade();
     }
 

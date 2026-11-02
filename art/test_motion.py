@@ -93,7 +93,7 @@ class OrganMotionTest(unittest.TestCase):
     # Organs that reach past their block's side faces on purpose, with the furthest point they may reach: the
     # Proboscis' rostrum and the Sentry's lash work on the blocks round them behind widened culling boxes, a pod hugs
     # its stem, and the Bio-Furnace's buttresses and the Cyst's chambers stand a little proud (older models).
-    SIDEWAYS_REACH = {'planting_proboscis': 16.5, 'spine_sentry': 12.75, 'item_capsule': 11.5, 'mixed_craw': 11.5, 'bio_furnace': 8.6,
+    SIDEWAYS_REACH = {'planting_proboscis': 16.5, 'spine_sentry': 12.75, 'item_capsule': 11.5, 'mixed_craw': 11.5, 'larder': 11.5, 'bio_furnace': 8.6,
                       'activation_cyst': 8.1}
 
     def test_every_organ_model_stays_inside_its_block_sideways(self):

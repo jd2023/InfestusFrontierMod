@@ -1,9 +1,12 @@
 package org.jd.infestusfrontier.storage;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.foundation.screen.OrganScreen;
 import org.jd.infestusfrontier.foundation.screen.Scrollbar;
 import org.jd.infestusfrontier.foundation.screen.Tally;
@@ -59,6 +62,21 @@ final class ItemCapsuleScreen extends OrganScreen<ItemCapsuleMenu> {
                         ? Component.translatable(KEY + "growth", menu.fed(), menu.cost())
                         : Component.translatable(KEY + "grown"),
                 () -> Component.translatable(KEY + "growth.story")));
+    }
+
+    /** A view cell's tooltip adds what the tree holds of its kind, what the reserves keep and what is free. */
+    @Override
+    protected List<Component> getTooltipFromContainerItem(ItemStack stack) {
+        List<Component> lines = new ArrayList<>(super.getTooltipFromContainerItem(stack));
+        Slot slot = hoveredSlot;
+        if (slot == null || slot.index >= ItemCapsuleMenu.VIEW || stack.isEmpty()) return lines;
+        int kept = menu.reserved(slot.index);
+        lines.add(Component.translatable(KEY + "ledger.held", stack.getCount()));
+        if (kept > 0) {
+            lines.add(Component.translatable(KEY + "ledger.kept", kept));
+            lines.add(Component.translatable(KEY + "ledger.free", stack.getCount() - kept));
+        }
+        return lines;
     }
 
     /** Asks the server for a view from {@code row}; the menu keeps the row asked for until the server shows it. */

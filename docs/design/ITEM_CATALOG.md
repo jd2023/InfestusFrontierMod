@@ -139,7 +139,7 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I024 | Synaptic Gel | Cyst: 1 redstone dust + 1 string + 1 Binder + 50 BU → 2 | Nerve Tissue and control treatments; with a spider eye, the Tread Receptor graft. Not electrical fuel. |
 | I026 | Digestive Enzyme | Cyst: 1 fermented spider eye + 1 Elastic Gel + 1 Binder + 50 BU → 2 | Digestive Tissue; digestive-organ upgrades; C13 Digestive Crop graft preparation with zombie stock. No DNA required for the simple defensive floor; armor has its own genome gate. |
 | I027 | Locomotor Gel | Cyst: 1 sugar + 1 rabbit hide + 1 Binder + 50 BU → 2 | Travel Tissue; later DNA-specific acceleration treatments. |
-| I028 | Sealing Resin | Cyst: 1 resin or Elastic Gel + 1 Sheet + 25 BU → 2 | Chemical lining; sealed containers. Does not provide thermal/spatial protection. |
+| I028 | Sealing Resin | Cyst: 1 resin or Elastic Gel + 1 Sheet + 25 BU → 2 | Chemical lining; sealed containers. Does not provide thermal/spatial protection. One in an empty Mixed Craw's treatment well makes it a Larder. |
 | I029 | Char Gland Feed | Bowl/Cyst: 1 charcoal + 1 Binder + 25 BU → 1 | Unlock solid-fuel feeding on a sufficiently practiced Bio-Furnace; operating charcoal is still consumed separately. |
 | I030 | Honey Culture | Bowl/Cyst: 1 honey bottle + 1 Culture → 2, returning bottle | Honey-feed adaptation, first Cradle economy treatment. It is not a free healing potion. |
 | I033 | Rooting Gel | Bowl/Cyst: 1 wheat seed + 1 Culture + 50 mB water → 2 | Selected crop-bed preparation, bush/tree graft attachment. Planting still needs real seed/sapling/cutting. |
@@ -387,7 +387,7 @@ Kidney process-water filtration is a separate recipe: 100 mB dirty water +
 
 Status: **the Gizzard, the Washing Kidney with its settle step, the three dusts,
 Mineral Tailings, Rock Residue, the two waste crafts and dust smelting in the
-Bio-Furnace ship** (sprint records F33, F34). The Larder and the Palm are proposed. Starting values until
+Bio-Furnace ship** (sprint records F33, F34), and so do the Mixed Craw and the Larder (F35, F36). The Palm is proposed. Starting values until
 play testing confirms them. Roadmap scope: [ROADMAP](../../ROADMAP.md#next-milestone--the-automated-mineral-workshop).
 
 Scope: iron, gold and copper raw items that the player mined or looted by hand;

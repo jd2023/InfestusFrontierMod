@@ -1,0 +1,112 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.larder",
+        "texture_width": 128,
+        "texture_height": 128,
+        "visible_bounds_width": 2,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [0, 0.5, 0]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [0, 8, 0]
+        },
+        {
+          "name": "neck",
+          "parent": "root",
+          "pivot": [0, 8, 5],
+          "cubes": [
+            {
+              "origin": [-2, 6, 1.5],
+              "size": [4, 4, 10],
+              "uv": [43, 0]
+            },
+            {
+              "origin": [-1.5, 4.3, 2],
+              "size": [3, 2, 8],
+              "uv": [86, 0]
+            }
+          ]
+        },
+        {
+          "name": "collar",
+          "parent": "root",
+          "pivot": [0, 8, 9],
+          "cubes": [
+            {
+              "origin": [-3, 5, 8.5],
+              "size": [6, 6, 2],
+              "uv": [108, 22]
+            }
+          ]
+        },
+        {
+          "name": "body",
+          "parent": "root",
+          "pivot": [0, 8, 5.5]
+        },
+        {
+          "name": "flesh",
+          "parent": "body",
+          "pivot": [0, 8, -3.5],
+          "cubes": [
+            {
+              "origin": [-6, 2, -3.5],
+              "size": [12, 12, 9],
+              "uv": [0, 0]
+            },
+            {
+              "origin": [-5, 14, -2.5],
+              "size": [10, 1, 7],
+              "uv": [38, 22]
+            },
+            {
+              "origin": [-5, 1, -2.5],
+              "size": [10, 1, 7],
+              "uv": [73, 22]
+            },
+            {
+              "origin": [-6, 13, -5.5],
+              "size": [12, 1, 2],
+              "uv": [0, 33]
+            },
+            {
+              "origin": [-6, 2, -5.5],
+              "size": [12, 1, 2],
+              "uv": [29, 33]
+            },
+            {
+              "origin": [-6, 3, -5.5],
+              "size": [1, 10, 2],
+              "uv": [79, 0]
+            },
+            {
+              "origin": [5, 3, -5.5],
+              "size": [1, 10, 2],
+              "uv": [72, 0]
+            },
+            {
+              "origin": [-4, 4, 5.5],
+              "size": [8, 8, 1],
+              "uv": [19, 22]
+            },
+            {
+              "origin": [-6.5, 9, -1.5],
+              "size": [1, 2, 8],
+              "uv": [0, 22]
+            },
+            {
+              "origin": [5.5, 9, -1.5],
+              "size": [1, 2, 8],
+              "uv": [109, 0]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

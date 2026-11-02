@@ -4,7 +4,7 @@ Each milestone ends in a playable build. Only the current sprint is planned in d
 
 Now: M0 and M1 are done; S01 and S02 are accepted. M2 is in progress: the Bowl, the Sac, the Bladder, the Bud, the probe and the guide are in; the Rack, the Loom, the Cradle and the four awakened pieces are in; the batch organs run on their own and take hoppers; the Bio-Furnace smelts on biomass and grows through three stages. M3 is in progress (`docs/sprints/S04.md`): the Activation Cyst and the eight treatments are in; the three veins and the Vascular Junction move biomass, water and items; veins climb walls and fork; Mouths under chests and organs route items through Item Veins by filter, amount and priority; the farm plants, waters, harvests and composts on its own; the Sensor Polyp reads a block into redstone; the Fuel Papilla refuels worn armor at base. Temporary art is on the placeholder list in `docs/sprints/ART.md`.
 
-Next: the [automated mineral workshop](#next-milestone--the-automated-mineral-workshop), M3b, is defined and proposed; its step 1 in part (the Mixed Craw) and its steps 2 and 3 (the Gizzard, the Kidney and finite waste) are built and await the owner's play. The living-workshop acceptance below stays open and is not replaced by it.
+Next: the [automated mineral workshop](#next-milestone--the-automated-mineral-workshop), M3b, is defined and proposed; its step 1 (the Mixed Craw and the Larder) and its steps 2 and 3 (the Gizzard, the Kidney and finite waste) are built and await the owner's play. The living-workshop acceptance below stays open and is not replaced by it.
 
 ## First meaningfully playable version — the living workshop
 
@@ -121,7 +121,7 @@ progress until their evidence passes. New systems do not substitute for that evi
 
 ## Next milestone — the automated mineral workshop
 
-M3b. Defined here and proposed; steps 2 and 3 are built, and step 1 is half built (the Craw). It starts from the colony the living workshop
+M3b. Defined here and proposed; steps 1 to 3 are built. It starts from the colony the living workshop
 delivers and turns the player's hand-mined raw ore into dust and ingots, keeps supplies
 in a store that guards them, and repeats one crafting recipe on its own.
 
@@ -167,7 +167,7 @@ default demo, any temporary art on the [placeholder list](docs/sprints/ART.md) a
 Missing final art never blocks a step. The book entry and the demo exhibit are verified through the capture
 workflow in the same step.
 
-1. **Mixed Craw and Larder.** The Craw is built (review and the owner's play pending): pod kinds, the mutation, the screen, saves. The Larder is not: labels, reserves, its screen. The reserve check in `CapsuleTree.extract` and `take`. Tests: every extraction path (hopper, Mouth, Item Vein, handler call) stops at the reserve; a Mouth's amount and a reserve combine; manual withdrawal; break, shed and reload keep stock, label and reserve; an old bulk pod loads unchanged; a Craw's capacity is half a bulk pod's at each grade; a non-empty pod refuses the gel.
+1. **Mixed Craw and Larder.** Both are built (review and the owner's play pending): pod kinds, the two mutations, the screens, saves, the Larder's labels and reserves, and the reserve check in `CapsuleTree.extract` and `take`. Tests: every extraction path (hopper, Mouth, Item Vein, handler call) stops at the reserve; a Mouth's amount and a reserve combine; manual withdrawal; break, shed and reload keep stock, label and reserve; an old bulk pod loads unchanged; a Craw's capacity is half a bulk pod's at each grade; a non-empty pod refuses the gel.
 2. **Dust and the Gizzard** (built; review and the owner's play pending). The raw-item inputs, the dust items, Tailings and Rock Residue, the multi-result `organ_batch` with its reserved tray, the Gizzard, dust smelting in the Bio-Furnace. Tests: 4 dust and 1 ingot per raw item to the item; refused inputs (ingot, nugget, block, ore block, Nether gold ore); full tray pauses; save mid-batch gives the products once; conservation through a whole line.
 3. **The Kidney and waste** (built; review and the owner's play pending). Washing, the dirty tank, settling, the discard and cobblestone crafts. Tests: 5 dust per washed raw item; a 3-unit or foreign parcel is refused; dirty water full pauses and a settle resumes; no path from dirty water to clean water; Rock Residue and Tailings feed nothing else; bounded buffers.
 4. **Palm stages 1 and 2.** The retained grid, vanilla remainders, the supply link and its three actions. Tests through a crafting menu with remainder recipes (cake, bucket, bottle), a full inventory, an unloaded or broken link, Larder reserves, save and reload with a filled grid.

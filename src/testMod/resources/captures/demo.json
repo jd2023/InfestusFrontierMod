@@ -328,7 +328,21 @@
     "setblock 80 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Bulk Pod\"','\"one kind, deep:\"','\"raw iron in\"','\"32 stacks\"']}}",
     "setblock 82 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mixed Craw\"','\"4 kinds, half\"','\"a bulk pod's\"','\"room: parts\"']}}",
     "setblock 84 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Empty Pod\"','\"gel in its well\"','\"makes a Craw\"','\"one way\"']}}",
-    "setblock 86 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Gel, Grafts\"','\"Elastic Gel:\"','\"Craw. Graft:\"','\"one grade up\"']}}"
+    "setblock 86 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Gel, Grafts\"','\"Elastic Gel:\"','\"Craw. Graft:\"','\"one grade up\"']}}",
+    "fill 90 -61 -29 104 -61 -26 grass_block",
+    "setblock 90 -60 -28 infestusfrontier:mixed_craw[facing=north,grade=1]",
+    "setblock 92 -60 -28 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:sealing_resin\",count:8},{Slot:1,id:\"infestusfrontier:skeletal_graft\",count:4}]}",
+    "setblock 90 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Empty Craw\"','\"Resin in its well\"','\"makes a Larder\"','\"one way\"']}}",
+    "setblock 92 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Resin, Grafts\"','\"Sealing Resin:\"','\"Larder. Graft:\"','\"one grade up\"']}}",
+    "setblock 96 -60 -28 infestusfrontier:larder[facing=north,grade=2]{stock:{kind:\"larder\",grade:2,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:200},{slot:1,item:{id:\"minecraft:gold_ingot\"},count:90},{slot:2,item:{id:\"minecraft:redstone\"},count:20}],marks:[{slot:0,label:{id:\"minecraft:iron_ingot\"},reserve:128},{slot:1,label:{id:\"minecraft:gold_ingot\"},reserve:64},{slot:2,label:{id:\"minecraft:redstone\"},reserve:16}]}}",
+    "setblock 96 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Stocked Larder\"','\"3 kinds, each\"','\"label + reserve\"','\"Withdraw: yours\"']}}",
+    "setblock 100 -60 -28 chest[facing=north]",
+    "setblock 100 -59 -28 hopper[facing=down]",
+    "setblock 100 -58 -28 infestusfrontier:larder[facing=north,grade=1]{stock:{kind:\"larder\",grade:1,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:30},{slot:1,item:{id:\"minecraft:gold_ingot\"},count:12}],marks:[{slot:0,label:{id:\"minecraft:iron_ingot\"},reserve:16},{slot:1,label:{id:\"minecraft:gold_ingot\"},reserve:12},{slot:2,label:{id:\"minecraft:copper_ingot\"},reserve:0}]}}",
+    "setblock 100 -57 -28 hopper[facing=down]",
+    "setblock 100 -56 -28 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:iron_ingot\",count:20}]}",
+    "setblock 100 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Larder tower\"','\"Keeps 16 iron\"','\"Hopper takes\"','\"only the rest\"']}}",
+    "setblock 102 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Top chest: iron\"','\"feeds the Larder\"','\"Bottom: what the\"','\"hopper may take\"']}}"
   ],
   "views": [
     {
@@ -1442,6 +1456,72 @@
       "gui": true,
       "name": "book_mixed_craw_recipe",
       "book": "infestusfrontier:circulation/mixed_craw",
+      "page": 2
+    },
+    {
+      "name": "larder_line",
+      "x": 96.0,
+      "y": -58.4,
+      "z": -34.0,
+      "yaw": 0,
+      "pitch": 18
+    },
+    {
+      "name": "larder_screen",
+      "x": 96.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        96,
+        -60,
+        -28
+      ]
+    },
+    {
+      "name": "larder_tower",
+      "x": 100.5,
+      "y": -58.4,
+      "z": -32.5,
+      "yaw": 0,
+      "pitch": 12
+    },
+    {
+      "name": "larder_tower_screen",
+      "x": 100.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        100,
+        -58,
+        -28
+      ]
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_larder",
+      "book": "infestusfrontier:circulation/larder",
+      "page": 0
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_larder_recipe",
+      "book": "infestusfrontier:circulation/larder",
       "page": 2
     }
   ]

@@ -64,6 +64,7 @@ public final class DiscoveryModule {
                         output.accept(StorageModule.CAPSULE_STEM_ITEM.get());
                         output.accept(StorageModule.ITEM_CAPSULE_ITEM.get());
                         output.accept(StorageModule.MIXED_CRAW_ITEM.get());
+                        output.accept(StorageModule.LARDER_ITEM.get());
                         output.accept(ProcessingModule.CULTURE_BOWL_ITEM.get());
                         output.accept(ProcessingModule.MEMBRANE_RACK_ITEM.get());
                         output.accept(ProcessingModule.MEMBRANE_SHEET.get());

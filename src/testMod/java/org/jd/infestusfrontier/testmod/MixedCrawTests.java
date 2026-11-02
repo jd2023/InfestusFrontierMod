@@ -821,6 +821,9 @@ public final class MixedCrawTests {
         CompoundTag future = saved(h, h.getBlockEntity(craw));
         future.getCompound("stock").putString("kind", "larder");
         h.getBlockEntity(craw).loadWithComponents(future, h.getLevel().registryAccess());
+        h.assertValueEqual(items(h, craw).getSlots(), 0, "a Craw refuses a Larder's stock");
+        future.getCompound("stock").putString("kind", "pantry");
+        h.getBlockEntity(craw).loadWithComponents(future, h.getLevel().registryAccess());
         h.assertValueEqual(items(h, craw).getSlots(), 0, "a kind it does not know is unreadable");
         BlockPos second = aloneCraw(h, new BlockPos(2, 1, 8), 0);
         store(h, second).insert(stack(Items.BONE, 3), false);

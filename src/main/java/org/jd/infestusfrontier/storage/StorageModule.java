@@ -204,6 +204,26 @@ public final class StorageModule {
                     "mixed_craw",
                     () -> BlockEntityType.Builder.of(MixedCrawBlockEntity::new, MIXED_CRAW.get())
                             .build(null));
+    /** The mutation of an empty Mixed Craw with Sealing Resin; it has no recipe of its own and no tool turns it back. */
+    public static final DeferredBlock<LarderBlock> LARDER = BLOCKS.registerBlock(
+            "larder",
+            LarderBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_ORANGE)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.BLOCK)
+                    .isViewBlocking((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false));
+
+    public static final DeferredItem<OrganItem> LARDER_ITEM =
+            ITEMS.register("larder", () -> new ItemCapsuleItem(LARDER.get(), new Item.Properties()));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LarderBlockEntity>> LARDER_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "larder",
+                    () -> BlockEntityType.Builder.of(LarderBlockEntity::new, LARDER.get())
+                            .build(null));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemCapsuleBlockEntity>> ITEM_CAPSULE_ENTITY =
             BLOCK_ENTITIES.register(
                     "item_capsule",
@@ -217,6 +237,9 @@ public final class StorageModule {
     /** Items that turn an empty bulk pod into a Mixed Craw when put in its treatment well. */
     public static final TagKey<Item> CRAW_GEL =
             TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "craw_gel"));
+    /** Items that turn an empty Mixed Craw into a Larder when put in its treatment well. */
+    public static final TagKey<Item> LARDER_RESIN = TagKey.create(
+            Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "larder_resin"));
     /** Blocks a Reservoir cell may also stand on: pumps that fill it from below. */
     public static final TagKey<Block> RESERVOIR_SUPPORTS = TagKey.create(
             Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "reservoir_supports"));
@@ -274,6 +297,10 @@ public final class StorageModule {
                     (pod, side) -> new CapsuleItems(() -> Stems.of(pod)));
             event.registerBlockEntity(
                     Capabilities.ItemHandler.BLOCK,
+                    LARDER_ENTITY.get(),
+                    (pod, side) -> new CapsuleItems(() -> Stems.of(pod)));
+            event.registerBlockEntity(
+                    Capabilities.ItemHandler.BLOCK,
                     CAPSULE_STEM_ENTITY.get(),
                     (cell, side) -> new CapsuleItems(() -> Stems.of(cell)));
         });
@@ -310,6 +337,22 @@ public final class StorageModule {
                     "mixed_craw",
                     MIXED_CRAW_ENTITY,
                     MIXED_CRAW_ITEM,
+                    FrontStockRenderer.overlay(
+                            ItemCapsuleBlock.FACING,
+                            ItemCapsuleBlockEntity::shown,
+                            new FrontStockRenderer.Pockets(2, 5.5F, 10.5F, 5F, 3.4F, 3.8F, 2.4F, 4.5F),
+                            ItemCapsuleBlockEntity::scale,
+                            8F,
+                            8F,
+                            13.5F,
+                            ResourceLocation.fromNamespaceAndPath("infestusfrontier", "block/item_capsule_lining")));
+            // three pockets in the Craw's socket, its pitch and icon: two in the top row, one below
+            // (art/gen_larder.py)
+            OrganRenderers.register(
+                    modBus,
+                    "larder",
+                    LARDER_ENTITY,
+                    LARDER_ITEM,
                     FrontStockRenderer.overlay(
                             ItemCapsuleBlock.FACING,
                             ItemCapsuleBlockEntity::shown,

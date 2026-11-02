@@ -64,7 +64,7 @@ public final class OrganTests {
         surgeon.setOnGround(true);
         List<Block> organs = new ArrayList<>();
         BuiltInRegistries.BLOCK.getTagOrEmpty(Organs.ORGANS).forEach(holder -> organs.add(holder.value()));
-        h.assertValueEqual(organs.size(), 25, "twenty-five organs");
+        h.assertValueEqual(organs.size(), 26, "twenty-six organs");
         for (String id : List.of(
                 "digestive_sac",
                 "biomass_bladder",
@@ -89,7 +89,8 @@ public final class OrganTests {
                 "filter_valve",
                 "spine_sentry",
                 "aerocyte_bloom",
-                "mixed_craw"))
+                "mixed_craw",
+                "larder"))
             h.assertTrue(
                     organs.contains(
                             BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("infestusfrontier", id))),
