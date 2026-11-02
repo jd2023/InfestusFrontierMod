@@ -293,7 +293,7 @@
     "setblock 66 -59 -28 hopper[facing=down]",
     "setblock 66 -58 -28 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:mineral_tailings\",count:32,components:{\"infestusfrontier:parcel\":{metal:\"iron\",units:4}}},{Slot:1,id:\"infestusfrontier:mineral_tailings\",count:16,components:{\"infestusfrontier:parcel\":{metal:\"gold\",units:4}}}]}",
     "setblock 67 -60 -28 infestusfrontier:vascular_junction[east=intake,west=outlet]",
-    "setblock 68 -60 -28 infestusfrontier:reservoir_cell{tank:{stored:2000,reserved:0,capacity:2000},body:[68,-60,-28,68,-60,-28]}",
+    "setblock 68 -60 -28 infestusfrontier:reservoir_cell{tank:{stored:2000,reserved:0,capacity:4000},body:[68,-60,-28,68,-60,-28]}",
     "setblock 66 -61 -27 infestusfrontier:mouth[mode=output]",
     "setblock 66 -60 -27 infestusfrontier:yield_lobe[facing=north]",
     "fill 67 -61 -27 70 -61 -27 infestusfrontier:item_vein",
