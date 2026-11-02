@@ -6,8 +6,8 @@ Proposed recipes and stage assignments. **Create** lists construction ingredient
 **Shipped or proposed.** The sprint record ([S04](../sprints/S04.md)) lists what ships.
 Entries not listed there are proposals. The next milestone, the
 [automated mineral workshop](../../ROADMAP.md#next-milestone--the-automated-mineral-workshop),
-is proposed: T1-09's Mixed Craw and Larder, T1-41 Shaping Palm, T2-23 Mineral Gizzard
-and T2-24 Washing Kidney, each marked *Milestone* below. Everything else in T2 stays
+is proposed except T2-23 Mineral Gizzard, which ships (sprint record F33): T1-09's Mixed
+Craw and Larder, T1-41 Shaping Palm and T2-24 Washing Kidney are each marked *Milestone* below. Everything else in T2 stays
 later work.
 
 **T0–T9 are catalog groupings**, not player or base ranks. Operation requires the entry's materials, physical structure, native bed and supplies; there is no additional colony-level permission gate. **Organ level** is earned by using that particular organ; upgrading other organs does not change it. Unless an entry says otherwise, an active organ gains one count per completed batch, not per tick or failed attempt. L0 starts at zero counts; L1, L2 and L3 start at 32, 128 and 512 counts respectively. At those thresholds, choose one improvement from that organ's **Growth** options. Each choice gives +10% to the selected property, at most three choices total. New functions require the listed mutation or physical addition; levels alone do not add every function.
@@ -184,7 +184,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 
 ### T0-07 — Bio-Furnace
 - **Does:** A living kiln: a charred carapace whose seams glow with heat, a deep firebox mouth with bone fangs over banked coals, a flesh chimney. While it smelts, fire rises behind the fangs, it lights its surroundings as a lit vanilla furnace does (light 13), and flames and smoke come from its mouth and chimney. Initially slower and more fuel-hungry than a vanilla furnace, but it accumulates permanent processing experience.
-- **Input → output:** A normal smelting ingredient + biomass → its normal smelting result. Starting target: 16 seconds per item; no free ore multiplication or extra XP from recooking outputs.
+- **Input → output:** A normal smelting ingredient + biomass → its normal smelting result. Starting target: 16 seconds per item; no free ore multiplication or extra XP from recooking outputs. Also four dust of one metal + 40 BU → one ingot of that metal, with its raw item's smelting experience ([Items](ITEM_CATALOG.md#first-release-the-automated-mineral-workshop)); the one slot takes dust or an ore, one kind at a time.
 - **Create:** 1 furnace + 1 Organ Bud + 2 Membrane Sheets.
 - **Growth:** Choose speed or biomass economy at each level. L1 permits a Char Gland Feed treatment for solid-fuel feeding; Hearth Lungs improve combustion. Mouths automate loading; a T3 Thermal Mantle enables hotter recipes on this same core.
 
@@ -954,7 +954,7 @@ cells use the strongest funded effect, not summed strength or double charging.
 - **Growth:** A Synaptic Gel treatment adds a pause point; luminous graft marks shaft edges. Changing a plan shows its new extent before work resumes, including a one-block-wide strip option.
 
 ### T2-23 — Mineral Gizzard
-- **Status:** Milestone, proposed. Owner modules: `mineral` for items and parcels, `processing` for the batch organ kind. Nothing ships yet.
+- **Status:** Milestone, shipped (sprint record F33). Owner modules: `mineral` for items and parcels, `processing` for the batch organ kind. Screen: one raw slot, a progress vein, the dust tray on the first row; the Tailings and Rock Residue trays on the second; a "Full" mark names the trays that hold a grind back. Guide entry `circulation/mineral_gizzard`; demo exhibit row C, x=44 to 58.
 - **Does:** Grinds supplied raw iron, gold or copper into dust. It neither extracts a world block nor performs the Work Bed's intact-block reaction. Its coarse residue is an output of grinding, not a second automatic recovery process.
 - **Input → output:** 1 raw item + 20 BU, 8 s → 4 dust of its metal + 1 Mineral Tailings (4 units) + 1 Rock Residue. Slots, tanks and tray: [Items](ITEM_CATALOG.md#first-release-the-automated-mineral-workshop). Later: Mineral Fragments from a fractured treated block have their own single recovery allowance, and separate no-bonus granulation prepares ingots, diamonds and obsidian for fusion.
 - **Create:** 1 Organ Bud + 1 iron pickaxe + 2 Bone Plates + 2 flint. Stands on an organ foundation. Guide: after SR2 and the Bone Loom. No genome, electricity or Kidney.

@@ -20,6 +20,7 @@ import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.equipment.EquipmentModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
+import org.jd.infestusfrontier.mineral.MineralModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
@@ -69,6 +70,12 @@ public final class DiscoveryModule {
                         output.accept(ProcessingModule.BONE_PLATE.get());
                         output.accept(ProcessingModule.AWAKENING_CRADLE_ITEM.get());
                         output.accept(ProcessingModule.BIO_FURNACE_ITEM.get());
+                        output.accept(ProcessingModule.MINERAL_GIZZARD_ITEM.get());
+                        output.accept(MineralModule.IRON_DUST.get());
+                        output.accept(MineralModule.GOLD_DUST.get());
+                        output.accept(MineralModule.COPPER_DUST.get());
+                        for (ItemStack tailings : MineralModule.freshTailings()) output.accept(tailings);
+                        output.accept(MineralModule.ROCK_RESIDUE.get());
                         output.accept(ProcessingModule.ACTIVATION_CYST_ITEM.get());
                         for (var treatment : List.of(
                                 ProcessingModule.FUSION_BINDER,

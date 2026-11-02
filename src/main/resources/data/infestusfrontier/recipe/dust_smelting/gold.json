@@ -1,0 +1,26 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "bio_furnace",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:gold_dust"
+    },
+    {
+      "item": "infestusfrontier:gold_dust"
+    },
+    {
+      "item": "infestusfrontier:gold_dust"
+    },
+    {
+      "item": "infestusfrontier:gold_dust"
+    }
+  ],
+  "water": 0,
+  "biomass": 40,
+  "result": {
+    "id": "minecraft:gold_ingot",
+    "count": 1
+  },
+  "ticks": 320,
+  "experience": 1.0
+}

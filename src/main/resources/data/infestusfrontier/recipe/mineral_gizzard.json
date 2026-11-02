@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "minecraft:iron_pickaxe"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "minecraft:flint"
+    },
+    {
+      "item": "minecraft:flint"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:mineral_gizzard",
+    "count": 1
+  }
+}

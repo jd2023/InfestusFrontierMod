@@ -385,9 +385,10 @@ Kidney process-water filtration is a separate recipe: 100 mB dirty water +
 
 ### First release: the automated mineral workshop
 
-Status: **proposed; nothing here ships yet.** What ships today is vanilla smelting
-in the Bio-Furnace, the Capsule Stem and the Mouths. Starting values until play
-testing confirms them. Roadmap scope: [ROADMAP](../../ROADMAP.md#next-milestone--the-automated-mineral-workshop).
+Status: **the Gizzard, the three dusts, Mineral Tailings, Rock Residue, the two waste
+crafts and dust smelting in the Bio-Furnace ship** (sprint record F33). The Washing
+Kidney, its settle step, the Larder and the Palm are proposed. Starting values until
+play testing confirms them. Roadmap scope: [ROADMAP](../../ROADMAP.md#next-milestone--the-automated-mineral-workshop).
 
 Scope: iron, gold and copper raw items that the player mined or looted by hand;
 the Gizzard; the optional Kidney washing; finite waste; the Bio-Furnace smelting
@@ -421,8 +422,9 @@ carries no record of the organ that made it.
 | Gizzard | 1 slot, 64 raw items of one kind | 1000 BU | 1 slot of dust (64), 1 of Tailings (64), 1 of Rock Residue (64) |
 | Kidney | 1 slot, 64 Tailings of 4 units | 1000 BU; 1000 mB clean water; 1000 mB dirty water | same three slots; Tailings of 3 units |
 
-The Gizzard fills its dust slot after 16 grinds and then waits for a Yield Lobe, a
-hopper or a Mouth. The Kidney settles before it washes again as soon as the dirty
+A tray holds one kind of item: Tailings of another metal, or another metal's dust, wait
+until the tray is emptied. The Gizzard fills its dust slot after 16 grinds and then
+waits for a Yield Lobe or a Mouth (a hopper pulls from a Gizzard only through a lobe). The Kidney settles before it washes again as soon as the dirty
 tank cannot take 250 mB more. Its steady cycle is 4 washes and 1 settle: 52 s,
 1000 mB water, 140 BU, 4 dust and 1 Rock Residue for 4 Tailings. The Kidney is slower
 than the Gizzard (13 s against 8 s per raw item), so a washing line wants a second

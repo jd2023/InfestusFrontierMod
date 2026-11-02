@@ -1,0 +1,32 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "mineral_gizzard",
+  "ingredients": [
+    {
+      "item": "minecraft:raw_gold"
+    }
+  ],
+  "water": 0,
+  "biomass": 20,
+  "result": {
+    "id": "infestusfrontier:gold_dust",
+    "count": 4
+  },
+  "byproducts": [
+    {
+      "id": "infestusfrontier:mineral_tailings",
+      "count": 1,
+      "components": {
+        "infestusfrontier:parcel": {
+          "metal": "gold",
+          "units": 4
+        }
+      }
+    },
+    {
+      "id": "infestusfrontier:rock_residue",
+      "count": 1
+    }
+  ],
+  "ticks": 160
+}

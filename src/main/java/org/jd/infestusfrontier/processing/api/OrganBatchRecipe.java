@@ -29,7 +29,8 @@ import org.jd.infestusfrontier.storage.api.BiomassCodecs;
  * {@code result} after {@code ticks} loaded ticks. The slots may hold more; a batch takes one item per ingredient and
  * leaves the rest. Data: {@code recipe/culturing/*.json} with
  * {@code "type": "infestusfrontier:organ_batch"}, {@code organ}, {@code ingredients}, {@code water}, {@code biomass},
- * {@code result}, {@code ticks}.
+ * {@code result}, {@code ticks}. A recipe may also name up to {@link #MAX_BYPRODUCTS} {@code byproducts}, each held in
+ * the output slot after the result's, and the {@code experience} a smelting recipe earns.
  */
 public record OrganBatchRecipe(
         String organ,
@@ -39,9 +40,14 @@ public record OrganBatchRecipe(
         ItemStack result,
         int ticks,
         boolean keepsWear,
-        List<DataComponentType<?>> keeps)
+        List<DataComponentType<?>> keeps,
+        List<ItemStack> byproducts,
+        float experience)
         implements Recipe<RecipeInput> {
     public static final int MAX_INGREDIENTS = 9;
+    /** The most results beyond the first: an organ's output tray has at most {@code 1 + MAX_BYPRODUCTS} slots. */
+    public static final int MAX_BYPRODUCTS = 2;
+
     public static final MapCodec<OrganBatchRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Codec.STRING.fieldOf("organ").forGetter(OrganBatchRecipe::organ),
                     Ingredient.CODEC_NONEMPTY
@@ -56,10 +62,34 @@ public record OrganBatchRecipe(
                     DataComponentType.CODEC
                             .listOf()
                             .optionalFieldOf("keeps", List.of())
-                            .forGetter(OrganBatchRecipe::keeps))
+                            .forGetter(OrganBatchRecipe::keeps),
+                    ItemStack.CODEC
+                            .listOf(0, MAX_BYPRODUCTS)
+                            .optionalFieldOf("byproducts", List.of())
+                            .forGetter(OrganBatchRecipe::byproducts),
+                    Codec.floatRange(0, BatchOrganContents.MAX_EXPERIENCE)
+                            .optionalFieldOf("experience", 0f)
+                            .forGetter(OrganBatchRecipe::experience))
             .apply(instance, OrganBatchRecipe::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, OrganBatchRecipe> STREAM_CODEC =
             ByteBufCodecs.fromCodecWithRegistries(CODEC.codec());
+
+    public OrganBatchRecipe {
+        byproducts = byproducts.stream().map(ItemStack::copy).toList();
+    }
+
+    @Override
+    public List<ItemStack> byproducts() {
+        return byproducts.stream().map(ItemStack::copy).toList();
+    }
+
+    /** Every result, in output slot order: the result, then the byproducts. */
+    public List<ItemStack> results() {
+        List<ItemStack> all = new ArrayList<>();
+        all.add(result.copy());
+        all.addAll(byproducts());
+        return all;
+    }
 
     /** True when {@link #plan} finds a batch in the input's slots. */
     @Override

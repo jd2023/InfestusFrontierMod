@@ -283,6 +283,29 @@ class OrganMotionTest(unittest.TestCase):
                             for (t0, a), (t1, b) in zip(values, values[1:]):
                                 self.assertLessEqual(max(abs(y - x) / (t1 - t0) for x, y in zip(a, b)), 720)
 
+    def test_gizzard_stones_swing_clear_of_the_lips_and_of_each_other(self):
+        """The two millstones turn inside the hopper's 9 by 5.5 opening: in every pose of every clip no corner of a
+        stone reaches a lip, and the stones never touch."""
+        import geo_audit
+        import numpy as np
+        geo = geometry('mineral_gizzard')
+        anims = animations('mineral_gizzard')
+        for clip, t in geo_audit.poses(anims, every=True):
+            reach = {}
+            for name, m, lo, hi in geo_audit.world_cubes(geo, anims[clip] if clip else None, t):
+                if not name.startswith('stone'):
+                    continue
+                corners = np.array([[x, y, z, 1] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
+                world = (m @ corners.T).T[:, :3]
+                reach[name.split('[')[0]] = (world[:, 0].min(), world[:, 0].max(), abs(world[:, 2]).max())
+            self.assertEqual(set(reach), {'stone_w', 'stone_e'})
+            for name, (low, high, depth) in reach.items():
+                self.assertGreater(low, -4.5, (clip, t, name))
+                self.assertLess(high, 4.5, (clip, t, name))
+                self.assertLess(depth, 2.75, (clip, t, name))
+            left, right = sorted(reach.values())
+            self.assertLess(left[1], right[0], (clip, t))
+
     def test_compost_has_its_own_silhouette_and_source(self):
         self.assertNotEqual(geometry('compost_gland')['bones'], geometry('bone_loom')['bones'])
         self.assertTrue((ASSETS.parents[4] / 'art/compost_gland.bbmodel').is_file())

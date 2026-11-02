@@ -134,7 +134,9 @@ public final class ProcessingModule {
     /** The Bio-Furnace: one smelting slot and biomass, no water, on the plain panel; vanilla smelting at 40 BU, faster at each stage. */
     static final BatchOrganKind FURNACE = new BatchOrganKind(
             "bio_furnace",
-            new BatchBook.Smelting(FURNACE_GROWTH, List.of(320, 240, 160), Biomass.of(40)),
+            new BatchBook.Furnace(
+                    new BatchBook.Smelting(FURNACE_GROWTH, List.of(320, 240, 160), Biomass.of(40)),
+                    new BatchBook.Data("bio_furnace")),
             FURNACE_GROWTH,
             1,
             0,
@@ -145,6 +147,25 @@ public final class ProcessingModule {
             () -> ProcessingModule.BIO_FURNACE.get(),
             () -> ProcessingModule.BIO_FURNACE_ENTITY.get(),
             () -> ProcessingModule.BIO_FURNACE_MENU.get());
+
+    /**
+     * The Mineral Gizzard: one raw-item slot and biomass, no water, on a one-strip panel. Its tray has a slot each for
+     * dust, Tailings and Rock Residue; a batch starts only when all three have room.
+     */
+    static final BatchOrganKind GIZZARD = new BatchOrganKind(
+            "mineral_gizzard",
+            new BatchBook.Data("mineral_gizzard"),
+            Growth.NONE,
+            1,
+            BatchOrganContents.MAX_OUTPUTS,
+            0,
+            Biomass.of(1000),
+            1,
+            Block.box(1, 0, 1, 15, 13, 15),
+            OrganEffects.NONE,
+            () -> ProcessingModule.MINERAL_GIZZARD.get(),
+            () -> ProcessingModule.MINERAL_GIZZARD_ENTITY.get(),
+            () -> ProcessingModule.MINERAL_GIZZARD_MENU.get());
 
     /** The Activation Cyst: three ingredient slots, water and biomass, on a two-strip panel; the treatments come from it. */
     static final BatchOrganKind CYST = new BatchOrganKind(
@@ -219,6 +240,14 @@ public final class ProcessingModule {
             batchEntity(FURNACE, () -> ProcessingModule.BIO_FURNACE.get());
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> BIO_FURNACE_MENU =
             batchMenu(FURNACE, () -> ProcessingModule.BIO_FURNACE_MENU.get());
+
+    public static final DeferredBlock<Block> MINERAL_GIZZARD = batchOrgan(GIZZARD, MapColor.TERRACOTTA_BROWN);
+    public static final DeferredItem<OrganItem> MINERAL_GIZZARD_ITEM = ITEMS.register(
+            "mineral_gizzard", () -> new OrganItem(MINERAL_GIZZARD.get(), new Item.Properties(), "idle"));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BatchOrganBlockEntity>> MINERAL_GIZZARD_ENTITY =
+            batchEntity(GIZZARD, () -> ProcessingModule.MINERAL_GIZZARD.get());
+    public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> MINERAL_GIZZARD_MENU =
+            batchMenu(GIZZARD, () -> ProcessingModule.MINERAL_GIZZARD_MENU.get());
 
     public static final DeferredBlock<Block> ACTIVATION_CYST = batchOrgan(CYST, MapColor.COLOR_PURPLE);
     public static final DeferredItem<OrganItem> ACTIVATION_CYST_ITEM = ITEMS.register(
@@ -313,6 +342,7 @@ public final class ProcessingModule {
             OrganRenderers.register(modBus, "bone_loom", BONE_LOOM_ENTITY, BONE_LOOM_ITEM);
             OrganRenderers.register(modBus, "awakening_cradle", AWAKENING_CRADLE_ENTITY, AWAKENING_CRADLE_ITEM);
             OrganRenderers.register(modBus, "bio_furnace", BIO_FURNACE_ENTITY, BIO_FURNACE_ITEM);
+            OrganRenderers.register(modBus, "mineral_gizzard", MINERAL_GIZZARD_ENTITY, MINERAL_GIZZARD_ITEM);
             OrganRenderers.register(modBus, "activation_cyst", ACTIVATION_CYST_ENTITY, ACTIVATION_CYST_ITEM);
             OrganRenderers.register(modBus, "compost_gland", COMPOST_GLAND_ENTITY, COMPOST_GLAND_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
@@ -322,6 +352,7 @@ public final class ProcessingModule {
                 event.register(BONE_LOOM_MENU.get(), BoneLoomScreen::new);
                 event.register(AWAKENING_CRADLE_MENU.get(), AwakeningCradleScreen::new);
                 event.register(BIO_FURNACE_MENU.get(), BioFurnaceScreen::new);
+                event.register(MINERAL_GIZZARD_MENU.get(), MineralGizzardScreen::new);
                 event.register(ACTIVATION_CYST_MENU.get(), ActivationCystScreen::new);
                 event.register(COMPOST_GLAND_MENU.get(), CompostGlandScreen::new);
             });
@@ -340,6 +371,7 @@ public final class ProcessingModule {
                     BONE_LOOM_ENTITY,
                     AWAKENING_CRADLE_ENTITY,
                     BIO_FURNACE_ENTITY,
+                    MINERAL_GIZZARD_ENTITY,
                     ACTIVATION_CYST_ENTITY,
                     COMPOST_GLAND_ENTITY)) {
                 event.registerBlockEntity(BiomassCapabilities.BLOCK, entity.get(), (organ, side) -> organ);

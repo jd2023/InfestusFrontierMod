@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "infestusfrontier:item/mineral_tailings",
+    "layer1": "infestusfrontier:item/mineral_tailings_flecks"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:mineral_tailings"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:rock_residue",
+    "count": 1
+  }
+}

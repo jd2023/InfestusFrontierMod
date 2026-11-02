@@ -1,0 +1,87 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.mineral_gizzard.name",
+  "description": "entry.infestusfrontier.circulation.mineral_gizzard.description",
+  "icon": "infestusfrontier:mineral_gizzard",
+  "x": 6,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/yield_lobe"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/biomass_bladder"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/mineral_gizzard"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.circulation.mineral_gizzard.name",
+      "images": [
+        "infestusfrontier:textures/book/mineral_gizzard.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.circulation.mineral_gizzard.description"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mineral_gizzard.name",
+      "text": "entry.infestusfrontier.circulation.mineral_gizzard.use"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:grinding/iron",
+      "title1": "item.minecraft.raw_iron",
+      "recipe_id_2": "infestusfrontier:grinding/gold",
+      "title2": "item.minecraft.raw_gold"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:grinding/copper",
+      "title1": "item.minecraft.raw_copper",
+      "recipe_id_2": "infestusfrontier:dust_smelting/iron",
+      "title2": "item.minecraft.iron_ingot"
+    },
+    {
+      "type": "infestusfrontier:organ_batch",
+      "recipe_id_1": "infestusfrontier:dust_smelting/gold",
+      "title1": "item.minecraft.gold_ingot",
+      "recipe_id_2": "infestusfrontier:dust_smelting/copper",
+      "title2": "item.minecraft.copper_ingot"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.circulation.mineral_gizzard.trays"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mineral_gizzard.sinks",
+      "text": "entry.infestusfrontier.circulation.mineral_gizzard.waste"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:rock_residue_to_cobblestone",
+      "recipe_id_2": "infestusfrontier:tailings_to_rock_residue"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mineral_gizzard.smelting",
+      "text": "entry.infestusfrontier.circulation.mineral_gizzard.smelt"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:mineral_gizzard",
+      "text": "entry.infestusfrontier.circulation.mineral_gizzard.craft"
+    }
+  ]
+}

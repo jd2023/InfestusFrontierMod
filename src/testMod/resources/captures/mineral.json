@@ -1,0 +1,102 @@
+{
+  "commands": [
+    "fill -8 -60 -2 12 -54 10 air",
+    "fill -8 -61 -2 12 -61 10 grass_block",
+    "kill @e[type=item]",
+    "fill -4 -61 1 6 -61 5 infestusfrontier:living_substrate[stage=mature]",
+    "setblock -2 -60 3 infestusfrontier:mineral_gizzard[working=true]{contents:{ingredients:[{id:\"minecraft:raw_gold\",count:9}],outputs:[{id:\"infestusfrontier:gold_dust\",count:12},{id:\"infestusfrontier:mineral_tailings\",count:3,components:{\"infestusfrontier:parcel\":{metal:\"gold\",units:4}}},{id:\"infestusfrontier:rock_residue\",count:3}],water:0,biomass:{stored:700,reserved:0,capacity:1000},history:{completed_batches:3},batch:{batch:{recipe:\"infestusfrontier:grinding/gold\",ticks_required:160,ticks_done:80},result:{id:\"infestusfrontier:gold_dust\",count:4},byproducts:[{id:\"infestusfrontier:mineral_tailings\",count:1,components:{\"infestusfrontier:parcel\":{metal:\"gold\",units:4}}},{id:\"infestusfrontier:rock_residue\",count:1}]}}}",
+    "setblock 1 -60 3 infestusfrontier:mineral_gizzard{contents:{ingredients:[{id:\"minecraft:raw_copper\",count:32}],outputs:[{id:\"infestusfrontier:copper_dust\",count:64},{id:\"infestusfrontier:mineral_tailings\",count:16,components:{\"infestusfrontier:parcel\":{metal:\"copper\",units:4}}},{id:\"infestusfrontier:rock_residue\",count:16}],water:0,biomass:{stored:900,reserved:0,capacity:1000},history:{completed_batches:16}}}",
+    "setblock 4 -60 3 infestusfrontier:bio_furnace[working=true]{contents:{ingredients:[{id:\"infestusfrontier:iron_dust\",count:9}],outputs:[{id:\"minecraft:iron_ingot\",count:2}],water:0,biomass:{stored:800,reserved:0,capacity:2000},history:{completed_batches:2},batch:{batch:{recipe:\"infestusfrontier:dust_smelting/iron\",ticks_required:320,ticks_done:120},result:{id:\"minecraft:iron_ingot\",count:1},experience:0.7},experience:1.4}}",
+    "give @s infestusfrontier:mineral_gizzard 1",
+    "give @s infestusfrontier:iron_dust 8",
+    "give @s infestusfrontier:gold_dust 8",
+    "give @s infestusfrontier:copper_dust 8",
+    "give @s infestusfrontier:mineral_tailings[infestusfrontier:parcel={metal:\"iron\",units:4}] 4",
+    "give @s infestusfrontier:rock_residue 8"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 1.5,
+      "y": -58,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 35
+    },
+    {
+      "name": "back",
+      "x": 1.5,
+      "y": -58,
+      "z": 8.5,
+      "yaw": 180,
+      "pitch": 35
+    },
+    {
+      "name": "close",
+      "x": -1.0,
+      "y": -59.2,
+      "z": 1.0,
+      "yaw": -8,
+      "pitch": 28
+    },
+    {
+      "name": "gizzard_screen",
+      "x": -1.5,
+      "y": -60,
+      "z": 5.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        -2,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "full_tray_screen",
+      "x": 1.5,
+      "y": -60,
+      "z": 5.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        1,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "furnace_screen",
+      "x": 4.5,
+      "y": -60,
+      "z": 5.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        4,
+        -60,
+        3
+      ]
+    },
+    {
+      "name": "hotbar",
+      "x": 1.5,
+      "y": -58,
+      "z": -1.5,
+      "yaw": 0,
+      "pitch": 35,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:mineral_gizzard",
+        "infestusfrontier:iron_dust",
+        "infestusfrontier:gold_dust",
+        "infestusfrontier:copper_dust",
+        "infestusfrontier:mineral_tailings",
+        "infestusfrontier:rock_residue"
+      ]
+    }
+  ]
+}

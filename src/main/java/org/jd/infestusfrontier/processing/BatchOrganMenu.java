@@ -22,8 +22,8 @@ import org.jd.infestusfrontier.ui.SlotGrid;
 
 /**
  * The server half of every batch organ's screen: the kind's ingredient slots and the output slot backed by the block
- * entity's own handlers and seven synced ints (water, biomass, biomass capacity, progress percent, state, growth
- * stage, batches to the next stage). Nothing here decides a batch; the block entity does, and credits it to the player whose click last
+ * entity's own handlers and eight synced ints (water, biomass, biomass capacity, progress percent, state, growth
+ * stage, batches to the next stage, full outputs). Nothing here decides a batch; the block entity does, and credits it to the player whose click last
  * changed the ingredients.
  */
 public final class BatchOrganMenu extends OrganMenu {
@@ -37,7 +37,8 @@ public final class BatchOrganMenu extends OrganMenu {
     private static final int STATE = 4;
     private static final int STAGE = 5;
     private static final int TO_NEXT = 6;
-    private static final int SYNCED = 7;
+    private static final int BLOCKED = 7;
+    private static final int SYNCED = 8;
 
     private final BatchOrganKind kind;
     private final Optional<BatchOrganBlockEntity> organ;
@@ -58,7 +59,8 @@ public final class BatchOrganMenu extends OrganMenu {
                         organ::percent,
                         organ::state,
                         organ::stage,
-                        organ::toNextStage),
+                        organ::toNextStage,
+                        organ::blocked),
                 at(organ),
                 Optional.of(organ));
     }
@@ -76,7 +78,7 @@ public final class BatchOrganMenu extends OrganMenu {
                 id,
                 inventory,
                 new ItemStackHandler(kind.slots()),
-                new ItemStackHandler(1),
+                new ItemStackHandler(kind.outputs()),
                 new SimpleContainerData(SYNCED),
                 at(inventory, extra),
                 Optional.empty());
@@ -99,20 +101,22 @@ public final class BatchOrganMenu extends OrganMenu {
             Bounds cell = ingredientWell(kind, i);
             addSlot(new SlotItemHandler(ingredients, i, cell.x() + 1, cell.y() + 1));
         }
-        Bounds out = outputWell(kind);
-        addSlot(new SlotItemHandler(output, 0, out.x() + 1, out.y() + 1) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return false;
-            }
+        for (int i = 0; i < kind.outputs(); i++) {
+            Bounds out = outputWell(kind, i);
+            addSlot(new SlotItemHandler(output, i, out.x() + 1, out.y() + 1) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return false;
+                }
 
-            /** Whoever takes the output takes the smelting experience that waits with it. */
-            @Override
-            public void onTake(Player player, ItemStack stack) {
-                super.onTake(player, stack);
-                organ.ifPresent(entity -> entity.awardExperience(player));
-            }
-        });
+                /** Whoever takes the output takes the smelting experience that waits with it. */
+                @Override
+                public void onTake(Player player, ItemStack stack) {
+                    super.onTake(player, stack);
+                    organ.ifPresent(entity -> entity.awardExperience(player));
+                }
+            });
+        }
         addPlayer(inventory, kind.strips());
     }
 
@@ -143,16 +147,41 @@ public final class BatchOrganMenu extends OrganMenu {
         return new Bounds(Sheet.FIRST_PART_X, Sheet.ROW2_Y, Sheet.SLOT.width(), Sheet.SLOT.height());
     }
 
-    /** The output well's place on the panel, for the screen that draws it. */
+    /** The pitch of the later output wells along the second row: a label above each, up to 40 pixels wide, fits. */
+    private static final int LABELLED_PITCH = 42;
+
+    /**
+     * Where output well {@code index} sits: the first as {@link #outputWell(BatchOrganKind)} says, each later one in
+     * turn along the second row, far enough apart for the labels above them.
+     */
+    static Bounds outputWell(BatchOrganKind kind, int index) {
+        if (index == 0) return outputWell(kind);
+        return new Bounds(
+                Sheet.FIRST_PART_X + Sheet.GAP + (index - 1) * LABELLED_PITCH,
+                Sheet.ROW2_Y,
+                Sheet.SLOT.width(),
+                Sheet.SLOT.height());
+    }
+
+    /** The first output well's place on the panel, for the screen that draws it. */
     public Bounds outputWell() {
         return outputWell(kind);
+    }
+
+    /** The place of output well {@code index}, from 0. */
+    public Bounds outputWell(int index) {
+        return outputWell(kind, index);
+    }
+
+    public int outputSlots() {
+        return kind.outputs();
     }
 
     public int ingredientSlots() {
         return kind.slots();
     }
 
-    /** The slot index of the output well. */
+    /** The slot index of the first output well; the others follow it. */
     public int outputSlot() {
         return kind.slots();
     }
@@ -177,6 +206,11 @@ public final class BatchOrganMenu extends OrganMenu {
 
     public int percent() {
         return Math.clamp(synced(PERCENT), 0, 100);
+    }
+
+    /** The output slots with no room for the batch that waits, bit {@code n} for output {@code n}; 0 when none waits. */
+    public int blocked() {
+        return Math.max(0, synced(BLOCKED));
     }
 
     /** One of {@link #IDLE}, {@link #WORKING}, {@link #PAUSED}. */

@@ -1,6 +1,6 @@
 # Art queue
 
-The art track. Same story template as the sprints, kind `art`. Textures come from an image model (Astra); the owner saves the result to the path the story names. GeckoLib models and animations come from a strong model. Rules: [ENGINEERING.md](../../ENGINEERING.md#art-track).
+The art track. ktask queues the art tasks; this file holds their specifications, prompts and provenance, in the story template of the sprints, kind `art`. Textures come from an image model (Astra) and are saved and exported to the path the story names. GeckoLib models and animations come from a strong model. Rules: [ENGINEERING.md](../../ENGINEERING.md#art-track).
 
 Fixed for every texture:
 
@@ -10,7 +10,7 @@ Fixed for every texture:
 - Prompts follow the shape used in ART-001: use case, asset type, subject, style, composition, palette, constraints, avoid. 16x16 pixel-art prompts with a five color palette gave the weak placeholders; sources drawn large and downsampled are what read as living material.
 - One `CREDITS.txt` line per story: file, who made it, tool, date.
 
-Quality bar. The owner rejects anything below it, and a sprint is not done while its art story is open.
+Quality bar. The owner rejects anything below it, and a milestone is not accepted while its art tasks are open.
 
 - A texture reads as its material from four blocks away in a capture, without a sign: flesh, membrane, bone, soil. The bar is the V3 substrate and the Astra living tissue from the model evaluation; weaker than those is rejected.
 - Ground textures are a 4x4-block macro pattern, 256x256 source cut into sixteen 64x64 tiles, so a 4x4 patch shows no repeat and no seam. The stages of one ground share one vein network and one ground tone, derived from one master by a generator under `art/`. Other blocks get random rotation in the blockstate.
@@ -44,6 +44,7 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Planting Proboscis | Reads as a seed weevil: the long rostrum over the bed in front and the sac of seeds on its back are the cues; the stab reaches the bed and the seed is left in it; the rostrum never enters the head; legs and claws stay on the slab (`motion_planting_proboscis`: close, corner and low views) |
 | Harvest Corolla | Moving parts remain attached; petals clear the heart; tips clear the floor |
 | Spine Sentry | Reads as a rooted lash: the plated, barbed spine coiled over a muscle mound that slopes up to its bone collar, tendons pulling at it, is the cue; working, it swings from side to side and whips out without the segments parting; the thorn clears the mound (`motion_spine_sentry` close, corner; `sentry`: a zoglin beside it, the store screen) |
+| Mineral Gizzard | Reads as a grinding muscle: two bone millstones in a lipped hopper on a wide, low belly wrapped in ridged muscle, and a bone chute with a drift of dust, are the cues; the stones swing against each other inside the hopper without reaching a lip; the ridges clench in a wave; the drift builds and slumps below the chute (`motion_mineral_gizzard` close, corner, top; `mineral`: screens, icons) |
 | Compost Gland | Reads as a fermentation gut of the mod's flesh: the gaping maw of scraps above and the meal-crusted spout below are the cues; the belly churns in a wave without its plates parting; the flanks swell at rest; the crumb of meal shows only while the spout presses, at its largest in `close_008` (`motion_compost_gland` close, corner, back) |
 | Seed Pouch | Reads as a seed sac: the crowned heap of seeds in flared lips and the split lobes are the cues; the body swells at its waist and tapers to the neck with no ledge; the lobes part without leaving the core; the cord stays round the neck (`motion_seed_pouch` close, corner, side) |
 | Vascular Junction | Reads as a heart: the lobed body that beats and the lipped sphincters are the cues; all six rings in all three modes gape, pucker and shrink without their lips parting; the bottom ring stays on the foundation (`motion_junction_intake` close, corner; `motion_junction_closed`, `motion_junction_outlet`) |
@@ -378,6 +379,36 @@ All fourteen sources are original image-model artwork. Export each with `python3
 Prompt contract: one isolated original biological Minecraft inventory icon, diagonal grip bottom-left and head top-right, broad chunky shading legible at 32 pixels, ivory lit upper-left and tan shadows, burgundy muscle, thin dark plum outline, true alpha, clear margin, no metal, jewel, text, scene or ground shadow. Pick: two hooked bone prongs. Hatchet: one broad crescent blade and a short blunt poll. Spade: pointed shoulder-blade scoop along the shaft. Hoe: one thick flat blade at a right angle to the shaft, no opposite prong, with three broad muscle sections on the living handle. Fang: a long curved tooth blade and a short grip. Generate the Pick first and use it as the family reference for the other four. Each Contractile edit preserves its head and adds thick purple muscle and three broad pale-violet tendon bands; use the mutated Pick as their colour reference. The Grasping edit preserves the Fang and adds three broad backward hooks to the lower blade edge and a purple tendon grip. For each dormant precursor, preserve the living head and replace all muscle with a plain walnut shaft and a small dry tan binding only at the joint; remove decorative bands and pommels, keep broad matte ivory/tan bone shading, and preserve the same upper-left light. Dormant Fang keeps a long smooth tooth blade and a short grip.
 
 Evidence: `equipment_showcase` captures the tools and mutations held in game. Compare silhouette, transparent edges and mutation colour at hotbar size; the Grasping Fang must show its hooked edge.
+
+## ART-009 — Mineral workshop item icons
+
+Five 32x32 item icons for the automated mineral workshop: `iron_dust`, `gold_dust`, `copper_dust`, `rock_residue`, `mineral_tailings`. Original image-model artwork (built-in image generation, 2026-11-01), one isolated object on true alpha, outline and light as the Spore Culture icon. Sources (1254x1254 RGBA, kept outside the repository) and their shipped names:
+
+| Shipped name | Source file |
+|---|---|
+| `iron_dust` | `exec-5c36c16d-79be-4ec6-b3e1-85ca38aa8497.png` |
+| `gold_dust` | `exec-43776cfd-c965-4b38-9a0b-ebb082e43d1a.png` |
+| `copper_dust` | `exec-0da768da-febb-4874-be2b-f8bf4fc58e21.png` |
+| `rock_residue` | `exec-5ff7521d-834f-4c01-99bf-71f5c9cad48e.png` |
+| `mineral_tailings` | `exec-cb5e68e5-c556-4ea2-86cb-71039c02eb8b.png` |
+
+Fit each source to its square with `python3 art/fit_icon_source.py <source> <fitted>` (trim to content, 84 percent fill, visual centroid on the centre, so the icon sits centred in its slot), then export each with `python3 scripts/texture.py <fitted> src/main/resources/assets/infestusfrontier/textures/item/<name>.png --size 32 --colors 0`. Then `python3 art/derive_tailings_flecks.py` cuts `mineral_tailings_flecks.png` from the shipped Tailings icon: its brightest nearly grey pixels, grey on clear. The item model draws it as layer 1 and `MineralModule` tints it with the metal of the stack's `parcel` (iron, gold or copper), so the clod stays image-model artwork. `python3 art/gen_book_mineral_gizzard.py` then redraws the guide plate, which lays the five icons under the organ.
+
+Prompt, one subject line each, the rest shared:
+
+```text
+Use case: stylized-concept. Asset type: source for a 32x32 voxel-game item icon. Subject: <subject>, centered, filling about 75 percent of the canvas. Style: hand-painted game sprite, bold readable silhouette, soft shading lit from upper left, thin dark outline. Palette: <palette>. Constraints: square, true alpha transparency, one isolated object, no background, no border, no text, no watermark. Avoid: photorealism, scenery, loose particles, glow, lens flare.
+```
+
+| Icon | Subject | Palette |
+|---|---|---|
+| `iron_dust` | one small low heap of fine pale steel-grey iron dust, a soft mound of fine grains with a few brighter silvery sparkles | cool slate and pale steel grey, deep charcoal shadows, one small near-white highlight |
+| `gold_dust` | one small low heap of fine golden dust, a soft mound of fine grains with a few brighter glinting sparkles | warm gold and amber, deep brown shadows, one small pale-yellow highlight |
+| `copper_dust` | one small low heap of fine reddish copper dust, a soft mound of fine grains with a few brighter glinting sparkles | orange-copper and terracotta, deep umber shadows, one small pale-peach highlight |
+| `rock_residue` | one small cluster of three chunky angular pale grey rock chips piled together, faceted and slightly chipped | pale stone grey, slate shadows, one small off-white highlight per chip |
+| `mineral_tailings` | one lumpy clod of dark grey-brown crushed grit and mud-like gravel, rough and uneven, with a scattering of tiny bright pale-grey metallic flecks embedded across its surface | dark umber and grey-brown, charcoal shadows, pale silvery-grey flecks |
+
+Evidence: the `mineral` scenario's `hotbar` and screen views, the demo's `mineral_items` and `mineral_line`, and the Gizzard book spreads. Check the silhouettes at hotbar size, the transparent edges, the three Tailings tints and the book plate.
 
 ## Aerocyte Bloom
 

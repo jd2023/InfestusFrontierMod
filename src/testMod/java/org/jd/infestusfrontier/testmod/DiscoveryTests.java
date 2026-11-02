@@ -144,7 +144,8 @@ public final class DiscoveryTests {
                 "septum_crossing",
                 "vascular_stitch",
                 "spine_sentry",
-                "aerocyte_bloom"))
+                "aerocyte_bloom",
+                "mineral_gizzard"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();
@@ -170,9 +171,49 @@ public final class DiscoveryTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void gizzardEntryShowsEveryGrindAndEverySmelt(GameTestHelper h) {
+        var entry = BookDataManager.get()
+                .getBook(BOOK)
+                .getCategory(id("circulation"))
+                .getEntries()
+                .get(id("circulation/mineral_gizzard"));
+        h.assertTrue(entry != null, "entry loaded");
+        List<ResourceLocation> shown = new java.util.ArrayList<>();
+        for (var page : entry.getPages())
+            if (page instanceof OrganBatchPage batch) {
+                shown.add(batch.getRecipeId1());
+                if (batch.getRecipeId2() != null) shown.add(batch.getRecipeId2());
+            }
+        h.assertValueEqual(
+                shown,
+                List.of(
+                        id("grinding/iron"),
+                        id("grinding/gold"),
+                        id("grinding/copper"),
+                        id("dust_smelting/iron"),
+                        id("dust_smelting/gold"),
+                        id("dust_smelting/copper")),
+                "one recipe shown for every grind and every dust smelt");
+        for (ResourceLocation recipe : shown)
+            h.assertTrue(
+                    h.getLevel().getRecipeManager().byKey(recipe).isPresent(), "the shown recipe exists: " + recipe);
+        h.assertTrue(
+                entry.getPages().stream()
+                        .anyMatch(page -> page instanceof com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage),
+                "and the crafts that make the Gizzard and clear its waste");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void entriesUnlockByStepOrByItem(GameTestHelper h) {
         var contact =
                 BookDataManager.get().getBook(BOOK).getCategory(id("contact")).getEntries();
+        var gizzard = BookDataManager.get()
+                .getBook(BOOK)
+                .getCategory(id("circulation"))
+                .getEntries()
+                .get(id("circulation/mineral_gizzard"));
+        h.assertTrue(gizzard.getCondition() instanceof BookOrCondition, "the Gizzard unlocks by step or by item");
         for (String name : List.of(
                 "living_substrate",
                 "organ_bud",
@@ -224,7 +265,8 @@ public final class DiscoveryTests {
                 "dormant_fang",
                 "living_fang",
                 "spine_sentry",
-                "aerocyte_bloom"))
+                "aerocyte_bloom",
+                "mineral_gizzard"))
             h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");
         h.succeed();
     }

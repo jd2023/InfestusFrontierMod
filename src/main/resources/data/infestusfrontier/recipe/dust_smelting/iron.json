@@ -1,0 +1,26 @@
+{
+  "type": "infestusfrontier:organ_batch",
+  "organ": "bio_furnace",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:iron_dust"
+    },
+    {
+      "item": "infestusfrontier:iron_dust"
+    },
+    {
+      "item": "infestusfrontier:iron_dust"
+    },
+    {
+      "item": "infestusfrontier:iron_dust"
+    }
+  ],
+  "water": 0,
+  "biomass": 40,
+  "result": {
+    "id": "minecraft:iron_ingot",
+    "count": 1
+  },
+  "ticks": 320,
+  "experience": 0.7
+}

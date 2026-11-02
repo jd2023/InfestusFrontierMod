@@ -9,10 +9,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.organ.Growth;
+import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 
 /**
  * What makes one batch organ differ from another: where its batches come from, how it grows, how many ingredient
- * slots it has, how much water and biomass it holds, how tall its screen is, its shape and how it shows its work. The Bowl, the Rack, the
+ * slots and output slots it has, how much water and biomass it holds, how tall its screen is, its shape and how it shows its work. The Bowl, the Rack, the
  * Loom, the Cradle, the Bio-Furnace and the Cyst are kinds; the block, block entity and menu are shared.
  */
 record BatchOrganKind(
@@ -20,6 +21,7 @@ record BatchOrganKind(
         BatchBook book,
         Growth growth,
         int slots,
+        int outputs,
         int waterMb,
         Biomass biomassCapacity,
         int strips,
@@ -28,6 +30,28 @@ record BatchOrganKind(
         Supplier<Block> block,
         Supplier<BlockEntityType<BatchOrganBlockEntity>> entity,
         Supplier<MenuType<BatchOrganMenu>> menu) {
+    BatchOrganKind {
+        if (outputs < 1 || outputs > BatchOrganContents.MAX_OUTPUTS)
+            throw new IllegalArgumentException(id + " has " + outputs + " output slots");
+    }
+
+    /** A kind with one output slot. */
+    BatchOrganKind(
+            String id,
+            BatchBook book,
+            Growth growth,
+            int slots,
+            int waterMb,
+            Biomass biomassCapacity,
+            int strips,
+            VoxelShape shape,
+            OrganEffects effects,
+            Supplier<Block> block,
+            Supplier<BlockEntityType<BatchOrganBlockEntity>> entity,
+            Supplier<MenuType<BatchOrganMenu>> menu) {
+        this(id, book, growth, slots, 1, waterMb, biomassCapacity, strips, shape, effects, block, entity, menu);
+    }
+
     ResourceLocation blockId() {
         return ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, id);
     }

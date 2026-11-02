@@ -9,7 +9,7 @@ from pathlib import Path
 OUT = Path('src/testMod/resources/captures')
 MODELS = ('culture_bowl', 'digestive_sac', 'membrane_rack', 'bone_loom', 'awakening_cradle',
           'activation_cyst', 'planting_proboscis', 'harvest_corolla', 'compost_gland', 'seed_pouch', 'item_capsule',
-          'spine_sentry')
+          'spine_sentry', 'mineral_gizzard')
 
 
 # Views an organ's identity pass added to its scene, kept here so regenerating the scenes never loses them: a close
@@ -24,6 +24,12 @@ EXTRA = {
         # the gut close up over one working cycle: the belly churns, the lips clench, the spout puffs meal
         {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 8},
         {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
+    ],
+    'mineral_gizzard': [
+        # the grinding close up over one working cycle: the stones swing against each other, the ridges clench, the dust drifts
+        {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 6},
+        {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
+        {'name': 'top', 'x': 1.0, 'y': -57.4, 'z': 3.6, 'yaw': 0, 'pitch': 80},
     ],
     'junction_intake': [
         # the heart close up over its beat and the mouths' pulses

@@ -34,9 +34,16 @@ interface BatchBook {
 
     /**
      * One batch about to start: what each slot gives, what the batch costs, what it makes after how many ticks, and the
-     * smelting experience it earns for whoever takes the result.
+     * smelting experience it earns for whoever takes the result. Result {@code n} goes to output slot {@code n}.
      */
-    record Plan(String id, int[] take, int waterMb, Biomass biomass, ItemStack result, int ticks, float experience) {}
+    record Plan(
+            String id,
+            int[] take,
+            int waterMb,
+            Biomass biomass,
+            List<ItemStack> results,
+            int ticks,
+            float experience) {}
 
     /** The items {@code take} says to take from {@code slots}, as stacks of that count. */
     static List<ItemStack> taken(List<ItemStack> slots, int[] take) {
@@ -61,6 +68,12 @@ interface BatchBook {
                     .toList();
         }
 
+        private static List<ItemStack> results(OrganBatchRecipe recipe, List<ItemStack> inputs) {
+            List<ItemStack> results = recipe.results();
+            results.set(0, recipe.resultFor(inputs));
+            return results;
+        }
+
         @Override
         public boolean takes(Level level, List<ItemStack> others, ItemStack stack) {
             for (ItemStack other : others) if (ItemStack.isSameItemSameComponents(other, stack)) return false;
@@ -81,9 +94,10 @@ interface BatchBook {
                         take.get(),
                         recipe.waterMb(),
                         recipe.biomass(),
-                        recipe.resultFor(taken(slots, take.get())),
+                        results(recipe, taken(slots, take.get())),
                         recipe.ticks(),
-                        0));
+                        // a data pack may write any number; the organ keeps at most MAX_EXPERIENCE and never a debt
+                        Math.clamp(recipe.experience(), 0, BatchOrganContents.MAX_EXPERIENCE)));
             }
             return plans;
         }
@@ -122,10 +136,38 @@ interface BatchBook {
                     take,
                     0,
                     biomass,
-                    found.get().value().assemble(new SingleRecipeInput(stack), level.registryAccess()),
+                    List.of(found.get().value().assemble(new SingleRecipeInput(stack), level.registryAccess())),
                     ticksByStage.get(growth.stage(history)),
                     // a data pack may write any number; the organ keeps at most MAX_EXPERIENCE and never a debt
                     Math.clamp(found.get().value().getExperience(), 0, BatchOrganContents.MAX_EXPERIENCE)));
+        }
+    }
+
+    /**
+     * The Bio-Furnace's book: vanilla smelting and the organ's own recipes, which smelt dust. A data recipe's ticks are
+     * its first stage's; a later stage runs it in the same share of them as it runs vanilla smelting.
+     */
+    record Furnace(Smelting smelting, Data data) implements BatchBook {
+        @Override
+        public boolean takes(Level level, List<ItemStack> others, ItemStack stack) {
+            return smelting.takes(level, others, stack) || data.takes(level, others, stack);
+        }
+
+        @Override
+        public List<Plan> plans(Level level, List<ItemStack> slots, OrganHistory history) {
+            List<Plan> plans = new ArrayList<>(smelting.plans(level, slots, history));
+            int first = smelting.ticksByStage().get(0);
+            int now = smelting.ticksByStage().get(smelting.growth().stage(history));
+            for (Plan plan : data.plans(level, slots, history))
+                plans.add(new Plan(
+                        plan.id(),
+                        plan.take(),
+                        plan.waterMb(),
+                        plan.biomass(),
+                        plan.results(),
+                        Math.max(1, (int) ((long) plan.ticks() * now / first)),
+                        plan.experience()));
+            return plans;
         }
     }
 }
