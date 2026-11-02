@@ -14,6 +14,7 @@
               "include": [
                 "infestusfrontier:palm_contents",
                 "infestusfrontier:palm_reach",
+                "infestusfrontier:palm_rote",
                 "infestusfrontier:unreadable_save"
               ]
             }

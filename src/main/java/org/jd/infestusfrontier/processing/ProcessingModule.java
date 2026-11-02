@@ -21,6 +21,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
@@ -29,8 +30,10 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.foundation.Biomass;
+import org.jd.infestusfrontier.core.foundation.TickQuota;
 import org.jd.infestusfrontier.core.organ.Growth;
 import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
@@ -40,6 +43,7 @@ import org.jd.infestusfrontier.processing.api.DigestionRecipe;
 import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 import org.jd.infestusfrontier.processing.api.PalmContents;
 import org.jd.infestusfrontier.processing.api.PalmLinking;
+import org.jd.infestusfrontier.processing.api.PalmRote;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
@@ -59,6 +63,8 @@ public final class ProcessingModule {
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, InfestusFrontier.MOD_ID);
     private static final DeferredRegister.DataComponents COMPONENTS =
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, InfestusFrontier.MOD_ID);
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
+            DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, InfestusFrontier.MOD_ID);
 
     public static final DeferredBlock<Block> DIGESTIVE_SAC = BLOCKS.registerBlock(
             "digestive_sac",
@@ -308,7 +314,7 @@ public final class ProcessingModule {
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> COMPOST_GLAND_MENU =
             batchMenu(COMPOST, () -> ProcessingModule.COMPOST_GLAND_MENU.get());
 
-    /** The Shaping Palm: a crafting grid that keeps its ingredients. Not a batch organ: it has no batch, tank or tray. */
+    /** The Shaping Palm: a crafting grid that keeps its ingredients. Not a batch organ; with Rote it repeats one craft on its own. */
     public static final DeferredBlock<Block> SHAPING_PALM = BLOCKS.registerBlock(
             "shaping_palm",
             ShapingPalmBlock::new,
@@ -340,6 +346,17 @@ public final class ProcessingModule {
     /** Grafts that give a Palm Reach, the supply link of its second stage. */
     public static final TagKey<Item> PALM_GRAFTS = TagKey.create(
             Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "palm_reach"));
+    /** Gels that give a Palm that has Reach its Rote, the third stage. */
+    public static final TagKey<Item> PALM_ROTE_GELS =
+            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "palm_rote"));
+    /** What a Palm with Rote keeps beyond its grid: pattern, cycle, tray, biomass. Carried on its item. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PalmRote>> PALM_ROTE =
+            COMPONENTS.registerComponentType(
+                    "palm_rote",
+                    builder -> builder.persistent(PalmRote.CODEC).networkSynchronized(PalmRote.STREAM_CODEC));
+    /** Cycle starts admitted this server tick, shared by every Palm in every dimension; held on the overworld. */
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<TickQuota>> PALM_STARTS = ATTACHMENTS.register(
+            "palm_starts", () -> AttachmentType.builder(() -> new TickQuota(32)).build());
 
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
@@ -403,6 +420,7 @@ public final class ProcessingModule {
         RECIPE_TYPES.register(modBus);
         RECIPE_SERIALIZERS.register(modBus);
         COMPONENTS.register(modBus);
+        ATTACHMENTS.register(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             OrganRenderers.register(modBus, "digestive_sac", DIGESTIVE_SAC_ENTITY, DIGESTIVE_SAC_ITEM);
             OrganRenderers.register(modBus, "culture_bowl", CULTURE_BOWL_ENTITY, CULTURE_BOWL_ITEM);
@@ -438,6 +456,14 @@ public final class ProcessingModule {
                     DIGESTIVE_SAC_ENTITY.get(),
                     (sac, side) -> BiomassFluids.handler(sac));
             event.registerBlockEntity(PalmLinking.PALM_LINK, SHAPING_PALM_ENTITY.get(), (palm, side) -> palm);
+            event.registerBlockEntity(
+                    Capabilities.ItemHandler.BLOCK, SHAPING_PALM_ENTITY.get(), (palm, side) -> palm.ports());
+            event.registerBlockEntity(
+                    BiomassCapabilities.BLOCK, SHAPING_PALM_ENTITY.get(), (palm, side) -> palm.hasRote() ? palm : null);
+            event.registerBlockEntity(
+                    Capabilities.FluidHandler.BLOCK,
+                    SHAPING_PALM_ENTITY.get(),
+                    (palm, side) -> palm.hasRote() ? BiomassFluids.handler(palm) : null);
             for (var entity : List.of(
                     CULTURE_BOWL_ENTITY,
                     MEMBRANE_RACK_ENTITY,

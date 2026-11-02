@@ -59,6 +59,21 @@
       "text": "entry.infestusfrontier.circulation.shaping_palm.supply"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.shaping_palm.rote.title",
+      "text": "entry.infestusfrontier.circulation.shaping_palm.rote"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.shaping_palm.cycle.title",
+      "text": "entry.infestusfrontier.circulation.shaping_palm.cycle"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.shaping_palm.lobes.title",
+      "text": "entry.infestusfrontier.circulation.shaping_palm.lobes"
+    },
+    {
       "type": "modonomicon:crafting_recipe",
       "recipe_id_1": "infestusfrontier:shaping_palm",
       "text": "entry.infestusfrontier.circulation.shaping_palm.craft"

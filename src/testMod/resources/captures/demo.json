@@ -374,6 +374,28 @@
     "setblock 140 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Larder keeps\"','\"16 iron: its\"','\"reserve stays\"','\"in the Larder\"']}}",
     "setblock 144 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Link Kit\"','\"Fiber on the\"','\"Palm, probe the\"','\"Palm, then chest\"']}}",
     "setblock 148 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Kit Chest\"','\"Fibers, probe,\"','\"planks, sticks,\"','\"cobblestone\"']}}",
+    "fill 151 -61 -29 174 -61 -26 grass_block",
+    "fill 154 -61 -28 160 -61 -28 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 154 -60 -28 infestusfrontier:reservoir_cell{tank:{stored:2000,reserved:0,capacity:4000},body:[154,-60,-28,154,-60,-28]}",
+    "setblock 155 -60 -28 infestusfrontier:vascular_junction[west=intake,east=outlet]",
+    "setblock 156 -60 -28 infestusfrontier:shaping_palm[rote=true]{reach:1b,contents:{grid:[]},rote:{pattern:{kinds:[{id:\"minecraft:milk_bucket\",count:1},{id:\"minecraft:milk_bucket\",count:1},{id:\"minecraft:milk_bucket\",count:1},{id:\"minecraft:sugar\",count:1},{id:\"minecraft:egg\",count:1},{id:\"minecraft:sugar\",count:1},{id:\"minecraft:wheat\",count:1},{id:\"minecraft:wheat\",count:1},{id:\"minecraft:wheat\",count:1}],recipe:\"minecraft:cake\",result:{id:\"minecraft:cake\",count:1}},tray:[],biomass:{stored:300,reserved:0,capacity:1000},cycles:0}}",
+    "setblock 156 -59 -28 hopper[facing=down]",
+    "setblock 156 -58 -28 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:milk_bucket\",count:1},{Slot:1,id:\"minecraft:milk_bucket\",count:1},{Slot:2,id:\"minecraft:milk_bucket\",count:1},{Slot:3,id:\"minecraft:sugar\",count:4},{Slot:4,id:\"minecraft:egg\",count:2},{Slot:5,id:\"minecraft:wheat\",count:6},{Slot:6,id:\"minecraft:milk_bucket\",count:1},{Slot:7,id:\"minecraft:milk_bucket\",count:1},{Slot:8,id:\"minecraft:milk_bucket\",count:1}]}",
+    "setblock 157 -61 -28 infestusfrontier:mouth[mode=output]",
+    "setblock 157 -60 -28 infestusfrontier:yield_lobe[facing=west]",
+    "fill 158 -61 -28 159 -61 -28 infestusfrontier:item_vein",
+    "setblock 160 -61 -28 infestusfrontier:mouth[mode=intake]",
+    "setblock 160 -60 -28 chest[facing=north]",
+    "setblock 152 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Cake Line\"','\"Rote Palm: a\"','\"cake pattern,\"','\"biomass, Lobe\"']}}",
+    "setblock 154 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Biomass\"','\"Reservoir and\"','\"Junction fill\"','\"the Palm tank\"']}}",
+    "setblock 156 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Rote Palm\"','\"Hopper feeds\"','\"only the cake\"','\"ingredients\"']}}",
+    "setblock 157 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Yield Lobe\"','\"cakes and the\"','\"buckets come\"','\"out, grid stays\"']}}",
+    "setblock 160 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Products\"','\"cakes and the\"','\"returned buckets\"','\"wait here\"']}}",
+    "setblock 164 -61 -28 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 164 -60 -28 infestusfrontier:shaping_palm{reach:1b,contents:{grid:[]}}",
+    "setblock 168 -60 -28 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:synaptic_gel\",count:4},{Slot:1,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:2,id:\"minecraft:oak_planks\",count:64},{Slot:3,id:\"minecraft:stick\",count:32},{Slot:4,id:\"minecraft:cobblestone\",count:64}]}",
+    "setblock 164 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Gel Palm\"','\"Has Reach.\"','\"Gel on it gives\"','\"Rote: Select\"']}}",
+    "setblock 168 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Gel Chest\"','\"Gel, 2 biomass\"','\"buckets: bucket\"','\"on the Palm\"']}}",
     "item replace entity @s inventory.17 with infestusfrontier:shaping_palm 2"
   ],
   "views": [
@@ -1685,6 +1707,47 @@
       "pitch": 10,
       "gui": true,
       "name": "book_shaping_palm_recipe",
+      "book": "infestusfrontier:circulation/shaping_palm",
+      "page": 8
+    },
+    {
+      "name": "palm_rote_line",
+      "x": 158.0,
+      "y": -57.3,
+      "z": -33.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "palm_rote_kit_line",
+      "x": 166.0,
+      "y": -57.3,
+      "z": -33.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "palm_rote_screen",
+      "x": 156.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        156,
+        -60,
+        -28
+      ]
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_shaping_palm_rote",
       "book": "infestusfrontier:circulation/shaping_palm",
       "page": 6
     }

@@ -54,6 +54,7 @@ import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.ShapingPalmMenu;
 import org.jd.infestusfrontier.processing.api.PalmContents;
+import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 
 /**
  * The Shaping Palm, stage 1: a crafting grid that stays in the organ. Every craft here goes through the menu a player
@@ -681,7 +682,7 @@ public final class ShapingPalmTests {
     // ---- no storage and no automation yet ----
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 80)
-    public static void aPalmHasNoItemHandlerAndNoHopperReachesIt(GameTestHelper h) {
+    public static void aPalmWithoutRoteHasNoItemHandlerAndNoHopperReachesIt(GameTestHelper h) {
         BlockPos at = palm(h);
         MenuPlayer player = open(h, at);
         put(player, 0, stack(Items.OAK_PLANKS, 4));
@@ -693,8 +694,11 @@ public final class ShapingPalmTests {
         h.assertTrue(
                 h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(at), null) == null,
                 "and none for a sideless caller");
-        h.assertFalse(containsPalm(Organs.FEEDING_HOSTS), "no Feeding Lobe serves it");
-        h.assertFalse(containsPalm(Organs.YIELD_HOSTS), "and no Yield Lobe");
+        h.assertTrue(containsPalm(Organs.FEEDING_HOSTS), "a Feeding Lobe may serve it once it has Rote");
+        h.assertTrue(containsPalm(Organs.YIELD_HOSTS), "and a Yield Lobe");
+        h.assertTrue(
+                h.getLevel().getCapability(BiomassCapabilities.BLOCK, h.absolutePos(at), null) == null,
+                "a Palm without Rote holds no biomass");
         h.assertTrue(containsPalm(Organs.ORGANS), "it is an organ");
         h.setBlock(at.above(), Blocks.HOPPER);
         h.setBlock(

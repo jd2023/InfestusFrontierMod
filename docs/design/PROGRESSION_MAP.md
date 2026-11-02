@@ -80,9 +80,10 @@ Fuel Papilla fills worn pieces from stored supply.
 Mixed Craw (shipped; four kinds at half a bulk pod's depth in total) and a Craw into a Larder (shipped;
 three labelled kinds, each with a reserve that every automatic extraction keeps).
 Use a Shaping Palm as a crafting table that keeps its grid (shipped; hands only, no hopper
-reaches it); link it to one store (shipped: Contractile Fiber, then the probe; Restock, Return and Store are
+reaches it until it has Rote); link it to one store (shipped: Contractile Fiber, then the probe; Restock, Return and Store are
 buttons you press); then
-let it repeat one chosen recipe on biomass through Feeding and Yield Lobes. Each step
+let it repeat one chosen recipe on biomass through Feeding and Yield Lobes (shipped: a Synaptic Gel gives it Rote,
+Select records the pattern). Each step
 keeps the hand path. See [Blocks](BLOCK_CATALOG.md#t1-09--item-capsule-and-capsule-stem)
 and [T1-41](BLOCK_CATALOG.md#t1-41--shaping-palm). Recursive orders wait for the Request Cortex.
 

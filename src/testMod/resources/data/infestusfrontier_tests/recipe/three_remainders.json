@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier_tests:husk_pickaxe"
+    },
+    {
+      "item": "infestusfrontier_tests:husk_shovel"
+    },
+    {
+      "item": "infestusfrontier_tests:husk_axe"
+    }
+  ],
+  "result": {
+    "id": "minecraft:cobblestone",
+    "count": 2
+  }
+}
