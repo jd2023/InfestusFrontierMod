@@ -396,7 +396,69 @@
     "setblock 168 -60 -28 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:synaptic_gel\",count:4},{Slot:1,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:2,id:\"minecraft:oak_planks\",count:64},{Slot:3,id:\"minecraft:stick\",count:32},{Slot:4,id:\"minecraft:cobblestone\",count:64}]}",
     "setblock 164 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Gel Palm\"','\"Has Reach.\"','\"Gel on it gives\"','\"Rote: Select\"']}}",
     "setblock 168 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Gel Chest\"','\"Gel, 2 biomass\"','\"buckets: bucket\"','\"on the Palm\"']}}",
-    "item replace entity @s inventory.17 with infestusfrontier:shaping_palm 2"
+    "item replace entity @s inventory.17 with infestusfrontier:shaping_palm 2",
+    "setblock 0 -61 -16 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 0 -60 -16 infestusfrontier:reservoir_cell{tank:{stored:4000,reserved:0,capacity:4000},body:[0,-60,-16,0,-60,-16]}",
+    "setblock 1 -61 -16 infestusfrontier:biomass_vein",
+    "setblock 1 -60 -16 infestusfrontier:vascular_junction[west=intake,down=outlet]",
+    "fill 1 -62 -16 26 -62 -16 infestusfrontier:biomass_vein",
+    "setblock 8 -61 -16 infestusfrontier:biomass_vein",
+    "setblock 14 -61 -16 infestusfrontier:biomass_vein",
+    "setblock 20 -61 -16 infestusfrontier:biomass_vein",
+    "setblock 26 -61 -16 infestusfrontier:biomass_vein",
+    "fill 4 -61 -15 31 -61 -15 infestusfrontier:item_vein",
+    "setblock 4 -61 -16 infestusfrontier:mouth[mode=output]{filter:[{id:\"minecraft:raw_iron\",count:1}]}",
+    "setblock 4 -60 -16 infestusfrontier:larder[facing=north,grade=1]{stock:{kind:\"larder\",grade:1,held:[{slot:0,item:{id:\"minecraft:raw_iron\"},count:18}],marks:[{slot:0,label:{id:\"minecraft:raw_iron\"},reserve:3}]}}",
+    "setblock 8 -60 -16 infestusfrontier:mineral_gizzard",
+    "setblock 8 -61 -15 infestusfrontier:mouth[mode=intake]{filter:[{id:\"minecraft:raw_iron\",count:1}]}",
+    "setblock 8 -60 -15 infestusfrontier:feeding_lobe[facing=north]",
+    "setblock 9 -61 -16 infestusfrontier:mouth[mode=output]",
+    "setblock 9 -60 -16 infestusfrontier:yield_lobe[facing=west]",
+    "setblock 14 -60 -16 infestusfrontier:washing_kidney",
+    "setblock 14 -61 -15 infestusfrontier:mouth[mode=intake]{filter:[{id:\"infestusfrontier:mineral_tailings\",count:1}],priority:1}",
+    "setblock 14 -60 -15 infestusfrontier:feeding_lobe[facing=north]",
+    "setblock 15 -61 -16 infestusfrontier:mouth[mode=output]",
+    "setblock 15 -60 -16 infestusfrontier:yield_lobe[facing=west]",
+    "fill 13 -61 -18 15 -61 -18 stone",
+    "fill 12 -60 -18 16 -60 -18 stone",
+    "fill 13 -60 -19 15 -60 -19 stone",
+    "setblock 13 -60 -17 stone",
+    "setblock 15 -60 -17 stone",
+    "fill 13 -60 -18 15 -60 -18 water",
+    "setblock 14 -61 -17 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 14 -60 -17 infestusfrontier:vascular_junction[north=intake,south=outlet]",
+    "setblock 18 -61 -16 infestusfrontier:mouth[mode=intake]{filter:[{id:\"infestusfrontier:mineral_tailings\",count:1},{id:\"infestusfrontier:rock_residue\",count:1}]}",
+    "setblock 18 -60 -16 chest[facing=north]",
+    "setblock 20 -60 -16 infestusfrontier:bio_furnace[stage=0]",
+    "setblock 20 -61 -15 infestusfrontier:mouth[mode=intake]{filter:[{id:\"infestusfrontier:iron_dust\",count:1}]}",
+    "setblock 20 -60 -15 infestusfrontier:feeding_lobe[facing=north]",
+    "setblock 21 -61 -16 infestusfrontier:mouth[mode=output]",
+    "setblock 21 -60 -16 infestusfrontier:yield_lobe[facing=west]",
+    "setblock 26 -60 -16 infestusfrontier:shaping_palm[rote=true]{reach:1b,contents:{grid:[]},rote:{pattern:{kinds:[{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{},{},{}],recipe:\"minecraft:iron_bars\",result:{id:\"minecraft:iron_bars\",count:16}},tray:[],biomass:{stored:0,reserved:0,capacity:1000},cycles:0}}",
+    "setblock 26 -61 -15 infestusfrontier:mouth[mode=intake]{filter:[{id:\"minecraft:iron_ingot\",count:1}]}",
+    "setblock 26 -60 -15 infestusfrontier:feeding_lobe[facing=north]",
+    "setblock 27 -61 -16 infestusfrontier:mouth[mode=output]",
+    "setblock 27 -60 -16 infestusfrontier:yield_lobe[facing=west]",
+    "setblock 31 -61 -16 infestusfrontier:mouth[mode=intake]{filter:[{id:\"minecraft:iron_bars\",count:1}]}",
+    "setblock 31 -60 -16 chest[facing=north]",
+    "setblock 0 -60 -18 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"BIOMASS\"','\"Reservoir: 4000\"','\"BU. Line uses\"','\"1560 BU a run\"']}}",
+    "setblock 1 -60 -20 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Not made here:\"','\"you bring the\"','\"raw iron and\"','\"the biomass\"']}}",
+    "setblock 4 -60 -18 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"INPUT\"','\"Larder of raw\"','\"iron: 18 in.\"','\"you restock it\"']}}",
+    "setblock 6 -60 -18 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"RESERVE\"','\"Larder keeps 3\"','\"raw iron; line\"','\"stops at them\"']}}",
+    "setblock 8 -60 -18 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mineral Gizzard\"','\"1 raw = 4 dust\"','\"20 BU, 8 s\"','\"+ Tailings\"']}}",
+    "setblock 13 -60 -20 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"WATER\"','\"3 sources,\"','\"Junction drinks\"','\"never runs dry\"']}}",
+    "setblock 15 -60 -20 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Washing Kidney\"','\"Tailings: +1\"','\"dust. 30 BU,\"','\"250 mB, settle\"']}}",
+    "setblock 18 -60 -18 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"WASTE\"','\"Tailings, Rock\"','\"Residue: empty\"','\"this chest\"']}}",
+    "setblock 20 -60 -18 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Bio-Furnace\"','\"4 dust = ingot\"','\"40 BU, 16 s\"','\"dust only\"']}}",
+    "setblock 26 -60 -18 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Shaping Palm\"','\"6 ingots = 16\"','\"iron bars\"','\"10 BU, 2 s\"']}}",
+    "setblock 31 -60 -18 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"OUTPUT\"','\"iron bars\"','\"16 a craft\"','\"empty me\"']}}",
+    "setblock 16 -60 -22 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"IRON BARS\"','\"FACTORY\"','\"raw iron in,\"','\"bars out\"']}}",
+    "setblock 17 -60 -22 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Cut a supply:\"','\"probe Junction\"','\"face; again to\"','\"restore it\"']}}",
+    "setblock 8 -60 -47 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"IRON BARS\"','\"FACTORY\"','\"south, x 0-31\"','\"z -22 to -15\"']}}",
+    "item replace entity @s inventory.18 with raw_iron 64",
+    "item replace entity @s inventory.19 with infestusfrontier:biomass_bucket 1",
+    "item replace entity @s inventory.20 with infestusfrontier:biomass_bucket 1",
+    "item replace entity @s inventory.21 with cobblestone 64"
   ],
   "views": [
     {
@@ -1749,6 +1811,160 @@
       "gui": true,
       "name": "book_shaping_palm_rote",
       "book": "infestusfrontier:circulation/shaping_palm",
+      "page": 6
+    },
+    {
+      "name": "iron_bars_overview",
+      "x": 19.5,
+      "y": -47.0,
+      "z": -27.0,
+      "yaw": 0,
+      "pitch": 58
+    },
+    {
+      "name": "iron_bars_supply",
+      "x": 6.5,
+      "y": -57.3,
+      "z": -23.5,
+      "yaw": 0,
+      "pitch": 28
+    },
+    {
+      "name": "iron_bars_mill",
+      "x": 16.5,
+      "y": -57.3,
+      "z": -23.5,
+      "yaw": 0,
+      "pitch": 28
+    },
+    {
+      "name": "iron_bars_press",
+      "x": 26.5,
+      "y": -57.3,
+      "z": -23.5,
+      "yaw": 0,
+      "pitch": 28
+    },
+    {
+      "name": "iron_bars_signpost",
+      "x": 8.5,
+      "y": -60.0,
+      "z": -51.5,
+      "yaw": 0,
+      "pitch": 5
+    },
+    {
+      "name": "iron_bars_larder_screen",
+      "x": 4.5,
+      "y": -60,
+      "z": -18.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        4,
+        -60,
+        -16
+      ]
+    },
+    {
+      "name": "iron_bars_gizzard_screen",
+      "x": 8.5,
+      "y": -60,
+      "z": -18.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        8,
+        -60,
+        -16
+      ]
+    },
+    {
+      "name": "iron_bars_kidney_screen",
+      "x": 17.5,
+      "y": -60,
+      "z": -16.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        14,
+        -60,
+        -16
+      ]
+    },
+    {
+      "name": "iron_bars_furnace_screen",
+      "x": 20.5,
+      "y": -60,
+      "z": -18.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        20,
+        -60,
+        -16
+      ]
+    },
+    {
+      "name": "iron_bars_palm_screen",
+      "x": 26.5,
+      "y": -60,
+      "z": -18.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        26,
+        -60,
+        -16
+      ]
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_iron_bars_factory",
+      "book": "infestusfrontier:circulation/iron_bars_factory",
+      "page": 0
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_iron_bars_factory_2",
+      "book": "infestusfrontier:circulation/iron_bars_factory",
+      "page": 2
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_iron_bars_factory_4",
+      "book": "infestusfrontier:circulation/iron_bars_factory",
+      "page": 4
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_iron_bars_factory_6",
+      "book": "infestusfrontier:circulation/iron_bars_factory",
       "page": 6
     }
   ]

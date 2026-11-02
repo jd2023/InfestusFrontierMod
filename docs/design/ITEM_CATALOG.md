@@ -449,6 +449,18 @@ A full buffer pauses the organ and names the cause on its screen and probe
 ("residue tray full", "dirty water full", "tailings tray full"). Nothing is dropped
 and nothing is deleted without an explicit craft.
 
+**Worked line: the demo's iron-bars factory.** A Larder of 18 raw iron keeps 3, a Gizzard, a Kidney, a Bio-Furnace at stage 0 and a Palm with Rote make vanilla iron bars (6 iron ingots, 16 bars) from the 15 raw iron the line may take.
+
+| Item | Amount |
+|---|---|
+| Dust | 60 ground + 15 washed = 75; 72 smelted, 3 left |
+| Ingots | 18 = three crafts of 6 |
+| Bars | 48 |
+| Waste | 15 Tailings of 3 units, 18 Rock Residue (15 ground, 3 settled), 750 mB dirty water left in the Kidney |
+| Water | 15 x 250 = 3,750 mB: 3,000 settled, 750 dirty |
+| Biomass | 300 grind + 450 wash + 60 settle + 720 smelt + 30 craft = 1,560 BU, of a Reservoir of 4,000 BU; the organs keep what they drew |
+| Time | the furnace sets the pace: 18 x 16 s, about five minutes |
+
 **Against direct smelting and vanilla mining.** Per ore block mined, average:
 raw items per block are 1 for iron and gold, 2–5 (3.5) for copper. Fortune I, II
 and III multiply the count by 1.33, 1.75 and 2.2 on average. Direct smelting is 1

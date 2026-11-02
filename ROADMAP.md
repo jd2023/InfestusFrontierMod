@@ -4,7 +4,7 @@ Each milestone ends in a playable build. Only the current sprint is planned in d
 
 Now: M0 and M1 are done; S01 and S02 are accepted. M2 is in progress: the Bowl, the Sac, the Bladder, the Bud, the probe and the guide are in; the Rack, the Loom, the Cradle and the four awakened pieces are in; the batch organs run on their own and take hoppers; the Bio-Furnace smelts on biomass and grows through three stages. M3 is in progress (`docs/sprints/S04.md`): the Activation Cyst and the eight treatments are in; the three veins and the Vascular Junction move biomass, water and items; veins climb walls and fork; Mouths under chests and organs route items through Item Veins by filter, amount and priority; the farm plants, waters, harvests and composts on its own; the Sensor Polyp reads a block into redstone; the Fuel Papilla refuels worn armor at base. Temporary art is on the placeholder list in `docs/sprints/ART.md`.
 
-Next: the [automated mineral workshop](#next-milestone--the-automated-mineral-workshop), M3b, is defined and proposed; its step 1 (the Mixed Craw and the Larder), its steps 2 and 3 (the Gizzard, the Kidney and finite waste) and its steps 4 and 5 (the Palm, its supply link and its Rote cycle) are built and await the owner's play. The living-workshop acceptance below stays open and is not replaced by it.
+Next: the [automated mineral workshop](#next-milestone--the-automated-mineral-workshop), M3b, is defined and proposed; its step 1 (the Mixed Craw and the Larder), its steps 2 and 3 (the Gizzard, the Kidney and finite waste) its steps 4 and 5 (the Palm, its supply link and its Rote cycle) and its step 6 (the iron-bars factory in the default demo) are built and await the owner's play. The living-workshop acceptance below stays open and is not replaced by it.
 
 ## First meaningfully playable version — the living workshop
 
@@ -105,8 +105,8 @@ and containers remain valid tools. JEI and Curios are optional, not prerequisite
    Each condition pauses the affected work without duplication or unintended loss.
    Restore the condition and resume. Save/reload with a batch and a transfer active;
    contents, settings and organ history survive. Retained reserves allow a restart.
-5. **Layout choice.** Build a second materially different route with a vertical run,
-   branch and isolated crossing. The loop works without copying the demo's geometry.
+5. **Concrete layout.** The iron-bars factory ([M3b step 6](#order-of-work)) is the
+   layout built on top of the loop. A second materially different route is not required.
 6. **Readable play.** The owner completes the loop using the guide and in-game
    feedback. Record confusing steps and long waits; fix progression blockers before
    acceptance. Required art is functional and readable; temporary assets are allowed and listed in [ART.md](docs/sprints/ART.md).
@@ -121,7 +121,7 @@ progress until their evidence passes. New systems do not substitute for that evi
 
 ## Next milestone — the automated mineral workshop
 
-M3b. Defined here and proposed; steps 1 to 3 are built and step 4 is half built. It starts from the colony the living workshop
+M3b. Defined here and proposed; steps 1 to 6 are built. It starts from the colony the living workshop
 delivers and turns the player's hand-mined raw ore into dust and ingots, keeps supplies
 in a store that guards them, and repeats one crafting recipe on its own.
 
@@ -172,13 +172,13 @@ workflow in the same step.
 3. **The Kidney and waste** (built; review and the owner's play pending). Washing, the dirty tank, settling, the discard and cobblestone crafts. Tests: 5 dust per washed raw item; a 3-unit or foreign parcel is refused; dirty water full pauses and a settle resumes; no path from dirty water to clean water; Rock Residue and Tailings feed nothing else; bounded buffers.
 4. **Palm stages 1 and 2.** The retained grid, vanilla remainders, the supply link and its three actions. Stage 1 is built (review and the owner's play pending): the grid, the engine's own result slot and remainders, tests through a crafting menu (cake, honey bottle, a banner and a shield, Tailings), a full inventory, two viewers, a client that claims a result, save and reload through a chunk, breaking and placing, and no item handler. Stage 2 is built (review and the owner's play pending): Reach from a Contractile Fiber, the probe's link to one store, Restock, Return and Store result, and nothing automatic. Tests: the fiber and probe, the link's refusals, Larder reserves and a reserve that changes between a read and the action, competing viewers and a competing consumer, component-sensitive matching, a broken, unloaded or full store, save and reload and a chunk that unloads, and no work done by a link.
 5. **Palm stage 3.** Built (review and the owner's play pending): the Synaptic Gel, Select, the cycle, the tray, the Lobes, the biomass tank. Tests: special recipes refused, a recipe change pauses, mid-cycle save, 10 BU and 40 ticks per craft, outputs and remainders held until they fit, no duplication through Lobes and hoppers, 32 starts a tick across many Palms.
-6. **Qualify.** A reference line in the demo and a test that runs it with no hand in it: stored raw ore to ingots, with a Kidney, a Larder reserve and a Palm making a vanilla item from the ingots. Ledger exact in biomass, water, dust and items. Three cycles; the settle and a full tray each occur at least once.
+6. **The iron-bars factory** (built; review and the owner's play pending). One labeled line in the default demo, south of row C at x=0 to 31, z=-22 to -15 (`src/testMod/resources/captures/demo.json`): a Larder of 18 raw iron that keeps 3, a Gizzard, a Kidney with a water pool and Junction, a waste chest, a Bio-Furnace, a Palm with Rote and the vanilla iron-bars recipe selected, and a chest of bars, joined by 11 Mouths, Feeding and Yield Lobes and Item Veins, with one Reservoir of 4,000 BU and a biomass vein under the organs. The player brings the raw iron and the biomass; the line makes neither. Guide entry `circulation/iron_bars_factory` names every part, its recipe and its costs. `IronBarsFactoryTests` builds the line from the demo's own commands and runs it: three crafts, 48 bars from 15 raw iron, with an exact ledger in raw iron, dust, ingots, bars, Tailings, Rock Residue, water and biomass; the water and the biomass cut by the probe and restored; the chunks unloaded and loaded in the middle of the washing; a full waste chest and a full chest of bars each pausing the line with its reason and resuming; the recipes and the Palm's pattern checked against what ships. No human Survival or multiplayer play of it is recorded.
 
 ### Acceptance
 
 1. Every step's tests pass in the gate (`bash scripts/verify.sh`), with the evidence kept as the task requires.
 2. Captures of each new book entry and each demo exhibit are read, not only checked by pixels.
-3. The reference line of step 6 runs with a measured ledger, from a saved and reloaded world.
+3. The iron-bars factory of step 6 runs with a measured ledger in a test, with the line's chunks saved and loaded in the middle of its work.
 4. Every number in the catalogs for this milestone is a starting value. Play testing may change it in the Items, Blocks and Engineering documents only.
 5. The owner plays the line in Survival before the milestone is called accepted. Scripted tests do not claim Survival or multiplayer acceptance.
 
@@ -210,7 +210,7 @@ Each milestone needs this evidence beyond the full gate (`bash scripts/verify.sh
 | M1 | Spore Culture converts eligible exposed ground and bone meal matures it, in GameTests; recipes and guide pages exist; client captures of all three stages, front, back and inventory scale, pass the capture checks and are read by the reviewer; textures functional and readable, temporary ones on the ART.md placeholder list; the owner repeats it by hand in a fresh world |
 | M2 | Fresh Survival acquisition and recipe reveal, empty/full inventory, insufficient biomass, break/reload preserving one organ history; client models render at all faces and inventory scale |
 | M3 | Three complete reference supply cycles with a positive measured surplus; seed/water/restart reserves retained; 3D branches/crossings and port direction inspected visually; full outputs and unloaded routes cannot spill or duplicate |
-| M3b | Four dust a raw item, five when washed, four an ingot, to the item; refused recycling and foreign parcels; every waste buffer fills, pauses and resumes; every extraction path keeps a Larder reserve; Palm remainders, link refusals and mid-cycle saves; bounded work at 32 starts a tick; save and reload of a running reference line |
+| M3b | Four dust a raw item, five when washed, four an ingot, to the item; refused recycling and foreign parcels; every waste buffer fills, pauses and resumes; every extraction path keeps a Larder reserve; Palm remainders, link refusals and mid-cycle saves; bounded work at 32 starts a tick; save and reload of the running iron-bars factory |
 | M4 | All sample qualities and capacities, last-slot contention, no-drop vanilla species, duplicate death callbacks, relocation across dimensions, copied-record merge, consumed sample never recreated; no ordinary-slot pollution or nested pack duplication |
 | M5 | Every activity has one owner, sum-cap clipping, partial clearing costs, permanent branch rejection, one-heart hunger floor, sleep/rescue persistence; ore conservation against direct mining/Fortune and retained dust |
 | M6 | Start with the declared finite kit, replace every recurring fuel/water input locally, manufacture/export lining, then restart without Overworld fuel; wrong dimension/bed/level/mutation each independently refuses unchanged |

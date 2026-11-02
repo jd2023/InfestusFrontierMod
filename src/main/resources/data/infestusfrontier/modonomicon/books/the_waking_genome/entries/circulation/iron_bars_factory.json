@@ -1,0 +1,55 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.iron_bars_factory.name",
+  "description": "entry.infestusfrontier.circulation.iron_bars_factory.description",
+  "icon": "minecraft:iron_bars",
+  "x": 7,
+  "y": 3,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/shaping_palm"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:advancement",
+    "advancement_id": "infestusfrontier:acquired/shaping_palm"
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.iron_bars_factory.name",
+      "text": "entry.infestusfrontier.circulation.iron_bars_factory.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.iron_bars_factory.route.title",
+      "text": "entry.infestusfrontier.circulation.iron_bars_factory.route"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.iron_bars_factory.costs.title",
+      "text": "entry.infestusfrontier.circulation.iron_bars_factory.costs"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.iron_bars_factory.supplies.title",
+      "text": "entry.infestusfrontier.circulation.iron_bars_factory.supplies"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.iron_bars_factory.waits.title",
+      "text": "entry.infestusfrontier.circulation.iron_bars_factory.waits"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.iron_bars_factory.parts.title",
+      "text": "entry.infestusfrontier.circulation.iron_bars_factory.parts"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "title": "entry.infestusfrontier.circulation.iron_bars_factory.recipe.title",
+      "recipe_id_1": "minecraft:iron_bars",
+      "text": "entry.infestusfrontier.circulation.iron_bars_factory.recipe"
+    }
+  ]
+}

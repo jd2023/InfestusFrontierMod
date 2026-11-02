@@ -148,7 +148,9 @@ public final class DiscoveryTests {
                 "mineral_gizzard",
                 "washing_kidney",
                 "mixed_craw",
-                "larder"))
+                "larder",
+                "shaping_palm",
+                "iron_bars_factory"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();
@@ -227,6 +229,44 @@ public final class DiscoveryTests {
                 entry.getParents().stream()
                         .anyMatch(parent -> parent.getEntryId().equals(id("circulation/larder"))),
                 "after the stores on the guide's way");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void ironBarsFactoryEntryFollowsThePalmAndShowsTheVanillaRecipe(GameTestHelper h) {
+        var entry = BookDataManager.get()
+                .getBook(BOOK)
+                .getCategory(id("circulation"))
+                .getEntries()
+                .get(id("circulation/iron_bars_factory"));
+        h.assertTrue(entry != null, "entry loaded");
+        var recipes = entry.getPages().stream()
+                .filter(page -> page instanceof com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage)
+                .map(page -> ((com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage) page).getRecipeId1())
+                .toList();
+        h.assertValueEqual(
+                recipes,
+                List.of(net.minecraft.resources.ResourceLocation.withDefaultNamespace("iron_bars")),
+                "one crafting page, for vanilla's iron bars");
+        h.assertTrue(
+                h.getLevel()
+                        .getRecipeManager()
+                        .byKey(net.minecraft.resources.ResourceLocation.withDefaultNamespace("iron_bars"))
+                        .isPresent(),
+                "the shown recipe exists");
+        h.assertValueEqual(
+                entry.getPages().stream()
+                        .filter(page -> page instanceof com.klikli_dev.modonomicon.book.page.BookTextPage)
+                        .count(),
+                6L,
+                "text pages for the line, the route, the costs, the supplies, the waits and the parts");
+        h.assertTrue(
+                entry.getParents().stream()
+                        .anyMatch(parent -> parent.getEntryId().equals(id("circulation/shaping_palm"))),
+                "after the Palm it ends in");
+        h.assertTrue(
+                h.getLevel().getServer().getAdvancements().get(id("acquired/shaping_palm")) != null,
+                "and the Palm's advancement opens it");
         h.succeed();
     }
 
