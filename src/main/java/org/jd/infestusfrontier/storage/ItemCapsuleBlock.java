@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jd.infestusfrontier.core.storage.PodKind;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.CapsuleStock;
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
  * a stack in or out and a treatment well; the stem's cells open the whole tree. A Skeletal Graft, used on the pod or
  * put in its well, grows the pod a grade, doubling what it holds.
  */
-public final class ItemCapsuleBlock extends BaseEntityBlock {
+public class ItemCapsuleBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final IntegerProperty GRADE = IntegerProperty.create("grade", 0, CapsuleStock.LAST_GRADE);
 
@@ -78,8 +79,13 @@ public final class ItemCapsuleBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected MapCodec<ItemCapsuleBlock> codec() {
+    protected MapCodec<? extends ItemCapsuleBlock> codec() {
         return CODEC;
+    }
+
+    /** What this block's pods are. */
+    PodKind kind() {
+        return PodKind.BULK;
     }
 
     @Override

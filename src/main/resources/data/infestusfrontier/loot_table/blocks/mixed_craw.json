@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "infestusfrontier:mixed_craw",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "source": "block_entity",
+              "include": [
+                "infestusfrontier:capsule_stock",
+                "infestusfrontier:unreadable_save",
+                "minecraft:max_stack_size"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

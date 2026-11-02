@@ -146,7 +146,8 @@ public final class DiscoveryTests {
                 "spine_sentry",
                 "aerocyte_bloom",
                 "mineral_gizzard",
-                "washing_kidney"))
+                "washing_kidney",
+                "mixed_craw"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();

@@ -57,7 +57,7 @@ Defect classes found in this project before. Check the ones that apply to the di
 - Transparent textures use a cutout or translucent render type. An opaque black patch is the wrong layer.
 - The geometry the catalog describes exists. A vanilla-textured cube is not art.
 - Guide entries have unique coordinates and text that fits the page.
-- Art meets the Quality bar in `docs/sprints/ART.md`: reads as its material from four blocks away, no seam or repeat in a 4x4 patch, one light direction, models with closed loops and no cross-bone overlap. On an art task or at milestone acceptance, below the bar is a blocker. On an implementation task with honest temporary assets and a queued art task, it is a follow-up routed to that art task; the checks above it stay blocking.
+- Assets are functional and readable: they render, read as their subject in a capture, and each temporary one is on the placeholder list in `docs/sprints/ART.md`. Missing final art, its quality or its provenance alone is never a finding and never a follow-up; the checks above stay blocking. The Quality bar in `ART.md` (reads as its material from four blocks away, no seam or repeat in a 4x4 patch, one light direction, models with closed loops and no cross-bone overlap) is judged only on a finishing art pass the owner requested.
 
 **Content completion**
 - Recipe, tag, translation, advancement or discovery step, and guide entry exist.

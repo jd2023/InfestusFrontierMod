@@ -319,7 +319,16 @@
     "setblock 0 -60 -44 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Spine Sentry\"','\"Ground defence\"','\"Biomass powered\"','\"Stores loot\"']}}",
     "setblock 6 -60 -44 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Aerocyte Bloom\"','\"Air defence\"','\"Biomass powered\"','\"Fires spores\"']}}",
     "setblock 3 -60 -42 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:zoglin_spawn_egg\",count:16},{Slot:1,id:\"minecraft:ghast_spawn_egg\",count:4},{Slot:2,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:3,id:\"infestusfrontier:biomass_bucket\",count:1}]}",
-    "setblock 3 -60 -41 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Defence supplies\"','\"Target eggs\"','\"Buckets: refuel\"','\"Open for loot\"']}}"
+    "setblock 3 -60 -41 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Defence supplies\"','\"Target eggs\"','\"Buckets: refuel\"','\"Open for loot\"']}}",
+    "fill 78 -61 -29 88 -61 -26 grass_block",
+    "setblock 80 -60 -28 infestusfrontier:item_capsule[facing=north,grade=2]{stock:{grade:2,held:[{slot:0,item:{id:\"minecraft:raw_iron\"},count:1920}]}}",
+    "setblock 82 -60 -28 infestusfrontier:mixed_craw[facing=north,grade=2]{stock:{kind:\"craw\",grade:2,held:[{slot:0,item:{id:\"minecraft:hopper\"},count:12},{slot:1,item:{id:\"minecraft:piston\"},count:9},{slot:2,item:{id:\"minecraft:observer\"},count:5},{slot:3,item:{id:\"minecraft:repeater\"},count:16}]}}",
+    "setblock 84 -60 -28 infestusfrontier:item_capsule[facing=north,grade=0]",
+    "setblock 86 -60 -28 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:elastic_gel\",count:8},{Slot:1,id:\"infestusfrontier:skeletal_graft\",count:4}]}",
+    "setblock 80 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Bulk Pod\"','\"one kind, deep:\"','\"raw iron in\"','\"32 stacks\"']}}",
+    "setblock 82 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mixed Craw\"','\"4 kinds, half\"','\"a bulk pod's\"','\"room: parts\"']}}",
+    "setblock 84 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Empty Pod\"','\"gel in its well\"','\"makes a Craw\"','\"one way\"']}}",
+    "setblock 86 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Gel, Grafts\"','\"Elastic Gel:\"','\"Craw. Graft:\"','\"one grade up\"']}}"
   ],
   "views": [
     {
@@ -1376,6 +1385,64 @@
       "name": "book_washing_kidney_pause",
       "book": "infestusfrontier:circulation/washing_kidney",
       "page": 6
+    },
+    {
+      "name": "craw_line",
+      "x": 83.0,
+      "y": -58.4,
+      "z": -32.0,
+      "yaw": 0,
+      "pitch": 33
+    },
+    {
+      "name": "craw_screen",
+      "x": 82.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        82,
+        -60,
+        -28
+      ]
+    },
+    {
+      "name": "pod_screen",
+      "x": 84.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        84,
+        -60,
+        -28
+      ]
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_mixed_craw",
+      "book": "infestusfrontier:circulation/mixed_craw",
+      "page": 0
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_mixed_craw_recipe",
+      "book": "infestusfrontier:circulation/mixed_craw",
+      "page": 2
     }
   ]
 }

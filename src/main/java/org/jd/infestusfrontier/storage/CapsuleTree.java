@@ -3,6 +3,7 @@ package org.jd.infestusfrontier.storage;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -13,15 +14,14 @@ import net.minecraft.world.item.ItemStackLinkedSet;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import org.jd.infestusfrontier.core.storage.Compartments;
-import org.jd.infestusfrontier.storage.api.CapsuleStock;
 
 /**
- * The one store of a standing Capsule Stem: the compartments of the pods its root reaches, in the order they grew,
- * {@value ItemCapsuleBlockEntity#COMPARTMENTS} a pod; or of one pod standing on its own. Its pods share it while the
- * tree stands; a pod or stem cell leaving, unloading or loading new state closes it, and a closed store holds no
- * slots. Callers reach it through {@link Stems#of}, which uses it only while {@link #isUsable}. Items go by
+ * The one store of a standing Capsule Stem: the compartments of the pods its root reaches, in the order they grew, a
+ * bulk pod's one or a Mixed Craw's four each; or of one pod standing on its own. Its pods share it while the tree
+ * stands; a pod or stem cell leaving, unloading or loading new state, or a pod mutating, closes it, and a closed store
+ * holds no slots. Callers reach it through {@link Stems#of}, which uses it only while {@link #isUsable}. Items go by
  * {@link Compartments}: a kind fills its own compartments before it opens an empty one, each compartment holding as
- * many stacks as its pod's grade allows. What a kind's compartments hold is read once per change of the store, so a
+ * many stacks as its pod's kind and grade allow, so bulk pods and Craws share one count of every kind. What a kind's compartments hold is read once per change of the store, so a
  * hopper trying every slot reads the tree once; so is the ledger of {@link #kinds}, which every viewer reads.
  */
 final class CapsuleTree {
@@ -34,6 +34,11 @@ final class CapsuleTree {
             .thenComparingInt(stack -> stack.getComponents().hashCode());
 
     private final List<ItemCapsuleBlockEntity> members;
+    /** The first slot of each pod, then the slot count: pods differ in how many compartments they have. */
+    private final int[] starts;
+    /** The pod each slot belongs to, by index in {@link #members}. */
+    private final int[] owners;
+
     private final Level level;
     /** The chunks the tree's plan spans, members or not: a planned pod coming back into reach reopens the store. */
     private final long[] chunks;
@@ -50,6 +55,11 @@ final class CapsuleTree {
     CapsuleTree(Level level, List<ItemCapsuleBlockEntity> members, List<BlockPos> span) {
         this.level = level;
         this.members = List.copyOf(members);
+        this.starts = new int[members.size() + 1];
+        for (int i = 0; i < members.size(); i++)
+            starts[i + 1] = starts[i] + members.get(i).compartments();
+        this.owners = new int[starts[members.size()]];
+        for (int i = 0; i < members.size(); i++) Arrays.fill(owners, starts[i], starts[i + 1], i);
         this.chunks = span.stream()
                 .mapToLong(ChunkPos::asLong)
                 .distinct()
@@ -91,13 +101,13 @@ final class CapsuleTree {
     }
 
     int slots() {
-        return open ? members.size() * ItemCapsuleBlockEntity.COMPARTMENTS : 0;
+        return open ? owners.length : 0;
     }
 
     /** The first slot of {@code pod}'s compartments, or -1 when the pod is not of this tree. */
     int slotOf(ItemCapsuleBlockEntity pod) {
         int index = members.indexOf(pod);
-        return index < 0 ? -1 : index * ItemCapsuleBlockEntity.COMPARTMENTS;
+        return index < 0 ? -1 : starts[index];
     }
 
     private boolean holds(int slot) {
@@ -105,11 +115,11 @@ final class CapsuleTree {
     }
 
     private ItemCapsuleBlockEntity pod(int slot) {
-        return members.get(slot / ItemCapsuleBlockEntity.COMPARTMENTS);
+        return members.get(owners[slot]);
     }
 
-    private static int compartment(int slot) {
-        return slot % ItemCapsuleBlockEntity.COMPARTMENTS;
+    private int compartment(int slot) {
+        return slot - starts[owners[slot]];
     }
 
     /** A hand edits one of the tree's compartments under the pod's existing admission rules. */
@@ -132,7 +142,7 @@ final class CapsuleTree {
     /** The most of a kind stacking to {@code maxStackSize} slot {@code slot} holds; 0 for no slot. */
     int limit(int slot, int maxStackSize) {
         if (!holds(slot)) return 0;
-        return Compartments.limit(CapsuleStock.stacks(pod(slot).grade()), maxStackSize);
+        return Compartments.limit(pod(slot).stacks(), maxStackSize);
     }
 
     /** How many of its kind a slot holds at most: the limit of what it holds, or of the largest stack when empty. */

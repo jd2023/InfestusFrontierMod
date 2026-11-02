@@ -184,6 +184,26 @@ public final class StorageModule {
                     .isSuffocating((state, level, pos) -> false));
     public static final DeferredItem<OrganItem> ITEM_CAPSULE_ITEM =
             ITEMS.register("item_capsule", () -> new ItemCapsuleItem(ITEM_CAPSULE.get(), new Item.Properties()));
+    /** The mutation of an empty pod with Elastic Gel; it has no recipe of its own and no tool turns it back. */
+    public static final DeferredBlock<MixedCrawBlock> MIXED_CRAW = BLOCKS.registerBlock(
+            "mixed_craw",
+            MixedCrawBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PINK)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.BLOCK)
+                    .isViewBlocking((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false));
+
+    public static final DeferredItem<OrganItem> MIXED_CRAW_ITEM =
+            ITEMS.register("mixed_craw", () -> new ItemCapsuleItem(MIXED_CRAW.get(), new Item.Properties()));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MixedCrawBlockEntity>> MIXED_CRAW_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "mixed_craw",
+                    () -> BlockEntityType.Builder.of(MixedCrawBlockEntity::new, MIXED_CRAW.get())
+                            .build(null));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemCapsuleBlockEntity>> ITEM_CAPSULE_ENTITY =
             BLOCK_ENTITIES.register(
                     "item_capsule",
@@ -194,6 +214,9 @@ public final class StorageModule {
     /** One pod's own screen, opened from the pod; cells open the tree's. */
     public static final DeferredHolder<MenuType<?>, MenuType<ItemCapsulePodMenu>> ITEM_CAPSULE_POD_MENU =
             MENUS.register("item_capsule_pod", () -> IMenuTypeExtension.create(ItemCapsulePodMenu::new));
+    /** Items that turn an empty bulk pod into a Mixed Craw when put in its treatment well. */
+    public static final TagKey<Item> CRAW_GEL =
+            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "craw_gel"));
     /** Blocks a Reservoir cell may also stand on: pumps that fill it from below. */
     public static final TagKey<Block> RESERVOIR_SUPPORTS = TagKey.create(
             Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "reservoir_supports"));
@@ -247,6 +270,10 @@ public final class StorageModule {
                     (pod, side) -> new CapsuleItems(() -> Stems.of(pod)));
             event.registerBlockEntity(
                     Capabilities.ItemHandler.BLOCK,
+                    MIXED_CRAW_ENTITY.get(),
+                    (pod, side) -> new CapsuleItems(() -> Stems.of(pod)));
+            event.registerBlockEntity(
+                    Capabilities.ItemHandler.BLOCK,
                     CAPSULE_STEM_ENTITY.get(),
                     (cell, side) -> new CapsuleItems(() -> Stems.of(cell)));
         });
@@ -270,6 +297,23 @@ public final class StorageModule {
                             ItemCapsuleBlock.FACING,
                             ItemCapsuleBlockEntity::shown,
                             new FrontStockRenderer.Pockets(1, 8F, 8F, 7F, 5.5F, 3.8F, 4F, 4.5F),
+                            ItemCapsuleBlockEntity::scale,
+                            8F,
+                            8F,
+                            13.5F,
+                            ResourceLocation.fromNamespaceAndPath("infestusfrontier", "block/item_capsule_lining")));
+            // four pockets in a square in the Craw's socket, a thinner rim than a bulk pod's: 10 px across, a cell 4.8
+            // px
+            // wide on a 5 px pitch with its icon 3.4 px wide (art/gen_mixed_craw.py RIM)
+            OrganRenderers.register(
+                    modBus,
+                    "mixed_craw",
+                    MIXED_CRAW_ENTITY,
+                    MIXED_CRAW_ITEM,
+                    FrontStockRenderer.overlay(
+                            ItemCapsuleBlock.FACING,
+                            ItemCapsuleBlockEntity::shown,
+                            new FrontStockRenderer.Pockets(2, 5.5F, 10.5F, 5F, 3.4F, 3.8F, 2.4F, 4.5F),
                             ItemCapsuleBlockEntity::scale,
                             8F,
                             8F,

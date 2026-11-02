@@ -9,22 +9,28 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import org.jd.infestusfrontier.core.storage.PodKind;
 
 /**
  * What one Item Capsule carries, as saved and as carried on its item: its compartments, each empty or holding one kind
- * with its count, which may pass a stack, and its grade, the volume it has been grown to. A value: stacks are copied
- * in and out and compared with {@link ItemStack#matches}. Saved as one entry per held compartment; a slot out of
- * range, a slot named twice or a grade past the last does not decode, though any value encodes, so bad state can be
- * kept as it came.
+ * with its count, which may pass a stack, its grade, the volume it has been grown to, and the kind of pod that carries
+ * them. A value: stacks are copied in and out and compared with {@link ItemStack#matches}. Saved as one entry per held
+ * compartment; a slot out of range, a slot named twice, an unknown kind or a grade past the last does not decode,
+ * though any value encodes, so bad state can be kept as it came. Stock saved before pods had kinds is a bulk pod's.
  */
-public record CapsuleStock(List<ItemStack> held, int grade) {
-    /** The most compartments any capsule carries. */
-    public static final int COMPARTMENTS = 4;
-    /** Grades 0 to this: a young capsule holds {@link #stacks} stacks of its kind, each grade doubles it. */
+public record CapsuleStock(List<ItemStack> held, int grade, PodKind kind) {
+    /** The most compartments any capsule carries: a Mixed Craw's. */
+    public static final int COMPARTMENTS = PodKind.CRAW_COMPARTMENTS;
+    /** Grades 0 to this: a young capsule holds {@link PodKind#stacks} stacks of its kind, each grade doubles it. */
     public static final int LAST_GRADE = 2;
 
-    public static final int YOUNG_STACKS = 8;
-    public static final CapsuleStock EMPTY = new CapsuleStock(List.of(), 0);
+    public static final CapsuleStock EMPTY = new CapsuleStock(List.of(), 0, PodKind.BULK);
+
+    private static final Codec<PodKind> KIND = Codec.STRING.comapFlatMap(
+            id -> PodKind.byId(id)
+                    .map(DataResult::success)
+                    .orElseGet(() -> DataResult.error(() -> "unknown pod kind " + id)),
+            PodKind::id);
 
     private record Entry(int slot, ItemStack kind, int count) {}
 
@@ -39,7 +45,8 @@ public record CapsuleStock(List<ItemStack> held, int grade) {
 
     public static final Codec<CapsuleStock> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                     HELD.optionalFieldOf("held", List.of()).forGetter(CapsuleStock::held),
-                    Codec.intRange(0, LAST_GRADE).optionalFieldOf("grade", 0).forGetter(CapsuleStock::grade))
+                    Codec.intRange(0, LAST_GRADE).optionalFieldOf("grade", 0).forGetter(CapsuleStock::grade),
+                    KIND.optionalFieldOf("kind", PodKind.BULK).forGetter(CapsuleStock::kind))
             .apply(instance, CapsuleStock::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, CapsuleStock> STREAM_CODEC = StreamCodec.composite(
@@ -47,7 +54,14 @@ public record CapsuleStock(List<ItemStack> held, int grade) {
             CapsuleStock::held,
             ByteBufCodecs.VAR_INT,
             CapsuleStock::grade,
+            ByteBufCodecs.STRING_UTF8.map(id -> PodKind.byId(id).orElse(PodKind.BULK), PodKind::id),
+            CapsuleStock::kind,
             CapsuleStock::new);
+
+    /** Stock of a bulk pod. */
+    public CapsuleStock(List<ItemStack> held, int grade) {
+        this(held, grade, PodKind.BULK);
+    }
 
     /** Keeps copies, so the value never changes. */
     public CapsuleStock {
@@ -56,11 +70,6 @@ public record CapsuleStock(List<ItemStack> held, int grade) {
         List<ItemStack> copies = new ArrayList<>(held.size());
         for (ItemStack stack : held) copies.add(stack.copy());
         held = List.copyOf(copies);
-    }
-
-    /** Stacks of its kind a compartment of grade {@code grade} holds: 8, 16 then 32. */
-    public static int stacks(int grade) {
-        return YOUNG_STACKS << grade;
     }
 
     /** Copies of the compartments, each with its whole count. */
@@ -84,20 +93,22 @@ public record CapsuleStock(List<ItemStack> held, int grade) {
 
     /** The same stock at {@code grade}. */
     public CapsuleStock graded(int grade) {
-        return new CapsuleStock(held, grade);
+        return new CapsuleStock(held, grade, kind);
     }
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof CapsuleStock that) || that.held.size() != held.size() || that.grade != grade)
-            return false;
+        if (!(other instanceof CapsuleStock that)
+                || that.held.size() != held.size()
+                || that.grade != grade
+                || that.kind != kind) return false;
         for (int i = 0; i < held.size(); i++) if (!ItemStack.matches(held.get(i), that.held.get(i))) return false;
         return true;
     }
 
     @Override
     public int hashCode() {
-        int hash = grade;
+        int hash = grade * 7 + kind.ordinal();
         for (ItemStack stack : held) hash = 31 * hash + ItemStack.hashItemAndComponents(stack) * 31 + stack.getCount();
         return hash;
     }

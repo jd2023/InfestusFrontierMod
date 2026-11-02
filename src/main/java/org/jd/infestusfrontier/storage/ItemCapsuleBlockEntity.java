@@ -19,10 +19,13 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.core.storage.Compartments;
+import org.jd.infestusfrontier.core.storage.PodKind;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.storage.api.CapsuleStock;
@@ -35,13 +38,13 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * One Item Capsule, the pod of a Capsule Stem: its own {@value #COMPARTMENTS} compartment of one kind, its grade and
- * the root of the stem it hangs on, if any. The compartment stays in the pod, so a broken pod carries exactly it; the
- * tree's one store is {@link CapsuleTree}, shared by its pods while it stands. Clients get the compartment and the
- * grade for the front.
+ * One pod of a Capsule Stem: the compartments its {@link PodKind} gives it, a bulk pod's one or a Mixed Craw's four,
+ * each of one kind of item, its grade and the root of the stem it hangs on, if any. The compartments stay in the pod,
+ * so a broken pod carries exactly them; the tree's one store is {@link CapsuleTree}, shared by its pods while it
+ * stands. The kind of pod is the block's, never changed in place: a mutation replaces the block, which closes the
+ * tree's store. Clients get the compartments and the grade for the front.
  */
-final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlockEntity {
-    static final int COMPARTMENTS = 1;
+class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlockEntity {
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final List<RawAnimation> GRADES = List.of(
             RawAnimation.begin().thenLoop("grade_0"),
@@ -58,7 +61,8 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
             .apply(instance, Saved::new));
 
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
-    private final ItemStack[] held = new ItemStack[COMPARTMENTS];
+    private final PodKind kind;
+    private final ItemStack[] held = new ItemStack[CapsuleStock.COMPARTMENTS];
     private int grade;
     private Optional<BlockPos> root = Optional.empty();
     private Optional<CompoundTag> unreadable = Optional.empty();
@@ -66,9 +70,28 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
     private @Nullable CapsuleTree store;
 
     ItemCapsuleBlockEntity(BlockPos pos, BlockState state) {
-        super(StorageModule.ITEM_CAPSULE_ENTITY.get(), pos, state);
+        this(StorageModule.ITEM_CAPSULE_ENTITY.get(), pos, state, PodKind.BULK);
+    }
+
+    ItemCapsuleBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, PodKind kind) {
+        super(type, pos, state);
+        this.kind = kind;
         Arrays.fill(held, ItemStack.EMPTY);
         grade = state.getValue(ItemCapsuleBlock.GRADE);
+    }
+
+    PodKind kind() {
+        return kind;
+    }
+
+    /** How many kinds of item the pod holds at once. */
+    int compartments() {
+        return kind.compartments();
+    }
+
+    /** Stacks of its kind one compartment holds at the pod's grade. */
+    int stacks() {
+        return kind.stacks(grade);
     }
 
     /** What a compartment holds, with its whole count; a copy. */
@@ -119,12 +142,15 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
 
     /**
      * Whether a hand may put {@code stack} into {@code compartment}: a kind a capsule takes, into its own compartment,
-     * or into an empty one when no other compartment of this pod holds it.
+     * or into an empty one when every other compartment of this pod holding the kind is full, as the tree's own
+     * rules open one.
      */
     boolean accepts(int compartment, ItemStack stack) {
         if (unreadable.isPresent() || !Stems.takes(stack)) return false;
         if (!held[compartment].isEmpty()) return holds(compartment, stack);
-        for (int other = 0; other < COMPARTMENTS; other++) if (holds(other, stack)) return false;
+        int limit = Compartments.limit(stacks(), stack.getMaxStackSize());
+        for (int other = 0; other < compartments(); other++)
+            if (holds(other, stack) && held[other].getCount() < limit) return false;
         return true;
     }
 
@@ -140,11 +166,11 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
 
     /** What the front shows: a copy of each compartment. */
     List<ItemStack> shown() {
-        return Arrays.stream(held).map(ItemStack::copy).toList();
+        return Arrays.stream(held, 0, compartments()).map(ItemStack::copy).toList();
     }
 
     CapsuleStock stock() {
-        return new CapsuleStock(List.of(held), grade);
+        return new CapsuleStock(List.of(Arrays.copyOf(held, compartments())), grade, kind);
     }
 
     private void changed() {
@@ -192,6 +218,40 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
         return true;
     }
 
+    /**
+     * Why this pod cannot become a Mixed Craw now, as the end of a language key under
+     * {@code gui.infestusfrontier.item_capsule.pod.gel.}, or empty when it can: only a readable, empty bulk pod on a
+     * server mutates, so nothing it holds is ever lost or squeezed.
+     */
+    Optional<String> craw() {
+        if (kind != PodKind.BULK) return Optional.of("not_bulk");
+        if (unreadable.isPresent()) return Optional.of("unreadable");
+        if (!isEmpty()) return Optional.of("not_empty");
+        if (level == null || level.isClientSide || isRemoved()) return Optional.of("no_level");
+        return Optional.empty();
+    }
+
+    /**
+     * The pod becomes a Mixed Craw of the same grade, facing and tree. The block is replaced, so this entity is
+     * removed and the tree reads its store again with the new one. False, changing nothing, when {@link #craw} refuses.
+     */
+    boolean mutateToCraw() {
+        if (craw().isPresent()) return false;
+        BlockState now = getBlockState();
+        Optional<BlockPos> hangs = root;
+        BlockState craw = StorageModule.MIXED_CRAW
+                .get()
+                .defaultBlockState()
+                .setValue(ItemCapsuleBlock.FACING, now.getValue(ItemCapsuleBlock.FACING))
+                .setValue(ItemCapsuleBlock.GRADE, grade);
+        Level where = level;
+        BlockPos pos = worldPosition;
+        where.setBlock(pos, craw, Block.UPDATE_ALL);
+        if (where.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity mutated) mutated.hangOn(hangs);
+        hangs.flatMap(rootPos -> Stems.rootAt(where, rootPos)).ifPresent(CapsuleStemBlockEntity::touch);
+        return true;
+    }
+
     /** A pod back in reach tells its root, so the tree's store is read again with it. */
     @Override
     public void onLoad() {
@@ -213,12 +273,14 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
         detach();
     }
 
-    private static Optional<String> check(Saved saved) {
-        if (saved.stock().held().size() > COMPARTMENTS)
-            return Optional.of(saved.stock().held().size() + " compartments in a pod of " + COMPARTMENTS);
+    private Optional<String> check(Saved saved) {
+        if (saved.stock().kind() != kind)
+            return Optional.of("a " + saved.stock().kind().id() + " pod's stock in a " + kind.id() + " pod");
+        if (saved.stock().held().size() > compartments())
+            return Optional.of(saved.stock().held().size() + " compartments in a pod of " + compartments());
         for (ItemStack stack : saved.stock().held()) {
             if (!stack.isEmpty() && !Stems.takes(stack)) return Optional.of("a capsule that holds " + stack);
-            int limit = Compartments.limit(CapsuleStock.stacks(saved.stock().grade()), stack.getMaxStackSize());
+            int limit = Compartments.limit(kind.stacks(saved.stock().grade()), stack.getMaxStackSize());
             if (stack.getCount() > limit) return Optional.of(stack.getCount() + " " + stack + " is past a compartment");
         }
         return Optional.empty();
@@ -227,7 +289,7 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
     private void restore(CapsuleStock stock) {
         Arrays.fill(held, ItemStack.EMPTY);
         List<ItemStack> stacks = stock.held();
-        for (int i = 0; i < Math.min(COMPARTMENTS, stacks.size()); i++) held[i] = stacks.get(i);
+        for (int i = 0; i < Math.min(compartments(), stacks.size()); i++) held[i] = stacks.get(i);
         grade = stock.grade();
     }
 
@@ -235,8 +297,8 @@ final class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, 
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         detach();
-        Optional<Saved> read = Persistence.read(
-                SAVED, tag, registries, StorageModule.LOGGER, "Item Capsule", ItemCapsuleBlockEntity::check);
+        Optional<Saved> read =
+                Persistence.read(SAVED, tag, registries, StorageModule.LOGGER, "Item Capsule", this::check);
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         restore(read.map(Saved::stock).orElse(CapsuleStock.EMPTY));
         root = read.flatMap(Saved::root);

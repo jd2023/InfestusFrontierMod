@@ -107,7 +107,7 @@ in this first recipe; it does not require or duplicate an actual fish entity.
 | I002 | Membrane Sheet | Membrane Rack: 1 rotten flesh + 1 string + 100 mB water → 1; leather may substitute at twice the processing time | Flexible construction, Binder and graft carriers. |
 | I003 | Bone Plate | Bone Loom: 1 bone + 50 BU → 1 | Structural ribs and prepared skeletal grafts. Bone blocks unpack into their normal bone-meal equivalent, not nine bones. Calcite alternative needs a separately balanced calcium recipe. |
 | I004 | Fusion Binder | Bowl: 1 Membrane Sheet + 1 Culture + 100 BU → 4 portions, 60 s; Vat 15 s | Universal biological carrier, never a substitute for a signature ingredient. |
-| I005 | Elastic Gel | Bowl/Cyst: 1 slime ball + 1 Culture + 50 mB water → 2 doses | Contour soles, impact/landing bladders and flexible organ treatments. |
+| I005 | Elastic Gel | Bowl/Cyst: 1 slime ball + 1 Culture + 50 mB water → 2 doses | Contour soles, impact/landing bladders and flexible organ treatments. One in an empty bulk pod's treatment well makes it a Mixed Craw. |
 | I006 | Lumen Secretion | Bowl/Cyst: 1 glow ink sac **or** 2 glow berries **or** 1 glowstone dust + 1 Binder + 25 BU → 2 doses | Lumen Tissue and Lantern Gland. These sources do not give different invisible light tiers. |
 | I007 | Nutrient Mash | Bowl/Cyst: 1 wheat + 1 carrot + 100 mB water → 2 portions | Culture feed and Feeding Lobe graft preparation; not edible player food or free biomass. |
 | I008 | Leaching Nodule | Leaching Gland: 1 bone meal + 100 mB water + 50 BU → 1 | Treat up to one 3×3 exposed eligible host-rock face; ores and block entities unchanged. Partial obstruction does not refund a whole dose. Exact reach is proposed balance. |

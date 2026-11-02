@@ -1,6 +1,23 @@
-# Art queue
+# Art placeholder list
 
-The art track. ktask queues the art tasks; this file holds their specifications, prompts and provenance, in the story template of the sprints, kind `art`. Textures come from an image model (Astra) and are saved and exported to the path the story names. GeckoLib models and animations come from a strong model. Rules: [ENGINEERING.md](../../ENGINEERING.md#art-track).
+The one list of temporary assets, and the specifications, prompts and provenance for their finals. Development and playable milestone qualification use functional temporary or procedural artwork and never wait for final art; a task adds its placeholders to the list below in the same change and files no art follow-up. Missing final art, its quality or its generation provenance alone never blocks a task or a milestone. The quality bar below applies to a finishing pass the owner requests separately; such a task is queued after all existing work. Textures come from an image model (Astra) and are saved and exported to the path the story names. GeckoLib models and animations come from a strong model. Rules: [ENGINEERING.md](../../ENGINEERING.md#art-track).
+
+## Placeholder list
+
+Every temporary asset still in the build. Each row gives the paths, the intended appearance, the image or model capability a final needs, and the captures that show it. A row leaves the list when its final is accepted; the specification (below, by story or section) stays.
+
+| Assets | Intended appearance | Capability | Captures | Specification |
+|---|---|---|---|---|
+| `textures/item/dead_tissue.png`, `textures/item/surgical_blade.png` | Dead Tissue: a limp grey-brown scrap of flesh, a dull pink fleck where it tore. Surgical Blade: a short pale bone handle bound in pink membrane, a thin curved steel blade, held lower left to upper right. Flat two-tone discs now | Image model (icons, 32x32) | `visual_static`, `walls` (`hotbar`) | [ART-009, Dead Tissue and Surgical Blade](#art-009--dead-tissue-and-surgical-blade-icons) |
+| `textures/block/living_wall.png`, `textures/item/skeletal_graft.png`, `textures/item/calcifying_graft.png` | Dense dark muscular tile with a faint fibre grain; a bone splint in a pink strip; a chalky cracked bone-paste lump. The tile is generated flesh (`art/gen_walls.py`), the icons flat discs | Image model (one seamless 64x64 tile, two 32x32 icons) | `walls` (`front`, `close_ribbed`, `hotbar`) | [ART-010](#art-010--living-wall-tile-and-graft-icons) |
+| `textures/item/membrane_window.png`, `textures/item/sphincter_door.png` | A pale translucent veined membrane square in an ivory frame; a closed iris of six pink petals in a red rim. Flat discs | Image model (two 32x32 icons) | `openings` (`windows`, `hotbar`) | [ART-011](#art-011--window-and-door-graft-icons) |
+| `art/gen_washing_kidney.py` model (`geo/block/washing_kidney.geo.json`, `animations/block/washing_kidney.animation.json`, `textures/block_entity/washing_kidney*.png`, `textures/block/washing_kidney.png`, `art/washing_kidney.bbmodel`), the emblem (`Sheet.KIDNEY_EMBLEM`, slot 10 of `textures/gui/organ.png`) and the guide plate (`textures/book/washing_kidney.png`) | Two soft blue-grey bean lobes, a pale clean sac and a murky dirty sac that read apart at hotbar size, a bone sieve between them, a low drip spout, at the Gizzard's finish | Strong model for GeckoLib; no image model | `motion_washing_kidney`, `mineral` (`kidney_screen`, `kidneys`, `hotbar`), `demo` (`kidney_line`, `book_washing_kidney`) | [Washing Kidney](#washing-kidney) |
+| `art/gen_mixed_craw.py` model (`geo/block/mixed_craw.geo.json`, `animations/block/mixed_craw.animation.json`, `textures/block_entity/mixed_craw*.png`, `textures/block/mixed_craw.png`, `art/mixed_craw.bbmodel`) and the Item Capsule lining it shares (`textures/block/item_capsule_lining.png`) | A bulk pod's plump squared hull in bog-green hide with pale bone creases, a wide socket with a one-pixel rim holding four small pockets in a square, two ivory ribs on the flanks that read as the partition between kinds; half the room of a bulk pod, a visible cue that it holds several kinds | Strong model for GeckoLib (model and animations); an image model for a hide texture on the finished model | `motion_mixed_craw`, `mixed_craw` (`front`, `grades`, `hotbar`), `demo` (`craw_line`, `craw_screen`) | [Mixed Craw](#mixed-craw) |
+| `textures/book/` plates: none for the Craw | The Craw's guide entry is text and the Elastic Gel recipe page, with the Craw item as its icon; a finished entry could add a plate of the pod beside a bulk pod | Strong model (render from the model) | `demo` (`book_mixed_craw`, `book_mixed_craw_recipe`) | [Mixed Craw](#mixed-craw) |
+
+The Mineral Gizzard has no placeholder left: its model, emblem and plate are the finished work of [CREDITS.txt](../../CREDITS.txt).
+
+Recoverable unfinished Kidney artwork waits in the git stash named `ktask: task #17 attempt #1` (a finer model and animations, texture, emblem and plate, and edits to this file). A finishing pass may recover it with `git stash list` and `git stash show -p`; development does not apply it and does not redo the deferred art.
 
 Fixed for every texture:
 
@@ -10,7 +27,7 @@ Fixed for every texture:
 - Prompts follow the shape used in ART-001: use case, asset type, subject, style, composition, palette, constraints, avoid. 16x16 pixel-art prompts with a five color palette gave the weak placeholders; sources drawn large and downsampled are what read as living material.
 - One `CREDITS.txt` line per story: file, who made it, tool, date.
 
-Quality bar. The owner rejects anything below it, and a milestone is not accepted while its art tasks are open.
+Quality bar. Applies to a finishing pass the owner requests; the owner rejects a final below it. Temporary assets are not judged against it and never hold a task or a milestone.
 
 - A texture reads as its material from four blocks away in a capture, without a sign: flesh, membrane, bone, soil. The bar is the V3 substrate and the Astra living tissue from the model evaluation; weaker than those is rejected.
 - Ground textures are a 4x4-block macro pattern, 256x256 source cut into sixteen 64x64 tiles, so a 4x4 patch shows no repeat and no seam. The stages of one ground share one vein network and one ground tone, derived from one master by a generator under `art/`. Other blocks get random rotation in the blockstate.
@@ -430,3 +447,15 @@ Specialist work to do, by an artist with a strong model for GeckoLib (no image m
 - Update `CREDITS.txt` for the new files.
 
 Capture acceptance: the `mineral` scenario's `kidney_screen`, `full_kidney_screen`, `kidneys` and `hotbar` views; the `motion_washing_kidney` scene (motion, back, side, close, corner); the demo's `kidney_line`, `kidney_screen`, `kidney_items` and the book views `book_washing_kidney`, `book_washing_kidney_washing`, `book_washing_kidney_settling`, `book_washing_kidney_pause`. The reviewer reads the PNGs; the hotbar icon's centroid stays within 1.5 px of its slot centre.
+
+## Mixed Craw
+
+`art/gen_mixed_craw.py` writes the model, Blockbench source, atlas, break particle and `idle`/`grade_0..2` clips through the shared organ pipeline, reusing the Item Capsule's hull, neck, collar, grades and breath (`art/gen_item_capsule.py`, now parametrised on the rim width, the hide palette and extra cubes). It is temporary procedural art written with the functional task: dark bog-green hide with pale bone creases, a one-pixel rim round the socket (10 pixels across) and two ivory flank ribs. `StorageModule` draws the stock in four pockets in a square, each 4.8 pixels across on a 5 pixel pitch, over `item_capsule_lining`; the pockets follow the socket, so a final model keeps the 10 pixel socket and its floor 4.5 pixels behind the front.
+
+Specialist work to do, by an artist with a strong model for GeckoLib:
+
+- Replace the procedural model with a finished one. Cues to keep: the block's footprint and the pod's neck, collar and shelf into the stem (the same grades, 0.72, 0.86 and 1 about the hull's back), a socket that shows four separate pockets, a hide and rim that tell it from a bulk pod at a glance and from across a room. Keep the clips `idle`, `grade_0`, `grade_1`, `grade_2`; every rule of the quality bar and `art/test_motion.py` applies.
+- Optionally, an image-model hide texture on the finished model and a guide plate (200x200 RGBA, `textures/book/mixed_craw.png`) beside a bulk pod.
+- Update `CREDITS.txt` for the new files.
+
+Capture acceptance: `motion_mixed_craw` (motion, back, side), the `mixed_craw` scenario's `front`, `grades` and `hotbar`, the demo's `craw_line` and `craw_screen`, and the book views `book_mixed_craw` and `book_mixed_craw_recipe`. The reviewer reads the PNGs; the hotbar icon's centroid stays within 1.5 px of its slot centre.

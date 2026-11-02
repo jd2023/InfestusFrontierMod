@@ -77,7 +77,7 @@ Invalid additions wait outside the valid body without erasing its contents.
 Fuel Papilla fills worn pieces from stored supply.
 
 **Specialized storage and crafting (proposed milestone).** Mutate an empty pod into a
-Mixed Craw (four kinds at half a bulk pod's depth in total) and a Craw into a Larder
+Mixed Craw (shipped; four kinds at half a bulk pod's depth in total) and a Craw into a Larder
 (three labelled kinds, each with a reserve that every automatic extraction keeps).
 Use a Shaping Palm as a crafting table that keeps its grid; link it to one store; then
 let it repeat one chosen recipe on biomass through Feeding and Yield Lobes. Each step

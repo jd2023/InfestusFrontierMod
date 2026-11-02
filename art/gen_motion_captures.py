@@ -9,7 +9,7 @@ from pathlib import Path
 OUT = Path('src/testMod/resources/captures')
 MODELS = ('culture_bowl', 'digestive_sac', 'membrane_rack', 'bone_loom', 'awakening_cradle',
           'activation_cyst', 'planting_proboscis', 'harvest_corolla', 'compost_gland', 'seed_pouch', 'item_capsule',
-          'spine_sentry', 'mineral_gizzard', 'washing_kidney')
+          'spine_sentry', 'mineral_gizzard', 'washing_kidney', 'mixed_craw')
 
 
 # Views an organ's identity pass added to its scene, kept here so regenerating the scenes never loses them: a close
@@ -96,7 +96,7 @@ def scene(name, left, right, frames=48):
 
 def main():
     for model in MODELS:
-        suffix = '' if model in ('seed_pouch', 'item_capsule') else '[working=true]'
+        suffix = '' if model in ('seed_pouch', 'item_capsule', 'mixed_craw') else '[working=true]'
         scene(model, model, model + suffix)
     for stage in range(3):
         scene(f'furnace_{stage}', f'bio_furnace[stage={stage}]', f'bio_furnace[stage={stage},working=true]')

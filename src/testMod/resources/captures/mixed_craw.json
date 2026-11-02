@@ -1,0 +1,175 @@
+{
+  "commands": [
+    "tick freeze",
+    "fill -10 -61 -8 14 -50 10 air",
+    "fill -10 -62 -8 14 -62 10 grass_block",
+    "kill @e[type=item]",
+    "advancement grant @s through infestusfrontier:contact/biomass_bladder",
+    "advancement grant @s only infestusfrontier:acquired/mixed_craw",
+    "give @s infestusfrontier:mixed_craw",
+    "give @s infestusfrontier:item_capsule",
+    "give @s infestusfrontier:elastic_gel 4",
+    "setblock 0 -62 6 infestusfrontier:mouth[mode=intake]",
+    "setblock 0 -61 6 infestusfrontier:capsule_stem[part=root]{root:[I;0,-61,6],plan:{seed:7L,cells:[{x:0,y:0,z:0,part:\"root\",side:-1,parent:-1,trunk:0,tier:0}],pods:[]},grow:40}",
+    "setblock -7 -61 6 infestusfrontier:mixed_craw[facing=north,grade=0]{stock:{kind:\"craw\",grade:0,held:[{slot:0,item:{id:\"minecraft:hopper\"},count:40},{slot:1,item:{id:\"minecraft:piston\"},count:12},{slot:2,item:{id:\"minecraft:comparator\"},count:30},{slot:3,item:{id:\"minecraft:dropper\"},count:9}]}}",
+    "setblock -5 -61 6 infestusfrontier:mixed_craw[facing=north,grade=1]{stock:{kind:\"craw\",grade:1,held:[{slot:0,item:{id:\"minecraft:hopper\"},count:100},{slot:1,item:{id:\"minecraft:piston\"},count:64},{slot:2,item:{id:\"minecraft:observer\"},count:20},{slot:3,item:{id:\"minecraft:repeater\"},count:128}]}}",
+    "setblock -3 -61 6 infestusfrontier:mixed_craw[facing=north,grade=2]{stock:{kind:\"craw\",grade:2,held:[{slot:0,item:{id:\"minecraft:hopper\"},count:256},{slot:1,item:{id:\"minecraft:piston\"},count:200},{slot:2,item:{id:\"minecraft:observer\"},count:5},{slot:3,item:{id:\"minecraft:repeater\"},count:16}]}}",
+    "setblock 4 -61 6 infestusfrontier:item_capsule[facing=north,grade=2]{stock:{held:[{slot:0,item:{id:\"minecraft:raw_iron\"},count:1900}],grade:2}}",
+    "setblock 6 -61 6 infestusfrontier:item_capsule[facing=north,grade=0]",
+    "tick unfreeze",
+    "time set noon",
+    "setblock 0 -60 5 infestusfrontier:mixed_craw[facing=north,grade=1]{stock:{kind:\"craw\",grade:1,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:30},{slot:1,item:{id:\"minecraft:gold_ingot\"},count:12},{slot:2,item:{id:\"minecraft:redstone\"},count:90},{slot:3,item:{id:\"minecraft:copper_ingot\"},count:7}]},root:[I;0,-61,6]}",
+    "time set noon"
+  ],
+  "views": [
+    {
+      "name": "front",
+      "x": 0.5,
+      "y": -58.5,
+      "z": 0.0,
+      "yaw": 0,
+      "pitch": 8
+    },
+    {
+      "name": "back",
+      "x": 0.5,
+      "y": -58.5,
+      "z": 12.5,
+      "yaw": 180,
+      "pitch": 8
+    },
+    {
+      "name": "corner",
+      "x": -4.5,
+      "y": -58.5,
+      "z": 1.5,
+      "yaw": -45,
+      "pitch": 12
+    },
+    {
+      "name": "grades",
+      "x": -3.0,
+      "y": -60.3,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 10
+    },
+    {
+      "name": "bulk_beside",
+      "x": 2.5,
+      "y": -60.3,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 10
+    },
+    {
+      "name": "in_tree",
+      "x": 0.5,
+      "y": -60.0,
+      "z": 2.8,
+      "yaw": 0,
+      "pitch": 14
+    },
+    {
+      "name": "hotbar",
+      "x": 0.5,
+      "y": -58.5,
+      "z": 0.0,
+      "yaw": 0,
+      "pitch": 8,
+      "gui": true,
+      "icons": [
+        "infestusfrontier:mixed_craw",
+        "infestusfrontier:item_capsule",
+        "infestusfrontier:elastic_gel"
+      ]
+    },
+    {
+      "name": "craw_screen",
+      "x": 0.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "use": [
+        0,
+        -60,
+        5
+      ]
+    },
+    {
+      "name": "grade_2_craw_screen",
+      "x": -3.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "use": [
+        -3,
+        -61,
+        6
+      ]
+    },
+    {
+      "name": "pod_screen",
+      "x": 4.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "use": [
+        6,
+        -61,
+        6
+      ]
+    },
+    {
+      "name": "tree_screen",
+      "x": 0.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "use": [
+        0,
+        -61,
+        6
+      ]
+    },
+    {
+      "name": "book_mixed_craw",
+      "x": 0.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "book": "infestusfrontier:circulation/mixed_craw"
+    },
+    {
+      "name": "book_mixed_craw_recipe",
+      "x": 0.5,
+      "y": -60.4,
+      "z": 3.4,
+      "yaw": 0,
+      "pitch": 20,
+      "gui": true,
+      "book": "infestusfrontier:circulation/mixed_craw",
+      "page": 2
+    },
+    {
+      "name": "breath",
+      "x": -2.0,
+      "y": -60.3,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 10,
+      "frames": 24,
+      "frameTicks": 4
+    }
+  ]
+}
