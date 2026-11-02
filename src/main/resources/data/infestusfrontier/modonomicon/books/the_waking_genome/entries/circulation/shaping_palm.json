@@ -49,6 +49,16 @@
       "text": "entry.infestusfrontier.circulation.shaping_palm.kept"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.shaping_palm.reach.title",
+      "text": "entry.infestusfrontier.circulation.shaping_palm.reach"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.shaping_palm.supply.title",
+      "text": "entry.infestusfrontier.circulation.shaping_palm.supply"
+    },
+    {
       "type": "modonomicon:crafting_recipe",
       "recipe_id_1": "infestusfrontier:shaping_palm",
       "text": "entry.infestusfrontier.circulation.shaping_palm.craft"

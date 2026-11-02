@@ -20,6 +20,8 @@ import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
@@ -64,21 +66,21 @@ import org.jd.infestusfrontier.processing.api.PalmContents;
 @PrefixGameTestTemplate(false)
 public final class ShapingPalmTests {
     private static final int Y = 1;
-    private static final int RESULT = ShapingPalmMenu.RESULT;
-    private static final int CELL = ShapingPalmMenu.FIRST_CELL;
-    private static final BlockPos AT = new BlockPos(2, Y + 1, 2);
+    static final int RESULT = ShapingPalmMenu.RESULT;
+    static final int CELL = ShapingPalmMenu.FIRST_CELL;
+    static final BlockPos AT = new BlockPos(2, Y + 1, 2);
 
     private ShapingPalmTests() {}
 
     // ---- helpers ----
 
-    private static BlockPos palm(GameTestHelper h) {
+    static BlockPos palm(GameTestHelper h) {
         h.setBlock(AT.below(), EcologyTests.mature());
         h.setBlock(AT, ProcessingModule.SHAPING_PALM.get());
         return AT;
     }
 
-    private static MenuPlayer open(GameTestHelper h, BlockPos at, String name) {
+    static MenuPlayer open(GameTestHelper h, BlockPos at, String name) {
         MenuPlayer player = new MenuPlayer(h.getLevel(), name);
         BlockPos absolute = h.absolutePos(at);
         player.moveTo(absolute.getX() + 0.5, absolute.getY(), absolute.getZ() - 1.5);
@@ -87,63 +89,63 @@ public final class ShapingPalmTests {
         return player;
     }
 
-    private static MenuPlayer open(GameTestHelper h, BlockPos at) {
+    static MenuPlayer open(GameTestHelper h, BlockPos at) {
         return open(h, at, "palm_tests");
     }
 
     /** Puts {@code stack} in grid cell {@code cell} (0 to 8) with the cursor, as a click on the well does. */
-    private static void put(MenuPlayer player, int cell, ItemStack stack) {
+    static void put(MenuPlayer player, int cell, ItemStack stack) {
         player.containerMenu.setCarried(stack);
         player.containerMenu.clicked(CELL + cell, 0, ClickType.PICKUP, player);
     }
 
-    private static ItemStack in(MenuPlayer player, int cell) {
+    static ItemStack in(MenuPlayer player, int cell) {
         return player.containerMenu.getSlot(CELL + cell).getItem();
     }
 
-    private static ItemStack result(MenuPlayer player) {
+    static ItemStack result(MenuPlayer player) {
         return player.containerMenu.getSlot(RESULT).getItem();
     }
 
     /** What the organ itself holds, read from its block entity, not from any menu. */
-    private static PalmContents grid(GameTestHelper h, BlockPos at) {
+    static PalmContents grid(GameTestHelper h, BlockPos at) {
         return h.getBlockEntity(at)
                 .collectComponents()
                 .getOrDefault(ProcessingModule.PALM_CONTENTS.get(), PalmContents.EMPTY);
     }
 
-    private static ItemStack cell(GameTestHelper h, BlockPos at, int cell) {
+    static ItemStack cell(GameTestHelper h, BlockPos at, int cell) {
         return grid(h, at).cell(cell);
     }
 
-    private static ItemStack stack(Item item, int count) {
+    static ItemStack stack(Item item, int count) {
         return new ItemStack(item, count);
     }
 
-    private static int held(Player player, Item item) {
+    static int held(Player player, Item item) {
         int count = 0;
         for (ItemStack stack : player.getInventory().items) if (stack.is(item)) count += stack.getCount();
         return count;
     }
 
-    private static int total(Player player, Item item) {
+    static int total(Player player, Item item) {
         return held(player, item)
                 + (player.containerMenu.getCarried().is(item)
                         ? player.containerMenu.getCarried().getCount()
                         : 0);
     }
 
-    private static void fillInventory(Player player) {
+    static void fillInventory(Player player) {
         for (int i = 0; i < player.getInventory().items.size(); i++)
             player.getInventory().items.set(i, stack(Items.DIRT, 64));
     }
 
-    private static void close(GameTestHelper h, MenuPlayer player) {
+    static void close(GameTestHelper h, MenuPlayer player) {
         player.closeContainer();
         h.assertTrue(player.containerMenu == player.inventoryMenu, "the screen closed");
     }
 
-    private static void reload(GameTestHelper h, BlockPos at) {
+    static void reload(GameTestHelper h, BlockPos at) {
         var registries = h.getLevel().registryAccess();
         try {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -161,7 +163,7 @@ public final class ShapingPalmTests {
         }
     }
 
-    private static List<ItemEntity> loose(GameTestHelper h, BlockPos at) {
+    static List<ItemEntity> loose(GameTestHelper h, BlockPos at) {
         return h.getEntities(EntityType.ITEM, at, 4.0);
     }
 
@@ -730,7 +732,7 @@ public final class ShapingPalmTests {
     }
 
     /** A server player outside the player list that opens menus without a client, as in the stem tests. */
-    private static final class MenuPlayer extends FakePlayer {
+    static final class MenuPlayer extends FakePlayer {
         private final java.util.Map<Stat<?>, Integer> awarded = new java.util.HashMap<>();
 
         MenuPlayer(ServerLevel level, String name) {
@@ -741,6 +743,21 @@ public final class ShapingPalmTests {
         @Override
         public void awardStat(Stat<?> stat, int amount) {
             awarded.merge(stat, amount, Integer::sum);
+        }
+
+        /** The last message the player was shown above the hotbar, or null. */
+        private Component said;
+
+        @Override
+        public void displayClientMessage(Component message, boolean overlay) {
+            said = message;
+        }
+
+        /** The translation key of the last message shown, or an empty string; the message is then forgotten. */
+        String saidKey() {
+            Component message = said;
+            said = null;
+            return message != null && message.getContents() instanceof TranslatableContents t ? t.getKey() : "";
         }
 
         int crafted(Item item) {

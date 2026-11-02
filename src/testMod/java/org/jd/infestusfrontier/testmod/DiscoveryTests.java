@@ -215,6 +215,12 @@ public final class DiscoveryTests {
                 .map(page -> ((com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage) page).getRecipeId1())
                 .toList();
         h.assertValueEqual(recipes, List.of(id("shaping_palm")), "one crafting page, for the Palm");
+        h.assertValueEqual(
+                entry.getPages().stream()
+                        .filter(page -> page instanceof com.klikli_dev.modonomicon.book.page.BookTextPage)
+                        .count(),
+                5L,
+                "text pages for use, keeps, kept, Reach and the supply buttons");
         h.assertTrue(h.getLevel().getRecipeManager().byKey(id("shaping_palm")).isPresent(), "the shown recipe exists");
         h.assertTrue(entry.getCondition() instanceof BookOrCondition, "the Palm unlocks by the Bone Plate or by item");
         h.assertTrue(

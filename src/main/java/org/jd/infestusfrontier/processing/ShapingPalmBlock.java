@@ -1,7 +1,9 @@
 package org.jd.infestusfrontier.processing;
 
 import com.mojang.serialization.MapCodec;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -19,13 +21,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.foundation.Refusals;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The Shaping Palm (BLOCK_CATALOG T1-41, stage 1): a crafting table that keeps its grid. It stands on an organ
- * foundation, and any hand opens its screen, like a chest. It has no state beyond its block entity, no ticks, and no
- * item handler: nothing but the player at its screen puts anything in or takes anything out.
+ * The Shaping Palm (BLOCK_CATALOG T1-41, stages 1 and 2): a crafting table that keeps its grid. It stands on an organ
+ * foundation, and any hand opens its screen, like a chest. A Contractile Fiber used on it gives it Reach, one supply
+ * link. It has no state beyond its block entity, no ticks, and no item handler: nothing but the player at its screen
+ * puts anything in or takes anything out.
  */
 public final class ShapingPalmBlock extends BaseEntityBlock {
     private static final MapCodec<ShapingPalmBlock> CODEC = simpleCodec(ShapingPalmBlock::new);
@@ -85,7 +90,23 @@ public final class ShapingPalmBlock extends BaseEntityBlock {
             Player player,
             InteractionHand hand,
             BlockHitResult hit) {
+        if (stack.is(ProcessingModule.PALM_GRAFTS)) return graft(stack, level, pos, player);
         return Organs.openScreen(stack, level, pos, player);
+    }
+
+    /** One Reach graft on a Palm: spent only when the Palm takes it, kept by a Creative player. */
+    private static ItemInteractionResult graft(ItemStack stack, Level level, BlockPos pos, Player player) {
+        if (!(level.getBlockEntity(pos) instanceof ShapingPalmBlockEntity palm))
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+        Optional<Refusal> why = palm.grantReach();
+        if (why.isPresent()) {
+            Refusals.show(player, why.get());
+            return ItemInteractionResult.CONSUME;
+        }
+        if (!player.getAbilities().instabuild) stack.shrink(1);
+        player.displayClientMessage(Component.translatable("infestusfrontier.status.palm.reach"), true);
+        return ItemInteractionResult.CONSUME;
     }
 
     @Override

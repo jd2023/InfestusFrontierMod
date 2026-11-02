@@ -13,6 +13,7 @@
               "source": "block_entity",
               "include": [
                 "infestusfrontier:palm_contents",
+                "infestusfrontier:palm_reach",
                 "infestusfrontier:unreadable_save"
               ]
             }

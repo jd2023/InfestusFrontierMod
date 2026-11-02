@@ -1,11 +1,14 @@
 package org.jd.infestusfrontier.processing;
 
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
 import java.util.List;
 import java.util.function.Supplier;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -36,6 +39,7 @@ import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
 import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 import org.jd.infestusfrontier.processing.api.PalmContents;
+import org.jd.infestusfrontier.processing.api.PalmLinking;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
@@ -329,6 +333,14 @@ public final class ProcessingModule {
                     "palm_contents",
                     builder -> builder.persistent(PalmContents.CODEC).networkSynchronized(PalmContents.STREAM_CODEC));
 
+    /** Set on a Palm item that has Reach, so breaking the organ does not spend the Contractile Fiber that gave it. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> PALM_REACH =
+            COMPONENTS.registerComponentType(
+                    "palm_reach", builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+    /** Grafts that give a Palm Reach, the supply link of its second stage. */
+    public static final TagKey<Item> PALM_GRAFTS = TagKey.create(
+            Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "palm_reach"));
+
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
     public static final DeferredHolder<RecipeType<?>, RecipeType<DigestionRecipe>> DIGESTION = RECIPE_TYPES.register(
@@ -425,6 +437,7 @@ public final class ProcessingModule {
                     Capabilities.FluidHandler.BLOCK,
                     DIGESTIVE_SAC_ENTITY.get(),
                     (sac, side) -> BiomassFluids.handler(sac));
+            event.registerBlockEntity(PalmLinking.PALM_LINK, SHAPING_PALM_ENTITY.get(), (palm, side) -> palm);
             for (var entity : List.of(
                     CULTURE_BOWL_ENTITY,
                     MEMBRANE_RACK_ENTITY,

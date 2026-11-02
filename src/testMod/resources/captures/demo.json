@@ -358,6 +358,22 @@
     "setblock 116 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Craft Kit\"','\"Any recipe:\"','\"milk, honey,\"','\"planks, ingots\"']}}",
     "setblock 120 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Palm Parts\"','\"Bud, table,\"','\"2 sheets, plate:\"','\"craft your own\"']}}",
     "setblock 124 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Hands Only\"','\"A hopper above\"','\"cannot reach\"','\"the Palm grid\"']}}",
+    "fill 127 -61 -29 150 -61 -26 grass_block",
+    "setblock 128 -61 -28 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 136 -61 -28 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 144 -61 -28 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 128 -60 -28 infestusfrontier:shaping_palm{reach:1b,link:[I;132,-60,-28],contents:{grid:[{id:\"minecraft:honey_bottle\",count:2},{id:\"minecraft:honey_bottle\",count:2},{},{id:\"minecraft:honey_bottle\",count:2},{id:\"minecraft:honey_bottle\",count:2}]}}",
+    "setblock 132 -60 -28 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:honey_bottle\",count:20},{Slot:1,id:\"minecraft:apple\",count:12},{Slot:2,id:\"minecraft:oak_planks\",count:16}]}",
+    "setblock 136 -60 -28 infestusfrontier:shaping_palm{reach:1b,link:[I;140,-60,-28],contents:{grid:[{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1},{id:\"minecraft:iron_ingot\",count:1}]}}",
+    "setblock 140 -60 -28 infestusfrontier:larder[facing=north,grade=1]{stock:{kind:\"larder\",grade:1,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:30}],marks:[{slot:0,label:{id:\"minecraft:iron_ingot\"},reserve:16},{slot:1,label:{id:\"minecraft:gold_ingot\"},reserve:0},{slot:2,label:{id:\"minecraft:redstone\"},reserve:0}]}}",
+    "setblock 144 -60 -28 infestusfrontier:shaping_palm",
+    "setblock 148 -60 -28 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:contractile_fiber\",count:4},{Slot:1,id:\"infestusfrontier:synaptic_probe\",count:1},{Slot:2,id:\"minecraft:oak_planks\",count:64},{Slot:3,id:\"minecraft:stick\",count:32},{Slot:4,id:\"minecraft:cobblestone\",count:64}]}",
+    "setblock 128 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Reach Palm\"','\"Restock tops the\"','\"grid up from the\"','\"linked chest\"']}}",
+    "setblock 132 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Linked Chest\"','\"Honey bottles:\"','\"Restock, then\"','\"craft honey\"']}}",
+    "setblock 136 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Palm + Larder\"','\"Restock takes\"','\"only the free\"','\"iron\"']}}",
+    "setblock 140 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Larder keeps\"','\"16 iron: its\"','\"reserve stays\"','\"in the Larder\"']}}",
+    "setblock 144 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Link Kit\"','\"Fiber on the\"','\"Palm, probe the\"','\"Palm, then chest\"']}}",
+    "setblock 148 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Kit Chest\"','\"Fibers, probe,\"','\"planks, sticks,\"','\"cobblestone\"']}}",
     "item replace entity @s inventory.17 with infestusfrontier:shaping_palm 2"
   ],
   "views": [
@@ -1585,6 +1601,50 @@
       ]
     },
     {
+      "name": "palm_reach_line",
+      "x": 136.0,
+      "y": -57.3,
+      "z": -33.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "palm_kit_line",
+      "x": 146.0,
+      "y": -57.3,
+      "z": -33.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "palm_reach_screen",
+      "x": 128.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        128,
+        -60,
+        -28
+      ]
+    },
+    {
+      "name": "palm_larder_screen",
+      "x": 136.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        136,
+        -60,
+        -28
+      ]
+    },
+    {
       "x": 2.5,
       "y": -60,
       "z": -39.5,
@@ -1613,9 +1673,20 @@
       "yaw": 0,
       "pitch": 10,
       "gui": true,
-      "name": "book_shaping_palm_recipe",
+      "name": "book_shaping_palm_reach",
       "book": "infestusfrontier:circulation/shaping_palm",
       "page": 4
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_shaping_palm_recipe",
+      "book": "infestusfrontier:circulation/shaping_palm",
+      "page": 6
     }
   ]
 }

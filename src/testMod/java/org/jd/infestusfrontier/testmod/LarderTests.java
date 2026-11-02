@@ -71,7 +71,7 @@ import org.jd.infestusfrontier.storage.api.ItemStore;
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class LarderTests {
-    private static final BlockPos ROOT = new BlockPos(8, 2, 8);
+    static final BlockPos ROOT = new BlockPos(8, 2, 8);
     /** Seed 7 forks east at tier 3, as in the stem tests. */
     private static final long FORKING = 7;
 
@@ -121,7 +121,7 @@ public final class LarderTests {
         return pods;
     }
 
-    private static IItemHandler items(GameTestHelper h, BlockPos pos) {
+    static IItemHandler items(GameTestHelper h, BlockPos pos) {
         return h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(pos), Direction.UP);
     }
 
@@ -179,7 +179,7 @@ public final class LarderTests {
         return pod(h, pod, StorageModule.LARDER.get(), grade);
     }
 
-    private static BlockPos aloneLarder(GameTestHelper h, int grade) {
+    static BlockPos aloneLarder(GameTestHelper h, int grade) {
         h.setBlock(ROOT.below(), Blocks.STONE);
         return larder(h, ROOT, grade);
     }
@@ -212,7 +212,7 @@ public final class LarderTests {
     }
 
     /** Steps compartment {@code compartment}'s reserve at the pod's screen to {@code wanted}, up through the settings. */
-    private static void reserve(GameTestHelper h, BlockPos pod, int compartment, int wanted) {
+    static void reserve(GameTestHelper h, BlockPos pod, int compartment, int wanted) {
         MenuPlayer player = open(h, pod);
         for (int i = 0; i < 16 && stockOf(h, pod).mark(compartment).reserve() != wanted; i++)
             player.containerMenu.clickMenuButton(player, RESERVE_UP + compartment);
@@ -222,7 +222,7 @@ public final class LarderTests {
     }
 
     /** Labels compartment {@code compartment} with {@code item} by clicking it on the label well. */
-    private static void label(GameTestHelper h, BlockPos pod, int compartment, Item item) {
+    static void label(GameTestHelper h, BlockPos pod, int compartment, Item item) {
         MenuPlayer player = open(h, pod);
         player.containerMenu.setCarried(stack(item, 1));
         player.containerMenu.clicked(LABELS + compartment, 0, ClickType.PICKUP, player);
@@ -230,7 +230,7 @@ public final class LarderTests {
         h.assertTrue(stockOf(h, pod).mark(compartment).label().is(item), "labelled " + item);
     }
 
-    private static int reserveOf(GameTestHelper h, BlockPos pod, int compartment) {
+    static int reserveOf(GameTestHelper h, BlockPos pod, int compartment) {
         return stockOf(h, pod).mark(compartment).reserve();
     }
 

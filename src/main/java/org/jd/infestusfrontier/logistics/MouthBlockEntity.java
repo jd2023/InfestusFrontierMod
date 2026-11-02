@@ -20,17 +20,14 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.ChestType;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.logistics.Delivery;
 import org.jd.infestusfrontier.core.logistics.NetworkIndex;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
-import org.jd.infestusfrontier.storage.api.ItemStore;
+import org.jd.infestusfrontier.storage.api.ItemStores;
 import org.jetbrains.annotations.Nullable;
 
 /** An item endpoint: transfers directly to loaded peers and retains only an undelivered remainder. */
@@ -42,8 +39,6 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
     static final int SOURCE_SLOTS = 16;
     /** Simulated inserts into destinations one pulse makes. */
     static final int OFFERS = 16;
-    /** Slots of a store one insertion or one count touches. */
-    static final int STORE_SLOTS = 64;
 
     static final int FILTER_SLOTS = 9;
 
@@ -194,7 +189,7 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
             if (offered.isEmpty() || !permits(offered)) continue;
             int allowed = amount == 0
                     ? offered.getCount()
-                    : Delivery.outputAllowance(amount, count(source, offered), offered.getCount());
+                    : Delivery.outputAllowance(amount, ItemStores.count(source, offered), offered.getCount());
             if (allowed == 0) continue;
             ItemStack wanted = offered.copyWithCount(allowed);
             Optional<Taker> taker = taker(order, wanted);
@@ -283,9 +278,10 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         if (unreadable.isPresent() || !mode().takes() || !permits(stack)) return 0;
         IItemHandler store = partner();
         if (store == null) return 0;
-        int allowed = Delivery.intakeRoom(amount, amount == 0 ? 0 : count(store, stack), stack.getCount());
+        int allowed = Delivery.intakeRoom(amount, amount == 0 ? 0 : ItemStores.count(store, stack), stack.getCount());
         if (allowed == 0) return 0;
-        return allowed - insert(store, stack.copyWithCount(allowed), true).getCount();
+        return allowed
+                - ItemStores.insert(store, stack.copyWithCount(allowed), true).getCount();
     }
 
     /** Inserts what {@link #room} allows and returns the rest. */
@@ -293,7 +289,8 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         int room = room(stack);
         if (room == 0) return stack;
         IItemHandler store = partner();
-        int inserted = room - insert(store, stack.copyWithCount(room), false).getCount();
+        int inserted = room
+                - ItemStores.insert(store, stack.copyWithCount(room), false).getCount();
         return stack.copyWithCount(stack.getCount() - inserted);
     }
 
@@ -309,38 +306,9 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         return deny != match;
     }
 
-    /**
-     * The store standing on this Mouth, or null. A double chest whose other half is in an unloaded chunk counts as
-     * absent: vanilla's chest capability reads that half and would load its chunk.
-     */
+    /** The store standing on this Mouth, or null: see {@link ItemStores#at}. */
     private @Nullable IItemHandler partner() {
-        BlockPos above = worldPosition.above();
-        if (!level.hasChunkAt(above)) return null;
-        BlockState state = level.getBlockState(above);
-        if (state.getBlock() instanceof ChestBlock
-                && state.getValue(ChestBlock.TYPE) != ChestType.SINGLE
-                && !level.hasChunkAt(above.relative(ChestBlock.getConnectedDirection(state)))) return null;
-        return level.getCapability(Capabilities.ItemHandler.BLOCK, above, Direction.DOWN);
-    }
-
-    /** A store the colony knows takes the stack by its own rules; any other store slot by slot. */
-    private static ItemStack insert(IItemHandler store, ItemStack stack, boolean simulate) {
-        if (store instanceof ItemStore known) return known.insert(stack, simulate);
-        int slots = Math.min(STORE_SLOTS, store.getSlots());
-        for (int slot = 0; slot < slots && !stack.isEmpty(); slot++) stack = store.insertItem(slot, stack, simulate);
-        return stack;
-    }
-
-    /** A store the colony knows gives its whole count; any other store is counted over its first slots. */
-    private static int count(IItemHandler store, ItemStack like) {
-        if (store instanceof ItemStore known) return known.count(like);
-        int total = 0;
-        int slots = Math.min(STORE_SLOTS, store.getSlots());
-        for (int slot = 0; slot < slots; slot++) {
-            ItemStack held = store.getStackInSlot(slot);
-            if (ItemStack.isSameItemSameComponents(held, like)) total += held.getCount();
-        }
-        return total;
+        return ItemStores.at(level, worldPosition.above(), Direction.DOWN);
     }
 
     /** Breaking an endpoint recovers its undelivered remainder exactly once. */

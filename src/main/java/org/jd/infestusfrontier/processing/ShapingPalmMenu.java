@@ -2,24 +2,34 @@ package org.jd.infestusfrontier.processing;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.IntSupplier;
+import java.util.function.UnaryOperator;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.ResultSlot;
+import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.foundation.Refusals;
 import org.jd.infestusfrontier.foundation.menu.OrganMenu;
+import org.jd.infestusfrontier.processing.PalmSupply.Reached;
 import org.jd.infestusfrontier.processing.api.PalmContents;
+import org.jd.infestusfrontier.storage.api.ItemStores;
 import org.jd.infestusfrontier.ui.Bounds;
 import org.jd.infestusfrontier.ui.Sheet;
 import org.jd.infestusfrontier.ui.SlotGrid;
@@ -30,14 +40,26 @@ import org.jd.infestusfrontier.ui.SlotGrid;
  * crafting table's: the recipe lookup is {@link PalmCrafting#update}, taking it is {@code ResultSlot.onTake}. This menu
  * adds three things the table does not do: it looks the result up again before a click on it, because another viewer
  * may have used the grid since this menu last did; it refuses a craft whose result or remainder has no room, which the
- * table would drop on the ground; and it never clears the grid when it closes. The client's copy is only a view.
+ * table would drop on the ground; and it never clears the grid when it closes. Its three buttons are the supply link's
+ * actions (Restock, Return, Store result), each one request the server decides on the live grid and the live store.
+ * The client's copy is only a view.
  */
 public final class ShapingPalmMenu extends OrganMenu {
     /** The vanilla result slot; the engine's result lookup writes slot 0. */
     public static final int RESULT = 0;
 
     public static final int FIRST_CELL = 1;
-    private static final int STRIPS = 1;
+    /** The button ids: top every filled cell up from the store, move the grid to it, craft once into it. */
+    public static final int RESTOCK = 0;
+
+    public static final int RETURN = 1;
+    public static final int STORE_RESULT = 2;
+    /** The synced ints: 0 no Reach, 1 Reach without a link, 2 linked; then the link's offset from the Palm. */
+    private static final int STATE = 0;
+
+    private static final int OFFSET = 1;
+    private static final int SYNCED = 4;
+    private static final int STRIPS = 2;
     private static final SlotGrid GRID = SlotGrid.standard3x3();
     /** How far right of the grid the result well sits. */
     private static final int RESULT_GAP = 24;
@@ -51,7 +73,7 @@ public final class ShapingPalmMenu extends OrganMenu {
 
     /** Server side. */
     ShapingPalmMenu(int id, Inventory inventory, ShapingPalmBlockEntity palm) {
-        this(id, inventory, palm.grid(), Optional.of(palm), at(palm));
+        this(id, inventory, palm.grid(), Optional.of(palm), at(palm), reading(reads(palm)));
     }
 
     /** Client side. The position arrives as extra data; the cells arrive as slot updates. */
@@ -61,7 +83,8 @@ public final class ShapingPalmMenu extends OrganMenu {
                 inventory,
                 NonNullList.withSize(PalmContents.CELLS, ItemStack.EMPTY),
                 Optional.empty(),
-                at(inventory, extra));
+                at(inventory, extra),
+                new SimpleContainerData(SYNCED));
     }
 
     private ShapingPalmMenu(
@@ -69,8 +92,9 @@ public final class ShapingPalmMenu extends OrganMenu {
             Inventory inventory,
             NonNullList<ItemStack> cells,
             Optional<ShapingPalmBlockEntity> palm,
-            ContainerLevelAccess access) {
-        super(ProcessingModule.SHAPING_PALM_MENU.get(), id, access, ProcessingModule.SHAPING_PALM.get(), reading());
+            ContainerLevelAccess access,
+            ContainerData data) {
+        super(ProcessingModule.SHAPING_PALM_MENU.get(), id, access, ProcessingModule.SHAPING_PALM.get(), data);
         this.palm = palm;
         this.player = inventory.player;
         this.grid = new Grid(cells);
@@ -81,6 +105,35 @@ public final class ShapingPalmMenu extends OrganMenu {
             addSlot(new Cell(grid, cell, well.x() + 1, well.y() + 1, palm));
         }
         addPlayer(inventory, STRIPS);
+    }
+
+    private static IntSupplier[] reads(ShapingPalmBlockEntity palm) {
+        IntSupplier[] reads = new IntSupplier[SYNCED];
+        reads[STATE] = () -> palm.link().isPresent() ? 2 : palm.hasReach() ? 1 : 0;
+        for (int axis = 0; axis < 3; axis++) {
+            int along = axis;
+            reads[OFFSET + axis] = () ->
+                    palm.link().map(to -> offset(palm.getBlockPos(), to, along)).orElse(0);
+        }
+        return reads;
+    }
+
+    private static int offset(BlockPos from, BlockPos to, int axis) {
+        return switch (axis) {
+            case 0 -> to.getX() - from.getX();
+            case 1 -> to.getY() - from.getY();
+            default -> to.getZ() - from.getZ();
+        };
+    }
+
+    /** 0 when the Palm has no Reach, 1 when it has Reach and no link, 2 when it is linked. */
+    public int reachState() {
+        return synced(STATE);
+    }
+
+    /** The linked store's offset from the Palm along x (0), y (1) or z (2); 0 while there is no link. */
+    public int linkOffset(int axis) {
+        return synced(OFFSET + axis);
     }
 
     /** Where the result well sits on the panel: level with the grid's middle row, right of the grid. */
@@ -155,19 +208,94 @@ public final class ShapingPalmMenu extends OrganMenu {
     @Override
     public ItemStack quickMoveStack(Player taker, int index) {
         if (index != RESULT) return super.quickMoveStack(taker, index);
+        if (!slots.get(RESULT).hasItem() || refuses(taker, true)) return ItemStack.EMPTY;
+        return craft(taker, stack -> {
+            moveItemStackTo(stack, FIRST_CELL + PalmContents.CELLS, slots.size(), true);
+            return stack;
+        });
+    }
+
+    /**
+     * One craft whose result goes where {@code sink} puts it, with the table's own bookkeeping: the item's crafted
+     * hook, the statistics and the recipe unlock of {@code onTake}. {@code sink} returns what it could not place; a
+     * craft that placed nothing returns empty and changes nothing, and a part left over is thrown at the player's
+     * feet, as the table does. Returns the result as it was.
+     */
+    private ItemStack craft(Player taker, UnaryOperator<ItemStack> sink) {
         Slot slot = slots.get(RESULT);
-        if (!slot.hasItem() || refuses(taker, true)) return ItemStack.EMPTY;
         ItemStack stack = slot.getItem();
         ItemStack before = stack.copy();
         stack.getItem().onCraftedBy(stack, taker.level(), taker);
-        if (!moveItemStackTo(stack, FIRST_CELL + PalmContents.CELLS, slots.size(), true)) return ItemStack.EMPTY;
+        stack.setCount(sink.apply(stack).getCount());
+        if (stack.getCount() == before.getCount()) return ItemStack.EMPTY;
         slot.onQuickCraft(stack, before);
         if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
         else slot.setChanged();
-        if (stack.getCount() == before.getCount()) return ItemStack.EMPTY;
         slot.onTake(taker, stack);
         if (!stack.isEmpty()) taker.drop(stack, false);
         return before;
+    }
+
+    /** The supply link's actions, sent by id; the server decides on the live grid and the live store. */
+    @Override
+    public boolean clickMenuButton(Player taker, int id) {
+        if (id < RESTOCK || id > STORE_RESULT) return false;
+        if (palm.isEmpty()) return true;
+        if (taker.containerMenu != this || !stillValid(taker)) return false;
+        ShapingPalmBlockEntity organ = palm.get();
+        Optional<Refusal> why = organ.refusal();
+        if (why.isPresent()) return refuse(taker, why.get());
+        return switch (organ.store()) {
+            case Reached.Refused refused -> refuse(taker, refused.why());
+            case Reached.Store reached -> act(taker, organ, reached.handler(), id);
+        };
+    }
+
+    private boolean refuse(Player taker, Refusal why) {
+        Refusals.show(taker, why);
+        return false;
+    }
+
+    private boolean act(Player taker, ShapingPalmBlockEntity organ, IItemHandler store, int id) {
+        refresh();
+        return switch (id) {
+            case RESTOCK -> {
+                int moved = PalmSupply.restock(organ.grid(), store, back(taker));
+                if (moved > 0) organ.touch();
+                yield moved == 0
+                        ? refuse(taker, PalmSupply.restockRefusal(organ.grid()))
+                        : said(taker, "restocked", moved);
+            }
+            case RETURN -> {
+                if (organ.grid().stream().allMatch(ItemStack::isEmpty)) yield refuse(taker, PalmSupply.GRID_EMPTY);
+                int moved = PalmSupply.giveAll(organ.grid(), store);
+                if (moved > 0) organ.touch();
+                yield moved == 0 ? refuse(taker, PalmSupply.STORE_FULL) : said(taker, "returned", moved);
+            }
+            default -> storeResult(taker, store);
+        };
+    }
+
+    private boolean storeResult(Player taker, IItemHandler store) {
+        ItemStack result = results.getItem(0);
+        if (result.isEmpty()) return refuse(taker, PalmSupply.NO_RESULT);
+        if (!ItemStores.insert(store, result, true).isEmpty()) return refuse(taker, PalmSupply.STORE_FULL);
+        Optional<Refusal> room = PalmCrafting.refusal(taker, grid, result, false);
+        if (room.isPresent()) return refuse(taker, room.get());
+        ItemStack made = craft(taker, stack -> ItemStores.insert(store, stack, false));
+        if (made.isEmpty()) return refuse(taker, PalmSupply.STORE_FULL);
+        return said(taker, "stored", made.getCount());
+    }
+
+    /** What did not go back to the store goes to the player, never to the floor of the store's chunk. */
+    private static Consumer<ItemStack> back(Player taker) {
+        return stack -> taker.getInventory().placeItemBackInInventory(stack);
+    }
+
+    private boolean said(Player taker, String what, int count) {
+        refresh();
+        taker.displayClientMessage(Component.translatable("infestusfrontier.status.palm." + what, count), true);
+        return true;
     }
 
     @Override
