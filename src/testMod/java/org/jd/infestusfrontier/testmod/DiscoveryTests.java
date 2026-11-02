@@ -203,6 +203,28 @@ public final class DiscoveryTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void palmEntryShowsItsRecipeAndOpensWithTheBonePlate(GameTestHelper h) {
+        var entry = BookDataManager.get()
+                .getBook(BOOK)
+                .getCategory(id("circulation"))
+                .getEntries()
+                .get(id("circulation/shaping_palm"));
+        h.assertTrue(entry != null, "entry loaded");
+        var recipes = entry.getPages().stream()
+                .filter(page -> page instanceof com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage)
+                .map(page -> ((com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage) page).getRecipeId1())
+                .toList();
+        h.assertValueEqual(recipes, List.of(id("shaping_palm")), "one crafting page, for the Palm");
+        h.assertTrue(h.getLevel().getRecipeManager().byKey(id("shaping_palm")).isPresent(), "the shown recipe exists");
+        h.assertTrue(entry.getCondition() instanceof BookOrCondition, "the Palm unlocks by the Bone Plate or by item");
+        h.assertTrue(
+                entry.getParents().stream()
+                        .anyMatch(parent -> parent.getEntryId().equals(id("circulation/larder"))),
+                "after the stores on the guide's way");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void gizzardEntryShowsEveryGrindAndEverySmelt(GameTestHelper h) {
         var entry = BookDataManager.get()
                 .getBook(BOOK)
@@ -299,7 +321,8 @@ public final class DiscoveryTests {
                 "spine_sentry",
                 "aerocyte_bloom",
                 "mineral_gizzard",
-                "washing_kidney"))
+                "washing_kidney",
+                "shaping_palm"))
             h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");
         h.succeed();
     }

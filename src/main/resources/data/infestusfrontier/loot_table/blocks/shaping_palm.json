@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "infestusfrontier:shaping_palm",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "source": "block_entity",
+              "include": [
+                "infestusfrontier:palm_contents",
+                "infestusfrontier:unreadable_save"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

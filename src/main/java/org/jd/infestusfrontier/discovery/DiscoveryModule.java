@@ -74,6 +74,7 @@ public final class DiscoveryModule {
                         output.accept(ProcessingModule.BIO_FURNACE_ITEM.get());
                         output.accept(ProcessingModule.MINERAL_GIZZARD_ITEM.get());
                         output.accept(ProcessingModule.WASHING_KIDNEY_ITEM.get());
+                        output.accept(ProcessingModule.SHAPING_PALM_ITEM.get());
                         output.accept(MineralModule.IRON_DUST.get());
                         output.accept(MineralModule.GOLD_DUST.get());
                         output.accept(MineralModule.COPPER_DUST.get());

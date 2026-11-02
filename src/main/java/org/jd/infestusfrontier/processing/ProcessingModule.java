@@ -35,11 +35,12 @@ import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
 import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
+import org.jd.infestusfrontier.processing.api.PalmContents;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
 
-/** Owner of reserved batch execution. Ships the Digestive Sac, the batch organs, the treatments and the two recipe types. */
+/** Owner of reserved batch execution. Ships the Digestive Sac, the batch organs, the Shaping Palm, the treatments and the two recipe types. */
 public final class ProcessingModule {
     static final Logger LOGGER = LogUtils.getLogger();
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(InfestusFrontier.MOD_ID);
@@ -303,6 +304,31 @@ public final class ProcessingModule {
     public static final DeferredHolder<MenuType<?>, MenuType<BatchOrganMenu>> COMPOST_GLAND_MENU =
             batchMenu(COMPOST, () -> ProcessingModule.COMPOST_GLAND_MENU.get());
 
+    /** The Shaping Palm: a crafting grid that keeps its ingredients. Not a batch organ: it has no batch, tank or tray. */
+    public static final DeferredBlock<Block> SHAPING_PALM = BLOCKS.registerBlock(
+            "shaping_palm",
+            ShapingPalmBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_PINK)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion());
+
+    public static final DeferredItem<OrganItem> SHAPING_PALM_ITEM =
+            ITEMS.register("shaping_palm", () -> new OrganItem(SHAPING_PALM.get(), new Item.Properties(), "idle"));
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ShapingPalmBlockEntity>> SHAPING_PALM_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "shaping_palm",
+                    () -> BlockEntityType.Builder.of(ShapingPalmBlockEntity::new, SHAPING_PALM.get())
+                            .build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<ShapingPalmMenu>> SHAPING_PALM_MENU =
+            MENUS.register("shaping_palm", () -> IMenuTypeExtension.create(ShapingPalmMenu::new));
+    /** The grid a Palm carries on its item when it is broken, and gives back when it is placed. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PalmContents>> PALM_CONTENTS =
+            COMPONENTS.registerComponentType(
+                    "palm_contents",
+                    builder -> builder.persistent(PalmContents.CODEC).networkSynchronized(PalmContents.STREAM_CODEC));
+
     public static final DeferredHolder<MenuType<?>, MenuType<DigestiveSacMenu>> DIGESTIVE_SAC_MENU =
             MENUS.register("digestive_sac", () -> IMenuTypeExtension.create(DigestiveSacMenu::new));
     public static final DeferredHolder<RecipeType<?>, RecipeType<DigestionRecipe>> DIGESTION = RECIPE_TYPES.register(
@@ -376,6 +402,7 @@ public final class ProcessingModule {
             OrganRenderers.register(modBus, "washing_kidney", WASHING_KIDNEY_ENTITY, WASHING_KIDNEY_ITEM);
             OrganRenderers.register(modBus, "activation_cyst", ACTIVATION_CYST_ENTITY, ACTIVATION_CYST_ITEM);
             OrganRenderers.register(modBus, "compost_gland", COMPOST_GLAND_ENTITY, COMPOST_GLAND_ITEM);
+            OrganRenderers.register(modBus, "shaping_palm", SHAPING_PALM_ENTITY, SHAPING_PALM_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(DIGESTIVE_SAC_MENU.get(), DigestiveSacScreen::new);
                 event.register(CULTURE_BOWL_MENU.get(), CultureBowlScreen::new);
@@ -387,6 +414,7 @@ public final class ProcessingModule {
                 event.register(WASHING_KIDNEY_MENU.get(), WashingKidneyScreen::new);
                 event.register(ACTIVATION_CYST_MENU.get(), ActivationCystScreen::new);
                 event.register(COMPOST_GLAND_MENU.get(), CompostGlandScreen::new);
+                event.register(SHAPING_PALM_MENU.get(), ShapingPalmScreen::new);
             });
         }
         modBus.addListener((RegisterCapabilitiesEvent event) -> {

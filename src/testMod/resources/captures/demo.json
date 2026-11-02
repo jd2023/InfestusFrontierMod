@@ -342,7 +342,23 @@
     "setblock 100 -57 -28 hopper[facing=down]",
     "setblock 100 -56 -28 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:iron_ingot\",count:20}]}",
     "setblock 100 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Larder tower\"','\"Keeps 16 iron\"','\"Hopper takes\"','\"only the rest\"']}}",
-    "setblock 102 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Top chest: iron\"','\"feeds the Larder\"','\"Bottom: what the\"','\"hopper may take\"']}}"
+    "setblock 102 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Top chest: iron\"','\"feeds the Larder\"','\"Bottom: what the\"','\"hopper may take\"']}}",
+    "fill 106 -61 -29 126 -61 -26 grass_block",
+    "setblock 108 -61 -28 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 112 -61 -28 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 124 -61 -28 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 108 -60 -28 infestusfrontier:shaping_palm{contents:{grid:[{id:\"minecraft:milk_bucket\",count:1},{id:\"minecraft:milk_bucket\",count:1},{id:\"minecraft:milk_bucket\",count:1},{id:\"minecraft:sugar\",count:4},{id:\"minecraft:egg\",count:4},{id:\"minecraft:sugar\",count:4},{id:\"minecraft:wheat\",count:3},{id:\"minecraft:wheat\",count:3},{id:\"minecraft:wheat\",count:3}]}}",
+    "setblock 112 -60 -28 infestusfrontier:shaping_palm",
+    "setblock 116 -60 -28 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:oak_planks\",count:64},{Slot:1,id:\"minecraft:stick\",count:32},{Slot:2,id:\"minecraft:iron_ingot\",count:32},{Slot:3,id:\"minecraft:honey_bottle\",count:8},{Slot:4,id:\"minecraft:milk_bucket\",count:3},{Slot:5,id:\"minecraft:sugar\",count:16},{Slot:6,id:\"minecraft:egg\",count:16},{Slot:7,id:\"minecraft:wheat\",count:16},{Slot:8,id:\"minecraft:cobblestone\",count:64}]}",
+    "setblock 120 -60 -28 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:organ_bud\",count:2},{Slot:1,id:\"minecraft:crafting_table\",count:2},{Slot:2,id:\"infestusfrontier:membrane_sheet\",count:4},{Slot:3,id:\"infestusfrontier:bone_plate\",count:2}]}",
+    "setblock 124 -60 -28 infestusfrontier:shaping_palm",
+    "setblock 124 -59 -28 hopper[facing=down]{Items:[{Slot:0,id:\"minecraft:stone\",count:16}]}",
+    "setblock 108 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Shaping Palm\"','\"Cake kept in\"','\"its grid: take\"','\"the cake\"']}}",
+    "setblock 112 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Empty Palm\"','\"Fill the grid,\"','\"close, return:\"','\"it keeps it\"']}}",
+    "setblock 116 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Craft Kit\"','\"Any recipe:\"','\"milk, honey,\"','\"planks, ingots\"']}}",
+    "setblock 120 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Palm Parts\"','\"Bud, table,\"','\"2 sheets, plate:\"','\"craft your own\"']}}",
+    "setblock 124 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Hands Only\"','\"A hopper above\"','\"cannot reach\"','\"the Palm grid\"']}}",
+    "item replace entity @s inventory.17 with infestusfrontier:shaping_palm 2"
   ],
   "views": [
     {
@@ -1523,6 +1539,83 @@
       "name": "book_larder_recipe",
       "book": "infestusfrontier:circulation/larder",
       "page": 2
+    },
+    {
+      "name": "palm_line",
+      "x": 112.5,
+      "y": -57.3,
+      "z": -33.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "palm_parts",
+      "x": 122.0,
+      "y": -57.3,
+      "z": -33.5,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
+      "name": "palm_screen",
+      "x": 108.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        108,
+        -60,
+        -28
+      ]
+    },
+    {
+      "name": "palm_empty_screen",
+      "x": 112.5,
+      "y": -60,
+      "z": -30.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        112,
+        -60,
+        -28
+      ]
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_shaping_palm",
+      "book": "infestusfrontier:circulation/shaping_palm",
+      "page": 0
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_shaping_palm_keeps",
+      "book": "infestusfrontier:circulation/shaping_palm",
+      "page": 2
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_shaping_palm_recipe",
+      "book": "infestusfrontier:circulation/shaping_palm",
+      "page": 4
     }
   ]
 }

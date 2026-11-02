@@ -79,7 +79,8 @@ Fuel Papilla fills worn pieces from stored supply.
 **Specialized storage and crafting (proposed milestone).** Mutate an empty pod into a
 Mixed Craw (shipped; four kinds at half a bulk pod's depth in total) and a Craw into a Larder (shipped;
 three labelled kinds, each with a reserve that every automatic extraction keeps).
-Use a Shaping Palm as a crafting table that keeps its grid; link it to one store; then
+Use a Shaping Palm as a crafting table that keeps its grid (shipped; hands only, no hopper
+reaches it); link it to one store; then
 let it repeat one chosen recipe on biomass through Feeding and Yield Lobes. Each step
 keeps the hand path. See [Blocks](BLOCK_CATALOG.md#t1-09--item-capsule-and-capsule-stem)
 and [T1-41](BLOCK_CATALOG.md#t1-41--shaping-palm). Recursive orders wait for the Request Cortex.

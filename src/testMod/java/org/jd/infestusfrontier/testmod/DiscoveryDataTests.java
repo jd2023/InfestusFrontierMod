@@ -112,6 +112,7 @@ public final class DiscoveryDataTests {
                 "compost_gland",
                 "mineral_gizzard",
                 "washing_kidney",
+                "shaping_palm",
                 "rock_residue_to_cobblestone",
                 "tailings_to_rock_residue",
                 "feeding_lobe",

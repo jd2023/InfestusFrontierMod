@@ -24,7 +24,7 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   238,0   12x54    scroll groove beside three rows of wells at the inventory pitch
   238,56  12x15    scroll thumb, a chitin plate with grip ridges; 238,72 the same greyed when nothing scrolls
   2,190   32x32 organ emblems, seven to a row at a 34 px pitch, rows 34 apart: Sac, Bladder, Bowl, Rack, Loom,
-                   Cradle, Furnace; then Cyst, Compost, Gizzard and Kidney on the second row
+                   Cradle, Furnace; then Cyst, Compost, Gizzard, Kidney and Palm on the second row
 
 Every screen writes its title at 8,6, its emblem at 8,27 if it has one, labels at y 26 above
 its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
@@ -60,7 +60,7 @@ BUTTON_OFF = (176, 96)
 BUTTON_SIZE = (52, 16)
 VEIN_EMPTY = (176, 112, 44, 12)
 VEIN_FULL = (176, 128, 44, 12)
-EMBLEMS = [(2 + 34 * (i % 7), 190 + 34 * (i // 7)) for i in range(11)]
+EMBLEMS = [(2 + 34 * (i % 7), 190 + 34 * (i // 7)) for i in range(12)]
 EMBLEM = 32
 POOL = [(168, 196, 150), (206, 224, 182), (236, 244, 220)]
 BODY_STRIP = (0, 168, 176, 18)  # a run of panel body the screen stacks under the parts to make a taller panel
@@ -638,8 +638,36 @@ def emblem_kidney(img, ox, oy):
                 put(img, ox + x, oy + y, OUTLINE if edge else mix(tint, IVORY[3], 0.45) if dx + dy < -0.2 else tint)
 
 
+def emblem_palm(img, ox, oy):
+    """An open hand of pink muscle, palm up, holding a three-by-three grid of bone studs in its cup."""
+    MUSCLE = [(96, 44, 64), (124, 60, 78), (150, 82, 92), (176, 110, 112)]
+    for y in range(EMBLEM):
+        for x in range(EMBLEM):
+            dx, dy = (x - 16) / 13.0, (y - 20) / 10.0
+            d = math.hypot(dx, dy)
+            if d > 1.0:
+                continue
+            if d > 0.9:
+                colour = OUTLINE
+            else:
+                colour = MUSCLE[3] if dx + dy < -0.7 else MUSCLE[2] if dx + dy < 0.0 else MUSCLE[1] if dx + dy < 0.7 else MUSCLE[0]
+            put(img, ox + x, oy + y, colour)
+    for cx in (5, 10, 16, 22, 27):
+        top = 3 + abs(cx - 16) // 3
+        for y in range(top, 16):
+            for x in range(cx - 2, cx + 2):
+                edge = x in (cx - 2, cx + 1) or y == top
+                put(img, ox + x, oy + y, OUTLINE if edge else MUSCLE[3] if x == cx - 1 else MUSCLE[2])
+    for row in range(3):
+        for col in range(3):
+            sx, sy = 11 + col * 5, 17 + row * 4
+            for y in range(sy, sy + 3):
+                for x in range(sx, sx + 4):
+                    put(img, ox + x, oy + y, IVORY[3] if y == sy else IVORY[2] if x < sx + 3 else IVORY[1])
+
+
 def emblems(img):
-    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom, emblem_cradle, emblem_furnace, emblem_cyst, emblem_compost, emblem_gizzard, emblem_kidney)):
+    for (ox, oy), draw in zip(EMBLEMS, (emblem_sac, emblem_bladder, emblem_bowl, emblem_rack, emblem_loom, emblem_cradle, emblem_furnace, emblem_cyst, emblem_compost, emblem_gizzard, emblem_kidney, emblem_palm)):
         draw(img, ox, oy)
 
 

@@ -502,5 +502,19 @@
   "entry.infestusfrontier.circulation.washing_kidney.pause": "A full dust, Tailings or Rock Residue tray, or a full dirty tank with no room to settle, pauses the Kidney and its screen marks it Full. Empty the trays by hand, with a Yield Lobe or through an Output Mouth, and it resumes. Nothing is dropped or deleted, and no waste can be turned back into water, ore or dust.",
   "entry.infestusfrontier.circulation.washing_kidney.craft": "An Organ Bud, two Membrane Sheets, sand and a glass bottle.",
   "entry.infestusfrontier.circulation.washing_kidney.wash": "Washing",
-  "entry.infestusfrontier.circulation.washing_kidney.settle": "Settling and waste"
+  "entry.infestusfrontier.circulation.washing_kidney.settle": "Settling and waste",
+  "block.infestusfrontier.shaping_palm": "Shaping Palm",
+  "infestusfrontier.refusal.processing.palm_no_room": "No room for the result or a remainder. Make room in your inventory",
+  "infestusfrontier.refusal.processing.palm_no_foundation": "This Palm has no Living Substrate under it. It keeps its grid and crafts nothing",
+  "gui.infestusfrontier.shaping_palm.grid": "Grid",
+  "gui.infestusfrontier.shaping_palm.result": "Result",
+  "gui.infestusfrontier.shaping_palm.result.story": "Take it to craft once, shift-click to craft as many as the grid holds. Ingredients and remainders stay in the grid when you close the screen.",
+  "entry.infestusfrontier.circulation.shaping_palm.name": "Shaping Palm",
+  "entry.infestusfrontier.circulation.shaping_palm.description": "A crafting table that keeps its grid",
+  "entry.infestusfrontier.circulation.shaping_palm.use": "Place it on Living Substrate. Any hand opens its screen: a three by three grid and a result well, laid out as at a crafting table. Put ingredients in and close the screen; they are still there when you come back. Click the result to craft once, or shift-click to craft as many as the grid holds. It runs the crafting recipes of the game and of other mods, with their own inputs, outputs and remainders. It costs no biomass and no time.",
+  "entry.infestusfrontier.circulation.shaping_palm.keeps.title": "What a craft takes",
+  "entry.infestusfrontier.circulation.shaping_palm.keeps": "A craft takes one of each filled cell and nothing more. A remainder, such as a bucket, a bottle or a bowl, goes back to its emptied cell, or into your inventory when it cannot. If the result or a remainder has no room, the craft is refused and nothing changes. Two players at one Palm take turns: each craft uses the grid as it is then.",
+  "entry.infestusfrontier.circulation.shaping_palm.kept.title": "What it keeps",
+  "entry.infestusfrontier.circulation.shaping_palm.kept": "Broken, a Palm comes out whole with its grid, and placed again it has it back. Without Living Substrate under it, it keeps its grid and crafts nothing. Only you at its screen put things in and take things out: hoppers, pipes and Lobes cannot reach it, and it has no link to a store and repeats nothing by itself.",
+  "entry.infestusfrontier.circulation.shaping_palm.craft": "An Organ Bud, a crafting table, two Membrane Sheets and a Bone Plate."
 }

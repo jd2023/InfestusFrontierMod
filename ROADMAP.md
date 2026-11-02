@@ -121,7 +121,7 @@ progress until their evidence passes. New systems do not substitute for that evi
 
 ## Next milestone — the automated mineral workshop
 
-M3b. Defined here and proposed; steps 1 to 3 are built. It starts from the colony the living workshop
+M3b. Defined here and proposed; steps 1 to 3 are built and step 4 is half built. It starts from the colony the living workshop
 delivers and turns the player's hand-mined raw ore into dust and ingots, keeps supplies
 in a store that guards them, and repeats one crafting recipe on its own.
 
@@ -170,7 +170,7 @@ workflow in the same step.
 1. **Mixed Craw and Larder.** Both are built (review and the owner's play pending): pod kinds, the two mutations, the screens, saves, the Larder's labels and reserves, and the reserve check in `CapsuleTree.extract` and `take`. Tests: every extraction path (hopper, Mouth, Item Vein, handler call) stops at the reserve; a Mouth's amount and a reserve combine; manual withdrawal; break, shed and reload keep stock, label and reserve; an old bulk pod loads unchanged; a Craw's capacity is half a bulk pod's at each grade; a non-empty pod refuses the gel.
 2. **Dust and the Gizzard** (built; review and the owner's play pending). The raw-item inputs, the dust items, Tailings and Rock Residue, the multi-result `organ_batch` with its reserved tray, the Gizzard, dust smelting in the Bio-Furnace. Tests: 4 dust and 1 ingot per raw item to the item; refused inputs (ingot, nugget, block, ore block, Nether gold ore); full tray pauses; save mid-batch gives the products once; conservation through a whole line.
 3. **The Kidney and waste** (built; review and the owner's play pending). Washing, the dirty tank, settling, the discard and cobblestone crafts. Tests: 5 dust per washed raw item; a 3-unit or foreign parcel is refused; dirty water full pauses and a settle resumes; no path from dirty water to clean water; Rock Residue and Tailings feed nothing else; bounded buffers.
-4. **Palm stages 1 and 2.** The retained grid, vanilla remainders, the supply link and its three actions. Tests through a crafting menu with remainder recipes (cake, bucket, bottle), a full inventory, an unloaded or broken link, Larder reserves, save and reload with a filled grid.
+4. **Palm stages 1 and 2.** The retained grid, vanilla remainders, the supply link and its three actions. Stage 1 is built (review and the owner's play pending): the grid, the engine's own result slot and remainders, tests through a crafting menu (cake, honey bottle, a banner and a shield, Tailings), a full inventory, two viewers, a client that claims a result, save and reload through a chunk, breaking and placing, and no item handler. Stage 2, the link and its three actions, is not built. Tests for it: an unloaded or broken link, Larder reserves.
 5. **Palm stage 3.** Select, the cycle, the tray, the Lobes. Tests: special recipes refused, a recipe change pauses, mid-cycle save, 10 BU and 40 ticks per craft, outputs and remainders held until they fit, no duplication through Lobes and hoppers, 32 starts a tick across many Palms.
 6. **Qualify.** A reference line in the demo and a test that runs it with no hand in it: stored raw ore to ingots, with a Kidney, a Larder reserve and a Palm making a vanilla item from the ingots. Ledger exact in biomass, water, dust and items. Three cycles; the settle and a full tray each occur at least once.
 

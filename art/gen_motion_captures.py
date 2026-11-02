@@ -9,7 +9,7 @@ from pathlib import Path
 OUT = Path('src/testMod/resources/captures')
 MODELS = ('culture_bowl', 'digestive_sac', 'membrane_rack', 'bone_loom', 'awakening_cradle',
           'activation_cyst', 'planting_proboscis', 'harvest_corolla', 'compost_gland', 'seed_pouch', 'item_capsule',
-          'spine_sentry', 'mineral_gizzard', 'washing_kidney', 'mixed_craw', 'larder')
+          'spine_sentry', 'mineral_gizzard', 'washing_kidney', 'mixed_craw', 'larder', 'shaping_palm')
 
 
 # Views an organ's identity pass added to its scene, kept here so regenerating the scenes never loses them: a close
@@ -34,6 +34,11 @@ EXTRA = {
     'washing_kidney': [
         # the working close up: the lobes squeeze in a wave, the sieve shivers, the dirty sac swells, the drip pulses
         {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 6},
+        {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
+    ],
+    'shaping_palm': [
+        # the idle close up: the fingertips curl and open in turn round the plate, the palm breathes
+        {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 8},
         {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
     ],
     'junction_intake': [
@@ -96,7 +101,7 @@ def scene(name, left, right, frames=48):
 
 def main():
     for model in MODELS:
-        suffix = '' if model in ('seed_pouch', 'item_capsule', 'mixed_craw', 'larder') else '[working=true]'
+        suffix = '' if model in ('seed_pouch', 'item_capsule', 'mixed_craw', 'larder', 'shaping_palm') else '[working=true]'
         scene(model, model, model + suffix)
     for stage in range(3):
         scene(f'furnace_{stage}', f'bio_furnace[stage={stage}]', f'bio_furnace[stage={stage},working=true]')
