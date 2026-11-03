@@ -1,0 +1,51 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "infestusfrontier:block/withered_flower_hanging"
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_hanging",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_hanging",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_hanging",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_forked"
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_forked",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_forked",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_forked",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_collapsed"
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_collapsed",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_collapsed",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_flower_collapsed",
+        "y": 270
+      }
+    ]
+  }
+}

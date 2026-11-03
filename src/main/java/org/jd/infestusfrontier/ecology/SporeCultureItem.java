@@ -6,10 +6,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
 
-/** Converts the one eligible, exposed ground block the player points at into basic Living Substrate. */
+/**
+ * Converts the one eligible, exposed ground block the player points at into basic Living Substrate, through
+ * {@link Vegetation#convert}: a supported flower on it withers, a rooted plant without a mapping keeps its ground.
+ */
 final class SporeCultureItem extends Item {
     private static final int GROWTH_PARTICLES = 15;
 
@@ -24,9 +26,10 @@ final class SporeCultureItem extends Item {
         if (!level.getBlockState(target).is(LivingSubstrateBlock.HOSTS)) return InteractionResult.PASS;
         BlockPos facing = target.relative(context.getClickedFace());
         if (!level.getBlockState(facing).getCollisionShape(level, facing).isEmpty()) return InteractionResult.PASS;
+        if (Vegetation.cover(level, target.above()) instanceof Vegetation.Rooted) return InteractionResult.PASS;
         if (level.isClientSide) return InteractionResult.SUCCESS;
 
-        level.setBlock(target, EcologyModule.LIVING_SUBSTRATE.get().cellAt(target), Block.UPDATE_ALL);
+        Vegetation.convert(level, target, EcologyModule.LIVING_SUBSTRATE.get().cellAt(target));
         level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target, GROWTH_PARTICLES);
         Player player = context.getPlayer();
         if (player == null || !player.getAbilities().instabuild)

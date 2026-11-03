@@ -134,7 +134,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 
 ### T0-01 — Living Substrate
 - **Does:** Replaces exposed ground with living, mottled tissue. Basic, young and mature patches differ in pores, veins and undergrowth. Ordinary occupants are slowed; a full bio suit avoids the penalty.
-- **Input → output:** Applied Spore Culture → converted exposed soil or stone. No autonomous unlimited spreading; applying culture does not produce terrain loot.
+- **Input → output:** Applied Spore Culture → converted exposed soil or stone. No autonomous unlimited spreading; applying culture does not produce terrain loot. A small flower on the converted ground withers in place and keeps its harvest; ground under any other rooted plant is left alone ([Vegetation infection](VEGETATION_INFECTION.md#shipped-withered-flower)).
 - **Create:** Apply Spore Culture to a visible eligible ground block; use bone meal to mature that cell. Substrate is only grown: no recipe makes a cell to place, and a broken cell, or anything grown in one, dies into Dead Tissue whatever the tool.
 - **Growth:** Mutate individual cells into conduits, farms, defense or travel surfaces. Each cell has one primary function; a fast path is not simultaneously a damaging floor.
 

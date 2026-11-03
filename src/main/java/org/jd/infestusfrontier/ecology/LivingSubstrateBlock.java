@@ -149,12 +149,15 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
         }
     }
 
-    /** Converts up to {@value #SPREAD_PER_CELL} exposed hosts beside {@code pos} into basic cells with {@code vigor}. */
+    /**
+     * Converts up to {@value #SPREAD_PER_CELL} exposed hosts beside {@code pos} into basic cells with {@code vigor},
+     * through {@link Vegetation#convert}, so a supported flower on a host withers instead of dropping.
+     */
     private void spread(ServerLevel level, BlockPos pos, int vigor, RandomSource random) {
         List<BlockPos> targets = spreadTargets(level, pos);
         for (int n = 0; n < SPREAD_PER_CELL && !targets.isEmpty(); n++) {
             BlockPos target = targets.remove(random.nextInt(targets.size()));
-            level.setBlock(target, cellAt(target).setValue(VIGOR, vigor), Block.UPDATE_ALL);
+            if (!Vegetation.convert(level, target, cellAt(target).setValue(VIGOR, vigor))) continue;
             level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target, STEP_PARTICLES);
             if (vigor > 0) level.scheduleTick(target, this, GROWTH_DELAY_TICKS);
         }
@@ -170,20 +173,12 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
             for (int dy : new int[] {0, 1, -1}) {
                 BlockPos host = pos.relative(side).above(dy);
                 if (!level.hasChunkAt(host) || !level.hasChunkAt(host.above())) continue;
-                if (isExposedHost(level, host)) {
+                if (Vegetation.isExposedHost(level, host)) {
                     targets.add(host);
                     break;
                 }
             }
         }
         return targets;
-    }
-
-    /** A host block with nothing solid on top of it. */
-    static boolean isExposedHost(LevelReader level, BlockPos host) {
-        return level.getBlockState(host).is(HOSTS)
-                && level.getBlockState(host.above())
-                        .getCollisionShape(level, host.above())
-                        .isEmpty();
     }
 }

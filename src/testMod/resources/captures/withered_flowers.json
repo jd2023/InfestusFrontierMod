@@ -1,0 +1,36 @@
+{
+  "commands": [
+    "fill -4 -60 0 4 -56 7 air",
+    "fill -4 -61 0 4 -61 7 grass_block",
+    "kill @e[type=item]",
+    "setblock -4 -61 3 infestusfrontier:living_substrate[stage=basic]",
+    "setblock -3 -60 2 poppy",
+    "setblock -3 -60 4 dandelion",
+    "setblock -2 -60 3 cornflower",
+    "setblock -2 -60 5 allium",
+    "setblock -1 -60 2 oxeye_daisy",
+    "setblock -1 -60 4 oak_sapling",
+    "fill 1 -61 1 4 -61 6 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 1 -60 1 infestusfrontier:withered_flower[source=dandelion]",
+    "setblock 2 -60 1 infestusfrontier:withered_flower[source=poppy]",
+    "setblock 3 -60 1 infestusfrontier:withered_flower[source=blue_orchid]",
+    "setblock 4 -60 1 infestusfrontier:withered_flower[source=allium]",
+    "setblock 1 -60 3 infestusfrontier:withered_flower[source=azure_bluet]",
+    "setblock 2 -60 3 infestusfrontier:withered_flower[source=red_tulip]",
+    "setblock 3 -60 3 infestusfrontier:withered_flower[source=orange_tulip]",
+    "setblock 4 -60 3 infestusfrontier:withered_flower[source=white_tulip]",
+    "setblock 1 -60 5 infestusfrontier:withered_flower[source=pink_tulip]",
+    "setblock 2 -60 5 infestusfrontier:withered_flower[source=oxeye_daisy]",
+    "setblock 3 -60 5 infestusfrontier:withered_flower[source=cornflower]",
+    "setblock 4 -60 5 infestusfrontier:withered_flower[source=lily_of_the_valley]",
+    "give @s minecraft:bone_meal 4",
+    "give @s infestusfrontier:spore_culture 2"
+  ],
+  "views": [
+    {"name": "front", "x": 0.5, "y": -60, "z": -2.5, "yaw": 0, "pitch": 20},
+    {"name": "back", "x": 0.5, "y": -60, "z": 10.5, "yaw": 180, "pitch": 20},
+    {"name": "close", "x": 2.5, "y": -60, "z": -1.5, "yaw": 0, "pitch": 30},
+    {"name": "above", "x": 0.5, "y": -55, "z": 3.5, "yaw": 0, "pitch": 90},
+    {"name": "hotbar", "x": 0.5, "y": -60, "z": -2.5, "yaw": 0, "pitch": 20, "gui": true, "icons": ["minecraft:bone_meal", "infestusfrontier:spore_culture"]}
+  ]
+}

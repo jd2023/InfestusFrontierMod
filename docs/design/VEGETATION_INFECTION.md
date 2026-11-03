@@ -1,8 +1,9 @@
 # Vegetation infection
 
-Status: proposed. Mostly cosmetic conversion of vegetation reached by deliberate
-Living Substrate growth. This document owns the proposed conversion mappings and
-visual rules. Existing substrate growth remains defined in
+Status: proposed, except the Withered Flower mapping, which ships
+([Shipped: Withered Flower](#shipped-withered-flower)). Mostly cosmetic conversion
+of vegetation reached by deliberate Living Substrate growth. This document owns the
+conversion mappings and visual rules. Existing substrate growth remains defined in
 [Living Substrate mutations](LIVING_SUBSTRATE_MUTATIONS.md#1-grow-the-foundation).
 
 ## Purpose
@@ -61,6 +62,34 @@ support would destroy it, leave that ground unconverted for this feature.
 
 Later support can add mappings without requiring a new model for every species.
 No wildcard conversion of third-party plants or blocks with inventories.
+
+## Shipped: Withered Flower
+
+The small-flower row is implemented in `ecology` (`WitheredFlowerBlock`, `FlowerSource`,
+`Vegetation`).
+
+- Spore Culture and the bone-meal wave convert a host through one routine,
+  `Vegetation.convert`. What stands on the host decides: a supported flower is
+  replaced by its dead form first and the ground after it, so vanilla's support
+  update finds a dead flower standing on substrate; air or a block that does not
+  depend on the ground leaves the host free; any other rooted plant (the bush
+  family, so saplings, grass, crops, bushes and mushrooms too, plus sugar cane,
+  bamboo and the big dripleaf) keeps its ground unconverted. Spore Culture is not
+  used up on such ground and the wave does not count it as a host. Existing growth
+  limits are unchanged ([ENGINEERING.md](../../ENGINEERING.md#performance-limits),
+  "Vegetation infection").
+- The block keeps one property, `source`, the flower it was. Its loot table rolls
+  that flower's own table through a nested `minecraft:loot_table` entry in the real
+  loot context, so tools, Silk Touch and data-pack changes to the flower carry over.
+  Pick block gives the flower. There is no Withered Flower item.
+- Appearance is never saved. The blockstate lists the three silhouettes turned four
+  ways and vanilla picks one by the position's seed; the block colour picks ash,
+  bone, brown or plum from the same seed. The same position always shows the same
+  look, on both sides of a chunk border and after every reload.
+- Dormant cells never scan. Bone meal and culture on a dead flower, or on the cell
+  under it, make nothing.
+- Guide: `contact/withered_flowers`. Demo: the Meadow and Withered Flower plots in
+  row B of `demo.json`, and the `withered_flowers` capture.
 
 ## Harvest rules
 

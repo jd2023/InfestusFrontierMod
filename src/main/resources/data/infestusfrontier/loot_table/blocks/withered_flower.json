@@ -1,0 +1,142 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/dandelion",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "dandelion" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/poppy",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "poppy" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/blue_orchid",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "blue_orchid" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/allium",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "allium" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/azure_bluet",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "azure_bluet" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/red_tulip",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "red_tulip" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/orange_tulip",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "orange_tulip" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/white_tulip",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "white_tulip" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/pink_tulip",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "pink_tulip" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/oxeye_daisy",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "oxeye_daisy" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/cornflower",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "cornflower" }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/lily_of_the_valley",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_flower",
+              "properties": { "source": "lily_of_the_valley" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

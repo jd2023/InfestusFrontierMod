@@ -3,6 +3,7 @@ package org.jd.infestusfrontier.ecology;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.InteractionResult;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -48,6 +50,20 @@ public final class EcologyModule {
      * Digestive Sac digests it back into a little biomass.
      */
     public static final DeferredItem<Item> DEAD_TISSUE = ITEMS.registerSimpleItem("dead_tissue");
+    /**
+     * A small flower killed by substrate growth under it (VEGETATION_INFECTION.md). No item: it is only ever grown,
+     * and breaking it gives the flower it was.
+     */
+    public static final DeferredBlock<WitheredFlowerBlock> WITHERED_FLOWER = BLOCKS.registerBlock(
+            "withered_flower",
+            WitheredFlowerBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.PLANT)
+                    .noCollission()
+                    .instabreak()
+                    .sound(SoundType.GRASS)
+                    .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .pushReaction(PushReaction.DESTROY));
 
     /** The three wall tiers: soft as grown, bone-ribbed, and calcified past any explosion. */
     public static final DeferredBlock<LivingWallBlock> LIVING_WALL =
@@ -186,8 +202,12 @@ public final class EcologyModule {
         BLOCKS.register(modBus);
         ITEMS.register(modBus);
         BLOCK_ENTITIES.register(modBus);
-        if (FMLEnvironment.dist == Dist.CLIENT)
+        if (FMLEnvironment.dist == Dist.CLIENT) {
             DOOR_ENTITIES.forEach((name, type) -> OrganRenderers.registerBlock(modBus, name, type, 2));
+            modBus.addListener((RegisterColorHandlersEvent.Block event) -> event.register(
+                    (state, level, pos, index) -> WitheredFlowerBlock.tintAt(pos == null ? BlockPos.ZERO : pos),
+                    WITHERED_FLOWER.get()));
+        }
         // vanilla skips a block's own use while its user sneaks with an item, so starting a wall listens here
         NeoForge.EVENT_BUS.addListener((PlayerInteractEvent.RightClickBlock event) -> {
             if (LivingWallBlock.start(

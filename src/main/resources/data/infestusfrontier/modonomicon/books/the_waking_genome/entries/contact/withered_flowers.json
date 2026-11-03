@@ -1,0 +1,36 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.withered_flowers.name",
+  "description": "entry.infestusfrontier.contact.withered_flowers.description",
+  "icon": {
+    "texture": "infestusfrontier:textures/book/withered_flowers.png",
+    "width": 16,
+    "height": 16
+  },
+  "x": 0,
+  "y": 4,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/living_substrate"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:advancement",
+    "advancement_id": "infestusfrontier:contact/living_substrate"
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.withered_flowers.name",
+      "text": "entry.infestusfrontier.contact.withered_flowers.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.withered_flowers.harvest"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.withered_flowers.limits"
+    }
+  ]
+}
