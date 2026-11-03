@@ -1,7 +1,8 @@
 # Vegetation infection
 
-Status: proposed, except the Withered Flower mapping, which ships
-([Shipped: Withered Flower](#shipped-withered-flower)). Mostly cosmetic conversion
+Status: proposed, except the Withered Flower and tall-plant mappings, which ship
+([Shipped: Withered Flower](#shipped-withered-flower),
+[Shipped: tall plants](#shipped-tall-plants)). Mostly cosmetic conversion
 of vegetation reached by deliberate Living Substrate growth. This document owns the
 conversion mappings and visual rules. Existing substrate growth remains defined in
 [Living Substrate mutations](LIVING_SUBSTRATE_MUTATIONS.md#1-grow-the-foundation).
@@ -90,6 +91,44 @@ The small-flower row is implemented in `ecology` (`WitheredFlowerBlock`, `Flower
   under it, make nothing.
 - Guide: `contact/withered_flowers`. Demo: the Meadow and Withered Flower plots in
   row B of `demo.json`, and the `withered_flowers` capture.
+
+## Shipped: tall plants
+
+The two-block rows are implemented in `ecology` (`TallWitheredFlowerBlock` and
+`TallBlightedUndergrowthBlock`, both `DeadTallPlantBlock`; `TallFlowerSource`,
+`TallUndergrowthSource`; `Vegetation`).
+
+- Sunflower, lilac, rose bush and peony become Tall Withered Flower. Tall grass and large
+  fern become Tall Blighted Undergrowth. Each is vanilla's `DoublePlantBlock` with a `half`
+  and a `source`, the plant it was. The halves support each other and vanish together
+  through vanilla's own update and break paths. There is no item; pick block gives the
+  source plant.
+- `Vegetation.convert` withers a tall plant only when it is whole: the block over the host
+  is a mapped plant's lower half, and the block over that, in a loaded chunk, is the same
+  plant's upper half. A lone lower half, a mismatched pair, an unloaded or out-of-world upper
+  half, or a mapped plant seen from its upper half leaves the host unconverted, as every
+  other unsupported rooted plant does: Spore Culture is refused and a wave does not count the
+  host. The check runs when the wave scans and again when it converts, so a plant broken
+  between the two keeps its ground.
+- A conversion replaces both halves before the ground, without shape updates (either half
+  alone would tell the other its partner is gone), and drops nothing. The ground change then
+  finds a dead plant standing on substrate.
+- Harvest is one loot table per family, written with vanilla's own pools and conditions for
+  each source: a flower drops itself from its lower half only; tall grass and large fern drop
+  two short plants with shears, otherwise a seed one time in eight, from whichever half still
+  has its partner. Vanilla's order does the rest: whichever half breaks first rolls the table
+  once and the cascade that removes the other half rolls it to nothing. Fortune and Silk Touch
+  change nothing, as they change nothing for the living plants. A data pack that changes a
+  vanilla plant's table does not change the dead one: the vanilla tables test the living
+  block, so they cannot be nested as the small flower's are.
+- Appearance is never saved. Vanilla seeds a double plant's look from its lower half, so the
+  blockstate's four quarter turns and the block colour agree on both halves. One flower model
+  serves all four flowers; undergrowth has one dry-grass and one fern shape. The tints are ash,
+  bone, brown and plum for flowers, straw, bone, ash and dry brown for undergrowth.
+- No block entity, tick or bone-meal response. Culture or bone meal on a dead tall plant, or on
+  the cell under it, makes nothing. They burn like flowers and grass.
+- Guide: `contact/withered_flowers`, page "tall". Demo: the Tall Plants plots south of the
+  Meadow, at x 31 to 46, z -27 to -23, and the `tall_withered_plants` capture.
 
 ## Harvest rules
 

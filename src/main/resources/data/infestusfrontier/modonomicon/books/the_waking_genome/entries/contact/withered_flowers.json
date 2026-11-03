@@ -30,6 +30,10 @@
     },
     {
       "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.withered_flowers.tall"
+    },
+    {
+      "type": "modonomicon:text",
       "text": "entry.infestusfrontier.contact.withered_flowers.limits"
     }
   ]

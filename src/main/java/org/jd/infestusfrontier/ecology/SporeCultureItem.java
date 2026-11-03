@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.LevelEvent;
 
 /**
  * Converts the one eligible, exposed ground block the player points at into basic Living Substrate, through
- * {@link Vegetation#convert}: a supported flower on it withers, a rooted plant without a mapping keeps its ground.
+ * {@link Vegetation#convert}: a supported flower or whole tall plant on it withers, a rooted plant without a mapping keeps its ground.
  */
 final class SporeCultureItem extends Item {
     private static final int GROWTH_PARTICLES = 15;

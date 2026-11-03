@@ -1,0 +1,72 @@
+{
+  "variants": {
+    "half=lower,source=tall_grass": [
+      {
+        "model": "infestusfrontier:block/tall_blighted_grass_lower"
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_grass_lower",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_grass_lower",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_grass_lower",
+        "y": 270
+      }
+    ],
+    "half=upper,source=tall_grass": [
+      {
+        "model": "infestusfrontier:block/tall_blighted_grass_upper"
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_grass_upper",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_grass_upper",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_grass_upper",
+        "y": 270
+      }
+    ],
+    "half=lower,source=large_fern": [
+      {
+        "model": "infestusfrontier:block/tall_blighted_fern_lower"
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_fern_lower",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_fern_lower",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_fern_lower",
+        "y": 270
+      }
+    ],
+    "half=upper,source=large_fern": [
+      {
+        "model": "infestusfrontier:block/tall_blighted_fern_upper"
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_fern_upper",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_fern_upper",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_blighted_fern_upper",
+        "y": 270
+      }
+    ]
+  }
+}

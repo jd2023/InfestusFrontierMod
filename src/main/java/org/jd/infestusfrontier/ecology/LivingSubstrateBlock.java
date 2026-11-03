@@ -151,7 +151,7 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
 
     /**
      * Converts up to {@value #SPREAD_PER_CELL} exposed hosts beside {@code pos} into basic cells with {@code vigor},
-     * through {@link Vegetation#convert}, so a supported flower on a host withers instead of dropping.
+     * through {@link Vegetation#convert}, so a supported flower or tall plant on a host withers instead of dropping.
      */
     private void spread(ServerLevel level, BlockPos pos, int vigor, RandomSource random) {
         List<BlockPos> targets = spreadTargets(level, pos);

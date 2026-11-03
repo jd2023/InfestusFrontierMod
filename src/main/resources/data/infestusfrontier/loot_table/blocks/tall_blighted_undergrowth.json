@@ -1,0 +1,258 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:tall_blighted_undergrowth",
+              "properties": {
+                "source": "tall_grass",
+                "half": "lower"
+              }
+            },
+            {
+              "condition": "minecraft:location_check",
+              "offsetY": 1,
+              "predicate": {
+                "block": {
+                  "blocks": "infestusfrontier:tall_blighted_undergrowth",
+                  "state": {
+                    "source": "tall_grass",
+                    "half": "upper"
+                  }
+                }
+              }
+            }
+          ],
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "items": "minecraft:shears"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2.0,
+                  "add": false
+                }
+              ],
+              "name": "minecraft:short_grass"
+            },
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:survives_explosion"
+                },
+                {
+                  "condition": "minecraft:random_chance",
+                  "chance": 0.125
+                }
+              ],
+              "name": "minecraft:wheat_seeds"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:alternatives",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:tall_blighted_undergrowth",
+              "properties": {
+                "source": "large_fern",
+                "half": "lower"
+              }
+            },
+            {
+              "condition": "minecraft:location_check",
+              "offsetY": 1,
+              "predicate": {
+                "block": {
+                  "blocks": "infestusfrontier:tall_blighted_undergrowth",
+                  "state": {
+                    "source": "large_fern",
+                    "half": "upper"
+                  }
+                }
+              }
+            }
+          ],
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "items": "minecraft:shears"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2.0,
+                  "add": false
+                }
+              ],
+              "name": "minecraft:fern"
+            },
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:survives_explosion"
+                },
+                {
+                  "condition": "minecraft:random_chance",
+                  "chance": 0.125
+                }
+              ],
+              "name": "minecraft:wheat_seeds"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:tall_blighted_undergrowth",
+              "properties": {
+                "source": "tall_grass",
+                "half": "upper"
+              }
+            },
+            {
+              "condition": "minecraft:location_check",
+              "offsetY": -1,
+              "predicate": {
+                "block": {
+                  "blocks": "infestusfrontier:tall_blighted_undergrowth",
+                  "state": {
+                    "source": "tall_grass",
+                    "half": "lower"
+                  }
+                }
+              }
+            }
+          ],
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "items": "minecraft:shears"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2.0,
+                  "add": false
+                }
+              ],
+              "name": "minecraft:short_grass"
+            },
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:survives_explosion"
+                },
+                {
+                  "condition": "minecraft:random_chance",
+                  "chance": 0.125
+                }
+              ],
+              "name": "minecraft:wheat_seeds"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:alternatives",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:tall_blighted_undergrowth",
+              "properties": {
+                "source": "large_fern",
+                "half": "upper"
+              }
+            },
+            {
+              "condition": "minecraft:location_check",
+              "offsetY": -1,
+              "predicate": {
+                "block": {
+                  "blocks": "infestusfrontier:tall_blighted_undergrowth",
+                  "state": {
+                    "source": "large_fern",
+                    "half": "lower"
+                  }
+                }
+              }
+            }
+          ],
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "items": "minecraft:shears"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2.0,
+                  "add": false
+                }
+              ],
+              "name": "minecraft:fern"
+            },
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:survives_explosion"
+                },
+                {
+                  "condition": "minecraft:random_chance",
+                  "chance": 0.125
+                }
+              ],
+              "name": "minecraft:wheat_seeds"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "infestusfrontier:blocks/tall_blighted_undergrowth"
+}

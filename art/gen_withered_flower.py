@@ -49,10 +49,14 @@ def blob(draw, box, value):
     draw.ellipse(box, fill=grey(value))
 
 
-def roots(draw, foot_x):
-    """Dark threads creeping out of the ground at the foot of the stalk."""
+def roots(draw, foot_x, bottom=63):
+    """Dark threads creeping out of the ground at the foot of the stalk, ending on row {bottom}."""
     for dx, dy in ((-9, 4), (7, 5), (-3, 7), (11, 2)):
-        draw.line([(foot_x, 60), (foot_x + dx, 63 - dy), (foot_x + dx * 2, 63)], fill=grey(ROOT_THREAD), width=1)
+        draw.line(
+            [(foot_x, bottom - 3), (foot_x + dx, bottom - dy), (foot_x + dx * 2, bottom)],
+            fill=grey(ROOT_THREAD),
+            width=1,
+        )
 
 
 def hanging(draw):

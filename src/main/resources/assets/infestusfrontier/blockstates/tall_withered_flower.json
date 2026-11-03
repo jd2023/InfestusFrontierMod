@@ -1,0 +1,140 @@
+{
+  "variants": {
+    "half=lower,source=sunflower": [
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower"
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 270
+      }
+    ],
+    "half=upper,source=sunflower": [
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper"
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 270
+      }
+    ],
+    "half=lower,source=lilac": [
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower"
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 270
+      }
+    ],
+    "half=upper,source=lilac": [
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper"
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 270
+      }
+    ],
+    "half=lower,source=rose_bush": [
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower"
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 270
+      }
+    ],
+    "half=upper,source=rose_bush": [
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper"
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 270
+      }
+    ],
+    "half=lower,source=peony": [
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower"
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_lower",
+        "y": 270
+      }
+    ],
+    "half=upper,source=peony": [
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper"
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/tall_withered_flower_upper",
+        "y": 270
+      }
+    ]
+  }
+}

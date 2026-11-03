@@ -64,6 +64,31 @@ public final class EcologyModule {
                     .sound(SoundType.GRASS)
                     .offsetType(BlockBehaviour.OffsetType.XZ)
                     .pushReaction(PushReaction.DESTROY));
+    /**
+     * A sunflower, lilac, rose bush or peony killed by substrate growth under it: both halves, one harvest. No item.
+     */
+    public static final DeferredBlock<TallWitheredFlowerBlock> TALL_WITHERED_FLOWER = BLOCKS.registerBlock(
+            "tall_withered_flower",
+            TallWitheredFlowerBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.PLANT)
+                    .noCollission()
+                    .instabreak()
+                    .sound(SoundType.GRASS)
+                    .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .pushReaction(PushReaction.DESTROY));
+    /** Tall grass or a large fern killed by substrate growth under it: both halves, one harvest. No item. */
+    public static final DeferredBlock<TallBlightedUndergrowthBlock> TALL_BLIGHTED_UNDERGROWTH = BLOCKS.registerBlock(
+            "tall_blighted_undergrowth",
+            TallBlightedUndergrowthBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.PLANT)
+                    .noCollission()
+                    .replaceable()
+                    .instabreak()
+                    .sound(SoundType.GRASS)
+                    .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .pushReaction(PushReaction.DESTROY));
 
     /** The three wall tiers: soft as grown, bone-ribbed, and calcified past any explosion. */
     public static final DeferredBlock<LivingWallBlock> LIVING_WALL =
@@ -204,9 +229,19 @@ public final class EcologyModule {
         BLOCK_ENTITIES.register(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             DOOR_ENTITIES.forEach((name, type) -> OrganRenderers.registerBlock(modBus, name, type, 2));
-            modBus.addListener((RegisterColorHandlersEvent.Block event) -> event.register(
-                    (state, level, pos, index) -> WitheredFlowerBlock.tintAt(pos == null ? BlockPos.ZERO : pos),
-                    WITHERED_FLOWER.get()));
+            modBus.addListener((RegisterColorHandlersEvent.Block event) -> {
+                event.register(
+                        (state, level, pos, index) -> WitheredFlowerBlock.tintAt(pos == null ? BlockPos.ZERO : pos),
+                        WITHERED_FLOWER.get());
+                event.register(
+                        (state, level, pos, index) ->
+                                TallWitheredFlowerBlock.tintAt(state, pos == null ? BlockPos.ZERO : pos),
+                        TALL_WITHERED_FLOWER.get());
+                event.register(
+                        (state, level, pos, index) ->
+                                TallBlightedUndergrowthBlock.tintAt(state, pos == null ? BlockPos.ZERO : pos),
+                        TALL_BLIGHTED_UNDERGROWTH.get());
+            });
         }
         // vanilla skips a block's own use while its user sneaks with an item, so starting a wall listens here
         NeoForge.EVENT_BUS.addListener((PlayerInteractEvent.RightClickBlock event) -> {

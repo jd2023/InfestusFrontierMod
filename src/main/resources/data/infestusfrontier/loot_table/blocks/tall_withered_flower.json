@@ -1,0 +1,73 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:tall_withered_flower",
+              "properties": {
+                "source": "sunflower",
+                "half": "lower"
+              }
+            }
+          ],
+          "name": "minecraft:sunflower"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:tall_withered_flower",
+              "properties": {
+                "source": "lilac",
+                "half": "lower"
+              }
+            }
+          ],
+          "name": "minecraft:lilac"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:tall_withered_flower",
+              "properties": {
+                "source": "rose_bush",
+                "half": "lower"
+              }
+            }
+          ],
+          "name": "minecraft:rose_bush"
+        },
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:tall_withered_flower",
+              "properties": {
+                "source": "peony",
+                "half": "lower"
+              }
+            }
+          ],
+          "name": "minecraft:peony"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "infestusfrontier:blocks/tall_withered_flower"
+}
