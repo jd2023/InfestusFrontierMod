@@ -73,7 +73,7 @@ import org.jd.infestusfrontier.storage.api.ItemStore;
 public final class LarderTests {
     static final BlockPos ROOT = new BlockPos(8, 2, 8);
     /** Seed 7 forks east at tier 3, as in the stem tests. */
-    private static final long FORKING = 7;
+    static final long FORKING = 7;
 
     private static final long EASTWARD = 8;
     private static final int RESERVE_UP = ItemCapsulePodMenu.RESERVE_UP * ItemCapsulePodMenu.BUTTON_STEP;
@@ -86,7 +86,7 @@ public final class LarderTests {
 
     // ---- helpers ----
 
-    private static void plant(GameTestHelper h, long seed) {
+    static void plant(GameTestHelper h, long seed) {
         h.setBlock(ROOT.below(), EcologyModule.LIVING_SUBSTRATE.get());
         CapsuleStemBlock.plant(h.getLevel(), h.absolutePos(ROOT), seed);
     }
@@ -95,7 +95,7 @@ public final class LarderTests {
         return BoneMealItem.growCrop(new ItemStack(Items.BONE_MEAL), h.getLevel(), h.absolutePos(ROOT));
     }
 
-    private static void growAll(GameTestHelper h) {
+    static void growAll(GameTestHelper h) {
         for (int fed = 0; fed < 1024 && grow(h); fed++) {}
     }
 
@@ -110,7 +110,7 @@ public final class LarderTests {
     }
 
     /** Every pod of the tree, in the order the template is walked. */
-    private static List<BlockPos> pods(GameTestHelper h) {
+    static List<BlockPos> pods(GameTestHelper h) {
         List<BlockPos> pods = new ArrayList<>();
         for (int x = 0; x < 16; x++)
             for (int y = 1; y < 12; y++)
@@ -129,19 +129,19 @@ public final class LarderTests {
         return h.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, h.absolutePos(pos), side);
     }
 
-    private static ItemStore store(GameTestHelper h, BlockPos pos) {
+    static ItemStore store(GameTestHelper h, BlockPos pos) {
         return (ItemStore) items(h, pos);
     }
 
-    private static ItemStack stack(Item item, int count) {
+    static ItemStack stack(Item item, int count) {
         return new ItemStack(item, count);
     }
 
-    private static ItemStack gel(int count) {
+    static ItemStack gel(int count) {
         return new ItemStack(ProcessingModule.ELASTIC_GEL.get(), count);
     }
 
-    private static ItemStack resin(int count) {
+    static ItemStack resin(int count) {
         return new ItemStack(LogisticsModule.SEALING_RESIN.get(), count);
     }
 
@@ -157,7 +157,7 @@ public final class LarderTests {
         return player;
     }
 
-    private static MenuPlayer treat(GameTestHelper h, BlockPos pod, ItemStack treatment) {
+    static MenuPlayer treat(GameTestHelper h, BlockPos pod, ItemStack treatment) {
         MenuPlayer player = open(h, pod);
         player.containerMenu.setCarried(treatment);
         player.containerMenu.clicked(ItemCapsulePodMenu.TREATMENT, 0, ClickType.PICKUP, player);
@@ -184,7 +184,7 @@ public final class LarderTests {
         return larder(h, ROOT, grade);
     }
 
-    private static CapsuleStock stockOf(GameTestHelper h, BlockPos pod) {
+    static CapsuleStock stockOf(GameTestHelper h, BlockPos pod) {
         CapsuleStock stock = h.getBlockEntity(pod).collectComponents().get(StorageModule.CAPSULE_STOCK.get());
         return stock == null ? CapsuleStock.EMPTY : stock;
     }
@@ -1243,7 +1243,7 @@ public final class LarderTests {
     }
 
     /** A server player outside the player list that opens menus without a client, as in the stem tests. */
-    private static final class MenuPlayer extends FakePlayer {
+    static final class MenuPlayer extends FakePlayer {
         MenuPlayer(ServerLevel level) {
             super(level, new GameProfile(UUID.fromString("6c1d2c3e-4b5f-4a6b-8c7d-9e0f1a2b3c4d"), "larder_tests"));
         }

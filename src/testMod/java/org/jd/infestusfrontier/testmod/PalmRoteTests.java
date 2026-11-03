@@ -36,8 +36,8 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
-import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
+import org.jd.infestusfrontier.logistics.MouthMode;
 import org.jd.infestusfrontier.logistics.Port;
 import org.jd.infestusfrontier.logistics.VascularJunctionBlock;
 import org.jd.infestusfrontier.processing.PalmStatus;
@@ -91,6 +91,17 @@ public final class PalmRoteTests {
 
     private static BlockPos rotePalm(GameTestHelper h) {
         return rotePalm(h, AT);
+    }
+
+    /** A Palm with Reach and Rote standing on a Mouth set to {@code door}: its door to the Item Vein network. */
+    private static BlockPos rotePalm(GameTestHelper h, BlockPos at, MouthMode door) {
+        PalmNet.mouth(h, at.below(), door, null);
+        h.setBlock(at, ProcessingModule.SHAPING_PALM.get());
+        MenuPlayer player = new MenuPlayer(h.getLevel(), "palm_rote_door_" + at.toShortString());
+        use(h, player, stack(LogisticsModule.CONTRACTILE_FIBER.get(), 1), at);
+        use(h, player, stack(ProcessingModule.SYNAPTIC_GEL.get(), 1), at);
+        h.assertTrue(rote(h, at) != null, "the gel gave the Palm Rote");
+        return at;
     }
 
     private static PalmRote rote(GameTestHelper h, BlockPos at) {
@@ -189,15 +200,6 @@ public final class PalmRoteTests {
         ChestBlockEntity box = h.getBlockEntity(at);
         for (int slot = 0; slot < contents.length; slot++) box.setItem(slot, contents[slot]);
         return box;
-    }
-
-    private static void link(GameTestHelper h, BlockPos at, BlockPos store) {
-        MenuPlayer player = new MenuPlayer(h.getLevel(), "palm_rote_probe");
-        ItemStack probe = stack(InteractionModule.SYNAPTIC_PROBE.get(), 1);
-        use(h, player, probe, at);
-        player.saidKey();
-        use(h, player, player.getMainHandItem(), store);
-        h.assertValueEqual(player.saidKey(), STATUS + "linked", "the probe linked the store");
     }
 
     // ---- the gel and Select ----
@@ -545,44 +547,36 @@ public final class PalmRoteTests {
                         .setValue(HorizontalDirectionalBlock.FACING, toOrgan));
     }
 
-    // ---- competing consumers and the link ----
+    // ---- competing consumers and the network ----
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 400)
-    public static void twoPalmsOnOneChestShareItAndRestockOncePerCompletedCycle(GameTestHelper h) {
-        BlockPos first = rotePalm(h, new BlockPos(2, 2, 2));
-        BlockPos second = rotePalm(h, new BlockPos(2, 2, 4));
-        BlockPos store = new BlockPos(4, 2, 3);
-        ChestBlockEntity box = chest(h, store, stack(Items.OAK_PLANKS, 8));
-        link(h, first, store);
-        link(h, second, store);
+    public static void twoPalmsOnOneChestShareItAndNoPlankIsMadeOrLost(GameTestHelper h) {
+        BlockPos first = rotePalm(h, new BlockPos(2, 2, 2), MouthMode.BOTH);
+        BlockPos second = rotePalm(h, new BlockPos(2, 2, 4), MouthMode.BOTH);
+        PalmNet.veins(h, new BlockPos(3, 1, 2), new BlockPos(3, 1, 4));
+        BlockPos far = new BlockPos(4, 1, 3);
+        PalmNet.mouth(h, far, MouthMode.OUTPUT, null);
+        ChestBlockEntity box = PalmNet.chest(h, far, stack(Items.OAK_PLANKS, 8));
         for (BlockPos at : List.of(first, second)) {
             fuel(h, at, 100);
             fill(h, at, stickGrid(1));
             select(h, at);
         }
         h.startSequence()
-                .thenExecuteAfter(TICKS + 5, () -> {
+                .thenExecuteAfter(TICKS + 30, () -> {
                     h.assertValueEqual(rote(h, first).cycles(), 1, "the first Palm finished a cycle");
                     h.assertValueEqual(rote(h, second).cycles(), 1, "and so did the second");
-                    h.assertValueEqual(box.countItem(Items.OAK_PLANKS), 0, "the 8 planks were taken, not copied");
                     int grids = inGrid(h, first, Items.OAK_PLANKS) + inGrid(h, second, Items.OAK_PLANKS);
                     int running = (rote(h, first).cycle().isPresent() ? 1 : 0)
                             + (rote(h, second).cycle().isPresent() ? 1 : 0);
                     h.assertValueEqual(
-                            grids + 2 * running + 2 * 2,
+                            grids + box.countItem(Items.OAK_PLANKS) + 2 * running + 2 * 2,
                             12,
-                            "the 2 + 2 planks the Palms held and the 8 in the chest are in grids, cycles or sticks");
-                    h.assertTrue(running >= 1, "the Palm that got planks went on");
+                            "the 2 + 2 planks the Palms held and the 8 in the chest are in grids, the chest, cycles or sticks");
                     box.setItem(0, stack(Items.OAK_PLANKS, 40));
                 })
-                .thenExecuteAfter(TICKS / 2, () -> {
-                    h.assertValueEqual(
-                            box.countItem(Items.OAK_PLANKS),
-                            40,
-                            "a restock is once a completed cycle: the chest is left");
-                })
-                .thenExecuteAfter(TICKS, () -> {
-                    h.assertTrue(box.countItem(Items.OAK_PLANKS) < 40, "the next completed cycle restocked again");
+                .thenExecuteAfter(TICKS * 2, () -> {
+                    h.assertTrue(box.countItem(Items.OAK_PLANKS) < 40, "the network went on supplying the Palms");
                     int sticks = inTray(h, first, Items.STICK) + inTray(h, second, Items.STICK);
                     int planks = inGrid(h, first, Items.OAK_PLANKS)
                             + inGrid(h, second, Items.OAK_PLANKS)
@@ -598,30 +592,33 @@ public final class PalmRoteTests {
                 .thenSucceed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 400)
-    public static void aMissingStorePausesTheRestockWithAReasonAndAReturnedOneResumesIt(GameTestHelper h) {
-        BlockPos at = rotePalm(h);
-        chest(h, CHEST, stack(Items.OAK_PLANKS, 30));
-        link(h, at, CHEST);
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 500)
+    public static void aBrokenRouteLetsTheHeldIngredientsFinishAndAMendedOneResumesTheSupply(GameTestHelper h) {
+        BlockPos at = rotePalm(h, new BlockPos(2, 2, 2), MouthMode.BOTH);
+        PalmNet.veins(h, new BlockPos(3, 1, 2), new BlockPos(6, 1, 2));
+        BlockPos far = new BlockPos(7, 1, 2);
+        PalmNet.mouth(h, far, MouthMode.OUTPUT, null);
+        PalmNet.chest(h, far, stack(Items.OAK_PLANKS, 30));
         fuel(h, at, 100);
         fill(h, at, stickGrid(1));
         select(h, at);
+        BlockPos cut = new BlockPos(5, 1, 2);
         h.startSequence()
-                .thenExecuteAfter(10, () -> {
-                    h.assertTrue(rote(h, at).cycle().isPresent(), "the first cycle runs on what the grid held");
-                    h.setBlock(CHEST, Blocks.AIR);
+                .thenExecuteAfter(5, () -> h.setBlock(cut, Blocks.AIR))
+                .thenExecuteAfter(TICKS + 40, () -> {
+                    ChestBlockEntity box = h.getBlockEntity(far.above());
+                    h.assertTrue(rote(h, at).cycles() >= 1, "the cycle finished on what the Palm already held");
+                    int now = box.countItem(Items.OAK_PLANKS);
+                    h.runAfterDelay(
+                            60,
+                            () -> h.assertValueEqual(
+                                    box.countItem(Items.OAK_PLANKS), now, "a broken vein moves nothing more"));
+                    h.assertValueEqual(inTray(h, at, Items.STICK) % 4, 0, "its sticks are whole crafts in the tray");
                 })
-                .thenExecuteAfter(TICKS + 10, () -> {
-                    h.assertValueEqual(rote(h, at).cycles(), 1, "the cycle finished without its store");
-                    h.assertTrue(rote(h, at).cycle().isEmpty(), "and none followed: the grid is empty");
-                    h.assertValueEqual(status(h, at), PalmStatus.LINK_LOST, "the Palm says the link is lost");
-                    h.assertValueEqual(inTray(h, at, Items.STICK), 4, "its sticks are safe in the tray");
-                    h.assertValueEqual(fuelHeld(h, at), 90, "and it spent nothing more");
-                    chest(h, CHEST, stack(Items.OAK_PLANKS, 30));
-                })
-                .thenExecuteAfter(RETRY_WAIT, () -> {
-                    ChestBlockEntity back = h.getBlockEntity(CHEST);
-                    h.assertTrue(back.countItem(Items.OAK_PLANKS) < 30, "the store came back and gave planks");
+                .thenExecuteAfter(120, () -> h.setBlock(cut, LogisticsModule.ITEM_VEIN.get()))
+                .thenExecuteAfter(60, () -> {
+                    ChestBlockEntity back = h.getBlockEntity(far.above());
+                    h.assertTrue(back.countItem(Items.OAK_PLANKS) < 30, "the mended route gave planks again");
                     h.assertTrue(rote(h, at).cycle().isPresent() || rote(h, at).cycles() >= 2, "so the Palm went on");
                 })
                 .thenSucceed();

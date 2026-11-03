@@ -221,8 +221,9 @@ public final class DiscoveryTests {
                 entry.getPages().stream()
                         .filter(page -> page instanceof com.klikli_dev.modonomicon.book.page.BookTextPage)
                         .count(),
-                8L,
-                "text pages for use, keeps, kept, Reach, the supply buttons, Rote, the cycle and the Lobes");
+                9L,
+                "text pages for use, keeps, kept, Reach, the supply buttons, the demo exhibits, Rote, the cycle and"
+                        + " the Lobes");
         h.assertTrue(h.getLevel().getRecipeManager().byKey(id("shaping_palm")).isPresent(), "the shown recipe exists");
         h.assertTrue(entry.getCondition() instanceof BookOrCondition, "the Palm unlocks by the Bone Plate or by item");
         h.assertTrue(

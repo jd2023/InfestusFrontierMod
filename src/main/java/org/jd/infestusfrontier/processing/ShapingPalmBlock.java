@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * The Shaping Palm (BLOCK_CATALOG T1-41): a crafting table that keeps its grid. It stands on an organ foundation, and
- * any hand opens its screen, like a chest. A Contractile Fiber used on it gives it Reach, one supply link; a Synaptic
+ * any hand opens its screen, like a chest. A Contractile Fiber used on it gives it Reach, the use of the Mouth under it; a Synaptic
  * Gel used on a Palm with Reach gives it Rote, which repeats one recorded craft by itself. Its block state mirrors
  * whether it has Rote and whether a cycle is under way, for the client; everything else is in its block entity.
  */

@@ -1,14 +1,10 @@
 package org.jd.infestusfrontier.interaction;
 
 import java.util.List;
-import net.minecraft.core.GlobalPos;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.component.Tool;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
@@ -17,15 +13,6 @@ import org.jd.infestusfrontier.organ.api.Organs;
 /** Owner of hand tools that read, open and remove organs. Ships the Synaptic Probe and the Surgical Blade. */
 public final class InteractionModule {
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(InfestusFrontier.MOD_ID);
-
-    private static final DeferredRegister.DataComponents COMPONENTS =
-            DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, InfestusFrontier.MOD_ID);
-
-    /** The Shaping Palm the probe was used on and now waits to link to a store; a probe holds at most one. */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<GlobalPos>> PALM_SOURCE =
-            COMPONENTS.registerComponentType(
-                    "palm_source",
-                    builder -> builder.persistent(GlobalPos.CODEC).networkSynchronized(GlobalPos.STREAM_CODEC));
 
     public static final DeferredItem<Item> SYNAPTIC_PROBE =
             ITEMS.registerItem("synaptic_probe", SynapticProbeItem::new, new Item.Properties().stacksTo(1));
@@ -51,6 +38,5 @@ public final class InteractionModule {
 
     public static void register(IEventBus modBus) {
         ITEMS.register(modBus);
-        COMPONENTS.register(modBus);
     }
 }

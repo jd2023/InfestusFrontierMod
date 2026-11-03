@@ -21,8 +21,8 @@ public enum PalmStatus {
     TRAY_FULL,
     /** The recipe or its result is no longer what Select recorded. */
     RECIPE_CHANGED,
-    /** The grid needs a restock and the linked store cannot be reached. */
-    LINK_LOST,
+    /** The grid needs a restock and the Mouth under the Palm cannot reach the network. */
+    NO_SUPPLY,
     /** No organ foundation under the Palm. */
     NO_FOUNDATION,
     /** The saved bytes could not be read. */

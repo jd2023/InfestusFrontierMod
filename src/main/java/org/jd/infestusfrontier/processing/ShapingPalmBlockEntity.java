@@ -9,7 +9,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
@@ -30,8 +29,6 @@ import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.api.PalmContents;
-import org.jd.infestusfrontier.processing.api.PalmLink;
-import org.jd.infestusfrontier.processing.api.PalmLinking;
 import org.jd.infestusfrontier.processing.api.PalmRote;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 import org.jetbrains.annotations.Nullable;
@@ -44,14 +41,14 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
  * A Shaping Palm (BLOCK_CATALOG T1-41): the nine stacks of a crafting grid that stay in the organ when its screen
- * closes, whether it has been given Reach, and its one supply link, a position. A craft at the screen is the crafting
+ * closes, and whether it has been given Reach, the right to use the Mouth under it as its door to the Item Vein
+ * network. A craft at the screen is the crafting
  * table's own, taken by the player ({@link ShapingPalmMenu}). A Palm with Rote (stage 3) also keeps one recorded
  * pattern, a biomass tank, a four-stack tray and at most one cycle under way, and repeats the pattern's craft by itself
- * ({@link #serverTick}); only then does it expose an item handler ({@link PalmPorts}) and a biomass handler. The store
- * is found at the linked position only when a screen action or a restock asks ({@link #store()}).
+ * ({@link #serverTick}); only then does it expose an item handler ({@link PalmPorts}) and a biomass handler. The network is reached through
+ * the Mouth under the Palm, only when a screen action or a restock asks ({@link #door()}).
  */
-final class ShapingPalmBlockEntity extends BlockEntity
-        implements MenuProvider, GeoBlockEntity, PalmLink, BiomassHandler {
+final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, GeoBlockEntity, BiomassHandler {
     /** The organ has no foundation under it, so it keeps its grid and crafts nothing. */
     static final Refusal NO_FOUNDATION = new Refusal("processing.palm_no_foundation");
     /** The organ already has Reach, so a second Contractile Fiber is not spent. */
@@ -74,17 +71,19 @@ final class ShapingPalmBlockEntity extends BlockEntity
                     PalmRote.CODEC.optionalFieldOf("rote").forGetter(Saved::rote))
             .apply(instance, Saved::new));
     private static final String REACH = "reach";
-    private static final String LINK = "link";
+    /**
+     * The direct-link position older saves hold. It is never read: a Palm reaches storage only through its Mouth. It
+     * is dropped from every tag the Palm reads, keeps and writes, and the rest of the save loads as it was.
+     */
+    private static final String LEGACY_LINK = "link";
 
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     private final NonNullList<ItemStack> grid = NonNullList.withSize(PalmContents.CELLS, ItemStack.EMPTY);
     private Optional<CompoundTag> unreadable = Optional.empty();
     /** Counts every change to the grid, so a menu that is open knows when what it shows is out of date. */
     private int version;
-    /** A Contractile Fiber was applied: the Palm may hold a supply link. Carried on its item. */
+    /** A Contractile Fiber was applied: the Palm may use the Mouth under it. Carried on its item. */
     private boolean reach;
-    /** The one linked store position, in this organ's dimension and within range; never carried on the item. */
-    private Optional<BlockPos> link = Optional.empty();
 
     /** A Synaptic Gel was applied: the Palm selects a pattern and repeats it. Everything below is meaningful only then. */
     private boolean rote;
@@ -96,7 +95,7 @@ final class ShapingPalmBlockEntity extends BlockEntity
 
     private BiomassTank biomass = BiomassTank.empty(PalmRote.CAPACITY);
     private int cycles;
-    /** A cycle was completed since the grid was last restocked from the link. */
+    /** A cycle was completed since the grid was last restocked through its Mouth. */
     private boolean restockOwed;
     /** True while something changed since the last attempt, so the next tick looks again at once. */
     private boolean dirty = true;
@@ -180,14 +179,8 @@ final class ShapingPalmBlockEntity extends BlockEntity
         return Optional.empty();
     }
 
-    @Override
-    public boolean hasReach() {
+    boolean hasReach() {
         return reach;
-    }
-
-    /** The linked store position, if the Palm has one; it says nothing of whether anything is there now. */
-    Optional<BlockPos> link() {
-        return reach ? link : Optional.empty();
     }
 
     /** Applies Reach once. Refuses a Palm whose save could not be read, and a Palm that already has it. */
@@ -333,24 +326,20 @@ final class ShapingPalmBlockEntity extends BlockEntity
     }
 
     /**
-     * Tops the pattern's cells up from the link, once for the cycle just completed. Returns true when the link was
-     * reached or there is none to reach; false leaves the restock owed for a later attempt.
+     * Tops the pattern's cells up through the Mouth under the Palm, once for the cycle just completed. Returns true when
+     * the network was consulted or there is no Mouth to consult; false leaves the restock owed for a later attempt.
      */
     private boolean supply(ServerLevel server) {
         if (!restockOwed) return true;
-        if (pattern.isEmpty() || link().isEmpty()) {
+        if (pattern.isEmpty() || !(PalmSupply.reach(server, worldPosition) instanceof PalmSupply.Reached.Door door)) {
             restockOwed = false;
             setChanged();
             return true;
         }
-        if (!(store() instanceof PalmSupply.Reached.Store reached)) return false;
+        PalmSupply.Moved moved = PalmSupply.restockPattern(grid, pattern.get().kinds(), door.access());
+        if (!moved.consulted()) return false;
         restockOwed = false;
-        int moved = PalmSupply.restockPattern(
-                grid,
-                pattern.get().kinds(),
-                reached.handler(),
-                spill -> Block.popResource(server, worldPosition.above(), spill));
-        if (moved > 0) touch();
+        if (moved.items() > 0) touch();
         else setChanged();
         return true;
     }
@@ -366,9 +355,9 @@ final class ShapingPalmBlockEntity extends BlockEntity
         cooldown = RETRY_TICKS;
         if (pattern.isEmpty()) return;
         PalmRote.Pattern recorded = pattern.get();
-        boolean reachedLink = supply(server);
+        boolean reachedNetwork = supply(server);
         if (!PalmPlan.matches(recorded.kinds(), grid)) {
-            judged = reachedLink ? PalmStatus.MISSING : PalmStatus.LINK_LOST;
+            judged = reachedNetwork ? PalmStatus.MISSING : PalmStatus.NO_SUPPLY;
             return;
         }
         if (!biomass.stored().atLeast(PalmRote.COST)) {
@@ -406,35 +395,21 @@ final class ShapingPalmBlockEntity extends BlockEntity
         show();
     }
 
-    @Override
-    public Optional<Refusal> link(BlockPos target) {
-        Optional<Refusal> why = reachRefusal();
-        if (why.isPresent()) return why;
-        if (level == null) return Optional.of(PalmSupply.NO_STORE);
-        PalmSupply.Reached reached = PalmSupply.reach(level, worldPosition, target);
-        if (reached instanceof PalmSupply.Reached.Refused refused) return Optional.of(refused.why());
-        link = Optional.of(target.immutable());
-        setChanged();
-        return Optional.empty();
-    }
-
-    /** Why the Palm cannot use a supply link at all now, or empty. */
+    /** Why the Palm cannot use its Mouth at all now, or empty. */
     private Optional<Refusal> reachRefusal() {
         if (unreadable.isPresent()) return Optional.of(Persistence.CORRUPT);
         return reach ? Optional.empty() : Optional.of(PalmSupply.NO_REACH);
     }
 
     /**
-     * The store the link reaches now, or the reason it does not: no Reach, no link, a position out of range, an
-     * unloaded chunk, or a block without an item handler. Looks at the linked position only, loads nothing, and keeps
-     * the link whatever it finds, so a store that comes back is used again.
+     * The door to the network now, or the reason there is none: no Reach, or no Mouth under the Palm. Looks at the one
+     * position under the Palm, loads nothing, and keeps nothing, so a Mouth that is placed or broken is seen at once.
      */
-    PalmSupply.Reached store() {
+    PalmSupply.Reached door() {
         Optional<Refusal> why = reachRefusal();
         if (why.isPresent()) return new PalmSupply.Reached.Refused(why.get());
-        if (link.isEmpty()) return new PalmSupply.Reached.Refused(PalmSupply.NOT_LINKED);
-        if (level == null) return new PalmSupply.Reached.Refused(PalmSupply.UNLOADED);
-        return PalmSupply.reach(level, worldPosition, link.get());
+        if (level == null) return new PalmSupply.Reached.Refused(PalmSupply.NO_MOUTH);
+        return PalmSupply.reach(level, worldPosition);
     }
 
     /** True when the grid is empty and no unreadable bytes are kept. */
@@ -512,8 +487,7 @@ final class ShapingPalmBlockEntity extends BlockEntity
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         read.ifPresent(this::restore);
         reach = tag.getBoolean(REACH);
-        link = NbtUtils.readBlockPos(tag, LINK)
-                .filter(pos -> pos.distSqr(worldPosition) <= PalmLinking.RANGE * PalmLinking.RANGE);
+        unreadable.ifPresent(kept -> kept.remove(LEGACY_LINK));
     }
 
     @Override
@@ -522,9 +496,8 @@ final class ShapingPalmBlockEntity extends BlockEntity
         if (unreadable.isPresent()) tag.merge(unreadable.get());
         else Persistence.write(SAVED, new Saved(contents(), roteState()), registries, tag);
         tag.remove(REACH);
-        tag.remove(LINK);
+        tag.remove(LEGACY_LINK);
         if (reach) tag.putBoolean(REACH, true);
-        link.ifPresent(pos -> tag.put(LINK, NbtUtils.writeBlockPos(pos)));
     }
 
     @Override
@@ -532,7 +505,7 @@ final class ShapingPalmBlockEntity extends BlockEntity
         super.collectImplicitComponents(components);
         if (unreadable.isPresent()) {
             CompoundTag kept = unreadable.get().copy();
-            kept.remove(LINK);
+            kept.remove(LEGACY_LINK);
             components.set(OrganModule.UNREADABLE_SAVE.get(), kept);
             return;
         }
@@ -547,7 +520,9 @@ final class ShapingPalmBlockEntity extends BlockEntity
         super.applyImplicitComponents(input);
         CompoundTag kept = input.get(OrganModule.UNREADABLE_SAVE.get());
         if (kept != null) {
-            unreadable = Optional.of(kept.copy());
+            CompoundTag copy = kept.copy();
+            copy.remove(LEGACY_LINK);
+            unreadable = Optional.of(copy);
             reach = kept.getBoolean(REACH);
             return;
         }
@@ -571,7 +546,7 @@ final class ShapingPalmBlockEntity extends BlockEntity
         tag.remove("contents");
         tag.remove("rote");
         tag.remove(REACH);
-        tag.remove(LINK);
+        tag.remove(LEGACY_LINK);
     }
 
     @Override

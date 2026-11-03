@@ -26,6 +26,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.core.logistics.Delivery;
 import org.jd.infestusfrontier.core.logistics.NetworkIndex;
 import org.jd.infestusfrontier.foundation.Persistence;
+import org.jd.infestusfrontier.logistics.api.ItemAccess;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.storage.api.ItemStores;
 import org.jetbrains.annotations.Nullable;
@@ -86,6 +87,15 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
 
     SimpleContainer filter() {
         return filter;
+    }
+
+    /** The next turn among equal-priority Mouths; a transaction that moved something takes it. */
+    int turn() {
+        return turn;
+    }
+
+    void turned() {
+        turn++;
     }
 
     boolean deny() {
@@ -249,19 +259,29 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
 
     /** Shared component membership; endpoint mode, filters and inventories are always read live. */
     private List<Route> routes() {
-        Optional<NetworkIndex.Component<NetworkTopology.Node>> component =
-                NetworkTopology.get((ServerLevel) level).network((ServerLevel) level, worldPosition, null);
-        if (component.isEmpty() || component.get().status() != NetworkIndex.Status.READY) return List.of();
         List<Route> found = new ArrayList<>();
-        for (NetworkTopology.Node node : component.get().nodes()) {
-            if (node.pos().equals(worldPosition) || node.faces() != (63 ^ NetworkTopology.bit(Direction.UP))) continue;
-            if (destination(node.pos()).filter(mouth -> mouth.mode().takes()).isPresent())
-                found.add(new Route(node.pos()));
-        }
+        for (BlockPos peer : peers().orElse(List.of()))
+            if (destination(peer).filter(mouth -> mouth.mode().takes()).isPresent()) found.add(new Route(peer));
         return found;
     }
 
-    private Optional<MouthBlockEntity> destination(BlockPos pos) {
+    /**
+     * The other Mouths of this Mouth's network, or empty while the network is not ready. They may stand in unloaded
+     * chunks: the topology is saved knowledge, and an unloaded Mouth is told by {@link #destination}.
+     */
+    Optional<List<BlockPos>> peers() {
+        Optional<NetworkIndex.Component<NetworkTopology.Node>> component =
+                NetworkTopology.get((ServerLevel) level).network((ServerLevel) level, worldPosition, null);
+        if (component.isEmpty() || component.get().status() != NetworkIndex.Status.READY) return Optional.empty();
+        List<BlockPos> found = new ArrayList<>();
+        for (NetworkTopology.Node node : component.get().nodes()) {
+            if (node.pos().equals(worldPosition) || node.faces() != (63 ^ NetworkTopology.bit(Direction.UP))) continue;
+            found.add(node.pos());
+        }
+        return Optional.of(found);
+    }
+
+    Optional<MouthBlockEntity> destination(BlockPos pos) {
         if (!level.hasChunkAt(pos)) return Optional.empty();
         return level.getBlockEntity(pos) instanceof MouthBlockEntity mouth ? Optional.of(mouth) : Optional.empty();
     }
@@ -284,6 +304,44 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
                 - ItemStores.insert(store, stack.copyWithCount(allowed), true).getCount();
     }
 
+    /**
+     * This Mouth as a source for an organ's pull: up to {@code limit} items of {@code kind} taken for real from its
+     * store, when its mode gives and its filter lets the kind out. The amount keeps that many in the store, and the
+     * store's own rules (sided access, Larder reserves) decide what each extraction gives. Looks at the store's first
+     * {@link ItemStores#STORE_SLOTS} slots. An extraction that is not the kind asked for, or more than asked, goes
+     * back to the store; what cannot go back is dropped on the Mouth.
+     */
+    ItemStack release(ItemStack kind, int limit) {
+        if (unreadable.isPresent() || !mode().gives() || !permits(kind) || limit <= 0) return ItemStack.EMPTY;
+        IItemHandler store = partner();
+        if (store == null) return ItemStack.EMPTY;
+        int allowed = amount == 0
+                ? limit
+                : Math.min(limit, Delivery.outputAllowance(amount, ItemStores.count(store, kind), limit));
+        int slots = Math.min(store.getSlots(), ItemStores.STORE_SLOTS);
+        int taken = 0;
+        for (int slot = 0; slot < slots && taken < allowed; slot++) {
+            if (!ItemStack.isSameItemSameComponents(store.getStackInSlot(slot), kind)) continue;
+            int ask = allowed - taken;
+            ItemStack got = store.extractItem(slot, ask, false);
+            if (got.isEmpty()) continue;
+            int used = ItemStack.isSameItemSameComponents(got, kind) ? Math.min(got.getCount(), ask) : 0;
+            taken += used;
+            if (used < got.getCount()) {
+                ItemStack rest = ItemStores.insert(store, got.copyWithCount(got.getCount() - used), false);
+                if (!rest.isEmpty())
+                    Containers.dropItemStack(
+                            level, worldPosition.getX(), worldPosition.getY() + 1, worldPosition.getZ(), rest);
+            }
+        }
+        return taken == 0 ? ItemStack.EMPTY : kind.copyWithCount(taken);
+    }
+
+    /** The organ standing on this Mouth reaches the network through this. */
+    ItemAccess access() {
+        return new MouthAccess(this);
+    }
+
     /** Inserts what {@link #room} allows and returns the rest. */
     ItemStack accept(ItemStack stack) {
         int room = room(stack);
@@ -294,7 +352,7 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         return stack.copyWithCount(stack.getCount() - inserted);
     }
 
-    private boolean permits(ItemStack stack) {
+    boolean permits(ItemStack stack) {
         boolean listed = false;
         boolean match = false;
         for (ItemStack entry : filter.getItems()) {
@@ -307,7 +365,7 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     /** The store standing on this Mouth, or null: see {@link ItemStores#at}. */
-    private @Nullable IItemHandler partner() {
+    @Nullable IItemHandler partner() {
         return ItemStores.at(level, worldPosition.above(), Direction.DOWN);
     }
 

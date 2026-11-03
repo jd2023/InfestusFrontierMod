@@ -42,7 +42,6 @@ import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
 import org.jd.infestusfrontier.processing.api.OrganBatchRecipe;
 import org.jd.infestusfrontier.processing.api.PalmContents;
-import org.jd.infestusfrontier.processing.api.PalmLinking;
 import org.jd.infestusfrontier.processing.api.PalmRote;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -343,7 +342,7 @@ public final class ProcessingModule {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> PALM_REACH =
             COMPONENTS.registerComponentType(
                     "palm_reach", builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
-    /** Grafts that give a Palm Reach, the supply link of its second stage. */
+    /** Grafts that give a Palm Reach, the use of the Mouth under it in its second stage. */
     public static final TagKey<Item> PALM_GRAFTS = TagKey.create(
             Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "palm_reach"));
     /** Gels that give a Palm that has Reach its Rote, the third stage. */
@@ -455,7 +454,6 @@ public final class ProcessingModule {
                     Capabilities.FluidHandler.BLOCK,
                     DIGESTIVE_SAC_ENTITY.get(),
                     (sac, side) -> BiomassFluids.handler(sac));
-            event.registerBlockEntity(PalmLinking.PALM_LINK, SHAPING_PALM_ENTITY.get(), (palm, side) -> palm);
             event.registerBlockEntity(
                     Capabilities.ItemHandler.BLOCK, SHAPING_PALM_ENTITY.get(), (palm, side) -> palm.ports());
             event.registerBlockEntity(

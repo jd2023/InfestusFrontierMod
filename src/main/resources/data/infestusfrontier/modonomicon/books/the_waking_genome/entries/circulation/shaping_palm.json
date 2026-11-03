@@ -60,6 +60,11 @@
     },
     {
       "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.shaping_palm.demo.title",
+      "text": "entry.infestusfrontier.circulation.shaping_palm.demo"
+    },
+    {
+      "type": "modonomicon:text",
       "title": "entry.infestusfrontier.circulation.shaping_palm.rote.title",
       "text": "entry.infestusfrontier.circulation.shaping_palm.rote"
     },

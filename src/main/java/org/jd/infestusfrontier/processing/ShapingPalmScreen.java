@@ -17,7 +17,7 @@ import org.jd.infestusfrontier.ui.SlotGrid;
 
 /**
  * Client view of the Palm: the nine grid wells it keeps, the result well beside them, a line saying whether it has
- * Reach (or, with Rote, what the cycle is doing) and a link, and the three supply buttons under the grid. With Rote it
+ * Reach (or, with Rote, what the cycle is doing) and the direction of its Mouth, and the three supply buttons under the grid. With Rote it
  * also has a biomass tank, Select and the four-slot tray on a third row.
  */
 final class ShapingPalmScreen extends OrganScreen<ShapingPalmMenu> {
@@ -29,6 +29,11 @@ final class ShapingPalmScreen extends OrganScreen<ShapingPalmMenu> {
     private static final int LABEL_GAP = Sheet.PARTS_Y - Sheet.LABEL_Y;
     private static final String KEY = "gui.infestusfrontier.shaping_palm.";
     private static final String[] BUTTONS = {"restock", "return", "store"};
+    /** One line for each reach state of {@link ShapingPalmMenu#reachState}. */
+    private static final String[] MOUTH_LINES = {
+        "mouth.no_reach", "mouth.none", "mouth.closed", "mouth.takes", "mouth.gives", "mouth.both"
+    };
+
     private static final int BUTTON_GAP = 2;
     private static final int LINE = 9;
 
@@ -74,14 +79,8 @@ final class ShapingPalmScreen extends OrganScreen<ShapingPalmMenu> {
                 textX,
                 textY + LINE - 1,
                 width,
-                () -> menu.reachState() == 2
-                        ? Component.translatable(
-                                KEY + "linked",
-                                signed(menu.linkOffset(0)),
-                                signed(menu.linkOffset(1)),
-                                signed(menu.linkOffset(2)))
-                        : Component.translatable(KEY + "not_linked"),
-                () -> Component.translatable(KEY + "link.story")));
+                () -> Component.translatable(KEY + MOUTH_LINES[menu.reachState()]),
+                () -> Component.translatable(KEY + "mouth.story")));
         int y = GRID.bounds().bottom() + 3;
         for (int id = 0; id < BUTTONS.length; id++) {
             int action = id;
@@ -114,10 +113,6 @@ final class ShapingPalmScreen extends OrganScreen<ShapingPalmMenu> {
                             Component.empty())
                     .story(Component.translatable(KEY + (slot == 0 ? "tray.result" : "tray.remainder"))));
         }
-    }
-
-    private static String signed(int offset) {
-        return offset > 0 ? "+" + offset : Integer.toString(offset);
     }
 
     private void send(int id) {

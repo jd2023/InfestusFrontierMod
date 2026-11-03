@@ -387,7 +387,7 @@ Kidney process-water filtration is a separate recipe: 100 mB dirty water +
 
 Status: **the Gizzard, the Washing Kidney with its settle step, the three dusts,
 Mineral Tailings, Rock Residue, the two waste crafts and dust smelting in the
-Bio-Furnace ship** (sprint records F33, F34), and so do the Mixed Craw and the Larder (F35, F36). The Palm, its supply link and its Rote cycle ship (F37, F38, F39). Starting values until
+Bio-Furnace ship** (sprint records F33, F34), and so do the Mixed Craw and the Larder (F35, F36). The Palm, its reach through the Mouth under it and its Rote cycle ship (F37, F38, F39). Starting values until
 play testing confirms them. Roadmap scope: [ROADMAP](../../ROADMAP.md#next-milestone--the-automated-mineral-workshop).
 
 Scope: iron, gold and copper raw items that the player mined or looted by hand;

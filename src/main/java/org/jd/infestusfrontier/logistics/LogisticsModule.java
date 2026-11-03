@@ -250,6 +250,8 @@ public final class LogisticsModule {
                     SEPTUM_CROSSING.get(),
                     VASCULAR_STITCH.get());
             event.registerBlockEntity(LogisticsCapabilities.MOUTH_SCREEN, MOUTH_ENTITY.get(), (mouth, none) -> mouth);
+            event.registerBlockEntity(
+                    LogisticsCapabilities.ITEM_ACCESS, MOUTH_ENTITY.get(), (mouth, none) -> mouth.access());
             event.registerBlock(
                     Capabilities.FluidHandler.BLOCK,
                     (level, pos, state, entity, side) -> side == state.getValue(FilterValveBlock.FACING)
