@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/planting_proboscis",
+  "display": {
+    "icon": { "id": "infestusfrontier:harvest_corolla" },
+    "title": { "translate": "advancement.infestusfrontier.contact.harvest_corolla.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.harvest_corolla.description" },
+    "frame": "task"
+  },
+  "criteria": {
+    "harvested": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": { "organ": "infestusfrontier:harvest_corolla" }
+    }
+  }
+}

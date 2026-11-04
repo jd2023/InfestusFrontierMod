@@ -12,7 +12,21 @@
     "give @s minecraft:rotten_flesh 4",
     "give @s minecraft:string 4",
     "give @s minecraft:bone 4",
-    "give @s minecraft:raw_iron 4"
+    "give @s minecraft:raw_iron 4",
+    "fill 93 -61 106 102 -61 110 infestusfrontier:living_substrate[stage=mature]",
+    "fill 99 -61 107 101 -61 109 infestusfrontier:cultivation_tissue{water:{id:\"minecraft:water\",amount:900}}",
+    "setblock 100 -61 108 infestusfrontier:living_substrate[stage=mature]",
+    "fill 94 -61 108 98 -61 108 infestusfrontier:item_vein",
+    "setblock 96 -61 108 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 94 -61 108 infestusfrontier:mouth[mode=intake]",
+    "setblock 98 -61 108 infestusfrontier:mouth[mode=output]",
+    "setblock 94 -60 108 infestusfrontier:digestive_sac",
+    "setblock 98 -60 108 infestusfrontier:harvest_corolla{tank:{stored:800,reserved:0,capacity:1000}}",
+    "setblock 100 -60 108 infestusfrontier:planting_proboscis{tank:{stored:800,reserved:0,capacity:1000}}",
+    "setblock 94 -60 106 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Digestive Sac\"','\"open it once;\"','\"fed by the line\"','\"no hands\"']}}",
+    "setblock 98 -60 106 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Harvest Corolla\"','\"open it once;\"','\"cuts ripe crops\"','\"Mouth below\"']}}",
+    "setblock 100 -60 106 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Planting Proboscis\"','\"a seed by hand\"','\"plants the beds\"','\"\"']}}",
+    "give @s minecraft:wheat_seeds 4"
   ],
   "views": [
     {
@@ -133,6 +147,87 @@
         100
       ],
       "expectToast": "infestusfrontier:contact/bio_furnace"
+    },
+    {
+      "name": "planter_seed",
+      "x": 100.5,
+      "y": -60,
+      "z": 104.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "holding": "minecraft:wheat_seeds",
+      "feed": [
+        100,
+        -60,
+        108
+      ],
+      "expectToast": "infestusfrontier:contact/planting_proboscis"
+    },
+    {
+      "name": "corolla_screen",
+      "x": 98.5,
+      "y": -60,
+      "z": 104.5,
+      "yaw": 0,
+      "pitch": 15,
+      "gui": true,
+      "use": [
+        98,
+        -60,
+        108
+      ]
+    },
+    {
+      "name": "sac_screen",
+      "x": 94.5,
+      "y": -60,
+      "z": 104.5,
+      "yaw": 0,
+      "pitch": 15,
+      "gui": true,
+      "use": [
+        94,
+        -60,
+        108
+      ]
+    },
+    {
+      "name": "corolla_cut",
+      "x": 98.5,
+      "y": -60,
+      "z": 104.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "trigger": "fill 99 -60 107 99 -60 109 wheat[age=7] replace wheat",
+      "expectToast": "infestusfrontier:contact/harvest_corolla"
+    },
+    {
+      "name": "line_joined",
+      "x": 96.5,
+      "y": -60,
+      "z": 104.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "trigger": "setblock 96 -61 108 infestusfrontier:item_vein",
+      "expectToast": "infestusfrontier:contact/automatic_supply"
+    },
+    {
+      "name": "tab_farm",
+      "x": 100.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "advancements": true,
+      "expectTab": true,
+      "scroll": [
+        -200,
+        0
+      ]
     },
     {
       "name": "tab_done",

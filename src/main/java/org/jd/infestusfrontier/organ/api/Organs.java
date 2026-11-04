@@ -7,15 +7,18 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jetbrains.annotations.Nullable;
 
 /** Rules every organ block shares. */
 public final class Organs {
@@ -67,8 +70,17 @@ public final class Organs {
         if (!(level.getBlockEntity(pos) instanceof MenuProvider provider))
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+        if (provider instanceof BlockEntity organ && organ instanceof Stewarded stewarded)
+            if (stewarded.steward().claim(player)) organ.setChanged();
         if (player instanceof ServerPlayer server) server.openMenu(provider, pos);
         return ItemInteractionResult.CONSUME;
+    }
+
+    /** For {@code setPlacedBy}: the player who placed a {@link Stewarded} organ becomes its steward. */
+    public static void placedBy(Level level, BlockPos pos, @Nullable LivingEntity placer) {
+        if (level.isClientSide || !(placer instanceof Player player)) return;
+        BlockEntity organ = level.getBlockEntity(pos);
+        if (organ instanceof Stewarded stewarded && stewarded.steward().assign(player)) organ.setChanged();
     }
 
     /**

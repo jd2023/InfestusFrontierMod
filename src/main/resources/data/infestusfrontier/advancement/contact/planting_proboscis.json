@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/digestive_sac",
+  "display": {
+    "icon": { "id": "infestusfrontier:planting_proboscis" },
+    "title": { "translate": "advancement.infestusfrontier.contact.planting_proboscis.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.planting_proboscis.description" },
+    "frame": "task"
+  },
+  "criteria": {
+    "planted": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": { "organ": "infestusfrontier:planting_proboscis" }
+    }
+  }
+}

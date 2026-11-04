@@ -33,6 +33,11 @@
       "type": "modonomicon:crafting_recipe",
       "recipe_id_1": "infestusfrontier:planting_proboscis",
       "text": "entry.infestusfrontier.circulation.planting_proboscis.craft"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.organ.steward.title",
+      "text": "entry.infestusfrontier.organ.steward.text"
     }
   ]
 }

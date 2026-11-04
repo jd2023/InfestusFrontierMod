@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -107,7 +108,16 @@ public final class PlotOrganBlock extends BaseEntityBlock {
             return Organs.openScreen(stack, level, pos, player);
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
         ItemStack offered = player.getAbilities().instabuild ? stack.copy() : stack;
-        return organ.insertByHand(offered) ? ItemInteractionResult.CONSUME : ItemInteractionResult.FAIL;
+        if (!organ.insertByHand(offered)) return ItemInteractionResult.FAIL;
+        if (organ.steward().assign(player)) organ.setChanged();
+        return ItemInteractionResult.CONSUME;
+    }
+
+    @Override
+    public void setPlacedBy(
+            Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        Organs.placedBy(level, pos, placer);
     }
 
     @Override

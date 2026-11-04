@@ -21,8 +21,8 @@ import net.minecraft.world.level.saveddata.SavedData;
 import org.slf4j.Logger;
 
 /**
- * Batch credits for players who were offline when their organ finished. Held on the overworld, one credit per
- * player and organ and at most {@link #LIMIT} in all: past that a new credit is refused and logged, so no player's
+ * Batch credits and automatic-work credits for players who were offline when their organ finished or worked. Held on
+ * the overworld, one credit per player, organ and kind and at most {@link #LIMIT} in all: past that a new credit is refused and logged, so no player's
  * credit ever evicts another's and the list we save is always one we can read back. A player's credits fire on
  * login and are forgotten. A credit list that cannot be read is kept as it was.
  */
@@ -37,10 +37,12 @@ public final class PendingCredits extends SavedData {
     private static final SavedData.Factory<PendingCredits> FACTORY =
             new SavedData.Factory<>(PendingCredits::new, PendingCredits::load);
 
-    private record Credit(UUID player, ResourceLocation organ) {
+    /** {@code automatic} tells work an organ did on its own for its steward apart from a batch a player started. */
+    private record Credit(UUID player, ResourceLocation organ, boolean automatic) {
         static final Codec<Credit> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                         UUIDUtil.CODEC.fieldOf("player").forGetter(Credit::player),
-                        ResourceLocation.CODEC.fieldOf("organ").forGetter(Credit::organ))
+                        ResourceLocation.CODEC.fieldOf("organ").forGetter(Credit::organ),
+                        Codec.BOOL.optionalFieldOf("automatic", false).forGetter(Credit::automatic))
                 .apply(instance, Credit::new));
     }
 
@@ -67,10 +69,19 @@ public final class PendingCredits extends SavedData {
     }
 
     public void remember(UUID player, ResourceLocation organ) {
-        Credit credit = new Credit(player, organ);
+        remember(new Credit(player, organ, false));
+    }
+
+    /** Remembers that {@code organ} worked on its own for {@code player}. */
+    public void rememberAutomatic(UUID player, ResourceLocation organ) {
+        remember(new Credit(player, organ, true));
+    }
+
+    private void remember(Credit credit) {
         if (credits.contains(credit)) return;
         if (credits.size() >= LIMIT) {
-            LOGGER.warn("Pending credits full ({}); {} loses its credit for {}", LIMIT, player, organ);
+            LOGGER.warn(
+                    "Pending credits full ({}); {} loses its credit for {}", LIMIT, credit.player(), credit.organ());
             return;
         }
         credits.add(credit);
@@ -83,7 +94,8 @@ public final class PendingCredits extends SavedData {
         for (Iterator<Credit> it = credits.iterator(); it.hasNext(); ) {
             Credit credit = it.next();
             if (!credit.player().equals(player.getUUID())) continue;
-            DiscoveryModule.ORGAN_BATCH_COMPLETED.get().trigger(player, credit.organ());
+            if (credit.automatic()) DiscoveryModule.AUTOMATIC_WORK.get().trigger(player, credit.organ());
+            else DiscoveryModule.ORGAN_BATCH_COMPLETED.get().trigger(player, credit.organ());
             it.remove();
             changed = true;
         }
@@ -95,7 +107,11 @@ public final class PendingCredits extends SavedData {
     }
 
     public boolean holds(UUID player, ResourceLocation organ) {
-        return credits.contains(new Credit(player, organ));
+        return credits.contains(new Credit(player, organ, false));
+    }
+
+    public boolean holdsAutomatic(UUID player, ResourceLocation organ) {
+        return credits.contains(new Credit(player, organ, true));
     }
 
     @Override

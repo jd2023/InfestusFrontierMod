@@ -70,7 +70,11 @@ public final class StarterAdvancementTests {
             "awakening",
             "membrane_sheet",
             "bone_plate",
-            "bio_furnace");
+            "bio_furnace",
+            "planting_proboscis",
+            "harvest_corolla",
+            "supplied_sac",
+            "automatic_supply");
     private static final BlockPos RACK = new BlockPos(1, 2, 1);
     private static final BlockPos LOOM = new BlockPos(3, 2, 1);
     private static final BlockPos FURNACE = new BlockPos(5, 2, 1);
@@ -79,17 +83,17 @@ public final class StarterAdvancementTests {
     private static final int FURNACE_TICKS = 320;
     private static final String RAW_IRON_RECIPE = "minecraft:iron_ingot_from_smelting_raw_iron";
 
-    private static ResourceLocation id(String path) {
+    static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath("infestusfrontier", path);
     }
 
-    private static AdvancementHolder holder(GameTestHelper h, String path) {
+    static AdvancementHolder holder(GameTestHelper h, String path) {
         AdvancementHolder holder = h.getLevel().getServer().getAdvancements().get(id(path));
         h.assertTrue(holder != null, "advancement " + path + " loaded");
         return holder;
     }
 
-    private static boolean done(GameTestHelper h, ServerPlayer player, String path) {
+    static boolean done(GameTestHelper h, ServerPlayer player, String path) {
         return player.getAdvancements().getOrStartProgress(holder(h, path)).isDone();
     }
 
@@ -98,7 +102,7 @@ public final class StarterAdvancementTests {
      * and from then on every advancement an unplaced player earns tries to send them a packet; so the tests use
      * unplaced players, whose batches leave a credit, and the real client capture covers the online player.
      */
-    private static ServerPlayer player(GameTestHelper h) {
+    static ServerPlayer player(GameTestHelper h) {
         GameProfile profile = new GameProfile(UUID.randomUUID(), "starter-tester");
         ServerPlayer player =
                 new ServerPlayer(h.getLevel().getServer(), h.getLevel(), profile, ClientInformation.createDefault());

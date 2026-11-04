@@ -33,7 +33,8 @@ record Scenario(String name, List<String> commands, List<String> play, List<View
      * screen. {@code feed} right-clicks a block with the {@code holding} item, as a player loads an organ by hand,
      * and opens no screen. {@code expectTab} holds the shot until the client does or does not know the Infestus
      * Frontier tab ({@code infestusfrontier:contact/root}); {@code expectToast} holds it until a toast for that
-     * advancement id shows. A wait that does not end fails the capture.
+     * advancement id shows. {@code scroll} drags the Advancements tab by that many pixels, as a mouse drag does, so a
+     * branch off the edge comes into view. A wait that does not end fails the capture.
      */
     record View(
             String name,
@@ -56,7 +57,9 @@ record Scenario(String name, List<String> commands, List<String> play, List<View
             boolean advancements,
             Optional<BlockPos> feed,
             Optional<Boolean> expectTab,
-            Optional<String> expectToast) {
+            Optional<String> expectToast,
+            int scrollX,
+            int scrollY) {
         boolean opensScreen() {
             return use.isPresent() || inventory || book.isPresent() || advancements;
         }
@@ -131,7 +134,9 @@ record Scenario(String name, List<String> commands, List<String> play, List<View
                         v.has("advancements") && v.get("advancements").getAsBoolean(),
                         feed,
                         v.has("expectTab") ? Optional.of(v.get("expectTab").getAsBoolean()) : Optional.empty(),
-                        v.has("expectToast") ? Optional.of(v.get("expectToast").getAsString()) : Optional.empty()));
+                        v.has("expectToast") ? Optional.of(v.get("expectToast").getAsString()) : Optional.empty(),
+                        v.has("scroll") ? v.getAsJsonArray("scroll").get(0).getAsInt() : 0,
+                        v.has("scroll") ? v.getAsJsonArray("scroll").get(1).getAsInt() : 0));
             }
             return new Scenario(name, List.copyOf(commands), List.copyOf(play), List.copyOf(views));
         }

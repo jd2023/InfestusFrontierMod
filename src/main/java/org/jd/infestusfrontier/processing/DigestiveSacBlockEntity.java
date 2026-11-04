@@ -10,6 +10,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -43,11 +44,14 @@ import org.jd.infestusfrontier.foundation.Refusals;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.OrganCodecs;
 import org.jd.infestusfrontier.organ.api.Organs;
+import org.jd.infestusfrontier.organ.api.Steward;
+import org.jd.infestusfrontier.organ.api.Stewarded;
 import org.jd.infestusfrontier.processing.api.DigestionRecipe;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
+import org.jd.infestusfrontier.storage.api.ItemStore;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -63,11 +67,15 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  *
  * <p>The feed slot holds one stack of digestible items, filled by hand through the screen or by any item pipe or
  * hopper through the item capability. Whenever the Sac is idle it takes one item from it. The slot's content stays
- * with the block and drops when the Sac is broken; it is not carried on the item.
+ * with the block and drops when the Sac is broken; it is not carried on the item. A batch from food a Mouth put in is
+ * automatic work of the Sac's steward; hand and hopper food is not.
  */
-final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandler, GeoBlockEntity, MenuProvider {
+final class DigestiveSacBlockEntity extends BlockEntity
+        implements BiomassHandler, GeoBlockEntity, MenuProvider, Stewarded {
 
     private static final String FEED_TAG = "feed";
+    private static final String DELIVERED_TAG = "delivered";
+    private static final int FEED_SLOT = 0;
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     private static final int BLEND_TICKS = 5;
@@ -89,6 +97,9 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
     private static final int RETRY_TICKS = 20;
 
     private final RetryGate<FeedState> feedGate = new RetryGate<>();
+    private final Steward steward = new Steward();
+    /** The items in the feed slot that a Mouth put in; never more than the slot holds. */
+    private ItemStack delivered = ItemStack.EMPTY;
 
     private final ItemStackHandler feed = new ItemStackHandler(1) {
         @Override
@@ -98,6 +109,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
 
         @Override
         protected void onContentsChanged(int slot) {
+            clampDelivered();
             setChanged();
         }
     };
@@ -111,39 +123,92 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
         return feed;
     }
 
-    /** The feed slot as hoppers, pipes and Mouths see it: they put feed in and never take it out. */
+    @Override
+    public Steward steward() {
+        return steward;
+    }
+
+    /**
+     * The feed slot as hoppers, pipes and Mouths see it: they put feed in and never take it out. Food that a Mouth
+     * puts in, through {@link ItemStore}, counts as delivered; a hopper or another mod's pipe uses the item handler
+     * and its food does not.
+     */
     IItemHandler port() {
-        return new IItemHandler() {
-            @Override
-            public int getSlots() {
-                return feed.getSlots();
-            }
+        return new Port();
+    }
 
-            @Override
-            public ItemStack getStackInSlot(int slot) {
-                return feed.getStackInSlot(slot);
-            }
+    private final class Port implements IItemHandler, ItemStore {
+        @Override
+        public int getSlots() {
+            return feed.getSlots();
+        }
 
-            @Override
-            public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-                return feed.insertItem(slot, stack, simulate);
-            }
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            return feed.getStackInSlot(slot);
+        }
 
-            @Override
-            public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                return ItemStack.EMPTY;
-            }
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            return feed.insertItem(slot, stack, simulate);
+        }
 
-            @Override
-            public int getSlotLimit(int slot) {
-                return feed.getSlotLimit(slot);
-            }
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
 
-            @Override
-            public boolean isItemValid(int slot, ItemStack stack) {
-                return feed.isItemValid(slot, stack);
+        @Override
+        public int getSlotLimit(int slot) {
+            return feed.getSlotLimit(slot);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return feed.isItemValid(slot, stack);
+        }
+
+        @Override
+        public int count(ItemStack like) {
+            ItemStack held = feed.getStackInSlot(FEED_SLOT);
+            return ItemStack.isSameItemSameComponents(held, like) ? held.getCount() : 0;
+        }
+
+        @Override
+        public int automatable(ItemStack like) {
+            return 0;
+        }
+
+        @Override
+        public ItemStack insert(ItemStack stack, boolean simulate) {
+            ItemStack left = feed.insertItem(FEED_SLOT, stack, simulate);
+            int accepted = stack.getCount() - left.getCount();
+            if (!simulate && accepted > 0) {
+                int arrived = delivered.isEmpty() ? accepted : delivered.getCount() + accepted;
+                delivered = stack.copyWithCount(arrived);
+                clampDelivered();
+                setChanged();
             }
-        };
+            return left;
+        }
+
+        @Override
+        public long stored() {
+            return feed.getStackInSlot(FEED_SLOT).getCount();
+        }
+
+        @Override
+        public long capacity() {
+            return feed.getSlotLimit(FEED_SLOT);
+        }
+    }
+
+    /** Keeps {@link #delivered} to what the feed slot still holds of that kind. */
+    private void clampDelivered() {
+        if (delivered.isEmpty()) return;
+        ItemStack held = feed.getStackInSlot(FEED_SLOT);
+        if (!ItemStack.isSameItemSameComponents(held, delivered)) delivered = ItemStack.EMPTY;
+        else delivered.setCount(Math.min(delivered.getCount(), held.getCount()));
     }
 
     int percent() {
@@ -204,6 +269,8 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             sac.history = sac.history.completed();
             sac.showWorking(false);
             OrganWork.completed(level, ProcessingModule.DIGESTIVE_SAC.getId(), finished);
+            if (finished.automatic() && level instanceof ServerLevel server)
+                sac.steward.worked(server, ProcessingModule.DIGESTIVE_SAC.getId());
             sac.pushToNeighbors(level, pos);
             return true;
         });
@@ -220,14 +287,15 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             Refusals.show(player, refusal.get());
             return ItemInteractionResult.FAIL;
         }
-        start(recipe.get(), Optional.of(player.getUUID()));
+        start(recipe.get(), Optional.of(player.getUUID()), false);
+        if (steward.assign(player)) setChanged();
         if (!player.getAbilities().instabuild) stack.shrink(1);
         return ItemInteractionResult.CONSUME;
     }
 
     /** One item from the feed slot starts a batch when the Sac is idle and the yield fits; otherwise it waits. */
     private void takeFromFeedSlot() {
-        ItemStack stack = feed.getStackInSlot(0);
+        ItemStack stack = feed.getStackInSlot(FEED_SLOT);
         if (stack.isEmpty()) return;
         FeedState now = new FeedState(tank, stack.getItem(), stack.getCount());
         if (!feedGate.due(now) && level.getGameTime() % RETRY_TICKS != 0) return;
@@ -237,26 +305,28 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             return;
         }
         feedGate.clear();
-        start(recipe.get(), Optional.empty());
-        feed.extractItem(0, 1, false);
+        boolean fromMouth = !delivered.isEmpty();
+        start(recipe.get(), steward.player(), fromMouth);
+        if (fromMouth) delivered.shrink(1);
+        feed.extractItem(FEED_SLOT, 1, false);
     }
 
     /** What an admission attempt from the feed slot depends on; the gate retries only when it changed. */
     private record FeedState(BiomassTank tank, Item item, int count) {}
 
-    private void start(RecipeHolder<DigestionRecipe> recipe, Optional<UUID> feeder) {
+    private void start(RecipeHolder<DigestionRecipe> recipe, Optional<UUID> feeder, boolean automatic) {
         DigestionRecipe value = recipe.value();
         tank = ((Outcome.Done<BiomassTank>) tank.reserve(value.biomass())).value();
-        batch = Optional.of(
-                new DigestionBatch(Batch.start(recipe.id().toString(), value.ticks()), value.biomass(), feeder));
+        batch = Optional.of(new DigestionBatch(
+                Batch.start(recipe.id().toString(), value.ticks()), value.biomass(), feeder, automatic));
         showWorking(true);
         setChanged();
     }
 
     /** Spills the feed slot when the Sac is broken. */
     void dropFeed(Level level, BlockPos pos) {
-        Containers.dropContents(level, pos, new SimpleContainer(feed.getStackInSlot(0)));
-        feed.setStackInSlot(0, ItemStack.EMPTY);
+        Containers.dropContents(level, pos, new SimpleContainer(feed.getStackInSlot(FEED_SLOT)));
+        feed.setStackInSlot(FEED_SLOT, ItemStack.EMPTY);
     }
 
     /** Offers the stored biomass to the six touching blocks, once, in a fixed order. Six capability reads at most. */
@@ -316,6 +386,11 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
             batch = saved.batch();
         });
         if (tag.contains(FEED_TAG)) feed.deserializeNBT(registries, tag.getCompound(FEED_TAG));
+        delivered = tag.contains(DELIVERED_TAG)
+                ? ItemStack.parseOptional(registries, tag.getCompound(DELIVERED_TAG))
+                : ItemStack.EMPTY;
+        clampDelivered();
+        steward.load(tag);
     }
 
     @Override
@@ -324,6 +399,8 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
         if (unreadable.isPresent()) tag.merge(unreadable.get());
         else Persistence.write(SAVED, new Saved(tank, history, batch), registries, tag);
         tag.put(FEED_TAG, feed.serializeNBT(registries));
+        if (!delivered.isEmpty()) tag.put(DELIVERED_TAG, delivered.save(registries));
+        steward.save(tag);
     }
 
     @Override
@@ -367,6 +444,7 @@ final class DigestiveSacBlockEntity extends BlockEntity implements BiomassHandle
         tag.remove("tank");
         tag.remove("history");
         tag.remove("batch");
+        tag.remove("steward");
     }
 
     @Override

@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/harvest_corolla",
+  "display": {
+    "icon": { "id": "infestusfrontier:mouth" },
+    "title": { "translate": "advancement.infestusfrontier.contact.supplied_sac.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.supplied_sac.description" },
+    "frame": "task"
+  },
+  "criteria": {
+    "supplied": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": { "organ": "infestusfrontier:digestive_sac" }
+    }
+  }
+}

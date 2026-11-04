@@ -431,13 +431,20 @@
     "fill 16 -61 -33 22 -61 -31 infestusfrontier:living_substrate[stage=mature]",
     "fill 18 -61 -33 20 -61 -31 infestusfrontier:cultivation_tissue{water:{id:\"minecraft:water\",amount:900}}",
     "setblock 19 -61 -32 infestusfrontier:living_substrate[stage=mature]",
-    "setblock 19 -60 -32 infestusfrontier:planting_proboscis{tank:{stored:800,reserved:0,capacity:1000},items:{Size:1,Items:[{Slot:0,id:\"minecraft:wheat_seeds\",count:16}]}}",
-    "setblock 18 -60 -33 wheat[age=7]",
-    "setblock 20 -60 -33 wheat[age=7]",
-    "setblock 18 -60 -31 wheat[age=6]",
-    "setblock 22 -60 -32 infestusfrontier:harvest_corolla{tank:{stored:800,reserved:0,capacity:1000}}",
-    "setblock 16 -60 -32 infestusfrontier:seed_pouch{stock:[{id:\"minecraft:wheat_seeds\",count:20},{},{},{}],reserve:2}",
-    "setblock 17 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Farm\"','\"pouch, planter\"','\"beds, corolla\"','\"5 BU an act\"']}}",
+    "setblock 19 -60 -32 infestusfrontier:planting_proboscis{tank:{stored:800,reserved:0,capacity:1000}}",
+    "setblock 18 -60 -33 wheat[age=2]",
+    "setblock 18 -60 -32 wheat[age=4]",
+    "setblock 17 -61 -32 infestusfrontier:mouth[mode=output]",
+    "setblock 17 -60 -32 infestusfrontier:harvest_corolla{tank:{stored:800,reserved:0,capacity:1000}}",
+    "fill 15 -61 -32 16 -61 -32 infestusfrontier:item_vein",
+    "setblock 14 -61 -32 infestusfrontier:mouth[mode=intake]",
+    "setblock 14 -60 -32 infestusfrontier:digestive_sac",
+    "setblock 22 -60 -32 infestusfrontier:seed_pouch{stock:[{id:\"minecraft:wheat_seeds\",count:20},{},{},{}],reserve:2}",
+    "setblock 14 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Digestive Sac\"','\"open it once\"','\"fed by the line\"','\"from the Corolla\"']}}",
+    "setblock 17 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Harvest Corolla\"','\"open it once\"','\"cuts ripe crops\"','\"Mouth below it\"']}}",
+    "setblock 19 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Proboscis\"','\"by hand: seeds\"','\"from the chest\"','\"bone meal ripens\"']}}",
+    "setblock 21 -60 -34 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:wheat_seeds\",count:16},{Slot:1,id:\"minecraft:bone_meal\",count:16}]}",
+    "setblock 22 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Seed Pouch\"','\"keeps a reserve\"','\"a planter takes\"','\"only above it\"']}}",
     "setblock 24 -61 -32 infestusfrontier:living_substrate[stage=mature]",
     "setblock 24 -60 -32 infestusfrontier:compost_gland{contents:{ingredients:[{id:\"minecraft:wheat_seeds\",count:4}],output:{},water:600,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:0}}}",
     "setblock 25 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Compost Gland\"','\"4 seeds, water\"','\"bone meal\"','\"\"']}}",
@@ -798,7 +805,7 @@
     "item replace entity @s inventory.20 with infestusfrontier:biomass_bucket 1",
     "item replace entity @s inventory.21 with cobblestone 64",
     "item replace entity @s inventory.22 with iron_ingot 64",
-    "setblock 2 -60 -47 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:oak_log\",count:8},{Slot:1,id:\"minecraft:rotten_flesh\",count:16},{Slot:2,id:\"minecraft:red_mushroom\",count:4},{Slot:3,id:\"minecraft:wheat_seeds\",count:8},{Slot:4,id:\"minecraft:string\",count:8},{Slot:5,id:\"minecraft:bone\",count:16},{Slot:6,id:\"minecraft:stick\",count:16},{Slot:7,id:\"minecraft:bone_meal\",count:8},{Slot:8,id:\"minecraft:furnace\",count:1},{Slot:9,id:\"minecraft:raw_iron\",count:8},{Slot:10,id:\"minecraft:water_bucket\",count:1},{Slot:11,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:12,id:\"minecraft:bowl\",count:2}]}",
+    "setblock 2 -60 -47 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:oak_log\",count:8},{Slot:1,id:\"minecraft:rotten_flesh\",count:16},{Slot:2,id:\"minecraft:red_mushroom\",count:4},{Slot:3,id:\"minecraft:wheat_seeds\",count:16},{Slot:4,id:\"minecraft:string\",count:8},{Slot:5,id:\"minecraft:bone\",count:16},{Slot:6,id:\"minecraft:stick\",count:16},{Slot:7,id:\"minecraft:bone_meal\",count:16},{Slot:8,id:\"minecraft:furnace\",count:1},{Slot:9,id:\"minecraft:raw_iron\",count:8},{Slot:10,id:\"minecraft:water_bucket\",count:1},{Slot:11,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:12,id:\"minecraft:bowl\",count:2}]}",
     "setblock 3 -60 -47 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Starter supplies\"','\"Take a log: the\"','\"Advancements tab\"','\"opens (key L)\"']}}"
   ],
   "play": [
@@ -1249,6 +1256,17 @@
       "yaw": 0,
       "pitch": 10,
       "gui": true,
+      "name": "book_digestive_sac_steward",
+      "book": "infestusfrontier:contact/digestive_sac",
+      "page": 2
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
       "name": "book_biomass_bladder",
       "book": "infestusfrontier:contact/biomass_bladder"
     },
@@ -1543,7 +1561,7 @@
     },
     {
       "name": "farm",
-      "x": 19.5,
+      "x": 17.5,
       "y": -57,
       "z": -36.5,
       "yaw": 0,
@@ -1551,14 +1569,14 @@
     },
     {
       "name": "pouch_screen",
-      "x": 16.5,
+      "x": 22.5,
       "y": -60,
       "z": -29.5,
       "yaw": 180,
       "pitch": 10,
       "gui": true,
       "use": [
-        16,
+        22,
         -60,
         -32
       ]
@@ -1579,14 +1597,28 @@
     },
     {
       "name": "harvester_screen",
-      "x": 22.5,
+      "x": 17.5,
       "y": -60,
       "z": -29.5,
       "yaw": 180,
       "pitch": 10,
       "gui": true,
       "use": [
-        22,
+        17,
+        -60,
+        -32
+      ]
+    },
+    {
+      "name": "farm_sac_screen",
+      "x": 14.5,
+      "y": -60,
+      "z": -29.5,
+      "yaw": 180,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        14,
         -60,
         -32
       ]
@@ -1642,8 +1674,30 @@
       "yaw": 0,
       "pitch": 10,
       "gui": true,
+      "name": "book_planting_proboscis_steward",
+      "book": "infestusfrontier:circulation/planting_proboscis",
+      "page": 2
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
       "name": "book_harvest_corolla",
       "book": "infestusfrontier:circulation/harvest_corolla"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_harvest_corolla_steward",
+      "book": "infestusfrontier:circulation/harvest_corolla",
+      "page": 2
     },
     {
       "x": 2.5,

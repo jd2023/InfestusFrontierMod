@@ -115,8 +115,16 @@ The Advancements screen shows SR0 and the first working patch as one tab, `infes
 | Stretched Skin (T0-05) | Living Substrate | Finish a Membrane Rack batch: a Membrane Sheet. |
 | Grown Bone (T0-06) | First Biomass | Finish a Bone Loom batch: a Bone Plate. |
 | A Hearth on Biomass (T0-07) | Stretched Skin | Finish a Bio-Furnace batch on biomass. |
+| Sown Without Hands (`planting_proboscis`) | First Biomass | A Planting Proboscis plants a seed. Next: a Harvest Corolla over the same beds. |
+| Reaped Without Hands (`harvest_corolla`) | Sown Without Hands | A Harvest Corolla cuts a ripe crop and stores the drops. Next: an Output Mouth under it and Item Veins to a Sac. |
+| Fed Through the Veins (`supplied_sac`) | Reaped Without Hands | A Digestive Sac finishes a batch on food an Intake Mouth put in, by Item Veins or a Palm's Reach; a hopper, the screen or a right click do not count. Next: the Sac's biomass back to the organs through a Bladder, a Junction and Biomass Veins. |
+| A Colony That Feeds Itself (`automatic_supply`, goal) | Fed Through the Veins | Have earned the three advancements above, in any order. |
 
 The three batch advancements use the `infestusfrontier:organ_batch_completed` trigger, which fires for the player who loaded the organ by hand. A batch that never starts (no water, no biomass) or cannot deliver (output full) earns nothing until it finishes. A player who is offline when the batch finishes gets the credit on the next login. Holding the organ or its product only opens its book entry through the invisible `acquired/` flag.
+
+The three farm advancements use the `infestusfrontier:automatic_work` trigger, which fires when an organ does one unit of work for its steward: a seed planted, a ripe crop cut, a Sac batch finished on food a Mouth delivered. The goal checks the three advancements on the player (a `minecraft:tick` criterion with an `advancements` predicate) and is awarded the tick after the last one. They may be earned in any order and require no layout, count or repeat.
+
+**Steward rule.** The steward of a Planting Proboscis, a Harvest Corolla or a Digestive Sac is the last player who placed it or loaded it by hand (a seed into the Proboscis, an item into the Sac); an organ nobody has tended is claimed by the first player who opens its screen. Nearness, a biomass bucket, and opening the screen of an organ that already has a steward change nothing. Breaking the organ forgets its steward; fake players are never stewards. Work is credited to the steward only; an organ with none credits nobody. A Sac batch taken from the feed slot is credited to the steward, so First Biomass follows it too; the batch is *automatic* only when a Mouth delivered the item it took. A steward who is offline gets the credit on the next login, one per organ and kind, through the same bounded store as batch credits. Failed work (no biomass, no bed, no ripe crop, a full output, a full Sac) and reloading credit nothing. The guide states this rule on the three organs' entries.
 
 ST-02 uses Item Catalog I010's Synaptic Probe recipe; no amethyst console is needed to configure the first organ. Sample Pouch and vial recipes appear with early collection instructions. Looking identifies a source; creature DNA requires actual death loot, and plant DNA requires consumed harvested material.
 

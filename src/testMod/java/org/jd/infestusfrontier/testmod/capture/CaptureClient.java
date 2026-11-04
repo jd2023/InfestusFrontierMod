@@ -103,6 +103,8 @@ final class CaptureClient {
     private int buttonMenu = -1;
     private int buttonTick;
     private boolean triggered;
+    private int tabShownTick = -1;
+    private int scrolledTick = -1;
     private long toastSeenAt = -1;
 
     CaptureClient(Path outputDir, List<Scenario> scenarios) {
@@ -364,7 +366,10 @@ final class CaptureClient {
             triggered = true;
             view.trigger().ifPresent(command -> FlatWorld.command(minecraft, command));
         }
-        if (view.advancements() && hasInfestusTab(minecraft)) showInfestusTab(minecraft);
+        if (view.advancements() && hasInfestusTab(minecraft)) {
+            showInfestusTab(minecraft);
+            if (!scrollSettled(minecraft, view)) return;
+        }
         if (!expectationsMet(minecraft, view)) return;
         enter(Stage.GRABBING);
         try {
@@ -430,6 +435,30 @@ final class CaptureClient {
         return minecraft.getConnection().getAdvancements().getTree().get(TAB_ROOT) != null;
     }
 
+    /**
+     * Whether the Advancements tab is ready to be shot with the view's {@code scroll} applied. A drag made after a
+     * frame is drawn cannot appear in that frame, and the tab centres itself on its first draw, so the tab is selected
+     * on one tick, dragged on the next (the first drag event only arms the drag) and shot on the tick after. A view
+     * without a scroll is always ready. If the screen is not the Advancements screen when the drag is due, the wait
+     * does not end and the stage timeout fails the capture.
+     */
+    private boolean scrollSettled(Minecraft minecraft, Scenario.View view) {
+        if (view.scrollX() == 0 && view.scrollY() == 0) return true;
+        if (tabShownTick < 0) {
+            tabShownTick = ticksInStage;
+            return false;
+        }
+        if (scrolledTick < 0) {
+            if (ticksInStage > tabShownTick && minecraft.screen instanceof AdvancementsScreen screen) {
+                screen.mouseDragged(0, 0, 0, 0, 0);
+                screen.mouseDragged(0, 0, 0, view.scrollX(), view.scrollY());
+                scrolledTick = ticksInStage;
+            }
+            return false;
+        }
+        return ticksInStage > scrolledTick;
+    }
+
     /** Selects the Infestus Frontier tab, as a click on it does, so the Advancements screen shows it. */
     private static void showInfestusTab(Minecraft minecraft) {
         var advancements = minecraft.getConnection().getAdvancements();
@@ -457,6 +486,8 @@ final class CaptureClient {
 
     private void advance(Minecraft minecraft) {
         triggered = false;
+        tabShownTick = -1;
+        scrolledTick = -1;
         toastSeenAt = -1;
         buttonMenu = -1;
         if (minecraft.screen instanceof AbstractContainerScreen<?> && minecraft.player != null)

@@ -25,7 +25,13 @@ final class HarvestCorollaBlockEntity extends PlotOrganBlockEntity {
     static final int OUTPUT_SLOTS = 4;
 
     HarvestCorollaBlockEntity(BlockPos pos, BlockState state) {
-        super(CultivationModule.HARVEST_COROLLA_ENTITY.get(), pos, state, "Harvest Corolla", OUTPUT_SLOTS);
+        super(
+                CultivationModule.HARVEST_COROLLA_ENTITY.get(),
+                pos,
+                state,
+                "Harvest Corolla",
+                CultivationModule.HARVEST_COROLLA.getId(),
+                OUTPUT_SLOTS);
     }
 
     @Override

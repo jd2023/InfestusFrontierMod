@@ -1,0 +1,32 @@
+{
+  "parent": "infestusfrontier:contact/supplied_sac",
+  "display": {
+    "icon": { "id": "infestusfrontier:item_vein" },
+    "title": { "translate": "advancement.infestusfrontier.contact.automatic_supply.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.automatic_supply.description" },
+    "frame": "goal"
+  },
+  "criteria": {
+    "earned_all": {
+      "trigger": "minecraft:tick",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type_specific": {
+                "type": "minecraft:player",
+                "advancements": {
+                  "infestusfrontier:contact/planting_proboscis": true,
+                  "infestusfrontier:contact/harvest_corolla": true,
+                  "infestusfrontier:contact/supplied_sac": true
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

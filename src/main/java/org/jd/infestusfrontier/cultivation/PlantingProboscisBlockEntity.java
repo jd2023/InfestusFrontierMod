@@ -24,7 +24,13 @@ import org.jetbrains.annotations.Nullable;
  */
 final class PlantingProboscisBlockEntity extends PlotOrganBlockEntity {
     PlantingProboscisBlockEntity(BlockPos pos, BlockState state) {
-        super(CultivationModule.PLANTING_PROBOSCIS_ENTITY.get(), pos, state, "Planting Proboscis", 1);
+        super(
+                CultivationModule.PLANTING_PROBOSCIS_ENTITY.get(),
+                pos,
+                state,
+                "Planting Proboscis",
+                CultivationModule.PLANTING_PROBOSCIS.getId(),
+                1);
     }
 
     @Override

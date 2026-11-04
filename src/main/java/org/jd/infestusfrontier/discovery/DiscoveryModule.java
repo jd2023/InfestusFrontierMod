@@ -22,6 +22,7 @@ import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.mineral.MineralModule;
 import org.jd.infestusfrontier.organ.OrganModule;
+import org.jd.infestusfrontier.organ.api.AutomaticWorkEvent;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
 import org.jd.infestusfrontier.storage.StorageModule;
@@ -37,6 +38,8 @@ public final class DiscoveryModule {
 
     static final DeferredHolder<CriterionTrigger<?>, OrganTriggers.OrganBatchCompleted> ORGAN_BATCH_COMPLETED =
             TRIGGERS.register("organ_batch_completed", OrganTriggers.OrganBatchCompleted::new);
+    static final DeferredHolder<CriterionTrigger<?>, OrganTriggers.AutomaticWork> AUTOMATIC_WORK =
+            TRIGGERS.register("automatic_work", OrganTriggers.AutomaticWork::new);
     static final DeferredHolder<CriterionTrigger<?>, OrganTriggers.BiomassBucket> BIOMASS_BUCKET =
             TRIGGERS.register("biomass_bucket", OrganTriggers.BiomassBucket::new);
 
@@ -134,6 +137,7 @@ public final class DiscoveryModule {
         TABS.register(modBus);
         TRIGGERS.register(modBus);
         NeoForge.EVENT_BUS.addListener(DiscoveryModule::onBatchCompleted);
+        NeoForge.EVENT_BUS.addListener(DiscoveryModule::onAutomaticWork);
         NeoForge.EVENT_BUS.addListener(DiscoveryModule::onBucket);
         NeoForge.EVENT_BUS.addListener(DiscoveryModule::onLogin);
     }
@@ -143,6 +147,13 @@ public final class DiscoveryModule {
         ServerPlayer feeder = event.level().getServer().getPlayerList().getPlayer(event.feeder());
         if (feeder != null) ORGAN_BATCH_COMPLETED.get().trigger(feeder, event.organ());
         else PendingCredits.get(event.level()).remember(event.feeder(), event.organ());
+    }
+
+    /** Fires for an online steward; an offline steward's credit waits in {@link PendingCredits}. */
+    private static void onAutomaticWork(AutomaticWorkEvent event) {
+        ServerPlayer steward = event.level().getServer().getPlayerList().getPlayer(event.steward());
+        if (steward != null) AUTOMATIC_WORK.get().trigger(steward, event.organ());
+        else PendingCredits.get(event.level()).rememberAutomatic(event.steward(), event.organ());
     }
 
     private static void onBucket(BiomassBucketEvent event) {

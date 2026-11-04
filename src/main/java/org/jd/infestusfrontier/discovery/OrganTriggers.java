@@ -35,6 +35,28 @@ final class OrganTriggers {
         }
     }
 
+    /** Fires with {@code {organ: id}} when an organ works on its own for the player who tends it. */
+    static final class AutomaticWork extends SimpleCriterionTrigger<AutomaticWork.Instance> {
+        @Override
+        public Codec<Instance> codec() {
+            return Instance.CODEC;
+        }
+
+        void trigger(ServerPlayer player, ResourceLocation organ) {
+            trigger(player, instance -> instance.organ().equals(organ));
+        }
+
+        record Instance(Optional<ContextAwarePredicate> player, ResourceLocation organ)
+                implements SimpleCriterionTrigger.SimpleInstance {
+            static final Codec<Instance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                            EntityPredicate.ADVANCEMENT_CODEC
+                                    .optionalFieldOf("player")
+                                    .forGetter(Instance::player),
+                            ResourceLocation.CODEC.fieldOf("organ").forGetter(Instance::organ))
+                    .apply(instance, Instance::new));
+        }
+    }
+
     /** Fires with {@code {block: id, inserted: boolean}} when a bucket moves biomass at an organ block. */
     static final class BiomassBucket extends SimpleCriterionTrigger<BiomassBucket.Instance> {
         @Override

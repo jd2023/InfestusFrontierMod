@@ -8,6 +8,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -25,6 +26,8 @@ import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
+import org.jd.infestusfrontier.organ.api.Steward;
+import org.jd.infestusfrontier.organ.api.Stewarded;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
@@ -41,7 +44,8 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * work is found, else every {@value #RETRY_TICKS}. A subclass does one act per try. It works only rooted on a
  * foundation.
  */
-abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandler, MenuProvider, GeoBlockEntity {
+abstract class PlotOrganBlockEntity extends BlockEntity
+        implements BiomassHandler, MenuProvider, GeoBlockEntity, Stewarded {
     static final int CAPACITY_BU = 1000;
     static final Biomass COST = Biomass.of(5);
     static final int PULSE_TICKS = 20;
@@ -56,14 +60,18 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
 
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     private final String name;
+    private final ResourceLocation id;
     protected Optional<CompoundTag> unreadable = Optional.empty();
     protected final ItemStackHandler items;
+    private final Steward steward = new Steward();
     private BiomassTank tank = BiomassTank.empty(Biomass.of(CAPACITY_BU));
     private int nextTry;
 
-    protected PlotOrganBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, String name, int slots) {
+    protected PlotOrganBlockEntity(
+            BlockEntityType<?> type, BlockPos pos, BlockState state, String name, ResourceLocation id, int slots) {
         super(type, pos, state);
         this.name = name;
+        this.id = id;
         this.items = new ItemStackHandler(slots) {
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
@@ -97,6 +105,11 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
         return items;
     }
 
+    @Override
+    public Steward steward() {
+        return steward;
+    }
+
     /** True when the tank can pay one act. */
     protected boolean canPay() {
         return tank.stored().atLeast(COST);
@@ -113,6 +126,7 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
             return;
         boolean worked = organ.canPay() && organ.act(server);
         organ.nextTry = worked ? PULSE_TICKS : RETRY_TICKS;
+        if (worked) organ.steward.worked(server, organ.id);
         BlockState shown = state.setValue(PlotOrganBlock.WORKING, worked);
         if (shown != state) level.setBlock(pos, shown, Block.UPDATE_CLIENTS);
     }
@@ -182,6 +196,7 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         read.ifPresent(saved -> tank = saved);
         if (tag.contains(ITEMS_TAG)) items.deserializeNBT(registries, tag.getCompound(ITEMS_TAG));
+        steward.load(tag);
     }
 
     @Override
@@ -190,6 +205,7 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
         if (unreadable.isPresent()) tag.merge(unreadable.get());
         else Persistence.write(SAVED, tank, registries, tag);
         tag.put(ITEMS_TAG, items.serializeNBT(registries));
+        steward.save(tag);
     }
 
     @Override
@@ -226,5 +242,6 @@ abstract class PlotOrganBlockEntity extends BlockEntity implements BiomassHandle
     @Override
     public void removeComponentsFromTag(CompoundTag tag) {
         tag.remove("tank");
+        tag.remove("steward");
     }
 }

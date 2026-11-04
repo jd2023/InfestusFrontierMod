@@ -9,6 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -124,6 +125,13 @@ public final class DigestiveSacBlock extends BaseEntityBlock {
         ItemInteractionResult fed = sac.feed(player, hand, stack);
         if (fed != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) return fed;
         return Organs.openScreen(stack, level, pos, player);
+    }
+
+    @Override
+    public void setPlacedBy(
+            Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        Organs.placedBy(level, pos, placer);
     }
 
     @Override
