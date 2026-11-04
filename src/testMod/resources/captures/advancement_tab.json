@@ -1,0 +1,149 @@
+{
+  "commands": [
+    "advancement revoke @s everything",
+    "gamemode survival @s",
+    "fill 94 -61 100 106 -61 100 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 96 -60 100 infestusfrontier:membrane_rack{contents:{ingredients:[],output:{},water:1000,biomass:{stored:0,reserved:0,capacity:0},history:{completed_batches:0}}}",
+    "setblock 100 -60 100 infestusfrontier:bone_loom{contents:{ingredients:[],output:{},water:0,biomass:{stored:800,reserved:0,capacity:1000},history:{completed_batches:0}}}",
+    "setblock 104 -60 100 infestusfrontier:bio_furnace{contents:{ingredients:[],output:{},water:0,biomass:{stored:800,reserved:0,capacity:2000},history:{completed_batches:0}}}",
+    "setblock 96 -60 99 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Membrane Rack\"','\"water inside\"','\"flesh + string\"','\"-> a sheet\"']}}",
+    "setblock 100 -60 99 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Bone Loom\"','\"biomass inside\"','\"a bone\"','\"-> a plate\"']}}",
+    "setblock 104 -60 99 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Bio-Furnace\"','\"biomass inside\"','\"raw iron\"','\"-> an ingot\"']}}",
+    "give @s minecraft:rotten_flesh 4",
+    "give @s minecraft:string 4",
+    "give @s minecraft:bone 4",
+    "give @s minecraft:raw_iron 4"
+  ],
+  "views": [
+    {
+      "name": "tab_before",
+      "x": 100.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "advancements": true,
+      "expectTab": false
+    },
+    {
+      "name": "log_toast",
+      "x": 100.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "trigger": "give @s minecraft:oak_log",
+      "expectTab": true,
+      "expectToast": "infestusfrontier:contact/root"
+    },
+    {
+      "name": "tab_log",
+      "x": 100.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "advancements": true,
+      "expectTab": true
+    },
+    {
+      "name": "toast_culture",
+      "x": 100.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "trigger": "give @s infestusfrontier:spore_culture",
+      "expectToast": "infestusfrontier:contact/a_culture_in_your_hand"
+    },
+    {
+      "name": "tab_steps",
+      "x": 100.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "advancements": true,
+      "expectTab": true
+    },
+    {
+      "name": "rack_flesh",
+      "x": 96.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "holding": "minecraft:rotten_flesh",
+      "feed": [
+        96,
+        -60,
+        100
+      ]
+    },
+    {
+      "name": "rack_sheet",
+      "x": 96.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "holding": "minecraft:string",
+      "feed": [
+        96,
+        -60,
+        100
+      ],
+      "expectToast": "infestusfrontier:contact/membrane_sheet"
+    },
+    {
+      "name": "loom_plate",
+      "x": 100.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "holding": "minecraft:bone",
+      "feed": [
+        100,
+        -60,
+        100
+      ],
+      "expectToast": "infestusfrontier:contact/bone_plate"
+    },
+    {
+      "name": "furnace_ingot",
+      "x": 104.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "holding": "minecraft:raw_iron",
+      "feed": [
+        104,
+        -60,
+        100
+      ],
+      "expectToast": "infestusfrontier:contact/bio_furnace"
+    },
+    {
+      "name": "tab_done",
+      "x": 100.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "advancements": true,
+      "expectTab": true
+    }
+  ]
+}

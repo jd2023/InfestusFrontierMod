@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/living_substrate",
+  "display": {
+    "icon": { "id": "infestusfrontier:membrane_sheet" },
+    "title": { "translate": "advancement.infestusfrontier.contact.membrane_sheet.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.membrane_sheet.description" },
+    "frame": "task"
+  },
+  "criteria": {
+    "stretched": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": { "organ": "infestusfrontier:membrane_rack" }
+    }
+  }
+}

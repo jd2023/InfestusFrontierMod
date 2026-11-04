@@ -4,9 +4,16 @@
     "title": { "translate": "advancement.infestusfrontier.contact.root.title" },
     "description": { "translate": "advancement.infestusfrontier.contact.root.description" },
     "background": "minecraft:textures/block/dirt.png",
-    "show_toast": false,
+    "show_toast": true,
     "announce_to_chat": false,
     "hidden": true
   },
-  "criteria": { "never": { "trigger": "minecraft:impossible" } }
+  "criteria": {
+    "never": { "trigger": "minecraft:impossible" },
+    "has_log": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [ { "items": "#minecraft:logs" } ] }
+    }
+  },
+  "requirements": [ [ "never", "has_log" ] ]
 }

@@ -362,7 +362,7 @@ tasks.named('runCapture') {
     dependsOn prepareCapture
     mustRunAfter tasks.named('runGameTestServer')
     outputs.upToDateWhen { false }
-    timeout = java.time.Duration.ofMinutes(20)
+    timeout = java.time.Duration.ofMinutes(30)
 }
 // Fresh demo world each run. The client options are seeded once and then left to the owner.
 def prepareDemo = tasks.register('prepareDemo') {

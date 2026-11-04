@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/membrane_sheet",
+  "display": {
+    "icon": { "id": "infestusfrontier:bio_furnace" },
+    "title": { "translate": "advancement.infestusfrontier.contact.bio_furnace.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.bio_furnace.description" },
+    "frame": "goal"
+  },
+  "criteria": {
+    "smelted": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": { "organ": "infestusfrontier:bio_furnace" }
+    }
+  }
+}

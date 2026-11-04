@@ -10,6 +10,7 @@ import com.klikli_dev.modonomicon.client.gui.book.BookAddress;
 import com.klikli_dev.modonomicon.data.BookDataManager;
 import com.mojang.logging.LogUtils;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,10 +20,14 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.CloudStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.client.gui.components.toasts.AdvancementToast;
+import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
@@ -57,6 +62,7 @@ final class CaptureClient {
     private static final int WORLD_SCALE = 2; // the HUD stays small in a world shot
     private static final int SCREEN_SCALE = 3; // a screen is shot the size a player sees it
     private static final int READY_RADIUS = 2; // chunks around the view that must have arrived from the server
+    private static final long TOAST_DWELL_MILLIS = 1500; // a toast slides in over 600 ms
     private static final int READY_FRAMES = 10; // consecutive frames with nothing left to compile
     private static final List<String> BASELINE = List.of(
             "gamerule sendCommandFeedback false",
@@ -96,6 +102,8 @@ final class CaptureClient {
     private boolean resized;
     private int buttonMenu = -1;
     private int buttonTick;
+    private boolean triggered;
+    private long toastSeenAt = -1;
 
     CaptureClient(Path outputDir, List<Scenario> scenarios) {
         this.outputDir = outputDir;
@@ -128,6 +136,13 @@ final class CaptureClient {
                                 .ifPresent(block ->
                                         useBlock(minecraft, block, currentView().holding()));
                         if (currentView().inventory()) minecraft.setScreen(new InventoryScreen(minecraft.player));
+                        if (currentView().advancements())
+                            minecraft.setScreen(new AdvancementsScreen(
+                                    minecraft.getConnection().getAdvancements()));
+                        currentView()
+                                .feed()
+                                .ifPresent(block ->
+                                        useBlock(minecraft, block, currentView().holding()));
                         currentView()
                                 .book()
                                 .ifPresent(
@@ -328,7 +343,9 @@ final class CaptureClient {
         // A view that used a block waits for its container screen; every other view waits for no screen at all.
         boolean screenOpen = view.book().isPresent()
                 ? minecraft.screen != null
-                : minecraft.screen instanceof AbstractContainerScreen<?>;
+                : view.advancements()
+                        ? minecraft.screen instanceof AdvancementsScreen
+                        : minecraft.screen instanceof AbstractContainerScreen<?>;
         if (view.opensScreen() ? !screenOpen || ticksInStage < MOVE_TICKS : minecraft.screen != null) return;
         if (view.menuButton().isPresent()) {
             if (!(minecraft.screen instanceof AbstractContainerScreen<?> screen)) return;
@@ -343,7 +360,12 @@ final class CaptureClient {
             if (screen.getMenu().containerId == buttonMenu || ticksInStage < buttonTick + 10) return;
         }
         // Trigger a state change only after the camera is ready, so the sequence includes its transition.
-        if (sequenceFrame == 0) view.trigger().ifPresent(command -> FlatWorld.command(minecraft, command));
+        if (!triggered) {
+            triggered = true;
+            view.trigger().ifPresent(command -> FlatWorld.command(minecraft, command));
+        }
+        if (view.advancements() && hasInfestusTab(minecraft)) showInfestusTab(minecraft);
+        if (!expectationsMet(minecraft, view)) return;
         enter(Stage.GRABBING);
         try {
             Path scenarioDir = outputDir.resolve(scenario.name());
@@ -384,7 +406,58 @@ final class CaptureClient {
         }
     }
 
+    /**
+     * Whether the client shows what the view expects: the Infestus Frontier tab known or unknown, and a toast for an
+     * advancement on screen. The shot waits for it; a wait that does not end is the stage timeout, which fails the
+     * capture.
+     */
+    private boolean expectationsMet(Minecraft minecraft, Scenario.View view) {
+        if (view.expectTab().isPresent() && view.expectTab().get() != hasInfestusTab(minecraft)) return false;
+        if (view.expectToast().isEmpty()) return true;
+        if (!toastShows(minecraft, ResourceLocation.parse(view.expectToast().get()))) {
+            toastSeenAt = -1;
+            return false;
+        }
+        // Shoot it once it has had time to be seen.
+        if (toastSeenAt < 0) toastSeenAt = System.currentTimeMillis();
+        return System.currentTimeMillis() - toastSeenAt >= TOAST_DWELL_MILLIS;
+    }
+
+    private static final ResourceLocation TAB_ROOT =
+            ResourceLocation.fromNamespaceAndPath("infestusfrontier", "contact/root");
+
+    private static boolean hasInfestusTab(Minecraft minecraft) {
+        return minecraft.getConnection().getAdvancements().getTree().get(TAB_ROOT) != null;
+    }
+
+    /** Selects the Infestus Frontier tab, as a click on it does, so the Advancements screen shows it. */
+    private static void showInfestusTab(Minecraft minecraft) {
+        var advancements = minecraft.getConnection().getAdvancements();
+        advancements.setSelectedTab(advancements.get(TAB_ROOT), false);
+    }
+
+    /** Whether a toast for {@code advancement} is on screen; the toast keeps its advancement private. */
+    private static boolean toastShows(Minecraft minecraft, ResourceLocation advancement) {
+        try {
+            Field visible = ToastComponent.class.getDeclaredField("visible");
+            visible.setAccessible(true);
+            Field held = AdvancementToast.class.getDeclaredField("advancement");
+            held.setAccessible(true);
+            for (Object instance : (Iterable<?>) visible.get(minecraft.getToasts())) {
+                Field toast = instance.getClass().getDeclaredField("toast");
+                toast.setAccessible(true);
+                if (toast.get(instance) instanceof AdvancementToast shown
+                        && ((AdvancementHolder) held.get(shown)).id().equals(advancement)) return true;
+            }
+            return false;
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Cannot read the toasts on screen", e);
+        }
+    }
+
     private void advance(Minecraft minecraft) {
+        triggered = false;
+        toastSeenAt = -1;
         buttonMenu = -1;
         if (minecraft.screen instanceof AbstractContainerScreen<?> && minecraft.player != null)
             minecraft.player.closeContainer();
@@ -448,7 +521,7 @@ final class CaptureClient {
         Scenario.View view = scenarioIndex < scenarios.size() ? currentView() : null;
         return String.format(
                 Locale.ROOT,
-                " at %.3f %.3f %.3f yaw %.2f pitch %.2f flying=%s sections=%d all=%s chunks=%s compiled=%s screen=%s",
+                " at %.3f %.3f %.3f yaw %.2f pitch %.2f flying=%s sections=%d all=%s chunks=%s compiled=%s screen=%s tab=%s",
                 minecraft.player.getX(),
                 minecraft.player.getY(),
                 minecraft.player.getZ(),
@@ -459,7 +532,14 @@ final class CaptureClient {
                 renderer.hasRenderedAllSections(),
                 view != null && chunksArrived(minecraft, view),
                 renderer.isSectionCompiled(minecraft.player.blockPosition()),
-                minecraft.screen == null ? null : minecraft.screen.getClass().getSimpleName());
+                minecraft.screen == null ? null : minecraft.screen.getClass().getSimpleName(),
+                hasInfestusTab(minecraft)
+                        + (view == null
+                                ? ""
+                                : view.expectToast()
+                                        .map(toast -> " toast " + toast + "="
+                                                + toastShows(minecraft, ResourceLocation.parse(toast)))
+                                        .orElse("")));
     }
 
     private void enter(Stage next) {

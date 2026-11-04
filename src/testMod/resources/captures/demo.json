@@ -797,7 +797,12 @@
     "item replace entity @s inventory.19 with infestusfrontier:biomass_bucket 1",
     "item replace entity @s inventory.20 with infestusfrontier:biomass_bucket 1",
     "item replace entity @s inventory.21 with cobblestone 64",
-    "item replace entity @s inventory.22 with iron_ingot 64"
+    "item replace entity @s inventory.22 with iron_ingot 64",
+    "setblock 2 -60 -47 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:oak_log\",count:8},{Slot:1,id:\"minecraft:rotten_flesh\",count:16},{Slot:2,id:\"minecraft:red_mushroom\",count:4},{Slot:3,id:\"minecraft:wheat_seeds\",count:8},{Slot:4,id:\"minecraft:string\",count:8},{Slot:5,id:\"minecraft:bone\",count:16},{Slot:6,id:\"minecraft:stick\",count:16},{Slot:7,id:\"minecraft:bone_meal\",count:8},{Slot:8,id:\"minecraft:furnace\",count:1},{Slot:9,id:\"minecraft:raw_iron\",count:8},{Slot:10,id:\"minecraft:water_bucket\",count:1},{Slot:11,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:12,id:\"minecraft:bowl\",count:2}]}",
+    "setblock 3 -60 -47 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Starter supplies\"','\"Take a log: the\"','\"Advancements tab\"','\"opens (key L)\"']}}"
+  ],
+  "play": [
+    "advancement revoke @s from infestusfrontier:contact/root"
   ],
   "views": [
     {
@@ -807,6 +812,15 @@
       "z": -48.5,
       "yaw": 0,
       "pitch": 10,
+      "gui": true
+    },
+    {
+      "name": "starter",
+      "x": 2.5,
+      "y": -60,
+      "z": -50.5,
+      "yaw": 0,
+      "pitch": 20,
       "gui": true
     },
     {

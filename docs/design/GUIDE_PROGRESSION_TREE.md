@@ -60,7 +60,7 @@ The arrows describe dependencies, not one required base layout. Optional branche
 
 | Node | Open after | Complete by | Teaches / unlocks |
 |---|---|---|---|
-| SR0 — Contact | START | Begin a world; initialize the personal guide journal. | T0 starter recipes and the first pages. |
+| SR0 — Contact | START | Obtain any log (item tag `minecraft:logs`) through an inventory change; the Infestus Frontier advancement tab opens. Joining a world grants nothing. | T0 starter recipes and the first pages. |
 | SR1 — Circulation | ALL(T0-03,T0-04,T0-05,T0-06) | Automatic badge after first biomass production, usable storage, a Membrane Sheet and a Bone Plate are recorded. | T1 circulation, farm and expandable-body commissioning. |
 | SR2 — Directed Mutation | ALL(CI-01,CI-02) | Commission one supplied processing line and its replenishable organic feed. | T2 laboratory, directed genetics, planned excavation and optional helpers. |
 | SR3 — Thermal Colony | ALL(GE-02,GE-04) | Complete one genome and use a researched trait in a useful plant, organ or equipment expression. | T3 native thermal and steam construction. No requirement to evolve a whole armor set first. |
@@ -98,6 +98,25 @@ The initial book is offered once on first join, retained as a pending claim if i
 | T0-14 — Leaching Gland | ALL(T0-03,T0-05,T0-16) | Produce a Leaching Nodule from a real batch. | Manual mining treatment before powered excavators. |
 | T0-15 — Leached Rock | T0-14 | Treat exposed host rock and mine one treated block with a suitable tool. | Nearby ore remains ordinary ore; treatment neither extracts it nor grants passage through solid rock. |
 | ST-04 — Grow, Then Reinforce | ALL(ST-03,T0-06) | Reinforce one mature cell while preserving its current function. | Bone ribs are independent of maturity and functional grafts; later tempered ribs replace their grade. |
+
+### Shipped advancement tab
+
+The Advancements screen shows SR0 and the first working patch as one tab, `infestusfrontier:contact/root`. The tab root is hidden until earned; a player who already held the old root keeps it. Each advancement has one parent, so an `ALL(...)` node above shows under the parent named here; the book keeps the full rule. No advancement grants an item, recipe or experience.
+
+| Advancement | Parent | Complete by |
+|---|---|---|
+| First Contact (`root`, SR0) | none | Obtain any log. Its text gives the Spore Culture recipe: rotten flesh, red mushroom, wheat seeds. |
+| A Culture in Your Hand (ST-01) | root | Hold a Spore Culture. |
+| Living Substrate (T0-01) | A Culture in Your Hand | Use a Spore Culture on exposed ground. |
+| A Bud in Your Hand (T0-16) | Living Substrate | Hold an Organ Bud. |
+| First Biomass (T0-03) | A Bud in Your Hand | Finish a Digestive Sac batch. |
+| Fuel in Reserve (T0-04) | First Biomass | Pour a bucket of biomass into a Biomass Bladder. |
+| Awakened (T0-08) | Fuel in Reserve | Wake a dormant piece in an Awakening Cradle. |
+| Stretched Skin (T0-05) | Living Substrate | Finish a Membrane Rack batch: a Membrane Sheet. |
+| Grown Bone (T0-06) | First Biomass | Finish a Bone Loom batch: a Bone Plate. |
+| A Hearth on Biomass (T0-07) | Stretched Skin | Finish a Bio-Furnace batch on biomass. |
+
+The three batch advancements use the `infestusfrontier:organ_batch_completed` trigger, which fires for the player who loaded the organ by hand. A batch that never starts (no water, no biomass) or cannot deliver (output full) earns nothing until it finishes. A player who is offline when the batch finishes gets the credit on the next login. Holding the organ or its product only opens its book entry through the invisible `acquired/` flag.
 
 ST-02 uses Item Catalog I010's Synaptic Probe recipe; no amethyst console is needed to configure the first organ. Sample Pouch and vial recipes appear with early collection instructions. Looking identifies a source; creature DNA requires actual death loot, and plant DNA requires consumed harvested material.
 

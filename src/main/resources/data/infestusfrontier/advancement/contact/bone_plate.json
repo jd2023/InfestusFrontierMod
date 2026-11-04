@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/digestive_sac",
+  "display": {
+    "icon": { "id": "infestusfrontier:bone_plate" },
+    "title": { "translate": "advancement.infestusfrontier.contact.bone_plate.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.bone_plate.description" },
+    "frame": "task"
+  },
+  "criteria": {
+    "woven": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": { "organ": "infestusfrontier:bone_loom" }
+    }
+  }
+}

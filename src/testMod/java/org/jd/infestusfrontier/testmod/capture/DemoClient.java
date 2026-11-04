@@ -54,6 +54,7 @@ final class DemoClient {
                     if (!FlatWorld.joined(minecraft)) return;
                     commandQueue.addAll(BASELINE);
                     commandQueue.addAll(scene.commands());
+                    commandQueue.addAll(scene.play());
                     commandQueue.addAll(FINAL);
                     enter(Stage.COMMANDS);
                 }
@@ -74,7 +75,7 @@ final class DemoClient {
                         minecraft.gui.getChat().clearMessages(true);
                         LOGGER.info(
                                 "INFESTUS_DEMO_READY commands={}",
-                                scene.commands().size());
+                                scene.commands().size() + scene.play().size());
                         enter(Stage.DONE);
                         return;
                     }

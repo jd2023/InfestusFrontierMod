@@ -15,9 +15,12 @@ import java.util.Optional;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
 
-/** One scripted scene from {@code <folder>/<name>.json}: commands to run, then views to stand at. */
-record Scenario(String name, List<String> commands, List<View> views) {
-    static final int MAX_VIEWS = 176;
+/**
+ * One scripted scene from {@code <folder>/<name>.json}: commands to run, then views to stand at. {@code play} holds
+ * the commands that only the playable demo runs after {@code commands}; a capture never runs them.
+ */
+record Scenario(String name, List<String> commands, List<String> play, List<View> views) {
+    static final int MAX_VIEWS = 184;
     private static final String NAME = "[a-z][a-z0-9_]{0,63}";
 
     /**
@@ -26,7 +29,11 @@ record Scenario(String name, List<String> commands, List<View> views) {
      * {@code inventory} opens the player's own inventory instead; {@code book} opens the guide at that entry id (empty
      * for its first screen) on page pair {@code page}. A view with any of these is shot at GUI scale 3. {@code icons}
      * names what the hotbar holds, left to right, for the verifier's centring check; the client selects an empty slot
-     * past them first so no selection ring touches a measured icon.
+     * past them first so no selection ring touches a measured icon. {@code advancements} opens the Advancements
+     * screen. {@code feed} right-clicks a block with the {@code holding} item, as a player loads an organ by hand,
+     * and opens no screen. {@code expectTab} holds the shot until the client does or does not know the Infestus
+     * Frontier tab ({@code infestusfrontier:contact/root}); {@code expectToast} holds it until a toast for that
+     * advancement id shows. A wait that does not end fails the capture.
      */
     record View(
             String name,
@@ -45,9 +52,13 @@ record Scenario(String name, List<String> commands, List<View> views) {
             int frames,
             int frameTicks,
             Optional<String> trigger,
-            Optional<Integer> menuButton) {
+            Optional<Integer> menuButton,
+            boolean advancements,
+            Optional<BlockPos> feed,
+            Optional<Boolean> expectTab,
+            Optional<String> expectToast) {
         boolean opensScreen() {
-            return use.isPresent() || inventory || book.isPresent();
+            return use.isPresent() || inventory || book.isPresent() || advancements;
         }
     }
 
@@ -72,6 +83,10 @@ record Scenario(String name, List<String> commands, List<View> views) {
             if (root.has("commands")) {
                 for (JsonElement e : root.getAsJsonArray("commands")) commands.add(e.getAsString());
             }
+            List<String> play = new ArrayList<>();
+            if (root.has("play")) {
+                for (JsonElement e : root.getAsJsonArray("play")) play.add(e.getAsString());
+            }
             JsonArray viewArray = root.getAsJsonArray("views");
             if (viewArray == null || viewArray.isEmpty() || viewArray.size() > MAX_VIEWS) {
                 throw new IOException(name + ": a scenario has 1 to " + MAX_VIEWS + " views");
@@ -89,14 +104,12 @@ record Scenario(String name, List<String> commands, List<View> views) {
                 int frameTicks = v.has("frameTicks") ? v.get("frameTicks").getAsInt() : 4;
                 if (frames < 1 || frames > 96 || frameTicks < 1 || frameTicks > 20)
                     throw new IOException(name + ": frames must be 1..96 and frameTicks 1..20");
-                if (v.has("use")) {
-                    JsonArray at = v.getAsJsonArray("use");
-                    if (at.size() != 3) throw new IOException(name + ": use needs [x, y, z] in view " + viewName);
-                    use = Optional.of(new BlockPos(
-                            at.get(0).getAsInt(),
-                            at.get(1).getAsInt(),
-                            at.get(2).getAsInt()));
-                }
+                if (v.has("use")) use = Optional.of(position(name, viewName, "use", v.getAsJsonArray("use")));
+                Optional<BlockPos> feed = v.has("feed")
+                        ? Optional.of(position(name, viewName, "feed", v.getAsJsonArray("feed")))
+                        : Optional.empty();
+                if (feed.isPresent() && v.get("holding") == null)
+                    throw new IOException(name + ": feed needs holding in view " + viewName);
                 views.add(new View(
                         viewName,
                         v.get("x").getAsDouble(),
@@ -114,10 +127,20 @@ record Scenario(String name, List<String> commands, List<View> views) {
                         frames,
                         frameTicks,
                         v.has("trigger") ? Optional.of(v.get("trigger").getAsString()) : Optional.empty(),
-                        v.has("menuButton") ? Optional.of(v.get("menuButton").getAsInt()) : Optional.empty()));
+                        v.has("menuButton") ? Optional.of(v.get("menuButton").getAsInt()) : Optional.empty(),
+                        v.has("advancements") && v.get("advancements").getAsBoolean(),
+                        feed,
+                        v.has("expectTab") ? Optional.of(v.get("expectTab").getAsBoolean()) : Optional.empty(),
+                        v.has("expectToast") ? Optional.of(v.get("expectToast").getAsString()) : Optional.empty()));
             }
-            return new Scenario(name, List.copyOf(commands), List.copyOf(views));
+            return new Scenario(name, List.copyOf(commands), List.copyOf(play), List.copyOf(views));
         }
+    }
+
+    private static BlockPos position(String scenario, String view, String key, JsonArray at) throws IOException {
+        if (at.size() != 3) throw new IOException(scenario + ": " + key + " needs [x, y, z] in view " + view);
+        return new BlockPos(
+                at.get(0).getAsInt(), at.get(1).getAsInt(), at.get(2).getAsInt());
     }
 
     private static List<String> icons(JsonArray array) {
