@@ -44,6 +44,11 @@
       "text": "entry.infestusfrontier.circulation.item_capsule.loss"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.item_capsule.milestone.title",
+      "text": "entry.infestusfrontier.circulation.item_capsule.milestone"
+    },
+    {
       "type": "modonomicon:crafting_recipe",
       "recipe_id_1": "infestusfrontier:capsule_stem",
       "text": "entry.infestusfrontier.circulation.item_capsule.craft"

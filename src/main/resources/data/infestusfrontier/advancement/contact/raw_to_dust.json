@@ -1,0 +1,45 @@
+{
+  "parent": "infestusfrontier:contact/bone_plate",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:mineral_gizzard"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.raw_to_dust.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.raw_to_dust.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "iron": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": {
+        "organ": "infestusfrontier:mineral_gizzard",
+        "recipe": "infestusfrontier:grinding/iron"
+      }
+    },
+    "gold": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": {
+        "organ": "infestusfrontier:mineral_gizzard",
+        "recipe": "infestusfrontier:grinding/gold"
+      }
+    },
+    "copper": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": {
+        "organ": "infestusfrontier:mineral_gizzard",
+        "recipe": "infestusfrontier:grinding/copper"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "iron",
+      "gold",
+      "copper"
+    ]
+  ]
+}

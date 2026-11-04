@@ -28,6 +28,8 @@ import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
+import org.jd.infestusfrontier.organ.api.Steward;
+import org.jd.infestusfrontier.organ.api.Stewarded;
 import org.jd.infestusfrontier.processing.api.PalmContents;
 import org.jd.infestusfrontier.processing.api.PalmRote;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
@@ -48,7 +50,8 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * ({@link #serverTick}); only then does it expose an item handler ({@link PalmPorts}) and a biomass handler. The network is reached through
  * the Mouth under the Palm, only when a screen action or a restock asks ({@link #door()}).
  */
-final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, GeoBlockEntity, BiomassHandler {
+final class ShapingPalmBlockEntity extends BlockEntity
+        implements MenuProvider, GeoBlockEntity, BiomassHandler, Stewarded {
     /** The organ has no foundation under it, so it keeps its grid and crafts nothing. */
     static final Refusal NO_FOUNDATION = new Refusal("processing.palm_no_foundation");
     /** The organ already has Reach, so a second Contractile Fiber is not spent. */
@@ -68,7 +71,11 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
     private static final int BLEND_TICKS = 10;
     private static final MapCodec<Saved> SAVED = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     PalmContents.CODEC.fieldOf("contents").forGetter(Saved::contents),
-                    PalmRote.CODEC.optionalFieldOf("rote").forGetter(Saved::rote))
+                    PalmRote.CODEC.optionalFieldOf("rote").forGetter(Saved::rote),
+                    ItemStack.OPTIONAL_CODEC
+                            .listOf(0, PalmContents.CELLS)
+                            .optionalFieldOf("fetched")
+                            .forGetter(Saved::fetched))
             .apply(instance, Saved::new));
     private static final String REACH = "reach";
     /**
@@ -79,6 +86,10 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
 
     private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     private final NonNullList<ItemStack> grid = NonNullList.withSize(PalmContents.CELLS, ItemStack.EMPTY);
+    /** What the Mouth fetched into the grid. Saved with the block and dropped when it is broken. */
+    private final PalmFetched fetched = new PalmFetched();
+
+    private final Steward steward = new Steward();
     private Optional<CompoundTag> unreadable = Optional.empty();
     /** Counts every change to the grid, so a menu that is open knows when what it shows is out of date. */
     private int version;
@@ -119,9 +130,33 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
 
     /** Marks the grid changed: saves it, tells every open menu, and lets the Palm look at once for a cycle to start. */
     void touch() {
+        fetched.reconcile(grid);
         version++;
         dirty = true;
         setChanged();
+    }
+
+    @Override
+    public Steward steward() {
+        return steward;
+    }
+
+    /** {@code items} of grid cell {@code cell}'s kind just came in from the network. */
+    void received(int cell, int items) {
+        fetched.received(grid, cell, items);
+        setChanged();
+    }
+
+    /** What the Mouth's restock put in each cell is network supply. */
+    void received(int[] items) {
+        for (int cell = 0; cell < items.length; cell++) if (items[cell] > 0) received(cell, items[cell]);
+    }
+
+    /** A craft by hand takes one of each filled cell: true when one of them came from the network. */
+    boolean spendFetched() {
+        boolean supplied = fetched.spendAll(grid);
+        if (supplied) setChanged();
+        return supplied;
     }
 
     /** Marks the tray changed: a cycle that waited for room may now deliver. */
@@ -322,6 +357,7 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
         restockOwed = true;
         judged = PalmStatus.READY;
         touch();
+        if (running.supplied()) steward.worked(server, ProcessingModule.SHAPING_PALM.getId());
         supply(server);
     }
 
@@ -338,6 +374,7 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
         }
         PalmSupply.Moved moved = PalmSupply.restockPattern(grid, pattern.get().kinds(), door.access());
         if (!moved.consulted()) return false;
+        received(moved.fetched());
         restockOwed = false;
         if (moved.items() > 0) touch();
         else setChanged();
@@ -382,13 +419,15 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
             cooldown = 5 + Math.floorMod(worldPosition.hashCode(), RETRY_TICKS);
             return;
         }
+        boolean supplied = false;
         for (int cell = 0; cell < PalmContents.CELLS; cell++) {
             if (recorded.kind(cell).isEmpty()) continue;
+            supplied |= fetched.spend(grid, cell);
             grid.get(cell).shrink(1);
             if (grid.get(cell).isEmpty()) grid.set(cell, ItemStack.EMPTY);
         }
         biomass = ((Outcome.Done<BiomassTank>) biomass.drain(PalmRote.COST)).value();
-        cycle = Optional.of(new PalmRote.Cycle(0, found.result(), found.remainders()));
+        cycle = Optional.of(new PalmRote.Cycle(0, found.result(), found.remainders(), supplied));
         judged = PalmStatus.WORKING;
         cooldown = 0;
         touch();
@@ -427,7 +466,11 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     /** The saved form of the whole Palm: its grid and, with Rote, its Rote state. */
-    private record Saved(PalmContents contents, Optional<PalmRote> rote) {}
+    private record Saved(PalmContents contents, Optional<PalmRote> rote, Optional<List<ItemStack>> fetched) {
+        Saved(PalmContents contents, Optional<PalmRote> rote) {
+            this(contents, rote, Optional.empty());
+        }
+    }
 
     /** Why {@code saved} cannot be installed as a whole, or empty when every stack is one the game could hold. */
     private static Optional<String> check(Saved saved) {
@@ -455,6 +498,7 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
     private void restore(Saved saved) {
         for (int cell = 0; cell < PalmContents.CELLS; cell++)
             grid.set(cell, saved.contents().cell(cell));
+        fetched.load(saved.fetched(), grid);
         version++;
         rote = saved.rote().isPresent();
         PalmRote state = saved.rote().orElseGet(PalmRote::fresh);
@@ -487,6 +531,7 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         read.ifPresent(this::restore);
         reach = tag.getBoolean(REACH);
+        steward.load(tag);
         unreadable.ifPresent(kept -> kept.remove(LEGACY_LINK));
     }
 
@@ -494,7 +539,8 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (unreadable.isPresent()) tag.merge(unreadable.get());
-        else Persistence.write(SAVED, new Saved(contents(), roteState()), registries, tag);
+        else Persistence.write(SAVED, new Saved(contents(), roteState(), fetched.saved()), registries, tag);
+        steward.save(tag);
         tag.remove(REACH);
         tag.remove(LEGACY_LINK);
         if (reach) tag.putBoolean(REACH, true);
@@ -506,6 +552,8 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
         if (unreadable.isPresent()) {
             CompoundTag kept = unreadable.get().copy();
             kept.remove(LEGACY_LINK);
+            kept.remove("fetched");
+            kept.remove("steward");
             components.set(OrganModule.UNREADABLE_SAVE.get(), kept);
             return;
         }
@@ -545,6 +593,8 @@ final class ShapingPalmBlockEntity extends BlockEntity implements MenuProvider, 
     public void removeComponentsFromTag(CompoundTag tag) {
         tag.remove("contents");
         tag.remove("rote");
+        tag.remove("fetched");
+        tag.remove("steward");
         tag.remove(REACH);
         tag.remove(LEGACY_LINK);
     }

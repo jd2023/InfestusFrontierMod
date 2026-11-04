@@ -16,8 +16,11 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
 import org.jd.infestusfrontier.core.storage.Ledger;
 import org.jd.infestusfrontier.foundation.menu.OrganMenu;
+import org.jd.infestusfrontier.organ.api.WorkshopActionEvent;
 import org.jd.infestusfrontier.ui.Bounds;
 import org.jd.infestusfrontier.ui.Sheet;
 import org.jd.infestusfrontier.ui.SlotGrid;
@@ -78,6 +81,8 @@ public final class ItemCapsuleMenu extends OrganMenu {
 
     private final Tree tree;
     private final View view;
+    /** True while a click has put something into the tree that no one has been credited for yet. */
+    private boolean stored;
     /** The kind each cell showed the client at the last broadcast; a click on another kind there is refused. */
     private final ItemStack[] shown = new ItemStack[VIEW];
 
@@ -121,18 +126,21 @@ public final class ItemCapsuleMenu extends OrganMenu {
                 tree.usable().ifPresent(store -> {
                     ItemStack held = store.kind(entry(cell));
                     if (stack.isEmpty()) return; // a kind leaves only through take; an empty cell is empty already
-                    if (held.isEmpty()) planted(store.insert(stack.copy(), false));
+                    if (held.isEmpty()) planted(stack, store.insert(stack.copy(), false));
                     else if (ItemStack.isSameItemSameComponents(held, stack)) {
                         int delta = stack.getCount() - held.getCount();
-                        if (delta > 0) planted(store.insert(held.copyWithCount(delta), false));
-                        else if (delta < 0) store.take(held, -delta);
+                        if (delta > 0) {
+                            ItemStack added = held.copyWithCount(delta);
+                            planted(added, store.insert(added.copy(), false));
+                        } else if (delta < 0) store.take(held, -delta);
                     }
                 });
             }
 
             /** Vanilla splits what it puts by {@link #room} first, so nothing is ever left over. */
-            private void planted(ItemStack rest) {
+            private void planted(ItemStack offered, ItemStack rest) {
                 if (!rest.isEmpty()) StorageModule.LOGGER.warn("Capsule Stem ledger refused {} it had room for", rest);
+                if (rest.getCount() < offered.getCount()) stored = true;
             }
 
             @Override
@@ -269,6 +277,15 @@ public final class ItemCapsuleMenu extends OrganMenu {
                 return;
         }
         super.clicked(slot, button, type, player);
+        credit(player);
+    }
+
+    /** Tells the world a player stored something in a standing tree, once for the click that did it. */
+    private void credit(Player player) {
+        if (!stored) return;
+        stored = false;
+        if (tree.root().isPresent() && player instanceof ServerPlayer server && !(server instanceof FakePlayer))
+            NeoForge.EVENT_BUS.post(new WorkshopActionEvent(server, WorkshopActionEvent.Action.TREE_STORED));
     }
 
     @Override
@@ -305,7 +322,11 @@ public final class ItemCapsuleMenu extends OrganMenu {
         if (store.isEmpty()) return ItemStack.EMPTY;
         ItemStack stack = slot.getItem();
         ItemStack rest = store.get().insert(stack, false);
-        if (rest.getCount() != stack.getCount()) slot.set(rest);
+        if (rest.getCount() != stack.getCount()) {
+            slot.set(rest);
+            stored = true;
+            credit(player);
+        }
         return ItemStack.EMPTY;
     }
 

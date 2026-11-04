@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/membrane_sheet",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:item_capsule"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.tree_storage.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.tree_storage.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "stored": {
+      "trigger": "infestusfrontier:workshop_action",
+      "conditions": {
+        "action": "tree_stored"
+      }
+    }
+  }
+}

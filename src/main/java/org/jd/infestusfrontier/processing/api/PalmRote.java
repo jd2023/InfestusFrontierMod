@@ -118,8 +118,16 @@ public record PalmRote(
         }
     }
 
-    /** A cycle under way: ticks done, and the products it delivers when it finishes. Its inputs are already spent. */
-    public record Cycle(int done, ItemStack result, List<ItemStack> remainders) {
+    /**
+     * A cycle under way: ticks done, and the products it delivers when it finishes. Its inputs are already spent.
+     * {@code supplied} is true when one of them was an item the Palm's Mouth fetched from the network.
+     */
+    public record Cycle(int done, ItemStack result, List<ItemStack> remainders, boolean supplied) {
+        /** A cycle on the hand's own ingredients. */
+        public Cycle(int done, ItemStack result, List<ItemStack> remainders) {
+            this(done, result, remainders, false);
+        }
+
         public Cycle {
             if (done < 0 || done > TICKS) throw new IllegalArgumentException("Progress " + done);
             if (remainders.size() > REMAINDER_SLOTS)
@@ -144,7 +152,7 @@ public record PalmRote(
 
         /** One loaded tick of work. A finished cycle stays finished. */
         public Cycle advance() {
-            return isDone() ? this : new Cycle(done + 1, result, remainders);
+            return isDone() ? this : new Cycle(done + 1, result, remainders, supplied);
         }
 
         public int percent() {
@@ -156,13 +164,14 @@ public record PalmRote(
             return other instanceof Cycle that
                     && done == that.done
                     && ItemStack.matches(result, that.result)
-                    && ItemStack.listMatches(remainders, that.remainders);
+                    && ItemStack.listMatches(remainders, that.remainders)
+                    && supplied == that.supplied;
         }
 
         @Override
         public int hashCode() {
             return java.util.Objects.hash(
-                    done, ItemStack.hashItemAndComponents(result), ItemStack.hashStackList(remainders));
+                    done, ItemStack.hashItemAndComponents(result), ItemStack.hashStackList(remainders), supplied);
         }
     }
 
@@ -181,7 +190,8 @@ public record PalmRote(
                     ItemStack.CODEC
                             .listOf(0, REMAINDER_SLOTS)
                             .fieldOf("remainders")
-                            .forGetter(Cycle::remainders))
+                            .forGetter(Cycle::remainders),
+                    Codec.BOOL.optionalFieldOf("supplied", false).forGetter(Cycle::supplied))
             .apply(instance, Cycle::new));
 
     /** Saved as a compound; the tray keeps its empty stacks so each product stays in its slot. */

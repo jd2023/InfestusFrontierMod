@@ -34,7 +34,9 @@ record Scenario(String name, List<String> commands, List<String> play, List<View
      * and opens no screen. {@code expectTab} holds the shot until the client does or does not know the Infestus
      * Frontier tab ({@code infestusfrontier:contact/root}); {@code expectToast} holds it until a toast for that
      * advancement id shows. {@code scroll} drags the Advancements tab by that many pixels, as a mouse drag does, so a
-     * branch off the edge comes into view. A wait that does not end fails the capture.
+     * branch off the edge comes into view. {@code press} lists menu buttons the client presses on the screen the view
+     * opened, then {@code quickMove} lists slots it shift-clicks, one every few ticks: the server judges each as it
+     * judges a player's. A wait that does not end fails the capture.
      */
     record View(
             String name,
@@ -59,10 +61,21 @@ record Scenario(String name, List<String> commands, List<String> play, List<View
             Optional<Boolean> expectTab,
             Optional<String> expectToast,
             int scrollX,
-            int scrollY) {
+            int scrollY,
+            List<Integer> press,
+            List<Integer> quickMove) {
         boolean opensScreen() {
             return use.isPresent() || inventory || book.isPresent() || advancements;
         }
+    }
+
+    /** The whole numbers a view lists under {@code key}, none when it has no such list; a view with one needs a screen. */
+    private static List<Integer> numbers(String scenario, String view, String key, JsonObject v) throws IOException {
+        if (!v.has(key)) return List.of();
+        if (!v.has("use")) throw new IOException(scenario + ": " + key + " needs use in view " + view);
+        List<Integer> numbers = new ArrayList<>();
+        for (JsonElement e : v.getAsJsonArray(key)) numbers.add(e.getAsInt());
+        return List.copyOf(numbers);
     }
 
     /** Loads every scenario named in a comma separated list from the test mod resources. */
@@ -136,7 +149,9 @@ record Scenario(String name, List<String> commands, List<String> play, List<View
                         v.has("expectTab") ? Optional.of(v.get("expectTab").getAsBoolean()) : Optional.empty(),
                         v.has("expectToast") ? Optional.of(v.get("expectToast").getAsString()) : Optional.empty(),
                         v.has("scroll") ? v.getAsJsonArray("scroll").get(0).getAsInt() : 0,
-                        v.has("scroll") ? v.getAsJsonArray("scroll").get(1).getAsInt() : 0));
+                        v.has("scroll") ? v.getAsJsonArray("scroll").get(1).getAsInt() : 0,
+                        numbers(name, viewName, "press", v),
+                        numbers(name, viewName, "quickMove", v)));
             }
             return new Scenario(name, List.copyOf(commands), List.copyOf(play), List.copyOf(views));
         }

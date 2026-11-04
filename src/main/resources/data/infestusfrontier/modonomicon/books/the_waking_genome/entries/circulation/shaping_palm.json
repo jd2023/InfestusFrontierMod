@@ -79,6 +79,11 @@
       "text": "entry.infestusfrontier.circulation.shaping_palm.lobes"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.shaping_palm.milestone.title",
+      "text": "entry.infestusfrontier.circulation.shaping_palm.milestone"
+    },
+    {
       "type": "modonomicon:crafting_recipe",
       "recipe_id_1": "infestusfrontier:shaping_palm",
       "text": "entry.infestusfrontier.circulation.shaping_palm.craft"

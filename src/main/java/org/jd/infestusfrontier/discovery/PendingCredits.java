@@ -37,12 +37,16 @@ public final class PendingCredits extends SavedData {
     private static final SavedData.Factory<PendingCredits> FACTORY =
             new SavedData.Factory<>(PendingCredits::new, PendingCredits::load);
 
-    /** {@code automatic} tells work an organ did on its own for its steward apart from a batch a player started. */
-    private record Credit(UUID player, ResourceLocation organ, boolean automatic) {
+    /**
+     * {@code automatic} tells work an organ did on its own for its steward apart from a batch a player started;
+     * {@code recipe} is the recipe a batch ran, so a credit for a grinding does not stand for a washing.
+     */
+    private record Credit(UUID player, ResourceLocation organ, boolean automatic, Optional<ResourceLocation> recipe) {
         static final Codec<Credit> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                         UUIDUtil.CODEC.fieldOf("player").forGetter(Credit::player),
                         ResourceLocation.CODEC.fieldOf("organ").forGetter(Credit::organ),
-                        Codec.BOOL.optionalFieldOf("automatic", false).forGetter(Credit::automatic))
+                        Codec.BOOL.optionalFieldOf("automatic", false).forGetter(Credit::automatic),
+                        ResourceLocation.CODEC.optionalFieldOf("recipe").forGetter(Credit::recipe))
                 .apply(instance, Credit::new));
     }
 
@@ -69,12 +73,17 @@ public final class PendingCredits extends SavedData {
     }
 
     public void remember(UUID player, ResourceLocation organ) {
-        remember(new Credit(player, organ, false));
+        remember(player, organ, Optional.empty());
+    }
+
+    /** Remembers that a batch of {@code recipe}, when it names one, finished in {@code organ} for {@code player}. */
+    public void remember(UUID player, ResourceLocation organ, Optional<ResourceLocation> recipe) {
+        remember(new Credit(player, organ, false, recipe));
     }
 
     /** Remembers that {@code organ} worked on its own for {@code player}. */
     public void rememberAutomatic(UUID player, ResourceLocation organ) {
-        remember(new Credit(player, organ, true));
+        remember(new Credit(player, organ, true, Optional.empty()));
     }
 
     private void remember(Credit credit) {
@@ -95,7 +104,7 @@ public final class PendingCredits extends SavedData {
             Credit credit = it.next();
             if (!credit.player().equals(player.getUUID())) continue;
             if (credit.automatic()) DiscoveryModule.AUTOMATIC_WORK.get().trigger(player, credit.organ());
-            else DiscoveryModule.ORGAN_BATCH_COMPLETED.get().trigger(player, credit.organ());
+            else DiscoveryModule.ORGAN_BATCH_COMPLETED.get().trigger(player, credit.organ(), credit.recipe());
             it.remove();
             changed = true;
         }
@@ -106,12 +115,20 @@ public final class PendingCredits extends SavedData {
         return credits.size();
     }
 
+    /** True when {@code player} has a batch credit for {@code organ}, whatever recipe it ran. */
     public boolean holds(UUID player, ResourceLocation organ) {
-        return credits.contains(new Credit(player, organ, false));
+        return credits.stream()
+                .anyMatch(credit ->
+                        credit.player().equals(player) && credit.organ().equals(organ) && !credit.automatic());
+    }
+
+    /** True when {@code player} has a batch credit for a batch of {@code recipe} finished in {@code organ}. */
+    public boolean holds(UUID player, ResourceLocation organ, ResourceLocation recipe) {
+        return credits.contains(new Credit(player, organ, false, Optional.of(recipe)));
     }
 
     public boolean holdsAutomatic(UUID player, ResourceLocation organ) {
-        return credits.contains(new Credit(player, organ, true));
+        return credits.contains(new Credit(player, organ, true, Optional.empty()));
     }
 
     @Override

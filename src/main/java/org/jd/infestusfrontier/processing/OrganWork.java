@@ -28,7 +28,7 @@ final class OrganWork {
     static void completed(Level level, ResourceLocation organ, RunningBatch<?> batch) {
         if (level instanceof ServerLevel server)
             batch.starter()
-                    .ifPresent(
-                            starter -> NeoForge.EVENT_BUS.post(new OrganBatchCompletedEvent(server, organ, starter)));
+                    .ifPresent(starter -> NeoForge.EVENT_BUS.post(
+                            new OrganBatchCompletedEvent(server, organ, starter, batch.recipe())));
     }
 }

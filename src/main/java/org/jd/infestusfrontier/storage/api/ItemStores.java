@@ -38,11 +38,12 @@ public final class ItemStores {
 
     /**
      * Puts {@code stack} into {@code store} and returns what did not fit; {@code stack} is unchanged. A store the
-     * colony knows takes it by its own rules as a whole; any other takes it slot by slot over its first
-     * {@link #STORE_SLOTS} slots.
+     * colony knows takes it by its own rules as a whole; one that tells a Mouth's delivery from a hopper's takes it as
+     * {@link MouthFed} says; any other takes it slot by slot over its first {@link #STORE_SLOTS} slots.
      */
     public static ItemStack insert(IItemHandler store, ItemStack stack, boolean simulate) {
         if (store instanceof ItemStore known) return known.insert(stack, simulate);
+        if (store instanceof MouthFed fed) return fed.deliver(stack, simulate);
         ItemStack rest = stack.copy(); // a handler may keep the stack it is given in a slot
         int slots = Math.min(STORE_SLOTS, store.getSlots());
         for (int slot = 0; slot < slots && !rest.isEmpty(); slot++) rest = store.insertItem(slot, rest, simulate);

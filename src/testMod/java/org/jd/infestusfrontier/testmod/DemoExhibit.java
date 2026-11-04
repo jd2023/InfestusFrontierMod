@@ -32,6 +32,7 @@ final class DemoExhibit {
     private static final Pattern SET = Pattern.compile("^setblock (-?\\d+) (-?\\d+) (-?\\d+) (\\S.*)$");
     private static final Pattern FILL =
             Pattern.compile("^fill (-?\\d+) (-?\\d+) (-?\\d+) (-?\\d+) (-?\\d+) (-?\\d+) (\\S.*)$");
+    private static final Pattern ROOT = Pattern.compile("root:\\[I;(-?\\d+),(-?\\d+),(-?\\d+)]");
     private static final int SHIFT_X = 246000;
     private static final int SHIFT_Y = 160;
     private static final int SHIFT_Z = 246000;
@@ -145,13 +146,23 @@ final class DemoExhibit {
 
     private String shifted(String command) {
         Matcher set = SET.matcher(command);
-        if (set.matches())
+        if (set.matches()) {
+            // a Capsule Stem names its root by position, and the root moves with the yard
+            Matcher root = ROOT.matcher(set.group(4));
+            String body = root.find()
+                    ? root.replaceFirst(Matcher.quoteReplacement("root:[I;%d,%d,%d]"
+                            .formatted(
+                                    Integer.parseInt(root.group(1)) + SHIFT_X,
+                                    Integer.parseInt(root.group(2)) + SHIFT_Y,
+                                    Integer.parseInt(root.group(3)) + shiftZ)))
+                    : set.group(4);
             return "setblock %d %d %d %s"
                     .formatted(
                             Integer.parseInt(set.group(1)) + SHIFT_X,
                             Integer.parseInt(set.group(2)) + SHIFT_Y,
                             Integer.parseInt(set.group(3)) + shiftZ,
-                            set.group(4));
+                            body);
+        }
         Matcher fill = FILL.matcher(command);
         if (!fill.matches()) throw new IllegalStateException(command);
         return "fill %d %d %d %d %d %d %s"

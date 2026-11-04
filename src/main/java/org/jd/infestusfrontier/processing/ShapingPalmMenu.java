@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,10 +23,13 @@ import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
 import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.foundation.Refusals;
 import org.jd.infestusfrontier.foundation.menu.OrganMenu;
 import org.jd.infestusfrontier.logistics.api.ItemAccess;
+import org.jd.infestusfrontier.organ.api.WorkshopActionEvent;
 import org.jd.infestusfrontier.processing.PalmSupply.Reached;
 import org.jd.infestusfrontier.processing.api.PalmContents;
 import org.jd.infestusfrontier.processing.api.PalmRote;
@@ -149,7 +153,7 @@ public final class ShapingPalmMenu extends OrganMenu {
         this.player = inventory.player;
         this.grid = new Grid(parts.cells());
         Bounds out = resultWell(rote);
-        addSlot(new ResultSlot(player, grid, results, RESULT, out.x() + 1, out.y() + 1));
+        addSlot(new Result(out.x() + 1, out.y() + 1));
         for (int cell = 0; cell < PalmContents.CELLS; cell++) {
             Bounds well = GRID.cell(cell);
             addSlot(new Cell(grid, cell, well.x() + 1, well.y() + 1, palm));
@@ -263,8 +267,21 @@ public final class ShapingPalmMenu extends OrganMenu {
         return why.isPresent();
     }
 
+    /** The player who changed the grid by hand becomes the Palm's steward, as the one who loaded it. */
+    private void tended(Player who, int versionBefore) {
+        if (palm.isPresent()
+                && palm.get().version() != versionBefore
+                && palm.get().steward().assign(who)) palm.get().setChanged();
+    }
+
     @Override
     public void clicked(int slotId, int button, ClickType type, Player clicker) {
+        int before = palm.map(ShapingPalmBlockEntity::version).orElse(0);
+        click(slotId, button, type, clicker);
+        tended(clicker, before);
+    }
+
+    private void click(int slotId, int button, ClickType type, Player clicker) {
         if (palm.isPresent() && slotId == RESULT) {
             refresh();
             boolean takes = type == ClickType.PICKUP || type == ClickType.SWAP || type == ClickType.THROW;
@@ -284,6 +301,13 @@ public final class ShapingPalmMenu extends OrganMenu {
      */
     @Override
     public ItemStack quickMoveStack(Player taker, int index) {
+        int before = palm.map(ShapingPalmBlockEntity::version).orElse(0);
+        ItemStack moved = quickMove(taker, index);
+        tended(taker, before);
+        return moved;
+    }
+
+    private ItemStack quickMove(Player taker, int index) {
         if (index != RESULT) return super.quickMoveStack(taker, index);
         if (!slots.get(RESULT).hasItem() || refuses(taker, true)) return ItemStack.EMPTY;
         return craft(taker, stack -> {
@@ -322,11 +346,14 @@ public final class ShapingPalmMenu extends OrganMenu {
         ShapingPalmBlockEntity organ = palm.get();
         Optional<Refusal> why = organ.refusal();
         if (why.isPresent()) return refuse(taker, why.get());
-        if (id == SELECT) return select(taker, organ);
-        return switch (organ.door()) {
-            case Reached.Refused refused -> refuse(taker, refused.why());
-            case Reached.Door reached -> act(taker, organ, reached.access(), id);
-        };
+        boolean done = id == SELECT
+                ? select(taker, organ)
+                : switch (organ.door()) {
+                    case Reached.Refused refused -> refuse(taker, refused.why());
+                    case Reached.Door reached -> act(taker, organ, reached.access(), id);
+                };
+        if (done && organ.steward().assign(taker)) organ.setChanged();
+        return done;
     }
 
     /** Select: the grid becomes the Palm's pattern, or the reason it cannot; the Palm changes nothing on a refusal. */
@@ -353,7 +380,10 @@ public final class ShapingPalmMenu extends OrganMenu {
                 Refusal nothingToDo = PalmSupply.restockRefusal(organ.grid());
                 if (nothingToDo != PalmSupply.STORE_SHORT) yield refuse(taker, nothingToDo);
                 PalmSupply.Moved moved = PalmSupply.restock(organ.grid(), door);
-                if (moved.items() > 0) organ.touch();
+                if (moved.items() > 0) {
+                    organ.received(moved.fetched());
+                    organ.touch();
+                }
                 yield moved.items() == 0
                         ? refuse(taker, moved.why().orElseGet(() -> PalmSupply.restockRefusal(organ.grid())))
                         : said(taker, "restocked", moved.items());
@@ -391,6 +421,25 @@ public final class ShapingPalmMenu extends OrganMenu {
         refresh();
         taker.displayClientMessage(Component.translatable("infestusfrontier.status.palm." + what, count), true);
         return true;
+    }
+
+    /**
+     * The crafting table's result slot. Taking a craft that spends an item the Palm's Mouth fetched tells the world
+     * the player made a craft from storage; a craft on the hand's own items, or one the Palm refused, does not.
+     */
+    private final class Result extends ResultSlot {
+        Result(int x, int y) {
+            super(player, grid, results, RESULT, x, y);
+        }
+
+        @Override
+        public void onTake(Player taker, ItemStack stack) {
+            boolean fetched = palm.map(ShapingPalmBlockEntity::spendFetched).orElse(false);
+            super.onTake(taker, stack);
+            if (fetched && taker instanceof ServerPlayer server && !(server instanceof FakePlayer))
+                NeoForge.EVENT_BUS.post(
+                        new WorkshopActionEvent(server, WorkshopActionEvent.Action.PALM_CRAFT_FROM_STORAGE));
+        }
     }
 
     @Override

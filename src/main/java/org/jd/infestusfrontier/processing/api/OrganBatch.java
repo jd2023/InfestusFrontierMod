@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.core.processing.Batch;
 
@@ -95,6 +96,11 @@ public record OrganBatch(
                             .optionalFieldOf("experience", 0f)
                             .forGetter(OrganBatch::experience))
             .apply(instance, OrganBatch::new));
+
+    @Override
+    public Optional<ResourceLocation> recipe() {
+        return Optional.ofNullable(ResourceLocation.tryParse(batch.recipe()));
+    }
 
     @Override
     public OrganBatch advance() {

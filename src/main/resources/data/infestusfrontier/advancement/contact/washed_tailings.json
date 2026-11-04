@@ -1,0 +1,45 @@
+{
+  "parent": "infestusfrontier:contact/raw_to_dust",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:washing_kidney"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.washed_tailings.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.washed_tailings.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "iron": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": {
+        "organ": "infestusfrontier:washing_kidney",
+        "recipe": "infestusfrontier:washing/iron"
+      }
+    },
+    "gold": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": {
+        "organ": "infestusfrontier:washing_kidney",
+        "recipe": "infestusfrontier:washing/gold"
+      }
+    },
+    "copper": {
+      "trigger": "infestusfrontier:organ_batch_completed",
+      "conditions": {
+        "organ": "infestusfrontier:washing_kidney",
+        "recipe": "infestusfrontier:washing/copper"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "iron",
+      "gold",
+      "copper"
+    ]
+  ]
+}

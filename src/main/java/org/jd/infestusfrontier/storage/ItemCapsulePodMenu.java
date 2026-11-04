@@ -6,6 +6,7 @@ import java.util.function.IntSupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -19,10 +20,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
 import org.jd.infestusfrontier.core.storage.Compartments;
 import org.jd.infestusfrontier.core.storage.PodKind;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.foundation.menu.OrganMenu;
+import org.jd.infestusfrontier.organ.api.WorkshopActionEvent;
 import org.jd.infestusfrontier.storage.api.CapsuleStock;
 import org.jd.infestusfrontier.ui.Sheet;
 
@@ -78,6 +82,8 @@ public final class ItemCapsulePodMenu extends OrganMenu {
 
     private final Optional<ItemCapsuleBlockEntity> pod;
     private final PodKind kind;
+    /** True while a click has put something into the pod that no one has been credited for yet. */
+    private boolean stored;
     /** The language key of why the well kept an item, said once to the player whose click it was. */
     private Optional<String> refusal = Optional.empty();
     /** The client's copy of the labels, for the click it predicts; the server's are the pod's. */
@@ -155,8 +161,14 @@ public final class ItemCapsulePodMenu extends OrganMenu {
 
             @Override
             public void set(int compartment, ItemStack stack) {
-                if (pod.isPresent()) pod.get().put(compartment, stack);
-                else copy[compartment] = stack.copy();
+                if (pod.isPresent()) {
+                    ItemStack before = pod.get().held(compartment);
+                    pod.get().put(compartment, stack);
+                    boolean more = before.isEmpty()
+                            || ItemStack.isSameItemSameComponents(before, stack)
+                                    && stack.getCount() > before.getCount();
+                    if (!stack.isEmpty() && more) stored = true;
+                } else copy[compartment] = stack.copy();
             }
 
             @Override
@@ -420,6 +432,17 @@ public final class ItemCapsulePodMenu extends OrganMenu {
         }
         super.clicked(slot, button, type, player);
         announce(player);
+        credit(player);
+    }
+
+    /** Tells the world a player stored something in a pod of a standing tree, once for the click that did it. */
+    private void credit(Player player) {
+        if (!stored) return;
+        stored = false;
+        if (pod.filter(Stems::inTree).isPresent()
+                && player instanceof ServerPlayer server
+                && !(server instanceof FakePlayer))
+            NeoForge.EVENT_BUS.post(new WorkshopActionEvent(server, WorkshopActionEvent.Action.TREE_STORED));
     }
 
     /** The Larder's buttons, sent by id: a reserve step up or down, or Withdraw reserve, for one compartment. */
@@ -515,6 +538,7 @@ public final class ItemCapsulePodMenu extends OrganMenu {
         if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
         else slot.setChanged();
         announce(player);
+        credit(player);
         return before;
     }
 

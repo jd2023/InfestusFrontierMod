@@ -41,6 +41,15 @@ final class Stems {
         return Optional.of(new CapsuleTree(level, List.of(pod), span));
     }
 
+    /** True when {@code pod} hangs on a standing stem whose tree is the store that serves it now: a Storage Tree's pod. */
+    static boolean inTree(ItemCapsuleBlockEntity pod) {
+        Level level = pod.getLevel();
+        if (level == null || pod.root().isEmpty()) return false;
+        Optional<CapsuleTree> grown = rootAt(level, pod.root().get()).flatMap(CapsuleStemBlockEntity::tree);
+        return grown.isPresent()
+                && of(pod).filter(served -> served == grown.get()).isPresent();
+    }
+
     /** The store of the tree {@code cell} belongs to; empty while its root is gone or part of the tree out of reach. */
     static Optional<CapsuleTree> of(CapsuleStemBlockEntity cell) {
         return cell.root().flatMap(CapsuleStemBlockEntity::tree);

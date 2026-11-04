@@ -38,6 +38,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -59,6 +60,8 @@ final class CaptureClient {
     private static final int STAGE_TIMEOUT_TICKS = 800;
     private static final int SETTLE_TICKS = 40;
     private static final int MOVE_TICKS = 10;
+    private static final int ACTION_START_TICKS = 25; // the opened screen is settled
+    private static final int ACTION_GAP_TICKS = 8;
     private static final int WORLD_SCALE = 2; // the HUD stays small in a world shot
     private static final int SCREEN_SCALE = 3; // a screen is shot the size a player sees it
     private static final int READY_RADIUS = 2; // chunks around the view that must have arrived from the server
@@ -102,6 +105,10 @@ final class CaptureClient {
     private boolean resized;
     private int buttonMenu = -1;
     private int buttonTick;
+    /** How many of the view's {@code press} and {@code quickMove} actions went out, and the tick the next may go. */
+    private int actionsSent;
+
+    private int nextActionTick;
     private boolean triggered;
     private int tabShownTick = -1;
     private int scrolledTick = -1;
@@ -361,6 +368,29 @@ final class CaptureClient {
             }
             if (screen.getMenu().containerId == buttonMenu || ticksInStage < buttonTick + 10) return;
         }
+        if (!view.press().isEmpty() || !view.quickMove().isEmpty()) {
+            if (!(minecraft.screen instanceof AbstractContainerScreen<?> screen)) return;
+            if (ticksInStage < ACTION_START_TICKS) return;
+            int total = view.press().size() + view.quickMove().size();
+            if (actionsSent < total) {
+                if (ticksInStage < nextActionTick) return;
+                int menu = screen.getMenu().containerId;
+                if (actionsSent < view.press().size())
+                    minecraft.gameMode.handleInventoryButtonClick(
+                            menu, view.press().get(actionsSent));
+                else
+                    minecraft.gameMode.handleInventoryMouseClick(
+                            menu,
+                            view.quickMove().get(actionsSent - view.press().size()),
+                            0,
+                            ClickType.QUICK_MOVE,
+                            minecraft.player);
+                actionsSent++;
+                nextActionTick = ticksInStage + ACTION_GAP_TICKS;
+                return;
+            }
+            if (ticksInStage < nextActionTick) return;
+        }
         // Trigger a state change only after the camera is ready, so the sequence includes its transition.
         if (!triggered) {
             triggered = true;
@@ -490,6 +520,8 @@ final class CaptureClient {
         scrolledTick = -1;
         toastSeenAt = -1;
         buttonMenu = -1;
+        actionsSent = 0;
+        nextActionTick = 0;
         if (minecraft.screen instanceof AbstractContainerScreen<?> && minecraft.player != null)
             minecraft.player.closeContainer();
         else if (minecraft.screen != null) minecraft.setScreen(null);

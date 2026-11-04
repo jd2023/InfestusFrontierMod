@@ -79,6 +79,11 @@
       "text": "entry.infestusfrontier.circulation.mineral_gizzard.smelt"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mineral_gizzard.milestone.title",
+      "text": "entry.infestusfrontier.circulation.mineral_gizzard.milestone"
+    },
+    {
       "type": "modonomicon:crafting_recipe",
       "recipe_id_1": "infestusfrontier:mineral_gizzard",
       "text": "entry.infestusfrontier.circulation.mineral_gizzard.craft"

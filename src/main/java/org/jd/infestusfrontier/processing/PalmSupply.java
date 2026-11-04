@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.logistics.api.ItemAccess;
 import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
+import org.jd.infestusfrontier.processing.api.PalmContents;
 
 /**
  * What a Palm may do with the Mouth under it (BLOCK_CATALOG T1-41, stage 2). The Palm keeps no store, link or
@@ -35,8 +36,15 @@ final class PalmSupply {
         record Refused(Refusal why) implements Reached {}
     }
 
-    /** What an action did: how many items moved, whether the network was consulted, and why it was not or gave nothing. */
-    record Moved(int items, boolean consulted, Optional<Refusal> why) {}
+    /**
+     * What an action did: how many items moved, whether the network was consulted, and why it was not or gave nothing.
+     * {@code fetched} is what each grid cell received, for a restock; none for any other action.
+     */
+    record Moved(int items, boolean consulted, Optional<Refusal> why, int[] fetched) {
+        Moved(int items, boolean consulted, Optional<Refusal> why) {
+            this(items, consulted, why, new int[PalmContents.CELLS]);
+        }
+    }
 
     /** The Mouth under {@code palm}, if it is there and loaded. Nothing is searched and no chunk is loaded. */
     static Reached reach(Level level, BlockPos palm) {
@@ -71,6 +79,7 @@ final class PalmSupply {
                 .map(g -> new ItemAccess.Want(g.kind(), g.room(), g.held()))
                 .toList());
         int moved = 0;
+        int[] fetched = new int[grid.size()];
         for (int n = 0; n < groups.size(); n++) {
             Group group = groups.get(n);
             int[] shares = new int[grid.size()];
@@ -84,9 +93,10 @@ final class PalmSupply {
                 if (shares[cell] <= 0) continue;
                 grid.set(cell, group.kind().copyWithCount(grid.get(cell).getCount() + shares[cell]));
                 moved += shares[cell];
+                fetched[cell] += shares[cell];
             }
         }
-        return new Moved(moved, drawn.consulted(), drawn.why());
+        return new Moved(moved, drawn.consulted(), drawn.why(), fetched);
     }
 
     /** The groups the pattern's kinds make: one per kind, in the order its first cell comes. */

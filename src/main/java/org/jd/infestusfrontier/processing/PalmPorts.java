@@ -5,13 +5,14 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jd.infestusfrontier.processing.api.PalmContents;
 import org.jd.infestusfrontier.processing.api.PalmRote;
+import org.jd.infestusfrontier.storage.api.MouthFed;
 
 /**
  * A Palm with Rote as hoppers, pipes and Lobes see it: the nine grid slots take only the item and components their
  * pattern slot holds, shared out among the cells of one kind, and give nothing back; the four tray slots after them give what a cycle made and take nothing.
  * Every slot answers what it holds. It reads and writes the Palm's own lists, so it keeps no state of its own.
  */
-record PalmPorts(ShapingPalmBlockEntity palm) implements IItemHandler {
+record PalmPorts(ShapingPalmBlockEntity palm) implements IItemHandler, MouthFed {
     private static final int GRID = PalmContents.CELLS;
 
     @Override
@@ -81,6 +82,19 @@ record PalmPorts(ShapingPalmBlockEntity palm) implements IItemHandler {
             palm.touchTray();
         }
         return out;
+    }
+
+    /** A Mouth fills the Palm through here, never a hopper or a Lobe: what goes in is network supply. */
+    @Override
+    public ItemStack deliver(ItemStack stack, boolean simulate) {
+        ItemStack rest = stack.copy();
+        for (int slot = 0; slot < GRID && !rest.isEmpty(); slot++) {
+            ItemStack left = insertItem(slot, rest, simulate);
+            int moved = rest.getCount() - left.getCount();
+            if (!simulate && moved > 0) palm.received(slot, moved);
+            rest = left;
+        }
+        return rest;
     }
 
     @Override

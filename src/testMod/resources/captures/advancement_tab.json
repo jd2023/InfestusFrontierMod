@@ -26,7 +26,31 @@
     "setblock 94 -60 106 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Digestive Sac\"','\"open it once;\"','\"fed by the line\"','\"no hands\"']}}",
     "setblock 98 -60 106 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Harvest Corolla\"','\"open it once;\"','\"cuts ripe crops\"','\"Mouth below\"']}}",
     "setblock 100 -60 106 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Planting Proboscis\"','\"a seed by hand\"','\"plants the beds\"','\"\"']}}",
-    "give @s minecraft:wheat_seeds 4"
+    "give @s minecraft:wheat_seeds 4",
+    "fill 93 -61 116 105 -61 116 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 94 -60 116 infestusfrontier:mineral_gizzard{contents:{ingredients:[],outputs:[],water:0,biomass:{stored:800,reserved:0,capacity:1000},history:{completed_batches:0}}}",
+    "setblock 98 -60 116 infestusfrontier:washing_kidney{contents:{ingredients:[],outputs:[],water:1000,biomass:{stored:800,reserved:0,capacity:1000},history:{completed_batches:0}}}",
+    "setblock 102 -60 116 infestusfrontier:bio_furnace{contents:{ingredients:[{id:\"infestusfrontier:iron_dust\",count:3}],outputs:[],water:0,biomass:{stored:1200,reserved:0,capacity:2000},history:{completed_batches:0}}}",
+    "setblock 94 -60 115 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mineral Gizzard\"','\"biomass inside\"','\"raw iron by hand\"','\"-> dust\"']}}",
+    "setblock 98 -60 115 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Washing Kidney\"','\"water inside\"','\"a Tailings\"','\"-> one dust\"']}}",
+    "setblock 102 -60 115 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Bio-Furnace\"','\"three dust inside\"','\"add a fourth\"','\"-> an ingot\"']}}",
+    "setblock 94 -61 122 infestusfrontier:mouth[mode=both]",
+    "setblock 94 -60 122 infestusfrontier:capsule_stem[part=root]{root:[I;94,-60,122],plan:{seed:7L,cells:[{x:0,y:0,z:0,part:\"root\",side:-1,parent:-1,trunk:0,tier:0},{x:0,y:1,z:0,part:\"trunk\",side:-1,parent:0,trunk:0,tier:1},{x:0,y:2,z:0,part:\"trunk\",side:-1,parent:1,trunk:0,tier:2},{x:0,y:3,z:0,part:\"trunk\",side:-1,parent:2,trunk:0,tier:3}],pods:[{x:0,y:1,z:-1,side:0,cell:1},{x:0,y:1,z:1,side:2,cell:1},{x:-1,y:1,z:0,side:3,cell:1},{x:1,y:2,z:0,side:1,cell:2}]}}",
+    "setblock 94 -59 122 infestusfrontier:capsule_stem[part=trunk,collar=true]{root:[I;94,-60,122]}",
+    "setblock 94 -58 122 infestusfrontier:capsule_stem[part=trunk,collar=true]{root:[I;94,-60,122]}",
+    "setblock 94 -57 122 infestusfrontier:capsule_stem[part=bud]{root:[I;94,-60,122]}",
+    "setblock 94 -59 121 infestusfrontier:item_capsule[facing=north,grade=1]{stock:{grade:1,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:14}]}}",
+    "setblock 94 -59 123 infestusfrontier:mixed_craw[facing=south,grade=1]{stock:{kind:\"craw\",grade:1,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:6},{slot:1,item:{id:\"minecraft:gold_ingot\"},count:4},{slot:2,item:{id:\"minecraft:redstone\"},count:8}]}}",
+    "setblock 93 -59 122 infestusfrontier:larder[facing=west,grade=1]{stock:{kind:\"larder\",grade:1,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:20},{slot:1,item:{id:\"minecraft:gold_ingot\"},count:12}],marks:[{slot:0,label:{id:\"minecraft:iron_ingot\"},reserve:16},{slot:1,label:{id:\"minecraft:gold_ingot\"},reserve:12},{slot:2,label:{id:\"minecraft:copper_ingot\"},reserve:0}]}}",
+    "setblock 95 -58 122 infestusfrontier:item_capsule[facing=east,grade=0]{stock:{grade:0,held:[{slot:0,item:{id:\"minecraft:coal\"},count:40}]}}",
+    "setblock 98 -61 122 infestusfrontier:mouth[mode=both]",
+    "setblock 98 -60 122 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:oak_log\",count:40}]}",
+    "fill 99 -61 122 101 -61 122 infestusfrontier:item_vein",
+    "setblock 102 -61 122 infestusfrontier:mouth[mode=both]",
+    "setblock 102 -60 122 infestusfrontier:shaping_palm{reach:1b,contents:{grid:[{id:\"minecraft:oak_log\",count:1}]}}",
+    "setblock 94 -60 120 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Capsule Tree\"','\"click the trunk,\"','\"shift-click a\"','\"stack in\"']}}",
+    "setblock 102 -60 120 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Reach Palm\"','\"Restock, then\"','\"shift-click the\"','\"result\"']}}",
+    "item replace entity @s inventory.0 with minecraft:copper_ingot 16"
   ],
   "views": [
     {
@@ -215,6 +239,113 @@
       "expectToast": "infestusfrontier:contact/automatic_supply"
     },
     {
+      "name": "ore_supply_tailings",
+      "x": 98.5,
+      "y": -60,
+      "z": 112.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "trigger": "item replace entity @s hotbar.7 with infestusfrontier:mineral_tailings[infestusfrontier:parcel={metal:\"iron\",units:4}] 1"
+    },
+    {
+      "name": "ore_supply_dust",
+      "x": 98.5,
+      "y": -60,
+      "z": 112.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "trigger": "item replace entity @s hotbar.8 with infestusfrontier:iron_dust 1"
+    },
+    {
+      "name": "ore_gizzard",
+      "x": 94.5,
+      "y": -60,
+      "z": 112.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "holding": "minecraft:raw_iron",
+      "feed": [
+        94,
+        -60,
+        116
+      ],
+      "expectToast": "infestusfrontier:contact/raw_to_dust"
+    },
+    {
+      "name": "ore_kidney",
+      "x": 98.5,
+      "y": -60,
+      "z": 112.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "holding": "infestusfrontier:mineral_tailings",
+      "feed": [
+        98,
+        -60,
+        116
+      ],
+      "expectToast": "infestusfrontier:contact/washed_tailings"
+    },
+    {
+      "name": "ore_furnace",
+      "x": 102.5,
+      "y": -60,
+      "z": 112.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "holding": "infestusfrontier:iron_dust",
+      "feed": [
+        102,
+        -60,
+        116
+      ],
+      "expectToast": "infestusfrontier:contact/ore_workshop"
+    },
+    {
+      "name": "tree_store",
+      "x": 94.5,
+      "y": -60,
+      "z": 118.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "use": [
+        94,
+        -60,
+        122
+      ],
+      "quickMove": [
+        24
+      ],
+      "expectToast": "infestusfrontier:contact/tree_storage"
+    },
+    {
+      "name": "palm_craft",
+      "x": 102.5,
+      "y": -60,
+      "z": 118.5,
+      "yaw": 0,
+      "pitch": 25,
+      "gui": true,
+      "use": [
+        102,
+        -60,
+        122
+      ],
+      "press": [
+        0
+      ],
+      "quickMove": [
+        0
+      ],
+      "expectToast": "infestusfrontier:contact/palm_from_storage"
+    },
+    {
       "name": "tab_farm",
       "x": 100.5,
       "y": -60,
@@ -239,6 +370,21 @@
       "gui": true,
       "advancements": true,
       "expectTab": true
+    },
+    {
+      "name": "tab_workshop",
+      "x": 100.5,
+      "y": -60,
+      "z": 96.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "advancements": true,
+      "expectTab": true,
+      "scroll": [
+        -420,
+        -60
+      ]
     }
   ]
 }

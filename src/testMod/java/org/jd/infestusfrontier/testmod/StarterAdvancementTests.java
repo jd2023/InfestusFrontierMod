@@ -74,7 +74,13 @@ public final class StarterAdvancementTests {
             "planting_proboscis",
             "harvest_corolla",
             "supplied_sac",
-            "automatic_supply");
+            "automatic_supply",
+            "tree_storage",
+            "palm_from_storage",
+            "raw_to_dust",
+            "washed_tailings",
+            "dust_ingot",
+            "ore_workshop");
     private static final BlockPos RACK = new BlockPos(1, 2, 1);
     private static final BlockPos LOOM = new BlockPos(3, 2, 1);
     private static final BlockPos FURNACE = new BlockPos(5, 2, 1);

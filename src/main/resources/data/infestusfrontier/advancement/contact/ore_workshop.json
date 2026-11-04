@@ -1,0 +1,38 @@
+{
+  "parent": "infestusfrontier:contact/dust_ingot",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:iron_dust"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.ore_workshop.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.ore_workshop.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "earned_all": {
+      "trigger": "minecraft:tick",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type_specific": {
+                "type": "minecraft:player",
+                "advancements": {
+                  "infestusfrontier:contact/raw_to_dust": true,
+                  "infestusfrontier:contact/washed_tailings": true,
+                  "infestusfrontier:contact/dust_ingot": true
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

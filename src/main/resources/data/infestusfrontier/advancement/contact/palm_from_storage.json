@@ -1,0 +1,35 @@
+{
+  "parent": "infestusfrontier:contact/tree_storage",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:shaping_palm"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.palm_from_storage.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.palm_from_storage.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "crafted": {
+      "trigger": "infestusfrontier:workshop_action",
+      "conditions": {
+        "action": "palm_craft_from_storage"
+      }
+    },
+    "cycled": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:shaping_palm"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "crafted",
+      "cycled"
+    ]
+  ]
+}
