@@ -1,0 +1,196 @@
+{
+  "variants": {
+    "source=oak": [
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 270
+      }
+    ],
+    "source=birch": [
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 270
+      }
+    ],
+    "source=spruce": [
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 270
+      }
+    ],
+    "source=jungle": [
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 270
+      }
+    ],
+    "source=acacia": [
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 270
+      }
+    ],
+    "source=dark_oak": [
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_bare",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled"
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/withered_sapling_curled",
+        "y": 270
+      }
+    ]
+  }
+}

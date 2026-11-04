@@ -101,9 +101,9 @@ public final class WitheredFlowerTests {
         h.setBlock(CENTER, EcologyTests.mature());
         h.setBlock(CENTER.south(), Blocks.OAK_PLANKS);
         h.setBlock(CENTER.east(), Blocks.DIRT);
-        h.setBlock(CENTER.east().above(), Blocks.OAK_SAPLING);
+        h.setBlock(CENTER.east().above(), Blocks.AZALEA);
         h.setBlock(CENTER.west(), Blocks.GRASS_BLOCK);
-        h.setBlock(CENTER.west().above(), Blocks.SHORT_GRASS); // a later mapping, not implemented yet
+        h.setBlock(CENTER.west().above(), Blocks.FLOWERING_AZALEA); // a shrub outside the mapping
         h.setBlock(CENTER.north(), Blocks.DIRT);
         h.setBlock(CENTER.north().above(), Blocks.TORCHFLOWER); // a flower outside the mapping
         Player boneMeal = EcologyTests.holding(h, GameType.SURVIVAL, Items.BONE_MEAL, 1);
@@ -115,9 +115,9 @@ public final class WitheredFlowerTests {
         h.assertValueEqual(culture.getMainHandItem().getCount(), 3, "culture is refused under a rooted plant");
         h.runAfterDelay(LivingSubstrateBlock.GROWTH_DELAY_TICKS + 2, () -> {
             h.assertBlockPresent(Blocks.DIRT, CENTER.east());
-            h.assertBlockPresent(Blocks.OAK_SAPLING, CENTER.east().above());
+            h.assertBlockPresent(Blocks.AZALEA, CENTER.east().above());
             h.assertBlockPresent(Blocks.GRASS_BLOCK, CENTER.west());
-            h.assertBlockPresent(Blocks.SHORT_GRASS, CENTER.west().above());
+            h.assertBlockPresent(Blocks.FLOWERING_AZALEA, CENTER.west().above());
             h.assertBlockPresent(Blocks.DIRT, CENTER.north());
             h.assertBlockPresent(Blocks.TORCHFLOWER, CENTER.north().above());
             assertNoItems(h);

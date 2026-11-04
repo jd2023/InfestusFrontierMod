@@ -4,12 +4,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -325,6 +328,17 @@ public final class EcologyTests {
         Vec3 hit = Vec3.atCenterOf(absolute)
                 .add(Vec3.atLowerCornerOf(face.getNormal()).scale(0.5));
         h.useBlock(cell, player, new BlockHitResult(hit, face, absolute, false));
+    }
+
+    /** Uses the held Spore Culture on the top face of {@code ground} (absolute), as an item, and returns its result. */
+    static InteractionResult useCulture(ServerLevel level, Player player, BlockPos ground) {
+        ItemStack culture = player.getMainHandItem();
+        return culture.useOn(new UseOnContext(
+                level,
+                player,
+                InteractionHand.MAIN_HAND,
+                culture,
+                new BlockHitResult(Vec3.atCenterOf(ground).add(0, 0.5, 0), Direction.UP, ground, false)));
     }
 
     static void assertStage(GameTestHelper h, BlockPos cell, SubstrateStage stage) {

@@ -1,8 +1,9 @@
 # Vegetation infection
 
-Status: proposed, except the Withered Flower and tall-plant mappings, which ship
+Status: proposed, except the Withered Flower, tall-plant and shrub mappings, which ship
 ([Shipped: Withered Flower](#shipped-withered-flower),
-[Shipped: tall plants](#shipped-tall-plants)). Mostly cosmetic conversion
+[Shipped: tall plants](#shipped-tall-plants),
+[Shipped: shrubs, grass and saplings](#shipped-shrubs-grass-and-saplings)). Mostly cosmetic conversion
 of vegetation reached by deliberate Living Substrate growth. This document owns the
 conversion mappings and visual rules. Existing substrate growth remains defined in
 [Living Substrate mutations](LIVING_SUBSTRATE_MUTATIONS.md#1-grow-the-foundation).
@@ -73,9 +74,9 @@ The small-flower row is implemented in `ecology` (`WitheredFlowerBlock`, `Flower
   `Vegetation.convert`. What stands on the host decides: a supported flower is
   replaced by its dead form first and the ground after it, so vanilla's support
   update finds a dead flower standing on substrate; air or a block that does not
-  depend on the ground leaves the host free; any other rooted plant (the bush
-  family, so saplings, grass, crops, bushes and mushrooms too, plus sugar cane,
-  bamboo and the big dripleaf) keeps its ground unconverted. Spore Culture is not
+  depend on the ground leaves the host free; any other rooted plant without a
+  mapping (the bush family, so crops, torchflowers, azaleas, other saplings and
+  mushrooms, plus sugar cane, bamboo and the big dripleaf) keeps its ground unconverted. Spore Culture is not
   used up on such ground and the wave does not count it as a host. Existing growth
   limits are unchanged ([ENGINEERING.md](../../ENGINEERING.md#performance-limits),
   "Vegetation infection").
@@ -129,6 +130,41 @@ The two-block rows are implemented in `ecology` (`TallWitheredFlowerBlock` and
   the cell under it, makes nothing. They burn like flowers and grass.
 - Guide: `contact/withered_flowers`, page "tall". Demo: the Tall Plants plots south of the
   Meadow, at x 31 to 46, z -27 to -23, and the `tall_withered_plants` capture.
+
+## Shipped: shrubs, grass and saplings
+
+The one-block rows are implemented in `ecology` (`DeadBerryBushBlock`, `BlightedDeadBushBlock`,
+`BlightedUndergrowthBlock` and `WitheredSaplingBlock`, all `DeadShrubBlock`; `UndergrowthSource`,
+`SaplingSource`; `Vegetation`).
+
+- Sweet berry bush becomes Dead Berry Bush, dead bush Blighted Dead Bush, short grass and fern
+  Blighted Undergrowth, and oak, birch, spruce, jungle, acacia and dark oak saplings Withered Sapling.
+  `Vegetation.convert` withers them as it does a small flower: the plant is replaced first, nothing
+  drops, then the ground. A plant is matched by its exact vanilla block, so a cherry sapling, a
+  mangrove propagule, an azalea, a torchflower, a crop, a mushroom or another mod's plant is rooted
+  without a mapping and keeps its ground. A potted plant is solid cover and keeps its ground too.
+- Each block keeps only what its harvest needs. Dead Berry Bush keeps `age` (0 to 3) as it was at
+  conversion; Blighted Undergrowth and Withered Sapling keep `source`; Blighted Dead Bush keeps
+  nothing. Pick block gives the plant: sweet berries, dead bush, short grass, fern or the sapling.
+  There is no item.
+- Harvest is one loot roll in the real loot context. Blighted Dead Bush, Blighted Undergrowth and
+  Withered Sapling nest the source's own table (`minecraft:blocks/dead_bush`, `short_grass`, `fern`,
+  `<species>_sapling`), so shears, bare hands, Silk Touch, Fortune and data-pack changes carry over.
+  Dead Berry Bush has its own table, a copy of vanilla's with this block's `age`, because vanilla's
+  tests the living block: age 3 gives 2 to 3 berries, age 2 gives 1 to 2, ages 0 and 1 give nothing,
+  Fortune adds as it does to the bush. Breaking is the only harvest.
+- The blocks are plain `BushBlock`s. A Dead Berry Bush cannot be picked, takes no random tick, never
+  ages, deals no contact damage or slowness and answers no bone meal. A Withered Sapling is not a
+  `SaplingBlock`: no growth stage, no tree. None has a block entity, a tick or a timer. They burn
+  like flowers. Culture or bone meal on a dead plant, or on the cell under it, makes nothing.
+- Appearance is never saved. The blockstate lists the shapes turned four ways and vanilla picks one by
+  the position's seed; the block colour tints by position (berry bush, dead bush, undergrowth) or by
+  species (sapling: oak brown, birch bone, spruce dark green-grey, jungle olive, acacia tan, dark oak
+  umber). Shapes: a bare sprout (berry age 0 and 1), a bare bush (age 2), the bush with dried berries
+  (age 3); two twig tangles; two tufts of dry blades and one curled frond; a bare stem and a stem with
+  curled leaves.
+- Guide: `contact/withered_shrubs`. Demo: the Shrubs plots at x 31 to 45, z -13 to -2 in `demo.json`
+  (a living row, its dead twin and an excluded row), and the `withered_shrubs` capture.
 
 ## Harvest rules
 

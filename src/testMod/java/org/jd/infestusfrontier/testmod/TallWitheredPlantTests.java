@@ -1,12 +1,8 @@
 package org.jd.infestusfrontier.testmod;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.authlib.GameProfile;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -17,10 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,17 +21,14 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
@@ -54,8 +43,6 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.storage.ChunkSerializer;
 import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.ecology.EcologyModule;
@@ -148,13 +135,15 @@ public final class TallWitheredPlantTests {
             for (DoubleBlockHalf half : DoubleBlockHalf.values()) {
                 BlockPos hit = half == DoubleBlockHalf.LOWER ? LOWER : UPPER;
                 standDead(h, plant);
-                ServerPlayer miner = miner(h, ItemStack.EMPTY, hit);
+                ServerPlayer miner = TestDrops.miner(h, ItemStack.EMPTY);
                 h.assertTrue(miner.gameMode.destroyBlock(h.absolutePos(hit)), plant + " " + half + " breaks");
                 h.assertBlockPresent(Blocks.AIR, LOWER);
                 h.assertBlockPresent(Blocks.AIR, UPPER);
                 h.assertValueEqual(
-                        dropped(h), Map.of(plant.asItem(), 1), "one " + plant + " for the " + half + " half alone");
-                clearDrops(h);
+                        TestDrops.dropped(h),
+                        Map.of(plant.asItem(), 1),
+                        "one " + plant + " for the " + half + " half alone");
+                TestDrops.clearDrops(h);
             }
         }
         h.succeed();
@@ -166,12 +155,12 @@ public final class TallWitheredPlantTests {
             Item shortPlant = plant == Blocks.TALL_GRASS ? Items.SHORT_GRASS : Items.FERN;
             for (BlockPos hit : List.of(LOWER, UPPER)) {
                 standDead(h, plant);
-                ServerPlayer miner = miner(h, new ItemStack(Items.SHEARS), hit);
+                ServerPlayer miner = TestDrops.miner(h, new ItemStack(Items.SHEARS));
                 miner.gameMode.destroyBlock(h.absolutePos(hit));
                 h.assertBlockPresent(Blocks.AIR, LOWER);
                 h.assertBlockPresent(Blocks.AIR, UPPER);
-                h.assertValueEqual(dropped(h), Map.of(shortPlant, 2), "shears on " + plant + " at " + hit);
-                clearDrops(h);
+                h.assertValueEqual(TestDrops.dropped(h), Map.of(shortPlant, 2), "shears on " + plant + " at " + hit);
+                TestDrops.clearDrops(h);
             }
         }
         h.succeed();
@@ -184,12 +173,12 @@ public final class TallWitheredPlantTests {
             for (BlockPos hit : List.of(LOWER, UPPER)) {
                 for (int roll = 0; roll < 12; roll++) {
                     standDead(h, plant);
-                    miner(h, ItemStack.EMPTY, hit).gameMode.destroyBlock(h.absolutePos(hit));
-                    Map<Item, Integer> dropped = dropped(h);
+                    TestDrops.miner(h, ItemStack.EMPTY).gameMode.destroyBlock(h.absolutePos(hit));
+                    Map<Item, Integer> dropped = TestDrops.dropped(h);
                     h.assertTrue(
                             dropped.isEmpty() || dropped.equals(Map.of(Items.WHEAT_SEEDS, 1)),
                             plant + " at " + hit + " dropped " + dropped);
-                    clearDrops(h);
+                    TestDrops.clearDrops(h);
                 }
             }
         }
@@ -208,7 +197,7 @@ public final class TallWitheredPlantTests {
             h.getLevel().removeBlock(at, false);
             h.assertBlockPresent(Blocks.AIR, LOWER);
             h.assertBlockPresent(Blocks.AIR, UPPER);
-            h.assertTrue(dropped(h).isEmpty(), "creative breaking drops nothing: " + dropped(h));
+            h.assertTrue(TestDrops.dropped(h).isEmpty(), "creative breaking drops nothing: " + TestDrops.dropped(h));
         }
         h.succeed();
     }
@@ -221,23 +210,23 @@ public final class TallWitheredPlantTests {
             h.assertBlockPresent(Blocks.AIR, LOWER);
             h.assertBlockPresent(Blocks.AIR, UPPER);
             h.assertValueEqual(
-                    dropped(h),
+                    TestDrops.dropped(h),
                     Map.of(plant.asItem(), 1, EcologyModule.DEAD_TISSUE.get(), 1),
                     plant + " and the cell's Dead Tissue, once");
-            clearDrops(h);
+            TestDrops.clearDrops(h);
         }
         for (Block plant : UNDERGROWTH) {
             standDead(h, plant);
             h.getLevel().destroyBlock(h.absolutePos(GROUND), true);
             h.assertBlockPresent(Blocks.AIR, LOWER);
             h.assertBlockPresent(Blocks.AIR, UPPER);
-            Map<Item, Integer> dropped = dropped(h);
+            Map<Item, Integer> dropped = TestDrops.dropped(h);
             h.assertValueEqual(dropped.get(EcologyModule.DEAD_TISSUE.get()), 1, "the cell's Dead Tissue in " + dropped);
             dropped.remove(EcologyModule.DEAD_TISSUE.get());
             h.assertTrue(
                     dropped.isEmpty() || dropped.equals(Map.of(Items.WHEAT_SEEDS, 1)),
                     plant + " without its ground drops at most one seed, not " + dropped);
-            clearDrops(h);
+            TestDrops.clearDrops(h);
         }
         h.succeed();
     }
@@ -265,8 +254,10 @@ public final class TallWitheredPlantTests {
                 List<ItemStack> dead = Block.getDrops(h.getBlockState(LOWER), h.getLevel(), deadAt, null, null, tool);
                 List<ItemStack> live =
                         Block.getDrops(h.getBlockState(LOWER.east(2)), h.getLevel(), liveAt, null, null, tool);
-                h.assertValueEqual(describe(dead), describe(live), plant + " lower half with " + tool);
-                h.assertValueEqual(describe(dead), Map.of(plant.asItem(), 1), plant + " lower half with " + tool);
+                h.assertValueEqual(
+                        TestDrops.describe(dead), TestDrops.describe(live), plant + " lower half with " + tool);
+                h.assertValueEqual(
+                        TestDrops.describe(dead), Map.of(plant.asItem(), 1), plant + " lower half with " + tool);
                 h.assertTrue(
                         Block.getDrops(h.getBlockState(UPPER), h.getLevel(), deadAt.above(), null, null, tool)
                                 .isEmpty(),
@@ -282,17 +273,19 @@ public final class TallWitheredPlantTests {
                 BlockPos liveHalf = h.absolutePos(half.east(2));
                 ItemStack shears = new ItemStack(Items.SHEARS);
                 h.assertValueEqual(
-                        describe(Block.getDrops(h.getBlockState(half), h.getLevel(), deadHalf, null, null, shears)),
-                        describe(Block.getDrops(
+                        TestDrops.describe(
+                                Block.getDrops(h.getBlockState(half), h.getLevel(), deadHalf, null, null, shears)),
+                        TestDrops.describe(Block.getDrops(
                                 h.getBlockState(half.east(2)), h.getLevel(), liveHalf, null, null, shears)),
                         plant + " " + half + " with shears");
                 h.assertValueEqual(
-                        describe(Block.getDrops(h.getBlockState(half), h.getLevel(), deadHalf, null, null, shears)),
+                        TestDrops.describe(
+                                Block.getDrops(h.getBlockState(half), h.getLevel(), deadHalf, null, null, shears)),
                         Map.of(shortPlant, 2),
                         plant + " " + half + " with shears");
                 for (ItemStack tool : List.of(ItemStack.EMPTY, silk, fortune)) {
-                    Map<Item, Integer> drops =
-                            describe(Block.getDrops(h.getBlockState(half), h.getLevel(), deadHalf, null, null, tool));
+                    Map<Item, Integer> drops = TestDrops.describe(
+                            Block.getDrops(h.getBlockState(half), h.getLevel(), deadHalf, null, null, tool));
                     h.assertTrue(
                             drops.isEmpty() || drops.equals(Map.of(Items.WHEAT_SEEDS, 1)),
                             plant + " " + half + " with " + tool + " drops " + drops);
@@ -373,7 +366,7 @@ public final class TallWitheredPlantTests {
         try {
             Player player = EcologyTests.holding(h, GameType.SURVIVAL, EcologyModule.SPORE_CULTURE.get(), 1);
             ItemStack culture = player.getMainHandItem();
-            InteractionResult result = useCulture(level, player, ground);
+            InteractionResult result = EcologyTests.useCulture(level, player, ground);
             h.assertValueEqual(result, InteractionResult.PASS, "culture is refused where the upper half cannot be");
             h.assertValueEqual(culture.getCount(), 1, "and not used up");
             h.assertTrue(level.getBlockState(ground).is(Blocks.GRASS_BLOCK), "the ground is unchanged");
@@ -420,7 +413,7 @@ public final class TallWitheredPlantTests {
         h.setBlock(CENTER.east(), Blocks.DIRT);
         grow(h, CENTER.east().above(), Blocks.PITCHER_PLANT); // a tall flower outside the mapping
         h.setBlock(CENTER.west(), Blocks.GRASS_BLOCK);
-        h.setBlock(CENTER.west().above(), Blocks.SHORT_GRASS); // a later mapping, not implemented yet
+        h.setBlock(CENTER.west().above(), Blocks.FLOWERING_AZALEA); // a shrub outside the mapping
         Player boneMeal = EcologyTests.holding(h, GameType.SURVIVAL, Items.BONE_MEAL, 1);
         EcologyTests.use(h, boneMeal, CENTER, Direction.UP);
         h.assertValueEqual(boneMeal.getMainHandItem().getCount(), 1, "no host to grow onto, so the bone meal is kept");
@@ -433,7 +426,7 @@ public final class TallWitheredPlantTests {
             h.assertBlockPresent(Blocks.PITCHER_PLANT, CENTER.east().above());
             h.assertBlockPresent(Blocks.PITCHER_PLANT, CENTER.east().above(2));
             h.assertBlockPresent(Blocks.GRASS_BLOCK, CENTER.west());
-            h.assertBlockPresent(Blocks.SHORT_GRASS, CENTER.west().above());
+            h.assertBlockPresent(Blocks.FLOWERING_AZALEA, CENTER.west().above());
             WitheredFlowerTests.assertNoItems(h);
             h.succeed();
         });
@@ -641,20 +634,9 @@ public final class TallWitheredPlantTests {
 
     // ---- the exhibit as the demo builds it ----
 
-    private static final Pattern SET = Pattern.compile("^setblock (-?\\d+) (-?\\d+) (-?\\d+) (\\S.*)$");
-    private static final Pattern FILL =
-            Pattern.compile("^fill (-?\\d+) (-?\\d+) (-?\\d+) (-?\\d+) (-?\\d+) (-?\\d+) (\\S.*)$");
     // the tall-plant exhibit of captures/demo.json: a living plot, its dead twin, a supply chest and two signs
-    private static final int MIN_X = 30;
-    private static final int MAX_X = 47;
-    private static final int MIN_Y = -62;
-    private static final int MAX_Y = -57;
-    private static final int MIN_Z = -27;
-    private static final int MAX_Z = -23;
-    private static final int SHIFT_X = 246000;
-    private static final int SHIFT_Y = 160;
-    private static final int SHIFT_Z = 246000;
-    private static final int SLOT_Z = 64;
+    private static final BlockPos EXHIBIT_MIN = new BlockPos(30, -62, -27);
+    private static final BlockPos EXHIBIT_MAX = new BlockPos(47, -57, -23);
     /** The demo's plot: each plant's lower half at x, z = -25, over the grass at y = -61. */
     private static final int LIVING_FIRST_X = 32;
 
@@ -663,124 +645,22 @@ public final class TallWitheredPlantTests {
     private static final BlockPos CHEST = new BlockPos(32, -60, -27);
     private static final BlockPos PITCHER = new BlockPos(38, -60, -25);
 
-    private static List<String> exhibitCommands() {
-        List<String> found = new ArrayList<>();
-        try (InputStream in = TallWitheredPlantTests.class.getResourceAsStream("/captures/demo.json")) {
-            if (in == null) throw new IllegalStateException("demo.json is not on the test classpath");
-            for (JsonElement command : JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8))
-                    .getAsJsonObject()
-                    .getAsJsonArray("commands")) {
-                String text = command.getAsString();
-                Matcher set = SET.matcher(text);
-                Matcher fill = FILL.matcher(text);
-                if (set.matches() && inBox(set, 1)) found.add(text);
-                else if (fill.matches() && inBox(fill, 1) && inBox(fill, 4)) found.add(text);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-        return found;
-    }
-
-    private static boolean inBox(Matcher matcher, int first) {
-        int x = Integer.parseInt(matcher.group(first));
-        int y = Integer.parseInt(matcher.group(first + 1));
-        int z = Integer.parseInt(matcher.group(first + 2));
-        return x >= MIN_X && x <= MAX_X && y >= MIN_Y && y <= MAX_Y && z >= MIN_Z && z <= MAX_Z;
-    }
-
-    private static String shifted(String command, int shiftZ) {
-        Matcher set = SET.matcher(command);
-        if (set.matches())
-            return "setblock %d %d %d %s"
-                    .formatted(
-                            Integer.parseInt(set.group(1)) + SHIFT_X,
-                            Integer.parseInt(set.group(2)) + SHIFT_Y,
-                            Integer.parseInt(set.group(3)) + shiftZ,
-                            set.group(4));
-        Matcher fill = FILL.matcher(command);
-        if (!fill.matches()) throw new IllegalStateException(command);
-        return "fill %d %d %d %d %d %d %s"
-                .formatted(
-                        Integer.parseInt(fill.group(1)) + SHIFT_X,
-                        Integer.parseInt(fill.group(2)) + SHIFT_Y,
-                        Integer.parseInt(fill.group(3)) + shiftZ,
-                        Integer.parseInt(fill.group(4)) + SHIFT_X,
-                        Integer.parseInt(fill.group(5)) + SHIFT_Y,
-                        Integer.parseInt(fill.group(6)) + shiftZ,
-                        fill.group(7));
-    }
-
-    private static BlockPos inYard(BlockPos demo, int shiftZ) {
-        return new BlockPos(demo.getX() + SHIFT_X, demo.getY() + SHIFT_Y, demo.getZ() + shiftZ);
-    }
-
-    /** Loads the exhibit's chunks and their entities. The saved test world may hold an earlier run's items there. */
-    private static List<ChunkPos> forceYard(GameTestHelper h, int shiftZ) {
-        List<ChunkPos> chunks = new ArrayList<>();
-        for (int x = (MIN_X + SHIFT_X) >> 4; x <= (MAX_X + SHIFT_X) >> 4; x++)
-            for (int z = (MIN_Z + shiftZ) >> 4; z <= (MAX_Z + shiftZ) >> 4; z++) chunks.add(new ChunkPos(x, z));
-        for (ChunkPos chunk : chunks) TestChunks.force(h.getLevel(), chunk);
-        return chunks;
-    }
-
-    /** Ticks the entities of a forced chunk take to load from a saved world. */
-    private static final int ENTITIES_LOAD_TICKS = 10;
-
-    /** Empties the exhibit's blocks, block entities and the items around them, dropping nothing. */
-    private static void tidy(GameTestHelper h, int shiftZ) {
-        ServerLevel level = h.getLevel();
-        for (BlockPos at : BlockPos.betweenClosed(
-                MIN_X + SHIFT_X - 1,
-                MIN_Y + SHIFT_Y - 1,
-                MIN_Z + shiftZ - 1,
-                MAX_X + SHIFT_X + 1,
-                MAX_Y + SHIFT_Y + 3,
-                MAX_Z + shiftZ + 1)) {
-            level.removeBlockEntity(at); // a saved world still holds an earlier run's chest
-            level.setBlock(at, Blocks.AIR.defaultBlockState(), 2);
-        }
-        AABB yard = new AABB(
-                        MIN_X + SHIFT_X,
-                        MIN_Y + SHIFT_Y,
-                        MIN_Z + shiftZ,
-                        MAX_X + SHIFT_X + 1,
-                        MAX_Y + SHIFT_Y + 3,
-                        MAX_Z + shiftZ + 1)
-                .inflate(16);
-        level.getEntitiesOfClass(ItemEntity.class, yard).forEach(ItemEntity::discard);
-    }
-
-    /** The demo exhibit, built from its own commands over an emptied yard. */
-    private static void buildExhibit(GameTestHelper h, int shiftZ) {
-        tidy(h, shiftZ);
-        ServerLevel level = h.getLevel();
-        CommandSourceStack source = level.getServer().createCommandSourceStack().withLevel(level);
-        for (String command : exhibitCommands()) {
-            try {
-                level.getServer().getCommands().getDispatcher().execute(shifted(command, shiftZ), source);
-            } catch (CommandSyntaxException e) {
-                h.fail("the demo's command failed: " + command + ": " + e.getMessage());
-            }
-        }
-    }
-
-    private static void forget(GameTestHelper h, List<ChunkPos> chunks) {
-        for (ChunkPos chunk : chunks) h.getLevel().setChunkForced(chunk.x, chunk.z, false);
+    private static DemoExhibit exhibit(int slot) {
+        return new DemoExhibit(EXHIBIT_MIN, EXHIBIT_MAX, slot);
     }
 
     /** The player needs nothing but what the exhibit's chest holds: culture, bone meal and shears. */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH, timeoutTicks = 300)
     public static void theDemoExhibitSuppliesAndWithersTheTallPlants(GameTestHelper h) {
-        int shiftZ = SHIFT_Z;
-        List<ChunkPos> chunks = forceYard(h, shiftZ);
+        DemoExhibit yard = exhibit(0);
+        yard.force(h);
         ServerLevel level = h.getLevel();
         h.startSequence()
-                .thenIdle(ENTITIES_LOAD_TICKS)
+                .thenIdle(DemoExhibit.ENTITIES_LOAD_TICKS)
                 .thenExecute(() -> {
-                    buildExhibit(h, shiftZ);
-                    h.assertTrue(exhibitCommands().size() > 30, "the demo holds the exhibit");
-                    ChestBlockEntity chest = (ChestBlockEntity) level.getBlockEntity(inYard(CHEST, shiftZ));
+                    yard.build(h);
+                    h.assertTrue(yard.commands().size() > 30, "the demo holds the exhibit");
+                    ChestBlockEntity chest = (ChestBlockEntity) level.getBlockEntity(yard.at(CHEST));
                     h.assertTrue(chest != null, "the supply chest stands");
                     h.assertTrue(chest.countItem(Items.BONE_MEAL) >= 4, "bone meal in the chest");
                     h.assertTrue(
@@ -790,12 +670,12 @@ public final class TallWitheredPlantTests {
                     Player gardener = EcologyTests.holding(
                             h, GameType.SURVIVAL, EcologyModule.SPORE_CULTURE.get(), PLANTS.size());
                     for (int i = 0; i < PLANTS.size(); i++) {
-                        BlockPos lower = inYard(new BlockPos(LIVING_FIRST_X + i, -60, PLOT_Z), shiftZ);
+                        BlockPos lower = yard.at(new BlockPos(LIVING_FIRST_X + i, -60, PLOT_Z));
                         h.assertValueEqual(
                                 level.getBlockState(lower),
                                 PLANTS.get(i).defaultBlockState(),
                                 "the living " + PLANTS.get(i));
-                        useCulture(level, gardener, lower.below());
+                        EcologyTests.useCulture(level, gardener, lower.below());
                         h.assertValueEqual(
                                 level.getBlockState(lower),
                                 dead(PLANTS.get(i), DoubleBlockHalf.LOWER),
@@ -809,15 +689,15 @@ public final class TallWitheredPlantTests {
                                 "over a cell");
                     }
                     h.assertValueEqual(gardener.getMainHandItem().getCount(), 0, "one culture a plant");
-                    BlockPos pitcher = inYard(PITCHER, shiftZ);
+                    BlockPos pitcher = yard.at(PITCHER);
                     Player spare = EcologyTests.holding(h, GameType.SURVIVAL, EcologyModule.SPORE_CULTURE.get(), 1);
                     h.assertValueEqual(
-                            useCulture(level, spare, pitcher.below()),
+                            EcologyTests.useCulture(level, spare, pitcher.below()),
                             InteractionResult.PASS,
                             "the pitcher plant stays");
                     h.assertTrue(level.getBlockState(pitcher.below()).is(Blocks.GRASS_BLOCK), "on its grass");
                     for (int i = 0; i < PLANTS.size(); i++) {
-                        BlockPos lower = inYard(new BlockPos(DEAD_FIRST_X + i, -60, PLOT_Z), shiftZ);
+                        BlockPos lower = yard.at(new BlockPos(DEAD_FIRST_X + i, -60, PLOT_Z));
                         h.assertValueEqual(
                                 level.getBlockState(lower),
                                 dead(PLANTS.get(i), DoubleBlockHalf.LOWER),
@@ -831,15 +711,15 @@ public final class TallWitheredPlantTests {
                 .thenIdle(10)
                 .thenExecute(() -> {
                     for (int i = 0; i < PLANTS.size(); i++) {
-                        BlockPos lower = inYard(new BlockPos(LIVING_FIRST_X + i, -60, PLOT_Z), shiftZ);
+                        BlockPos lower = yard.at(new BlockPos(LIVING_FIRST_X + i, -60, PLOT_Z));
                         h.assertValueEqual(
                                 level.getBlockState(lower), dead(PLANTS.get(i), DoubleBlockHalf.LOWER), "it stays");
                     }
                     List<ItemEntity> drops =
-                            level.getEntitiesOfClass(ItemEntity.class, new AABB(inYard(CHEST, shiftZ)).inflate(16));
+                            level.getEntitiesOfClass(ItemEntity.class, new AABB(yard.at(CHEST)).inflate(16));
                     h.assertTrue(drops.isEmpty(), "infection dropped nothing, not " + drops);
-                    tidy(h, shiftZ);
-                    forget(h, chunks);
+                    yard.tidy(h);
+                    yard.forget(h);
                 })
                 .thenSucceed();
     }
@@ -847,16 +727,16 @@ public final class TallWitheredPlantTests {
     /** Harvest from the exhibit's dead plot with shears: two short grass from one half hit, a sunflower from another. */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH, timeoutTicks = 300)
     public static void theDemoExhibitsDeadPlantsHarvestOnce(GameTestHelper h) {
-        int shiftZ = SHIFT_Z + SLOT_Z;
-        List<ChunkPos> chunks = forceYard(h, shiftZ);
+        DemoExhibit yard = exhibit(1);
+        yard.force(h);
         ServerLevel level = h.getLevel();
-        BlockPos grass = inYard(new BlockPos(DEAD_FIRST_X + 4, -60, PLOT_Z), shiftZ);
-        BlockPos sunflower = inYard(new BlockPos(DEAD_FIRST_X, -60, PLOT_Z), shiftZ);
+        BlockPos grass = yard.at(new BlockPos(DEAD_FIRST_X + 4, -60, PLOT_Z));
+        BlockPos sunflower = yard.at(new BlockPos(DEAD_FIRST_X, -60, PLOT_Z));
         h.startSequence()
-                .thenIdle(ENTITIES_LOAD_TICKS)
+                .thenIdle(DemoExhibit.ENTITIES_LOAD_TICKS)
                 .thenExecute(() -> {
-                    buildExhibit(h, shiftZ);
-                    ServerPlayer miner = miner(h, new ItemStack(Items.SHEARS), grass);
+                    yard.build(h);
+                    ServerPlayer miner = TestDrops.miner(h, new ItemStack(Items.SHEARS));
                     miner.gameMode.destroyBlock(grass.above());
                     miner.gameMode.destroyBlock(sunflower);
                 })
@@ -874,20 +754,10 @@ public final class TallWitheredPlantTests {
                             sums,
                             Map.of(Items.SHORT_GRASS, 2, Items.SUNFLOWER, 1),
                             "two short grass and one sunflower");
-                    tidy(h, shiftZ);
-                    forget(h, chunks);
+                    yard.tidy(h);
+                    yard.forget(h);
                 })
                 .thenSucceed();
-    }
-
-    private static InteractionResult useCulture(ServerLevel level, Player player, BlockPos ground) {
-        ItemStack culture = player.getMainHandItem();
-        return culture.useOn(new UseOnContext(
-                level,
-                player,
-                InteractionHand.MAIN_HAND,
-                culture,
-                new BlockHitResult(Vec3.atCenterOf(ground).add(0, 0.5, 0), Direction.UP, ground, false)));
     }
 
     // --- fixtures ---
@@ -953,41 +823,5 @@ public final class TallWitheredPlantTests {
         h.assertValueEqual(h.getBlockState(lower), dead(plant, DoubleBlockHalf.LOWER), "lower half of " + plant);
         h.assertValueEqual(
                 h.getBlockState(lower.above()), dead(plant, DoubleBlockHalf.UPPER), "upper half of " + plant);
-    }
-
-    private static ServerPlayer miner(GameTestHelper h, ItemStack tool, BlockPos target) {
-        ServerPlayer player = new ServerPlayer(
-                h.getLevel().getServer(),
-                h.getLevel(),
-                new GameProfile(UUID.randomUUID(), "gardener"),
-                ClientInformation.createDefault());
-        player.setGameMode(GameType.SURVIVAL);
-        Vec3 feet = h.absolutePos(new BlockPos(3, 1, 1)).getCenter().add(0, -0.5, 0);
-        player.moveTo(feet.x, feet.y, feet.z, 0F, 0F);
-        player.setItemInHand(InteractionHand.MAIN_HAND, tool);
-        return player;
-    }
-
-    /** What lies on the ground, item by item. */
-    private static Map<Item, Integer> dropped(GameTestHelper h) {
-        Map<Item, Integer> sums =
-                new TreeMap<>((a, b) -> BuiltInRegistries.ITEM.getKey(a).compareTo(BuiltInRegistries.ITEM.getKey(b)));
-        for (ItemEntity drop :
-                h.getLevel().getEntitiesOfClass(ItemEntity.class, h.getBounds().inflate(1)))
-            sums.merge(drop.getItem().getItem(), drop.getItem().getCount(), Integer::sum);
-        return sums;
-    }
-
-    private static Map<Item, Integer> describe(List<ItemStack> drops) {
-        Map<Item, Integer> sums =
-                new TreeMap<>((a, b) -> BuiltInRegistries.ITEM.getKey(a).compareTo(BuiltInRegistries.ITEM.getKey(b)));
-        for (ItemStack drop : drops) sums.merge(drop.getItem(), drop.getCount(), Integer::sum);
-        return sums;
-    }
-
-    private static void clearDrops(GameTestHelper h) {
-        h.getLevel()
-                .getEntitiesOfClass(ItemEntity.class, h.getBounds().inflate(1))
-                .forEach(ItemEntity::discard);
     }
 }

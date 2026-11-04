@@ -51,7 +51,7 @@ final class CaptureClient {
     private static final String WORLD = "capture";
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
-    private static final int STAGE_TIMEOUT_TICKS = 600;
+    private static final int STAGE_TIMEOUT_TICKS = 800;
     private static final int SETTLE_TICKS = 40;
     private static final int MOVE_TICKS = 10;
     private static final int WORLD_SCALE = 2; // the HUD stays small in a world shot

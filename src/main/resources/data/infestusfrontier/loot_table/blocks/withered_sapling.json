@@ -1,0 +1,88 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/oak_sapling",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_sapling",
+              "properties": {
+                "source": "oak"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/birch_sapling",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_sapling",
+              "properties": {
+                "source": "birch"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/spruce_sapling",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_sapling",
+              "properties": {
+                "source": "spruce"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/jungle_sapling",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_sapling",
+              "properties": {
+                "source": "jungle"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/acacia_sapling",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_sapling",
+              "properties": {
+                "source": "acacia"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/dark_oak_sapling",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:withered_sapling",
+              "properties": {
+                "source": "dark_oak"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

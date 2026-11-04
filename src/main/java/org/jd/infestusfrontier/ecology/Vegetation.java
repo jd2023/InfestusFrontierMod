@@ -33,7 +33,10 @@ final class Vegetation {
      */
     record Clear() implements Cover {}
 
-    /** A supported flower. The host may convert once the flower is replaced by {@code dead}. */
+    /**
+     * A supported flower, shrub, undergrowth or sapling. The host may convert once the plant is replaced by
+     * {@code dead}.
+     */
     record Withers(BlockState dead) implements Cover {}
 
     /**
@@ -43,8 +46,8 @@ final class Vegetation {
     record WithersTall(BlockState lower, BlockState upper) implements Cover {}
 
     /**
-     * A plant rooted in the ground with no mapping, or a tall plant that is not whole: a sapling, short grass, a crop,
-     * a bush, a mushroom, sugar cane, bamboo, a big dripleaf, a tall plant whose upper half is missing, another plant
+     * A plant rooted in the ground with no mapping, or a tall plant that is not whole: a crop, a torchflower, an
+     * azalea, a mushroom, sugar cane, bamboo, a big dripleaf, a tall plant whose upper half is missing, another plant
      * or out of reach. Converting the host would uproot it, so the host stays as it is.
      */
     record Rooted() implements Cover {}
@@ -55,9 +58,11 @@ final class Vegetation {
      */
     static Cover cover(LevelReader level, BlockPos above) {
         BlockState state = level.getBlockState(above);
-        if (state.is(EcologyModule.WITHERED_FLOWER.get()) || DeadTallPlantBlock.isDead(state)) return new Clear();
-        Optional<BlockState> flower = WitheredFlowerBlock.wither(state);
-        if (flower.isPresent()) return new Withers(flower.get());
+        if (state.is(EcologyModule.WITHERED_FLOWER.get())
+                || DeadTallPlantBlock.isDead(state)
+                || DeadShrubBlock.isDead(state)) return new Clear();
+        Optional<BlockState> small = WitheredFlowerBlock.wither(state).or(() -> DeadShrubBlock.wither(state));
+        if (small.isPresent()) return new Withers(small.get());
         Optional<BlockState> tall = DeadTallPlantBlock.wither(state);
         if (tall.isPresent()) return wholeTall(level, above, state, tall.get());
         return isRooted(state) ? new Rooted() : new Clear();

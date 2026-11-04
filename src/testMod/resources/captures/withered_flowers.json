@@ -9,7 +9,7 @@
     "setblock -2 -60 3 cornflower",
     "setblock -2 -60 5 allium",
     "setblock -1 -60 2 oxeye_daisy",
-    "setblock -1 -60 4 oak_sapling",
+    "setblock -1 -60 4 azalea",
     "fill 1 -61 1 4 -61 6 infestusfrontier:living_substrate[stage=mature]",
     "setblock 1 -60 1 infestusfrontier:withered_flower[source=dandelion]",
     "setblock 2 -60 1 infestusfrontier:withered_flower[source=poppy]",

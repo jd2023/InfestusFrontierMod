@@ -1,0 +1,53 @@
+{
+  "variants": {
+    "source=short_grass": [
+      {
+        "model": "infestusfrontier:block/blighted_grass_a"
+      },
+      {
+        "model": "infestusfrontier:block/blighted_grass_a",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/blighted_grass_a",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/blighted_grass_a",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/blighted_grass_b"
+      },
+      {
+        "model": "infestusfrontier:block/blighted_grass_b",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/blighted_grass_b",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/blighted_grass_b",
+        "y": 270
+      }
+    ],
+    "source=fern": [
+      {
+        "model": "infestusfrontier:block/blighted_fern"
+      },
+      {
+        "model": "infestusfrontier:block/blighted_fern",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/blighted_fern",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/blighted_fern",
+        "y": 270
+      }
+    ]
+  }
+}

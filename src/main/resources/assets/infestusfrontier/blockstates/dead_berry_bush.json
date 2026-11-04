@@ -1,0 +1,72 @@
+{
+  "variants": {
+    "age=0": [
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_small"
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_small",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_small",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_small",
+        "y": 270
+      }
+    ],
+    "age=1": [
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_small"
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_small",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_small",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_small",
+        "y": 270
+      }
+    ],
+    "age=2": [
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_large"
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_large",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_large",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_large",
+        "y": 270
+      }
+    ],
+    "age=3": [
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_fruited"
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_fruited",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_fruited",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/dead_berry_bush_fruited",
+        "y": 270
+      }
+    ]
+  }
+}

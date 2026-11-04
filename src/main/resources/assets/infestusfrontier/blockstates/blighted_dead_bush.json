@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "infestusfrontier:block/blighted_dead_bush_a"
+      },
+      {
+        "model": "infestusfrontier:block/blighted_dead_bush_a",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/blighted_dead_bush_a",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/blighted_dead_bush_a",
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/blighted_dead_bush_b"
+      },
+      {
+        "model": "infestusfrontier:block/blighted_dead_bush_b",
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/blighted_dead_bush_b",
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/blighted_dead_bush_b",
+        "y": 270
+      }
+    ]
+  }
+}

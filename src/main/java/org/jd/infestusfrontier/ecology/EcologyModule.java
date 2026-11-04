@@ -3,6 +3,7 @@ package org.jd.infestusfrontier.ecology;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -89,6 +90,18 @@ public final class EcologyModule {
                     .sound(SoundType.GRASS)
                     .offsetType(BlockBehaviour.OffsetType.XZ)
                     .pushReaction(PushReaction.DESTROY));
+    /** A sweet berry bush killed by substrate growth under it: it keeps its age, and breaking it is its one harvest. */
+    public static final DeferredBlock<DeadBerryBushBlock> DEAD_BERRY_BUSH =
+            shrub("dead_berry_bush", DeadBerryBushBlock::new, false);
+    /** A dead bush darkened by substrate growth under it. No item. */
+    public static final DeferredBlock<BlightedDeadBushBlock> BLIGHTED_DEAD_BUSH =
+            shrub("blighted_dead_bush", BlightedDeadBushBlock::new, false);
+    /** Short grass or a fern killed by substrate growth under it. No item. */
+    public static final DeferredBlock<BlightedUndergrowthBlock> BLIGHTED_UNDERGROWTH =
+            shrub("blighted_undergrowth", BlightedUndergrowthBlock::new, true);
+    /** An oak, birch, spruce, jungle, acacia or dark oak sapling killed by substrate growth under it. No item. */
+    public static final DeferredBlock<WitheredSaplingBlock> WITHERED_SAPLING =
+            shrub("withered_sapling", WitheredSaplingBlock::new, false);
 
     /** The three wall tiers: soft as grown, bone-ribbed, and calcified past any explosion. */
     public static final DeferredBlock<LivingWallBlock> LIVING_WALL =
@@ -192,6 +205,18 @@ public final class EcologyModule {
         return DOOR_ENTITIES.get(name).get();
     }
 
+    private static <B extends DeadShrubBlock> DeferredBlock<B> shrub(
+            String id, Function<BlockBehaviour.Properties, B> factory, boolean undergrowth) {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of()
+                .mapColor(MapColor.PLANT)
+                .noCollission()
+                .instabreak()
+                .sound(SoundType.GRASS)
+                .pushReaction(PushReaction.DESTROY);
+        if (undergrowth) properties = properties.replaceable().offsetType(BlockBehaviour.OffsetType.XZ);
+        return BLOCKS.registerBlock(id, factory, properties);
+    }
+
     private static DeferredBlock<SphincterDoorBlock> door(
             String id,
             BlockSetType type,
@@ -241,6 +266,18 @@ public final class EcologyModule {
                         (state, level, pos, index) ->
                                 TallBlightedUndergrowthBlock.tintAt(state, pos == null ? BlockPos.ZERO : pos),
                         TALL_BLIGHTED_UNDERGROWTH.get());
+                event.register(
+                        (state, level, pos, index) -> DeadBerryBushBlock.tintAt(pos == null ? BlockPos.ZERO : pos),
+                        DEAD_BERRY_BUSH.get());
+                event.register(
+                        (state, level, pos, index) -> BlightedDeadBushBlock.tintAt(pos == null ? BlockPos.ZERO : pos),
+                        BLIGHTED_DEAD_BUSH.get());
+                event.register(
+                        (state, level, pos, index) ->
+                                BlightedUndergrowthBlock.tintAt(pos == null ? BlockPos.ZERO : pos),
+                        BLIGHTED_UNDERGROWTH.get());
+                event.register(
+                        (state, level, pos, index) -> WitheredSaplingBlock.tintOf(state), WITHERED_SAPLING.get());
             });
         }
         // vanilla skips a block's own use while its user sneaks with an item, so starting a wall listens here
