@@ -30,7 +30,9 @@ import org.jd.infestusfrontier.InfestusFrontier;
  * {@value #SPREAD_PER_CELL} exposed host blocks beside it into basic cells with one vigor less; a young cell with two
  * or more vigor becomes mature; a mature cell that was fed converts hosts the same way. Then the cell goes dormant.
  * Vigor 0 cells do nothing. One bone meal on basic ground therefore reaches at most 15 cells, 3 mature in the core,
- * 4 young around them and 8 basic at the edge, schedules at most 10 ticks and is quiet after 90 ticks.
+ * 4 young around them and 8 basic at the edge, schedules at most 10 ticks and is quiet after 90 ticks. A cell the
+ * wave converts or grows touches the trunk bases beside it; a supported tree so touched may start one bounded
+ * infection of its own ({@link TreeInfections}), which never changes what the wave converts.
  *
  * <p>Each stage is drawn from sixteen 64x64 tiles cut out of one 4x4-block macro texture. {@link #TILE} follows the
  * cell's position ({@link #tileAt}), so a patch shows the macro pattern without seams or repeats.
@@ -152,14 +154,18 @@ public final class LivingSubstrateBlock extends Block implements BonemealableBlo
     /**
      * Converts up to {@value #SPREAD_PER_CELL} exposed hosts beside {@code pos} into basic cells with {@code vigor},
      * through {@link Vegetation#convert}, so a supported flower or tall plant on a host withers instead of dropping.
+     * The spreading cell and each new cell touch the trunks beside them ({@link TreeInfection#touch}): a tree the
+     * wave reaches may start one bounded infection, and a refused tree costs the wave nothing.
      */
     private void spread(ServerLevel level, BlockPos pos, int vigor, RandomSource random) {
+        TreeInfection.touch(level, pos);
         List<BlockPos> targets = spreadTargets(level, pos);
         for (int n = 0; n < SPREAD_PER_CELL && !targets.isEmpty(); n++) {
             BlockPos target = targets.remove(random.nextInt(targets.size()));
             if (!Vegetation.convert(level, target, cellAt(target).setValue(VIGOR, vigor))) continue;
             level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target, STEP_PARTICLES);
             if (vigor > 0) level.scheduleTick(target, this, GROWTH_DELAY_TICKS);
+            TreeInfection.touch(level, target);
         }
     }
 

@@ -26,6 +26,18 @@
     },
     {
       "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.infected_timber.infect"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.infected_timber.rules"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.infected_timber.refused"
+    },
+    {
+      "type": "modonomicon:text",
       "text": "entry.infestusfrontier.contact.infected_timber.logs"
     },
     {

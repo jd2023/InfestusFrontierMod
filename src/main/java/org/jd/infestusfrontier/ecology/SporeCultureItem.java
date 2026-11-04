@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.ecology;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -10,7 +11,8 @@ import net.minecraft.world.level.block.LevelEvent;
 
 /**
  * Converts the one eligible, exposed ground block the player points at into basic Living Substrate, through
- * {@link Vegetation#convert}: a supported flower or whole tall plant on it withers, a rooted plant without a mapping keeps its ground.
+ * {@link Vegetation#convert}: a supported flower or whole tall plant on it withers, a rooted plant without a mapping
+ * keeps its ground. The new cell touches the trunk bases beside it ({@link TreeInfection#touch}).
  */
 final class SporeCultureItem extends Item {
     private static final int GROWTH_PARTICLES = 15;
@@ -31,6 +33,7 @@ final class SporeCultureItem extends Item {
 
         Vegetation.convert(level, target, EcologyModule.LIVING_SUBSTRATE.get().cellAt(target));
         level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target, GROWTH_PARTICLES);
+        if (level instanceof ServerLevel server) TreeInfection.touch(server, target);
         Player player = context.getPlayer();
         if (player == null || !player.getAbilities().instabuild)
             context.getItemInHand().shrink(1);

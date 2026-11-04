@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
@@ -18,20 +21,26 @@ import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.ecology.api.TreeInfectionSnapshot;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 
-/** Owner of substrate maturity, function, lining, reinforcement, dye, deliberate conversion, living walls and infected timber. */
+/**
+ * Owner of substrate maturity, function, lining, reinforcement, dye, deliberate conversion, living walls, infected
+ * timber and the infection of standing trees.
+ */
 public final class EcologyModule {
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(InfestusFrontier.MOD_ID);
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(InfestusFrontier.MOD_ID);
@@ -246,9 +255,27 @@ public final class EcologyModule {
 
     private EcologyModule() {}
 
+    /** The name of each dimension's saved tree infection work. */
+    public static final String TREE_INFECTIONS = TreeInfections.NAME;
+
     /** The block entity type that draws the door of this name. */
     static BlockEntityType<SphincterDoorBlockEntity> doorEntity(String name) {
         return DOOR_ENTITIES.get(name).get();
+    }
+
+    /** The tree infection jobs and recent refusals of {@code level}, as they stand. */
+    public static TreeInfectionSnapshot treeInfections(ServerLevel level) {
+        return TreeInfections.get(level).snapshot();
+    }
+
+    /** Persistence entry point for a dimension's tree infection work: what {@link #saveTreeInfections} wrote. */
+    public static SavedData restoreTreeInfections(CompoundTag tag, HolderLookup.Provider registries) {
+        return TreeInfections.load(tag, registries);
+    }
+
+    /** The saved form of {@code level}'s tree infection work, as a save writes it. */
+    public static CompoundTag saveTreeInfections(ServerLevel level) {
+        return TreeInfections.get(level).save(new CompoundTag(), level.registryAccess());
     }
 
     private static <B extends DeadShrubBlock> DeferredBlock<B> shrub(
@@ -336,6 +363,10 @@ public final class EcologyModule {
             modBus.addListener((RegisterColorHandlersEvent.Item event) ->
                     event.register((stack, index) -> TreeSource.OAK.barkTint(), INFECTED_LOG_ITEM.get()));
         }
+        NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post event) -> {
+            if (event.getLevel() instanceof ServerLevel server)
+                TreeInfections.get(server).advance(server);
+        });
         // vanilla skips a block's own use while its user sneaks with an item, so starting a wall listens here
         NeoForge.EVENT_BUS.addListener((PlayerInteractEvent.RightClickBlock event) -> {
             if (LivingWallBlock.start(

@@ -85,6 +85,9 @@ final class CaptureClient {
     private final JsonArray report = new JsonArray();
     private Stage stage = Stage.TITLE;
     private int ticksInStage;
+    /** How many commands the current command stage started with; its deadline allows one tick each. */
+    private int commandsInStage;
+
     private int scenarioIndex;
     private int viewIndex;
     private int sequenceFrame;
@@ -105,7 +108,9 @@ final class CaptureClient {
     private void onTick(ClientTickEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
         try {
-            if (++ticksInStage > STAGE_TIMEOUT_TICKS && stage != Stage.DONE) {
+            // the command stage sends one command a tick, so its deadline grows with the scenario
+            int deadline = STAGE_TIMEOUT_TICKS + (stage == Stage.COMMANDS ? commandsInStage : 0);
+            if (++ticksInStage > deadline && stage != Stage.DONE) {
                 throw new IllegalStateException("Timed out in stage " + stage + where(minecraft));
             }
             switch (stage) {
@@ -181,6 +186,7 @@ final class CaptureClient {
         commandQueue.addAll(BASELINE);
         commandQueue.addAll(RESET);
         commandQueue.addAll(scenarios.get(scenarioIndex).commands());
+        commandsInStage = commandQueue.size();
         enter(Stage.COMMANDS);
     }
 
@@ -393,6 +399,7 @@ final class CaptureClient {
         if (scenarioIndex < scenarios.size()) {
             commandQueue.addAll(RESET);
             commandQueue.addAll(scenarios.get(scenarioIndex).commands());
+            commandsInStage = commandQueue.size();
             enter(Stage.COMMANDS);
             return;
         }

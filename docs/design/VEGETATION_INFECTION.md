@@ -1,11 +1,12 @@
 # Vegetation infection
 
-Status: proposed, except the Withered Flower, tall-plant and shrub mappings and the infected timber blocks, which ship
+Status: proposed, except the Withered Flower, tall-plant and shrub mappings, the infected timber blocks and the
+infection of a standing tree, which ship
 ([Shipped: Withered Flower](#shipped-withered-flower),
 [Shipped: tall plants](#shipped-tall-plants),
 [Shipped: shrubs, grass and saplings](#shipped-shrubs-grass-and-saplings),
-[Shipped: infected timber](#shipped-infected-timber-and-blighted-leaves)). The conversion of a standing tree
-into those blocks is not built. Mostly cosmetic conversion
+[Shipped: infected timber](#shipped-infected-timber-and-blighted-leaves),
+[Shipped: tree infection](#shipped-tree-infection)). Mostly cosmetic conversion
 of vegetation reached by deliberate Living Substrate growth. This document owns the
 conversion mappings and visual rules. Existing substrate growth remains defined in
 [Living Substrate mutations](LIVING_SUBSTRATE_MUTATIONS.md#1-grow-the-foundation).
@@ -52,7 +53,7 @@ treatment on already infected vegetation creates no extra items or growth.
 | Sweet berry bush | Dead Berry Bush | Retains the age present at infection for its normal break loot. No regrowth, berry picking or bone-meal production after infection. |
 | Dead bush | Blighted Dead Bush | Cosmetic darkening and root threads. Retains ordinary dead-bush drops. |
 | Oak, spruce, birch, jungle, acacia and dark oak saplings | Withered Sapling | No growth. Breaking returns the original sapling through normal harvest rules. |
-| Supported rooted tree logs and leaves | Infected Logs and Blighted Leaves | Preserves the admitted tree's geometry. Logs provide infected timber. Leaves retain source-specific harvest rules and vanilla decay behavior. The blocks ship; converting a standing tree is not built ([Trees](#trees)). |
+| Supported rooted tree logs and leaves | Infected Logs and Blighted Leaves | Preserves the admitted tree's geometry. Logs provide infected timber. Leaves retain source-specific harvest rules and vanilla decay behavior. Ships ([Shipped: tree infection](#shipped-tree-infection)). |
 
 Initial tree support covers ordinary, dry-land oak, birch, spruce, jungle, acacia
 and dark oak forms that fit the bounded tree rules below. Support is explicit;
@@ -171,9 +172,8 @@ The one-block rows are implemented in `ecology` (`DeadBerryBushBlock`, `Blighted
 ## Shipped: infected timber and blighted leaves
 
 The blocks a converted tree is made of are implemented in `ecology` (`InfectedLogBlock`, `InfectedPlanksBlock`,
-`BlightedLeavesBlock`, `TreeSource`). Nothing in the game converts a standing tree yet: that is a separate behavior
-(admission, discovery, incremental replacement, [Trees](#trees)), not a crafting recipe, and no recipe makes a log from
-anything. Until it ships the blocks are placed by commands and the demo, and the log and planks are items.
+`BlightedLeavesBlock`, `TreeSource`). A standing tree becomes them through tree infection
+([Shipped: tree infection](#shipped-tree-infection)); no recipe makes a log from anything. The log and planks are items.
 
 - Infected Log is vanilla's `RotatedPillarBlock` with `axis` and `source` (oak, birch, spruce, jungle, acacia or dark
   oak). `source` only picks the bark tone. Breaking it, with any tool, drops one Infected Log
@@ -199,6 +199,51 @@ anything. Until it ships the blocks are placed by commands and the demo, and the
 - Guide: `contact/infected_timber`. Demo: the Timber exhibit at x 47 to 75, z -13 to -2 in `demo.json` (a log and a leaf
   of each species, lying logs, a living and an infected oak side by side, a crafting table with logs, planks and tools)
   and the `infected_timber` capture.
+
+## Shipped: tree infection
+
+The infection of a standing tree is implemented in `ecology` (`TreeInfection`, `TreeInfections`) over the pure rules
+in `core.ecology.TreeDiscovery`, with the budgets in `core.foundation.TickQuota`.
+
+- Contact. A cell the bone-meal wave converts or steps, and a cell Spore Culture makes, touches the trunk bases beside
+  it: the four horizontal neighbours, level with the cell, one up or one down. A root is an upright (axis y) log of one
+  of the six species standing on a host block or a cell. Nothing else is contact: a lying log, a log on sand or
+  planks, a stripped log, wood, planks, an Infected Log. The ground under the trunk is not made a host and is not
+  converted; no other covered ground becomes eligible.
+- Discovery. One job per root. It reads the world through `TreeDiscovery`: logs of the species join through any of
+  their 26 neighbours, as vanilla's diagonal branches do; a leaf of the species belongs when it stands face to face
+  with a log of the tree at leaf distance 1 or with a claimed leaf at one more than its distance, the gradient vanilla's
+  own distance rule writes. Leaves never lead to logs, so touching crowns never carry a job into the next tree, and a
+  leaf nearer another trunk keeps a lower distance than the gradient wants and is left alone; a leaf the same distance
+  from two trunks goes to whichever tree is discovered first. Every position is read once and counted.
+- Admission. The tree fits a 17x32x17 envelope (8 each way from the root, one below it, 30 above), has at most 128 logs
+  and 512 leaves and costs at most 2,048 reads; otherwise it is refused as oversized. A log of another supported species
+  joined to it refuses it as ambiguous; a position in no loaded chunk refuses it as unloaded, and no chunk is loaded. A
+  refused tree is left whole. A root a job already claims is not a second job; two jobs that discover one tree keep the
+  one that converts first.
+- Conversion. Logs first, in discovery order from the root, then leaves by rising distance: each block is read again
+  and replaced only if it is still the living log or leaf discovery saw, so a block a player changed is kept. A log
+  becomes an Infected Log with its axis, a leaf Blighted Leaves with its distance, persistence and water. The
+  replacement sends no neighbour updates (the new log is a log, the leaf keeps its distance), drops nothing and gives
+  no experience. Infected Logs are no roots and no logs of a species, so a converted tree starts nothing and is never
+  discovered again.
+- Budgets. At most 16 jobs a dimension, discovering and converting together; 128 discovery reads and 16 replacements a
+  server tick, shared by every dimension through two `TickQuota`s on the overworld's data, handed round the jobs in
+  turn. A tree touched while the jobs are full is refused for capacity; there is no queue, and the next wave or
+  culture asks again. Existing wave limits are unchanged: a refused tree costs the wave nothing and the ground and
+  plants it reaches convert as before.
+- Feedback. Admission and every refusal (capacity, oversized, ambiguous, unloaded) are shown above the hotbar to the
+  players within 32 blocks of the root, once per tree and reason in 200 ticks (`infestusfrontier.tree_infection.*`).
+  `EcologyModule.treeInfections` is the snapshot of a dimension's jobs and its last 16 refusals.
+- Persistence. Each dimension saves its jobs (`infestusfrontier_tree_infections`): root, species, and the logs and
+  leaves still to convert; a job still discovering saves its root and species and discovers again on load. A job whose
+  next block is in no loaded chunk waits, asks again after 100 ticks and loads nothing; it goes on when the chunk is
+  back, also after a save and reload. A saved list that cannot be read is kept as it was and written back.
+- Guide: `contact/infected_timber`, pages "infect", "rules" and "refused". Demo: the Woodland plot at x 79 to 115,
+  z -13 to -2 in `demo.json` (an oak with a bone-meal dispenser and button at the end of a one-wide corridor, its
+  infected twin, two birches with touching crowns, a treehouse with planks, a stripped log, a chest and a fence against
+  the trunk, a 2x2 spruce of 132 logs and 33 blocks that is refused, and a chest of bone meal, culture, an axe and
+  shears), the `woodland_wave` frames and the `tree_infection` capture.
 
 ## Harvest rules
 
@@ -286,12 +331,13 @@ replacement; player edits are not overwritten. Persist bounded progress and paus
 on unload without loading chunks. Infection does not propagate from the converted
 logs as an independent new wave.
 
-Proposed first limits: one tree job admits at most 128 logs and 512 leaves inside
-a 17×32×17 envelope. Discovery stops after 2,048 examined positions. At most 16
-jobs exist per dimension, with server-wide budgets of 128 discovery reads and 16
-replacements per tick. These are starting limits for testing, not measured safe
-capacity. At capacity, skip new tree infection and explain the limit; do not add
-an unbounded retry queue. Existing substrate-wave limits remain unchanged.
+First limits, shipped as starting values ([Shipped: tree infection](#shipped-tree-infection)): one tree job
+admits at most 128 logs and 512 leaves inside a 17×32×17 envelope. Discovery
+stops after 2,048 examined positions. At most 16 jobs exist per dimension, with
+server-wide budgets of 128 discovery reads and 16 replacements per tick. These
+are starting limits for testing, not measured safe capacity. At capacity, skip
+new tree infection and explain the limit; do not add an unbounded retry queue.
+Existing substrate-wave limits remain unchanged.
 
 ### Infected timber and Living Wood
 
