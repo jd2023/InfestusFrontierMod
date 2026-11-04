@@ -1,0 +1,88 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/oak_leaves",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:blighted_leaves",
+              "properties": {
+                "source": "oak"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/birch_leaves",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:blighted_leaves",
+              "properties": {
+                "source": "birch"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/spruce_leaves",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:blighted_leaves",
+              "properties": {
+                "source": "spruce"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/jungle_leaves",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:blighted_leaves",
+              "properties": {
+                "source": "jungle"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/acacia_leaves",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:blighted_leaves",
+              "properties": {
+                "source": "acacia"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:blocks/dark_oak_leaves",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "infestusfrontier:blighted_leaves",
+              "properties": {
+                "source": "dark_oak"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

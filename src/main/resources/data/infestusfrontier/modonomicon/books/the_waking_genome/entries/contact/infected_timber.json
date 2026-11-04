@@ -1,0 +1,40 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.infected_timber.name",
+  "description": "entry.infestusfrontier.contact.infected_timber.description",
+  "icon": {
+    "texture": "infestusfrontier:textures/book/infected_timber.png",
+    "width": 16,
+    "height": 16
+  },
+  "x": 2,
+  "y": 4,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/withered_shrubs"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:advancement",
+    "advancement_id": "infestusfrontier:contact/living_substrate"
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.infected_timber.name",
+      "text": "entry.infestusfrontier.contact.infected_timber.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.infected_timber.logs"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.infected_timber.leaves"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.infected_timber.limits"
+    }
+  ]
+}

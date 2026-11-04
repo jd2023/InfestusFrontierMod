@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "infestusfrontier:block/infected_log_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "infestusfrontier:block/infected_log"
+    },
+    "axis=z": {
+      "model": "infestusfrontier:block/infected_log_horizontal",
+      "x": 90
+    }
+  }
+}

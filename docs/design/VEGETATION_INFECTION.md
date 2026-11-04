@@ -1,9 +1,11 @@
 # Vegetation infection
 
-Status: proposed, except the Withered Flower, tall-plant and shrub mappings, which ship
+Status: proposed, except the Withered Flower, tall-plant and shrub mappings and the infected timber blocks, which ship
 ([Shipped: Withered Flower](#shipped-withered-flower),
 [Shipped: tall plants](#shipped-tall-plants),
-[Shipped: shrubs, grass and saplings](#shipped-shrubs-grass-and-saplings)). Mostly cosmetic conversion
+[Shipped: shrubs, grass and saplings](#shipped-shrubs-grass-and-saplings),
+[Shipped: infected timber](#shipped-infected-timber-and-blighted-leaves)). The conversion of a standing tree
+into those blocks is not built. Mostly cosmetic conversion
 of vegetation reached by deliberate Living Substrate growth. This document owns the
 conversion mappings and visual rules. Existing substrate growth remains defined in
 [Living Substrate mutations](LIVING_SUBSTRATE_MUTATIONS.md#1-grow-the-foundation).
@@ -50,7 +52,7 @@ treatment on already infected vegetation creates no extra items or growth.
 | Sweet berry bush | Dead Berry Bush | Retains the age present at infection for its normal break loot. No regrowth, berry picking or bone-meal production after infection. |
 | Dead bush | Blighted Dead Bush | Cosmetic darkening and root threads. Retains ordinary dead-bush drops. |
 | Oak, spruce, birch, jungle, acacia and dark oak saplings | Withered Sapling | No growth. Breaking returns the original sapling through normal harvest rules. |
-| Supported rooted tree logs and leaves | Infected Logs and Blighted Leaves | Preserves the admitted tree's geometry. Logs provide infected timber. Leaves retain source-specific harvest rules and vanilla decay behavior. |
+| Supported rooted tree logs and leaves | Infected Logs and Blighted Leaves | Preserves the admitted tree's geometry. Logs provide infected timber. Leaves retain source-specific harvest rules and vanilla decay behavior. The blocks ship; converting a standing tree is not built ([Trees](#trees)). |
 
 Initial tree support covers ordinary, dry-land oak, birch, spruce, jungle, acacia
 and dark oak forms that fit the bounded tree rules below. Support is explicit;
@@ -166,6 +168,38 @@ The one-block rows are implemented in `ecology` (`DeadBerryBushBlock`, `Blighted
 - Guide: `contact/withered_shrubs`. Demo: the Shrubs plots at x 31 to 45, z -13 to -2 in `demo.json`
   (a living row, its dead twin and an excluded row), and the `withered_shrubs` capture.
 
+## Shipped: infected timber and blighted leaves
+
+The blocks a converted tree is made of are implemented in `ecology` (`InfectedLogBlock`, `InfectedPlanksBlock`,
+`BlightedLeavesBlock`, `TreeSource`). Nothing in the game converts a standing tree yet: that is a separate behavior
+(admission, discovery, incremental replacement, [Trees](#trees)), not a crafting recipe, and no recipe makes a log from
+anything. Until it ships the blocks are placed by commands and the demo, and the log and planks are items.
+
+- Infected Log is vanilla's `RotatedPillarBlock` with `axis` and `source` (oak, birch, spruce, jungle, acacia or dark
+  oak). `source` only picks the bark tone. Breaking it, with any tool, drops one Infected Log
+  (`loot_table/blocks/infected_log.json`); the item carries no species, so a log cut, put down and cut again is still one
+  log, and a placed log takes the default source. Axis survives rotation. Planks are one plain block.
+- Infected Logs sit in the `logs_that_burn` block tag, which feeds `minecraft:logs`, the tag vanilla's `LeavesBlock`
+  tests to count a neighbour as distance 0. That is the whole of the support: no leaf code of ours. The item is not in
+  any item `logs` tag, so no recipe that takes ordinary logs takes it, and a Living Wood recipe that names ordinary logs
+  does not accept it. Infected Planks are in the `planks` block and item tags: sticks, crafting table, chest and every
+  recipe that takes the planks tag accept them, mixed with ordinary planks too. One Infected Log makes four
+  (`recipe/infected_planks.json`); nothing turns planks back into a log. Both burn 300 ticks (`neoforge` fuel data map for
+  the log, the planks tag for the planks). Both are mined with an axe. There is no premium: biomass value is that of
+  ordinary timber and the Digestive Sac takes neither.
+- Blighted Leaves are vanilla's `LeavesBlock` with `source`. `distance`, `persistent` and `waterlogged` are vanilla's
+  and survive every update, so decay, placement by a log, the 7-block range and water behave as for living leaves. A leaf
+  at distance 7 and not persistent decays on a random tick, and cutting a trunk starts that. Breaking and decay roll
+  `loot_table/blocks/blighted_leaves.json`, which nests the source's own leaf table: saplings, sticks, apples (oak and
+  dark oak), Fortune, shears and Silk Touch (the living leaves, once) carry over. There is no Blighted Leaves item; pick
+  block gives the living leaves.
+- Appearance is never saved. The log and leaves each have one model and one texture for all six species: grey bark with
+  root threads and a grey sparse leaf cutout over vanilla's full cube, tinted by the block colour with the species'
+  tone. No block entity, tick, resin, fruit, regrowth or spread.
+- Guide: `contact/infected_timber`. Demo: the Timber exhibit at x 47 to 75, z -13 to -2 in `demo.json` (a log and a leaf
+  of each species, lying logs, a living and an infected oak side by side, a crafting table with logs, planks and tools)
+  and the `infected_timber` capture.
+
 ## Harvest rules
 
 Infection is a replacement, not a harvest. It creates no loose items or experience.
@@ -275,7 +309,7 @@ Keep this material distinct from **Living Wood**, which the existing catalog use
 for cultivated production and biological construction. A later explicit Rooting Gel
 treatment can turn one suitable Infected Log into one Living Wood, alongside the
 existing ordinary-log treatment route. Its recipe belongs in the Item Catalog
-when implemented. Passive infection alone does not unlock Arbor Root production,
+when implemented and names the Infected Log item; the item is in no log item tag, so an ordinary-log recipe never takes it. Passive infection alone does not unlock Arbor Root production,
 resin tapping or the Living Wood digestion yield.
 
 This gives infected trees immediate crafting value while leaving a progression

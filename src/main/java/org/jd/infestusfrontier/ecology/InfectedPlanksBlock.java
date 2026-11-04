@@ -1,0 +1,24 @@
+package org.jd.infestusfrontier.ecology;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+
+/** Planks cut from an Infected Log: ordinary planks that burn like them and carry no species or state. */
+public final class InfectedPlanksBlock extends Block {
+    InfectedPlanksBlock(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return 20;
+    }
+
+    @Override
+    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return 5;
+    }
+}

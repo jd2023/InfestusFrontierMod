@@ -8,12 +8,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.api.distmarker.Dist;
@@ -29,7 +31,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 
-/** Owner of substrate maturity, function, lining, reinforcement, dye, deliberate conversion and living walls. */
+/** Owner of substrate maturity, function, lining, reinforcement, dye, deliberate conversion, living walls and infected timber. */
 public final class EcologyModule {
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(InfestusFrontier.MOD_ID);
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(InfestusFrontier.MOD_ID);
@@ -102,6 +104,50 @@ public final class EcologyModule {
     /** An oak, birch, spruce, jungle, acacia or dark oak sapling killed by substrate growth under it. No item. */
     public static final DeferredBlock<WitheredSaplingBlock> WITHERED_SAPLING =
             shrub("withered_sapling", WitheredSaplingBlock::new, false);
+
+    /**
+     * The trunk of an infected tree: it keeps its axis and the species it was. Breaking it gives one Infected Log. Not
+     * Living Wood: no production, resin or biomass premium.
+     */
+    public static final DeferredBlock<InfectedLogBlock> INFECTED_LOG = BLOCKS.registerBlock(
+            "infected_log",
+            InfectedLogBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .instrument(NoteBlockInstrument.BASS)
+                    .strength(2.0F)
+                    .sound(SoundType.WOOD)
+                    .ignitedByLava());
+
+    public static final DeferredItem<BlockItem> INFECTED_LOG_ITEM = ITEMS.registerSimpleBlockItem(INFECTED_LOG);
+    /** One Infected Log makes four; they stand in for ordinary planks in every recipe that takes the planks tag. */
+    public static final DeferredBlock<InfectedPlanksBlock> INFECTED_PLANKS = BLOCKS.registerBlock(
+            "infected_planks",
+            InfectedPlanksBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .instrument(NoteBlockInstrument.BASS)
+                    .strength(2.0F, 3.0F)
+                    .sound(SoundType.WOOD)
+                    .ignitedByLava());
+
+    public static final DeferredItem<BlockItem> INFECTED_PLANKS_ITEM = ITEMS.registerSimpleBlockItem(INFECTED_PLANKS);
+    /** The crown of an infected tree: vanilla leaf behaviour, the species' own loot. No item. */
+    public static final DeferredBlock<BlightedLeavesBlock> BLIGHTED_LEAVES = BLOCKS.registerBlock(
+            "blighted_leaves",
+            BlightedLeavesBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .strength(0.2F)
+                    .randomTicks()
+                    .sound(SoundType.GRASS)
+                    .noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> type == EntityType.OCELOT || type == EntityType.PARROT)
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos) -> false)
+                    .ignitedByLava()
+                    .pushReaction(PushReaction.DESTROY)
+                    .isRedstoneConductor((state, level, pos) -> false));
 
     /** The three wall tiers: soft as grown, bone-ribbed, and calcified past any explosion. */
     public static final DeferredBlock<LivingWallBlock> LIVING_WALL =
@@ -278,7 +324,17 @@ public final class EcologyModule {
                         BLIGHTED_UNDERGROWTH.get());
                 event.register(
                         (state, level, pos, index) -> WitheredSaplingBlock.tintOf(state), WITHERED_SAPLING.get());
+                event.register(
+                        (state, level, pos, index) ->
+                                state.getValue(InfectedLogBlock.SOURCE).barkTint(),
+                        INFECTED_LOG.get());
+                event.register(
+                        (state, level, pos, index) ->
+                                state.getValue(BlightedLeavesBlock.SOURCE).leafTint(),
+                        BLIGHTED_LEAVES.get());
             });
+            modBus.addListener((RegisterColorHandlersEvent.Item event) ->
+                    event.register((stack, index) -> TreeSource.OAK.barkTint(), INFECTED_LOG_ITEM.get()));
         }
         // vanilla skips a block's own use while its user sneaks with an item, so starting a wall listens here
         NeoForge.EVENT_BUS.addListener((PlayerInteractEvent.RightClickBlock event) -> {
