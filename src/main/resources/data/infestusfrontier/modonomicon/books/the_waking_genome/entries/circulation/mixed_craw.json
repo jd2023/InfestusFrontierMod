@@ -33,6 +33,15 @@
   },
   "pages": [
     {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.circulation.mixed_craw.name",
+      "images": [
+        "infestusfrontier:textures/book/mixed_craw.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.circulation.mixed_craw.description"
+    },
+    {
       "type": "modonomicon:text",
       "title": "entry.infestusfrontier.circulation.mixed_craw.name",
       "text": "entry.infestusfrontier.circulation.mixed_craw.use"

@@ -44,6 +44,11 @@ EXTRA = {
         {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 4},
         {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
     ],
+    'mixed_craw': [
+        # both empty Craws close from the front and from a corner: the four cups behind the bone cross, the rim, the ribs
+        {'name': 'close', 'x': 0.0, 'y': -59.4, 'z': 1.0, 'yaw': 0, 'pitch': 18},
+        {'name': 'corner', 'x': -1.4, 'y': -59.4, 'z': 1.2, 'yaw': -38, 'pitch': 18},
+    ],
     'junction_intake': [
         # the heart close up over its beat and the mouths' pulses
         {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 6},

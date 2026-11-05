@@ -283,6 +283,44 @@ class OrganMotionTest(unittest.TestCase):
                             for (t0, a), (t1, b) in zip(values, values[1:]):
                                 self.assertLessEqual(max(abs(y - x) / (t1 - t0) for x, y in zip(a, b)), 720)
 
+    def test_craw_pockets_stay_inside_the_rim_and_the_septum_behind_the_stock(self):
+        """StorageModule draws the Craw's four pockets as cells 2.4 px each way from centres 2.5 px off the middle of the
+        front, their icons 0.7 px in front of the socket floor (4.5 px behind the block's front), all scaled with the
+        grade about the hull's back. At every grade and in every idle key the rim's inner faces stay outside the cells
+        and the septum's front stays behind the icons."""
+        import geo_audit
+        import numpy as np
+        geo = geometry('mixed_craw')
+        idle = animations('mixed_craw')['idle']
+        rim = {'brow': (1, -1), 'chin': (1, 1), 'cheek_w': (0, 1), 'cheek_e': (0, -1)}
+        names = {}
+        for bone in geo['bones']:
+            for i, cube in enumerate(bone.get('cubes', [])):
+                names[f"{bone['name']}[{i}]"] = (cube['size'], cube['origin'])
+        about = np.array([0, 8, 5.5])  # the hull's back: x and y from the front's middle, z in the file
+        cell = 2.5 + 2.4
+        times = sorted(float(t) for t in idle['bones']['flesh']['scale'])
+        for grade in (0.72, 0.86, 1.0):
+            for t in times:
+                cubes = geo_audit.world_cubes(geo, idle, t)
+                inner = {axis: [] for axis in (0, 1)}
+                septum = []
+                for name, m, lo, hi in cubes:
+                    size, origin = names[name]
+                    corners = np.array([[x, y, z, 1] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
+                    world = about + ((m @ corners.T).T[:, :3] - about) * grade
+                    if size[2] == 2 and origin[2] == -5.5 and (size[0] in (1, 12) and size[1] in (1, 10)):
+                        axis = 0 if size[0] == 1 else 1
+                        middle = 0 if axis == 0 else 8
+                        inner[axis].append(abs(world[:, axis] - middle).min())
+                    if size[2] <= 0.8 and -4.2 < origin[2] < -3:
+                        septum.append(world[:, 2].min())
+                self.assertEqual([len(inner[0]), len(inner[1])], [2, 2], 'four rim cubes')
+                self.assertGreater(min(inner[0] + inner[1]), cell * grade, (grade, t))
+                floor = 5.5 + (-3.5 - 5.5) * grade
+                self.assertEqual(len(septum), 3, 'the cross and its knot')
+                self.assertGreater(min(septum), floor - 0.7 + 0.1, (grade, t))
+
     def test_palm_fingers_stay_on_the_hand_and_close_clear_of_the_plate(self):
         """Each finger and the thumb is a near segment on the pad and a tip on it, the tip's joint on the near segment,
         so a curl never parts them. In every keyframe of every clip no point of a finger enters the plate, a stud or a

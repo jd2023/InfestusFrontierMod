@@ -16,6 +16,9 @@
     "setblock -3 -61 6 infestusfrontier:mixed_craw[facing=north,grade=2]{stock:{kind:\"craw\",grade:2,held:[{slot:0,item:{id:\"minecraft:hopper\"},count:256},{slot:1,item:{id:\"minecraft:piston\"},count:200},{slot:2,item:{id:\"minecraft:observer\"},count:5},{slot:3,item:{id:\"minecraft:repeater\"},count:16}]}}",
     "setblock 4 -61 6 infestusfrontier:item_capsule[facing=north,grade=2]{stock:{held:[{slot:0,item:{id:\"minecraft:raw_iron\"},count:1900}],grade:2}}",
     "setblock 6 -61 6 infestusfrontier:item_capsule[facing=north,grade=0]",
+    "setblock 9 -61 6 infestusfrontier:mixed_craw[facing=north,grade=0]",
+    "setblock 11 -61 6 infestusfrontier:mixed_craw[facing=north,grade=1]",
+    "setblock 13 -61 6 infestusfrontier:mixed_craw[facing=north,grade=2]",
     "tick unfreeze",
     "time set noon",
     "setblock 0 -60 5 infestusfrontier:mixed_craw[facing=north,grade=1]{stock:{kind:\"craw\",grade:1,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:30},{slot:1,item:{id:\"minecraft:gold_ingot\"},count:12},{slot:2,item:{id:\"minecraft:redstone\"},count:90},{slot:3,item:{id:\"minecraft:copper_ingot\"},count:7}]},root:[I;0,-61,6]}",
@@ -49,6 +52,14 @@
     {
       "name": "grades",
       "x": -3.0,
+      "y": -60.3,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 10
+    },
+    {
+      "name": "empty_grades",
+      "x": 11.5,
       "y": -60.3,
       "z": 1.5,
       "yaw": 0,

@@ -400,6 +400,7 @@ Timed frames and their capture timestamps are kept in `build/captures/`.
 | Vascular Junction | Reads as a heart: the lobed body that beats and the lipped sphincters are the cues; all six rings in all three modes gape, pucker and shrink without their lips parting; the bottom ring stays on the foundation (`motion_junction_intake` close, corner; `motion_junction_closed`, `motion_junction_outlet`) |
 | Reservoir | Joined bodies, exterior corners, fill surfaces and inventory models |
 | Capsule Stem, Item Capsule | `capsule_stem`: a grown tree with a fork, pods with stock on their faces, three grades, the root's screen; `motion_item_capsule`: the pod breathes |
+| Mixed Craw | Reads apart from a bulk pod at four blocks: bog-green hide with pale bone creases, an ivory cross dividing the socket into four cups behind a one-pixel rim, two knuckled ivory ribs on the flanks; stock sits inside the rim and in front of the cross at all three grades, empty cups still read as four (`mixed_craw` front, grades, `empty_grades`, `bulk_beside`, hotbar; `motion_mixed_craw` close, corner) |
 | Bud, veins, Mouth, lobes, cultivation, Polyp, Valve, Papilla | Existing static scenes plus `visual_static`: front/back views, recessed surfaces and connections |
 | Dormant and awakened armor | `visual_armor`: front/back/side views with bent arms and legs; dyed, trimmed and enchanted sets; an adult and a baby zombie wearing them |
 | Living walls, windows, crossings and stitches | `walls`, `openings`, `crossings`: all tiers, joined frames and routed faces |
