@@ -321,6 +321,49 @@ class OrganMotionTest(unittest.TestCase):
                 self.assertEqual(len(septum), 3, 'the cross and its knot')
                 self.assertGreater(min(septum), floor - 0.7 + 0.1, (grade, t))
 
+    def test_larder_pockets_stay_open_and_the_fourth_quarter_sealed(self):
+        """StorageModule draws the Larder's three pockets as cells 2.4 px each way from centres 2.5 px off the middle of
+        the front, two in the top row and the third under the viewer's left one (the game's +x, as GeckoLib mirrors the
+        file's x), their icons 0.7 px in front of the socket floor, all scaled with the grade about the hull's back. At
+        every grade and in every idle key no cube but the ridge reaches into a cell in front of the floor, the ridge's
+        front stays behind the icons, and the resin seal fills the fourth quarter to the rim's front."""
+        import geo_audit
+        import numpy as np
+        geo = geometry('larder')
+        idle = animations('larder')['idle']
+        names = {}
+        for bone in geo['bones']:
+            for i, cube in enumerate(bone.get('cubes', [])):
+                names[f"{bone['name']}[{i}]"] = (cube['size'], cube['origin'])
+        about = np.array([0, 8, 5.5])  # the hull's back: x and y from the front's middle, z in the file
+        times = sorted(float(t) for t in idle['bones']['flesh']['scale'])
+        for grade in (0.72, 0.86, 1.0):
+            floor = 5.5 + (-3.5 - 5.5) * grade
+            cells = [(x * grade, 8 + (y - 8) * grade) for x, y in ((2.5, 10.5), (-2.5, 10.5), (2.5, 5.5))]
+            fourth = (-2.5 * grade, 8 - 2.5 * grade)
+            half = 2.4 * grade
+            for t in times:
+                ridge, sealed = 0, False
+                for name, m, lo, hi in geo_audit.world_cubes(geo, idle, t):
+                    size, origin = names[name]
+                    corners = np.array([[x, y, z, 1] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
+                    world = about + ((m @ corners.T).T[:, :3] - about) * grade
+                    low, high = world.min(axis=0), world.max(axis=0)
+                    if size[2] <= 0.8 and -4.2 < origin[2] < -3:
+                        ridge += 1
+                        self.assertGreater(low[2], floor - 0.7 + 0.1, (name, grade, t))
+                        continue
+                    for cx, cy in cells:
+                        self.assertFalse(
+                            min(high[0], cx + half) - max(low[0], cx - half) > 1e-6
+                            and min(high[1], cy + half) - max(low[1], cy - half) > 1e-6
+                            and low[2] < floor - 1e-6, (name, (cx, cy), grade, t))
+                    if (low[0] < fourth[0] - half and high[0] > fourth[0] + half and low[1] < fourth[1] - half
+                            and high[1] > fourth[1] + half and low[2] < floor - 1.9 * grade):
+                        sealed = True
+                self.assertEqual(ridge, 2, 'the two arms of the ridge')
+                self.assertTrue(sealed, (grade, t))
+
     def test_palm_fingers_stay_on_the_hand_and_close_clear_of_the_plate(self):
         """Each finger and the thumb is a near segment on the pad and a tip on it, the tip's joint on the near segment,
         so a curl never parts them. In every keyframe of every clip no point of a finger enters the plate, a stud or a

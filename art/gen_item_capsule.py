@@ -39,84 +39,74 @@ RIM = 2
 RIM_DEPTH = 2
 
 
-def bones(rim=RIM, extra=()):
-    """The pod's bones; `rim` is the rim's width round the socket and `extra` more cubes of the hull's bone."""
-    return [
-        ('root', None, [0, MID, 0], []),
-        # the neck into the stem, a shelf of bone under it to the stem's collar, and the collar that grips it there
-        ('neck', 'root', [0, MID, 5], [
-            ('neck', [-2, MID - 2, 1.5], [4, 4, 10], None),
-            ('shelf', [-1.5, MID - 3.7, 2], [3, 2, 8], None),
-        ]),
-        ('collar', 'root', [0, MID, 9], [('collar', [-3, MID - 3, 8.5], [6, 6, 2], None)]),
-        # the pod: scaled by grade about its back, so it grows outward from the stem
-        ('body', 'root', [0, MID, BACK], []),
-        ('flesh', 'body', [0, MID, FLOOR], [
-            ('hull', [-6, MID - 6, FLOOR], [12, 12, 9], None),
-            ('crown', [-5, MID + 6, FLOOR + 1], [10, 1, 7], None),
-            ('keel', [-5, MID - 7, FLOOR + 1], [10, 1, 7], None),
-            # the rim round the socket: its inner faces are the socket's walls
-            ('brow', [-6, MID + 6 - rim, FLOOR - RIM_DEPTH], [12, rim, RIM_DEPTH], None),
-            ('chin', [-6, MID - 6, FLOOR - RIM_DEPTH], [12, rim, RIM_DEPTH], None),
-            ('cheek_w', [-6, MID - 6 + rim, FLOOR - RIM_DEPTH], [rim, 12 - 2 * rim, RIM_DEPTH], None),
-            ('cheek_e', [6 - rim, MID - 6 + rim, FLOOR - RIM_DEPTH], [rim, 12 - 2 * rim, RIM_DEPTH], None),
-            ('shoulder', [-4, MID - 4, BACK], [8, 8, 1], None),
-            *extra,
-        ]),
-    ]
-
-
-BONES = bones()
+BONES = [
+    ('root', None, [0, MID, 0], []),
+    # the neck into the stem, a shelf of bone under it to the stem's collar, and the collar that grips it there
+    ('neck', 'root', [0, MID, 5], [
+        ('neck', [-2, MID - 2, 1.5], [4, 4, 10], None),
+        ('shelf', [-1.5, MID - 3.7, 2], [3, 2, 8], None),
+    ]),
+    ('collar', 'root', [0, MID, 9], [('collar', [-3, MID - 3, 8.5], [6, 6, 2], None)]),
+    # the pod: scaled by grade about its back, so it grows outward from the stem
+    ('body', 'root', [0, MID, BACK], []),
+    ('flesh', 'body', [0, MID, FLOOR], [
+        ('hull', [-6, MID - 6, FLOOR], [12, 12, 9], None),
+        ('crown', [-5, MID + 6, FLOOR + 1], [10, 1, 7], None),
+        ('keel', [-5, MID - 7, FLOOR + 1], [10, 1, 7], None),
+        # the rim round the socket: its inner faces are the socket's walls
+        ('brow', [-6, MID + 6 - RIM, FLOOR - RIM_DEPTH], [12, RIM, RIM_DEPTH], None),
+        ('chin', [-6, MID - 6, FLOOR - RIM_DEPTH], [12, RIM, RIM_DEPTH], None),
+        ('cheek_w', [-6, MID - 6 + RIM, FLOOR - RIM_DEPTH], [RIM, 12 - 2 * RIM, RIM_DEPTH], None),
+        ('cheek_e', [6 - RIM, MID - 6 + RIM, FLOOR - RIM_DEPTH], [RIM, 12 - 2 * RIM, RIM_DEPTH], None),
+        ('shoulder', [-4, MID - 4, BACK], [8, 8, 1], None),
+    ]),
+]
 # the socket's walls: the face of each rim cube that looks into it
 WALLS = {'brow': 'down', 'chin': 'up', 'cheek_w': 'east', 'cheek_e': 'west'}
 
 
-def creases(p, rect, lines, salmon=SALMON, pod=POD):
+def creases(p, rect, lines):
     """Muted salmon creases: short shallow wrinkles of hide pushed up, a shadow under each, no two in a line."""
     x0, y0, w, h = rect
     for sx, sy, length, slope in lines:
         for i in range(length):
             x, y = sx + i, sy + (i * slope) // 2
             if 0 <= x < w and 0 <= y < h - 1:
-                p.put(rect, x, y, salmon[2 if 0 < i < length - 1 else 1])
-                p.put(rect, x, y + 1, pod[0])
+                p.put(rect, x, y, SALMON[2 if 0 < i < length - 1 else 1])
+                p.put(rect, x, y + 1, POD[0])
 
 
-def textures(uv, model_bones=BONES, pod=POD, salmon=SALMON, seed=811):
-    p = Painter(SHEET, seed)
-    sizes = islands(model_bones)
+def textures(uv):
+    p = Painter(SHEET, 811)
+    sizes = islands(BONES)
     rects = {name: faces(sizes[name], uv[name]) for name in sizes}
     for face, rect in rects['hull'].items():
         if face == 'north':
             # the socket floor: quiet dark wet flesh under the membrane
             p.ramp(rect, FACE, flat(0.35), grain=0.03, mottle=0.2)
             continue
-        p.ramp(rect, pod, flat(0.72 if face == 'up' else 0.3 if face == 'down' else 0.55), grain=0.05, mottle=0.35)
+        p.ramp(rect, POD, flat(0.72 if face == 'up' else 0.3 if face == 'down' else 0.55), grain=0.05, mottle=0.35)
         if face in ('west', 'east'):
-            creases(p, rect, [(1, 2, 4, 1), (4, 6, 3, -1), (2, 9, 3, 1)], salmon, pod)
+            creases(p, rect, [(1, 2, 4, 1), (4, 6, 3, -1), (2, 9, 3, 1)])
         elif face in ('up', 'down'):
-            creases(p, rect, [(2, 1, 4, 1), (7, 3, 3, -1), (3, 6, 4, 1)], salmon, pod)
+            creases(p, rect, [(2, 1, 4, 1), (7, 3, 3, -1), (3, 6, 4, 1)])
         elif face == 'south':
-            creases(p, rect, [(2, 0, 3, 1), (7, 10, 3, -1)], salmon, pod)
+            creases(p, rect, [(2, 0, 3, 1), (7, 10, 3, -1)])
     for name in ('crown', 'keel'):
         for face, rect in rects[name].items():
-            p.ramp(rect, pod, flat(0.8 if face == 'up' else 0.25 if face == 'down' else 0.5), grain=0.05, mottle=0.3)
+            p.ramp(rect, POD, flat(0.8 if face == 'up' else 0.25 if face == 'down' else 0.5), grain=0.05, mottle=0.3)
     for name, wall in WALLS.items():
         for face, rect in rects[name].items():
             if face == wall:
                 p.ramp(rect, FACE, flat(0.55), grain=0.03, mottle=0.2)
             else:
-                p.ramp(rect, pod, flat(0.78 if face == 'up' else 0.35 if face == 'down' else 0.62), grain=0.05, mottle=0.3)
+                p.ramp(rect, POD, flat(0.78 if face == 'up' else 0.35 if face == 'down' else 0.62), grain=0.05, mottle=0.3)
     for face, rect in rects['shoulder'].items():
-        p.ramp(rect, pod, flat(0.4), grain=0.04, mottle=0.3)
+        p.ramp(rect, POD, flat(0.4), grain=0.04, mottle=0.3)
     for face, rect in rects['neck'].items():
         p.ramp(rect, STEM, lambda x, y, w, h: 0.55 - 0.2 * (x % 2 == 0), grain=0.03, mottle=0.1)
     for name in ('shelf', 'collar'):
         for face, rect in rects[name].items():
-            p.ramp(rect, BONE, lambda x, y, w, h, face=face: (0.8 if face == 'up' else 0.55) - 0.15 * ((x + 2 * y) % 5 == 0),
-                   grain=0.03, mottle=0.1)
-    for name in ('rib_w', 'rib_e'):
-        for face, rect in rects.get(name, {}).items():
             p.ramp(rect, BONE, lambda x, y, w, h, face=face: (0.8 if face == 'up' else 0.55) - 0.15 * ((x + 2 * y) % 5 == 0),
                    grain=0.03, mottle=0.1)
     return p, rects['hull']['south']

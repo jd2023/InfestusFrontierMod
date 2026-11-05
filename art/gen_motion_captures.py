@@ -49,6 +49,11 @@ EXTRA = {
         {'name': 'close', 'x': 0.0, 'y': -59.4, 'z': 1.0, 'yaw': 0, 'pitch': 18},
         {'name': 'corner', 'x': -1.4, 'y': -59.4, 'z': 1.2, 'yaw': -38, 'pitch': 18},
     ],
+    'larder': [
+        # both empty Larders close from the front and from a corner: the three cups, the resin seal, the rim, the latches
+        {'name': 'close', 'x': 0.0, 'y': -59.4, 'z': 1.0, 'yaw': 0, 'pitch': 18},
+        {'name': 'corner', 'x': -1.4, 'y': -59.4, 'z': 1.2, 'yaw': -38, 'pitch': 18},
+    ],
     'junction_intake': [
         # the heart close up over its beat and the mouths' pulses
         {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 6},

@@ -139,6 +139,7 @@ final class CaptureClient {
                 }
                 case MOVE -> {
                     holdInAir(minecraft);
+                    holdAim(minecraft);
                     if (ticksInStage >= MOVE_TICKS) {
                         currentView()
                                 .use()
@@ -161,7 +162,10 @@ final class CaptureClient {
                         enter(Stage.FRAME);
                     }
                 }
-                case FRAME, GRABBING -> holdInAir(minecraft);
+                case FRAME, GRABBING -> {
+                    holdInAir(minecraft);
+                    holdAim(minecraft);
+                }
                 case DISCONNECT -> disconnect(minecraft);
                 case STOP -> stop(minecraft);
                 case DONE -> {}
@@ -309,6 +313,21 @@ final class CaptureClient {
             player.setDeltaMovement(Vec3.ZERO);
             player.setPos(view.x(), view.y(), view.z());
         }
+    }
+
+    /**
+     * Once the teleport has arrived the player keeps the view's yaw and pitch: the mouse grabbed again as a screen
+     * closes can turn the camera after the teleport, and the shot would then wait for an aim that never returns.
+     */
+    private void holdAim(Minecraft minecraft) {
+        var player = minecraft.player;
+        if (player == null) return;
+        Scenario.View view = currentView();
+        if (player.position().distanceToSqr(view.x(), view.y(), view.z()) >= 1.0) return;
+        player.setYRot(view.yaw());
+        player.setXRot(view.pitch());
+        player.yRotO = view.yaw();
+        player.xRotO = view.pitch();
     }
 
     private void onLevelRendered(RenderLevelStageEvent event) {

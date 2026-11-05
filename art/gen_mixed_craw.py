@@ -100,7 +100,7 @@ def trace(points):
     return out
 
 
-def creases(p, rect, paths):
+def creases(p, rect, paths, hide=HIDE, crease=CREASE):
     """Pale bone creases: wandering ridges of hide pushed up, bright along the middle and duller at the ends, with a
     wet shadow under the lit side."""
     for path in paths:
@@ -108,9 +108,9 @@ def creases(p, rect, paths):
         ridge = set(texels)
         for i, (x, y) in enumerate(texels):
             if (x, y + 1) not in ridge and 0 < i < len(texels) - 1:
-                p.put(rect, x, y + 1, HIDE[0])
+                p.put(rect, x, y + 1, hide[0])
         for i, (x, y) in enumerate(texels):
-            p.put(rect, x, y, CREASE[2 if 0 < i < len(texels) - 1 else 1])
+            p.put(rect, x, y, crease[2 if 0 < i < len(texels) - 1 else 1])
 
 
 def cups(p, rect):
@@ -126,12 +126,14 @@ def cups(p, rect):
             p.put(rect, cx + 1, cy + 1, CUP[3])
 
 
-def bone_fill(p, rect, face, along_y=False):
+def bone_fill(p, rect, face, palette=BONE, along_y=False):
+    """A bone surface from `palette`: the top face lit, the end texels along its length darker where it meets the
+    hide, and a sparse speckle of bone grain."""
     def value(x, y, w, h):
         i, n = (y, h) if along_y else (x, w)
         end = min(i, n - 1 - i)
         return (0.78 if face == 'up' else 0.62) - 0.22 * (end == 0 and n > 2) - 0.12 * ((x + 2 * y) % 5 == 0)
-    p.ramp(rect, BONE, value, grain=0.03, mottle=0.1)
+    p.ramp(rect, palette, value, grain=0.03, mottle=0.1)
 
 
 def whole(rect):

@@ -33,6 +33,15 @@
   },
   "pages": [
     {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.circulation.larder.name",
+      "images": [
+        "infestusfrontier:textures/book/larder.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.circulation.larder.description"
+    },
+    {
       "type": "modonomicon:text",
       "title": "entry.infestusfrontier.circulation.larder.name",
       "text": "entry.infestusfrontier.circulation.larder.use"

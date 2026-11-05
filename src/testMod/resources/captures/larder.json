@@ -16,6 +16,9 @@
     "setblock -3 -61 6 infestusfrontier:larder[facing=north,grade=2]{stock:{kind:\"larder\",grade:2,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:200},{slot:1,item:{id:\"minecraft:gold_ingot\"},count:90},{slot:2,item:{id:\"minecraft:redstone\"},count:20}],marks:[{slot:0,label:{id:\"minecraft:iron_ingot\"},reserve:128},{slot:1,label:{id:\"minecraft:gold_ingot\"},reserve:64},{slot:2,label:{id:\"minecraft:redstone\"},reserve:16}]}}",
     "setblock 4 -61 6 infestusfrontier:mixed_craw[facing=north,grade=1]{stock:{kind:\"craw\",grade:1,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:50},{slot:1,item:{id:\"minecraft:gold_ingot\"},count:20}]}}",
     "setblock 6 -61 6 infestusfrontier:mixed_craw[facing=north,grade=0]",
+    "setblock 9 -61 6 infestusfrontier:larder[facing=north,grade=0]",
+    "setblock 11 -61 6 infestusfrontier:larder[facing=north,grade=1]",
+    "setblock 13 -61 6 infestusfrontier:larder[facing=north,grade=2]",
     "tick unfreeze",
     "time set noon",
     "setblock 0 -60 5 infestusfrontier:larder[facing=north,grade=1]{stock:{kind:\"larder\",grade:1,held:[{slot:0,item:{id:\"minecraft:iron_ingot\"},count:30},{slot:1,item:{id:\"minecraft:gold_ingot\"},count:12}],marks:[{slot:0,label:{id:\"minecraft:iron_ingot\"},reserve:16},{slot:1,label:{id:\"minecraft:gold_ingot\"},reserve:12},{slot:2,label:{id:\"minecraft:copper_ingot\"},reserve:0}]},root:[I;0,-61,6]}",
@@ -49,6 +52,14 @@
     {
       "name": "grades",
       "x": -3.0,
+      "y": -60.3,
+      "z": 1.5,
+      "yaw": 0,
+      "pitch": 10
+    },
+    {
+      "name": "empty_grades",
+      "x": 11.5,
       "y": -60.3,
       "z": 1.5,
       "yaw": 0,
@@ -159,7 +170,7 @@
       "pitch": 20,
       "gui": true,
       "book": "infestusfrontier:circulation/larder",
-      "page": 2
+      "page": 4
     },
     {
       "name": "breath",

@@ -2324,7 +2324,7 @@
       "gui": true,
       "name": "book_larder_recipe",
       "book": "infestusfrontier:circulation/larder",
-      "page": 2
+      "page": 4
     },
     {
       "name": "palm_line",
