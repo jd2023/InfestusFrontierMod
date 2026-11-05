@@ -68,6 +68,7 @@ final class ShapingPalmBlockEntity extends BlockEntity
     static final int RETRY_TICKS = 20;
 
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     private static final int BLEND_TICKS = 10;
     private static final MapCodec<Saved> SAVED = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     PalmContents.CODEC.fieldOf("contents").forGetter(Saved::contents),
@@ -308,12 +309,15 @@ final class ShapingPalmBlockEntity extends BlockEntity
         return change;
     }
 
-    /** Mirrors Rote and a running cycle into the block state, so every client can see them. */
+    /**
+     * Mirrors Rote and a running cycle into the block state, so every client can see them. A cycle that is done but
+     * waits for room in the tray, or that is paused for want of a foundation, shows as idle.
+     */
     private void show() {
         if (level == null || level.isClientSide) return;
         BlockState state = getBlockState();
         BlockState shown = state.setValue(ShapingPalmBlock.ROTE, rote)
-                .setValue(ShapingPalmBlock.WORKING, rote && cycle.isPresent());
+                .setValue(ShapingPalmBlock.WORKING, status() == PalmStatus.WORKING);
         if (shown != state) level.setBlock(worldPosition, shown, Block.UPDATE_CLIENTS);
     }
 
@@ -513,9 +517,18 @@ final class ShapingPalmBlockEntity extends BlockEntity
         cooldown = 0;
     }
 
+    /**
+     * The client plays {@code working}, the hand closing over its plate, while the block state says a cycle runs, and
+     * {@code idle} otherwise; nothing else is sent for it.
+     */
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "state", BLEND_TICKS, state -> state.setAndContinue(IDLE)));
+        controllers.add(new AnimationController<>(
+                this,
+                "state",
+                BLEND_TICKS,
+                state -> state.setAndContinue(
+                        state.getAnimatable().getBlockState().getValue(ShapingPalmBlock.WORKING) ? WORKING : IDLE)));
     }
 
     @Override

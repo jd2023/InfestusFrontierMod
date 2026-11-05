@@ -670,31 +670,56 @@ def emblem_kidney(img, ox, oy):
 
 
 def emblem_palm(img, ox, oy):
-    """An open hand of pink muscle, palm up, holding a three-by-three grid of bone studs in its cup."""
-    MUSCLE = [(96, 44, 64), (124, 60, 78), (150, 82, 92), (176, 110, 112)]
-    for y in range(EMBLEM):
-        for x in range(EMBLEM):
-            dx, dy = (x - 16) / 13.0, (y - 20) / 10.0
-            d = math.hypot(dx, dy)
-            if d > 1.0:
-                continue
-            if d > 0.9:
-                colour = OUTLINE
-            else:
-                colour = MUSCLE[3] if dx + dy < -0.7 else MUSCLE[2] if dx + dy < 0.0 else MUSCLE[1] if dx + dy < 0.7 else MUSCLE[0]
-            put(img, ox + x, oy + y, colour)
-    for cx in (5, 10, 16, 22, 27):
-        top = 3 + abs(cx - 16) // 3
-        for y in range(top, 16):
-            for x in range(cx - 2, cx + 2):
-                edge = x in (cx - 2, cx + 1) or y == top
-                put(img, ox + x, oy + y, OUTLINE if edge else MUSCLE[3] if x == cx - 1 else MUSCLE[2])
+    """An open hand of pink muscle, palm up and cupped: four fingers rising from the back of the palm and a thumb
+    splayed to the side, every tip ivory, round an ivory plate with a three-by-three grid of studs in its cup."""
+    MUSCLE = [(112, 40, 66), (152, 62, 90), (190, 92, 116), (220, 124, 142), (242, 172, 176)]
+    fingers = [(4, 8), (10, 4), (16, 3), (22, 6)]  # left column and top row of each finger, 5 wide
+    thumb = ((21.0, 26.0), (28.5, 18.5))  # the thumb's spine, from the palm up and out to the right
+
+    def region(x, y):
+        """'tip', 'finger', 'thumb', 'palm' or None for each pixel of the emblem."""
+        dx, dy = (x - 15.5) / 11.5, (y - 21.5) / 8.5
+        for fx, top in fingers:
+            if fx <= x < fx + 5 and top <= y < 18:
+                return 'tip' if y < top + 4 else 'finger'
+        (ax, ay), (bx, by) = thumb
+        t = max(0.0, min(1.0, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / ((bx - ax) ** 2 + (by - ay) ** 2)))
+        if math.hypot(x - ax - t * (bx - ax), y - ay - t * (by - ay)) <= 2.7:
+            return 'tip' if t > 0.72 else 'thumb'
+        if math.hypot(dx, dy) <= 1.0 and y >= 14:
+            return 'palm'
+        return None
+
+    pixels = {(x, y): region(x, y) for y in range(EMBLEM) for x in range(EMBLEM)}
+    for (x, y), part in pixels.items():
+        if part is None:
+            continue
+        edge = any(pixels.get((x + i, y + j)) is None for i, j in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        if edge:
+            colour = OUTLINE
+        elif part == 'tip':
+            colour = IVORY[3] if (x + y) % 5 == 0 else IVORY[2]
+        elif part in ('finger', 'thumb'):
+            colour = MUSCLE[3] if (x - 4) % 6 in (1, 2) or part == 'thumb' and x + y < 46 else MUSCLE[2]
+        else:
+            k = (x - 15.5) / 11.5 + (y - 21.5) / 8.5
+            colour = MUSCLE[4] if k < -0.9 else MUSCLE[3] if k < -0.2 else MUSCLE[2] if k < 0.6 else MUSCLE[1]
+        put(img, ox + x, oy + y, colour)
+    # a crease where each finger meets the palm
+    for fx, _ in fingers:
+        for x in range(fx + 1, fx + 4):
+            put(img, ox + x, oy + 17, MUSCLE[0])
+    # the plate in the cup: an ivory slab with three rows of three studs
+    for y in range(17, 28):
+        for x in range(8, 23):
+            edge = y in (17, 27) or x in (8, 22)
+            put(img, ox + x, oy + y, OUTLINE if edge else IVORY[1])
     for row in range(3):
         for col in range(3):
-            sx, sy = 11 + col * 5, 17 + row * 4
-            for y in range(sy, sy + 3):
-                for x in range(sx, sx + 4):
-                    put(img, ox + x, oy + y, IVORY[3] if y == sy else IVORY[2] if x < sx + 3 else IVORY[1])
+            sx, sy = 10 + col * 4, 19 + row * 3
+            for y in range(sy, sy + 2):
+                for x in range(sx, sx + 3):
+                    put(img, ox + x, oy + y, IVORY[3] if y == sy else IVORY[2] if x < sx + 2 else IVORY[0])
 
 
 def emblems(img):

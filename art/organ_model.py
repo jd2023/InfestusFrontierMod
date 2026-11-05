@@ -36,7 +36,7 @@ def pack(bones, sheet):
     uv, x, y, shelf = {}, 0, 0, 0
     for name in order:
         w, h, d = sizes[name]
-        fw, fh = 2 * w + 2 * d, h + d
+        fw, fh = math.ceil(2 * w + 2 * d), math.ceil(h + d)  # a fractional cube keeps whole texels to itself
         if x + fw > sheet:
             x, y, shelf = 0, y + shelf + 1, 0
         uv[name] = (x, y)
@@ -335,9 +335,12 @@ def write(model, bones, sheet, painter, anims, particle_rect, bounds=(2, 2, (0, 
     (ASSETS / 'animations/block').mkdir(parents=True, exist_ok=True)
     painter.img.save(out / (model + '.png'), optimize=True)
     painter.glow.save(out / (model + '_glowmask.png'), optimize=True)
-    # the break particle: one 16x16 patch of the skin
-    px, py = particle_rect
-    painter.img.crop((px, py, px + 16, py + 16)).save(ASSETS / 'textures/block' / (model + '.png'), optimize=True)
+    # the break particle: one 16x16 patch of the skin, or an image of its own
+    if isinstance(particle_rect, Image.Image):
+        particle_rect.save(ASSETS / 'textures/block' / (model + '.png'), optimize=True)
+    else:
+        px, py = particle_rect
+        painter.img.crop((px, py, px + 16, py + 16)).save(ASSETS / 'textures/block' / (model + '.png'), optimize=True)
     animation_json = animation_file(anims)
     (ASSETS / 'geo/block' / (model + '.geo.json')).write_text(compact(geo(model, bones, uv, sheet, bounds)), encoding='utf-8')
     (ASSETS / 'animations/block' / (model + '.animation.json')).write_text(compact(animation_json), encoding='utf-8')

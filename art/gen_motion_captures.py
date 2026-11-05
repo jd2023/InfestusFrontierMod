@@ -37,8 +37,11 @@ EXTRA = {
         {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
     ],
     'shaping_palm': [
-        # the idle close up: the fingertips curl and open in turn round the plate, the palm breathes
-        {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 8},
+        # both hands from the front, still: the idle one open on the left, the working one on the right
+        {'name': 'front', 'x': 0.5, 'y': -59.4, 'z': 0.6, 'yaw': 0, 'pitch': 26},
+        # the working hand close up over a little more than one 2 s cycle: the fingers and the thumb curl over the
+        # plate and open, and the studs glow faintly while the hand is closed
+        {'name': 'close', 'x': 1.5, 'y': -59.2, 'z': 1.2, 'yaw': 0, 'pitch': 30, 'frames': 12, 'frameTicks': 4},
         {'name': 'corner', 'x': -0.4, 'y': -59.1, 'z': 1.2, 'yaw': -38, 'pitch': 28},
     ],
     'junction_intake': [
@@ -80,6 +83,16 @@ EXTRA = {
 }
 
 
+# A Palm with Rote half way through a cycle of planks: the block entity holds the cycle that its working state shows,
+# and tick freeze keeps both where they are.
+WORKING_PALM = ('shaping_palm[rote=true,working=true]{reach:1b,contents:{grid:[{id:"minecraft:oak_log",count:12}]},'
+                'rote:{pattern:{kinds:[{id:"minecraft:oak_log",count:1},{},{},{},{},{},{},{},{}],'
+                'recipe:"minecraft:oak_planks",result:{id:"minecraft:oak_planks",count:4}},'
+                'cycle:{done:20,result:{id:"minecraft:oak_planks",count:4},remainders:[]},tray:[],'
+                'biomass:{stored:500,reserved:0,capacity:1000},cycles:3}}')
+WORKING = {'shaping_palm': WORKING_PALM}
+
+
 def scene(name, left, right, frames=48):
     # Move while ticks run so the server tracks the fixture's chunks before freezing.
     spec = {
@@ -101,8 +114,8 @@ def scene(name, left, right, frames=48):
 
 def main():
     for model in MODELS:
-        suffix = '' if model in ('seed_pouch', 'item_capsule', 'mixed_craw', 'larder', 'shaping_palm') else '[working=true]'
-        scene(model, model, model + suffix)
+        suffix = '' if model in ('seed_pouch', 'item_capsule', 'mixed_craw', 'larder') else '[working=true]'
+        scene(model, model, WORKING.get(model, model + suffix))
     for stage in range(3):
         scene(f'furnace_{stage}', f'bio_furnace[stage={stage}]', f'bio_furnace[stage={stage},working=true]')
     for level in range(5):

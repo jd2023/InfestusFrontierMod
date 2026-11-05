@@ -7,12 +7,15 @@ import static org.jd.infestusfrontier.testmod.ShapingPalmTests.put;
 import static org.jd.infestusfrontier.testmod.ShapingPalmTests.reload;
 import static org.jd.infestusfrontier.testmod.ShapingPalmTests.stack;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -49,6 +52,12 @@ import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jd.infestusfrontier.testmod.ShapingPalmTests.MenuPlayer;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
 
 /**
  * The Shaping Palm's Rote (BLOCK_CATALOG T1-41, stage 3): the Synaptic Gel that gives it, Select, and the cycle that
@@ -838,5 +847,173 @@ public final class PalmRoteTests {
             h.assertTrue(ticksWithStarts[0] > 1, "the rest started on later ticks");
             h.succeed();
         });
+    }
+
+    // ---- what the client is shown ----
+
+    private static boolean working(GameTestHelper h, BlockPos at) {
+        return h.getBlockState(at).getValue(ShapingPalmBlock.WORKING);
+    }
+
+    /**
+     * The clip the Palm's animation controller asks for now: the controller's own predicate, run against the block as
+     * it stands, with a probe controller that records the request instead of playing it.
+     */
+    private static String clip(GameTestHelper h, BlockPos at) {
+        GeoBlockEntity palm = (GeoBlockEntity) h.getBlockEntity(at);
+        AnimationController<GeoBlockEntity> state = new AnimatableManager<GeoBlockEntity>(palm)
+                .getAnimationControllers()
+                .get("state");
+        String[] asked = {"none"};
+        AnimationController<GeoBlockEntity> probe = new AnimationController<>(palm, "probe", 0, s -> PlayState.STOP) {
+            @Override
+            public void setAnimation(RawAnimation animation) {
+                asked[0] = animation.getAnimationStages().getFirst().animationName();
+            }
+        };
+        state.getStateHandler().handle(new AnimationState<>(palm, 0, 0, 0, false).withController(probe));
+        return asked[0];
+    }
+
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "palm_rote_working",
+            timeoutTicks = 200)
+    public static void aRunningCycleShowsWorkingAndAPausedOrStoppedPalmShowsIdle(GameTestHelper h) {
+        BlockPos at = rotePalm(h);
+        h.assertFalse(working(h, at), "a Palm with Rote and nothing to do shows idle");
+        h.assertValueEqual(clip(h, at), "idle", "and plays its idle clip");
+        fuel(h, at, 10);
+        fill(h, at, stickGrid(2));
+        h.assertFalse(working(h, at), "filling the grid by hand is not a cycle");
+        select(h, at);
+        h.startSequence()
+                .thenExecuteAfter(5, () -> {
+                    h.assertTrue(rote(h, at).cycle().isPresent(), "the cycle started");
+                    h.assertTrue(working(h, at), "the block state shows it working");
+                    h.assertValueEqual(clip(h, at), "working", "and the hand plays its working clip");
+                    h.setBlock(at.below(), Blocks.DIRT);
+                })
+                .thenExecuteAfter(5, () -> {
+                    h.assertTrue(rote(h, at).cycle().isPresent(), "without a foundation the cycle is kept");
+                    h.assertFalse(working(h, at), "but it is paused, so the Palm shows idle");
+                    h.assertValueEqual(clip(h, at), "idle", "and plays its idle clip");
+                    h.setBlock(at.below(), EcologyTests.mature());
+                })
+                .thenExecuteAfter(5, () -> {
+                    h.assertTrue(working(h, at), "on its foundation again the cycle runs on and shows");
+                    h.assertValueEqual(clip(h, at), "working", "working");
+                })
+                .thenExecuteAfter(TICKS + 5, () -> {
+                    h.assertValueEqual(inTray(h, at, Items.STICK), 4, "the cycle finished");
+                    h.assertTrue(rote(h, at).cycle().isEmpty(), "and no second one started on an empty tank");
+                    h.assertValueEqual(status(h, at), PalmStatus.NO_BIOMASS, "the Palm says it needs biomass");
+                    h.assertFalse(working(h, at), "a stopped Palm shows idle");
+                    h.assertValueEqual(clip(h, at), "idle", "and plays its idle clip");
+                })
+                .thenSucceed();
+    }
+
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "palm_rote_working",
+            timeoutTicks = 200)
+    public static void aFinishedCycleWaitingForRoomInTheTrayShowsIdle(GameTestHelper h) {
+        BlockPos at = AT;
+        h.setBlock(at.below(), EcologyTests.mature());
+        // shown working, as a cycle that was running when the tray filled would have left it
+        h.setBlock(
+                at,
+                ProcessingModule.SHAPING_PALM
+                        .get()
+                        .defaultBlockState()
+                        .setValue(ShapingPalmBlock.ROTE, true)
+                        .setValue(ShapingPalmBlock.WORKING, true));
+        try {
+            h.getBlockEntity(at)
+                    .loadWithComponents(
+                            TagParser.parseTag("{reach:1b,contents:{grid:[]},rote:{pattern:{kinds:["
+                                    + "{id:\"minecraft:oak_log\",count:1},{},{},{},{},{},{},{},{}],"
+                                    + "recipe:\"minecraft:oak_planks\",result:{id:\"minecraft:oak_planks\",count:4}},"
+                                    + "cycle:{done:40,result:{id:\"minecraft:oak_planks\",count:4},remainders:[]},"
+                                    + "tray:[{id:\"minecraft:cobblestone\",count:64}],"
+                                    + "biomass:{stored:0,reserved:0,capacity:1000},cycles:1}}"),
+                            h.getLevel().registryAccess());
+        } catch (CommandSyntaxException e) {
+            throw new IllegalStateException(e);
+        }
+        IItemHandler ports = ports(h, at);
+        h.startSequence()
+                .thenExecuteAfter(3, () -> {
+                    h.assertTrue(rote(h, at).cycle().get().isDone(), "the cycle is done");
+                    h.assertValueEqual(status(h, at), PalmStatus.TRAY_FULL, "and waits for room in the tray");
+                    h.assertFalse(working(h, at), "a blocked Palm shows idle");
+                    h.assertValueEqual(clip(h, at), "idle", "and plays its idle clip");
+                    h.assertTrue(ports.extractItem(9, 64, false).is(Items.COBBLESTONE), "the tray is emptied");
+                })
+                .thenExecuteAfter(RETRY_WAIT, () -> {
+                    h.assertValueEqual(inTray(h, at, Items.OAK_PLANKS), 4, "the planks are delivered");
+                    h.assertTrue(rote(h, at).cycle().isEmpty(), "the cycle is over");
+                    h.assertFalse(working(h, at), "and the Palm still shows idle");
+                })
+                .thenSucceed();
+    }
+
+    // the default demo's plank line, in demo coordinates: a Rote Palm on a Mouth that makes planks into a chest
+    private static final BlockPos PLANK_LINE_MIN = new BlockPos(149, -61, -30);
+    private static final BlockPos PLANK_LINE_MAX = new BlockPos(151, -58, -26);
+    private static final BlockPos PLANK_PALM = new BlockPos(150, -60, -28);
+    private static final BlockPos PLANK_CHEST = new BlockPos(151, -60, -28);
+    private static final int PLANK_CYCLES = 10;
+
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "palm_plank_line",
+            timeoutTicks = 40 * PLANK_CYCLES + 200)
+    public static void theDemosPlankLineWorksCycleAfterCycleAndShowsIt(GameTestHelper h) {
+        DemoExhibit yard = new DemoExhibit(PLANK_LINE_MIN, PLANK_LINE_MAX, 40);
+        yard.force(h);
+        ServerLevel level = h.getLevel();
+        BlockPos palm = yard.at(PLANK_PALM);
+        int[] watched = {0};
+        int[] shown = {0};
+        boolean[] watching = {false};
+        h.onEachTick(() -> {
+            if (!watching[0]) return;
+            watched[0]++;
+            if (level.getBlockState(palm).getValue(ShapingPalmBlock.WORKING)) shown[0]++;
+        });
+        h.startSequence()
+                .thenIdle(DemoExhibit.ENTITIES_LOAD_TICKS)
+                .thenExecute(() -> yard.build(h))
+                .thenIdle(5)
+                .thenExecute(() -> {
+                    h.assertTrue(
+                            level.getBlockState(palm).getValue(ShapingPalmBlock.WORKING), "the line starts at once");
+                    watching[0] = true;
+                })
+                .thenIdle(TICKS * PLANK_CYCLES)
+                .thenExecute(() -> {
+                    watching[0] = false;
+                    PalmRote state =
+                            level.getBlockEntity(palm).collectComponents().get(ProcessingModule.PALM_ROTE.get());
+                    h.assertTrue(state.cycles() >= PLANK_CYCLES - 1, "a cycle every 2 s: " + state.cycles());
+                    int planks = 0;
+                    ChestBlockEntity chest = (ChestBlockEntity) level.getBlockEntity(yard.at(PLANK_CHEST));
+                    for (int slot = 0; slot < chest.getContainerSize(); slot++)
+                        if (chest.getItem(slot).is(Items.OAK_PLANKS))
+                            planks += chest.getItem(slot).getCount();
+                    h.assertTrue(
+                            planks >= 4 * (PLANK_CYCLES - 2), "the Mouth carries the planks to the chest: " + planks);
+                    h.assertTrue(
+                            shown[0] >= watched[0] - 2,
+                            "the hand shows working between cycles too: " + shown[0] + " of " + watched[0] + " ticks");
+                    yard.tidy(h);
+                    yard.forget(h);
+                })
+                .thenSucceed();
     }
 }

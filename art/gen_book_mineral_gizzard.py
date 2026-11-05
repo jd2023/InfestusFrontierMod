@@ -74,7 +74,8 @@ def world_faces(geo):
             pivot = np.array(cube.get('pivot', [0, 0, 0]), dtype=float)
             if 'rotation' in cube:
                 rx, ry, rz = cube['rotation']
-                turn = rot_z(rz) @ rot_y(ry) @ rot_x(rx)
+                # as GeckoLib turns it, seen in the file's space: x and z come out negated (art/geo_audit.py)
+                turn = rot_z(-rz) @ rot_y(ry) @ rot_x(-rx)
             for normal, corners, uvs in cube_faces(cube, description['texture_width']):
                 corners = (corners - pivot) @ turn.T + pivot
                 faces.append((turn @ normal, corners, uvs))

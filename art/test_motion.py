@@ -283,6 +283,68 @@ class OrganMotionTest(unittest.TestCase):
                             for (t0, a), (t1, b) in zip(values, values[1:]):
                                 self.assertLessEqual(max(abs(y - x) / (t1 - t0) for x, y in zip(a, b)), 720)
 
+    def test_palm_fingers_stay_on_the_hand_and_close_clear_of_the_plate(self):
+        """Each finger and the thumb is a near segment on the pad and a tip on it, the tip's joint on the near segment,
+        so a curl never parts them. In every keyframe of every clip no point of a finger enters the plate, a stud or a
+        glow shell, and no corner of those enters a finger."""
+        import geo_audit
+        import numpy as np
+        geo = geometry('shaping_palm')
+        anims = animations('shaping_palm')
+        bones = {b['name']: b for b in geo['bones']}
+        fingers = ('little', 'ring', 'middle', 'index', 'thumb')
+        rest = {name: (m, lo, hi) for name, m, lo, hi in geo_audit.world_cubes(geo, None, 0)}
+        for finger in fingers:
+            self.assertEqual(bones[finger]['parent'], 'pad', finger)
+            self.assertEqual(bones[finger + '_tip']['parent'], finger, finger)
+            m, lo, hi = rest[finger + '[0]']
+            px, py, pz = bones[finger + '_tip']['pivot']
+            joint = np.linalg.solve(m, np.array([-px, py, pz, 1]))[:3]  # GeckoLib mirrors x
+            self.assertTrue(np.all(joint >= lo - 1e-3) and np.all(joint <= hi + 1e-3), (finger, joint, lo, hi))
+        held = {i for i, cube in enumerate(bones['pad']['cubes']) if cube['size'] in ([6, 1, 6], [1, 1, 1])}
+        self.assertEqual(len(held), 10, 'the plate and its nine studs')
+
+        def points(m, lo, hi, n=5):
+            grid = np.stack(np.meshgrid(*[np.linspace(lo[i], hi[i], n) for i in range(3)]), -1).reshape(-1, 3)
+            return (m @ np.c_[grid, np.ones(len(grid))].T).T[:, :3]
+
+        for clip, t in geo_audit.poses(anims, every=True):
+            cubes = geo_audit.world_cubes(geo, anims[clip] if clip else None, t)
+            hand = [c for c in cubes if c[0].split('[')[0].removesuffix('_tip') in fingers]
+            grid = [c for c in cubes if c[0].startswith('glow[')
+                    or c[0].startswith('pad[') and int(c[0][4:-1]) in held]
+            for group, others in ((hand, grid), (grid, hand)):
+                for name, m, lo, hi in group:
+                    for point in points(m, lo, hi, 5 if group is hand else 2):
+                        self.assertFalse(geo_audit.inside(point, others), (clip, t, name))
+
+    def test_palm_glows_only_while_working(self):
+        """The glow shells are clear in the model texture and are all the glowmask lights; their bone is scaled to
+        nothing in every idle key and shown through the working clip. So an idle Palm, a manual craft and the item,
+        which plays idle, are unlit."""
+        from PIL import Image
+        geo = geometry('shaping_palm')
+        clips = animations('shaping_palm')
+        for scale in clips['idle']['bones']['glow']['scale'].values():
+            self.assertEqual(scale, [0, 0, 0])
+        for scale in clips['working']['bones']['glow']['scale'].values():
+            self.assertGreater(min(scale), 0.5)
+        texture = Image.open(ASSETS / 'textures/block_entity/shaping_palm.png').convert('RGBA')
+        glow = Image.open(ASSETS / 'textures/block_entity/shaping_palm_glowmask.png').convert('RGBA')
+        shells = set()
+        for bone in geo['bones']:
+            if bone['name'] != 'glow':
+                continue
+            for cube in bone['cubes']:
+                (u, v), (w, h, d) = cube['uv'], cube['size']
+                shells |= {(x, y) for x in range(int(u), math.ceil(u + 2 * w + 2 * d))
+                           for y in range(int(v), math.ceil(v + h + d))}
+        self.assertTrue(shells)
+        lit = {(x, y) for x in range(glow.width) for y in range(glow.height) if glow.getpixel((x, y))[3]}
+        self.assertTrue(lit)
+        self.assertLessEqual(lit, shells)
+        self.assertEqual([p for p in shells if texture.getpixel(p)[3]], [])
+
     def test_gizzard_stones_swing_clear_of_the_lips_and_of_each_other(self):
         """The two millstones turn inside the hopper's 9 by 5.5 opening: in every pose of every clip no corner of a
         stone reaches a lip, and the stones never touch."""

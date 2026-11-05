@@ -36,12 +36,15 @@ import org.jetbrains.annotations.Nullable;
  * The Shaping Palm (BLOCK_CATALOG T1-41): a crafting table that keeps its grid. It stands on an organ foundation, and
  * any hand opens its screen, like a chest. A Contractile Fiber used on it gives it Reach, the use of the Mouth under it; a Synaptic
  * Gel used on a Palm with Reach gives it Rote, which repeats one recorded craft by itself. Its block state mirrors
- * whether it has Rote and whether a cycle is under way, for the client; everything else is in its block entity.
+ * whether it has Rote and whether a cycle is running, for the client; everything else is in its block entity.
  */
 public final class ShapingPalmBlock extends BaseEntityBlock {
     /** The Palm has Rote: its screen has a biomass tank, a tray and Select. */
     public static final BooleanProperty ROTE = BooleanProperty.create("rote");
-    /** A cycle is under way. */
+    /**
+     * A cycle is running: the client plays the hand's working clip. A finished cycle waiting for room in its tray, and a
+     * cycle paused for want of a foundation, are not running.
+     */
     public static final BooleanProperty WORKING = BooleanProperty.create("working");
 
     private static final MapCodec<ShapingPalmBlock> CODEC = simpleCodec(ShapingPalmBlock::new);
