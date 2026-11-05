@@ -169,6 +169,19 @@ def pool():
     return img.filter(ImageFilter.GaussianBlur(1.1))
 
 
+def item_icon(item):
+    """The mod's own icon of `item` as a 32x32 RGBA image. Tailings get the iron tint the client colour handler multiplies
+    into the grey flecks, as the item shows in the world."""
+    icon = Image.open(ASSETS / f'textures/item/{item}.png').convert('RGBA')
+    if item == 'mineral_tailings':
+        flecks = Image.open(ASSETS / 'textures/item/mineral_tailings_flecks.png').convert('RGBA')
+        metal = (198, 200, 206)
+        tinted = flecks.copy()
+        tinted.putdata([(g * metal[0] // 255, g * metal[1] // 255, g * metal[2] // 255, a) for g, _, _, a in flecks.getdata()])
+        icon.alpha_composite(tinted)
+    return icon
+
+
 def plate(name, row, destination):
     """The guide plate of organ model `name` with the items of `row` laid out in front, written to `destination`."""
     out = Image.new('RGBA', (SIZE, SIZE), (0, 0, 0, 0))
@@ -177,14 +190,7 @@ def plate(name, row, destination):
     out.alpha_composite(model, ((SIZE - model.width) // 2, 6))
     x = (SIZE - (len(row) * 34 - 2)) // 2
     for item in row:
-        icon = Image.open(ASSETS / f'textures/item/{item}.png').convert('RGBA')
-        if item == 'mineral_tailings':
-            flecks = Image.open(ASSETS / 'textures/item/mineral_tailings_flecks.png').convert('RGBA')
-            metal = (198, 200, 206)  # the iron tint, as the client colour handler multiplies it into the grey flecks
-            tinted = flecks.copy()
-            tinted.putdata([(g * metal[0] // 255, g * metal[1] // 255, g * metal[2] // 255, a) for g, _, _, a in flecks.getdata()])
-            icon.alpha_composite(tinted)
-        out.alpha_composite(icon, (x, 150))
+        out.alpha_composite(item_icon(item), (x, 150))
         x += 34
     destination.parent.mkdir(parents=True, exist_ok=True)
     out.save(destination, optimize=True)

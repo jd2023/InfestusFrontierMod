@@ -2782,7 +2782,7 @@
       "yaw": 0,
       "pitch": 10,
       "gui": true,
-      "name": "book_iron_bars_factory_2",
+      "name": "book_iron_bars_factory_costs",
       "book": "infestusfrontier:circulation/iron_bars_factory",
       "page": 2
     },
@@ -2793,7 +2793,7 @@
       "yaw": 0,
       "pitch": 10,
       "gui": true,
-      "name": "book_iron_bars_factory_4",
+      "name": "book_iron_bars_factory_reserves",
       "book": "infestusfrontier:circulation/iron_bars_factory",
       "page": 4
     },
@@ -2804,7 +2804,7 @@
       "yaw": 0,
       "pitch": 10,
       "gui": true,
-      "name": "book_iron_bars_factory_6",
+      "name": "book_iron_bars_factory_recipe",
       "book": "infestusfrontier:circulation/iron_bars_factory",
       "page": 6
     },

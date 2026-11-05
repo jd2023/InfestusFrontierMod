@@ -16,6 +16,15 @@
   },
   "pages": [
     {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.circulation.iron_bars_factory.name",
+      "images": [
+        "infestusfrontier:textures/book/iron_bars_factory.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.circulation.iron_bars_factory.plate"
+    },
+    {
       "type": "modonomicon:text",
       "title": "entry.infestusfrontier.circulation.iron_bars_factory.name",
       "text": "entry.infestusfrontier.circulation.iron_bars_factory.use"
