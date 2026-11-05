@@ -4,7 +4,9 @@
 # screen (L); its steps run from a Spore Culture to a working Bio-Furnace and an automatic farm (the Farm exhibit at
 # x 14 to 25: load the Proboscis, open the Corolla and the Sac once, bone-meal the wheat) and the Workshop steps row
 # (south, x 84 to 112, z -22 to -15: feed the Gizzard, the Kidney and the furnace by hand from their chests, put a stack in
-# the Capsule Tree, press Restock on a Palm and take its craft). The tab starts empty, with no advancement granted.
+# the Capsule Tree, press Restock on a Palm and take its craft). The Palm supply exhibits (south, x 40 to 80) join a
+# Capsule Tree and a chest to a Rote Palm by Item Veins; four Palms (east, x 140 to 152, z -40) show each Mouth symbol.
+# The tab starts empty, with no advancement granted.
 # Play, then close the window. The world is rebuilt on every run; your options.txt in runs/demo is kept.
 set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."

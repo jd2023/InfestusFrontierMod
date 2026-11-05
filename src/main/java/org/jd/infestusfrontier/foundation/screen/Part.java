@@ -1,11 +1,13 @@
 package org.jd.infestusfrontier.foundation.screen;
 
+import java.util.Objects;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import org.jd.infestusfrontier.ui.Bounds;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * One drawn part of an organ screen. It is laid out in panel pixels; {@link OrganScreen#add} moves it into the
@@ -14,7 +16,7 @@ import org.jd.infestusfrontier.ui.Bounds;
  */
 public abstract class Part extends AbstractWidget {
     private final Bounds panel;
-    private Component lastTip;
+    private @Nullable Component lastTip;
 
     Part(Bounds panel, Component narration) {
         super(panel.x(), panel.y(), panel.width(), panel.height(), narration);
@@ -27,11 +29,11 @@ public abstract class Part extends AbstractWidget {
         return panel;
     }
 
-    /** Shows {@code text} while hovered. Cheap to call every frame. */
-    protected final void tip(Component text) {
-        if (text.equals(lastTip)) return;
+    /** Shows {@code text} while hovered, or nothing for null. Cheap to call every frame. */
+    protected final void tip(@Nullable Component text) {
+        if (Objects.equals(text, lastTip)) return;
         lastTip = text;
-        setTooltip(Tooltip.create(text));
+        setTooltip(text == null ? null : Tooltip.create(text));
     }
 
     @Override

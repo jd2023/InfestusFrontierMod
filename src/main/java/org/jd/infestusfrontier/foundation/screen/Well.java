@@ -10,6 +10,8 @@ import org.jd.infestusfrontier.ui.Sheet;
 /** The well around one of the organ's slots, with its label above. The slot must sit where the row puts it. */
 public final class Well extends Part {
     private final Component label;
+    private final Slot slot;
+    private Bounds mark;
 
     public Well(PartRow row, Slot slot, Component label) {
         this(row.place(Sheet.SLOT.width()), Sheet.LABEL_Y, Sheet.PARTS_Y, slot, label);
@@ -19,6 +21,13 @@ public final class Well extends Part {
     public Well(int x, int labelY, int wellY, Slot slot, Component label) {
         super(place(x, labelY, wellY, slot), label);
         this.label = label;
+        this.slot = slot;
+    }
+
+    /** Cuts {@code sprite} into the well's floor. It shows while the slot is empty and gives way to the item. */
+    public Well mark(Bounds sprite) {
+        mark = sprite;
+        return this;
     }
 
     /** Shows {@code text} while the well is hovered. */
@@ -37,6 +46,8 @@ public final class Well extends Part {
     @Override
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         Draw.centered(graphics, label, getX() + Sheet.SLOT.width() / 2, getY());
-        Draw.sprite(graphics, Sheet.SLOT, getX(), getY() + getHeight() - Sheet.SLOT.height());
+        int wellY = getY() + getHeight() - Sheet.SLOT.height();
+        Draw.sprite(graphics, Sheet.SLOT, getX(), wellY);
+        if (mark != null && !slot.hasItem()) Draw.sprite(graphics, mark, getX() + 1, wellY + 1);
     }
 }

@@ -65,7 +65,12 @@ public abstract class OrganScreen<M extends AbstractContainerMenu & BiomassView>
 
     /** A sheet button at panel position {@code x, y}. */
     protected final Button button(int x, int y, Component text, Button.OnPress onPress) {
-        return addRenderableWidget(new SheetButton(leftPos + x, topPos + y, text, onPress));
+        return button(x, y, text, onPress, null);
+    }
+
+    /** A sheet button at panel position {@code x, y} with {@code mark}, a sheet sprite, set into its left end. */
+    protected final Button button(int x, int y, Component text, Button.OnPress onPress, @Nullable Bounds mark) {
+        return addRenderableWidget(new SheetButton(leftPos + x, topPos + y, text, onPress, mark));
     }
 
     @Override

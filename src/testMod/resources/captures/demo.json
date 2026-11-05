@@ -717,6 +717,20 @@
     "setblock 168 -60 -28 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:synaptic_gel\",count:4},{Slot:1,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:2,id:\"minecraft:oak_planks\",count:64},{Slot:3,id:\"minecraft:stick\",count:32},{Slot:4,id:\"minecraft:cobblestone\",count:64}]}",
     "setblock 164 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Gel Palm\"','\"Has Reach.\"','\"Gel on it gives\"','\"Rote: Select\"']}}",
     "setblock 168 -60 -30 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Gel Chest\"','\"Gel, 2 biomass\"','\"buckets: bucket\"','\"on the Palm\"']}}",
+    "setblock 140 -61 -40 infestusfrontier:mouth[mode=intake]",
+    "setblock 140 -60 -40 infestusfrontier:shaping_palm{reach:1b,contents:{grid:[]}}",
+    "setblock 140 -60 -42 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mouth: takes\"','\"Mode Intake:\"','\"arrow up under\"','\"the hand\"']}}",
+    "setblock 144 -61 -40 infestusfrontier:mouth[mode=output]",
+    "setblock 144 -60 -40 infestusfrontier:shaping_palm{reach:1b,contents:{grid:[]}}",
+    "setblock 144 -60 -42 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mouth: gives\"','\"Mode Output:\"','\"arrow down\"','\"under the hand\"']}}",
+    "setblock 148 -61 -40 infestusfrontier:mouth[mode=both]",
+    "setblock 148 -60 -40 infestusfrontier:shaping_palm{reach:1b,contents:{grid:[]}}",
+    "setblock 148 -60 -42 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mouth: both\"','\"Mode Both:\"','\"both arrows\"','\"under the hand\"']}}",
+    "setblock 152 -61 -40 infestusfrontier:mouth[mode=closed]",
+    "setblock 152 -60 -40 infestusfrontier:shaping_palm{reach:1b,contents:{grid:[]}}",
+    "setblock 152 -60 -42 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Mouth closed\"','\"Mode Closed:\"','\"no arrow,\"','\"lips shut\"']}}",
+    "setblock 146 -60 -44 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"MOUTH SYMBOLS\"','\"Palm screen: the\"','\"lips under the\"','\"hand, x 140-152\"']}}",
+    "setblock 20 -60 -47 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"MOUTH SYMBOLS\"','\"four Palms, one\"','\"per Mouth mode\"','\"east, x 140-152\"']}}",
     "item replace entity @s inventory.17 with infestusfrontier:shaping_palm 2",
     "setblock 0 -61 -16 infestusfrontier:living_substrate[stage=mature]",
     "setblock 0 -60 -16 infestusfrontier:reservoir_cell{tank:{stored:4000,reserved:0,capacity:4000},body:[0,-60,-16,0,-60,-16]}",
@@ -2454,9 +2468,20 @@
       "yaw": 0,
       "pitch": 10,
       "gui": true,
+      "name": "book_shaping_palm_demo",
+      "book": "infestusfrontier:circulation/shaping_palm",
+      "page": 6
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
       "name": "book_shaping_palm_recipe",
       "book": "infestusfrontier:circulation/shaping_palm",
-      "page": 10
+      "page": 12
     },
     {
       "name": "palm_rote_line",
@@ -2489,6 +2514,62 @@
       ]
     },
     {
+      "name": "palm_mouth_takes_screen",
+      "x": 140.5,
+      "y": -60,
+      "z": -42.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        140,
+        -60,
+        -40
+      ]
+    },
+    {
+      "name": "palm_mouth_gives_screen",
+      "x": 144.5,
+      "y": -60,
+      "z": -42.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        144,
+        -60,
+        -40
+      ]
+    },
+    {
+      "name": "palm_mouth_both_screen",
+      "x": 148.5,
+      "y": -60,
+      "z": -42.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        148,
+        -60,
+        -40
+      ]
+    },
+    {
+      "name": "palm_mouth_closed_screen",
+      "x": 152.5,
+      "y": -60,
+      "z": -42.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "use": [
+        152,
+        -60,
+        -40
+      ]
+    },
+    {
       "x": 2.5,
       "y": -60,
       "z": -39.5,
@@ -2497,7 +2578,7 @@
       "gui": true,
       "name": "book_shaping_palm_rote",
       "book": "infestusfrontier:circulation/shaping_palm",
-      "page": 6
+      "page": 8
     },
     {
       "name": "iron_bars_overview",

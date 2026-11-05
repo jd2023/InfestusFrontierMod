@@ -20,7 +20,7 @@ import net.minecraft.core.BlockPos;
  * the commands that only the playable demo runs after {@code commands}; a capture never runs them.
  */
 record Scenario(String name, List<String> commands, List<String> play, List<View> views) {
-    static final int MAX_VIEWS = 184;
+    static final int MAX_VIEWS = 192;
     private static final String NAME = "[a-z][a-z0-9_]{0,63}";
 
     /**

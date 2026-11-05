@@ -125,28 +125,36 @@ def draw_polygon(canvas, depth, texture, xy, uvs, z, shade):
         depth[y0:y1 + 1, x0:x1 + 1][visible] = dz[visible]
 
 
+def bounds(faces):
+    """The extent of the faces on screen under the current YAW and PITCH: x min, x max, y min, y max."""
+    x, y, _ = project(np.concatenate([f[1] for f in faces]))
+    return x.min(), x.max(), y.min(), y.max()
+
+
+def render_faces(faces, width, height, scale):
+    """Faces of (normal, corners, uvs, texture) seen through YAW and PITCH at `scale` book pixels per unit, centred in
+    width x height. Nearest faces win the depth test, faces that point away are skipped, and the 8x drawing is reduced."""
+    x0, x1, y0, y1 = bounds(faces)
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    canvas = np.zeros((height * SS, width * SS, 4))
+    depth = np.full((height * SS, width * SS), np.inf)
+    view = rot_x(-PITCH) @ rot_y(YAW)
+    for normal, corners, uvs, texture in faces:
+        if (view @ normal)[2] > 1e-6:  # facing away from a camera looking along +z
+            continue
+        x, y, z = project(corners)
+        xy = np.stack([(x - cx) * scale * SS + width * SS / 2, (cy - y) * scale * SS + height * SS / 2], axis=1)
+        shade = 0.62 + 0.38 * max(0.0, float(np.dot(normal, LIGHT)))
+        draw_polygon(canvas, depth, texture, xy, uvs, z, shade)
+    return Image.fromarray(canvas.astype(np.uint8), 'RGBA').resize((width, height), Image.LANCZOS)
+
+
 def render_model(name='mineral_gizzard'):
     geo = json.loads((ASSETS / f'geo/block/{name}.geo.json').read_text())['minecraft:geometry'][0]
     texture = np.array(Image.open(ASSETS / f'textures/block_entity/{name}.png').convert('RGBA'))
-    faces = world_faces(geo)
-    allp = np.concatenate([f[1] for f in faces])
-    px, py, _ = project(allp)
-    scale = MODEL_SIZE * SS / max(px.max() - px.min(), py.max() - py.min())
-    side = (MODEL_SIZE + 12) * SS
-    canvas = np.zeros((side, side, 4))
-    depth = np.full((side, side), np.inf)
-    cx, cy = (px.max() + px.min()) / 2, (py.max() + py.min()) / 2
-    # nearest faces win the depth test; faces that point away are skipped
-    view = rot_x(-PITCH) @ rot_y(YAW)
-    for normal, corners, uvs in faces:
-        n = view @ normal
-        if n[2] > 1e-6:  # facing away from a camera looking along +z
-            continue
-        x, y, z = project(corners)
-        xy = np.stack([(x - cx) * scale + side / 2, (cy - y) * scale + side / 2], axis=1)
-        shade = 0.62 + 0.38 * max(0.0, float(np.dot(normal, LIGHT)))
-        draw_polygon(canvas, depth, texture, xy, uvs, z, shade)
-    return Image.fromarray(canvas.astype(np.uint8), 'RGBA').resize((side // SS, side // SS), Image.LANCZOS)
+    faces = [(normal, corners, uvs, texture) for normal, corners, uvs in world_faces(geo)]
+    x0, x1, y0, y1 = bounds(faces)
+    return render_faces(faces, MODEL_SIZE + 12, MODEL_SIZE + 12, MODEL_SIZE / max(x1 - x0, y1 - y0))
 
 
 def pool():

@@ -50,6 +50,26 @@ public final class Sheet {
     private static final int EMBLEM_SHEET_Y = 190;
     private static final int EMBLEM_SIZE = 32;
     private static final int EMBLEM_PITCH = 34;
+    /** The Mouth symbols, 24x22: lips closed, then lips with an arrow up (takes), down (gives) and both. */
+    public static final int MOUTH_SYMBOL_COUNT = 4;
+
+    private static final Bounds[] MOUTH_SYMBOLS = {
+        new Bounds(232, 88, 24, 22),
+        new Bounds(176, 224, 24, 22),
+        new Bounds(202, 224, 24, 22),
+        new Bounds(228, 224, 24, 22)
+    };
+    /** The marks cut into a Rote Palm's tray wells, 16x16: the item a craft makes, then bucket, bottle and bowl. */
+    public static final int TRAY_MARK_COUNT = 4;
+
+    private static final Bounds[] TRAY_MARKS = {
+        new Bounds(224, 112, 16, 16),
+        new Bounds(240, 112, 16, 16),
+        new Bounds(224, 128, 16, 16),
+        new Bounds(240, 128, 16, 16)
+    };
+    /** A stud pressed into a button's left end, 8x8. */
+    public static final Bounds STUD = new Bounds(176, 248, 8, 8);
     /** Flesh-dark ink on the ivory membrane. */
     public static final int INK = 0xFF3E262C;
     /** Ivory text on a flesh button. */
@@ -134,6 +154,18 @@ public final class Sheet {
                 EMBLEM_SIZE);
     }
 
+    /** The Mouth symbol for {@code index}: closed, takes, gives, both. */
+    public static Bounds mouthSymbol(int index) {
+        if (index < 0 || index >= MOUTH_SYMBOL_COUNT) throw new IllegalArgumentException("No Mouth symbol " + index);
+        return MOUTH_SYMBOLS[index];
+    }
+
+    /** The tray mark for {@code index}: result, bucket, bottle, bowl. */
+    public static Bounds trayMark(int index) {
+        if (index < 0 || index >= TRAY_MARK_COUNT) throw new IllegalArgumentException("No tray mark " + index);
+        return TRAY_MARKS[index];
+    }
+
     /** The column inside a tank frame placed at {@code x, y}. */
     public static Bounds tankColumn(int x, int y) {
         return new Bounds(x + 2, y + 2, TANK_FILL.width(), TANK_FILL.height());
@@ -166,6 +198,15 @@ public final class Sheet {
                 emblem(5),
                 emblem(6),
                 emblem(7),
-                emblem(8));
+                emblem(8),
+                STUD,
+                MOUTH_SYMBOLS[0],
+                MOUTH_SYMBOLS[1],
+                MOUTH_SYMBOLS[2],
+                MOUTH_SYMBOLS[3],
+                TRAY_MARKS[0],
+                TRAY_MARKS[1],
+                TRAY_MARKS[2],
+                TRAY_MARKS[3]);
     }
 }

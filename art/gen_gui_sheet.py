@@ -25,6 +25,9 @@ ui/src/main/java/org/jd/infestusfrontier/ui/Sheet.java; change both together.
   238,56  12x15    scroll thumb, a chitin plate with grip ridges; 238,72 the same greyed when nothing scrolls
   2,190   32x32 organ emblems, seven to a row at a 34 px pitch, rows 34 apart: Sac, Bladder, Bowl, Rack, Loom,
                    Cradle, Furnace; then Cyst, Compost, Gizzard, Kidney and Palm on the second row
+  232,88  24x22 Mouth symbols, one pair of lips each: closed here; takes, gives, both at 176,224 / 202,224 / 228,224
+  224,112 16x16 engraved tray marks, two to a row: the result, bucket, bottle and bowl wells of a Rote Palm
+  176,248 8x8 stud pressed into a button
 
 Every screen writes its title at 8,6, its emblem at 8,27 if it has one, labels at y 26 above
 its slots, and the biomass tank at 150,20 with "Biomass" above and the amount below, right-aligned to
@@ -70,6 +73,12 @@ SCROLL_TRACK = (238, 0, 12, 54)
 SCROLL_THUMB = (238, 56)
 SCROLL_THUMB_OFF = (238, 72)
 THUMB_SIZE = (12, 15)
+MOUTH_SYMBOLS = [(232, 88), (176, 224), (202, 224), (228, 224)]  # closed, takes, gives, both
+MOUTH_SYMBOL = (24, 22)
+TRAY_MARKS = [(224, 112), (240, 112), (224, 128), (240, 128)]  # result, bucket, bottle, bowl
+TRAY_MARK = 16
+STUD = (176, 248)
+STUD_SIZE = 8
 WATER = [(28, 58, 118), (58, 118, 198), (120, 188, 240), (204, 236, 255)]
 # where screens write: title, slot labels, tank label and amount, inventory label; and the emblem column
 TEXT = [(6, 4, 164, 12), (40, 24, 130, 10), (118, 8, 52, 10), (118, 60, 52, 10), (6, 70, 164, 12), (6, 25, 36, 36)]
@@ -727,6 +736,110 @@ def emblems(img):
         draw(img, ox, oy)
 
 
+def lip_edges(x):
+    """The top and bottom of the lips at column x of a 24x22 symbol: a wide oval pinched at the corners, the upper lip
+    with a notch at its middle."""
+    t = (x + 0.5 - 12) / 11
+    s = math.sqrt(max(0.0, 1 - t * t))
+    return 11 - 4.2 * s + 1.5 * math.exp(-(t / 0.2) ** 2) * s, 11 + 4.4 * s
+
+
+def lips_mask(x, y):
+    top, bottom = lip_edges(x)
+    return 0 <= x < 24 and top <= y + 0.5 <= bottom and abs(x + 0.5 - 12) < 11
+
+
+def arrow_up(x, y, top):
+    """A 6-row arrow pointing up, its tip on row `top`, centred between x 11 and 12."""
+    j, half = y - top, abs(x - 11.5) - 0.5
+    return (0 <= j <= 3 and half <= j) or (j in (4, 5) and half <= 0)
+
+
+def arrow_down(x, y, top):
+    return arrow_up(x, 2 * top + 5 - y, top)
+
+
+def mouth_symbol(img, ox, oy, state):
+    """The Mouth under a Palm as a pair of lips under the Palm's emblem. An arrow rising towards the Palm says the Palm
+    takes from the network, one leaving down says it gives, both say both; a seam with no arrow is a closed Mouth."""
+    takes, gives, opened = state in ('takes', 'both'), state in ('gives', 'both'), state != 'closed'
+    for y in range(MOUTH_SYMBOL[1]):
+        for x in range(MOUTH_SYMBOL[0]):
+            if (takes and arrow_up(x, y, 0)) or (gives and arrow_down(x, y, 16)):
+                put(img, ox + x, oy + y, OUTLINE)
+                continue
+            if not lips_mask(x, y):
+                continue
+            if any(not lips_mask(x + i, y + j) for i, j in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                put(img, ox + x, oy + y, OUTLINE)
+                continue
+            t = (x + 0.5 - 12) / 11
+            if opened and abs(t) < 0.7 and abs(y + 0.5 - 11.2) <= 1.7 * math.sqrt(1 - (t / 0.7) ** 2) + 0.1:
+                put(img, ox + x, oy + y, IVORY[2] if y <= 9 and abs(t) < 0.6 else PIT)
+            elif y == 11 and not opened:
+                put(img, ox + x, oy + y, OUTLINE)
+            elif y < 11:
+                put(img, ox + x, oy + y, FLESH[4] if y <= 8 else FLESH[3])
+            else:
+                put(img, ox + x, oy + y, FLESH[2] if y < 14 else FLESH[1])
+    return img
+
+
+def engrave(img, ox, oy, shape, veins=()):
+    """A held-item mark cut into a tray well: a dark cut with a pale rim on its lower right, and any `veins` (lines
+    inside the shape) left as the well's own colour."""
+    cut = mix(PIT, OUTLINE, 0.5)
+    rim = mix(WELL, FLESH[4], 0.7)
+    inside = {(x, y) for y in range(TRAY_MARK) for x in range(TRAY_MARK) if shape(x, y)}
+    for x, y in inside:
+        put(img, ox + x, oy + y, WELL if (x, y) in veins else cut)
+    for x, y in inside:
+        for i, j in ((1, 0), (0, 1), (1, 1)):
+            if (x + i, y + j) not in inside and 0 <= x + i < TRAY_MARK and 0 <= y + j < TRAY_MARK:
+                put(img, ox + x + i, oy + y + j, rim)
+
+
+def inside_polygon(x, y, points):
+    px, py, hit = x + 0.5, y + 0.5, False
+    for (ax, ay), (bx, by) in zip(points, points[1:] + points[:1]):
+        if (ay > py) != (by > py) and px < ax + (py - ay) * (bx - ax) / (by - ay):
+            hit = not hit
+    return hit
+
+
+def tray_marks(img):
+    """What each tray well holds, cut into its floor: the item a craft makes, then the three kinds of remainder."""
+    cube = [(8, 1), (14, 4), (14, 11), (8, 14), (2, 11), (2, 4)]
+    ridges = {(8, y) for y in range(8, 14)} | {(8 - i, 8 - i // 2) for i in range(1, 6)} | {(8 + i, 8 - i // 2) for i in range(1, 6)}
+    engrave(img, *TRAY_MARKS[0], lambda x, y: inside_polygon(x, y, cube), {p for p in ridges if inside_polygon(*p, cube)})
+    bucket = [(3, 5), (13, 5), (11, 14), (5, 14)]
+    engrave(img, *TRAY_MARKS[1], lambda x, y: inside_polygon(x, y, bucket) or (
+        y < 5 and 5.2 <= math.hypot(x + 0.5 - 8, y + 0.5 - 5) <= 6.4), {(x, 6) for x in range(4, 12)})
+    engrave(img, *TRAY_MARKS[2], lambda x, y: (6 <= x <= 9 and 3 <= y <= 6) or (math.hypot(x + 0.5 - 8, y + 0.5 - 10) <= 4.6)
+            or (6 <= x <= 9 and y == 2), {(6, 2), (9, 2), (7, 4), (8, 4)})
+    engrave(img, *TRAY_MARKS[3], lambda x, y: (y >= 6 and ((x + 0.5 - 8) / 7) ** 2 + ((y + 0.5 - 6) / 7.2) ** 2 <= 1.0)
+            or (6 <= x <= 9 and y == 14), {(x, 6) for x in range(2, 14)})
+
+
+def stud(img):
+    """A round stud pressed into a button: a dark seat, lit on its lower rim, with an ivory dome shaded from below."""
+    ox, oy = STUD
+    for y in range(STUD_SIZE):
+        for x in range(STUD_SIZE):
+            r = math.hypot(x - 3.5, y - 3.5)
+            if r > 3.9:
+                continue
+            if r > 2.9:
+                put(img, ox + x, oy + y, FLESH[3] if x + y > 7 else PIT)
+            else:
+                put(img, ox + x, oy + y, IVORY[0] if x + y < 6 else IVORY[1] if x + y < 8 else IVORY[3])
+
+
+def mouth_symbols(img):
+    for origin, state in zip(MOUTH_SYMBOLS, ('closed', 'takes', 'gives', 'both')):
+        mouth_symbol(img, *origin, state)
+
+
 def button(img, origin, hovered, disabled=False):
     w, h = BUTTON_SIZE
     for j in range(h):
@@ -754,6 +867,9 @@ def main():
     strip(img)
     tank(img)
     emblems(img)
+    mouth_symbols(img)
+    tray_marks(img)
+    stud(img)
     button(img, BUTTON, False)
     button(img, BUTTON_HOVER, True)
     button(img, BUTTON_OFF, False, True)

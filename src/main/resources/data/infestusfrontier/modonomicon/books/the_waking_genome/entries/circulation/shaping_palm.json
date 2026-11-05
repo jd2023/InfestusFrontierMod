@@ -54,6 +54,15 @@
       "text": "entry.infestusfrontier.circulation.shaping_palm.reach"
     },
     {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.circulation.shaping_palm.supply.plate.title",
+      "images": [
+        "infestusfrontier:textures/book/shaping_palm_supply.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.circulation.shaping_palm.supply.plate"
+    },
+    {
       "type": "modonomicon:text",
       "title": "entry.infestusfrontier.circulation.shaping_palm.supply.title",
       "text": "entry.infestusfrontier.circulation.shaping_palm.supply"
@@ -67,6 +76,15 @@
       "type": "modonomicon:text",
       "title": "entry.infestusfrontier.circulation.shaping_palm.rote.title",
       "text": "entry.infestusfrontier.circulation.shaping_palm.rote"
+    },
+    {
+      "type": "modonomicon:image",
+      "title": "entry.infestusfrontier.circulation.shaping_palm.rote.plate.title",
+      "images": [
+        "infestusfrontier:textures/book/shaping_palm_rote.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.circulation.shaping_palm.rote.plate"
     },
     {
       "type": "modonomicon:text",

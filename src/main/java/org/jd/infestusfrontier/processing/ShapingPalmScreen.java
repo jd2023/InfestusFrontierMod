@@ -4,6 +4,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import org.jd.infestusfrontier.foundation.screen.Emblem;
+import org.jd.infestusfrontier.foundation.screen.Glyph;
 import org.jd.infestusfrontier.foundation.screen.OrganScreen;
 import org.jd.infestusfrontier.foundation.screen.Tally;
 import org.jd.infestusfrontier.foundation.screen.Well;
@@ -14,6 +15,7 @@ import org.jd.infestusfrontier.ui.Bounds;
 import org.jd.infestusfrontier.ui.PartRow;
 import org.jd.infestusfrontier.ui.Sheet;
 import org.jd.infestusfrontier.ui.SlotGrid;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Client view of the Palm: the nine grid wells it keeps, the result well beside them, a line saying whether it has
@@ -35,6 +37,9 @@ final class ShapingPalmScreen extends OrganScreen<ShapingPalmMenu> {
     };
 
     private static final int BUTTON_GAP = 2;
+    /** Rows between the emblem and the Mouth symbol under it. */
+    private static final int MOUTH_SYMBOL_GAP = 3;
+
     private static final int LINE = 9;
 
     ShapingPalmScreen(ShapingPalmMenu menu, Inventory inventory, Component title) {
@@ -50,6 +55,14 @@ final class ShapingPalmScreen extends OrganScreen<ShapingPalmMenu> {
     protected void addParts(PartRow row) {
         Bounds out = ShapingPalmMenu.resultWell(menu.hasRote());
         add(new Emblem(Sheet.PALM_EMBLEM));
+        Bounds lips = Sheet.mouthSymbol(0);
+        add(new Glyph(
+                Sheet.EMBLEM_X + (Sheet.emblem(Sheet.PALM_EMBLEM).width() - lips.width()) / 2,
+                Sheet.EMBLEM_Y + Sheet.emblem(Sheet.PALM_EMBLEM).height() + MOUTH_SYMBOL_GAP,
+                lips.width(),
+                lips.height(),
+                this::mouthSymbol,
+                () -> Component.translatable(KEY + "mouth.story")));
         add(new Wells(
                 row,
                 GRID,
@@ -94,6 +107,12 @@ final class ShapingPalmScreen extends OrganScreen<ShapingPalmMenu> {
         if (menu.hasRote()) addRote();
     }
 
+    /** The lips for the Mouth's direction, in the order closed, takes, gives, both; none without a Mouth to show. */
+    private @Nullable Bounds mouthSymbol() {
+        int direction = menu.reachState() - ShapingPalmMenu.MOUTH_CLOSED;
+        return direction < 0 ? null : Sheet.mouthSymbol(direction);
+    }
+
     /** Select under the supply buttons and the four tray wells beside it. */
     private void addRote() {
         int y = ShapingPalmMenu.trayY();
@@ -101,7 +120,8 @@ final class ShapingPalmScreen extends OrganScreen<ShapingPalmMenu> {
                         Sheet.LEFT_X,
                         y + (Sheet.SLOT.height() - Sheet.BUTTON.height()) / 2,
                         Component.translatable(KEY + "select"),
-                        b -> send(ShapingPalmMenu.SELECT))
+                        b -> send(ShapingPalmMenu.SELECT),
+                        Sheet.STUD)
                 .setTooltip(Tooltip.create(Component.translatable(KEY + "select.story")));
         for (int slot = 0; slot < PalmRote.TRAY; slot++) {
             Bounds well = ShapingPalmMenu.trayWell(slot);
@@ -111,6 +131,7 @@ final class ShapingPalmScreen extends OrganScreen<ShapingPalmMenu> {
                             well.y(),
                             menu.getSlot(ShapingPalmMenu.FIRST_TRAY + slot),
                             Component.empty())
+                    .mark(Sheet.trayMark(slot))
                     .story(Component.translatable(KEY + (slot == 0 ? "tray.result" : "tray.remainder"))));
         }
     }
