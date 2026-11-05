@@ -8,10 +8,6 @@ Every temporary asset still in the build. Each row gives the paths, the intended
 
 | Assets | Intended appearance | Capability | Captures | Specification |
 |---|---|---|---|---|
-| `textures/item/dead_tissue.png`, `textures/item/surgical_blade.png` | Dead Tissue: a limp grey-brown scrap of flesh, a dull pink fleck where it tore. Surgical Blade: a short pale bone handle bound in pink membrane, a thin curved steel blade, held lower left to upper right. Flat two-tone discs now | Image model (icons, 32x32) | `visual_static`, `walls` (`hotbar`) | [ART-009, Dead Tissue and Surgical Blade](#art-009--dead-tissue-and-surgical-blade-icons) |
-| `textures/block/living_wall.png`, `textures/item/skeletal_graft.png`, `textures/item/calcifying_graft.png` | Dense dark muscular tile with a faint fibre grain; a bone splint in a pink strip; a chalky cracked bone-paste lump. The tile is generated flesh (`art/gen_walls.py`), the icons flat discs | Image model (one seamless 64x64 tile, two 32x32 icons) | `walls` (`front`, `close_ribbed`, `hotbar`) | [ART-010](#art-010--living-wall-tile-and-graft-icons) |
-| `textures/item/membrane_window.png`, `textures/item/sphincter_door.png` | A pale translucent veined membrane square in an ivory frame; a closed iris of six pink petals in a red rim. Flat discs | Image model (two 32x32 icons) | `openings` (`windows`, `hotbar`) | [ART-011](#art-011--window-and-door-graft-icons) |
-| `art/gen_washing_kidney.py` model (`geo/block/washing_kidney.geo.json`, `animations/block/washing_kidney.animation.json`, `textures/block_entity/washing_kidney*.png`, `textures/block/washing_kidney.png`, `art/washing_kidney.bbmodel`), the emblem (`Sheet.KIDNEY_EMBLEM`, slot 10 of `textures/gui/organ.png`) and the guide plate (`textures/book/washing_kidney.png`) | Two soft blue-grey bean lobes, a pale clean sac and a murky dirty sac that read apart at hotbar size, a bone sieve between them, a low drip spout, at the Gizzard's finish | Strong model for GeckoLib; no image model | `motion_washing_kidney`, `mineral` (`kidney_screen`, `kidneys`, `hotbar`), `demo` (`kidney_line`, `book_washing_kidney`) | [Washing Kidney](#washing-kidney) |
 | `art/gen_shaping_palm.py` model (`geo/block/shaping_palm.geo.json`, `animations/block/shaping_palm.animation.json`, `textures/block_entity/shaping_palm*.png`, `textures/block/shaping_palm.png`, `art/shaping_palm.bbmodel`), the emblem (`Sheet.PALM_EMBLEM`, slot 11 of `textures/gui/organ.png`) and the guide plate (`textures/book/shaping_palm.png`) | An open hand of pink muscle, palm up, on a root foot: four fingers and a thumb stand up round the rim with bone tips curled inward, and in the cup lies an ivory plate with nine bone studs in three rows of three, the crafting grid it keeps; the fingertips curl and open slowly. Reads as a hand that holds a grid, not as a table, from across a room | Strong model for GeckoLib; no image model | `motion_shaping_palm`, `demo` (`palm_line`, `palm_screen`, `palm_empty_screen`, `palm_rote_line`, `palm_rote_screen`, `book_shaping_palm`) | [Shaping Palm](#shaping-palm) |
 | The Palm's Rote stage has no assets of its own: it plays the `idle` clip while its `working` block state is set (`textures/block_entity/shaping_palm*.png` unchanged), its screen is drawn from the shared sheet's wells, button and tank in `textures/gui/organ.png`, and its three guide pages carry text only | While a cycle runs the fingers close slowly over the plate and open when it delivers, with a faint wet shine on the bone studs that rises with the cycle and fades at the end (`working` clip and a `shaping_palm_glowmask.png` pulse); the tray wells and the Select button each get a small engraved mark (a held stone, a pressed stud) instead of a plain well and button; the guide gets one plate of a Palm with a cake in its tray | Strong model for GeckoLib for the clip; image model for the three marks and the plate | `demo` (`palm_rote_line`, `palm_rote_screen`, `book_shaping_palm_rote`) | [Shaping Palm](#shaping-palm) |
 | The Palm's Mouth line on its screen (`gui.infestusfrontier.shaping_palm.mouth.*`, text only) and the two Palm supply exhibits (vanilla signs and chests, shipped organs, a vein row flush with the floor, no drawn asset; the guide page "Where to see it" is text only) | A small engraved lip beside the Mouth line that shows the Mouth's direction (open for takes, pushing for gives, both, shut for closed); one guide plate of a Palm on a Mouth with a vein running to a tree and to a chest | Image model for the lip and the plate | `demo` (`palm_tree_overview`, `palm_tree_pods`, `palm_tree_screen`, `palm_tree_mouth_screen`, `palm_chest_overview`, `palm_chest_screen`, `palm_signpost`, `book_shaping_palm_reach`, `book_shaping_palm_rote`) | [Shaping Palm](#shaping-palm) |
@@ -19,15 +15,11 @@ Every temporary asset still in the build. Each row gives the paths, the intended
 | `textures/book/` plates: none for the Craw | The Craw's guide entry is text and the Elastic Gel recipe page, with the Craw item as its icon; a finished entry could add a plate of the pod beside a bulk pod | Strong model (render from the model) | `demo` (`book_mixed_craw`, `book_mixed_craw_recipe`) | [Mixed Craw](#mixed-craw) |
 | `art/gen_larder.py` model (`geo/block/larder.geo.json`, `animations/block/larder.animation.json`, `textures/block_entity/larder*.png`, `textures/block/larder.png`, `art/larder.bbmodel`) sharing the Item Capsule lining | The Craw's squared hull in waxed amber hide with pale bone creases and a one-pixel rim, a strap of ivory bone across each flank like a latch, the socket holding up to three small pockets (two over one); reads as a sealed pantry pod beside the Craw's bog-green ribs | Strong model for GeckoLib (model and animations); an image model for a hide texture on the finished model | `motion_larder`, `larder` (`front`, `grades`, `hotbar`, `craw_beside`), `demo` (`larder_line`, `larder_screen`, `larder_tower`) | [Larder](#larder) |
 | `textures/book/` plates: none for the Larder | The Larder's guide entry is three text pages and the Sealing Resin recipe page, with the Larder item as its icon; a finished entry could add a plate of the pod beside a Craw | Strong model (render from the model) | `demo` (`book_larder`, `book_larder_recipe`) | [Larder](#larder) |
-| `art/gen_withered_flower.py` output: `textures/block/withered_flower_hanging.png`, `withered_flower_forked.png`, `withered_flower_collapsed.png`, the three `models/block/withered_flower_*.json`, `blockstates/withered_flower.json` and the entry icon `textures/book/withered_flowers.png` | Three dead small-flower silhouettes as grey cutouts the block colour tints ash, bone, brown or plum by position: a bent stalk with a hanging spent head, a forked dry stalk with split seed pods, a low collapsed bloom with curled petals; dark root threads at the foot and one dull knot on the stalk; still, no glow. Drawn as rimmed line art by the generator now | Image model (three 64x64 RGBA cutouts in greys so the tint reads, one 16x16 icon) | `withered_flowers` (`front`, `back`, `close`, `above`), `demo` (`meadow`, `withered_flowers`, `withered_flowers_close`, `book_withered_flowers`) | [Withered Flower](#withered-flower) |
-| `art/gen_tall_withered_plants.py` output: `textures/block/tall_withered_flower_{lower,upper}.png`, `tall_blighted_grass_{lower,upper}.png`, `tall_blighted_fern_{lower,upper}.png`, the six `models/block/tall_*_{lower,upper}.json` and `blockstates/tall_withered_flower.json`, `blockstates/tall_blighted_undergrowth.json` | Three dead two-block silhouettes as grey cutouts the block colour tints by position (ash, bone, brown, plum for the flowers; straw, bone, ash, dry brown for the undergrowth), each drawn on one 64x128 canvas and cut at the block seam so the stalk runs through: a tall dry flower stalk with limp leaves, a forked side stem with a seed pod and a heavy spent head bowed at the top; a tuft of seven dry blades, the tallest bowing over, some snapped; a large fern of three arching fronds with paired dry pinnae and curled tips. Dark root threads and one dull knot at the foot; still, no glow. Drawn as rimmed line art by the generator now | Image model (three 64x128 RGBA cutouts in greys so the tint reads, cut into 64x64 halves) | `tall_withered_plants` (`front`, `back`, `close`, `above`), `demo` (`tall_meadow`, `tall_withered_plants`, `tall_withered_plants_close`, `book_withered_flowers_2`) | [Tall Withered Plants](#tall-withered-plants) |
-| `art/gen_withered_shrubs.py` output: `textures/block/dead_berry_bush_{small,large,fruited}.png`, `blighted_dead_bush_{a,b}.png`, `blighted_grass_{a,b}.png`, `blighted_fern.png`, `withered_sapling_{bare,curled}.png`, the ten `models/block/*.json` of the same names, `blockstates/dead_berry_bush.json`, `blighted_dead_bush.json`, `blighted_undergrowth.json`, `withered_sapling.json` and the entry icon `textures/book/withered_shrubs.png` | Ten dead one-block silhouettes as grey cutouts the block colour tints (by position for the berry bush, dead bush and undergrowth; by species for the sapling: oak brown, birch bone, spruce dark green-grey, jungle olive, acacia tan, dark oak umber): a bare sprout, a bare bush and a bush hung with dried berries; two tangles of snapped twigs; two tufts of dry blades and a curled fern frond; a bare stem with limp leaves and a bent stem with curled leaves. Dark root threads at the foot and one dull knot; still, no glow. Drawn as rimmed line art by the generator now | Image model (ten 64x64 RGBA cutouts in greys so the tint reads, one 16x16 icon) | `withered_shrubs` (`front`, `back`, `close`, `above`), `demo` (`shrubs`, `shrub_berries`, `shrubs_dead`, `shrubs_left_alone`, `book_withered_shrubs`) | [Withered Shrubs](#withered-shrubs) |
-| `art/gen_infected_timber.py` output: `textures/block/infected_log.png`, `infected_log_top.png`, `infected_planks.png`, `blighted_leaves.png`, `models/block/infected_log.json`, `infected_log_horizontal.json`, `infected_planks.json`, `blighted_leaves.json`, the two item models, `blockstates/infected_log.json`, `infected_planks.json`, `blighted_leaves.json` and the entry icon `textures/book/infected_timber.png` | Dead timber in six species tones: one grey bark tile with dark seams, root threads and knots and one ring tile for the log, tinted by species (oak brown, birch bone, spruce green-grey, jungle olive, acacia tan, dark oak umber); one warm grey plank tile; one sparse grey leaf cutout over vanilla's full cube, tinted the same way, with holes that show the branches | Image model (Astra) for the four 64x64 tiles | `infected_timber` (`front`, `close`, `trees`, `above`, `hotbar`), `tree_infection` (`before`, `turning`, `after_side`, `after_above`, `after_close`), `demo` (`timber`, `timber_logs`, `timber_trees`, `timber_craft`, `woodland`, `woodland_wave`, `woodland_crowns`) | [Infected timber](#infected-timber) |
 | `textures/book/iron_bars_factory.png` (not yet drawn); the factory's signs are waxed vanilla oak signs and its entry icon is vanilla `minecraft:iron_bars` | The Iron Bars Factory entry is six text pages and the vanilla iron-bars recipe page. A finished entry opens on a plate: the line as a left-to-right schematic (Larder, Gizzard, Kidney, Bio-Furnace, Palm, chest of bars) in the organ palette, with the Reservoir and the water pool under it. Finished sign plaques could replace the oak signs | Image model for the plate (200x200 RGBA); a strong model may render it from the demo exhibit | `demo` (`iron_bars_overview`, `iron_bars_supply`, `iron_bars_mill`, `iron_bars_press`, `book_iron_bars_factory`) | [Iron Bars Factory](#iron-bars-factory) |
 
 The Mineral Gizzard has no placeholder left: its model, emblem and plate are the finished work of [CREDITS.txt](../../CREDITS.txt).
 
-The Kidney finishing model, emblem and guide plate are exported and await review.
+The Washing Kidney model, emblem and guide plate are accepted in `67bcc57`.
 
 Fixed for every texture:
 
@@ -352,7 +344,7 @@ Files: src/main/resources/assets/infestusfrontier/textures/block/{reservoir_memb
 
 ## ART-009 — Dead Tissue and Surgical Blade icons
 
-Status: review. Image-model sources and exports: [finishing sources](#texture-finishing-sources--2026-11-04).
+Status: accepted `67bcc57`. Image-model sources and exports: [finishing sources](#texture-finishing-sources--2026-11-04).
 Files: src/main/resources/assets/infestusfrontier/textures/item/{dead_tissue,surgical_blade}.png, CREDITS.txt
 
 - Two 32x32 icons, `--size 32 --colors 0`, one family with the Spore Culture and treatment icons: same outline weight, light from the upper left. Dead Tissue: a limp grey-brown scrap of flesh, dry and wrinkled, a dull pink fleck where it tore. Surgical Blade: a short pale bone handle bound with a strip of pink membrane, a thin curved steel blade, held diagonally from lower left to upper right like the probe; the item renders as a handheld tool.
@@ -360,7 +352,7 @@ Files: src/main/resources/assets/infestusfrontier/textures/item/{dead_tissue,sur
 
 ## ART-010 — Living wall tile and graft icons
 
-Status: review. Image-model sources and exports: [finishing sources](#texture-finishing-sources--2026-11-04).
+Status: accepted `67bcc57`. Image-model sources and exports: [finishing sources](#texture-finishing-sources--2026-11-04).
 Files: src/main/resources/assets/infestusfrontier/textures/block/living_wall.png, textures/item/{skeletal_graft,calcifying_graft}.png, CREDITS.txt
 
 - living_wall: a 64x64 block texture, seamless on all four edges, one family with the Living Substrate tiles and reservoir_flesh. Dense dark muscular tissue: broad lobes parted by narrow dark creases, a faint grain of fibres running one way, a wet sheen on the crowns. Opaque. It covers every face of the three wall tiers; the Ribbed Wall's ribs and the Calcified Wall's plates are model parts cut from reservoir_bone and stay with art/gen_walls.py. The blockstate turns the Living Wall four ways at random, about the vertical and the horizontal axis, so the edges must still match after a 90-degree turn and no feature may end at an edge. The Ribbed Wall is not turned (its ribs must line up), so its flesh repeats every block and must not show an obvious motif.
@@ -369,7 +361,7 @@ Files: src/main/resources/assets/infestusfrontier/textures/block/living_wall.png
 
 ## ART-011 — Window and door graft icons
 
-Status: review. Image-model sources and exports: [finishing sources](#texture-finishing-sources--2026-11-04).
+Status: accepted `67bcc57`. Image-model sources and exports: [finishing sources](#texture-finishing-sources--2026-11-04).
 Files: src/main/resources/assets/infestusfrontier/textures/item/{membrane_window,sphincter_door}.png, CREDITS.txt
 
 - Two 32x32 icons, `--size 32 --colors 0`, one family with the treatment icons. Membrane Window: a small square of pale pink translucent membrane with red veins in a thin ivory bone frame. Sphincter Door: a closed iris of six overlapping pink membrane petals spiralling into a dark centre, ringed by a muscular red rim.
@@ -503,6 +495,8 @@ Capture acceptance: the demo's `iron_bars_overview`, `iron_bars_supply`, `iron_b
 
 ## Withered Flower
 
+Status: accepted `67bcc57`. Sources: [finishing sources](#texture-finishing-sources--2026-11-04).
+
 The three silhouettes are image-model exports. `art/gen_withered_flower.py` maintains their models, blockstate and
 16x16 entry icon without overwriting the textures. The block colour tints every look from the position's seed, so a final keeps the textures grey.
 
@@ -519,6 +513,8 @@ silhouettes and all four tints appear across the patch and read apart at four bl
 patch and no missing texture.
 
 ## Tall Withered Plants
+
+Status: accepted `67bcc57`. Sources: [finishing sources](#texture-finishing-sources--2026-11-04).
 
 The three shapes are image-model exports from continuous 64x128 canvases split into lower and upper tiles.
 `art/gen_tall_withered_plants.py` maintains their models and blockstates without overwriting the textures. The block colour tints every look from the lower half's position, so a final
@@ -537,6 +533,8 @@ black patch and no missing texture.
 
 ## Withered Shrubs
 
+Status: accepted `67bcc57`. Sources: [finishing sources](#texture-finishing-sources--2026-11-04).
+
 The ten shapes are image-model exports on 64x64 canvases. `art/gen_withered_shrubs.py` maintains their models, blockstates and guide icon without overwriting the textures. The block colour
 tints every look, so a final keeps the textures grey, keeps the silhouette readable at four blocks and keeps the berry
 bush's three stages apart: bare sprout (age 0 and 1), bare bush (age 2), dried berries still hanging (age 3).
@@ -554,6 +552,8 @@ Checks: `withered_shrubs` captures `front`, `close` and `above`, and `demo` `shr
 apart at four blocks, the bush's three stages differ, the cutout shows no black patch and no missing texture.
 
 ## Infected Timber
+
+Status: accepted `67bcc57`. Sources: [finishing sources](#texture-finishing-sources--2026-11-04).
 
 The four 64x64 tiles are image-model exports. `art/gen_infected_timber.py` maintains their models, blockstates and guide icon without overwriting the textures. The block colour tints the log tiles and the leaf tile by
 species, so a final keeps the bark and leaf tiles grey and the planks warm grey, and keeps one tile and one model for all
@@ -575,7 +575,7 @@ dispenser and a button, and the turned tree is drawn with the tiles above (`tree
 
 ## Texture finishing sources — 2026-11-04
 
-Status: review. Generated with the built-in image tool. Full gate: 652 GameTests and 2,458 captures passed.
+Status: accepted `67bcc57`. Generated with the built-in image tool. Full gate: 652 GameTests and 2,458 captures passed.
 Masters remain outside the repository under `/home/etf/.codex/generated_images/01a198d4-70e3-7f33-abc6-9d6b514d6668/`.
 Icons use `art/fit_icon_source.py` followed by `scripts/texture.py --size 32 --colors 0`.
 Square block sources use `scripts/texture.py --size 64 --colors 0`; near-square cutouts are padded transparently, centered horizontally and aligned to the bottom before export.
