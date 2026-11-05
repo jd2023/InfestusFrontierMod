@@ -5,7 +5,7 @@
 One block family stands in for every small flower substrate growth kills (docs/design/VEGETATION_INFECTION.md,
 "Visual variety with few assets"). Three silhouettes: a bent stalk with a hanging spent head, a forked dry stalk
 with small seed pods, and a low collapsed bloom with curled petals. Each is a grey cutout on a transparent 64x64
-tile, exported from the image-model sources recorded in docs/sprints/ART.md; the block colour tints it ash, bone, brown or plum
+tile, exported from the image-model sources recorded in CREDITS.txt; the block colour tints it ash, bone, brown or plum
 by position, so the textures carry shape and shading only. The blockstate lists the three models turned four ways
 and lets vanilla pick one by the position's seed, which never changes: no block state property, no block entity.
 A few dark root threads at the foot and one dull knot on the stalk are the only signs of infection.

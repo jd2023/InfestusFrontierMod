@@ -8,7 +8,7 @@ with a spent seed head for the four flowers, one dry tall-grass tuft and one lar
 64x128 grey canvas, so the stalk runs unbroken across the seam, and cut into a lower and an upper 64x64 cutout. The
 block colour tints it by the lower half's position (ash, bone, brown, plum for flowers; straw, bone, ash, dry brown for
 undergrowth), and the blockstate turns it a quarter turn by the same seed, so both halves always agree.
-The image-model sources and export commands are recorded in docs/sprints/ART.md.
+The image-model sources and export commands are recorded in CREDITS.txt.
 This generator preserves the finished textures.
 """
 import json

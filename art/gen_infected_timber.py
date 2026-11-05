@@ -2,7 +2,7 @@
 
     python3 art/gen_infected_timber.py
 
-Models and guide icon for the finished image-model textures (docs/sprints/ART.md).
+Models and guide icon for the finished image-model textures (CREDITS.txt).
 The log has one grey bark tile and one grey end tile; the block colour tints both by the species the tree was (oak brown, birch bone, spruce dark green-grey, jungle
 olive, acacia tan, dark oak umber), so six species share two textures and one model per axis. The planks are one
 untinted tile. The leaves are one sparse grey cutout tile over vanilla's full cube, tinted by species the same way,

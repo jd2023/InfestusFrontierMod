@@ -29,7 +29,7 @@ Output: `build/libs/infestusfrontier-0.1.0-dev.1.jar`. It holds the mod, `core` 
 | `src/testMod/` | Development-only GameTests and the capture client, mod id `infestusfrontier_tests`. |
 | `src/testMod/resources/captures/` | One JSON per capture scenario; `golden/` holds approved screenshots. |
 | `docs/design/` | Gameplay design. One owner document per subject. |
-| `docs/sprints/` | One file per sprint (`S01.md`, ...) and `ART.md`, the placeholder list and art specifications. |
+| `docs/sprints/` | One file per sprint (`S01.md`, ...). Art tasks live in ktask; source records live in `CREDITS.txt`. |
 | `scripts/verify.sh` | The gate. |
 
 ## Architecture
@@ -272,7 +272,7 @@ One story, one kind, one outcome. About 12 files and 400 changed lines at most. 
 | Kind | Contains | Evidence |
 |---|---|---|
 | rules | Pure `core` types and JUnit tests. No Minecraft types | rules |
-| platform | Block, item, block entity, codec, menu wiring, GameTests. Temporary or procedural assets allowed, listed in `ART.md` | game |
+| platform | Block, item, block entity, codec, menu wiring, GameTests. Temporary or procedural assets allowed, identified in `CREDITS.txt` | game |
 | data | Recipes, tags, loot, translations and their GameTests | game |
 | art | Final textures, models, blockstates, icons, CREDITS line. Assets only, no Java. Only when the owner asks for a finishing pass | visual |
 | complete | Guide entry, advancement or discovery step | game, visual |
@@ -329,23 +329,86 @@ The sprint loop:
 
 ### Art track
 
-Owner policy: functional temporary or procedural artwork is allowed throughout development and playable milestone qualification. `docs/sprints/ART.md` keeps the one placeholder list: each temporary asset's path, intended appearance, the image or model capability a final needs and a capture that shows it. A task adds its placeholders to that list in the same change. It files no art follow-up and asks for no art approval. Missing final art, its quality or its generation provenance alone never blocks a task or a milestone.
+Functional temporary or procedural artwork is allowed throughout development and playable milestone qualification. `ktask` owns the art queue. Each art task names the assets, intended appearance, relevant generators, demo/book changes and capture acceptance in its own goal and criteria; it must not require a retired sprint file. `CREDITS.txt` owns provenance and identifies assets that are still temporary.
 
+The planner appends requested art tasks after all existing work. They are ready implementation tasks, with checks and review inside each task. Never insert an art approval or owner-input task between development tasks. Workers report new placeholders in their result and credits; they do not file automatic art follow-ups. No development task depends on final art, and missing final art, its quality or its provenance alone never blocks development or a playable milestone.
+
+Keep project model defaults unless the task needs a different capability. A new articulated model or animation design needs a strong model; rendering a guide plate from existing models and adding ordinary UI symbols normally use the default executor. Use an image-capable executor only when new image generation is required, and verify that the runner exposes that capability before queuing it as ready.
 Still mandatory on every task: functional rendering, readable UI, correct behavior, tests, guide entries and labeled usable exhibits in the default `scripts/demo.sh`.
 
-The final-art quality bar in `ART.md` applies to a finishing pass the owner requests separately. Such a task is appended after all existing queued work, never between development tasks, and no development task depends on it. An art task depends only on the task that registers its content.
+The art quality bar below applies to a finishing pass the owner requests separately. Such a task is appended after all existing queued work, never between development tasks, and no development task depends on it. An art task depends only on the task that registers its content.
 
 Two kinds of art story. A texture story gives an image model the prompt, the size and the output path; whoever runs the task saves the result, exporting it with `scripts/texture.py` (and `art/fit_icon_source.py` for an icon). A model story gives a strong model the GeckoLib `geo` and `animation` JSON to write, with bone names, dimensions and animation names fixed in the story. Never mix the two in one story.
 
-- A `platform` story ships functional placeholder assets: the geometry the catalog describes, with a texture at the shipped size (a flat two-tone texture at the least) and an item model; a vanilla-textured cube is not enough ([REVIEW.md](REVIEW.md) "Visuals"). The game must run and the reviewer must see the block. Workers never attempt final art. A task passes with honest functional temporary or procedural assets listed in the `ART.md` placeholder list (asset paths, intended appearance, the image or model capability a final needs, a capture reference); functional rendering, readable UI, guide and demo coverage and the behavioral checks stay mandatory on it.
+- A `platform` story ships functional placeholder assets: the geometry the catalog describes, with a texture at the shipped size (a flat two-tone texture at the least) and an item model; a vanilla-textured cube is not enough ([REVIEW.md](REVIEW.md) "Visuals"). The game must run and the reviewer must see the block. Workers never attempt final art. A task passes with honest functional temporary or procedural assets identified as temporary in `CREDITS.txt` and reported in the task result; functional rendering, readable UI, guide and demo coverage and the behavioral checks stay mandatory on it.
 - Who makes finals: flat block tiles and item icons come from the image model (Astra) through a texture story. Organ models with their textures, animations and glowmasks, the GUI sheet and fluid textures come from the builder through a generator under `art/` (`art/organ_model.py` is the shared pipeline; `art/gen_<name>.py` is one model). The generator is the source; run it from the repository root and commit its output.
 - `art/geo_audit.py` checks every GeckoLib model for faces fighting for depth (parallel, overlapping, closer than 0.1 px, in the rest pose and through the animations); `art/test_motion.py` runs it, `--all` checks every keyframe.
 - Armor comes from the builder too (owner, 2026-10-24): `art/gen_armor.py` writes each set's two vanilla-layout layers, its growth sheet, the growth file `armor/<set>.json` and the icons, rendered from the pieces themselves so they always match. The base stays vanilla armor so dye, trims and the glint work; growths are drawn by `foundation/render/LivingArmorLayer`, a render layer on every humanoid renderer; a module registers a set with `LivingArmor.register`. Growth cubes keep whole sizes, never share a plane with the base shell and never reach another bone (`art/test_armor.py`).
 - An animated organ: the block entity implements `GeoBlockEntity`, its item is an `integration.geckolib.OrganItem`, the module calls `OrganRenderers.register` on the client, the block returns `RenderShape.ENTITYBLOCK_ANIMATED` and its blockstate names only the break particle. Block state properties drive the animations; nothing extra is sent.
 - Shipped assets live in `src/main/resources/assets/infestusfrontier/`. File name is the registry id. Block textures are 64x64 and item icons 32x32, exported from image-model sources with `scripts/texture.py`, unless the story says otherwise. Animated organs use GeckoLib models in `geo/` and `animations/`.
-- Image masters and renders stay outside the repository; prompts live in the art story. Model sources (`.bbmodel`) are committed under `art/`, next to any generator that bakes them.
+- Image masters and renders stay outside the repository; prompts, source digests and export settings live in `CREDITS.txt`; the ktask definition holds the implementation outcome. Model sources (`.bbmodel`) are committed under `art/`, next to any generator that bakes them.
 - Every asset adds one line to `CREDITS.txt`: file, author, license.
-- An art story is accepted on a client capture judged against the catalog description and the Quality bar in `docs/sprints/ART.md`, by the checklist in [REVIEW.md](REVIEW.md) "Visuals". Final art quality is enforced only on a finishing pass the owner requests. It is not enforced on an implementation task or at milestone acceptance, and an art task is accepted on the capture and the bar above.
+- An art story is accepted on a client capture judged against the catalog description and the art quality bar below, by the checklist in [REVIEW.md](REVIEW.md) "Visuals". Final art quality is enforced only on a finishing pass the owner requests. It is not enforced on an implementation task or at milestone acceptance, and an art task is accepted on the capture and the bar above.
+
+### Art quality bar
+
+- The image model draws the source at its own size. `python3 scripts/texture.py <source.png> <shipped.png> --size 64` downsamples it, caps the palette and writes `build/art/<name>-tiled.png`, a 3x3 repeat to check for seams and repeated bright spots. Only the shipped file is committed.
+- Blocks are 64x64, opaque and seamless on all four edges: the prompt says "veins continue across opposite edges". Items are 32x32 on a transparent background, one centered object.
+- Original biological look: membrane, muscle, veins, pores, nodules. Broad readable forms, low noise. No grid, no border, no bevel, no central emblem, no text, no copy of an existing game texture.
+- Prompts record: use case, asset type, subject, style, composition, palette, constraints, avoid. 16x16 pixel-art prompts with a five color palette gave the weak placeholders; sources drawn large and downsampled are what read as living material.
+- One `CREDITS.txt` record per asset: file, who made it, tool, date.
+
+The quality bar applies to a finishing pass the owner requests and is checked in its normal task review. Temporary assets are not judged against it and never hold a task or a milestone.
+
+- A texture reads as its material from four blocks away in a capture, without a sign: flesh, membrane, bone, soil. The bar is the V3 substrate and the Astra living tissue from the model evaluation; weaker than those is rejected.
+- Ground textures are a 4x4-block macro pattern, 256x256 source cut into sixteen 64x64 tiles, so a 4x4 patch shows no repeat and no seam. The stages of one ground share one vein network and one ground tone, derived from one master by a generator under `art/`. Other blocks get random rotation in the blockstate.
+- One light direction, top-left, across every texture. Soft shading, no flat fills, no dithering noise, no outlines inside a block face.
+- An item icon is one object with a silhouette that reads at hotbar size, a thin dark outline, and a highlight on the lit side.
+- An organ item's icon sits centred in its slot: its visual centroid within 1.5 px of the slot centre, nothing drawn outside the 16 px square. The gate measures it on the organs hotbar capture; the numbers live in the item model's `display.gui`.
+- A model has one bone per moving part. At rest no cube of one bone sits inside a cube of another bone, except plates named as layered. Every loop closes: the last key equals the first pose, and a rotating channel ends at a multiple of 360. No channel moves faster than 720 degrees per second. Emissive parts have a glowmask. No two parallel faces of different cubes overlap closer than a tenth of a pixel, facing either way, in any pose (`art/geo_audit.py`; organ models draw both sides of every face). Model textures are 64x64 per model; living armor growth sheets are 128x64 (both sets' growths share one texel per unit, as the vanilla armor layers do).
+- Model sources are `.bbmodel` files committed under `art/`, openable in Blockbench; the shipped `geo` and `animation` JSON are exported from them. The first model story also adds the lint that measures the four rules above.
+- Evidence for a texture: `build/art/<name>-tiled.png` and the captures. For a model: front, side, back, dark and an animation frame sheet.
+
+### Model and animation verification
+
+The [capture generator](art/gen_motion_captures.py) covers every shipped
+GeckoLib clip, including each furnace stage, bladder fill and junction port mode.
+Each organ scene shows idle and working side by side, followed by back and side
+views. The Seed Pouch and storage scenes show their available resting states.
+Timed frames and their capture timestamps are kept in `build/captures/`.
+[Contact sheets](art/motion_contact_sheets.py) summarize them under
+`build/art/motion/`; inspect the source frames for fine detail.
+
+| Models | Visual checks |
+|---|---|
+| Culture Bowl | Pool stays inside its walls; bubbles form independently at the surface |
+| Digestive Sac | Reads as a stomach: the acid window is the cue, the body stays quiet; the gullet stays seated while the sac squeezes; mouth and glands stay attached |
+| Biomass Bladder | Reads as a bladder: a translucent sac swelling out of a lip of flesh and closing in under a lipped collar, bone ribs bowed down its corners, the level seen through it; no straight frame, no box; empty is empty; all fill levels stay inside the membrane (`motion_bladder_2` close, corner; `motion_bladder_0`..`4`) |
+| Membrane Rack | Skin stays between posts; the droplet resets while invisible |
+| Bone Loom | Reads as a ribcage loom: curved ribs gripping a plate woven in unequal strips is the cue; the ribs breathe and clench without parting from the mound; the shuttle stays on its strip and clear of the ribs (`motion_bone_loom` close, corner, back) |
+| Awakening Cradle | Reads as something being brought to life: the glowing cocoon is the cue; closed petals clear the cocoon and its pulse, open ones stay inside the block |
+| Bio-Furnace | All three stages; reads as a furnace from across a room, day and night: dark body, hot mouth and seams, fire and light only while it works; the fangs, coals, chimney, buttresses, bellows and second chimney remain distinct |
+| Activation Cyst, Seed Pouch | Chambers, neck, rim and throat follow their supporting tissue |
+| Planting Proboscis | Reads as a seed weevil: the long rostrum over the bed in front and the sac of seeds on its back are the cues; the stab reaches the bed and the seed is left in it; the rostrum never enters the head; legs and claws stay on the slab (`motion_planting_proboscis`: close, corner and low views) |
+| Harvest Corolla | Moving parts remain attached; petals clear the heart; tips clear the floor |
+| Spine Sentry | Reads as a rooted lash: the plated, barbed spine coiled over a muscle mound that slopes up to its bone collar, tendons pulling at it, is the cue; working, it swings from side to side and whips out without the segments parting; the thorn clears the mound (`motion_spine_sentry` close, corner; `sentry`: a zoglin beside it, the store screen) |
+| Mineral Gizzard | Reads as a grinding muscle: two bone millstones in a lipped hopper on a wide, low belly wrapped in ridged muscle, and a bone chute with a drift of dust, are the cues; the stones swing against each other inside the hopper without reaching a lip; the ridges clench in a wave; the drift builds and slumps below the chute (`motion_mineral_gizzard` close, corner, top; `mineral`: screens, icons) |
+| Washing Kidney | Reads as a rinsing organ: two soft blue-grey lobes under a pale clean-water sac and a murky dirty-water sac, a bone sieve between them and a low drip spout, are the cues; the lobes squeeze in a wave without parting, the sieve shivers between the sacs, the dirty sac swells while working, the drip stays under the spout and inside the block (`motion_washing_kidney` close, corner; `mineral`: screens `kidney_screen`, `full_kidney_screen`, `kidneys`) |
+| Compost Gland | Reads as a fermentation gut of the mod's flesh: the gaping maw of scraps above and the meal-crusted spout below are the cues; the belly churns in a wave without its plates parting; the flanks swell at rest; the crumb of meal shows only while the spout presses, at its largest in `close_008` (`motion_compost_gland` close, corner, back) |
+| Seed Pouch | Reads as a seed sac: the crowned heap of seeds in flared lips and the split lobes are the cues; the body swells at its waist and tapers to the neck with no ledge; the lobes part without leaving the core; the cord stays round the neck (`motion_seed_pouch` close, corner, side) |
+| Vascular Junction | Reads as a heart: the lobed body that beats and the lipped sphincters are the cues; all six rings in all three modes gape, pucker and shrink without their lips parting; the bottom ring stays on the foundation (`motion_junction_intake` close, corner; `motion_junction_closed`, `motion_junction_outlet`) |
+| Reservoir | Joined bodies, exterior corners, fill surfaces and inventory models |
+| Capsule Stem, Item Capsule | `capsule_stem`: a grown tree with a fork, pods with stock on their faces, three grades, the root's screen; `motion_item_capsule`: the pod breathes |
+| Bud, veins, Mouth, lobes, cultivation, Polyp, Valve, Papilla | Existing static scenes plus `visual_static`: front/back views, recessed surfaces and connections |
+| Dormant and awakened armor | `visual_armor`: front/back/side views with bent arms and legs; dyed, trimmed and enchanted sets; an adult and a baby zombie wearing them |
+| Living walls, windows, crossings and stitches | `walls`, `openings`, `crossings`: all tiers, joined frames and routed faces |
+| Sphincter Door | `motion_sphincter_door`: closed pulse and redstone opening/closing from both sides; sealed flaps and distinct edge planes |
+
+[Asset regression checks](art/test_motion.py) run in the engineering gate.
+They cover resource references, UV bounds, bone references, loop closure, rotation
+speed, overlapping surface planes and the motion constraints above. In-game visual
+review remains required; those checks cannot judge appearance by themselves.
+
 
 ## Dependencies
 

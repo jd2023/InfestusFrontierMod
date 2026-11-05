@@ -6,7 +6,7 @@ across a room and by the four pockets on their faces.
 
     python3 art/gen_mixed_craw.py
 
-Temporary procedural art (docs/sprints/ART.md, placeholder list). Pockets: StorageModule's Pockets(2, ...) follow the
+Temporary procedural art (credited in CREDITS.txt; finishing task in ktask). Pockets: StorageModule's Pockets(2, ...) follow the
 10 pixel socket this file leaves.
 """
 from PIL import Image

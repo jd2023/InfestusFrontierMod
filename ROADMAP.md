@@ -2,7 +2,7 @@
 
 Each milestone ends in a playable build. Only the current sprint is planned in detail, in `docs/sprints/`. Later milestones stay at one line each here.
 
-Now: M0 and M1 are done; S01 and S02 are accepted. M2 is in progress: the Bowl, the Sac, the Bladder, the Bud, the probe and the guide are in; the Rack, the Loom, the Cradle and the four awakened pieces are in; the batch organs run on their own and take hoppers; the Bio-Furnace smelts on biomass and grows through three stages. M3 is in progress (`docs/sprints/S04.md`): the Activation Cyst and the eight treatments are in; the three veins and the Vascular Junction move biomass, water and items; veins climb walls and fork; Mouths under chests and organs route items through Item Veins by filter, amount and priority; the farm plants, waters, harvests and composts on its own; the Sensor Polyp reads a block into redstone; the Fuel Papilla refuels worn armor at base. Temporary art is on the placeholder list in `docs/sprints/ART.md`.
+Now: M0 and M1 are done; S01 and S02 are accepted. M2 is in progress: the Bowl, the Sac, the Bladder, the Bud, the probe and the guide are in; the Rack, the Loom, the Cradle and the four awakened pieces are in; the batch organs run on their own and take hoppers; the Bio-Furnace smelts on biomass and grows through three stages. M3 is in progress (`docs/sprints/S04.md`): the Activation Cyst and the eight treatments are in; the three veins and the Vascular Junction move biomass, water and items; veins climb walls and fork; Mouths under chests and organs route items through Item Veins by filter, amount and priority; the farm plants, waters, harvests and composts on its own; the Sensor Polyp reads a block into redstone; the Fuel Papilla refuels worn armor at base. Art finishing work is queued in ktask; `CREDITS.txt` identifies temporary assets.
 
 Next: the [automated mineral workshop](#next-milestone--the-automated-mineral-workshop), M3b, is defined and proposed; its step 1 (the Mixed Craw and the Larder), its steps 2 and 3 (the Gizzard, the Kidney and finite waste) its steps 4 and 5 (the Palm, its reach through the Mouth under it and its Rote cycle) and its step 6 (the iron-bars factory in the default demo) are built and await the owner's play. The living-workshop acceptance below stays open and is not replaced by it.
 
@@ -109,7 +109,7 @@ and containers remain valid tools. JEI and Curios are optional, not prerequisite
    layout built on top of the loop. A second materially different route is not required.
 6. **Readable play.** The owner completes the loop using the guide and in-game
    feedback. Record confusing steps and long waits; fix progression blockers before
-   acceptance. Required art is functional and readable; temporary assets are allowed and listed in [ART.md](docs/sprints/ART.md).
+   acceptance. Required art is functional and readable; temporary assets are allowed and identified in `CREDITS.txt`.
 7. **Build and server health.** Pass the [engineering gate](ENGINEERING.md#testing)
    and M2/M3 evidence below. Smoke-test the packaged build on a dedicated server
    with two clients using the same stores and routes. The full campaign and broad
@@ -163,7 +163,7 @@ Washing needs no electricity and no completed genome.
 
 Each step is one feature task with its own review. A step ships its recipes, its
 discovery and advancements, its in-game book entry, a labeled usable exhibit in the
-default demo, any temporary art on the [placeholder list](docs/sprints/ART.md) and tests.
+default demo, any temporary art identified in `CREDITS.txt` and tests.
 Missing final art never blocks a step. The book entry and the demo exhibit are verified through the capture
 workflow in the same step.
 
@@ -207,7 +207,7 @@ Each milestone needs this evidence beyond the full gate (`bash scripts/verify.sh
 | M | Evidence |
 |---|---|
 | M0 | Clean build; core and ui tests; one GameTest in a real server; `core` and `ui` have an empty classpath |
-| M1 | Spore Culture converts eligible exposed ground and bone meal matures it, in GameTests; recipes and guide pages exist; client captures of all three stages, front, back and inventory scale, pass the capture checks and are read by the reviewer; textures functional and readable, temporary ones on the ART.md placeholder list; the owner repeats it by hand in a fresh world |
+| M1 | Spore Culture converts eligible exposed ground and bone meal matures it, in GameTests; recipes and guide pages exist; client captures of all three stages, front, back and inventory scale, pass the capture checks and are read by the reviewer; textures functional and readable, temporary ones identified in `CREDITS.txt`; the owner repeats it by hand in a fresh world |
 | M2 | Fresh Survival acquisition and recipe reveal, empty/full inventory, insufficient biomass, break/reload preserving one organ history; client models render at all faces and inventory scale |
 | M3 | Three complete reference supply cycles with a positive measured surplus; seed/water/restart reserves retained; 3D branches/crossings and port direction inspected visually; full outputs and unloaded routes cannot spill or duplicate |
 | M3b | Four dust a raw item, five when washed, four an ingot, to the item; refused recycling and foreign parcels; every waste buffer fills, pauses and resumes; every extraction path keeps a Larder reserve; Palm remainders, refusals of the Palm's Mouth and mid-cycle saves; bounded work at 32 starts a tick; save and reload of the running iron-bars factory |

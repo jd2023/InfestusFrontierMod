@@ -4,7 +4,7 @@
 
 A few shared shapes stand in for every shrub, grass, fern and sapling substrate growth kills
 (docs/design/VEGETATION_INFECTION.md, "Visual variety with few assets"). Each is a grey cutout on a transparent 64x64
-tile exported from the image-model sources recorded in docs/sprints/ART.md; the block colour tints it by position (or, for a
+tile exported from the image-model sources recorded in CREDITS.txt; the block colour tints it by position (or, for a
 sapling, by species), so the textures carry shape and shading only. Models are the vanilla tinted cross. The
 blockstates list the shapes turned four ways and let vanilla pick one by the position's seed, which never changes: no
 saved appearance, no block entity. Dark root threads at the foot and one dull knot are the only signs of infection.
