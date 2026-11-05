@@ -22,11 +22,13 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 
 ## Roles
 
+- Never select Fable for the execution role. Keep the default executor unless an override is necessary; use Opus for a necessary strong-model override. This restriction does not change review, validation or remediation roles.
+
 - **Owner** (human): makes product decisions and plays the build when a milestone's organs are in. Nothing else goes to the owner. Tuning, API research and technical choices are engineering work.
 - **Builder** (strong model, with the owner): takes a goal, its constraints and one line of acceptance from the owner, says how in a few lines, then implements, gates, and hands the commits to a reviewer. Reads the real code first. Hands a cheap model only work a machine judges.
 - **Worker** (cheap model): a mechanical task from the builder: data files, a further copy of an existing pattern, renames, test ports. Never a framework API shape or a design decision.
 - **Reviewer** (strong model, a fresh run, never the builder's): reads the whole diff and the tests. Says `APPROVED` or `REJECTED` with numbered findings. Never edits. One review per feature; a repair goes back to the same reviewer.
-- **Artist** (separate track, only when the owner asks for a finishing pass): delivers final assets from self-contained ktask tasks. Asset prompts, source records and credits live in `CREDITS.txt`; quality rules live in [ENGINEERING.md](ENGINEERING.md#art-track). Textures come from an image model (Astra). GeckoLib models and animations come from a strong model (Opus or Fable). Model-only work writes no Java. A task that explicitly includes animation or screen integration may change the required Java in the same task.
+- **Artist** (separate track, only when the owner asks for a finishing pass): delivers final assets from self-contained ktask tasks. Asset prompts, source records and credits live in `CREDITS.txt`; quality rules live in [ENGINEERING.md](ENGINEERING.md#art-track). Textures come from an image model (Astra). GeckoLib models and animations come from Opus when a strong executor is needed. Model-only work writes no Java. A task that explicitly includes animation or screen integration may change the required Java in the same task.
 
 ## Running work
 
