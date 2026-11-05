@@ -8,7 +8,8 @@ that flesh and grows two upright bone ribs on each side face, unevenly spaced an
 walls show unbroken ribs. A Calcified Wall is plated: bevelled bone plates on every face with staggered flesh seams,
 a different layout on each side; it turns four ways at random, so neighbouring blocks never line up into a grid.
 Bone parts stand proud and cull against a neighbouring wall, so joined walls show no bone between them. The bone is
-the Reservoir's painted bone; the flesh texture is generated here until ART-010 paints it.
+the Reservoir's painted bone. The finished flesh texture is exported from the ART-010 image-model source.
+This generator preserves it.
 """
 import json
 import math
@@ -159,7 +160,7 @@ def model(elements, occlusion=True):
 
 
 def main():
-    wall_texture()
+    # ART-010 image-model texture is maintained independently; never overwrite it.
     write(MODELS / 'living_wall.json', model([cube()]))
     write(MODELS / 'ribbed_wall.json', model(ribbed(), occlusion=False))
     write(MODELS / 'calcified_wall.json', model(calcified(), occlusion=False))
@@ -171,7 +172,7 @@ def main():
     write(STATES / 'calcified_wall.json', {'variants': {'': plates}})
     for name in ('living_wall', 'ribbed_wall', 'calcified_wall'):
         write(ITEMS / (name + '.json'), {'parent': NS + name})
-    print('walls: 1 texture, 3 models, 3 blockstates, 3 items')
+    print('walls: 3 models, 3 blockstates, 3 items; finished texture preserved')
 
 
 if __name__ == '__main__':

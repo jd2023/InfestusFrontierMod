@@ -2,8 +2,8 @@
 
     python3 art/gen_infected_timber.py
 
-Placeholders until the art pass paints them (docs/sprints/ART.md). The log has one grey bark tile and one grey end
-tile; the block colour tints both by the species the tree was (oak brown, birch bone, spruce dark green-grey, jungle
+Models and guide icon for the finished image-model textures (docs/sprints/ART.md).
+The log has one grey bark tile and one grey end tile; the block colour tints both by the species the tree was (oak brown, birch bone, spruce dark green-grey, jungle
 olive, acacia tan, dark oak umber), so six species share two textures and one model per axis. The planks are one
 untinted tile. The leaves are one sparse grey cutout tile over vanilla's full cube, tinted by species the same way,
 so the holes show the branches behind them. Dark root threads and a few dull knots are the only signs of infection.
@@ -170,7 +170,11 @@ def write_models():
     }
     (MODELS / 'blighted_leaves.json').write_text(json.dumps(leaves_model, indent=2) + '\n')
     for name in ('infected_log', 'infected_planks'):
-        (ITEM_MODELS / f'{name}.json').write_text(json.dumps({'parent': NS + name}, indent=2) + '\n')
+        # Keep the painted cube's visual weight centered inside the hotbar slot.
+        model = {'parent': NS + name, 'display': {'gui': {
+            'rotation': [30, 225, 0], 'translation': [0.8, -1.2, 0], 'scale': [0.55, 0.55, 0.55],
+        }}}
+        (ITEM_MODELS / f'{name}.json').write_text(json.dumps(model, indent=2) + '\n')
 
 
 def write_blockstates():
@@ -205,7 +209,7 @@ def write_icon():
 
 
 def main():
-    write_textures()
+    # Finished image-model textures are maintained independently.
     write_models()
     write_blockstates()
     write_icon()

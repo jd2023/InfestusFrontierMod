@@ -7,8 +7,9 @@ Substrate growth kills a sunflower, lilac, rose bush, peony, tall grass or large
 with a spent seed head for the four flowers, one dry tall-grass tuft and one large-fern clump. Each is drawn on one
 64x128 grey canvas, so the stalk runs unbroken across the seam, and cut into a lower and an upper 64x64 cutout. The
 block colour tints it by the lower half's position (ash, bone, brown, plum for flowers; straw, bone, ash, dry brown for
-undergrowth), and the blockstate turns it a quarter turn by the same seed, so both halves always agree. Drawn here as a
-placeholder until the art pass paints it. Reuses the line-art helpers of the small flower generator.
+undergrowth), and the blockstate turns it a quarter turn by the same seed, so both halves always agree.
+The image-model sources and export commands are recorded in docs/sprints/ART.md.
+This generator preserves the finished textures.
 """
 import json
 import math
@@ -152,7 +153,7 @@ def write_blockstates():
 
 
 def main():
-    write_textures()
+    # Finished image-model textures are maintained independently.
     write_models()
     write_blockstates()
 

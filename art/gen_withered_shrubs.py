@@ -4,7 +4,7 @@
 
 A few shared shapes stand in for every shrub, grass, fern and sapling substrate growth kills
 (docs/design/VEGETATION_INFECTION.md, "Visual variety with few assets"). Each is a grey cutout on a transparent 64x64
-tile drawn here as a placeholder until the art pass paints it; the block colour tints it by position (or, for a
+tile exported from the image-model sources recorded in docs/sprints/ART.md; the block colour tints it by position (or, for a
 sapling, by species), so the textures carry shape and shading only. Models are the vanilla tinted cross. The
 blockstates list the shapes turned four ways and let vanilla pick one by the position's seed, which never changes: no
 saved appearance, no block entity. Dark root threads at the foot and one dull knot are the only signs of infection.
@@ -138,13 +138,11 @@ SHAPES = {
 }
 
 
-def write_textures_and_models():
+def write_models():
     TEXTURES.mkdir(parents=True, exist_ok=True)
     MODELS.mkdir(parents=True, exist_ok=True)
-    for name, paint in SHAPES.items():
-        image = Image.new('RGBA', (SIZE, SIZE), (0, 0, 0, 0))
-        paint(ImageDraw.Draw(image))
-        image.save(TEXTURES / f'{name}.png')
+    for name in SHAPES:
+        # Finished image-model textures are maintained independently.
         model = {
             'parent': 'minecraft:block/tinted_cross',
             'render_type': 'minecraft:cutout',
@@ -202,7 +200,7 @@ def write_icon():
 
 
 def main():
-    write_textures_and_models()
+    write_models()
     write_blockstates()
     write_icon()
 

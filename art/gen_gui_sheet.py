@@ -613,29 +613,60 @@ def emblem_gizzard(img, ox, oy):
 
 
 def emblem_kidney(img, ox, oy):
-    """Two blue-grey bean lobes side by side under a pale clean drop on the left and a murky one on the right."""
+    """Two blue-grey bean lobes with a bone sieve standing between them, a pale clean-water sac over the left lobe, a murky
+    one over the right and a drop falling below."""
     LOBE = [(44, 54, 72), (74, 90, 110), (110, 130, 146), (150, 170, 182)]
-    for cx in (10.5, 21.5):
-        for y in range(EMBLEM):
-            for x in range(EMBLEM):
-                dx, dy = (x - cx) / 9.0, (y - 20) / 8.0
-                d = math.hypot(dx, dy)
-                if d > 1.0:
-                    continue
-                if d > 0.88:
-                    colour = OUTLINE
-                else:
-                    colour = LOBE[3] if dx + dy < -0.6 else LOBE[2] if dx + dy < 0.1 else LOBE[1] if dx + dy < 0.7 else LOBE[0]
-                put(img, ox + x, oy + y, colour)
-    for cx, tint in ((9, (112, 190, 214)), (23, (118, 104, 58))):
-        for y in range(2, 14):
-            for x in range(cx - 4, cx + 5):
-                dx, dy = (x - cx) / 4.0, (y - 9) / 6.0
-                top = y < 6 and abs(x - cx) > (y - 1) * 0.9
-                if math.hypot(dx, dy) > 1.0 or top:
-                    continue
-                edge = math.hypot(dx, dy) > 0.8
-                put(img, ox + x, oy + y, OUTLINE if edge else mix(tint, IVORY[3], 0.45) if dx + dy < -0.2 else tint)
+    WATER = [(70, 132, 164), (112, 186, 212), (170, 226, 238), (238, 252, 252)]
+    MUD = [(48, 42, 26), (86, 76, 44), (124, 110, 62), (168, 152, 96)]
+
+    def shape(inside, shades, key=lambda dx, dy: dx + dy, lo=-0.6, step=0.55):
+        """Paints every pixel of `inside` (x, y -> (dx, dy) in -1..1 of its blob, or None): an outline where a 4-neighbour is
+        outside, else the light ramp by key (lit from the upper left)."""
+        pixels = {(x, y): inside(x, y) for y in range(EMBLEM) for x in range(EMBLEM)}
+        for (x, y), d in pixels.items():
+            if d is None:
+                continue
+            edge = any(pixels.get((x + i, y + j)) is None for i, j in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            k = key(*d)
+            tone = len(shades) - 1 - max(0, min(len(shades) - 1, int((k - lo) / step)))
+            put(img, ox + x, oy + y, OUTLINE if edge else shades[tone])
+
+    def bean(cx, side):
+        """A lobe: an ellipse with a bite out of its inner flank where the vessels enter."""
+        def inside(x, y):
+            dx, dy = (x - cx) / 6.1, (y - 21) / 6.8
+            bite = math.hypot((x - (cx + side * 6.6)) / 2.8, (y - 22) / 3.6)
+            return (dx, dy) if math.hypot(dx, dy) <= 1.0 and bite > 1.0 else None
+        return inside
+
+    for cx, side in ((8.8, 1), (23.2, -1)):
+        shape(bean(cx, side), LOBE)
+
+    def drop(cx, cy, rx, ry):
+        """A sac: a round belly narrowing to a tip at the top."""
+        def inside(x, y):
+            dx, dy = (x - cx) / rx, (y - cy) / ry
+            width = rx * (0.35 + 0.65 * min(1.0, (y - (cy - ry)) / (1.15 * ry)))
+            return (dx, dy) if abs(x - cx) <= width and math.hypot(dx, dy) <= 1.05 else None
+        return inside
+
+    shape(drop(8.5, 11, 5.0, 6.0), WATER)
+    shape(drop(23.5, 12.5, 5.0, 4.4), MUD)
+    put(img, ox + 7, oy + 9, WATER[3])
+    put(img, ox + 6, oy + 11, WATER[3])
+    for x, y in ((22, 12), (25, 14), (23, 15), (26, 11)):
+        put(img, ox + x, oy + y, MUD[0] if (x + y) % 2 else MUD[3])
+    # the sieve: an ivory plate between the lobes with a column of holes through it
+    for y in range(4, 27):
+        for x in range(15, 18):
+            edge = y in (4, 26) or x in (15, 17)
+            hole = x == 16 and 7 <= y <= 23 and y % 4 == 3
+            put(img, ox + x, oy + y, OUTLINE if edge else PIT if hole else IVORY[3])
+    for y in (28, 29, 30):
+        w = (0, 1, 0)[y - 28]
+        for x in range(16 - w, 17 + w):
+            put(img, ox + x, oy + y, OUTLINE if y == 30 or x in (16 - w, 16 + w) and w else WATER[2])
+    put(img, ox + 16, oy + 29, WATER[3])
 
 
 def emblem_palm(img, ox, oy):

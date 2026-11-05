@@ -27,7 +27,7 @@ Every temporary asset still in the build. Each row gives the paths, the intended
 
 The Mineral Gizzard has no placeholder left: its model, emblem and plate are the finished work of [CREDITS.txt](../../CREDITS.txt).
 
-Recoverable unfinished Kidney artwork waits in the git stash named `ktask: task #17 attempt #1` (a finer model and animations, texture, emblem and plate, and edits to this file). A finishing pass may recover it with `git stash list` and `git stash show -p`; development does not apply it and does not redo the deferred art.
+The Kidney finishing model, emblem and guide plate are exported and await review.
 
 Fixed for every texture:
 
@@ -352,28 +352,28 @@ Files: src/main/resources/assets/infestusfrontier/textures/block/{reservoir_memb
 
 ## ART-009 — Dead Tissue and Surgical Blade icons
 
-Status: open. Owner of the asset: Astra.
+Status: review. Image-model sources and exports: [finishing sources](#texture-finishing-sources--2026-11-04).
 Files: src/main/resources/assets/infestusfrontier/textures/item/{dead_tissue,surgical_blade}.png, CREDITS.txt
 
 - Two 32x32 icons, `--size 32 --colors 0`, one family with the Spore Culture and treatment icons: same outline weight, light from the upper left. Dead Tissue: a limp grey-brown scrap of flesh, dry and wrinkled, a dull pink fleck where it tore. Surgical Blade: a short pale bone handle bound with a strip of pink membrane, a thin curved steel blade, held diagonally from lower left to upper right like the probe; the item renders as a handheld tool.
-- Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background. The placeholders are flat two-tone discs drawn by the builder.
+- Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background.
 
 ## ART-010 — Living wall tile and graft icons
 
-Status: open. Owner of the asset: Astra.
+Status: review. Image-model sources and exports: [finishing sources](#texture-finishing-sources--2026-11-04).
 Files: src/main/resources/assets/infestusfrontier/textures/block/living_wall.png, textures/item/{skeletal_graft,calcifying_graft}.png, CREDITS.txt
 
 - living_wall: a 64x64 block texture, seamless on all four edges, one family with the Living Substrate tiles and reservoir_flesh. Dense dark muscular tissue: broad lobes parted by narrow dark creases, a faint grain of fibres running one way, a wet sheen on the crowns. Opaque. It covers every face of the three wall tiers; the Ribbed Wall's ribs and the Calcified Wall's plates are model parts cut from reservoir_bone and stay with art/gen_walls.py. The blockstate turns the Living Wall four ways at random, about the vertical and the horizontal axis, so the edges must still match after a 90-degree turn and no feature may end at an edge. The Ribbed Wall is not turned (its ribs must line up), so its flesh repeats every block and must not show an obvious motif.
 - skeletal_graft and calcifying_graft: two 32x32 icons, `--size 32 --colors 0`, one family with the treatment icons. Skeletal Graft: a small curved bone splint wrapped in a pink membrane strip. Calcifying Graft: a chalky white lump of bone paste with a hard, cracked crust.
-- Prompt shapes as ART-001 and the synaptic_probe source prompt; evidence `build/art/living_wall-tiled.png` and the capture walls. The placeholders are art/gen_walls.py's generated flesh and flat two-tone discs.
+- Prompt shapes as ART-001 and the synaptic_probe source prompt; evidence `build/art/living_wall-tiled.png` and the capture walls.
 
 ## ART-011 — Window and door graft icons
 
-Status: open. Owner of the asset: Astra.
+Status: review. Image-model sources and exports: [finishing sources](#texture-finishing-sources--2026-11-04).
 Files: src/main/resources/assets/infestusfrontier/textures/item/{membrane_window,sphincter_door}.png, CREDITS.txt
 
 - Two 32x32 icons, `--size 32 --colors 0`, one family with the treatment icons. Membrane Window: a small square of pale pink translucent membrane with red veins in a thin ivory bone frame. Sphincter Door: a closed iris of six overlapping pink membrane petals spiralling into a dark centre, ringed by a muscular red rim.
-- Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background. The placeholders are flat two-tone discs; the window block and the door model come from art/gen_openings.py and are not part of this story.
+- Prompt shape as the synaptic_probe source prompt; one object, true alpha, no background. The window block and the door model come from art/gen_openings.py and are not part of this story.
 
 ### Capsule Stem and Item Capsule pods
 
@@ -448,12 +448,12 @@ Capture checks: the mint bladder must be visible between the four petals from gr
 
 ## Washing Kidney
 
-`art/gen_washing_kidney.py` writes the model, Blockbench source, atlas, break particle and `idle`/`working` clips through the shared organ pipeline; `art/gen_gui_sheet.py` draws the emblem (`Sheet.KIDNEY_EMBLEM`) and `art/gen_book_washing_kidney.py` renders the guide plate from the model and the existing mineral icons. All three are procedural placeholders written with the functional task. The Kidney needs no new item icon: it makes the Gizzard's dust, Tailings and Rock Residue.
+`art/gen_washing_kidney.py` writes the model, Blockbench source, atlas, break particle and `idle`/`working` clips through the shared organ pipeline; `art/gen_gui_sheet.py` draws the emblem (`Sheet.KIDNEY_EMBLEM`) and `art/gen_book_washing_kidney.py` renders the guide plate from the model and the existing mineral icons. The model has shaped bean lobes, distinct clean and dirty sacs, a perforated sieve and a falling-drop cycle. Its emblem and guide plate match the model. The Kidney needs no new item icon: it makes the Gizzard's dust, Tailings and Rock Residue.
 
-Specialist work to do, by an artist with a strong model for GeckoLib (no image model needed):
+Finishing specification (model, emblem and guide plate):
 
-- Replace the procedural model with a finished one. Cues to keep: two lobes (bean), a clean sac and a dirty sac that read as different at hotbar size and from across a room, a sieve plate between them, a drip spout. Keep the block's footprint (`Block.box(1, 0, 1, 15, 12, 15)`), the bone names `lobe_l`, `lobe_r`, `clean`, `dirty`, `sieve`, `spout`, `drip` only if the clips keep using them, and the clips `idle` and `working`; every rule of the quality bar and `art/test_motion.py` applies.
-- Redraw the emblem (32x32 at slot 10 of the organ GUI sheet) and the guide plate (200x200 RGBA, `textures/book/washing_kidney.png`) at the Gizzard's finish.
+- Model cues: two lobes (bean), a clean sac and a dirty sac that read as different at hotbar size and from across a room, a sieve plate between them, a drip spout. Keep the block's footprint (`Block.box(1, 0, 1, 15, 12, 15)`), the bone names `lobe_l`, `lobe_r`, `clean`, `dirty`, `sieve`, `spout`, `drip` only if the clips keep using them, and the clips `idle` and `working`; every rule of the quality bar and `art/test_motion.py` applies.
+- The emblem (32x32 at slot 10 of the organ GUI sheet) and the guide plate (200x200 RGBA, `textures/book/washing_kidney.png`) match the Gizzard's finish.
 - Update `CREDITS.txt` for the new files.
 
 Capture acceptance: the `mineral` scenario's `kidney_screen`, `full_kidney_screen`, `kidneys` and `hotbar` views; the `motion_washing_kidney` scene (motion, back, side, close, corner); the demo's `kidney_line`, `kidney_screen`, `kidney_items` and the book views `book_washing_kidney`, `book_washing_kidney_washing`, `book_washing_kidney_settling`, `book_washing_kidney_pause`. The reviewer reads the PNGs; the hotbar icon's centroid stays within 1.5 px of its slot centre.
@@ -491,7 +491,7 @@ Specialist work to do, by an artist with a strong model for GeckoLib (no image m
 - Replace the procedural model with a finished one. Cues to keep: a hand (palm, fingers, thumb) cupped round a plate of nine studs that reads as the crafting grid, bone tips, no glow (it works only by hand). Keep the block's footprint (`Block.box(1, 0, 1, 15, 10, 15)`), the clip `idle`, and the bone names `tip_*`, `pad`, `plate` only if the clip keeps using them; every rule of the quality bar and `art/test_motion.py` applies. Reach (stage 2) has no model change: the Palm's screen shows Reach and its Mouth's direction as text, and its buttons use the shared sheet button. A working clip is not part of this model.
 - Redraw the emblem (32x32 at slot 11 of the organ GUI sheet) and the guide plate (200x200 RGBA, `textures/book/shaping_palm.png`).
 - Update `CREDITS.txt` for the new files.
-- Rote (stage 3) placeholders: add the `working` clip the block state `working` already selects (today the `idle` clip plays), a glow-mask pulse on the studs, an engraved mark on each of the four tray wells and on the Select button (`Sheet` entries drawn by `art/gen_gui_sheet.py`), and a guide plate for the Rote pages. Keep the screen's geometry: `ShapingPalmMenu.trayWell` and the third body strip.
+- Rote (stage 3) placeholders: add a `working` clip and connect the animation controller to the `working` block state (the controller currently always selects `idle`), a glow-mask pulse on the studs, an engraved mark on each of the four tray wells and on the Select button (`Sheet` entries drawn by `art/gen_gui_sheet.py`), and a guide plate for the Rote pages. Keep the screen's geometry: `ShapingPalmMenu.trayWell` and the third body strip.
 
 Capture acceptance: the `motion_shaping_palm` scene (motion, back, side, close, corner); the demo's `palm_line`, `palm_parts`, `palm_screen`, `palm_empty_screen`, `palm_reach_line`, `palm_reach_screen`, `palm_larder_screen` and the book views `book_shaping_palm`, `book_shaping_palm_keeps`, `book_shaping_palm_reach` (the Reach and supply pages as one spread), `palm_rote_line`, `palm_rote_kit_line`, `palm_rote_screen`, `book_shaping_palm_rote` (the exhibit and Rote pages), `book_shaping_palm_recipe`, and the Mouth-supplied exhibits `palm_tree_overview`, `palm_tree_pods`, `palm_tree_screen`, `palm_tree_mouth_screen`, `palm_chest_overview`, `palm_chest_screen`, `palm_signpost`. The reviewer reads the PNGs.
 
@@ -503,8 +503,8 @@ Capture acceptance: the demo's `iron_bars_overview`, `iron_bars_supply`, `iron_b
 
 ## Withered Flower
 
-Placeholder: `art/gen_withered_flower.py` draws the three silhouettes as rimmed grey line art and the 16x16 entry
-icon. The block colour tints every look from the position's seed, so a final keeps the textures grey.
+The three silhouettes are image-model exports. `art/gen_withered_flower.py` maintains their models, blockstate and
+16x16 entry icon without overwriting the textures. The block colour tints every look from the position's seed, so a final keeps the textures grey.
 
 Texture story, three sources of 64x64 RGBA on a transparent background, exported with
 `python3 scripts/texture.py <source.png> <shipped.png> --size 64 --colors 0`:
@@ -520,8 +520,8 @@ patch and no missing texture.
 
 ## Tall Withered Plants
 
-Placeholder: `art/gen_tall_withered_plants.py` draws the three shapes as rimmed grey line art on 64x128 canvases and
-cuts each into a lower and an upper tile. The block colour tints every look from the lower half's position, so a final
+The three shapes are image-model exports from continuous 64x128 canvases split into lower and upper tiles.
+`art/gen_tall_withered_plants.py` maintains their models and blockstates without overwriting the textures. The block colour tints every look from the lower half's position, so a final
 keeps the textures grey and keeps the stalk continuous across the seam.
 
 Texture story, three sources of 64x128 RGBA on a transparent background, exported with
@@ -537,7 +537,7 @@ black patch and no missing texture.
 
 ## Withered Shrubs
 
-Placeholder: `art/gen_withered_shrubs.py` draws the ten shapes as rimmed grey line art on 64x64 canvases. The block colour
+The ten shapes are image-model exports on 64x64 canvases. `art/gen_withered_shrubs.py` maintains their models, blockstates and guide icon without overwriting the textures. The block colour
 tints every look, so a final keeps the textures grey, keeps the silhouette readable at four blocks and keeps the berry
 bush's three stages apart: bare sprout (age 0 and 1), bare bush (age 2), dried berries still hanging (age 3).
 
@@ -555,7 +555,7 @@ apart at four blocks, the bush's three stages differ, the cutout shows no black 
 
 ## Infected Timber
 
-Placeholder: `art/gen_infected_timber.py` draws four 64x64 tiles. The block colour tints the log tiles and the leaf tile by
+The four 64x64 tiles are image-model exports. `art/gen_infected_timber.py` maintains their models, blockstates and guide icon without overwriting the textures. The block colour tints the log tiles and the leaf tile by
 species, so a final keeps the bark and leaf tiles grey and the planks warm grey, and keeps one tile and one model for all
 six species. The leaf tile stays sparse (about half the pixels opaque, wrapping at the edges) so the branches behind show.
 
@@ -572,3 +572,173 @@ at four blocks, the infected oak's silhouette matches the living oak's, the cuto
 Tree infection adds no asset of its own: the Woodland plot and the `tree_infection` scene are vanilla trees, signs, a
 dispenser and a button, and the turned tree is drawn with the tiles above (`tree_infection` `turning` frames, `demo`
 `woodland_wave` frames).
+
+## Texture finishing sources — 2026-11-04
+
+Status: review. Generated with the built-in image tool. Full gate: 652 GameTests and 2,458 captures passed.
+Masters remain outside the repository under `/home/etf/.codex/generated_images/01a198d4-70e3-7f33-abc6-9d6b514d6668/`.
+Icons use `art/fit_icon_source.py` followed by `scripts/texture.py --size 32 --colors 0`.
+Square block sources use `scripts/texture.py --size 64 --colors 0`; near-square cutouts are padded transparently, centered horizontally and aligned to the bottom before export.
+Tall sources are resized as one continuous 64x128 RGBA image, split at row 64, then exported as two 64x64 tiles. Guide icons are derived from the finished block textures by the family generators.
+
+### `blighted_dead_bush_a`
+
+Source: `exec-a775bc7c-dce4-4064-9054-83ad8f2f236d.png`. SHA-256: `706f421dffcd493972910630a7f29b6956dbd5780d7a8595a8be2e174f80b0e6`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a dead bush, a loose asymmetric tangle of snapped dry twigs from a single stem. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `blighted_dead_bush_b`
+
+Source: `exec-434e430e-9863-4a35-863b-fbd818497714.png`. SHA-256: `3ab48e0cd9afcd629c341ebb46e1131b06ff8a0e4ae2f7ed5ebf15609a0bf0fa`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a dead bush, a low wide tangle of snapped dry twigs from two stems. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `blighted_fern`
+
+Source: `exec-4d01ba10-a323-49c7-8fa4-81e0f18cefda.png`. SHA-256: `1562a373c8e6382345bae50301572c9fae5c18ba49c725ea430f75fc919d8700`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a dead fern with three arching fronds, paired dry pinnae and curled tips. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `blighted_grass_a`
+
+Source: `exec-ffc4e48a-5c97-484f-bb24-6f7d20959734.png`. SHA-256: `7dfda29787a0112a17bfe5b61f01bb786599ce02942c08a45c1b67495e0b5dd7`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a tuft of five dry grass blades fanning from one point, tallest bowed to the right, one snapped. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `blighted_grass_b`
+
+Source: `exec-b6dd36ee-6308-47ea-86a0-cde884562b6d.png`. SHA-256: `331c078e5cdf96d3d4509e66165e7a9117065cd222d00e755ff9ee55e1c08617`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a low tuft of seven dry grass blades, tallest bowed to the left, two snapped. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `blighted_leaves`
+
+Source: `exec-9de23812-e1f1-442e-901d-b68ee01f11c9.png`. SHA-256: `f383503c9aa8079bd418d3c1c0d9ee6fb1732f2300ad8c1e1086c0d3b2f720cf`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. seamless square leaf canopy tile. Sparse dry GREYSCALE leaf clumps joined by thin dark twigs, many irregular see-through holes, approximately half tile genuinely transparent, a few dull knots. Pattern extends across all edges and repeats seamlessly. No background, no solid backing, greys ONLY because game applies species tint. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `calcifying_graft`
+
+Source: `exec-0cdea209-ed69-4649-be28-8a6c91d43e0b.png`. SHA-256: `c7ccb9639811ff4850ac8f9e00d46e990e10048657bd8cb88e9d8069f2186572`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game inventory icon to be reduced to 32x32. Subject: one chalky ivory lump of bone paste with a hard cracked crust, broad irregular shape with shaded fissures. Hand-painted original biological game artwork, broad readable forms, soft shading from upper left, thin dark outer outline. One centered isolated object occupying 80 percent of square canvas, true alpha transparency. No text, background, shadows outside object, border, scenery, loose particles or glow. Strong distinct silhouette at tiny size.
+
+### `dead_berry_bush_fruited`
+
+Source: `exec-22bf2324-b08d-461a-b6a5-97e69fd3c788.png`. SHA-256: `aecef21d80edc97a688f3687aa0adeff44e20845bd7da90a152aef7a3aadc66d`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a dead sweet berry bush of five branching bare twigs hung with six shrivelled dried berries, no leaves. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `dead_berry_bush_large`
+
+Source: `exec-984fbdf4-002d-444a-a3f3-ca7d9449384a.png`. SHA-256: `93cea8efd86203ba880f4fae56dddb1c7a88bc5ed50c02202777ddf875e7d213`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a dead sweet berry bush of five branching bare twigs, no leaves, no berries. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `dead_berry_bush_small`
+
+Source: `exec-9b5c4c02-8e86-4901-b314-dcfd5c2178f5.png`. SHA-256: `4dae3f8cc889dcfd3972c97508549349a61fc3e1c0996ccf36c34214e68aedba`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a low dead sweet berry sprout of three bare twigs. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `dead_tissue`
+
+Source: `exec-f2fa01d1-855b-44f9-9094-5406bf9d6764.png`. SHA-256: `628fa1c38553d1336e293fd6016ccefef67e3b2228a225234ede82fdc0ceb85b`.
+
+Prompt: Use case: stylized-concept. Asset type: finished voxel-game inventory icon, will be downsampled to 32x32. Subject: one limp grey-brown scrap of dead organic tissue, folded dry wrinkled flesh, a small dull pink fleck at its torn edge. Broad readable single silhouette, hand-painted game art, restrained soft upper-left light, thin dark outer outline. Centered isolated object occupying 80 percent of square canvas, real transparent background. No text, no border, no scenery, no loose particles, no glow, no photorealistic gore. Original biological game asset.
+
+### `infected_log`
+
+Source: `exec-c50d1e9c-6fa7-405c-87ef-42e2e1f550c5.png`. SHA-256: `a522fb1f4f47e1abcac5d826132083137cba6467e5b254b92da9fbd605787153`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. seamless square bark tile, dead GREYSCALE tree bark with vertical ridges and dark seams, a few dark root threads crawling over it, two dull fleshy knots. Neutral greys ONLY because game applies species tint. Opaque edge-to-edge tile, matching opposite edges, no border. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `infected_log_top`
+
+Source: `exec-2f742577-0a0d-4138-99fa-3266c9a8d473.png`. SHA-256: `9442468d1e26d7e74979ae9a46ecbbbb7fb22ffcc12daafd010bdf0f8712ffed`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. square cut-end log tile. Square grey bark rim surrounding pale GREYSCALE growth rings, a dull knot at the heart, dark root threads running through rings. Opaque edge-to-edge square block face, no outside background, all corners filled with bark. Greys ONLY because game applies species tint. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `infected_planks`
+
+Source: `exec-482c2723-85c4-4756-9f62-ddd342d6adf0.png`. SHA-256: `52b971651ab199b6ee908180fdf8afcb5b074577d20cdacbb4a83bd334c60dd0`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. seamless square tile of four dead wooden planks in horizontal rows with dark seams and restrained wood grain, warm grey tones, one knot and one dark crack. Opaque edge to edge, matching opposite edges, no border. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `living_wall`
+
+Source: `exec-0c32251c-d0a5-4008-a0ee-8878726fbd02.png`. SHA-256: `ff546e47dd5dfab8827c89ccb10a79c24c1256c45d90b8ee3790b5800dd2b56f`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. seamless square texture of dense dark burgundy muscular tissue, broad irregular lobes parted by narrow dark creases, faint directional muscle fibres and restrained wet sheen. Low contrast at borders, no central motif, no borders. Opaque tile covers the entire square, matching opposite edges, veins continue across opposite edges. Must look natural when rotated 90 degrees. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `membrane_window`
+
+Source: `exec-4b5fb0ba-a224-4180-b48f-010766aa0750.png`. SHA-256: `cdf53b2887bdd3ef1074ca30d7bdc39a8c9a8f1b916426737d05b9b07b443630`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game inventory icon to be reduced to 32x32. Subject: one small square of pale pink translucent membrane with branching red veins enclosed in a thin ivory bone frame, front view. Hand-painted original biological game artwork, broad readable forms, soft shading from upper left, thin dark outer outline. One centered isolated object occupying 80 percent of square canvas, true alpha transparency. No text, background, shadows outside object, border, scenery, loose particles or glow. Strong distinct silhouette at tiny size.
+
+### `skeletal_graft`
+
+Source: `exec-ced4f955-2706-479c-9273-c4053a26c055.png`. SHA-256: `a3617b9ee386151a98add9cf067087482c9d636484068dc8fba80dbfe3e2113f`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game inventory icon to be reduced to 32x32. Subject: one small curved ivory bone splint wrapped loosely in a pink membrane strip. Hand-painted original biological game artwork, broad readable forms, soft shading from upper left, thin dark outer outline. One centered isolated object occupying 80 percent of square canvas, true alpha transparency. No text, background, shadows outside object, border, scenery, loose particles or glow. Strong distinct silhouette at tiny size.
+
+### `sphincter_door`
+
+Source: `exec-ea344abb-5d9a-4694-adad-52c9e782a05a.png`. SHA-256: `a5ae6774e28404c70282a6f22ddb0722ea1b3d56c90adef5ea58a407f5278401`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game inventory icon to be reduced to 32x32. Subject: one closed iris of six overlapping pink membrane petals spiralling into a dark centre, ringed by a thick muscular dark red rim, front view. Hand-painted original biological game artwork, broad readable forms, soft shading from upper left, thin dark outer outline. One centered isolated object occupying 80 percent of square canvas, true alpha transparency. No text, background, shadows outside object, border, scenery, loose particles or glow. Strong distinct silhouette at tiny size.
+
+### `surgical_blade`
+
+Source: `exec-ddfdb2c0-698f-4f1f-aef7-290ca76d1af9.png`. SHA-256: `a7ab012199a37e14dfe4d9b506c41b5f9a9e9d751784b554f409096737114490`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game inventory icon to be reduced to 32x32. Subject: one short pale ivory bone handle bound in pink membrane, attached to a thin curved steel surgical blade, held diagonally from lower left to upper right. Hand-painted original biological game artwork, broad readable forms, soft shading from upper left, thin dark outer outline. One centered isolated object occupying 80 percent of square canvas, true alpha transparency. No text, background, shadows outside object, border, scenery, loose particles or glow. Strong distinct silhouette at tiny size.
+
+### `tall_blighted_fern`
+
+Source: `exec-1533f228-2a29-41c1-af20-eb64f00f3311.png`. SHA-256: `ae43d911598904019bcd042869c29821d5c5c99ad04edb64d894f42857d62ca6`.
+
+Prompt: Use case: stylized-concept. Asset type: GREYSCALE cross-plane plant texture for a TWO-block-tall voxel plant, exported to a 64x128 canvas then split horizontally into two 64x64 tiles. Portrait canvas, width:height exactly 1:2. Subject: one large dead fern, three tall arching fronds growing from bottom centre, paired dry drooping pinnae and curled tips, taller central frond crosses the middle of the image, a few dark root threads at foot and one dull fleshy knot. Side view, plant touches bottom centre edge and remains within side and top margins. The stalk continues unbroken through centre seam. Hand-painted original game sprite, broad readable shapes, soft shading from upper left, thin dark rim, neutral grey tones ONLY because the game applies tint. Genuine transparent background without any surrounding haze or speckles. No text, labels, colour, glow, scenery, pot or ground mound.
+
+### `tall_blighted_grass`
+
+Source: `exec-bffe9c85-3d8d-40bb-a1a1-f901067a1875.png`. SHA-256: `4b1a4cb8dce9ecd749afefc806a23d58f752e947ff49112de0a67c5fa852c3ee`.
+
+Prompt: Use case: stylized-concept. Asset type: GREYSCALE cross-plane plant texture for a TWO-block-tall voxel plant, exported to a 64x128 canvas then split horizontally into two 64x64 tiles. Portrait canvas, width:height exactly 1:2. Subject: one tuft of seven dry grass blades fanning from bottom centre, tall blades crossing middle of image, tallest bowing near top, two shorter blades snapped, a few dark root threads at foot and one dull fleshy knot. Side view, plant touches bottom centre edge and remains within side and top margins. The stalk continues unbroken through centre seam. Hand-painted original game sprite, broad readable shapes, soft shading from upper left, thin dark rim, neutral grey tones ONLY because the game applies tint. Genuine transparent background without any surrounding haze or speckles. No text, labels, colour, glow, scenery, pot or ground mound.
+
+### `tall_withered_flower`
+
+Source: `exec-6619a144-e66f-42f3-b298-e7d3970ed05c.png`. SHA-256: `6dcf5ba1a570e7ee340896cc8b7de8c9b30526a897951945df95ef5cfb2288ac`.
+
+Prompt: Use case: stylized-concept. Asset type: GREYSCALE cross-plane plant texture for a TWO-block-tall voxel plant, exported to a 64x128 canvas then split horizontally into two 64x64 tiles. Portrait canvas, width:height exactly 1:2. Subject: one tall dead flower, thin dry stalk from bottom centre through centre of image, two limp leaves low down, forked side stem with split seed pod, heavy spent seed head bowed at top, a few dark root threads at foot and one dull fleshy knot. Side view, plant touches bottom centre edge and remains within side and top margins. The stalk continues unbroken through centre seam. Hand-painted original game sprite, broad readable shapes, soft shading from upper left, thin dark rim, neutral grey tones ONLY because the game applies tint. Genuine transparent background without any surrounding haze or speckles. No text, labels, colour, glow, scenery, pot or ground mound.
+
+### `withered_flower_collapsed`
+
+Source: `exec-cabe3d6f-5227-4022-a6c7-1d51c5e89f91.png`. SHA-256: `42fd9fff9308842a4e18bd4b32703245a6ce23cbed1c8e56dadfb4af6e156fd1`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: one dead small flower collapsed to the ground, short stalk, dry centre and six curled petals splayed outward and downward; entire silhouette in lower half of square. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `withered_flower_forked`
+
+Source: `exec-195752b1-98fa-462c-af75-bceb513e426e.png`. SHA-256: `966034ef78129a22bfc5b37d2936e6a88ecc1de2065fdc87a3f635d549ea6958`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: one dead small flower, dry stalk that forks twice into three stems ending in small split seed pods. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `withered_flower_hanging`
+
+Source: `exec-e98cd0c9-63e7-45a1-ac85-d9c6c2502528.png`. SHA-256: `1e20ca336e48bf23417d06e2db80f33fdc0379fe9338e0609cf10ab5dae128d5`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: one dead small flower, thin stalk from bottom centre bending over near top with a hanging spent seed head, two limp leaves. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `withered_sapling_bare`
+
+Source: `exec-ceaea4c2-d438-47be-ac48-125959eb0842.png`. SHA-256: `c5e4bb03068fce9ddf1a7a6bdc788f613f3df04e3bcecb1df2de9587e230804f`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a dead tree sapling, thin upright stem with three limp dry leaves. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
+
+### `withered_sapling_curled`
+
+Source: `exec-92f50f64-94c5-4247-8f15-5234b00160da.png`. SHA-256: `e5628640f51819940f8434c788b3353c5cd254ae3d29ad6610040d9f844ecba9`.
+
+Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a dead tree sapling, bent stem with four curled dried leaves. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.

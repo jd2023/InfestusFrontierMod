@@ -1,3 +1,22 @@
 {
-  "parent": "infestusfrontier:block/infected_planks"
+  "parent": "infestusfrontier:block/infected_planks",
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "translation": [
+        0.8,
+        -1.2,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    }
+  }
 }
