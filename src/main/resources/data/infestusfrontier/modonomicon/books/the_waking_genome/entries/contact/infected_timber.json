@@ -47,6 +47,10 @@
     {
       "type": "modonomicon:text",
       "text": "entry.infestusfrontier.contact.infected_timber.limits"
+    },
+    {
+      "type": "modonomicon:text",
+      "text": "entry.infestusfrontier.contact.infected_timber.packs"
     }
   ]
 }

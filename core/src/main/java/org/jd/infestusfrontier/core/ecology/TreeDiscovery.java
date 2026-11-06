@@ -11,17 +11,19 @@ import java.util.Set;
 
 /**
  * Bounded, incremental discovery of one rooted tree: the logs joined to a root log and the foliage those logs hold
- * (VEGETATION_INFECTION.md, "Tree boundaries"). Logs join through any of their 26 neighbours, as vanilla's diagonal
- * branches and leaning trunks do. A leaf belongs to the tree when it stands face to face with a log of the tree at
- * leaf distance 1, or with a claimed leaf at one more than that leaf's distance: the gradient vanilla's own distance
- * rule writes. Leaves never lead to logs, so contact between crowns never carries discovery into another tree, and a
- * leaf nearer another tree's log than this tree's keeps a lower distance than the gradient wants and is left alone.
+ * (VEGETATION_INFECTION.md, "Tree boundaries"). A tree's logs are of one kind, the root's: logs of that kind join
+ * through any of their 26 neighbours, as vanilla's diagonal branches and leaning trunks do. A leaf belongs to the tree
+ * when it stands face to face with a log of the tree at leaf distance 1, or with a claimed leaf at one more than that
+ * leaf's distance: the gradient vanilla's own distance rule writes. The kinds of leaf the trunk touches at distance 1
+ * are the tree's foliage, at most {@link Limits#foliage()} of them; a gradient leaf of any other kind is another
+ * tree's. Leaves never lead to logs, so contact between crowns never carries discovery into another tree, and a leaf
+ * nearer another tree's log than this tree's keeps a lower distance than the gradient wants and is left alone.
  *
  * <p>Every position is read at most once through the {@link Terrain} and the reads are counted; {@link #advance}
  * does at most the reads it is given, so a server budget bounds a tick. The outcome is one of: the tree is admitted
  * with its logs and leaves in discovery order; it is refused as oversized (a log or leaf outside the envelope, more
- * logs, leaves or reads than the limits allow), ambiguous (a supported log of another species joined to it),
- * unloaded (a position in no loaded chunk) or missing (the root is not a log).
+ * logs, leaves or reads than the limits allow), ambiguous (a log of another kind joined to it, or more kinds of
+ * foliage than the limits allow), unloaded (a position in no loaded chunk) or missing (the root is not a log).
  */
 public final class TreeDiscovery {
     /** A block position; the caller maps it to the world. */
@@ -31,19 +33,16 @@ public final class TreeDiscovery {
         }
     }
 
-    /** What stands at a position, as the species being discovered sees it. */
-    public sealed interface Block permits Log, Leaf, ForeignLog, Nothing, Unloaded {}
+    /** What stands at a position. A kind names a block; two parts are of one kind when their kinds are equal. */
+    public sealed interface Block permits Log, Leaf, Nothing, Unloaded {}
 
-    /** A log of the tree's species. */
-    public record Log() implements Block {}
+    /** A log a tree may be made of. Joined to a tree of another kind, it makes that tree ambiguous. */
+    public record Log(String kind) implements Block {}
 
-    /** Leaves of the tree's species, with their leaf distance (1 to 7). */
-    public record Leaf(int distance) implements Block {}
+    /** Leaves a tree may hold, with their leaf distance (1 to 7). */
+    public record Leaf(String kind, int distance) implements Block {}
 
-    /** A supported log of another species: joined to this tree, it makes the tree ambiguous. */
-    public record ForeignLog() implements Block {}
-
-    /** Anything else: air, ground, planks, a stripped log, another species' leaves, an infected log. */
+    /** Anything else: air, ground, planks, a stripped log, wood, an infected log or infected leaves. */
     public record Nothing() implements Block {}
 
     /** A position in no loaded chunk. */
@@ -57,16 +56,16 @@ public final class TreeDiscovery {
     /**
      * The envelope and counts one tree may have: {@code reach} blocks each way from the root horizontally (a width of
      * {@code 2 * reach + 1}), {@code height} blocks from one below the root upward, and at most {@code logs} logs,
-     * {@code leaves} leaves and {@code examined} reads.
+     * {@code leaves} leaves, {@code foliage} kinds of leaf and {@code examined} reads.
      */
-    public record Limits(int reach, int height, int logs, int leaves, int examined) {
+    public record Limits(int reach, int height, int logs, int leaves, int foliage, int examined) {
         public Limits {
-            if (reach < 0 || height < 2 || logs < 1 || leaves < 0 || examined < 1)
+            if (reach < 0 || height < 2 || logs < 1 || leaves < 0 || foliage < 0 || examined < 1)
                 throw new IllegalArgumentException("tree limits");
         }
 
-        /** The proposed first limits: a 17x32x17 envelope, 128 logs, 512 leaves, 2,048 reads. */
-        public static final Limits DEFAULT = new Limits(8, 32, 128, 512, 2048);
+        /** The first limits: a 17x32x17 envelope, 128 logs, 512 leaves of at most 4 kinds, 2,048 reads. */
+        public static final Limits DEFAULT = new Limits(8, 32, 128, 512, 4, 2048);
     }
 
     public enum Reason {
@@ -78,8 +77,11 @@ public final class TreeDiscovery {
 
     public sealed interface Outcome permits Admitted, Refused {}
 
-    /** The tree in discovery order: the root first; leaves by rising distance. */
-    public record Admitted(List<Position> logs, List<Position> leaves) implements Outcome {
+    /** A claimed log or leaf and the kind it was when read. */
+    public record Part(Position position, String kind) {}
+
+    /** The tree in discovery order: the root first; leaves by rising distance. Every log is of the root's kind. */
+    public record Admitted(List<Part> logs, List<Part> leaves) implements Outcome {
         public Admitted {
             logs = List.copyOf(logs);
             leaves = List.copyOf(leaves);
@@ -101,8 +103,10 @@ public final class TreeDiscovery {
     private final Map<Position, Block> read = new HashMap<>();
     private final ArrayDeque<Position> logQueue = new ArrayDeque<>();
     private final ArrayDeque<ClaimedLeaf> leafQueue = new ArrayDeque<>();
-    private final List<Position> logs = new ArrayList<>();
-    private final List<Position> leaves = new ArrayList<>();
+    private final List<Part> logs = new ArrayList<>();
+    private final List<Part> leaves = new ArrayList<>();
+    private final Set<String> foliage = new HashSet<>();
+    private String kind = "";
     private int examined;
     private boolean rootRead;
     private Optional<Position> expanding = Optional.empty();
@@ -146,10 +150,12 @@ public final class TreeDiscovery {
                 used++;
                 examined++;
                 switch (terrain.at(root)) {
-                    case Log l -> claimLog(root);
+                    case Log l -> {
+                        kind = l.kind();
+                        claimLog(root);
+                    }
                     case Unloaded u -> refuse(Reason.UNLOADED);
                     case Leaf f -> refuse(Reason.MISSING);
-                    case ForeignLog f -> refuse(Reason.MISSING);
                     case Nothing n -> refuse(Reason.MISSING);
                 }
                 continue;
@@ -177,13 +183,16 @@ public final class TreeDiscovery {
             }
             switch (block) {
                 case Unloaded u -> refuse(Reason.UNLOADED);
-                case ForeignLog f -> refuse(Reason.AMBIGUOUS);
                 case Nothing n -> {}
                 case Log l -> {
-                    if (fromLog) claimLog(next);
+                    if (!l.kind().equals(kind)) refuse(Reason.AMBIGUOUS);
+                    else if (fromLog) claimLog(next);
                 }
                 case Leaf f -> {
-                    if (index < FACES && f.distance() == expandingDistance + 1) claimLeaf(next, f.distance());
+                    if (index < FACES && f.distance() == expandingDistance + 1) {
+                        if (fromLog) holdFoliage(f.kind());
+                        if (outcome.isEmpty() && foliage.contains(f.kind())) claimLeaf(next, f);
+                    }
                 }
             }
         }
@@ -212,19 +221,26 @@ public final class TreeDiscovery {
         }
         claimed.add(position);
         read.remove(position);
-        logs.add(position);
+        logs.add(new Part(position, kind));
         logQueue.add(position);
     }
 
-    private void claimLeaf(Position position, int distance) {
+    /** A kind of leaf the trunk touches at distance 1 is the tree's foliage, up to the limit. */
+    private void holdFoliage(String leafKind) {
+        if (foliage.contains(leafKind)) return;
+        if (foliage.size() == limits.foliage()) refuse(Reason.AMBIGUOUS);
+        else foliage.add(leafKind);
+    }
+
+    private void claimLeaf(Position position, Leaf leaf) {
         if (!inEnvelope(position) || leaves.size() == limits.leaves()) {
             refuse(Reason.OVERSIZED);
             return;
         }
         claimed.add(position);
         read.remove(position);
-        leaves.add(position);
-        leafQueue.add(new ClaimedLeaf(position, distance));
+        leaves.add(new Part(position, leaf.kind()));
+        leafQueue.add(new ClaimedLeaf(position, leaf.distance()));
     }
 
     private boolean inEnvelope(Position p) {

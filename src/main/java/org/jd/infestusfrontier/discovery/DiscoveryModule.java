@@ -55,7 +55,7 @@ public final class DiscoveryModule {
                         output.accept(EcologyModule.SPORE_CULTURE.get());
                         output.accept(EcologyModule.DEAD_TISSUE.get());
                         output.accept(EcologyModule.INFECTED_LOG_ITEM.get());
-                        output.accept(EcologyModule.INFECTED_PLANKS_ITEM.get());
+                        output.accept(EcologyModule.BLIGHTED_LEAVES_ITEM.get());
                         output.accept(EcologyModule.LIVING_WALL_ITEM.get());
                         output.accept(EcologyModule.RIBBED_WALL_ITEM.get());
                         output.accept(EcologyModule.CALCIFIED_WALL_ITEM.get());

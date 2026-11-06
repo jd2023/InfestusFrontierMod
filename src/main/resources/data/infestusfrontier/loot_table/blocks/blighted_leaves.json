@@ -3,86 +3,40 @@
   "pools": [
     {
       "rolls": 1,
-      "entries": [
+      "bonus_rolls": 0.0,
+      "conditions": [
         {
-          "type": "minecraft:loot_table",
-          "value": "minecraft:blocks/oak_leaves",
-          "conditions": [
+          "condition": "minecraft:any_of",
+          "terms": [
             {
-              "condition": "minecraft:block_state_property",
-              "block": "infestusfrontier:blighted_leaves",
-              "properties": {
-                "source": "oak"
-              }
-            }
-          ]
-        },
-        {
-          "type": "minecraft:loot_table",
-          "value": "minecraft:blocks/birch_leaves",
-          "conditions": [
+              "ability": "shears_dig",
+              "condition": "neoforge:can_item_perform_ability"
+            },
             {
-              "condition": "minecraft:block_state_property",
-              "block": "infestusfrontier:blighted_leaves",
-              "properties": {
-                "source": "birch"
-              }
-            }
-          ]
-        },
-        {
-          "type": "minecraft:loot_table",
-          "value": "minecraft:blocks/spruce_leaves",
-          "conditions": [
-            {
-              "condition": "minecraft:block_state_property",
-              "block": "infestusfrontier:blighted_leaves",
-              "properties": {
-                "source": "spruce"
-              }
-            }
-          ]
-        },
-        {
-          "type": "minecraft:loot_table",
-          "value": "minecraft:blocks/jungle_leaves",
-          "conditions": [
-            {
-              "condition": "minecraft:block_state_property",
-              "block": "infestusfrontier:blighted_leaves",
-              "properties": {
-                "source": "jungle"
-              }
-            }
-          ]
-        },
-        {
-          "type": "minecraft:loot_table",
-          "value": "minecraft:blocks/acacia_leaves",
-          "conditions": [
-            {
-              "condition": "minecraft:block_state_property",
-              "block": "infestusfrontier:blighted_leaves",
-              "properties": {
-                "source": "acacia"
-              }
-            }
-          ]
-        },
-        {
-          "type": "minecraft:loot_table",
-          "value": "minecraft:blocks/dark_oak_leaves",
-          "conditions": [
-            {
-              "condition": "minecraft:block_state_property",
-              "block": "infestusfrontier:blighted_leaves",
-              "properties": {
-                "source": "dark_oak"
+              "condition": "minecraft:match_tool",
+              "predicate": {
+                "predicates": {
+                  "minecraft:enchantments": [
+                    {
+                      "enchantments": "minecraft:silk_touch",
+                      "levels": {
+                        "min": 1
+                      }
+                    }
+                  ]
+                }
               }
             }
           ]
         }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "infestusfrontier:blighted_leaves"
+        }
       ]
     }
-  ]
+  ],
+  "random_sequence": "infestusfrontier:blocks/blighted_leaves"
 }

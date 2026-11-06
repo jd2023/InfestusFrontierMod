@@ -1,0 +1,11 @@
+{
+  "values": [
+    "infestusfrontier_tests:fixture_log",
+    "infestusfrontier_tests:fixture_wood",
+    "infestusfrontier_tests:fixture_stripped_log",
+    "infestusfrontier_tests:fixture_excluded_log",
+    "infestusfrontier_tests:fixture_included_log",
+    "infestusfrontier_tests:fixture_branch",
+    "infestusfrontier_tests:fixture_entity_log"
+  ]
+}

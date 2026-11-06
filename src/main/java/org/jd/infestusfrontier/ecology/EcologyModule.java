@@ -115,8 +115,8 @@ public final class EcologyModule {
             shrub("withered_sapling", WitheredSaplingBlock::new, false);
 
     /**
-     * The trunk of an infected tree: it keeps its axis and the species it was. Breaking it gives one Infected Log. Not
-     * Living Wood: no production, resin or biomass premium.
+     * The trunk of every infected tree: one material whatever the tree was, keeping only its axis. Breaking it gives
+     * one Infected Log. Not Living Wood: no production, resin or biomass premium.
      */
     public static final DeferredBlock<InfectedLogBlock> INFECTED_LOG = BLOCKS.registerBlock(
             "infected_log",
@@ -129,7 +129,10 @@ public final class EcologyModule {
                     .ignitedByLava());
 
     public static final DeferredItem<BlockItem> INFECTED_LOG_ITEM = ITEMS.registerSimpleBlockItem(INFECTED_LOG);
-    /** One Infected Log makes four; they stand in for ordinary planks in every recipe that takes the planks tag. */
+    /**
+     * Kept for worlds and inventories that hold it: no recipe makes it now. It stands in for ordinary planks in every
+     * recipe that takes the planks tag.
+     */
     public static final DeferredBlock<InfectedPlanksBlock> INFECTED_PLANKS = BLOCKS.registerBlock(
             "infected_planks",
             InfectedPlanksBlock::new,
@@ -141,7 +144,7 @@ public final class EcologyModule {
                     .ignitedByLava());
 
     public static final DeferredItem<BlockItem> INFECTED_PLANKS_ITEM = ITEMS.registerSimpleBlockItem(INFECTED_PLANKS);
-    /** The crown of an infected tree: vanilla leaf behaviour, the species' own loot. No item. */
+    /** The crown of every infected tree: vanilla leaf behaviour; only shears or Silk Touch give it, as itself. */
     public static final DeferredBlock<BlightedLeavesBlock> BLIGHTED_LEAVES = BLOCKS.registerBlock(
             "blighted_leaves",
             BlightedLeavesBlock::new,
@@ -157,6 +160,8 @@ public final class EcologyModule {
                     .ignitedByLava()
                     .pushReaction(PushReaction.DESTROY)
                     .isRedstoneConductor((state, level, pos) -> false));
+
+    public static final DeferredItem<BlockItem> BLIGHTED_LEAVES_ITEM = ITEMS.registerSimpleBlockItem(BLIGHTED_LEAVES);
 
     /** The three wall tiers: soft as grown, bone-ribbed, and calcified past any explosion. */
     public static final DeferredBlock<LivingWallBlock> LIVING_WALL =
@@ -351,17 +356,13 @@ public final class EcologyModule {
                         BLIGHTED_UNDERGROWTH.get());
                 event.register(
                         (state, level, pos, index) -> WitheredSaplingBlock.tintOf(state), WITHERED_SAPLING.get());
-                event.register(
-                        (state, level, pos, index) ->
-                                state.getValue(InfectedLogBlock.SOURCE).barkTint(),
-                        INFECTED_LOG.get());
-                event.register(
-                        (state, level, pos, index) ->
-                                state.getValue(BlightedLeavesBlock.SOURCE).leafTint(),
-                        BLIGHTED_LEAVES.get());
+                event.register((state, level, pos, index) -> InfectedLogBlock.TINT, INFECTED_LOG.get());
+                event.register((state, level, pos, index) -> BlightedLeavesBlock.TINT, BLIGHTED_LEAVES.get());
             });
-            modBus.addListener((RegisterColorHandlersEvent.Item event) ->
-                    event.register((stack, index) -> TreeSource.OAK.barkTint(), INFECTED_LOG_ITEM.get()));
+            modBus.addListener((RegisterColorHandlersEvent.Item event) -> {
+                event.register((stack, index) -> InfectedLogBlock.TINT, INFECTED_LOG_ITEM.get());
+                event.register((stack, index) -> BlightedLeavesBlock.TINT, BLIGHTED_LEAVES_ITEM.get());
+            });
         }
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post event) -> {
             if (event.getLevel() instanceof ServerLevel server)

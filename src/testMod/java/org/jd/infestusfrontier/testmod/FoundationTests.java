@@ -17,6 +17,7 @@ public final class FoundationTests {
     public FoundationTests(IEventBus modBus) {
         modBus.addListener(M3RouteTests::registerTickets);
         TestItems.register(modBus);
+        TestTrees.register(modBus);
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")

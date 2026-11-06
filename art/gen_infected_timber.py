@@ -1,13 +1,13 @@
-"""Infected timber: Infected Log, Infected Planks and Blighted Leaves.
+"""Infected timber: Infected Log, Blighted Leaves and the Infected Planks old worlds keep.
 
     python3 art/gen_infected_timber.py
 
 Models and guide icon for the finished image-model textures (CREDITS.txt).
-The log has one grey bark tile and one grey end tile; the block colour tints both by the species the tree was (oak brown, birch bone, spruce dark green-grey, jungle
-olive, acacia tan, dark oak umber), so six species share two textures and one model per axis. The planks are one
-untinted tile. The leaves are one sparse grey cutout tile over vanilla's full cube, tinted by species the same way,
-so the holes show the branches behind them. Dark root threads and a few dull knots are the only signs of infection.
-No block entity, no saved appearance.
+Every infected tree is the same two blocks. The log has one grey bark tile and one grey end tile, tinted by one
+bark colour (InfectedLogBlock.TINT), one model per axis. The leaves are one sparse grey cutout tile over vanilla's
+full cube, tinted by one leaf colour (BlightedLeavesBlock.TINT), so the holes show the branches behind them; the
+Blighted Leaves item shows the block. The planks are one untinted tile. Dark root threads and a few dull knots are
+the only signs of infection. No block entity, no saved appearance, no origin.
 """
 import json
 import random
@@ -23,7 +23,6 @@ STATES = ROOT / 'blockstates'
 BOOK = ROOT / 'textures/book'
 NS = 'infestusfrontier:block/'
 SIZE = 64
-SPECIES = ('oak', 'birch', 'spruce', 'jungle', 'acacia', 'dark_oak')
 ROOT_THREAD = 52
 KNOT = 96
 
@@ -169,6 +168,7 @@ def write_models():
         'textures': {'all': NS + 'blighted_leaves'},
     }
     (MODELS / 'blighted_leaves.json').write_text(json.dumps(leaves_model, indent=2) + '\n')
+    (ITEM_MODELS / 'blighted_leaves.json').write_text(json.dumps({'parent': NS + 'blighted_leaves'}, indent=2) + '\n')
     for name in ('infected_log', 'infected_planks'):
         # Keep the painted cube's visual weight centered inside the hotbar slot.
         model = {'parent': NS + name, 'display': {'gui': {

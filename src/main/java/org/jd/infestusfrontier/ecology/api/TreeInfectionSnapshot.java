@@ -18,7 +18,10 @@ public record TreeInfectionSnapshot(List<Job> jobs, List<Refusal> refusals) {
         CONVERTING
     }
 
-    /** Why a tree was refused: the dimension holds its 16 jobs, or discovery found the tree too large, joined to another species or partly unloaded. */
+    /**
+     * Why a tree was refused: the dimension holds its 16 jobs, or discovery found the tree too large, joined to logs of
+     * another kind or holding too many kinds of leaves, or partly unloaded.
+     */
     public enum Reason {
         CAPACITY,
         OVERSIZED,
@@ -26,8 +29,11 @@ public record TreeInfectionSnapshot(List<Job> jobs, List<Refusal> refusals) {
         UNLOADED
     }
 
-    /** A job on the tree rooted at {@code root}; the counts are what is still to convert, 0 while discovering. */
-    public record Job(BlockPos root, String species, Phase phase, int logsLeft, int leavesLeft) {}
+    /**
+     * A job on the tree rooted at {@code root}, whose logs are the block {@code log} names; the counts are what is still
+     * to convert, 0 while discovering.
+     */
+    public record Job(BlockPos root, String log, Phase phase, int logsLeft, int leavesLeft) {}
 
     public record Refusal(BlockPos root, Reason reason) {}
 
