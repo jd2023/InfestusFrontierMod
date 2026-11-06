@@ -18,7 +18,9 @@ public final class TestClient {
             if (captureDir != null) {
                 new CaptureClient(
                         Path.of(captureDir),
-                        Scenario.loadAll("captures", System.getProperty("infestusfrontier.capture.scenarios", "")));
+                        Scenario.loadAll(
+                                System.getProperty("infestusfrontier.capture.folder", "captures"),
+                                System.getProperty("infestusfrontier.capture.scenarios", "")));
             } else if (demoScene != null) {
                 new DemoClient(Scenario.load("captures", demoScene));
             }

@@ -41,6 +41,9 @@ def captureScenarios = fileTree(captureScenarioDir) { include '*.json' }.files.c
 // -PcaptureOnly=a,b photographs and verifies only those scenarios; scripts/verify.sh runs all.
 def captureOnly = providers.gradleProperty('captureOnly').map { it.split(',') as List }.getOrElse(captureScenarios)
 def captureOutput = layout.buildDirectory.dir('captures')
+// The negative fixture lives outside captureScenarioDir, so no capture run photographs it or discovers it.
+def captureNegativeDir = layout.projectDirectory.dir('src/testMod/resources/captures_negative')
+def captureNegativeOutput = layout.buildDirectory.dir('captures-negative')
 
 // Optional runtime mods for manual play: ./gradlew runClient -PwithJei -PwithCurios
 def withJei = providers.gradleProperty('withJei').isPresent()
@@ -108,6 +111,17 @@ neoForge {
             loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
             systemProperty 'infestusfrontier.capture.dir', captureOutput.get().asFile.absolutePath
             systemProperty 'infestusfrontier.capture.scenarios', captureOnly.join(',')
+            jvmArgument '-Xmx3G'
+        }
+        // Disposable client that runs the negative fixture: a demo command at an unloaded position must fail it.
+        captureNegative {
+            client()
+            sourceSet = sourceSets.testMod
+            gameDirectory = project.file('runs/capture-negative')
+            loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
+            systemProperty 'infestusfrontier.capture.dir', captureNegativeOutput.get().asFile.absolutePath
+            systemProperty 'infestusfrontier.capture.folder', 'captures_negative'
+            systemProperty 'infestusfrontier.capture.scenarios', 'unloaded_position'
             jvmArgument '-Xmx3G'
         }
         // Playable client in a fresh world built from the capture scenario src/testMod/resources/captures/demo.json.
@@ -343,26 +357,36 @@ abstract class VerifyCaptures extends DefaultTask {
 }
 
 // Fresh world and output each run; fixed client options and FML config so the client never shows a first-run screen.
-def prepareCapture = tasks.register('prepareCapture') {
-    def world = layout.projectDirectory.dir('runs/capture/saves/capture').asFile
-    def output = captureOutput.get().asFile
-    def runDir = layout.projectDirectory.dir('runs/capture').asFile
-    def options = layout.projectDirectory.file('src/testMod/capture/options.txt').asFile
-    def fml = layout.projectDirectory.file('src/testMod/capture/fml.toml').asFile
-    inputs.files(options, fml)
-    outputs.upToDateWhen { false }
-    doLast {
-        [world, output].each { it.deleteDir() }
-        new File(runDir, 'config').mkdirs()
-        new File(runDir, 'options.txt').text = options.text
-        new File(runDir, 'config/fml.toml').text = fml.text
+def registerPrepare = { String taskName, String runName, Provider<Directory> outputDir ->
+    tasks.register(taskName) {
+        def world = layout.projectDirectory.dir("runs/${runName}/saves/capture").asFile
+        def output = outputDir.get().asFile
+        def runDir = layout.projectDirectory.dir("runs/${runName}").asFile
+        def options = layout.projectDirectory.file('src/testMod/capture/options.txt').asFile
+        def fml = layout.projectDirectory.file('src/testMod/capture/fml.toml').asFile
+        inputs.files(options, fml)
+        outputs.upToDateWhen { false }
+        doLast {
+            [world, output].each { it.deleteDir() }
+            new File(runDir, 'config').mkdirs()
+            new File(runDir, 'options.txt').text = options.text
+            new File(runDir, 'config/fml.toml').text = fml.text
+        }
     }
 }
+def prepareCapture = registerPrepare('prepareCapture', 'capture', captureOutput)
+def prepareCaptureNegative = registerPrepare('prepareCaptureNegative', 'capture-negative', captureNegativeOutput)
 tasks.named('runCapture') {
     dependsOn prepareCapture
     mustRunAfter tasks.named('runGameTestServer')
     outputs.upToDateWhen { false }
     timeout = java.time.Duration.ofMinutes(30)
+}
+tasks.named('runCaptureNegative') {
+    dependsOn prepareCaptureNegative
+    mustRunAfter tasks.named('runCapture')
+    outputs.upToDateWhen { false }
+    timeout = java.time.Duration.ofMinutes(5)
 }
 // Fresh demo world each run. The client options are seeded once and then left to the owner.
 def prepareDemo = tasks.register('prepareDemo') {
@@ -393,4 +417,28 @@ tasks.register('verifyCaptures', VerifyCaptures) {
     captures = captureOutput
     def goldenDir = captureScenarioDir.dir('golden')
     if (goldenDir.asFile.directory) goldens = goldenDir
+}
+
+// The gate's proof that a missing exhibit cannot pass silently: the fixture sends a vanilla setblock to a position that
+// is not loaded while the player stands at spawn, and the capture client must fail on the "That position is not loaded"
+// reply. Any other outcome fails here: no report, a failure that is not that one, or a screenshot taken.
+tasks.register('verifyCaptureFailure') {
+    group = 'verification'
+    description = 'Checks that a demo command at an unloaded position fails the capture client.'
+    dependsOn tasks.named('runCaptureNegative')
+    def report = captureNegativeOutput.map { it.file('report.json') }
+    def fixture = captureNegativeDir.file('unloaded_position.json')
+    inputs.file(fixture)
+    outputs.upToDateWhen { false }
+    doLast {
+        File reportFile = report.get().asFile
+        if (!reportFile.file) throw new GradleException("The negative capture wrote no report at ${reportFile}")
+        def parsed = new groovy.json.JsonSlurper().parse(reportFile)
+        if (!parsed.failure)
+            throw new GradleException('The negative capture did not fail: a command at an unloaded position passed')
+        if (!parsed.failure.contains('argument.pos.unloaded'))
+            throw new GradleException("The negative capture failed for another reason: ${parsed.failure}")
+        if (parsed.captures) throw new GradleException('The negative capture photographed a view after its failure')
+        println "Negative capture failed as required: ${parsed.failure}"
+    }
 }

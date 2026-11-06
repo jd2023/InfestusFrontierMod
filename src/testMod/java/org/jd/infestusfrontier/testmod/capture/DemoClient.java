@@ -1,8 +1,6 @@
 package org.jd.infestusfrontier.testmod.capture;
 
 import com.mojang.logging.LogUtils;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 import net.minecraft.client.Minecraft;
@@ -28,9 +26,11 @@ final class DemoClient {
     private static final List<String> FINAL = List.of("gamerule sendCommandFeedback true");
 
     private final Scenario scene;
-    private final Deque<String> commandQueue = new ArrayDeque<>();
+    private final CommandFeed commands = new CommandFeed();
     private Stage stage = Stage.TITLE;
     private int ticksInStage;
+    /** How many commands the command stage started with; its deadline allows one tick each. */
+    private int commandsInStage;
 
     DemoClient(Scenario scene) {
         this.scene = scene;
@@ -40,7 +40,9 @@ final class DemoClient {
     private void onTick(ClientTickEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
         try {
-            if (++ticksInStage > STAGE_TIMEOUT_TICKS && stage != Stage.DONE) {
+            // the command stage sends one command a tick, so its deadline grows with the scenario
+            int deadline = STAGE_TIMEOUT_TICKS + (stage == Stage.COMMANDS ? commandsInStage : 0);
+            if (++ticksInStage > deadline && stage != Stage.DONE) {
                 throw new IllegalStateException("Timed out in stage " + stage);
             }
             switch (stage) {
@@ -52,15 +54,15 @@ final class DemoClient {
                 }
                 case JOIN -> {
                     if (!FlatWorld.joined(minecraft)) return;
-                    commandQueue.addAll(BASELINE);
-                    commandQueue.addAll(scene.commands());
-                    commandQueue.addAll(scene.play());
-                    commandQueue.addAll(FINAL);
+                    commands.addAll(BASELINE);
+                    commands.addAll(scene.commands());
+                    commands.addAll(scene.play());
+                    commands.addAll(FINAL);
+                    commandsInStage = commands.size();
                     enter(Stage.COMMANDS);
                 }
                 case COMMANDS -> {
-                    String command = commandQueue.poll();
-                    if (command == null) {
+                    if (commands.tick(minecraft)) {
                         Scenario.View view = scene.views().get(0);
                         FlatWorld.command(
                                 minecraft,
@@ -77,9 +79,7 @@ final class DemoClient {
                                 "INFESTUS_DEMO_READY commands={}",
                                 scene.commands().size() + scene.play().size());
                         enter(Stage.DONE);
-                        return;
                     }
-                    FlatWorld.command(minecraft, command);
                 }
                 case DONE -> {}
             }

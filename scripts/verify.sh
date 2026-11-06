@@ -12,3 +12,4 @@ filter_gametest_progress() {
 }
 ./gradlew verifyAll --max-workers=1 --console=plain 2>&1 | filter_gametest_progress | tee "$log"
 ./gradlew verifyCaptures --max-workers=1 --console=plain 2>&1 | tee -a "$log"
+./gradlew verifyCaptureFailure --max-workers=1 --console=plain 2>&1 | tee -a "$log"

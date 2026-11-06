@@ -223,3 +223,159 @@ Each milestone needs this evidence beyond the full gate (`bash scripts/verify.sh
 ## Outside M0 to M11
 
 The Fold dimension, its boss, and every Fold-dependent recipe and graft. If it comes, it follows M11 as its own sequence: a playable foothold, a native sustainable habitat, adaptive processing, the Manyfold encounter, reconstructed boss stock. Its first habitat cannot require boss loot.
+
+## Proposed — verification that scales
+
+Status: proposed. This is an implementation plan, not a change to the mandatory
+[engineering gate](ENGINEERING.md#testing). Keep the current full gate until the
+selection and evidence rules below are implemented and verified.
+
+### Start with the actual cost
+
+The saved `build/verification/full-gate.log` inspected on 2026-11-06 records:
+
+| Work | Recorded duration |
+|---|---:|
+| Headless `verifyAll`, including builds and GameTests | 5m 55s |
+| GameTest execution inside that run: 677 tests | 2.651 minutes |
+| Separate graphical `verifyCaptures` invocation | 25m 29s |
+
+The checkout has 65 capture scenarios with 599 views. The available JUnit reports
+contain 119 core tests, 21 UI tests and five architecture tests; their summed test
+body times are about 0.54 seconds, excluding Gradle/JVM startup. These are one saved
+run and available report files, not fresh benchmarks or guaranteed future timings.
+
+Target captures first. Keep all cheap pure tests and static checks. Keep one server
+startup for the union of selected GameTests, and one client startup for the union of
+selected captures. Headless and graphical Gradle invocations remain separate as the
+current harness requires. Splitting every test into a fresh Minecraft process would
+spend more time starting the game and complicate shared test quotas.
+
+### Three verification passes
+
+| Pass | Runs | When |
+|---|---|---|
+| Development | All cheap pure/static checks; affected GameTest groups; affected capture scenarios | While implementing and repairing |
+| Task completion, first rollout | Full headless gate; affected captures plus cross-feature smoke scenarios | Every completed implementation |
+| Full integration | Existing full headless gate and every capture | Shared/global changes, milestone builds, releases, and periodic integration during targeted operation |
+
+Keep full headless completion while it costs roughly six minutes. Do not spend
+engineering effort selectively skipping sub-second JUnit tests. Introduce selected
+GameTests for development now; make them the task-completion default only if measured
+server cost becomes a real bottleneck and the dependency coverage rules are proven.
+
+Once targeted completion is enabled, a full integration run is due after at most five
+completed tasks or one day of development, whichever comes first. Run it only at a
+queue boundary on a fixed tree, never concurrently against the worker's changing
+checkout. Overdue or failed integration stops promotion of later work until fixed.
+A targeted pass is labeled targeted; it never claims complete-suite coverage.
+A playable milestone or release always has a full passing run on its exact build.
+
+### Selection follows dependencies, not just filenames
+
+One checked-in ownership map associates production modules and resource families
+with GameTest groups, capture scenarios and dependent consumers. Every new test and
+scenario belongs to a group. Every changed production/resource path is classified.
+Unknown files, missing mappings or an invalid selection expand to full verification.
+The selector explains each inclusion in its output. Do not ask the executor to guess
+which tests are safe to omit, or pretend Java imports alone cover data-driven links.
+
+| Changed area | Required expansion |
+|---|---|
+| Gizzard or mineral recipes | Processing/mineral tests, storage and logistics port contracts, iron-bars factory route, mineral screens/motion and relevant demo views |
+| A vein, Mouth or item capability | Logistics, every direct consuming organ/storage group, cross-feature automated routes |
+| Persistence, shared quotas or common batch lifecycle | All GameTests; captures for affected states, full capture fallback when reach is uncertain |
+| Screen kit, GeckoLib adapter, shared atlas or texture generator | All affected consumers; initially full captures for shared rendering changes |
+| One organ texture/model | Asset checks, that organ's model states/screens, shared demo exhibit and guide plate using it |
+| Guide/advancement/recipe data | Discovery checks and dependent routes; book pages, recipe screens and matching demo scenarios |
+| Build configuration, dependencies, loader or test selector | Full verification |
+| Prose-only design text with no shipped assets or rules | Link/reference checks; no Minecraft launch |
+
+Selection is the union since the last verified baseline, including uncommitted,
+untracked, renamed and deleted inputs. Reusing a result requires matching relevant
+inputs, dependency/toolchain pins, test selection and harness version. For the first
+rollout, reuse only exact-tree reports. Never assemble a green report from arbitrary
+old results after a repair. A failing test stays selected until it passes on the fixed
+inputs; shrinking the selection does not clear the failure.
+
+### Use the existing harness, with explicit inventories
+
+JUnit already supports Gradle test filters. The existing `-PcaptureOnly=a,b` selects
+whole capture scenarios. Preserve that mechanism and add dependency-aware selection
+around it. Scenarios currently share one world, so first make selected scenarios
+self-contained or declare their prerequisite setup. A test which only passes after
+another scenario is not independently selectable. Each selected run uses a fresh
+output directory and disposable world; stale images cannot fill a missing result.
+
+GameTests currently share one namespace, so `neoforge.enabledGameTestNamespaces`
+is not a feature-group selector. NeoForge 21.1.249 exposes `RegisterGameTestsEvent`
+for explicit registration. Register selected classes through that supported event;
+remove their automatic `@GameTestHolder` discovery so it cannot silently register
+all classes again. Preserve explicit template namespaces, test names and before/after
+batch hooks, including the crop-growth batch. No engine patch or reflective deletion
+from the registry. Verify full registration against the existing inventory before
+turning filtering on.
+
+Proposed command shape: `scripts/verify.sh --scope changed --base COMMIT` and
+`scripts/verify.sh --scope full`. These flags do not exist yet. The selector resolves
+one complete selection before launching either Minecraft process. A repair can use
+an explicit group, but task completion recomputes the required union from the diff.
+
+Every run records selected IDs, discovered IDs, executed IDs, pass/fail/skip status,
+start/finish time, source tree, artifact digests and log paths. Empty selections,
+missing expected tests, crashes, timeouts, disabled required tests and incomplete
+capture reports fail. A generic “all required tests passed” line is not enough to
+prove the intended selection ran. Keep failed suites separate from passing ones.
+
+Emit bounded per-suite `KTASK_CHECK_RESULT` records for ktask, with report paths.
+Preserve full raw logs and actual screenshots separately. The reviewer receives the
+selection reason, concise failures and coverage inventory, then opens the necessary
+proof. Smaller reports must not mean hidden omissions or relaxed assertions.
+
+### Keep the suite itself efficient
+
+Move combinations of accounting, shape matching, slot rules and reservations into
+pure core tests. Retain real GameTests for each engine boundary: placement, sided
+capabilities, save/reload, unload, breaking, multiplayer access and recipe integration.
+Do not replace a save/reload test with a codec round-trip or simulate the batch in
+place of its server execution.
+
+Keep a few complete production routes for shared behavior. Test individual failure
+conditions with short fixtures instead of repeating the entire colony bootstrap.
+Observe completion conditions rather than padding waits. Preserve real long-running
+cycles where sustained throughput, reserve depletion or growth is the property.
+
+Measure per-group runtime and startup time before changing concurrency. GameTests
+share a server and some global budgets/gamerules; isolate those batches rather than
+starting competing servers in the same world. If one process eventually becomes too
+slow, shard only independent groups into separate worlds, ports and output paths.
+Keep full coverage and combine explicit inventories. This is a later option, not the
+first optimization on this workstation.
+
+### Concrete implementation order
+
+1. **Record verification inventories and timings.** Add per-suite structured reports,
+   expected/discovered/executed ID checks and capture timing. Preserve current full
+   runs. A crash after a passing suite must remain a failed overall run.
+2. **Select related capture scenarios.** Add the ownership/dependency map, standalone
+   scenario setup and fresh output handling. A Gizzard-only change selects its states,
+   guide/demo evidence and factory route; a shared renderer change selects all captures.
+3. **Select GameTest groups in one server run.** Use explicit supported registration,
+   preserve batch hooks and verify full-mode inventory equality. Keep the full
+   headless task-completion gate during this rollout.
+4. **Enforce scoped proof in ktask completion.** Pass the baseline and selected scope,
+   pin evidence to inputs, and keep unresolved failures mandatory. Before accepting
+   targeted completion, run it alongside full verification on representative changes
+   to recipes, ports, shared rendering and persistence, including deliberate faults
+   in dependents. A missed failure repairs the map and keeps full mode mandatory.
+5. **Schedule full integration at queue boundaries.** Implement the five-task/one-day
+   limit and milestone/release full gate. A failed full run prevents later promotion;
+   fixing it includes focused proof and a fresh full integration run.
+
+Each item is implementation work with its own verification. No research, standalone
+approval or generic qualification tasks are needed. This plan adds no queue entries.
+
+Technical references: [Gradle test filtering](https://docs.gradle.org/current/userguide/java_testing.html#test_filtering)
+and [NeoForge 1.21.1 GameTests](https://docs.neoforged.net/docs/1.21.1/misc/gametest/).
+The registration details above were also checked against the installed NeoForge
+21.1.249 source JAR, `RegisterGameTestsEvent` and `GameTestHooks`.

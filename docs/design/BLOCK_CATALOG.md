@@ -16,6 +16,215 @@ Normal dismantling of an organ preserves its counts, level, chosen improvements 
 
 Free-standing organs root into Living Substrate or a named specialized bed. Attached parts root through their host. The same organ can be hand-fed first, mutated later and expanded with physical parts without crafting a replacement core. Use with any hand opens an organ's screen, like a chest; a held bucket, feed or ingredient acts on the organ instead. Sneak to build against an organ.
 
+## Proposed: growing organs into multiblocks
+
+Status: proposed. This section owns organ expansion and appearance. Existing
+recipes and shipped behavior stay unchanged until an implementation adopts it.
+Testing work is planned in the [roadmap](../../ROADMAP.md#proposed--verification-that-scales).
+
+### The same organ grows a body
+
+Keep the original core, its identity, completed work, growth choices and mutations.
+A mutation unlocks a body plan and specific attachment sockets. The player supplies
+and places the physical tissue that makes that body useful. A level alone never
+creates chambers, ports or free capacity.
+
+Separate three improvements:
+
+| Improvement | What it changes | What still limits it |
+|---|---|---|
+| Earned growth | An existing operation's rate or economy | The organ's current body and supplies |
+| Mutation | Admitted body plans, materials or operations | Prepared graft, compatible host and real components |
+| Physical expansion | Chambers, buffers and distinct input/output faces | Space, construction stock, biomass, transport and waste |
+
+A production lobe does production work. An input throat admits ingredients. A waste
+bladder holds waste. Adding three input throats must not silently triple production.
+The guide and probe show these limits separately, including observed input, output
+and blocked time. A small organ remains cheap and useful at a remote outpost.
+
+### How the player forms it
+
+1. Open the existing organ and choose an available body mutation. See its footprint,
+   material list, benefits, costs and incompatible branches before spending anything.
+   Early body mutations use obtainable host-grown treatments; completed DNA research
+   gates later specializations, not the first expansion of an early workshop.
+2. Rotate the proposed body around its rooted core. A local outline marks occupied
+   cells, accessible ports and space needed for maintenance. The preview does not
+   claim terrain or locate distant resources.
+3. Place rib supports, tissue buds and port lobes in those cells using normal block
+   placement. The original organ keeps working in its small form during preparation.
+   Each cell has a declared role; any pile of flesh is not a valid structure.
+4. Request growth. Finish the current batch, drain any buffer that would lose capacity,
+   then validate the complete footprint. Refuse occupied, unloaded, foreign-owned,
+   incompatible or unsupported cells with an exact highlighted position. No blocks
+   are overwritten and no costs are consumed on this refusal.
+5. Reserve the graft and growth supplies in the core. Grow only the installed tissue,
+   in bounded steps. Each part keeps its block identity and changes its formed state;
+   no inventory-bearing block is swapped for an invisible generic replacement. A saved
+   growth plan records which steps committed. Interruption pauses that plan; resuming
+   never pays twice or creates a second core.
+6. Activate only after every required part validates. The membrane closes over the
+   ribs, mouths open at the chosen ports, and the probe names the expanded capability.
+   This is an assembly operation, not automatic spread into the player's base.
+
+Start with a few authored body plans and named sockets. Allow rotation and selected
+port positions. Add optional lobes at those sockets later. Arbitrary free-form flesh
+blobs would make collision, asset combinations and performance difficult to bound.
+
+### First playable body: expanded Mineral Gizzard
+
+Use the Gizzard as the first consumer of this design. Its job stays grinding; washing,
+smelting and waste disposal remain separate factory operations.
+
+Proposed first body: at most 3×3×2 occupied cells, with the original core at the lower
+centre, two fleshy grinding flanks, upper bone teeth and distinct ingredient, dust
+and Tailings exits. The player can rotate it and choose one of two port arrangements.
+Its lower core remains reachable from a service recess.
+
+The first expansion processes up to two raw items in one reserved batch. Each input
+keeps the existing dust, Tailings and operating cost accounting. The proposed benefit
+is two items in approximately the original batch duration, at twice the batch supply
+and output demand. This is a playtest baseline, not a promised balance value. Output
+space is reserved for the whole chosen batch before work begins. One-item operation
+remains possible; a blocked waste exit still stops new work.
+
+This preserves the current one-active-batch lifecycle. Later independent chambers
+may each own one batch, with an explicit finite chamber limit and fair access to
+shared ports. They are a separate implementation, not a side effect of adding slots.
+
+Next body branches should have different jobs: a larger Kidney adds supplied wash
+and settling capacity; a furnace adds a supplied hot chamber and relief; a Palm grows
+additional working fingers and staging space. None grants the next organ's operation
+or bypasses Reach, Rote, recipes, pressure rules or research requirements.
+
+### What it looks like
+
+Model the whole organ first, then divide its implementation into cells. The outline
+should read as a swollen stomach, paired kidney or rooted hand from several blocks
+away. Use a low root skirt, uneven muscular lobes, ribs that follow the curve, recessed
+mouths and a few thick tendons. Hide construction seams under continuous skin folds.
+Avoid a rectangular tank with a flesh texture, repeated cube borders and noisy pores.
+
+Keep Minecraft's visual language: broad stepped volumes, restrained pixel textures,
+small palettes and a few purposeful moving parts. Biological does not mean smooth,
+high-poly or covered in tiny detail. A second chamber changes the silhouette; an
+output mutation visibly grows a throat. Port identity must survive darkness and
+colour-vision differences through shape and position, not colour alone.
+
+The Gizzard's stone-bearing cheeks squeeze alternately beneath an arched bone jaw.
+A full Tailings pouch hangs lower; starvation leaves the teeth idle. The Kidney's
+paired lobes surround a narrow washing cleft, with different clean and dirty sacs.
+An expanded Palm spreads its fingers around a recessed working surface instead of
+becoming a larger crafting-table cube. Animation explains work and blockage.
+
+### Rendering choice
+
+| Approach | Benefit | Practical cost | Use |
+|---|---|---|---|
+| One large GeckoLib renderer on the core | Continuous animation; existing library and asset pipeline | Per-frame geometry, lighting and culling across the whole body; absent core cannot draw it | Small moving interiors and the first compact animated body |
+| One static sculpture exported as cell-sized meshes | Continuous visual shell with normal chunk rendering and local lighting | Export seam checks and per-cell shapes; static skin cannot breathe | Ribs, roots, thick hide and large bodies |
+| Static shell plus animated organs | Large-scale rendering stays cheap; mouths and sacs remain alive | Both exports must share coordinates, sockets and material boundaries | Recommended long-term design, established by the first Gizzard |
+
+The shell pieces are slices of one sculpture, not independent cubes with joined
+textures. Export them ahead of time. Do not generate or split geometry every frame.
+Use GeckoLib for the working chambers, throat, tendons and small membrane windows.
+Most of the body is opaque or cutout; restrict translucent layers to small windows.
+The current `OrganModel` makes every organ translucent, so a material-aware adapter
+is required rather than applying that default to an entire expanded body.
+
+`integration/geckolib/OrganRenderers` already supports an explicit render AABB beyond
+one block. Extend the adapter to select the body's model, material and bounds from
+an immutable client snapshot. Bounds cover every rotated animation pose. Do not use
+an infinite box or disable culling globally. No renderer scans the world for a body.
+
+The static shell belongs to its physical cells. If the core's chunk is unavailable,
+loaded cells still show a resting shell and expose no usable port. Dynamic interiors
+stop. Test a camera that sees only the far lobe, all four rotations, chunk borders,
+reload, resource reload, night lighting and overlapping transparent surfaces.
+Collision and selection remain static, per-cell voxel shapes; do not animate hitboxes.
+Ports are real faces at reachable positions. A decorative mouth cannot accept items
+through a missing block or from an unrelated store.
+
+### Ownership, interruption and removal
+
+The core owns history, active work, shared buffers and the growth plan. Parts store
+only their role, relative core location and assembly identity. Independently useful
+organs attached to an installation retain their own histories; assembly never folds
+those histories into the controller. A passive lobe has no copied organ history.
+
+Capabilities on ports resolve the loaded core, validate membership and expose only
+that port's permitted resources. Invalidate capabilities when membership changes.
+All ports share the same reservations and transfer budget. More faces do not create
+more contents or multiply the server's work allowance. Hoppers, Mouths and veins
+remain the transport path; there is no remote inventory link in the body mutation.
+
+Missing parts, a broken core or an unavailable member chunk stop new work and external
+transfers immediately. Committed intermediates stay in their owning core. Loss of a
+part never refunds already converted ingredients. A missing part and an unloaded
+part are different states; neither causes a destructive automatic dismantling.
+
+Removing an optional empty lobe explicitly releases its socket. Capacity reduction
+requires a drained buffer and no dependent batch. Breaking a mandatory part leaves
+an incomplete, dormant body that can be repaired. Normal core dismantling recovers
+its history and owned contents exactly once using normal block loot/component hooks;
+parts drop only their own materials. Loaded orphan parts become inert and recoverable.
+Reloading an old member must validate assembly identity before reconnecting. Explosions
+and hazardous processes retain the catalog's separate containment rules.
+
+Use normal placement, scheduled ticks, block-entity saving, loot and capability APIs.
+No engine patches, chunk tickets, world-scale search, air replacement or moving
+collision entities. Growth modifies only installed members. Persist progress and
+revalidate each cell before changing it; do not invent a transaction system for the
+whole Minecraft world.
+
+Proposed pilot bounds: 18 cells, four rotations, two port arrangements, one batch,
+one core ticker, and no ticking passive parts. A validation reads at most those 18
+loaded positions and is admitted through a shared dimension budget of 32 validations
+per tick. Repeated notifications coalesce; a deferred validation leaves the organ
+paused. Check every membership before transfers or batch commits, against the same
+finite footprint. Publish state on change, with animated progress updates capped at
+five per second per body; clients interpolate. Set and measure geometry and packet
+byte budgets during the first model implementation before adding more body plans.
+
+### Implementation order and outcomes
+
+1. **Add Gizzard body formation.** Keep the original core, add the two chamber flanks
+   and defined port cells, show the footprint and exact formation refusal, and persist
+   interrupted growth. Ship a usable labeled demo exhibit and formation guide page.
+2. **Run expanded Gizzard batches through physical ports.** Reserve both raw inputs,
+   their products, waste and cost. Demonstrate hopper and Mouth/vein supply, blocked
+   waste, removal, two-player interaction and reload without duplicate goods/history.
+3. **Render the Gizzard as one biological body.** Export the continuous shell and
+   integrate animated chambers. Deliver correct collision, port hit targets, partial
+   chunk rendering, bounds and material layers. Capture small and expanded organs
+   side by side, working and blocked; update the existing demo and guide in this task.
+4. **Add one optional specialization.** Choose an extra feed throat or waste buffer
+   at a declared socket; show its actual bottleneck effect and a changed silhouette.
+   Complete its behavior, book, demo, tests and captures in the same implementation.
+5. **Apply the proven body model to the Kidney.** Add supplied washing/settling parts
+   and retain separate waste handling. Extract shared code only where both organs
+   need the same contract. Larger furnaces and Palms follow their own concrete plans.
+
+Functional temporary assets ship with each step. Final art never blocks behavior.
+This list is a proposed implementation order, not new ktask entries.
+
+### Implementation references
+
+- Existing adapters: `integration/geckolib/OrganRenderers.java` and `OrganModel.java`;
+  existing `storage/Bodies.java` and `Reservoir.java` provide bounded membership and
+  unload patterns, but their auto-merging boxes and distributed contents are not the
+  new core-owned production model.
+- [NeoForge 1.21.1 block-entity rendering](https://docs.neoforged.net/docs/1.21.1/blockentities/ber/)
+  supplies the renderer extension point. Instance state belongs to the block entity,
+  not the renderer shared by its type.
+- [GeckoLib 4 block rendering](https://github.com/bernie-g/geckolib/wiki/Geckolib-Blocks-%28Geckolib4%29)
+  uses block-entity rendering with the ordinary block model disabled for animated parts.
+- Immersive Engineering's 1.21.1 implementation separates
+  [split baked geometry](https://github.com/BluSunrize/ImmersiveEngineering/blob/75a27f03e4243544243567e8d5c38d336f4f10f4/src/main/java/blusunrize/immersiveengineering/client/models/split/AbstractSplitModel.java)
+  from a [Crusher's moving barrels](https://github.com/BluSunrize/ImmersiveEngineering/blob/75a27f03e4243544243567e8d5c38d336f4f10f4/src/main/java/blusunrize/immersiveengineering/client/render/tile/CrusherRenderer.java).
+  This supports the hybrid choice; it is an architectural reference, not a proposal
+  to copy its licensed code or add a dependency.
+
 ## Building with operations
 
 Each working organ performs one reusable operation. Installations combine organs

@@ -1,0 +1,8 @@
+{
+  "commands": [
+    "setblock 4000 -60 -36 stone"
+  ],
+  "views": [
+    { "name": "spawn", "x": 0.5, "y": -60, "z": 0.5, "yaw": 0, "pitch": 0 }
+  ]
+}

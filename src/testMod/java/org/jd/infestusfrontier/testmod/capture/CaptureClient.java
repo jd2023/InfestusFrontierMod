@@ -15,8 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -90,7 +88,7 @@ final class CaptureClient {
 
     private final Path outputDir;
     private final List<Scenario> scenarios;
-    private final Deque<String> commandQueue = new ArrayDeque<>();
+    private final CommandFeed commands = new CommandFeed();
     private final JsonArray report = new JsonArray();
     private Stage stage = Stage.TITLE;
     private int ticksInStage;
@@ -130,6 +128,7 @@ final class CaptureClient {
             if (++ticksInStage > deadline && stage != Stage.DONE) {
                 throw new IllegalStateException("Timed out in stage " + stage + where(minecraft));
             }
+            if (stage != Stage.DONE) commands.check(); // a view's trigger command can fail too
             switch (stage) {
                 case TITLE -> createWorld(minecraft);
                 case JOIN -> join(minecraft);
@@ -211,20 +210,15 @@ final class CaptureClient {
     private void join(Minecraft minecraft) {
         if (!FlatWorld.joined(minecraft)) return;
         LOGGER.info("INFESTUS_CAPTURE_JOINED");
-        commandQueue.addAll(BASELINE);
-        commandQueue.addAll(RESET);
-        commandQueue.addAll(scenarios.get(scenarioIndex).commands());
-        commandsInStage = commandQueue.size();
+        commands.addAll(BASELINE);
+        commands.addAll(RESET);
+        commands.addAll(scenarios.get(scenarioIndex).commands());
+        commandsInStage = commands.size();
         enter(Stage.COMMANDS);
     }
 
     private void sendNextCommand(Minecraft minecraft) {
-        String command = commandQueue.poll();
-        if (command == null) {
-            enter(Stage.SETTLE);
-            return;
-        }
-        FlatWorld.command(minecraft, command);
+        if (commands.tick(minecraft)) enter(Stage.SETTLE);
     }
 
     private void moveToView(Minecraft minecraft) {
@@ -552,9 +546,9 @@ final class CaptureClient {
         viewIndex = 0;
         scenarioIndex++;
         if (scenarioIndex < scenarios.size()) {
-            commandQueue.addAll(RESET);
-            commandQueue.addAll(scenarios.get(scenarioIndex).commands());
-            commandsInStage = commandQueue.size();
+            commands.addAll(RESET);
+            commands.addAll(scenarios.get(scenarioIndex).commands());
+            commandsInStage = commands.size();
             enter(Stage.COMMANDS);
             return;
         }

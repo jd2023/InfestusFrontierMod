@@ -1,5 +1,6 @@
 {
   "commands": [
+    "forceload add -6 -47 174 -2",
     "advancement grant @s through infestusfrontier:contact/biomass_bladder",
     "setblock 0 -60 -36 infestusfrontier:living_substrate[stage=basic]",
     "setblock 2 -60 -36 infestusfrontier:living_substrate[stage=young]",
