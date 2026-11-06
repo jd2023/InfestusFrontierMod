@@ -69,6 +69,15 @@ def turn_y(point, degrees, centre=8.0):
     return (x, y, z)
 
 
+def turn_x(point, degrees, centre=8.0):
+    """A block-space point turned about the cell's x axis as a blockstate's x does it (top toward north), by a multiple
+    of 90 degrees."""
+    x, y, z = point
+    for _ in range((degrees // 90) % 4):
+        y, z = centre + (z - centre), centre - (y - centre)
+    return (x, y, z)
+
+
 def face_corners(direction, f, t):
     (x0, y0, z0), (x1, y1, z1) = f, t
     return {
@@ -90,8 +99,9 @@ def default_uv(direction, f, t):
     }[direction]
 
 
-def block_faces(name, cell, turn=0, textures=None):
-    """Every face of block model `name` in cell (i, j, k), as (normal, corners, uvs, texture) in scene space."""
+def block_faces(name, cell, turn=0, textures=None, tilt=0):
+    """Every face of block model `name` in cell (i, j, k), as (normal, corners, uvs, texture) in scene space, turned
+    as a blockstate's x (`tilt`) and then y (`turn`) turn it."""
     data = model(name)
     refs = dict(data.get('textures', {}), **(textures or {}))
     i, j, k = cell
@@ -106,8 +116,8 @@ def block_faces(name, cell, turn=0, textures=None):
             shift = (face.get('rotation', 0) // 90) % 4
             uvs = uvs[-shift:] + uvs[:-shift] if shift else uvs
             uvs = np.array([(u * sx, v * sy) for u, v in uvs])
-            corners = [turn_y(p, turn) for p in face_corners(direction, f, t)]
-            nx, ny, nz = turn_y(tuple(DIRECTIONS[direction]), turn, 0.0)
+            corners = [turn_y(turn_x(p, tilt), turn) for p in face_corners(direction, f, t)]
+            nx, ny, nz = turn_y(turn_x(tuple(DIRECTIONS[direction]), tilt, 0.0), turn, 0.0)
             world = np.array([(-(16 * i + x), 16 * j + y, 16 * k + z) for x, y, z in corners], dtype=float)
             faces.append((np.array([-nx, ny, nz], dtype=float), world, uvs, tex))
     return faces

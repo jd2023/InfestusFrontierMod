@@ -1,5 +1,12 @@
 package org.jd.infestusfrontier.testmod;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +45,11 @@ import net.minecraft.world.level.chunk.storage.ChunkSerializer;
 import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.ecology.EcologyModule;
@@ -57,6 +69,13 @@ public final class InfectedTimberTests {
 
     private static final BlockPos EXHIBIT_MIN = new BlockPos(47, -61, -13);
     private static final BlockPos EXHIBIT_MAX = new BlockPos(75, -50, -2);
+    private static final BlockPos GROVE_MIN = new BlockPos(131, -61, -13);
+    private static final BlockPos GROVE_MAX = new BlockPos(165, -48, -2);
+    /** The infected grove stands this far east of its living twin. */
+    private static final int GROVE_SHIFT = 14;
+
+    private static final List<String> LOG_MODELS =
+            List.of("infected_log", "infected_log_twig", "infected_log_stub", "infected_log_wound");
 
     // --- logs ---
 
@@ -537,6 +556,85 @@ public final class InfectedTimberTests {
         h.succeed();
     }
 
+    /**
+     * The cut bark is only the model's: collision, outline and light stay the full log's, so a trunk walks, mines and
+     * shades as any log does, whatever its axis.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH)
+    public static void aLogIsAFullBlockToCollisionOutlineAndLight(GameTestHelper h) {
+        BlockPos at = h.absolutePos(AT);
+        for (Direction.Axis axis : Direction.Axis.values()) {
+            h.getLevel().setBlockAndUpdate(at, log(axis));
+            BlockState state = h.getLevel().getBlockState(at);
+            h.assertTrue(same(state.getCollisionShape(h.getLevel(), at), Shapes.block()), "full collision " + axis);
+            h.assertTrue(same(state.getShape(h.getLevel(), at), Shapes.block()), "full outline " + axis);
+            h.assertValueEqual(state.getLightBlock(h.getLevel(), at), 15, "stops all light " + axis);
+            h.assertTrue(state.canOcclude(), "hides what its section covers " + axis);
+        }
+        h.succeed();
+    }
+
+    /**
+     * Every log model draws one section, and the block occludes exactly that section along its axis: where the bark
+     * is cut, a neighbour's face is kept, so no groove opens onto a missing face.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH)
+    public static void theLogOccludesTheSectionItsModelsDraw(GameTestHelper h) {
+        boolean[][] section = null;
+        for (String model : LOG_MODELS) {
+            boolean[][] caps = caps(model);
+            if (section == null) section = caps;
+            for (int x = 0; x < 16; x++)
+                for (int z = 0; z < 16; z++)
+                    h.assertValueEqual(caps[x][z], section[x][z], model + " shares the section at " + x + "," + z);
+        }
+        int wood = 0;
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                if (section[x][z]) wood++;
+                double u = (x + 0.5) / 16, v = (z + 0.5) / 16;
+                h.assertValueEqual(
+                        holds(InfectedLogBlock.OCCLUSION.get(Direction.Axis.Y), new Vec3(u, 0.5, v)),
+                        section[x][z],
+                        "upright section at " + x + "," + z);
+                h.assertValueEqual(
+                        holds(InfectedLogBlock.OCCLUSION.get(Direction.Axis.Z), new Vec3(u, v, 0.5)),
+                        section[x][z],
+                        "laid x 90 along z at " + x + "," + z);
+                h.assertValueEqual(
+                        holds(InfectedLogBlock.OCCLUSION.get(Direction.Axis.X), new Vec3(0.5, v, u)),
+                        section[x][z],
+                        "laid along x at " + x + "," + z);
+            }
+        }
+        h.assertTrue(wood > 128 && wood < 256, "a cut section, not the full block: " + wood);
+        // grass under a trunk keeps its top; a stacked log hides the end it sits on, as a vanilla trunk does
+        BlockPos ground = h.absolutePos(AT);
+        BlockPos above = ground.above();
+        h.getLevel().setBlockAndUpdate(ground, Blocks.GRASS_BLOCK.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(above, log(Direction.Axis.Y));
+        h.assertTrue(
+                Block.shouldRenderFace(
+                        Blocks.GRASS_BLOCK.defaultBlockState(), h.getLevel(), ground, Direction.UP, above),
+                "the grass top under the grooves is drawn");
+        h.getLevel().setBlockAndUpdate(above, Blocks.OAK_LOG.defaultBlockState());
+        h.assertFalse(
+                Block.shouldRenderFace(
+                        Blocks.GRASS_BLOCK.defaultBlockState(), h.getLevel(), ground, Direction.UP, above),
+                "under a vanilla log it is hidden");
+        for (Direction.Axis axis : Direction.Axis.values()) {
+            Direction along = Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE);
+            BlockPos next = ground.relative(along);
+            h.getLevel().setBlockAndUpdate(ground, log(axis));
+            h.getLevel().setBlockAndUpdate(next, log(axis));
+            h.assertFalse(
+                    Block.shouldRenderFace(log(axis), h.getLevel(), ground, along, next),
+                    "the end between two " + axis + " logs is hidden");
+            h.getLevel().setBlockAndUpdate(next, Blocks.AIR.defaultBlockState());
+        }
+        h.succeed();
+    }
+
     // --- the demo ---
 
     private static DemoExhibit exhibit(int slot) {
@@ -634,6 +732,72 @@ public final class InfectedTimberTests {
                 .thenSucceed();
     }
 
+    /**
+     * The Grove sets a living grove (a 2x2 dark oak with lying branches, an oak with a low limb, a birch, a spruce)
+     * beside the same grove in Infected Logs and Blighted Leaves, log for log and leaf for leaf, and a frame built of
+     * Infected Logs in all three axes with an old plank, each with its sign.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH, timeoutTicks = 300)
+    public static void theDemoGroveSetsLivingTreesBesideTheirInfectedTwinsAndABuiltFrame(GameTestHelper h) {
+        DemoExhibit yard = new DemoExhibit(GROVE_MIN, GROVE_MAX, 21);
+        yard.force(h);
+        ServerLevel level = h.getLevel();
+        h.startSequence()
+                .thenIdle(DemoExhibit.ENTITIES_LOAD_TICKS)
+                .thenExecute(() -> {
+                    yard.build(h);
+                    int logs = 0, leaves = 0, eyeLevel = 0;
+                    for (BlockPos demo : BlockPos.betweenClosed(132, -60, -11, 143, -50, -2)) {
+                        BlockState living = level.getBlockState(yard.at(demo));
+                        BlockState infected = level.getBlockState(yard.at(demo.east(GROVE_SHIFT)));
+                        if (living.is(BlockTags.LOGS)) {
+                            h.assertValueEqual(
+                                    infected, log(living.getValue(RotatedPillarBlock.AXIS)), "a log's twin at " + demo);
+                            logs++;
+                        } else if (living.is(BlockTags.LEAVES)) {
+                            h.assertTrue(infected.is(EcologyModule.BLIGHTED_LEAVES.get()), "a leaf's twin at " + demo);
+                            leaves++;
+                            if (demo.getY() <= -58 && demo.getZ() == -11) eyeLevel++;
+                        } else {
+                            h.assertTrue(infected.isAir(), "open where the living grove is open at " + demo);
+                        }
+                    }
+                    h.assertTrue(logs >= 40 && leaves >= 100, logs + " logs and " + leaves + " leaves");
+                    h.assertTrue(eyeLevel >= 3, "foliage at eye level by the path: " + eyeLevel);
+                    for (int dx = 0; dx < 2; dx++)
+                        for (int dz = 0; dz < 2; dz++)
+                            for (int y = -60; y <= -54; y++)
+                                h.assertValueEqual(
+                                        level.getBlockState(yard.at(new BlockPos(150 + dx, y, -8 + dz))),
+                                        log(Direction.Axis.Y),
+                                        "a 2x2 infected trunk");
+                    for (Direction.Axis lying : List.of(Direction.Axis.X, Direction.Axis.Z)) {
+                        long branches = BlockPos.betweenClosedStream(146, -60, -11, 157, -50, -2)
+                                .filter(p -> level.getBlockState(yard.at(p)).equals(log(lying)))
+                                .count();
+                        h.assertTrue(branches >= 2, "branches lying along " + lying + ": " + branches);
+                    }
+                    for (Direction.Axis axis : Direction.Axis.values()) {
+                        long built = BlockPos.betweenClosedStream(159, -60, -10, 163, -57, -6)
+                                .filter(p -> level.getBlockState(yard.at(p)).equals(log(axis)))
+                                .count();
+                        h.assertTrue(built >= 4, "the frame uses logs along " + axis + ": " + built);
+                    }
+                    h.assertTrue(
+                            level.getBlockState(yard.at(new BlockPos(161, -60, -8)))
+                                    .is(EcologyModule.INFECTED_PLANKS.get()),
+                            "an old plank in the frame");
+                    for (int x : List.of(133, 147, 151, 160, 162))
+                        h.assertTrue(
+                                level.getBlockState(yard.at(new BlockPos(x, -60, -12)))
+                                        .is(BlockTags.SIGNS),
+                                "a sign at " + x);
+                    yard.tidy(h);
+                    yard.forget(h);
+                })
+                .thenSucceed();
+    }
+
     /** The storage row has a crafting table and a chest of stem parts beside the demo's Capsule Stem. */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH, timeoutTicks = 200)
     public static void theDemoStorageRowHasAStemStation(GameTestHelper h) {
@@ -656,6 +820,39 @@ public final class InfectedTimberTests {
     }
 
     // --- fixtures ---
+
+    /** Where a model's end caps cover the upright section, read from the shipped model file. */
+    private static boolean[][] caps(String model) {
+        Path file = ModList.get()
+                .getModFileById("infestusfrontier")
+                .getFile()
+                .findResource("assets", "infestusfrontier", "models", "block", model + ".json");
+        boolean[][] covered = new boolean[16][16];
+        try (var in = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+            JsonObject json = JsonParser.parseReader(in).getAsJsonObject();
+            for (JsonElement element : json.getAsJsonArray("elements")) {
+                JsonObject box = element.getAsJsonObject();
+                JsonObject up = box.getAsJsonObject("faces").getAsJsonObject("up");
+                if (up == null
+                        || !"up".equals(up.has("cullface") ? up.get("cullface").getAsString() : null)) continue;
+                var from = box.getAsJsonArray("from");
+                var to = box.getAsJsonArray("to");
+                for (int x = from.get(0).getAsInt(); x < to.get(0).getAsInt(); x++)
+                    for (int z = from.get(2).getAsInt(); z < to.get(2).getAsInt(); z++) covered[x][z] = true;
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        return covered;
+    }
+
+    private static boolean holds(VoxelShape shape, Vec3 point) {
+        return shape.toAabbs().stream().anyMatch(box -> box.contains(point));
+    }
+
+    private static boolean same(VoxelShape a, VoxelShape b) {
+        return !Shapes.joinIsNotEmpty(a, b, BooleanOp.NOT_SAME);
+    }
 
     private static BlockState log(Direction.Axis axis) {
         return EcologyModule.INFECTED_LOG.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, axis);

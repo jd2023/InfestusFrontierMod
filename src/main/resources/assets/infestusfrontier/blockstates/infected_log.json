@@ -1,16 +1,178 @@
 {
   "variants": {
-    "axis=x": {
-      "model": "infestusfrontier:block/infected_log_horizontal",
-      "x": 90,
-      "y": 90
-    },
-    "axis=y": {
-      "model": "infestusfrontier:block/infected_log"
-    },
-    "axis=z": {
-      "model": "infestusfrontier:block/infected_log_horizontal",
-      "x": 90
-    }
+    "axis=x": [
+      {
+        "model": "infestusfrontier:block/infected_log",
+        "weight": 3,
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log",
+        "weight": 3,
+        "x": 270,
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_twig",
+        "weight": 1,
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_twig",
+        "weight": 1,
+        "x": 270,
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_stub",
+        "weight": 1,
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_stub",
+        "weight": 1,
+        "x": 270,
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_wound",
+        "weight": 1,
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_wound",
+        "weight": 1,
+        "x": 270,
+        "y": 270
+      }
+    ],
+    "axis=y": [
+      {
+        "model": "infestusfrontier:block/infected_log",
+        "weight": 3
+      },
+      {
+        "model": "infestusfrontier:block/infected_log",
+        "weight": 3,
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log",
+        "weight": 3,
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/infected_log",
+        "weight": 3,
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_twig",
+        "weight": 1
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_twig",
+        "weight": 1,
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_twig",
+        "weight": 1,
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_twig",
+        "weight": 1,
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_stub",
+        "weight": 1
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_stub",
+        "weight": 1,
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_stub",
+        "weight": 1,
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_stub",
+        "weight": 1,
+        "y": 270
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_wound",
+        "weight": 1
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_wound",
+        "weight": 1,
+        "y": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_wound",
+        "weight": 1,
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_wound",
+        "weight": 1,
+        "y": 270
+      }
+    ],
+    "axis=z": [
+      {
+        "model": "infestusfrontier:block/infected_log",
+        "weight": 3,
+        "x": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log",
+        "weight": 3,
+        "x": 270,
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_twig",
+        "weight": 1,
+        "x": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_twig",
+        "weight": 1,
+        "x": 270,
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_stub",
+        "weight": 1,
+        "x": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_stub",
+        "weight": 1,
+        "x": 270,
+        "y": 180
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_wound",
+        "weight": 1,
+        "x": 90
+      },
+      {
+        "model": "infestusfrontier:block/infected_log_wound",
+        "weight": 1,
+        "x": 270,
+        "y": 180
+      }
+    ]
   }
 }

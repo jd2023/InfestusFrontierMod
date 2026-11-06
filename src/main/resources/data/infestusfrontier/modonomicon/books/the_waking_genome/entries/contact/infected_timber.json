@@ -20,8 +20,16 @@
   },
   "pages": [
     {
-      "type": "modonomicon:text",
+      "type": "modonomicon:image",
       "title": "entry.infestusfrontier.contact.infected_timber.name",
+      "images": [
+        "infestusfrontier:textures/book/infected_timber_grove.png"
+      ],
+      "border": false,
+      "text": "entry.infestusfrontier.contact.infected_timber.plate"
+    },
+    {
+      "type": "modonomicon:text",
       "text": "entry.infestusfrontier.contact.infected_timber.use"
     },
     {

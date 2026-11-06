@@ -223,6 +223,28 @@ public final class DiscoveryTests {
         h.succeed();
     }
 
+    /** The Infected Timber entry opens on its plate, a living oak beside the same tree infected, before its text. */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void theInfectedTimberEntryOpensOnItsGrovePlate(GameTestHelper h) {
+        var entry = BookDataManager.get()
+                .getBook(BOOK)
+                .getCategory(id("contact"))
+                .getEntries()
+                .get(id("contact/infected_timber"));
+        h.assertTrue(entry != null, "entry loaded");
+        h.assertTrue(
+                entry.getPages().get(0) instanceof com.klikli_dev.modonomicon.book.page.BookImagePage,
+                "the first page is the plate");
+        h.assertTrue(
+                java.nio.file.Files.isRegularFile(net.neoforged.fml.ModList.get()
+                        .getModFileById("infestusfrontier")
+                        .getFile()
+                        .findResource("assets", "infestusfrontier", "textures", "book", "infected_timber_grove.png")),
+                "the plate ships");
+        h.assertValueEqual(entry.getPages().size(), 10, "the plate and nine pages of text and recipe");
+        h.succeed();
+    }
+
     /** Holding an Infected Log, the missing part, reveals the stem recipe in the recipe book. */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void theStemRecipeUnlocksWithTheInfectedLog(GameTestHelper h) {

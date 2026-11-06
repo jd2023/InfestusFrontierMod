@@ -13,12 +13,9 @@ import net.minecraft.world.level.block.state.BlockState;
  * {@code loot_table/blocks/blighted_leaves.json}: nothing, or with shears or Silk Touch one Blighted Leaves, so no
  * sapling, fruit or stick of the tree it was ever comes back. No block entity, no production, no regrowth. A state
  * saved with the {@code source} property of older versions reads as this block with its distance, persistence and
- * water.
+ * water. Its models are sparse twigs and torn membrane in most of an empty block, drawn untinted.
  */
 public final class BlightedLeavesBlock extends LeavesBlock {
-    /** The one colour all Blighted Leaves are drawn in. */
-    public static final int TINT = 0x9A9250;
-
     private static final MapCodec<BlightedLeavesBlock> CODEC = simpleCodec(BlightedLeavesBlock::new);
 
     BlightedLeavesBlock(Properties properties) {

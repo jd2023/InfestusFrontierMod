@@ -1,3 +1,6 @@
 {
-  "parent": "infestusfrontier:block/blighted_leaves"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "infestusfrontier:item/blighted_leaves"
+  }
 }

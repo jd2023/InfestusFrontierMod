@@ -356,12 +356,6 @@ public final class EcologyModule {
                         BLIGHTED_UNDERGROWTH.get());
                 event.register(
                         (state, level, pos, index) -> WitheredSaplingBlock.tintOf(state), WITHERED_SAPLING.get());
-                event.register((state, level, pos, index) -> InfectedLogBlock.TINT, INFECTED_LOG.get());
-                event.register((state, level, pos, index) -> BlightedLeavesBlock.TINT, BLIGHTED_LEAVES.get());
-            });
-            modBus.addListener((RegisterColorHandlersEvent.Item event) -> {
-                event.register((stack, index) -> InfectedLogBlock.TINT, INFECTED_LOG_ITEM.get());
-                event.register((stack, index) -> BlightedLeavesBlock.TINT, BLIGHTED_LEAVES_ITEM.get());
             });
         }
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post event) -> {

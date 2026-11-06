@@ -193,13 +193,31 @@ a log from anything. They are one material: no species, no tint by origin, no bl
   stay so old worlds and inventories keep them and use them as planks.
 - A block state saved by an older version with `source` reads as the one block: vanilla's state codec ignores the
   unknown property and keeps axis, distance, persistence and water.
-- Appearance is never saved. The log and leaves each have one model, one texture and one tint: grey bark with root
-  threads and a grey sparse leaf cutout over vanilla's full cube. No tick, resin, fruit, regrowth or spread.
-- Guide: `contact/infected_timber`. Demo: the Timber exhibit at x 47 to 75, z -13 to -2 in `demo.json` (six living
+- Appearance is never saved and nothing is tinted. Both blocks draw from one 64x64 atlas,
+  `textures/block/infected_timber.png`, one texel per model pixel as on a 16x16 block, made with the models by
+  `art/gen_infected_timber.py`. A log is charcoal bark plates recessed 1 or 2 pixels, an ivory rib flush with the
+  block on each face, crossed by a band of bark, and a cleft 4 pixels deep, black like a sealed wound or, rarely, dull
+  maroon tissue. All four sides cut the same profile, so every model, quarter turn and axis meets its neighbour on one
+  outline: up a trunk, along a lying log and across the four logs of a 2x2 trunk. Four log models dress that one
+  section: plain, a hooked twig or a snapped stub out of a cleft (inside the block), and a maroon wound. The blockstate
+  picks a model and a turn about the log's own axis by position. Collision, outline and light are the full log's;
+  `InfectedLogBlock.OCCLUSION` is the cut section, so the ground or a block beside a groove keeps its face. Leaves are
+  three sparse cutout models of hooked dry twigs and torn hanging membrane, under half of any face covered, picked and
+  turned the same way; the crown's silhouette breaks and the branches show through. One-pixel twigs vanish at slot
+  size, so the Blighted Leaves item is a flat 16x16 sprite of a hooked branch and torn membrane. The legacy planks are
+  one untinted 16x16 tile in the same palette. No tick, resin, fruit, regrowth or spread.
+- Guide: `contact/infected_timber`, opening on the plate `textures/book/infected_timber_grove.png`
+  (`art/gen_book_infected_timber.py`: a living oak, the same oak infected and cut logs); its icon is drawn by the timber
+  generator. Demo: the Timber exhibit at x 47 to 75, z -13 to -2 in `demo.json` (six living
   trees, oak to cherry, each beside the same Infected Log and Blighted Leaves, lying logs, a living and an infected oak
   side by side, a furnace burning Infected Logs, a chest of logs and leaves, the tools and the Capsule Stem station of
-  [Shipped: Capsule Stem from infected timber](#shipped-capsule-stem-from-infected-timber)) and the `infected_timber`
-  capture.
+  [Shipped: Capsule Stem from infected timber](#shipped-capsule-stem-from-infected-timber)) and the Grove at x 131 to
+  165, z -13 to -2 (a living grove of a 2x2 dark oak with lying branches, an oak with a low limb at eye level, a birch
+  and a spruce beside the same grove infected, and a frame of posts, beams and walls built of Infected Logs with an
+  old plank), photographed by the demo's `grove` views. The `infected_timber` capture builds the two groves and the
+  frame at x 296 to 333, z 56 to 80, away from the shared plot, and shows them from the front at 4 and 8 blocks, the
+  back, the side, above, close on the 2x2 trunk, a branch and the low foliage, by day and at night, and the three items
+  in the hotbar and the inventory.
 
 ## Shipped: Capsule Stem from infected timber
 
@@ -359,8 +377,8 @@ Convert admitted logs in place, preserving their axes and branch positions. Use 
 infected bark for every tree. Do not replace every tree with the same generated
 sculpture.
 
-Convert admitted foliage to Blighted Leaves with sparse cutout textures. Keep the
-existing leaf positions initially; holes in the texture expose the branches.
+Convert admitted foliage to Blighted Leaves with sparse cutout models. Keep the
+existing leaf positions; the open models expose the branches.
 Avoid removing a random fraction of leaf blocks and showering the colony in drops.
 Retain vanilla leaf-distance, persistence and decay behavior through supported
 block behavior. Infected logs must support their blighted leaves normally.

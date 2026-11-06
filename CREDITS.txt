@@ -45,15 +45,11 @@ textures/block/blighted_dead_bush_b.png: original artwork for this project, buil
 textures/block/blighted_fern.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/block/blighted_grass_a.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/block/blighted_grass_b.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
-textures/block/blighted_leaves.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/item/calcifying_graft.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/block/dead_berry_bush_fruited.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/block/dead_berry_bush_large.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/block/dead_berry_bush_small.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/item/dead_tissue.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
-textures/block/infected_log.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
-textures/block/infected_log_top.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
-textures/block/infected_planks.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/block/living_wall.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/item/membrane_window.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/item/skeletal_graft.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
@@ -70,8 +66,10 @@ textures/block/withered_flower_forked.png: original artwork for this project, bu
 textures/block/withered_flower_hanging.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/block/withered_sapling_bare.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
 textures/block/withered_sapling_curled.png: original artwork for this project, built-in image generation, 2026-11-04; CC BY 4.0. Source prompt and digest in the texture source records below.
-Withered vegetation and infected timber models and blockstates: original procedural geometry for this project, 2026-11-03; CC BY 4.0. Their family generators preserve the finished image-model textures.
-textures/book/{withered_flowers,withered_shrubs,infected_timber}.png: derived from the finished image-model block textures by their family generators, 2026-11-04; CC BY 4.0.
+Withered vegetation models and blockstates: original procedural geometry for this project, 2026-11-03; CC BY 4.0. Their family generators preserve the finished image-model textures.
+textures/book/{withered_flowers,withered_shrubs}.png: derived from the finished image-model block textures by their family generators, 2026-11-04; CC BY 4.0.
+Infected timber (textures/block/infected_timber.png, the 64x64 atlas of 16x16 cells drawn one texel per model pixel; textures/block/infected_planks.png, 16x16; models/block/infected_log*.json, models/block/blighted_leaves*.json and their blockstates and item models; the Blighted Leaves item sprite textures/item/blighted_leaves.png and the guide icon textures/book/infected_timber.png, 16x16 each): original procedural model art for this project by art/gen_infected_timber.py, 2026-11-06; CC BY 4.0. It replaces the 64x64 image-model bark, end, leaf and plank tiles of 2026-11-04. The 16x16 bark of Biomes O' Plenty, Oh The Biomes We've Gone and Atmospheric named in the task set the texel scale only; nothing is copied from them or from vanilla.
+Infected Timber guide plate (textures/book/infected_timber_grove.png, 200x200 RGBA): original work for this project rendered by art/gen_book_infected_timber.py with art/book_scene.py from the shipped infected timber models and Minecraft's oak log, oak leaves, grass and dirt textures (Mojang Studios, read from the 1.21.1 client jar at generation time and shown at their own texel size), 2026-11-06; CC BY 4.0.
 
 
 Texture source records — 2026-11-04
@@ -115,12 +113,6 @@ Source: `exec-b6dd36ee-6308-47ea-86a0-cde884562b6d.png`. SHA-256: `331c078e5cdf9
 
 Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. GREYSCALE side-view cross-plane plant sprite: a low tuft of seven dry grass blades, tallest bowed to the left, two snapped. Dark root threads at foot and one dull fleshy knot. Base touches bottom centre edge of SQUARE canvas; no ground mound. Everything else stays within canvas with clear side/top margins. Grey tones ONLY, game applies tint. Thin dark rim, readable thick-enough stalks at 64x64, genuine transparent background, no shadow, no glow, no green, no pot. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
 
-### `blighted_leaves`
-
-Source: `exec-9de23812-e1f1-442e-901d-b68ee01f11c9.png`. SHA-256: `f383503c9aa8079bd418d3c1c0d9ee6fb1732f2300ad8c1e1086c0d3b2f720cf`.
-
-Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. seamless square leaf canopy tile. Sparse dry GREYSCALE leaf clumps joined by thin dark twigs, many irregular see-through holes, approximately half tile genuinely transparent, a few dull knots. Pattern extends across all edges and repeats seamlessly. No background, no solid backing, greys ONLY because game applies species tint. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
-
 ### `calcifying_graft`
 
 Source: `exec-0cdea209-ed69-4649-be28-8a6c91d43e0b.png`. SHA-256: `c7ccb9639811ff4850ac8f9e00d46e990e10048657bd8cb88e9d8069f2186572`.
@@ -150,24 +142,6 @@ Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture e
 Source: `exec-f2fa01d1-855b-44f9-9094-5406bf9d6764.png`. SHA-256: `628fa1c38553d1336e293fd6016ccefef67e3b2228a225234ede82fdc0ceb85b`.
 
 Prompt: Use case: stylized-concept. Asset type: finished voxel-game inventory icon, will be downsampled to 32x32. Subject: one limp grey-brown scrap of dead organic tissue, folded dry wrinkled flesh, a small dull pink fleck at its torn edge. Broad readable single silhouette, hand-painted game art, restrained soft upper-left light, thin dark outer outline. Centered isolated object occupying 80 percent of square canvas, real transparent background. No text, no border, no scenery, no loose particles, no glow, no photorealistic gore. Original biological game asset.
-
-### `infected_log`
-
-Source: `exec-c50d1e9c-6fa7-405c-87ef-42e2e1f550c5.png`. SHA-256: `a522fb1f4f47e1abcac5d826132083137cba6467e5b254b92da9fbd605787153`.
-
-Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. seamless square bark tile, dead GREYSCALE tree bark with vertical ridges and dark seams, a few dark root threads crawling over it, two dull fleshy knots. Neutral greys ONLY because game applies species tint. Opaque edge-to-edge tile, matching opposite edges, no border. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
-
-### `infected_log_top`
-
-Source: `exec-2f742577-0a0d-4138-99fa-3266c9a8d473.png`. SHA-256: `9442468d1e26d7e74979ae9a46ecbbbb7fb22ffcc12daafd010bdf0f8712ffed`.
-
-Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. square cut-end log tile. Square grey bark rim surrounding pale GREYSCALE growth rings, a dull knot at the heart, dark root threads running through rings. Opaque edge-to-edge square block face, no outside background, all corners filled with bark. Greys ONLY because game applies species tint. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
-
-### `infected_planks`
-
-Source: `exec-482c2723-85c4-4756-9f62-ddd342d6adf0.png`. SHA-256: `52b971651ab199b6ee908180fdf8afcb5b074577d20cdacbb4a83bd334c60dd0`.
-
-Prompt: Use case: stylized-concept. Asset type: final voxel-game block texture exported at 64x64. seamless square tile of four dead wooden planks in horizontal rows with dark seams and restrained wood grain, warm grey tones, one knot and one dark crack. Opaque edge to edge, matching opposite edges, no border. Hand-painted original game asset with broad readable forms, low visual noise, soft shading from upper left. No text, watermark, labels, photorealism or scenery.
 
 ### `living_wall`
 
