@@ -23,6 +23,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -34,6 +35,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CocoaBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
@@ -373,6 +375,146 @@ public final class TreeInfectionTests {
                             state.getBlock(),
                             "built against the trunk at " + pos));
                     assertNothingSpawned(h);
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * Cocoa pods on a jungle trunk test the log's tag, which the Infected Log is not in. Infection removes the pods
+     * the conversion unseats without a drop; neighbour updates afterwards find nothing to pop.
+     */
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = BATCH + "23",
+            timeoutTicks = 200)
+    public static void cocoaPodsOnAnInfectedTrunkAreRemovedWithoutADrop(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        floor(h);
+        BlockPos base = h.absolutePos(new BlockPos(7, 2, 7));
+        Tree jungle = tree(level, base, Blocks.JUNGLE_LOG, Blocks.JUNGLE_LEAVES, 5, List.of(2, 3), 4);
+        Map<BlockPos, BlockState> pods = Map.of(
+                base.east(),
+                Blocks.COCOA
+                        .defaultBlockState()
+                        .setValue(CocoaBlock.FACING, Direction.WEST)
+                        .setValue(CocoaBlock.AGE, 2),
+                base.above().south(),
+                Blocks.COCOA
+                        .defaultBlockState()
+                        .setValue(CocoaBlock.FACING, Direction.NORTH)
+                        .setValue(CocoaBlock.AGE, 0));
+        pods.forEach((pos, pod) -> level.setBlock(pos, pod, Block.UPDATE_ALL));
+        Player gardener = EcologyTests.holding(h, GameType.SURVIVAL, EcologyModule.SPORE_CULTURE.get(), 1);
+        h.startSequence()
+                .thenExecuteAfter(2, () -> {
+                    pods.forEach((pos, pod) -> h.assertValueEqual(level.getBlockState(pos), pod, "a living pod"));
+                    EcologyTests.useCulture(level, gardener, base.below().west());
+                })
+                .thenWaitUntil(() -> assertConverted(h, jungle))
+                .thenExecute(() -> {
+                    pods.keySet()
+                            .forEach(
+                                    pos -> h.assertTrue(level.getBlockState(pos).isAir(), "no pod at " + pos));
+                    assertNothingSpawned(h);
+                    for (BlockPos log : jungle.logs()) level.updateNeighborsAt(log, EcologyModule.INFECTED_LOG.get());
+                    pods.keySet().forEach(pos -> level.updateNeighborsAt(pos, Blocks.AIR));
+                })
+                .thenIdle(5)
+                .thenExecute(() -> {
+                    pods.keySet()
+                            .forEach(
+                                    pos -> h.assertTrue(level.getBlockState(pos).isAir(), "still no pod at " + pos));
+                    assertNothingSpawned(h);
+                    assertConverted(h, jungle);
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * A pod on a log at a chunk edge stands in the next chunk. When that chunk unloads after admission, the job
+     * waits with the log unturned and loads nothing; once the chunk is back the log turns, the pods go without a
+     * drop and neighbour updates find nothing to pop.
+     */
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = BATCH + "24",
+            timeoutTicks = 900)
+    public static void attachmentsInAnUnloadedChunkPauseTheLogUntilItIsBack(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        Yard yard = new Yard(h, 6, 32, 16);
+        ChunkPos west = new ChunkPos(yard.at(8, 1, 8));
+        ChunkPos east = new ChunkPos(yard.at(24, 1, 8));
+        BlockPos beyond = yard.at(16, 8, 9);
+        // the west chunk is held loaded only, so the east chunk is no neighbour of a ticking one and may unload
+        level.getChunkSource().addRegionTicket(TicketType.FORCED, west, 0, west);
+        // 128 logs, a 4x4 trunk 8 high: eight ticks of replacements, the top layer last
+        List<BlockPos> logs = new ArrayList<>();
+        for (int y = 0; y < 8; y++)
+            for (int x = 12; x < 16; x++) for (int z = 8; z < 12; z++) logs.add(yard.at(x, 1 + y, z));
+        Map<BlockPos, Integer> leaves = new HashMap<>();
+        for (int x = 12; x < 16; x++) for (int z = 8; z < 12; z++) leaves.put(yard.at(x, 9, z), 1);
+        Tree jungle = place(level, new Tree(Blocks.JUNGLE_LOG, Blocks.JUNGLE_LEAVES, logs, leaves));
+        List<BlockPos> pods = new ArrayList<>();
+        for (int z = 8; z < 12; z++) {
+            BlockPos pod = yard.at(16, 8, z);
+            level.setBlock(
+                    pod,
+                    Blocks.COCOA.defaultBlockState().setValue(CocoaBlock.FACING, Direction.WEST),
+                    Block.UPDATE_ALL);
+            pods.add(pod);
+        }
+        BlockPos root = logs.getFirst();
+        Player gardener = EcologyTests.holding(h, GameType.SURVIVAL, EcologyModule.SPORE_CULTURE.get(), 1);
+        EcologyTests.useCulture(level, gardener, root.below().west());
+        AABB around = new AABB(root).inflate(20);
+        int[] left = {0};
+        h.startSequence()
+                .thenWaitUntil(() -> {
+                    TreeInfectionSnapshot.Job job = job(h, root);
+                    h.assertTrue(job.phase() == TreeInfectionSnapshot.Phase.CONVERTING, "admitted");
+                    h.assertTrue(job.logsLeft() > 64, "most logs still waiting: " + job);
+                })
+                .thenExecute(() -> {
+                    level.setChunkForced(west.x, west.z, false);
+                    level.setChunkForced(east.x, east.z, false);
+                })
+                .thenWaitUntil(() -> {
+                    // a busy test server defers unloads until it has spare time; give the chunk source that time now
+                    level.getChunkSource().tick(() -> true, false);
+                    h.assertFalse(level.hasChunkAt(beyond), "the chunk beside the trunk unloaded");
+                    h.assertTrue(job(h, root).logsLeft() > 0, "and the logs were not all turned by then");
+                })
+                .thenIdle(40)
+                .thenExecute(() -> {
+                    left[0] = job(h, root).logsLeft();
+                    h.assertTrue(left[0] > 0, "the job waits with logs left");
+                    h.assertTrue(
+                            logs.stream()
+                                    .anyMatch(log -> level.getBlockState(log).is(Blocks.JUNGLE_LOG)),
+                            "a log still waits unturned");
+                })
+                .thenIdle(120)
+                .thenExecute(() -> {
+                    h.assertFalse(level.hasChunkAt(beyond), "waiting loaded nothing");
+                    h.assertValueEqual(job(h, root).logsLeft(), left[0], "and turned nothing");
+                    TestChunks.force(level, east);
+                })
+                .thenWaitUntil(() -> h.assertFalse(snapshot(h).works(root), "the job finished after the reload"))
+                .thenExecute(() -> {
+                    assertConverted(h, jungle);
+                    pods.forEach(pod -> h.assertTrue(level.getBlockState(pod).isAir(), "no pod at " + pod));
+                    assertNothingSpawnedAround(h, around);
+                    for (BlockPos log : logs) level.updateNeighborsAt(log, EcologyModule.INFECTED_LOG.get());
+                    pods.forEach(pod -> level.updateNeighborsAt(pod, Blocks.AIR));
+                })
+                .thenIdle(5)
+                .thenExecute(() -> {
+                    pods.forEach(pod -> h.assertTrue(level.getBlockState(pod).isAir(), "still no pod at " + pod));
+                    assertNothingSpawnedAround(h, around);
+                    level.getChunkSource().removeRegionTicket(TicketType.FORCED, west, 0, west);
+                    yard.clear(h);
                 })
                 .thenSucceed();
     }
@@ -1292,6 +1434,65 @@ public final class TreeInfectionTests {
                 .thenSucceed();
     }
 
+    /** The Jungle plot's button bone-meals the cell; the living jungle tree turns and its four cocoa pods go, dropping nothing. */
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = BATCH + "25",
+            timeoutTicks = 400)
+    public static void theDemoJungleCocoaTreeTurnsAndItsPodsGoWithoutADrop(GameTestHelper h) {
+        DemoExhibit exhibit = new DemoExhibit(new BlockPos(117, -61, -13), new BlockPos(129, -20, -2), 0);
+        exhibit.force(h);
+        ServerLevel level = h.getLevel();
+        BlockPos cell = exhibit.at(new BlockPos(121, -61, -7));
+        BlockPos root = exhibit.at(new BlockPos(121, -60, -8));
+        BlockPos twin = exhibit.at(new BlockPos(127, -60, -8));
+        List<BlockPos> pods = List.of(
+                exhibit.at(new BlockPos(122, -60, -8)),
+                exhibit.at(new BlockPos(122, -59, -8)),
+                exhibit.at(new BlockPos(120, -59, -8)),
+                exhibit.at(new BlockPos(121, -60, -9)));
+        AABB around = new AABB(root).inflate(12);
+        h.startSequence()
+                .thenIdle(DemoExhibit.ENTITIES_LOAD_TICKS)
+                .thenExecute(() -> {
+                    exhibit.build(h);
+                    h.assertTrue(level.getBlockState(root).is(Blocks.JUNGLE_LOG), "a living jungle tree");
+                    pods.forEach(pod -> h.assertTrue(level.getBlockState(pod).is(Blocks.COCOA), "a pod at " + pod));
+                    h.assertTrue(level.getBlockState(twin).getBlock() instanceof InfectedLogBlock, "its infected twin");
+                    h.assertTrue(level.getBlockState(cell.above()).is(Blocks.DISPENSER), "a dispenser on the cell");
+                    // the button: a redstone block where it would power the dispenser
+                    level.setBlock(cell.above().east(), Blocks.REDSTONE_BLOCK.defaultBlockState(), Block.UPDATE_ALL);
+                })
+                .thenWaitUntil(() -> h.assertTrue(
+                        level.getBlockState(root).getBlock() instanceof InfectedLogBlock, "the jungle tree turned"))
+                .thenWaitUntil(() -> h.assertFalse(snapshot(h).works(root), "and the job finished"))
+                .thenExecute(() -> {
+                    pods.forEach(pod -> h.assertTrue(level.getBlockState(pod).isAir(), "no pod at " + pod));
+                    // from the first log up: the dispenser, button and redstone at the foot have no twin
+                    for (BlockPos offset : BlockPos.betweenClosed(-2, 0, 0, 2, 5, 0))
+                        h.assertValueEqual(
+                                level.getBlockState(root.offset(offset)).getBlock(),
+                                level.getBlockState(twin.offset(offset)).getBlock(),
+                                "the turned tree matches its twin at " + offset);
+                    for (BlockPos offset : BlockPos.betweenClosed(-2, 1, -2, 2, 5, 2))
+                        h.assertValueEqual(
+                                level.getBlockState(root.offset(offset)).getBlock(),
+                                level.getBlockState(twin.offset(offset)).getBlock(),
+                                "the turned crown matches its twin at " + offset);
+                    assertNothingSpawnedAround(h, around);
+                    for (BlockPos offset : BlockPos.betweenClosed(-2, 0, -2, 2, 5, 2))
+                        level.updateNeighborsAt(root.offset(offset), Blocks.AIR);
+                })
+                .thenIdle(5)
+                .thenExecute(() -> {
+                    assertNothingSpawnedAround(h, around);
+                    exhibit.tidy(h);
+                    exhibit.forget(h);
+                })
+                .thenSucceed();
+    }
+
     // --- fixtures ---
 
     /** Grass over the whole structure floor, at y 1. */
@@ -1453,12 +1654,15 @@ public final class TreeInfectionTests {
     }
 
     /** No item and no experience inside the structure: conversion is a replacement, never a harvest. */
-    private static void assertNothingSpawned(GameTestHelper h) {
-        AABB box = h.getBounds().inflate(1);
+    private static void assertNothingSpawnedAround(GameTestHelper h, AABB box) {
         List<ItemEntity> items = h.getLevel().getEntitiesOfClass(ItemEntity.class, box);
         h.assertTrue(items.isEmpty(), "infection dropped " + items);
         List<ExperienceOrb> orbs = h.getLevel().getEntitiesOfClass(ExperienceOrb.class, box);
         h.assertTrue(orbs.isEmpty(), "infection gave experience " + orbs);
+    }
+
+    private static void assertNothingSpawned(GameTestHelper h) {
+        assertNothingSpawnedAround(h, h.getBounds().inflate(1));
     }
 
     /** Where the old build's fixture chunk stood: its own chunk, far from every yard. */

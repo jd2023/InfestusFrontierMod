@@ -242,6 +242,13 @@ in `core.ecology.TreeDiscovery`, with the budgets in `core.foundation.TickQuota`
   persistence and water. The replacement sends no neighbour updates (the new log is a log, the leaf keeps its
   distance), drops nothing and gives no experience. Infected Logs are no trunk logs, so a converted tree starts nothing
   and is never discovered again.
+- Attached plants. A block that stands against a trunk log and survives there, but would not survive against the
+  Infected Log, is removed with the log, without a drop, an item or experience. Cocoa pods are the case: they test
+  vanilla's `jungle_logs` tag, the Infected Log is in no species tag, and the pod would otherwise drop on the next
+  neighbour update. The test is the block's own `canSurvive`, read before and after the log is replaced, so a mod's
+  attachment that tests its log's tag is handled the same way; a block that stands on the Infected Log (a torch, a
+  button, a vine) stays. An infected tree grows no pods and becomes no farm. A log waits, like any target, until the chunks its
+  attachments' survival checks may read (the log's chunk and the chunks 2 blocks round it) are loaded, and loads none.
 - Budgets. At most 16 jobs a dimension, discovering and converting together; 128 discovery reads and 16 replacements a
   server tick, shared by every dimension through two `TickQuota`s on the overworld's data, handed round the jobs in
   turn. A tree touched while the jobs are full is refused for capacity; there is no queue, and the next wave or
@@ -267,7 +274,10 @@ in `core.ecology.TreeDiscovery`, with the budgets in `core.foundation.TickQuota`
   115, z -13 to -2 in `demo.json` (an oak with a bone-meal dispenser and button at the end of a one-wide corridor, its
   infected twin, a birch and a cherry with touching crowns and a cell by each, a treehouse with planks, a stripped log,
   a chest and a fence against the trunk, a 2x2 spruce of 132 logs and 33 blocks that is refused, and a chest of bone
-  meal, culture, an axe and shears), the `woodland_wave` frames and the `tree_infection` capture.
+  meal, culture, an axe and shears), the `woodland_wave` frames and the `tree_infection` capture. The Jungle plot east of
+  it at x 117 to 129, z -13 to -2 shows a living jungle tree with four cocoa pods, a cell under a bone-meal dispenser
+  and button, its infected twin without pods and the same supplies; the `jungle_cocoa` and `jungle_cocoa_after` views
+  photograph it before and after.
 
 ## Harvest rules
 

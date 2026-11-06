@@ -62,6 +62,8 @@ final class TreeInfections extends SavedData {
     static final int READS_PER_TICK = 128;
     static final int REPLACEMENTS_PER_TICK = 16;
     static final int UNLOADED_RETRY_TICKS = 100;
+    /** How far from a log a plant attached to it may read, in blocks, to tell whether it still stands. */
+    private static final int ATTACHMENT_REACH = 2;
     /** How far from a tree a player hears about it. */
     static final int FEEDBACK_RANGE = 32;
 
@@ -512,7 +514,7 @@ final class TreeInfections extends SavedData {
             return false;
         }
         Target target = log ? job.logs.peek() : job.leaves.peek();
-        if (!level.hasChunkAt(target.pos())) {
+        if (!level.hasChunkAt(target.pos()) || (log && !attachmentsLoaded(level, target.pos()))) {
             job.pausedUntil = now + UNLOADED_RETRY_TICKS;
             return false;
         }
@@ -525,9 +527,40 @@ final class TreeInfections extends SavedData {
         if (job.logs.isEmpty() && job.leaves.isEmpty()) jobs.remove(job);
         setDirty();
         if (infected.isEmpty()) return true;
+        Map<BlockPos, BlockState> attached = log ? attachments(level, target.pos()) : Map.of();
         level.setBlock(target.pos(), infected.get(), QUIET);
+        attached.forEach((at, plant) -> {
+            if (!level.getBlockState(at).equals(plant) || plant.canSurvive(level, at)) return;
+            level.setBlock(at, plant.getFluidState().createLegacyBlock(), QUIET);
+        });
         if (log) level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, target.pos(), STEP_PARTICLES);
         return true;
+    }
+
+    /**
+     * Whether every chunk the attachments' survival checks may read is loaded: the blocks against the log and the
+     * {@value #ATTACHMENT_REACH} blocks round it, which a plant's {@code canSurvive} reads for its support.
+     */
+    private static boolean attachmentsLoaded(ServerLevel level, BlockPos log) {
+        for (int dx = -ATTACHMENT_REACH; dx <= ATTACHMENT_REACH; dx += 2 * ATTACHMENT_REACH)
+            for (int dz = -ATTACHMENT_REACH; dz <= ATTACHMENT_REACH; dz += 2 * ATTACHMENT_REACH)
+                if (!level.hasChunkAt(log.offset(dx, 0, dz))) return false;
+        return true;
+    }
+
+    /**
+     * The blocks standing against a log that survive there now: a plant attached to a log tests the log's tag, as
+     * cocoa pods do, and would drop on the next neighbour update once the log is the Infected Log. Blocks that could
+     * not stand already are not listed, so only what the conversion itself unseats is removed.
+     */
+    private static Map<BlockPos, BlockState> attachments(ServerLevel level, BlockPos log) {
+        Map<BlockPos, BlockState> attached = new HashMap<>();
+        for (Direction side : Direction.values()) {
+            BlockPos at = log.relative(side);
+            BlockState state = level.getBlockState(at);
+            if (!state.isAir() && state.canSurvive(level, at)) attached.put(at, state);
+        }
+        return attached;
     }
 
     /** Remembers the refusal and tells the players nearby, once per tree and reason in {@value #REFUSAL_QUIET_TICKS} ticks. */
