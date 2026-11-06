@@ -41,6 +41,12 @@
       "text": "entry.infestusfrontier.contact.infected_timber.logs"
     },
     {
+      "type": "modonomicon:crafting_recipe",
+      "title": "block.infestusfrontier.capsule_stem",
+      "recipe_id_1": "infestusfrontier:capsule_stem",
+      "text": "entry.infestusfrontier.contact.infected_timber.craft"
+    },
+    {
       "type": "modonomicon:text",
       "text": "entry.infestusfrontier.contact.infected_timber.leaves"
     },

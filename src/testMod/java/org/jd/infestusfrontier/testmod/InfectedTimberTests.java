@@ -42,6 +42,8 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.ecology.InfectedLogBlock;
+import org.jd.infestusfrontier.processing.ProcessingModule;
+import org.jd.infestusfrontier.storage.StorageModule;
 
 /** Infected Logs, Blighted Leaves and the Infected Planks old worlds keep: VEGETATION_INFECTION.md, "Trees". */
 @GameTestHolder("infestusfrontier_tests")
@@ -178,9 +180,134 @@ public final class InfectedTimberTests {
         h.succeed();
     }
 
+    // --- the Capsule Stem ---
+
+    /** The recipe of the Capsule Stem: an Infected Log, a chest, two Membrane Sheets and a Spore Culture. */
+    private static final ResourceLocation STEM_RECIPE =
+            ResourceLocation.fromNamespaceAndPath("infestusfrontier", "capsule_stem");
+
+    /** The five stem parts with {@code log} as the timber, in a 3x3 grid in the given order, then empty cells. */
+    static List<ItemStack> stemParts(ItemStack log) {
+        return List.of(
+                log,
+                new ItemStack(Items.CHEST),
+                new ItemStack(ProcessingModule.MEMBRANE_SHEET.get()),
+                new ItemStack(ProcessingModule.MEMBRANE_SHEET.get()),
+                new ItemStack(EcologyModule.SPORE_CULTURE.get()));
+    }
+
+    /** The result of {@code parts} laid in the first cells of a 3x3 grid; empty when no recipe matches. */
+    static ItemStack craftStem(GameTestHelper h, List<ItemStack> parts) {
+        List<ItemStack> cells = new ArrayList<>(parts);
+        while (cells.size() < 9) cells.add(ItemStack.EMPTY);
+        return craft(h, 3, 3, cells);
+    }
+
+    /**
+     * A demo Capsule Stem station: a crafting table beside a chest holding the parts, an oak log to be refused and, when
+     * {@code withLog}, an Infected Log, so a player crafts a stem there; without it the player cuts the log from an
+     * infected tree first. The chest's oak log, put in the log's place, makes nothing.
+     */
+    static void assertStemStation(GameTestHelper h, DemoExhibit yard, BlockPos table, BlockPos chest, boolean withLog) {
+        ServerLevel level = h.getLevel();
+        h.assertTrue(level.getBlockState(yard.at(table)).is(Blocks.CRAFTING_TABLE), "a crafting table at " + table);
+        ChestBlockEntity parts = (ChestBlockEntity) level.getBlockEntity(yard.at(chest));
+        h.assertTrue(parts != null, "a chest of stem parts at " + chest);
+        h.assertTrue(
+                (parts.countItem(EcologyModule.INFECTED_LOG_ITEM.get()) >= 1) == withLog
+                        && parts.countItem(Items.CHEST) >= 1
+                        && parts.countItem(ProcessingModule.MEMBRANE_SHEET.get()) >= 2
+                        && parts.countItem(EcologyModule.SPORE_CULTURE.get()) >= 1
+                        && parts.countItem(Items.OAK_LOG) >= 1,
+                "a chest, two sheets and a culture to craft with, an oak log to be refused, a log only if offered");
+        h.assertTrue(
+                craftStem(h, stemParts(new ItemStack(EcologyModule.INFECTED_LOG_ITEM.get())))
+                        .is(StorageModule.CAPSULE_STEM_ITEM.get()),
+                "the chest's parts craft a stem");
+        h.assertTrue(craftStem(h, stemParts(new ItemStack(Items.OAK_LOG))).isEmpty(), "its oak log does not");
+    }
+
+    /**
+     * The Capsule Stem takes the one Infected Log of any infected tree with a chest, two Membrane Sheets and a Spore
+     * Culture, in any arrangement, and leaves nothing behind.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH)
+    public static void theCapsuleStemRecipeTakesTheInfectedLogWithItsFourPartsAndNothingRemains(GameTestHelper h) {
+        var recipe = h.getLevel().getRecipeManager().byKey(STEM_RECIPE);
+        h.assertTrue(recipe.isPresent(), "the recipe loads");
+        h.assertValueEqual(recipe.get().value().getIngredients().size(), 5, "five ingredients");
+        h.assertValueEqual(
+                recipe.get()
+                        .value()
+                        .getResultItem(h.getLevel().registryAccess())
+                        .getCount(),
+                1,
+                "one stem a craft");
+        ItemStack log = new ItemStack(EcologyModule.INFECTED_LOG_ITEM.get());
+        ItemStack stem = craftStem(h, stemParts(log.copy()));
+        h.assertTrue(stem.is(StorageModule.CAPSULE_STEM_ITEM.get()) && stem.getCount() == 1, "one stem: " + stem);
+        List<ItemStack> shuffled = new ArrayList<>(stemParts(log.copy()));
+        java.util.Collections.reverse(shuffled);
+        h.assertTrue(craftStem(h, shuffled).is(StorageModule.CAPSULE_STEM_ITEM.get()), "in the reverse order");
+        List<ItemStack> scattered = new ArrayList<>(java.util.Collections.nCopies(9, ItemStack.EMPTY));
+        List<ItemStack> parts = stemParts(log.copy());
+        int[] cells = {8, 0, 5, 2, 4};
+        for (int i = 0; i < parts.size(); i++) scattered.set(cells[i], parts.get(i));
+        h.assertTrue(craftStem(h, scattered).is(StorageModule.CAPSULE_STEM_ITEM.get()), "scattered over the grid");
+        CraftingInput input = CraftingInput.of(3, 3, scattered);
+        var crafted = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, h.getLevel());
+        h.assertTrue(crafted.isPresent() && crafted.get().id().equals(STEM_RECIPE), "the stem recipe matched");
+        h.assertTrue(
+                crafted.get().value().getRemainingItems(input).stream().allMatch(ItemStack::isEmpty),
+                "the craft leaves no container behind: it takes exactly the five items");
+        h.succeed();
+    }
+
+    /** An ordinary log of any kind, a stripped log, wood, planks and the legacy Infected Plank are not the log. */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH)
+    public static void theCapsuleStemRecipeRefusesOrdinaryWoodAndOldPlanks(GameTestHelper h) {
+        int tried = 0;
+        for (Item item : BuiltInRegistries.ITEM) {
+            ItemStack wood = new ItemStack(item);
+            if (!wood.is(ItemTags.LOGS) && !wood.is(ItemTags.PLANKS)) continue;
+            tried++;
+            h.assertTrue(craftStem(h, stemParts(wood)).isEmpty(), "no stem from " + item);
+        }
+        h.assertTrue(tried > 30, "every log and plank item was tried: " + tried);
+        h.assertTrue(
+                craftStem(h, stemParts(new ItemStack(EcologyModule.INFECTED_PLANKS_ITEM.get())))
+                        .isEmpty(),
+                "no stem from an Infected Plank");
+        h.assertTrue(craftStem(h, stemParts(new ItemStack(Items.OAK_LOG))).isEmpty(), "no stem from an oak log");
+        h.succeed();
+    }
+
+    /** Each part is needed, none twice: the old three-part stem, a missing sheet, a second log and a second chest fail. */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH)
+    public static void theCapsuleStemRecipeNeedsEveryPartOnce(GameTestHelper h) {
+        ItemStack log = new ItemStack(EcologyModule.INFECTED_LOG_ITEM.get());
+        List<ItemStack> parts = stemParts(log.copy());
+        h.assertTrue(
+                craftStem(h, parts.subList(1, 5)).isEmpty(), "a chest, two sheets and a culture, the old recipe, fail");
+        for (int missing = 0; missing < parts.size(); missing++) {
+            List<ItemStack> fewer = new ArrayList<>(parts);
+            fewer.remove(missing);
+            h.assertTrue(craftStem(h, fewer).isEmpty(), "no stem without part " + missing);
+        }
+        for (int extra = 0; extra < parts.size(); extra++) {
+            List<ItemStack> more = new ArrayList<>(parts);
+            more.add(parts.get(extra).copy());
+            h.assertTrue(craftStem(h, more).isEmpty(), "no stem with a second of part " + extra);
+        }
+        h.assertTrue(
+                craft(h, 2, 2, new ArrayList<>(parts.subList(0, 4))).isEmpty(),
+                "four items cannot make it: it needs 3x3");
+        h.succeed();
+    }
+
     // --- planks, kept for old worlds ---
 
-    /** Nothing makes Infected Planks or Infected Logs any more, and no recipe of the mod takes an Infected Log. */
+    /** Nothing makes Infected Planks or Infected Logs any more, and only the Capsule Stem recipe takes an Infected Log. */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH)
     public static void noRecipeMakesPlanksOrLogsOrTakesALog(GameTestHelper h) {
         ItemStack log = new ItemStack(EcologyModule.INFECTED_LOG_ITEM.get());
@@ -189,9 +316,10 @@ public final class InfectedTimberTests {
             h.assertFalse(result.is(log.getItem()), holder.id() + " makes Infected Logs");
             h.assertFalse(result.is(EcologyModule.INFECTED_PLANKS_ITEM.get()), holder.id() + " makes Infected Planks");
             if (!holder.id().getNamespace().equals("infestusfrontier")) continue;
-            h.assertFalse(
+            h.assertValueEqual(
                     holder.value().getIngredients().stream().anyMatch(i -> i.test(log)),
-                    holder.id() + " takes an Infected Log");
+                    holder.id().equals(STEM_RECIPE),
+                    holder.id() + " takes an Infected Log only if it is the Capsule Stem");
         }
         h.assertTrue(craft(h, 1, 1, List.of(log)).isEmpty(), "a log alone crafts nothing");
         h.assertFalse(log.is(ItemTags.LOGS), "not an ordinary log item");
@@ -459,6 +587,12 @@ public final class InfectedTimberTests {
                                     && supplies.countItem(EcologyModule.BLIGHTED_LEAVES_ITEM.get()) >= 8
                                     && supplies.countItem(EcologyModule.INFECTED_PLANKS_ITEM.get()) == 0,
                             "logs and leaves to build with, no planks");
+                    assertStemStation(h, yard, new BlockPos(62, -60, -4), new BlockPos(63, -60, -4), true);
+                    ChestBlockEntity refused =
+                            (ChestBlockEntity) level.getBlockEntity(yard.at(new BlockPos(63, -60, -4)));
+                    h.assertTrue(
+                            refused.countItem(EcologyModule.INFECTED_PLANKS_ITEM.get()) >= 1,
+                            "an old Infected Plank to be refused");
                     ChestBlockEntity tools =
                             (ChestBlockEntity) level.getBlockEntity(yard.at(new BlockPos(60, -60, -4)));
                     h.assertTrue(
@@ -494,6 +628,27 @@ public final class InfectedTimberTests {
                     List<ItemEntity> drops = level.getEntitiesOfClass(ItemEntity.class, new AABB(trunk).inflate(4));
                     h.assertValueEqual(drops.size(), 1, "one drop from the trunk: " + drops);
                     h.assertTrue(drops.get(0).getItem().is(EcologyModule.INFECTED_LOG_ITEM.get()), "an Infected Log");
+                    yard.tidy(h);
+                    yard.forget(h);
+                })
+                .thenSucceed();
+    }
+
+    /** The storage row has a crafting table and a chest of stem parts beside the demo's Capsule Stem. */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = BATCH, timeoutTicks = 200)
+    public static void theDemoStorageRowHasAStemStation(GameTestHelper h) {
+        DemoExhibit yard = new DemoExhibit(new BlockPos(75, -61, -38), new BlockPos(82, -50, -33), 20);
+        yard.force(h);
+        h.startSequence()
+                .thenIdle(DemoExhibit.ENTITIES_LOAD_TICKS)
+                .thenExecute(() -> {
+                    yard.build(h);
+                    h.assertTrue(
+                            h.getLevel()
+                                    .getBlockState(yard.at(new BlockPos(76, -60, -36)))
+                                    .is(StorageModule.CAPSULE_STEM.get()),
+                            "the Capsule Stem the station feeds");
+                    assertStemStation(h, yard, new BlockPos(80, -60, -33), new BlockPos(81, -60, -33), true);
                     yard.tidy(h);
                     yard.forget(h);
                 })

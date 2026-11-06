@@ -1,12 +1,13 @@
 # Vegetation infection
 
 Status: proposed, except the Withered Flower, tall-plant and shrub mappings, the infected timber blocks and the
-infection of a standing tree, which ship
+infection of a standing tree and the Capsule Stem made from infected timber, which ship
 ([Shipped: Withered Flower](#shipped-withered-flower),
 [Shipped: tall plants](#shipped-tall-plants),
 [Shipped: shrubs, grass and saplings](#shipped-shrubs-grass-and-saplings),
 [Shipped: infected timber](#shipped-infected-timber-and-blighted-leaves),
-[Shipped: tree infection](#shipped-tree-infection)). Mostly cosmetic conversion
+[Shipped: tree infection](#shipped-tree-infection),
+[Shipped: Capsule Stem from infected timber](#shipped-capsule-stem-from-infected-timber)). Mostly cosmetic conversion
 of vegetation reached by deliberate Living Substrate growth. This document owns the
 conversion mappings and visual rules. Existing substrate growth remains defined in
 [Living Substrate mutations](LIVING_SUBSTRATE_MUTATIONS.md#1-grow-the-foundation).
@@ -177,7 +178,8 @@ a log from anything. They are one material: no species, no tint by origin, no bl
 
 - Infected Log is vanilla's `RotatedPillarBlock` with only `axis`. Breaking it, with any tool, drops one Infected Log
   (`loot_table/blocks/infected_log.json`); a log cut, put down and cut again is still one log. Axis survives rotation.
-  It burns 300 ticks (`neoforge` fuel data map) and is mined with an axe. No recipe takes it; the item is in no item
+  It burns 300 ticks (`neoforge` fuel data map) and is mined with an axe. One recipe takes it: the Capsule Stem
+  ([Shipped: Capsule Stem from infected timber](#shipped-capsule-stem-from-infected-timber)). The item is in no item
   `logs` tag, so no recipe that takes ordinary logs takes it either. There is no premium: biomass value is that of
   ordinary timber and the Digestive Sac takes none.
 - Infected Logs sit in the `logs_that_burn` block tag, which feeds `minecraft:logs`, the tag vanilla's `LeavesBlock`
@@ -195,8 +197,30 @@ a log from anything. They are one material: no species, no tint by origin, no bl
   threads and a grey sparse leaf cutout over vanilla's full cube. No tick, resin, fruit, regrowth or spread.
 - Guide: `contact/infected_timber`. Demo: the Timber exhibit at x 47 to 75, z -13 to -2 in `demo.json` (six living
   trees, oak to cherry, each beside the same Infected Log and Blighted Leaves, lying logs, a living and an infected oak
-  side by side, a furnace burning Infected Logs, a chest of logs and leaves and the tools) and the `infected_timber`
+  side by side, a furnace burning Infected Logs, a chest of logs and leaves, the tools and the Capsule Stem station of
+  [Shipped: Capsule Stem from infected timber](#shipped-capsule-stem-from-infected-timber)) and the `infected_timber`
   capture.
+
+## Shipped: Capsule Stem from infected timber
+
+Infected timber is a construction ingredient. The recipe is `data/infestusfrontier/recipe/capsule_stem.json`, a
+shapeless crafting recipe: 1 Infected Log + 1 chest + 2 Membrane Sheets + 1 Spore Culture make 1 Capsule Stem. Its
+ingredients are exact items. Only the Infected Log item satisfies the log: no ordinary log, stripped log, wood, plank or
+legacy Infected Plank does, and the log keeps no source species, so the log of any infected tree serves. The five
+ingredients need a 3x3 grid, a crafting table or a Shaping Palm; the Palm crafts it through its existing recipe lookup,
+with no recipe of its own. The recipe adds no item, treatment or Living Wood.
+
+- Play: grow substrate to an eligible tree ([Shipped: tree infection](#shipped-tree-infection)), cut its Infected Log
+  with an axe, craft the stem and plant it ([Block catalog: T1-09](BLOCK_CATALOG.md#t1-09--item-capsule-and-capsule-stem)).
+- Stems already placed and what their pods hold are unchanged: only the crafting of a new stem asks for a log.
+- Discovery: the recipe-book advancement `recipes/capsule_stem` unlocks the recipe when the player holds an Infected
+  Log. The guide shows the recipe on `contact/infected_timber` (page "Capsule Stem", after "logs") and on
+  `circulation/item_capsule` (its last page).
+- Demo: a crafting table beside the Woodland supplies chest at x 79 to 80, z -10 (the chest also holds a chest, Membrane
+  Sheets and an oak log to show the refusal), a table and a chest of stem parts in the Timber plot at x 62 to 63, z -4
+  (an oak log and an Infected Plank for the refusal) and a table and chest of stem parts beside the Capsule Stem at
+  x 80 to 81, z -33, each with a sign. The `woodland_craft`, `timber_stem` and `capsule_craft` views and the
+  `book_infected_timber_4` and `book_item_capsule_recipe` views photograph them.
 
 ## Shipped: tree infection
 
@@ -274,7 +298,7 @@ in `core.ecology.TreeDiscovery`, with the budgets in `core.foundation.TickQuota`
   115, z -13 to -2 in `demo.json` (an oak with a bone-meal dispenser and button at the end of a one-wide corridor, its
   infected twin, a birch and a cherry with touching crowns and a cell by each, a treehouse with planks, a stripped log,
   a chest and a fence against the trunk, a 2x2 spruce of 132 logs and 33 blocks that is refused, and a chest of bone
-  meal, culture, an axe and shears), the `woodland_wave` frames and the `tree_infection` capture. The Jungle plot east of
+  meal, culture, an axe, shears and the parts of a Capsule Stem, with a crafting table beside it), the `woodland_wave` frames and the `tree_infection` capture. The Jungle plot east of
   it at x 117 to 129, z -13 to -2 shows a living jungle tree with four cocoa pods, a cell under a bone-meal dispenser
   and button, its infected twin without pods and the same supplies; the `jungle_cocoa` and `jungle_cocoa_after` views
   photograph it before and after.
@@ -378,7 +402,8 @@ Existing substrate-wave limits remain unchanged.
 
 Use **Infected Log** for harvested infected trunks. It is one material whatever the
 tree was. It builds and burns as a log; it makes no planks, and no decorative wood
-family is made from it.
+family is made from it. It is an ingredient of the Capsule Stem
+([Shipped: Capsule Stem from infected timber](#shipped-capsule-stem-from-infected-timber)).
 
 Cutting yields infected timber instead of the original log, never both. Axes and
 normal block-breaking behavior apply. Replacing a harvested log and infecting it
@@ -389,7 +414,8 @@ Keep this material distinct from **Living Wood**, which the existing catalog use
 for cultivated production and biological construction. A later explicit Rooting Gel
 treatment can turn one suitable Infected Log into one Living Wood, alongside the
 existing ordinary-log treatment route. Its recipe belongs in the Item Catalog
-when implemented and names the Infected Log item; the item is in no log item tag, so an ordinary-log recipe never takes it. Passive infection alone does not unlock Arbor Root production,
+when implemented and names the Infected Log item; the item is in no log item tag, so an ordinary-log recipe never takes it.
+The Capsule Stem recipe is no such treatment: it makes no Living Wood. Passive infection alone does not unlock Arbor Root production,
 resin tapping or the Living Wood digestion yield.
 
 This leaves a progression from damaged wild timber to deliberately cultivated

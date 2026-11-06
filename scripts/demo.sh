@@ -6,6 +6,8 @@
 # (south, x 84 to 112, z -22 to -15: feed the Gizzard, the Kidney and the furnace by hand from their chests, put a stack in
 # the Capsule Tree, press Restock on a Palm and take its craft). The Palm supply exhibits (south, x 40 to 80) join a
 # Capsule Tree and a chest to a Rote Palm by Item Veins; four Palms (east, x 140 to 152, z -40) show each Mouth symbol.
+# Capsule Stems need an Infected Log: turn a tree in the Woodland plot (x 79 to 115), cut its log and craft at the table
+# beside the supplies chest; the Timber plot (x 62) and the Capsule Stem exhibit (x 80, z -33) have tables and parts too.
 # The tab starts empty, with no advancement granted.
 # Play, then close the window. The world is rebuilt on every run; your options.txt in runs/demo is kept.
 set -euo pipefail

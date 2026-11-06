@@ -1035,6 +1035,7 @@ public final class CapsuleStemTests {
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void theRecipeMakesAStem(GameTestHelper h) {
         List<ItemStack> grid = new ArrayList<>(List.of(
+                new ItemStack(EcologyModule.INFECTED_LOG_ITEM.get()),
                 new ItemStack(Items.CHEST),
                 new ItemStack(ProcessingModule.MEMBRANE_SHEET.get()),
                 new ItemStack(ProcessingModule.MEMBRANE_SHEET.get()),

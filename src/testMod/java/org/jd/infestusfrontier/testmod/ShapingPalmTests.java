@@ -48,12 +48,14 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.mineral.Metal;
 import org.jd.infestusfrontier.core.mineral.Parcel;
+import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.mineral.MineralModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.ShapingPalmMenu;
 import org.jd.infestusfrontier.processing.api.PalmContents;
+import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 
 /**
@@ -232,14 +234,42 @@ public final class ShapingPalmTests {
         put(player, 8, stack(Items.WHEAT_SEEDS, 2));
         put(player, 0, stack(Items.ROTTEN_FLESH, 2));
         put(player, 5, stack(Items.RED_MUSHROOM, 2));
-        h.assertTrue(
-                result(player).is(org.jd.infestusfrontier.ecology.EcologyModule.SPORE_CULTURE.get()),
-                "a Spore Culture");
+        h.assertTrue(result(player).is(EcologyModule.SPORE_CULTURE.get()), "a Spore Culture");
         player.containerMenu.clicked(RESULT, 0, ClickType.PICKUP, player);
         h.assertValueEqual(player.containerMenu.getCarried().getCount(), 1, "one culture");
         h.assertValueEqual(cell(h, at, 8).getCount(), 1, "one seed taken");
         h.assertValueEqual(cell(h, at, 0).getCount(), 1, "one flesh taken");
         h.assertValueEqual(cell(h, at, 5).getCount(), 1, "one mushroom taken");
+        h.succeed();
+    }
+
+    /**
+     * The Palm crafts the Capsule Stem through the same recipe lookup as a table: an Infected Log, a chest, two
+     * Membrane Sheets and a Spore Culture in any cells give one stem and take one of each; an oak log gives nothing.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "capsule_stem_recipe")
+    public static void aCapsuleStemCraftsInThePalmFromTheInfectedLogAndRefusesOak(GameTestHelper h) {
+        BlockPos at = palm(h);
+        MenuPlayer player = open(h, at);
+        put(player, 7, stack(EcologyModule.INFECTED_LOG_ITEM.get(), 3));
+        put(player, 1, stack(Items.CHEST, 3));
+        put(player, 3, stack(ProcessingModule.MEMBRANE_SHEET.get(), 4));
+        put(player, 5, stack(ProcessingModule.MEMBRANE_SHEET.get(), 4));
+        put(player, 8, stack(EcologyModule.SPORE_CULTURE.get(), 3));
+        h.assertTrue(
+                result(player).is(StorageModule.CAPSULE_STEM_ITEM.get()), "a Capsule Stem shows in the result well");
+        player.containerMenu.clicked(RESULT, 0, ClickType.PICKUP, player);
+        h.assertTrue(player.containerMenu.getCarried().is(StorageModule.CAPSULE_STEM_ITEM.get()), "a click takes it");
+        h.assertValueEqual(player.containerMenu.getCarried().getCount(), 1, "one stem");
+        h.assertValueEqual(cell(h, at, 7).getCount(), 2, "one log taken");
+        h.assertValueEqual(cell(h, at, 1).getCount(), 2, "one chest taken");
+        h.assertValueEqual(cell(h, at, 3).getCount(), 3, "one sheet taken from the first cell");
+        h.assertValueEqual(cell(h, at, 5).getCount(), 3, "one sheet taken from the second cell");
+        h.assertValueEqual(cell(h, at, 8).getCount(), 2, "one culture taken");
+        player.containerMenu.setCarried(ItemStack.EMPTY);
+        put(player, 7, stack(Items.OAK_LOG, 3)); // swaps the oak logs in for the Infected Logs
+        h.assertTrue(in(player, 7).is(Items.OAK_LOG), "oak logs lie where the Infected Logs did");
+        h.assertTrue(result(player).isEmpty(), "an oak log in the log's cell makes nothing");
         h.succeed();
     }
 

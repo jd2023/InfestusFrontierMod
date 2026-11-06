@@ -179,6 +179,10 @@
     "setblock 60 -60 -4 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:iron_axe\",count:1},{Slot:1,id:\"minecraft:shears\",count:1},{Slot:2,id:\"minecraft:iron_hoe\",count:1},{Slot:3,id:\"minecraft:iron_hoe\",count:1,components:{\"minecraft:enchantments\":{levels:{\"minecraft:silk_touch\":1}}}}]}",
     "setblock 59 -60 -6 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Timber\"','\"build with logs\"','\"or burn them:\"','\"chest, furnace\"']}}",
     "setblock 60 -60 -3 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Tools\"','\"axe: one log;\"','\"shears or silk\"','\"touch: leaves\"']}}",
+    "setblock 62 -60 -4 crafting_table",
+    "setblock 63 -60 -4 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:infected_log\",count:8},{Slot:1,id:\"minecraft:chest\",count:4},{Slot:2,id:\"infestusfrontier:membrane_sheet\",count:8},{Slot:3,id:\"infestusfrontier:spore_culture\",count:4},{Slot:4,id:\"minecraft:oak_log\",count:2},{Slot:5,id:\"infestusfrontier:infected_planks\",count:2}]}",
+    "setblock 62 -60 -3 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Capsule Stem\"','\"Infected Log +\"','\"chest, 2 sheets,\"','\"culture: craft\"']}}",
+    "setblock 63 -60 -3 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Refused\"','\"oak log and old\"','\"Infected Planks\"','\"make no stem\"']}}",
     "setblock 65 -60 -8 oak_log",
     "setblock 65 -59 -8 oak_log",
     "setblock 65 -58 -8 oak_log",
@@ -292,8 +296,10 @@
     "setblock 68 -60 -12 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Field Conversion\"','\"see Woodland,\"','\"east: the wave\"','\"turns a tree\"']}}",
     "fill 79 -61 -13 115 -61 -2 grass_block",
     "setblock 80 -60 -12 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Woodland\"','\"the wave or a\"','\"culture at the\"','\"trunk: it turns\"']}}",
-    "setblock 80 -60 -10 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:bone_meal\",count:16},{Slot:1,id:\"infestusfrontier:spore_culture\",count:8},{Slot:2,id:\"minecraft:iron_axe\",count:1},{Slot:3,id:\"minecraft:shears\",count:1}]}",
-    "setblock 80 -60 -9 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Supplies\"','\"bone meal,\"','\"culture, axe,\"','\"shears\"']}}",
+    "setblock 80 -60 -10 chest[facing=north]{Items:[{Slot:0,id:\"minecraft:bone_meal\",count:16},{Slot:1,id:\"infestusfrontier:spore_culture\",count:8},{Slot:2,id:\"minecraft:iron_axe\",count:1},{Slot:3,id:\"minecraft:shears\",count:1},{Slot:4,id:\"minecraft:chest\",count:2},{Slot:5,id:\"infestusfrontier:membrane_sheet\",count:4},{Slot:6,id:\"minecraft:oak_log\",count:2}]}",
+    "setblock 80 -60 -9 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Supplies\"','\"bone meal, axe,\"','\"culture, shears,\"','\"stem parts, oak\"']}}",
+    "setblock 79 -60 -10 crafting_table",
+    "setblock 79 -60 -9 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Capsule Stem\"','\"Infected Log +\"','\"chest, 2 sheets,\"','\"culture. Oak: no\"']}}",
     "fill 80 -61 -9 83 -61 -7 sand",
     "fill 82 -61 -8 83 -61 -8 grass_block",
     "setblock 81 -61 -8 infestusfrontier:living_substrate[stage=basic]",
@@ -521,6 +527,10 @@
     "setblock 76 -60 -36 infestusfrontier:capsule_stem[part=root]{root:[I;76,-60,-36],plan:{seed:7L,cells:[{x:0,y:0,z:0,part:\"root\",side:-1,parent:-1,trunk:0,tier:0}],pods:[]},grow:40}",
     "setblock 79 -60 -37 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Capsule Stem\"','\"bone meal grows\"','\"pods: one kind\"','\"each, 8 stacks\"']}}",
     "give @s infestusfrontier:capsule_stem 2",
+    "setblock 80 -60 -33 crafting_table",
+    "setblock 81 -60 -33 chest[facing=north]{Items:[{Slot:0,id:\"infestusfrontier:infected_log\",count:4},{Slot:1,id:\"minecraft:chest\",count:4},{Slot:2,id:\"infestusfrontier:membrane_sheet\",count:8},{Slot:3,id:\"infestusfrontier:spore_culture\",count:4},{Slot:4,id:\"minecraft:oak_log\",count:2}]}",
+    "setblock 80 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Capsule Stem\"','\"Infected Log +\"','\"chest, 2 sheets,\"','\"culture: craft\"']}}",
+    "setblock 81 -60 -34 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"Stem parts\"','\"log: Infected\"','\"Timber, a tree\"','\"turned. Oak: no\"']}}",
     "setblock 102 -61 -34 infestusfrontier:fluid_vein[sealed=true]",
     "setblock 102 -62 -34 infestusfrontier:fluid_vein[sealed=true]",
     "setblock 102 -62 -35 infestusfrontier:fluid_vein[sealed=true]",
@@ -1076,6 +1086,14 @@
       "pitch": 22
     },
     {
+      "name": "timber_stem",
+      "x": 62.5,
+      "y": -58.8,
+      "z": -6.6,
+      "yaw": 0,
+      "pitch": 34
+    },
+    {
       "name": "timber_furnace_screen",
       "x": 57.5,
       "y": -60,
@@ -1096,6 +1114,14 @@
       "z": -27.5,
       "yaw": 0,
       "pitch": 28
+    },
+    {
+      "name": "woodland_craft",
+      "x": 79.8,
+      "y": -58.2,
+      "z": -12.0,
+      "yaw": 0,
+      "pitch": 42
     },
     {
       "name": "woodland_wave",
@@ -1490,6 +1516,17 @@
       "name": "book_infected_timber_6",
       "book": "infestusfrontier:contact/infected_timber",
       "page": 6
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_infected_timber_8",
+      "book": "infestusfrontier:contact/infected_timber",
+      "page": 8
     },
     {
       "x": 2.5,
@@ -1969,6 +2006,14 @@
       "pitch": 10
     },
     {
+      "name": "capsule_craft",
+      "x": 80.5,
+      "y": -57.8,
+      "z": -38.8,
+      "yaw": 0,
+      "pitch": 30
+    },
+    {
       "name": "capsule_screen",
       "x": 76.5,
       "y": -59.5,
@@ -1991,6 +2036,17 @@
       "gui": true,
       "name": "book_item_capsule",
       "book": "infestusfrontier:circulation/item_capsule"
+    },
+    {
+      "x": 2.5,
+      "y": -60,
+      "z": -39.5,
+      "yaw": 0,
+      "pitch": 10,
+      "gui": true,
+      "name": "book_item_capsule_recipe",
+      "book": "infestusfrontier:circulation/item_capsule",
+      "page": 4
     },
     {
       "name": "crossing",

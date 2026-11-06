@@ -1390,6 +1390,8 @@ public final class TreeInfectionTests {
                                     && supplies.countItem(Items.IRON_AXE) == 1
                                     && supplies.countItem(Items.SHEARS) == 1,
                             "bone meal, culture, an axe and shears in the chest");
+                    InfectedTimberTests.assertStemStation(
+                            h, exhibit, new BlockPos(79, -60, -10), new BlockPos(80, -60, -10), false);
                     h.assertTrue(level.getBlockState(root).is(Blocks.OAK_LOG), "a living oak");
                     h.assertTrue(
                             level.getBlockState(exhibit.at(new BlockPos(90, -60, -8)))

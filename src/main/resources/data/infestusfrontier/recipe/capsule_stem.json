@@ -3,6 +3,9 @@
   "category": "misc",
   "ingredients": [
     {
+      "item": "infestusfrontier:infected_log"
+    },
+    {
       "item": "minecraft:chest"
     },
     {

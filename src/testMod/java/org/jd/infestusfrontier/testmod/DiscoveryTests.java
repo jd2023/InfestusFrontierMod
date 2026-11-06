@@ -204,6 +204,41 @@ public final class DiscoveryTests {
         h.succeed();
     }
 
+    /** The stem's recipe is shown, as data, by the Infected Timber entry and by the Item Capsule entry. */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void bothStemEntriesShowTheDataDrivenStemRecipe(GameTestHelper h) {
+        h.assertTrue(h.getLevel().getRecipeManager().byKey(id("capsule_stem")).isPresent(), "the recipe exists");
+        for (var location : List.of(id("contact/infected_timber"), id("circulation/item_capsule"))) {
+            var category = BookDataManager.get()
+                    .getBook(BOOK)
+                    .getCategory(id(location.getPath().split("/")[0]));
+            var entry = category.getEntries().get(location);
+            h.assertTrue(entry != null, location + " loaded");
+            var recipes = entry.getPages().stream()
+                    .filter(page -> page instanceof com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage)
+                    .map(page -> ((com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage) page).getRecipeId1())
+                    .toList();
+            h.assertValueEqual(recipes, List.of(id("capsule_stem")), location + " shows the Capsule Stem recipe");
+        }
+        h.succeed();
+    }
+
+    /** Holding an Infected Log, the missing part, reveals the stem recipe in the recipe book. */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void theStemRecipeUnlocksWithTheInfectedLog(GameTestHelper h) {
+        AdvancementHolder holder = h.getLevel().getServer().getAdvancements().get(id("recipes/capsule_stem"));
+        h.assertTrue(holder != null, "the recipe advancement loads");
+        var trigger = (net.minecraft.advancements.critereon.InventoryChangeTrigger.TriggerInstance)
+                holder.value().criteria().get("has_input").triggerInstance();
+        h.assertValueEqual(trigger.items().size(), 1, "one item test");
+        h.assertTrue(
+                trigger.items().get(0).items().orElseThrow().stream()
+                        .allMatch(item -> item.value() == EcologyModule.INFECTED_LOG_ITEM.get()),
+                "it tests for the Infected Log");
+        h.assertTrue(holder.value().rewards().recipes().contains(id("capsule_stem")), "and rewards the recipe");
+        h.succeed();
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void palmEntryShowsItsRecipeAndOpensWithTheBonePlate(GameTestHelper h) {
         var entry = BookDataManager.get()
