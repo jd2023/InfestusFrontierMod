@@ -195,14 +195,16 @@ a log from anything. They are one material: no species, no tint by origin, no bl
   unknown property and keeps axis, distance, persistence and water.
 - Appearance is never saved and nothing is tinted. Both blocks draw from one 64x64 atlas,
   `textures/block/infected_timber.png`, one texel per model pixel as on a 16x16 block, made with the models by
-  `art/gen_infected_timber.py`. A log is charcoal bark plates recessed 1 or 2 pixels, an ivory rib flush with the
-  block on each face, crossed by a band of bark, and a cleft 4 pixels deep, black like a sealed wound or, rarely, dull
+  `art/gen_infected_timber.py`. A log is charcoal bark plates recessed 1 or 2 pixels, a muted bone rib flush with the
+  block on each face, broken by bands of bark, and a cleft 4 pixels deep, black like a sealed wound or, rarely, dull
   maroon tissue. All four sides cut the same profile, so every model, quarter turn and axis meets its neighbour on one
   outline: up a trunk, along a lying log and across the four logs of a 2x2 trunk. Four log models dress that one
   section: plain, a hooked twig or a snapped stub out of a cleft (inside the block), and a maroon wound. The blockstate
   picks a model and a turn about the log's own axis by position. Collision, outline and light are the full log's;
   `InfectedLogBlock.OCCLUSION` is the cut section, so the ground or a block beside a groove keeps its face. Leaves are
-  three sparse cutout models of hooked dry twigs and torn hanging membrane, under half of any face covered, picked and
+  five sparse cutout models, each one connected cluster of dry bough and hooked twigs with at most one torn
+  membrane hanging from it. Bent twigs meet all six faces at matching centre 2x2 tips; every neighbouring variant
+  and quarter turn joins without straight rails. Under half of any face is covered. Models are picked and
   turned the same way; the crown's silhouette breaks and the branches show through. One-pixel twigs vanish at slot
   size, so the Blighted Leaves item is a flat 16x16 sprite of a hooked branch and torn membrane. The legacy planks are
   one untinted 16x16 tile in the same palette. No tick, resin, fruit, regrowth or spread.

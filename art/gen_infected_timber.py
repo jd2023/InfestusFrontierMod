@@ -36,24 +36,24 @@ CELL = 16
 # The restrained palette: charcoal bark, ivory rib, black cleft, dull maroon tissue, grey-brown twig, dull membrane.
 BARK_DARK = (30, 24, 22)
 BARK = (46, 37, 32)
-BARK_MID = (60, 48, 40)
-BARK_LIGHT = (77, 63, 51)
+BARK_MID = (55, 44, 37)
+BARK_LIGHT = (66, 54, 45)
 CLEFT_BLACK = (13, 9, 10)
 CLEFT = (24, 16, 17)
 MAROON_DARK = (56, 22, 26)
 MAROON = (80, 33, 35)
-MAROON_LIGHT = (104, 48, 46)
-IVORY_SHADOW = (146, 134, 108)
-IVORY = (190, 180, 150)
-IVORY_LIGHT = (214, 205, 176)
+MAROON_LIGHT = (94, 43, 43)
+IVORY_SHADOW = (112, 104, 88)
+IVORY = (150, 141, 119)
+IVORY_LIGHT = (170, 161, 137)
 HEART = (88, 72, 58)
 HEART_RING = (70, 56, 46)
 TWIG_DARK = (38, 31, 27)
-TWIG = (66, 56, 47)
-TWIG_LIGHT = (88, 76, 63)
-MEMBRANE_DARK = (74, 56, 54)
-MEMBRANE = (104, 84, 78)
-MEMBRANE_LIGHT = (126, 106, 94)
+TWIG = (64, 54, 46)
+TWIG_LIGHT = (80, 69, 58)
+MEMBRANE_DARK = (70, 53, 52)
+MEMBRANE = (96, 78, 73)
+MEMBRANE_LIGHT = (112, 93, 84)
 CLEAR = (0, 0, 0, 0)
 
 # Atlas cells (column, row), 16x16 texels each.
@@ -80,22 +80,23 @@ def rgba(colour, alpha=255):
 
 
 def bark_base(seed):
-    """Charcoal plates in vertical strips, each broken by dark cracks into chunks lit on their top row. Wraps
-    vertically, so a log stacked on any other log continues the strips."""
+    """Charcoal plates in vertical strips, each broken by a few short dark cracks with the chunk above lit only where
+    it is not a full row, so no crack runs across the trunk. Wraps vertically, so a log stacked on any other log
+    continues the strips."""
     rng = random.Random(seed)
     image = Image.new('RGBA', (CELL, CELL), rgba(BARK))
     px = image.load()
     x = 0
     for width in (3, 2, 3, 3, 2, 3):
         shade = BARK_MID if rng.random() < 0.5 else BARK
-        cracks = sorted(rng.sample(range(CELL), 2))
         for y in range(CELL):
             for dx in range(width):
                 px[x + dx, y] = rgba(shade)
-        for crack in cracks:  # a two-row dark crack across the strip, the chunk above it lit on top
-            for dx in range(width):
+        for crack in rng.sample(range(1, CELL, 3), 2):  # a crack across part of the strip, a lit lip above it
+            start = rng.randrange(0, 2) if width == 3 else 0
+            for dx in range(start, min(width, start + 2)):
                 px[x + dx, crack] = rgba(BARK_DARK)
-                px[x + dx, (crack + 1) % CELL] = rgba(BARK_LIGHT if dx < width - 1 else shade)
+                px[x + dx, (crack - 1) % CELL] = rgba(BARK_MID if shade == BARK else BARK_LIGHT)
         for y in range(CELL):  # the strip's right edge in shadow, in runs, never a full hairline
             if (y // 3 + x) % 2 == 0 and px[x + width - 1, y][:3] != BARK_DARK:
                 px[x + width - 1, y] = rgba(BARK_DARK if shade == BARK else BARK)
@@ -140,9 +141,10 @@ def bark_scar():
     return image
 
 
-def rib(band, joints):
-    """Ivory bone in knuckled segments, a shadowed joint under a lit lip, a few coarse pits, and one band of bark
-    grown over it, so the ribs read as bone breaking through the bark. Wraps vertically."""
+def rib(bands, joints):
+    """Bone in knuckled segments, a shadowed joint under a lit lip and a few coarse pits, with bark grown over it in
+    bands of two lengths whose edges are ragged, so the ribs read as bone breaking through the bark and not as a pale
+    rail. Wraps vertically."""
     image = Image.new('RGBA', (CELL, CELL), rgba(IVORY))
     px = image.load()
     for y in range(CELL):
@@ -153,12 +155,13 @@ def rib(band, joints):
                 px[x, y] = rgba(IVORY_LIGHT)
     for x, y in ((10, joints[0] + 2), (11, joints[0] + 3), (2, joints[1] + 2), (3, joints[1] + 3)):
         px[x, y % CELL] = rgba(IVORY_SHADOW)
-    top, bottom = band
-    for y in range(top, bottom + 1):
-        for x in range(CELL):
-            px[x, y] = rgba(BARK_DARK if y in (top, bottom) else BARK_MID if (x // 2 + y) % 3 else BARK)
-    for x in range(0, CELL, 3):  # the bark's ragged edge over the bone
-        px[x, top - 1] = rgba(BARK_DARK)
+    for top, bottom in bands:
+        for y in range(top, bottom + 1):
+            for x in range(CELL):
+                px[x, y % CELL] = rgba(BARK_DARK if y in (top, bottom) else BARK_MID if (x // 2 + y) % 3 else BARK)
+        for x in range(0, CELL, 3):  # the bark's ragged edge over the bone
+            px[x, (top - 1) % CELL] = rgba(BARK_DARK)
+            px[(x + 1) % CELL, (bottom + 1) % CELL] = rgba(BARK_DARK)
     return image
 
 
@@ -215,37 +218,39 @@ def twig():
     return image
 
 
-# A torn membrane scrap: (left, top, width, height) in its cell and the rows each column hangs to, two columns at a time.
+# A torn membrane scrap: (cell, (left, top, width, height), the rows each column hangs to). Six shapes of different
+# widths and ragged lower edges on two cells, none over 8 texels wide, so no two read as the same flag.
 SCRAPS = {
-    'wide': ((0, 2), (0, 0, 7, 9), (9, 7, 8, 6, 7, 4, 5)),
-    'short': ((0, 2), (8, 0, 8, 7), (5, 7, 6, 3, 6, 7, 4, 2)),
-    'tatter': ((1, 2), (0, 0, 4, 12), (12, 8, 11, 6)),
-    'sheet': ((1, 2), (5, 0, 11, 10), (7, 10, 9, 8, 10, 9, 6, 5, 8, 6, 3)),
+    'tab': ((0, 2), (0, 0, 5, 6), (6, 5, 6, 3, 5)),
+    'tatter': ((0, 2), (6, 0, 3, 11), (11, 7, 9)),
+    'rag': ((0, 2), (10, 0, 6, 8), (4, 7, 8, 5, 2, 6)),
+    'fringe': ((0, 2), (0, 8, 6, 6), (5, 3, 6, 2, 5, 3)),
+    'strip': ((1, 2), (0, 0, 3, 12), (12, 9, 11)),
+    'flap': ((1, 2), (4, 0, 7, 8), (8, 7, 5, 6, 8, 4, 3)),
+    'shred': ((1, 2), (12, 0, 4, 9), (9, 5, 7, 3)),
 }
-HOLES = {'wide': ((2, 3),), 'short': (), 'tatter': ((1, 5),), 'sheet': ((3, 3), (7, 5))}
+HOLES = {'flap': ((2, 3),)}
+STAINS = {'tab': ((1, 1), (2, 1)), 'rag': ((1, 1),), 'strip': ((1, 1), (1, 2)), 'flap': ((2, 1), (3, 1), (2, 2))}
 
 
 def membranes():
-    """The four scraps on two cells: a dark seam where each hangs from its twig, a ragged lower edge, a vein, a hole."""
+    """The scraps on two cells: a dark seam where each hangs from its twig, a ragged lower edge, a pale fleck here and
+    there, a maroon stain on four of them and a torn hole in one."""
     cells = {cell: Image.new('RGBA', (CELL, CELL), CLEAR) for cell in MEMBRANE_CELLS}
     for name, (cell, (left, top, width, height), hangs) in SCRAPS.items():
         px = cells[cell].load()
         for dx in range(width):
             bottom = min(hangs[dx], height)
             for dy in range(bottom):
-                colour = MEMBRANE_LIGHT if (dx + dy // 3) % 4 == 0 else MEMBRANE
+                colour = MEMBRANE_LIGHT if (dx * 2 + dy) % 7 == 0 and 0 < dy < bottom - 1 else MEMBRANE
                 if dy == 0:
                     colour = MEMBRANE_DARK
-                elif dy == bottom - 1:
-                    colour = MEMBRANE_DARK if dx % 2 else MEMBRANE
+                elif dy == bottom - 1 and dx % 2:
+                    colour = MEMBRANE_DARK
                 px[left + dx, top + dy] = rgba(colour)
-        vein = left + width // 2
-        for dy in range(1, min(hangs[width // 2], height) - 1):  # one vein down the middle
-            px[vein, top + dy] = rgba(MEMBRANE_DARK)
-        for dx, dy in ((1, 1), (2, 1), (1, 2)):  # a maroon stain at the seam
-            if dx < width:
-                px[left + dx, top + dy] = rgba(MAROON)
-        for hx, hy in HOLES[name]:  # a torn hole, two by two
+        for dx, dy in STAINS.get(name, ()):  # a maroon stain at the seam
+            px[left + dx, top + dy] = rgba(MAROON)
+        for hx, hy in HOLES.get(name, ()):  # a torn hole, two by two
             for dx in (0, 1):
                 for dy in (0, 1):
                     px[left + hx + dx, top + hy + dy] = CLEAR
@@ -273,8 +278,8 @@ def atlas():
     put(BARK_CELLS['plain'], bark_plain())
     put(BARK_CELLS['tissue'], bark_tissue())
     put(BARK_CELLS['scar'], bark_scar())
-    put(RIB_CELLS['high'], rib((5, 7), (2, 11)))
-    put(RIB_CELLS['low'], rib((12, 14), (4, 9)))
+    put(RIB_CELLS['high'], rib(((5, 7), (13, 14)), (2, 10)))
+    put(RIB_CELLS['low'], rib(((1, 3), (8, 12)), (5, 14)))
     put(CLEFT_CELLS['black'], cleft(False))
     put(CLEFT_CELLS['maroon'], cleft(True))
     put(END_CELL, end())
@@ -528,31 +533,115 @@ def log_model(spec):
     }
 
 
-# The crown: per model, twigs as 1x1 boxes (from, to), stepping like a dry limb and hooked at their ends, and torn
-# membrane hanging from inside a twig as a plane (scrap name, axis of the plane's normal, position on that axis,
-# left, top); a scrap's size is its texels. Most of the block stays open.
+# The crown: per model, one cluster of dry wood grown on the 16x16x16 grid of texels, as boxes (from, to), and torn
+# membrane hanging from inside it as a plane (scrap name, axis of the plane's normal, position on that axis, left,
+# top); a scrap's size is its texels. The blockstate picks a model and a turn about the vertical for each block on its
+# own, so every model meets every face the same way: a 2x2 pad of wood, one texel deep, centred on each of the six
+# faces (texels 7-9 across, which no quarter turn moves). Two neighbouring blocks therefore always join, whatever
+# they are and however they are turned. Inside, a 1x1 twig leaves each pad and bends in short runs of at most three
+# or four texels to the model's hub, off the block's centre differently in every model, so the crown's branches
+# weave and never run straight across a block; a few short spurs hook off them. Most of the block stays open, and
+# one model in five has no membrane.
+PORT = (7, 9)
+FACES = tuple((axis, side) for axis in range(3) for side in (0, 1))
+RUN = 3  # the longest run of a twig between bends, in texels, besides the first and last
+SPURS = 3
+
+
+def pad(axis, side):
+    f, t = [PORT[0]] * 3, [PORT[1]] * 3
+    f[axis], t[axis] = (0, 1) if side == 0 else (15, 16)
+    return tuple(f), tuple(t)
+
+
+def walk(cells, axis, target):
+    """Extend a path of grid cells along one axis to `target`."""
+    cur = list(cells[-1])
+    step = 1 if target > cur[axis] else -1
+    while cur[axis] != target:
+        cur[axis] += step
+        cells.append(tuple(cur))
+
+
+def route(rng, axis, side, hub):
+    """The cells of a twig from one face's pad to the hub: along the axis, jogging sideways between runs."""
+    layer = 1 if side == 0 else 14
+    start = [0, 0, 0]
+    start[axis] = layer
+    lateral = [k for k in range(3) if k != axis]
+    for k in lateral:
+        start[k] = rng.choice(range(*PORT))
+    cells = [tuple(start)]
+    total = abs(hub[axis] - layer)
+    sign = 1 if hub[axis] > layer else -1
+    first = min(total, rng.choice((2, 3)))
+    second = min(total - first, RUN)
+    rng.shuffle(lateral)
+    at = layer
+    for length, jog in ((first, lateral[0]), (second, lateral[1]), (total - first - second, None)):
+        at += sign * length
+        walk(cells, axis, at)
+        if jog is not None:
+            walk(cells, jog, hub[jog])
+    return cells
+
+
+def boxes_of(cells):
+    """Grid cells as boxes, each the longest straight run of the cells left, so no two boxes share volume."""
+    left, found = set(cells), []
+    while left:
+        best = None
+        for cell in sorted(left):
+            for axis in range(3):
+                end = list(cell)
+                while True:
+                    end[axis] += 1
+                    if tuple(end) not in left:
+                        break
+                length = end[axis] - cell[axis]
+                if best is None or length > best[0]:
+                    best = (length, cell, axis)
+        length, cell, axis = best
+        f, t = list(cell), [c + 1 for c in cell]
+        t[axis] = cell[axis] + length
+        left -= {tuple(cell[k] + (i if k == axis else 0) for k in range(3)) for i in range(length)}
+        found.append((tuple(f), tuple(t)))
+    return found
+
+
+def crown(seed, hub, scrap_name=None):
+    """One model: the six pads, a twig from each to the hub, a few hooked spurs and at most one scrap."""
+    rng = random.Random(seed)
+    cells = {hub}
+    for axis, side in FACES:
+        cells.update(route(rng, axis, side, hub))
+    for cell in rng.sample(sorted(cells - {hub}), SPURS):
+        axis, step = rng.randrange(3), rng.choice((-1, 1))
+        for _ in range(rng.choice((1, 2, 2, 3))):
+            cell = tuple(c + step if k == axis else c for k, c in enumerate(cell))
+            if not all(1 <= c <= 14 for c in cell) or cell in cells:
+                break
+            cells.add(cell)
+    twigs = tuple(pad(*face) for face in FACES) + tuple(boxes_of(cells))
+    scraps = ()
+    if scrap_name:
+        axis = rng.choice(('x', 'z'))
+        width, height = SCRAPS[scrap_name][1][2:]
+        hanging = [c for c in sorted(cells) if c[1] >= height - 1 and 3 <= c[0] <= 12 and 3 <= c[2] <= 12]
+        x, y, z = rng.choice(hanging)
+        along, across = (z, x) if axis == 'x' else (x, z)
+        left = max(0, min(16 - width, along - width // 2))
+        scraps = ((scrap_name, axis, across + 0.5, left, y + 1),)
+    return {'twigs': twigs, 'scraps': scraps}
+
+
+# Each hub is off the centre in every axis, differently, so the twigs bend differently in every model.
 LEAF_VARIANTS = {
-    'blighted_leaves': {  # a limb stepping up across the block, a spur hooked down, two thin twigs
-        'twigs': (((0, 6, 6), (5, 8, 7)), ((4, 8, 6), (9, 9, 7)), ((8, 9, 6), (13, 10, 7)), ((12, 10, 6), (16, 11, 7)),
-                  ((8, 9, 7), (9, 10, 12)), ((8, 6, 11), (9, 9, 12)), ((8, 6, 10), (9, 7, 11)),
-                  ((2, 13, 0), (3, 14, 9)), ((2, 14, 8), (3, 16, 9)),
-                  ((13, 3, 9), (14, 4, 16)), ((13, 4, 9), (14, 6, 10))),
-        'scraps': (('short', 'z', 6.5, 5, 9),),
-    },
-    'blighted_leaves_hooks': {  # bare twigs: a high twig with a hook up, a stepped twig hooked down, a low fork
-        'twigs': (((5, 13, 0), (6, 14, 16)), ((5, 14, 3), (6, 16, 4)),
-                  ((6, 12, 12), (10, 13, 13)), ((9, 11, 12), (13, 12, 13)), ((12, 10, 12), (16, 11, 13)),
-                  ((12, 7, 12), (13, 10, 13)),
-                  ((0, 5, 3), (9, 6, 4)), ((8, 6, 3), (9, 8, 4)), ((2, 2, 3), (3, 5, 4)),
-                  ((13, 0, 7), (14, 6, 8)), ((12, 5, 7), (13, 6, 8))),
-        'scraps': (('tatter', 'x', 5.5, 6, 14),),
-    },
-    'blighted_leaves_tatters': {  # one long twig with hooks both ways, a high twig, two scraps
-        'twigs': (((0, 8, 11), (16, 9, 12)), ((2, 9, 11), (3, 12, 12)), ((12, 5, 11), (13, 8, 12)),
-                  ((7, 14, 0), (8, 15, 11)), ((7, 12, 0), (8, 14, 1)),
-                  ((8, 14, 4), (12, 15, 5)), ((11, 13, 4), (15, 14, 5)), ((14, 11, 4), (15, 13, 5))),
-        'scraps': (('short', 'z', 11.5, 3, 9), ('wide', 'x', 7.5, 3, 15)),
-    },
+    'blighted_leaves': crown(11, (10, 5, 6), 'tab'),
+    'blighted_leaves_hooks': crown(23, (5, 10, 10), 'tatter'),
+    'blighted_leaves_tatters': crown(37, (10, 10, 5), 'flap'),
+    'blighted_leaves_sprigs': crown(41, (5, 5, 10)),
+    'blighted_leaves_fork': crown(59, (6, 11, 5), 'shred'),
 }
 
 
@@ -655,9 +744,9 @@ def write_icon():
         '......BRBkB..m..',
         '......BRBkB.....',
         '......bRBkM.....',
-        '......BRBkB.....',
+        '......BBBkB.....',
         '......BRbkB.....',
-        '......BRBkB.....',
+        '......BbBkB.....',
         '.....bBRBkBb....',
         '....bBBRBkBBb...',
     ]
@@ -693,7 +782,7 @@ def leaves_sprite():
         '.T.....M..m.....',
         'T...............',
     ]
-    colours = {'T': TWIG, 't': TWIG_DARK, 'M': MEMBRANE_LIGHT, 'm': MEMBRANE_DARK, 'r': MAROON}
+    colours = {'T': TWIG, 't': TWIG_DARK, 'M': MEMBRANE, 'm': MEMBRANE_DARK, 'r': MAROON}
     sprite = Image.new('RGBA', (16, 16), CLEAR)
     for y, row in enumerate(rows):
         for x, key in enumerate(row):

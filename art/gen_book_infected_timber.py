@@ -13,6 +13,7 @@ import numpy as np
 from PIL import Image
 
 import book_scene as scene
+import gen_infected_timber as gen
 import gen_book_mineral_gizzard as book
 
 OUT = book.ASSETS / 'textures/book/infected_timber_grove.png'
@@ -65,9 +66,9 @@ def infected_oak():
     logs = ('infected_log', 'infected_log_twig', 'infected_log_wound')
     for n, (x, y, z) in enumerate(TRUNK):
         faces += scene.block_faces(logs[n], (x, y, z), turn=90 * n)
-    crowns = ('blighted_leaves', 'blighted_leaves_hooks', 'blighted_leaves_tatters')
+    crowns = tuple(gen.LEAF_VARIANTS)
     for n, (x, y, z) in enumerate(CROWN):
-        faces += scene.block_faces(crowns[n % 3], (x, y, z), turn=90 * (n % 4))
+        faces += scene.block_faces(crowns[n % len(crowns)], (x, y, z), turn=90 * (n % 4))
     return faces
 
 
