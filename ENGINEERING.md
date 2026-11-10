@@ -183,7 +183,7 @@ Every feature survives: full outputs; broken, split or merged structures; cycles
 | Boundaries | `:core:verifyBoundary`, `:ui:verifyBoundary` | Those modules have an empty classpath |
 | Distribution | `verifyDistribution` | The JAR holds the entry point, `core`, `ui`, expanded metadata, and no test mod |
 | Visual assets | `verifyVisualAssets` (Python 3 with Pillow) | Loop closure, bone references and UV bounds; overlapping storage/model faces; fluid continuity and repaired motion regressions |
-| GameTests | `runGameTestServer` | Server-side behavior across real ticks, in `runs/gametest` |
+| GameTests | `runGameTestServer` | Server-side behavior across real ticks, in `runs/gametest`; each run recreates the disposable `runs/gametest/world` |
 | Client captures | `./gradlew verifyCaptures` | Real client screenshots in `build/captures/<scenario>/<view>.png`. Checked for missing textures and blank frames, compared with goldens when present. The reviewer opens the images |
 | Demo world | `bash scripts/demo.sh` | Every shipped block, item and recipe in one fresh world, labeled. The owner plays it after each sprint |
 | Manual play | `runClient`, `runServer` | Feel and usability. Owner only, at milestone gates |

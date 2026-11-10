@@ -207,11 +207,14 @@ def distribution = tasks.register('verifyDistribution', VerifyDistribution) {
     artifact = tasks.named('jar', Jar).flatMap { it.archiveFile }
 }
 
-def gameTestProperties = layout.projectDirectory.file('runs/gametest/server.properties')
+// Every run starts from a fresh world, so state saved by earlier runs never carries over. Only runs/gametest/world is deleted.
+def resetGameTestWorld = tasks.register('resetGameTestWorld', Delete) {
+    delete layout.projectDirectory.dir('runs/gametest/world')
+}
 def prepareGameTest = tasks.register('prepareGameTest', Copy) {
+    dependsOn resetGameTestWorld
     from 'src/testMod/server.properties'
     into layout.projectDirectory.dir('runs/gametest')
-    onlyIf { !gameTestProperties.asFile.exists() }
 }
 // A hung game process fails the gate instead of holding it: no run outlives its timeout.
 // A server that never ran its tests, as one whose mods failed to load, exits cleanly too: the log must say they passed.
