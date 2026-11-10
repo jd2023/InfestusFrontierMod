@@ -13,7 +13,7 @@ These rules apply to any agent: Codex, Claude or another tool. Read this file, t
 
 - Work on branch `v4`. Push only to `origin/v4`.
 - Never push to `main`. Never force-push. Never create a remote, a tag or a release.
-- Every commit, including ktask checkpoints, must use `Illya Yalovyy <yalovoy@gmail.com>` ([IllyaYalovyy](https://github.com/IllyaYalovyy)) as its author. Verify the effective author before committing. Never substitute a tool identity. Preserve this identity in local git config and runner settings.
+- Every commit, including ktask checkpoints, must use `Illya Yalovyy <1623643+IllyaYalovyy@users.noreply.github.com>` ([IllyaYalovyy](https://github.com/IllyaYalovyy)) as its author. Verify the effective author before committing. Never substitute a tool identity. Preserve this identity in local git config and runner settings.
 - No `Co-Authored-By` lines. No "Generated with" lines. No agent or model names in commits.
 - Commit message: one imperative line under 72 characters. Add a body only when the diff does not explain itself.
 - Stage files by name. Never `git add -A`. Never commit `build/`, `runs/`, `.ktask/` or IDE files.

@@ -9,7 +9,8 @@ evaluationDependsOn(':ui')
 version = mod_version
 group = mod_group_id
 base { archivesName = mod_id }
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(JavaVersion.current().majorVersion)
+tasks.withType(JavaCompile).configureEach { options.release = 21 }
 
 repositories {
     mavenCentral()
@@ -133,6 +134,19 @@ neoForge {
             systemProperty 'infestusfrontier.demo.scene', providers.gradleProperty('demoScene').getOrElse('demo')
             jvmArgument '-Xmx3G'
         }
+    }
+}
+
+// Use the build JDK for both NeoForm tools and its runtime launcher.
+tasks.withType(net.neoforged.nfrtgradle.CreateMinecraftArtifacts).configureEach {
+    toolsJavaExecutable = javaToolchains.launcherFor(java.toolchain).map {
+        it.executablePath.asFile.absolutePath
+    }
+}
+
+tasks.withType(net.neoforged.nfrtgradle.NeoFormRuntimeTask).configureEach {
+    javaExecutable = javaToolchains.launcherFor(java.toolchain).map {
+        it.executablePath.asFile.absolutePath
     }
 }
 

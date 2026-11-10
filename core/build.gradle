@@ -2,7 +2,8 @@ plugins {
     id 'java-library'
     id 'com.diffplug.spotless'
 }
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(JavaVersion.current().majorVersion)
+tasks.withType(JavaCompile).configureEach { options.release = 21 }
 repositories { mavenCentral() }
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.11.4')

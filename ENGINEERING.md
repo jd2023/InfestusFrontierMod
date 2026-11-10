@@ -4,7 +4,7 @@ For the builder and the worker. Rules about git and roles are in [AGENTS.md](AGE
 
 ## Toolchain and commands
 
-Minecraft 1.21.1, NeoForge 21.1.249, Java 21, Gradle 9.2.1, ModDevGradle 2.0.146, Parchment 2024.11.17. Exact pins: [Dependencies](#dependencies).
+Toolchain requirements and dependency pins: [Dependencies](#dependencies).
 
 ```bash
 ./gradlew spotlessApply                     # format everything; run before every commit
@@ -415,13 +415,13 @@ review remains required; those checks cannot judge appearance by themselves.
 
 ## Dependencies
 
-Change a pin only in its own story, with a cold build, a server run and a client run. No dynamic versions.
+Change a dependency pin only in its own story, with a cold build, a server run and a client run. No dynamic dependency versions. The build JDK follows the installed system JDK; verify it with the full gate.
 
 | Component | Pin |
 |---|---|
 | Minecraft | 1.21.1 |
 | NeoForge | 21.1.249 (metadata accepts only this version) |
-| Java | 21 |
+| Java | System-installed JDK for Gradle, compilation, NeoForm and development runs; `--release 21` for Minecraft-compatible bytecode |
 | Gradle wrapper | 9.2.1 |
 | ModDevGradle | 2.0.146 |
 | Parchment | 1.21.1 / 2024.11.17 |
