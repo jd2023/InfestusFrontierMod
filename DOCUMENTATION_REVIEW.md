@@ -29,9 +29,9 @@ Word counts are approximate. Paths below identify source material; deleted files
 | ROADMAP.md | 2,198 | Milestones, implementation status, player steps and finish conditions | Keep; own delivery order and status here only. |
 | ROADMAP_OLD.md | 4,787 | Previous roadmap, detailed acceptance evidence and verification proposal | Historical comparison only. Remove after owner review; do not implement from it. |
 | README.md | 243 | Reading map and launch/build commands | Keep a short entry point linking the surviving documents. |
-| AGENTS.md | 989 | Repository restrictions, roles, execution process and completion rules | Make this the sole engineering/workflow authority after consolidation. |
-| ENGINEERING.md | 11,643 | Architecture, limits, tests, demo inventories, art rules, dependency pins and task process | Move durable constraints into AGENTS; remove code inventories, demo coordinates and execution history. |
-| REVIEW.md | 835 | Review procedure and defect checklist | Merge a short checklist into AGENTS; delete the separate file. |
+| AGENTS.md | 989 | Repository restrictions, roles, execution process and completion rules | Keep shared repository restrictions and the role reading map only. |
+| ENGINEERING.md | 11,643 | Architecture, limits, tests, demo inventories, art rules, dependency pins and task process | Keep a short development-only guide; remove code inventories, demo coordinates and execution history. |
+| REVIEW.md | 835 | Review procedure and defect checklist | Keep a short review-only guide; remove duplicated rules and manual verdict instructions. |
 | CLAUDE.md | 12 | Redirect to AGENTS | Keep as a compatibility pointer, with no independent rules. |
 | PLAYTEST_WALKTHROUGH.md | 1,287 | Starter workshop walkthrough and showcase | Put player instructions in the shipped guide; retain unfinished player outcomes in ROADMAP. Then remove. |
 
@@ -76,7 +76,7 @@ The shipped book, advancements and translations are product content, not plannin
 | Organ behavior and material flows | Block and item catalogs, ENGINEERING, sprint history | DESIGN |
 | Evolution and mutation | Armor specification, item catalog, guide tree, VISION | VISION defines principles; DESIGN specifies the mechanics |
 | Construction and ecology | Substrate, vegetation and block documents | DESIGN |
-| Architecture, verification and review | AGENTS, ENGINEERING, REVIEW | AGENTS |
+| Architecture, verification and review | AGENTS, ENGINEERING, REVIEW | ENGINEERING for development; REVIEW for review; AGENTS for shared restrictions |
 | Implementation details and exact shipped values | Catalogs, sprint reports, code and recipes | Code, recipe data and tests |
 | Work remaining | Sprint tables, roadmap and task queue | ROADMAP for milestones; ktask for concrete implementation tasks |
 
@@ -97,14 +97,16 @@ The mutation pool and recycling leftover DNA into culture medium remain proposal
 
 ## Recommended final document set
 
-Four files govern development. README remains a short entrance.
+Three human-reviewed product documents define direction. Three short role documents guide execution. README remains a short entrance.
 
 | File | Responsibility | Editing budget |
 |---|---|---:|
 | VISION.md | What the game is and the rules that define it | About 800 words |
 | ROADMAP.md | Ordered milestones, current status and player outcomes | 2,000–3,000 words |
 | DESIGN.md | Approved mechanics, dependencies, choices and operating rules by system | 6,000–10,000 words |
-| AGENTS.md | Repository rules, architecture boundaries, commands and completion/review requirements | 1,500–2,500 words |
+| AGENTS.md | Shared repository restrictions and which document each role reads | 300–500 words |
+| ENGINEERING.md | Development architecture, bounds, focused verification and feature completion | 1,000–1,500 words |
+| REVIEW.md | Review-specific checks and evidence expectations | 400–700 words |
 
 These budgets guide compression; they do not authorize dropping a unique owner requirement. Do not concatenate the existing catalogs into DESIGN.
 
@@ -120,11 +122,30 @@ Keep design-critical ratios where they explain a choice. Keep exact shipped tuni
 
 Retain LICENSE, CREDITS and the CLAUDE pointer separately. They are supporting records, not additional design authorities.
 
+## Ktask role routing: implementation and configuration checked
+
+The separate development and review files have a useful purpose. Keep that separation while shrinking them.
+
+Current findings from the ktask source and Infestus configuration:
+
+- Infestus uses the built-in `code`, `documents` and `art` categories. There are no project category overrides or default review lenses.
+- The built-in role templates do not explicitly name ENGINEERING.md or REVIEW.md. The repository's AGENTS reading table supplies the role routing; ktask does not explicitly inject either file's contents. This does not prove that past agents skipped them.
+- `src/application/prompt.rs` selects execution, review, validation and remediation templates separately. Project category overrides can tell each role which file to read.
+- Ktask explicitly owns full checks, independent review, commits and delivery. AGENTS and ENGINEERING still describe a competing manual loop.
+- REVIEW requires an APPROVED/REJECTED text verdict. Ktask requires its own structured result and distinguishes critical findings from minor ones. Rewrite REVIEW to define review substance, not its output protocol.
+- The configured code check runs `bash scripts/verify.sh`. Document and art categories disable project checks; REVIEW must not demand game-test logs for those categories.
+- Pending tasks #7–#11 use the code category and no review lenses. Category templates are pinned to task revisions; changing project defaults alone does not update existing tasks.
+- A review lens replaces the normal category review template. If lenses are added later, their instructions must also route reviewers to REVIEW.md.
+
+Recommended routing: execution and repair read ENGINEERING; review reads REVIEW; validation uses REVIEW's applicable acceptance/evidence rules. All roles follow shared repository restrictions. Keep gameplay rules in VISION and DESIGN, referenced as needed rather than copied into either role guide.
+
+This inspection changed no ktask configuration. After rewriting the guides, add explicit project role instructions and update pending task revisions through the supported CLI. Merely keeping the files does not make their use explicit.
+
 ## Cleanup sequence
 
 1. Extract unique owner requirements from the existing designs and historical decisions. List actual conflicts for resolution; do not silently choose a convenient interpretation.
 2. Write DESIGN around the updated VISION. Start with growth, experience, evolution, genetics and multiblock expansion; then cover production, transport, equipment and dimensional bases.
-3. Consolidate engineering and review rules into AGENTS. Remove task choreography, copied implementation details and history.
+3. Rewrite AGENTS, ENGINEERING and REVIEW with distinct responsibilities. Remove manual task choreography, copied implementation details and history. Explicitly route ktask roles to the appropriate guide.
 4. Update README and remaining links in the same change that removes superseded specifications.
 5. Remove retired specifications from the working tree once their useful decisions have been preserved. Use Git history rather than another mandatory archive.
 6. Remove ROADMAP_OLD after owner comparison. Remove this report when the cleanup is complete.
