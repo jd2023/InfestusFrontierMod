@@ -1,0 +1,9 @@
+{
+  "categories": ["code", "documents", "art"],
+  "roles": {
+    "execution": "Read AGENTS.md, VISION.md and ENGINEERING.md. Apply the development guidance relevant to this category and task. Ktask owns orchestration and delivery.",
+    "review": "Read AGENTS.md, VISION.md and REVIEW.md. Apply only the checks relevant to this category and diff. Follow ktask's structured response protocol.",
+    "validation": "Read AGENTS.md, VISION.md and REVIEW.md. Validate the goal and criteria using the applicable evidence rules. Do not require project checks for a category that disables them.",
+    "remediation": "Read AGENTS.md and VISION.md. For a read-only failure-judge turn, use REVIEW.md to assess the evidence; for an implementation repair turn, use ENGINEERING.md. Follow the role restrictions supplied by ktask."
+  }
+}

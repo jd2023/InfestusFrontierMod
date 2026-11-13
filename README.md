@@ -1,35 +1,23 @@
 # Infestus Frontier V4
 
-NeoForge 1.21.1 mod. Start with [VISION.md](VISION.md).
+Minecraft 1.21.1 / NeoForge mod. Grow and evolve a living industrial colony across the Overworld, Nether and End.
 
-| Reader | Read |
+| Document | Purpose |
 |---|---|
-| Everyone | [VISION.md](VISION.md), then [AGENTS.md](AGENTS.md) |
-| Planner | [ROADMAP.md](ROADMAP.md), then [ENGINEERING.md](ENGINEERING.md) |
-| Coder | [ENGINEERING.md](ENGINEERING.md) and the one design document the story names |
-| Reviewer | [REVIEW.md](REVIEW.md) |
-| Owner | `docs/archive/` |
+| [VISION.md](VISION.md) | Product direction and permanent rules |
+| [ROADMAP.md](ROADMAP.md) | Milestones, current status and player outcomes |
+| [AGENTS.md](AGENTS.md) | Shared repository rules and role reading map |
+| [ENGINEERING.md](ENGINEERING.md) | Development and repair |
+| [REVIEW.md](REVIEW.md) | Independent review and validation |
+| [docs/design/](docs/design/) | Detailed designs awaiting consolidation; VISION takes precedence |
+| [DOCUMENTATION_REVIEW.md](DOCUMENTATION_REVIEW.md) | Temporary consolidation report |
 
-| Document | Owns |
-|---|---|
-| [VISION.md](VISION.md) | What we are building and the rules that do not change. The owner edits it |
-| [ROADMAP.md](ROADMAP.md) | Milestones and their acceptance evidence |
-| [docs/sprints/](docs/sprints/) | Stories of the current sprint and the art placeholder list |
-| [docs/design/PROGRESSION_MAP.md](docs/design/PROGRESSION_MAP.md) | Player projects SR0 to SR9 |
-| [docs/design/GUIDE_PROGRESSION_TREE.md](docs/design/GUIDE_PROGRESSION_TREE.md) | Guide pages and advancements; species atlas in section 15; tools and weapons in section 17 |
-| [docs/design/BLOCK_CATALOG.md](docs/design/BLOCK_CATALOG.md) | Every organ, structure and construction block, by tier |
-| [docs/design/ITEM_CATALOG.md](docs/design/ITEM_CATALOG.md) | Every item, ingredient and preparation recipe |
-| [docs/design/ARMOR_EVOLUTION.md](docs/design/ARMOR_EVOLUTION.md) | The four armor pieces, their branches, fuel and recovery |
-| [docs/design/LIVING_SUBSTRATE_MUTATIONS.md](docs/design/LIVING_SUBSTRATE_MUTATIONS.md) | Substrate growth, function and reinforcement |
-| [ENGINEERING.md](ENGINEERING.md) | How we build: modules, code style, limits, tests, stories |
-| [REVIEW.md](REVIEW.md) | How we accept work |
-| [AGENTS.md](AGENTS.md) | Rules for anyone who changes this repository |
-
-Numbers in the design documents are starting values until play testing confirms them.
+ROADMAP_OLD.md is retained for owner comparison only. LICENSE.txt and CREDITS.txt hold licensing and asset records.
 
 ```bash
-bash scripts/verify.sh       # the gate
-./gradlew spotlessApply      # format
-bash scripts/demo.sh         # play the demo world
-./gradlew runClient          # play your own world
+bash scripts/demo.sh         # playable demo
+./gradlew runClient          # own world
+bash scripts/verify.sh       # full code check
 ```
+
+Build requirements and focused commands are in ENGINEERING. For ktask on another computer, apply the versioned role instructions with `python3 scripts/configure_ktask.py`; this configures roles but does not start tasks.

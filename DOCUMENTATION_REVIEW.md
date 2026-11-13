@@ -2,7 +2,7 @@
 
 Review date: 2026-11-12. This is a temporary cleanup report, not a gameplay specification. Remove it when the consolidation is complete.
 
-## Current state
+## Inventory before consolidation
 
 Before this report, the working tree contains 21 Markdown files with about 113,300 words, including the historical roadmap and local process report. Eight design files contain 83,735 words. The five deleted sprint files contained another 23,697 words.
 
@@ -122,7 +122,7 @@ Keep design-critical ratios where they explain a choice. Keep exact shipped tuni
 
 Retain LICENSE, CREDITS and the CLAUDE pointer separately. They are supporting records, not additional design authorities.
 
-## Ktask role routing: implementation and configuration checked
+## Ktask role routing: original findings
 
 The separate development and review files have a useful purpose. Keep that separation while shrinking them.
 
@@ -139,7 +139,15 @@ Current findings from the ktask source and Infestus configuration:
 
 Recommended routing: execution and repair read ENGINEERING; review reads REVIEW; validation uses REVIEW's applicable acceptance/evidence rules. All roles follow shared repository restrictions. Keep gameplay rules in VISION and DESIGN, referenced as needed rather than copied into either role guide.
 
-This inspection changed no ktask configuration. After rewriting the guides, add explicit project role instructions and update pending task revisions through the supported CLI. Merely keeping the files does not make their use explicit.
+### Applied changes
+
+AGENTS now contains shared repository rules and role routing. ENGINEERING is reduced to development contracts, existing numerical limits, focused commands and feature completion. REVIEW contains review and validation rules with category-appropriate evidence. README no longer points to deleted sprints.
+
+Project overrides for code, documents and art now explicitly route execution to ENGINEERING, review and validation to REVIEW, and remediation according to whether it is judging or repairing. Original category guidance, model choices and check settings are preserved. Pending tasks #8–#11 were refreshed to revision 2. Task #7 was already running and its pinned revision was not changed.
+
+The reading map is versioned in `config/ktask-roles.json`. Run `python3 scripts/configure_ktask.py` to apply it to another computer's local ktask database; add `--refresh-pending` to repin ready pending tasks. This never starts the queue. Review lenses still need their own explicit routing if enabled later.
+
+The inventory above records the pre-consolidation sizes. The gameplay specification consolidation remains outstanding.
 
 ## Cleanup sequence
 

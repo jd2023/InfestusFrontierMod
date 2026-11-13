@@ -1,70 +1,33 @@
 # Review
 
-For the reviewer. You read; you never edit, commit, push or run models.
+For independent review and validation. Inspect the change and evidence; do not edit, commit or rerun writable checks from a read-only review role.
 
-## Procedure
+## Scope and result
 
-1. Read what the commit message claims and the design document it rests on (the story, when a sprint file has one). Judge the change as claimed. Behavior a design document gives to another organ or a later milestone is not a defect here.
-2. Read the whole diff from the previous accepted commit to HEAD, the surrounding code and the tests.
-3. Confirm the gate log `build/verification/full-gate.log` shows `BUILD SUCCESSFUL` and the GameTest line `All N required tests passed`.
-4. For stories with captures, open the images yourself. Look at them.
-5. From round two on, first check that every earlier finding is fixed and has a test or a named capture that fails without the fix. Then report new blocking defects only in code changed since the last round, unless the defect is severe (data loss, crash, unbounded work).
+Read the task goal, criteria, complete diff and relevant surrounding code. Review what the task delivers, not every future feature in a catalog. Follow VISION where older designs disagree.
 
-## Verdict format
+Under ktask, return its required structured result. Outside ktask, state APPROVED or REJECTED and list concrete findings. A blocker identifies a location, reachable trigger, consequence and focused correction. Report minor issues separately; speculative risks are not blockers.
 
-First line: `APPROVED` or `REJECTED`. Then numbered findings. Each finding names the file and symbol, gives the evidence, and states the correction. Everything not blocking goes under a final `FOLLOW-UP:` heading.
+On repair rounds, verify earlier findings against current code and evidence. Do not repeat a fixed finding from an old report. Inspect newly changed behavior for regressions.
 
-Never approve because the build passed or the worker said it works.
+## Evidence
 
-## Blocking defects
+- Code tasks: inspect the supervisor's check results for the reviewed tree and the focused proof for each criterion. Do not substitute an old green log or executor summary.
+- Document tasks: check accuracy, scope, clarity, consistency and references. Do not demand game-test logs or build runs.
+- Art tasks: inspect the actual deliverables and relevant images. Do not demand project checks when the category disables them.
+- Visual criteria require opening the images. A successful pixel check alone does not establish readability.
+- Validation checks the complete goal and criteria, rather than repeating a general code review.
 
-- A `Do`, `Tests` or `Done` item is missing, untested or was not run.
-- Data loss, item duplication, a crash, or a previously accepted behavior broke.
-- Unbounded work, implicit chunk loading, or another limit in ENGINEERING.md "Performance limits" violated.
-- An unrelated edit riding in the commit (outside a story's `Files`, when there is a story). A raised limit, a weakened assertion or a replaced golden image without a regression test and an explained reason.
-- A visual defect a player would notice, for stories with captures.
-- Engine behavior patched, bypassed or re-implemented.
+## Applicable checks
 
-A concern is not a blocker because a bad outcome can be imagined. Show the reachable scenario.
+- Resources have one owner. Refused work consumes nothing; full outputs pause safely; retries and save/load cannot duplicate results.
+- Unknown or corrupt saves remain intact and unavailable, including through manual screens, hoppers, breaking and replacing.
+- Chunk availability is checked before access. Searches, queues, allocations, entities and retries respect shared bounds.
+- Clients cannot choose unchecked targets or manufacture results. Menus validate current server state, including competing viewers.
+- Module boundaries and shared screen primitives remain intact. New behavior does not duplicate an existing implementation or bypass engine rules.
+- Automation matches the intended stage. A manual starter stage is not a defect; a promised automatic operation requiring repeated hand input is.
+- Recipes, translations, discovery, guide text and usable demo exhibits match the shipped change. Planned abilities are not presented as available.
+- Model, selection and collision shapes agree. Assets render clearly; temporary assets are identified in CREDITS. Missing final art alone is not a blocker or an automatic follow-up.
+- Tests exercise the changed behavior. Weakened assertions, raised limits or replaced golden images need a concrete justification; a passing build alone is not approval.
 
-## Checklist
-
-Defect classes found in this project before. Check the ones that apply to the diff.
-
-**World access**
-- Every neighbor or target read checks `isLoaded` first, including reads inside vanilla superclasses: stair shapes, pane connections, `getStateForPlacement`.
-- Validation that spans ticks re-checks what it observed earlier.
-- Model shape, collision shape and targeting shape agree.
-
-**Persistence**
-- Unknown, corrupt or oversized saved data keeps the original bytes and refuses edits. It is never replaced by empty state.
-- Restored work matches a real recipe, its outputs and its containers.
-- Tested through a real save and reload, not only the codec.
-
-**Transactions**
-- Validate everything, then consume. A refusal leaves every input unchanged.
-- Earned credit and outputs survive logout, full inventories and Creative mode.
-- Rate limits cannot be bypassed by reopening a menu or using a second route such as buckets.
-- An organ can never clog: every admitted input has an exit.
-- An organ runs without a player: a hopper can load it, its output can be taken by a pipe, and work starts on its own. A feature that only works by hand is a defect.
-
-**Player interaction**
-- Any hand opens an organ's screen, like a chest, through `Organs.openScreen`. Only an item with a job on the organ (bucket, feed, ingredient, reader) acts instead; an awakened piece opens the screen and is filled from the Bladder's slot. Sneaking with an item builds against it.
-- The server re-derives what the client claims: face, reach, selection, visibility.
-
-**Visuals** (stories with captures)
-- Every new block and item appears in a capture, blocks from front and back.
-- Transparent textures use a cutout or translucent render type. An opaque black patch is the wrong layer.
-- The geometry the catalog describes exists. A vanilla-textured cube is not art.
-- Guide entries have unique coordinates and text that fits the page.
-- Assets are functional and readable: they render, read as their subject in a capture, and each temporary one is identified in `CREDITS.txt`. Missing final art, its quality or its provenance alone is never a finding and never a follow-up; the checks above stay blocking. The art quality bar in `ENGINEERING.md` (reads as its material from four blocks away, no seam or repeat in a 4x4 patch, one light direction, models with closed loops and no cross-bone overlap) is judged only on a finishing art pass the owner requested.
-
-**Content completion**
-- Recipe, tag, translation, advancement or discovery step, and guide entry exist.
-- Guide and JEI render recipes from the recipe data, never from copies.
-- Guide text describes what the build does today. A catalog promise that no accepted story ships yet is a defect.
-
-**Ownership**
-- A feature `*Screen` only adds parts from `foundation/screen`. A draw call, a sprite coordinate or a colour in a feature screen is a defect; the fix is a new part in the kit, not a one-off.
-- Every `Tests` and `Done` line of the story ran, and the report names them.
-- Comments state a contract. Narrating comments are defects.
+Consult ENGINEERING's relevant contracts when needed, without importing its developer workflow into review. Under ktask the supervisor owns all execution and delivery.
