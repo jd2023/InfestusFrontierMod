@@ -3,7 +3,18 @@
   "organ": "awakening_cradle",
   "ingredients": [
     {
-      "item": "infestusfrontier:living_spade"
+      "type": "neoforge:difference",
+      "base": {
+        "item": "infestusfrontier:living_spade"
+      },
+      "subtracted": {
+        "type": "neoforge:components",
+        "items": "infestusfrontier:living_spade",
+        "components": {
+          "infestusfrontier:tool_mutation": "contractile"
+        },
+        "strict": false
+      }
     },
     {
       "item": "infestusfrontier:contractile_fiber"

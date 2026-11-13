@@ -152,7 +152,7 @@ Early Lumen treatment is made in the Bowl; all T1 transport treatments use the C
 
 ### Living tools
 
-One branch per tool, taken once in the Awakening Cradle and never removed; the tool keeps its wear and reserve.
+One branch per tool, taken once in the Awakening Cradle and never removed; the tool keeps its wear and reserve. The Cradle refuses a tool that already has its branch: it takes neither tool nor fiber and spends no biomass.
 
 | Branch | Preparation in the Cradle | Effect |
 |---|---|---|

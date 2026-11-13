@@ -199,6 +199,57 @@ public final class LivingToolTests {
         });
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "graft_refusal")
+    public static void theCradleRefusesAContractileGraftOnAToolThatHasIt(GameTestHelper h) {
+        h.setBlock(GROUND, EcologyModule.LIVING_SUBSTRATE.get());
+        h.setBlock(ORGAN, ProcessingModule.AWAKENING_CRADLE.get());
+        load(h, LogisticsModule.CONTRACTILE_FIBER.get(), 1);
+        load(h, StorageModule.BIOMASS_BUCKET.get(), 1);
+        for (var tool :
+                List.of(EquipmentModule.LIVING_PICK, EquipmentModule.LIVING_HATCHET, EquipmentModule.LIVING_SPADE)) {
+            ItemStack grafted = new ItemStack(tool.get());
+            grafted.set(EquipmentModule.TOOL_MUTATION.get(), ToolMutation.CONTRACTILE);
+            fill(grafted, 25);
+            Player loader = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            loader.setItemInHand(InteractionHand.MAIN_HAND, grafted);
+            EcologyTests.use(h, loader, ORGAN, Direction.UP);
+            h.assertValueEqual(loader.getMainHandItem().getCount(), 1, "the tool stays in the hand");
+            h.assertTrue(loader.getMainHandItem().is(tool.get()), "the same tool");
+            h.assertValueEqual(
+                    contents(h).ingredients().stream().filter(i -> !i.isEmpty()).count(),
+                    1L,
+                    "only the fiber is in the Cradle");
+            h.assertTrue(
+                    contents(h).ingredients().stream().anyMatch(i -> i.is(LogisticsModule.CONTRACTILE_FIBER.get())),
+                    "and the fiber is still there");
+            h.assertValueEqual(contents(h).biomass().stored().units(), 1000, "no biomass spent");
+        }
+        h.assertTrue(contents(h).output().isEmpty(), "nothing was made");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "graft_refusal")
+    public static void noContractileBatchPlansWithAToolThatAlreadyHasTheGraft(GameTestHelper h) {
+        for (var entry : List.of(
+                java.util.Map.entry("contractile_pick", EquipmentModule.LIVING_PICK),
+                java.util.Map.entry("contractile_hatchet", EquipmentModule.LIVING_HATCHET),
+                java.util.Map.entry("contractile_spade", EquipmentModule.LIVING_SPADE))) {
+            var holder = h.getLevel()
+                    .getRecipeManager()
+                    .byKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(
+                            "infestusfrontier", "awakening/" + entry.getKey()))
+                    .orElseThrow();
+            var batch = (org.jd.infestusfrontier.processing.api.OrganBatchRecipe) holder.value();
+            ItemStack fiber = new ItemStack(LogisticsModule.CONTRACTILE_FIBER.get());
+            ItemStack bare = new ItemStack(entry.getValue().get());
+            h.assertTrue(batch.plan(List.of(bare, fiber)).isPresent(), entry.getKey() + " grafts a bare tool");
+            ItemStack grafted = bare.copy();
+            grafted.set(EquipmentModule.TOOL_MUTATION.get(), ToolMutation.CONTRACTILE);
+            h.assertTrue(batch.plan(List.of(grafted, fiber)).isEmpty(), entry.getKey() + " refuses a grafted tool");
+        }
+        h.succeed();
+    }
+
     /**
      * A wall of stone three wide and three high at z 3, with obsidian in one corner and dirt in another; the player
      * stands north of it looking at its centre and breaks that block as a survival player does.

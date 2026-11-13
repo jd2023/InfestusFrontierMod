@@ -91,6 +91,43 @@ public final class LivingFangTests {
         });
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "graft_refusal")
+    public static void theCradleRefusesAGraspingGraftOnAFangThatHasIt(GameTestHelper h) {
+        h.setBlock(GROUND, EcologyModule.LIVING_SUBSTRATE.get());
+        h.setBlock(ORGAN, ProcessingModule.AWAKENING_CRADLE.get());
+        load(h, LogisticsModule.CONTRACTILE_FIBER.get(), 1);
+        load(h, StorageModule.BIOMASS_BUCKET.get(), 1);
+        ItemStack fang = new ItemStack(EquipmentModule.LIVING_FANG.get());
+        fang.set(EquipmentModule.TOOL_MUTATION.get(), ToolMutation.GRASPING);
+        fill(fang, 12);
+        Player loader = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        loader.setItemInHand(InteractionHand.MAIN_HAND, fang);
+        EcologyTests.use(h, loader, ORGAN, Direction.UP);
+        h.assertValueEqual(loader.getMainHandItem().getCount(), 1, "the fang stays in the hand");
+        h.assertValueEqual(
+                contents(h).ingredients().stream().filter(i -> !i.isEmpty()).count(),
+                1L,
+                "only the fiber is in the Cradle");
+        h.assertTrue(
+                contents(h).ingredients().stream().anyMatch(i -> i.is(LogisticsModule.CONTRACTILE_FIBER.get())),
+                "and the fiber is still there");
+        h.assertValueEqual(contents(h).biomass().stored().units(), 1000, "no biomass spent");
+        var batch = (org.jd.infestusfrontier.processing.api.OrganBatchRecipe) h.getLevel()
+                .getRecipeManager()
+                .byKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(
+                        "infestusfrontier", "awakening/grasping_fang"))
+                .orElseThrow()
+                .value();
+        ItemStack fiber = new ItemStack(LogisticsModule.CONTRACTILE_FIBER.get());
+        h.assertTrue(
+                batch.plan(List.of(new ItemStack(EquipmentModule.LIVING_FANG.get()), fiber))
+                        .isPresent(),
+                "a bare fang is still grafted");
+        h.assertTrue(batch.plan(List.of(fang, fiber)).isEmpty(), "a grasping fang is refused");
+        h.assertTrue(contents(h).output().isEmpty(), "nothing was made");
+        h.succeed();
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void aGraspingFangSlowsWhatItHitsForTwoBUUntilItIsDry(GameTestHelper h) {
         Zombie prey = h.spawn(EntityType.ZOMBIE, new BlockPos(2, 1, 2));
