@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
@@ -155,6 +156,58 @@ public final class LivingFangTests {
         h.assertTrue(prey.getEffect(MobEffects.MOVEMENT_SLOWDOWN) == null, "an ungrafted fang only cuts");
         h.assertValueEqual(Reserves.of(plain).orElseThrow().stored(), Biomass.of(40), "for free");
         h.assertValueEqual(prey.getHealth(), health, "no hook of ours hurts; the blade's damage is vanilla's");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void aGraspingFangPaysOnlyForAGripThatChangesALivingTarget(GameTestHelper h) {
+        Zombie prey = h.spawn(EntityType.ZOMBIE, new BlockPos(2, 1, 2));
+        prey.setNoAi(true);
+        ItemStack fang = new ItemStack(EquipmentModule.LIVING_FANG.get());
+        fang.set(EquipmentModule.TOOL_MUTATION.get(), ToolMutation.GRASPING);
+        fill(fang, 14);
+        Player hunter = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        hunter.setItemInHand(InteractionHand.MAIN_HAND, fang);
+        int slow = LivingTool.GRIP_LEVEL;
+        prey.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 1000, slow + 1));
+        fang.getItem().postHurtEnemy(fang, prey, hunter);
+        h.assertValueEqual(
+                Reserves.of(fang).orElseThrow().stored(), Biomass.of(14), "a stronger Slowness costs nothing");
+        prey.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        prey.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, LivingTool.GRIP_TICKS + 20, slow));
+        fang.getItem().postHurtEnemy(fang, prey, hunter);
+        h.assertValueEqual(Reserves.of(fang).orElseThrow().stored(), Biomass.of(14), "a longer Slowness costs nothing");
+        h.assertValueEqual(
+                prey.getEffect(MobEffects.MOVEMENT_SLOWDOWN).getDuration(), LivingTool.GRIP_TICKS + 20, "and stays");
+        prey.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        prey.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, slow));
+        fang.getItem().postHurtEnemy(fang, prey, hunter);
+        h.assertValueEqual(Reserves.of(fang).orElseThrow().stored(), Biomass.of(12), "a refresh pays once");
+        h.assertValueEqual(
+                prey.getEffect(MobEffects.MOVEMENT_SLOWDOWN).getDuration(), LivingTool.GRIP_TICKS, "and lasts");
+        prey.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        prey.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, slow + 1));
+        fang.getItem().postHurtEnemy(fang, prey, hunter);
+        h.assertValueEqual(
+                Reserves.of(fang).orElseThrow().stored(), Biomass.of(10), "a stronger, shorter one is outlasted");
+        h.assertValueEqual(
+                prey.getEffect(MobEffects.MOVEMENT_SLOWDOWN).getAmplifier(), slow + 1, "while the stronger shows");
+        prey.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        prey.addEffect(
+                new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, MobEffectInstance.INFINITE_DURATION, slow - 1));
+        fang.getItem().postHurtEnemy(fang, prey, hunter);
+        h.assertValueEqual(Reserves.of(fang).orElseThrow().stored(), Biomass.of(8), "a weaker endless one is raised");
+        h.assertValueEqual(prey.getEffect(MobEffects.MOVEMENT_SLOWDOWN).getAmplifier(), slow, "to Slowness II");
+        prey.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        prey.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, MobEffectInstance.INFINITE_DURATION, slow));
+        fang.getItem().postHurtEnemy(fang, prey, hunter);
+        h.assertValueEqual(
+                Reserves.of(fang).orElseThrow().stored(), Biomass.of(8), "an equal endless one costs nothing");
+        prey.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        prey.setHealth(0);
+        fang.getItem().postHurtEnemy(fang, prey, hunter);
+        h.assertTrue(prey.getEffect(MobEffects.MOVEMENT_SLOWDOWN) == null, "the dead are not gripped");
+        h.assertValueEqual(Reserves.of(fang).orElseThrow().stored(), Biomass.of(8), "a killing hit costs nothing");
         h.succeed();
     }
 

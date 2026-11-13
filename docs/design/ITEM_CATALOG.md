@@ -157,7 +157,7 @@ One branch per tool, taken once in the Awakening Cradle and never removed; the t
 | Branch | Preparation in the Cradle | Effect |
 |---|---|---|
 | Contractile | Living Pick, Hatchet or Spade + 1 Contractile Fiber + 200 BU, 30 s | Each block the tool mines, it also breaks the eight round it on the struck face, those it is the right tool for and only as the player would break them, for 2 BU each from its reserve; dry, it mines one block. A hoe takes no branch. |
-| Grasping | Living Fang + 1 Contractile Fiber + 200 BU, 30 s | Each hit grips its target: Slowness II for three seconds, for 2 BU from the reserve; dry, the fang only cuts. |
+| Grasping | Living Fang + 1 Contractile Fiber + 200 BU, 30 s | Each hit grips its target: Slowness II for three seconds, for 2 BU from the reserve, only when it affects a living target (no cost on a killing hit or under a Slowness at least as strong and as long); dry, the fang only cuts. |
 
 ### Temporary construction tool
 

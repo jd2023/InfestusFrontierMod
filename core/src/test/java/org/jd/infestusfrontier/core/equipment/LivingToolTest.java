@@ -26,6 +26,17 @@ class LivingToolTest {
     }
 
     @Test
+    void aGripImprovesUnlessSlownessIsAsStrongAndAsLong() {
+        assertEquals(true, LivingTool.improvesOn(0, 1000));
+        assertEquals(true, LivingTool.improvesOn(0, Integer.MAX_VALUE));
+        assertEquals(true, LivingTool.improvesOn(1, LivingTool.GRIP_TICKS - 1));
+        assertEquals(false, LivingTool.improvesOn(1, LivingTool.GRIP_TICKS));
+        assertEquals(false, LivingTool.improvesOn(1, Integer.MAX_VALUE));
+        assertEquals(true, LivingTool.improvesOn(2, LivingTool.GRIP_TICKS - 1));
+        assertEquals(false, LivingTool.improvesOn(2, LivingTool.GRIP_TICKS));
+    }
+
+    @Test
     void aGraspingFangGripsWhileItCanPay() {
         assertEquals(false, LivingTool.grips(0));
         assertEquals(false, LivingTool.grips(1));

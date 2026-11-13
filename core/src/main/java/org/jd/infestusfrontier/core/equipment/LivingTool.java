@@ -35,6 +35,15 @@ public final class LivingTool {
         return stored >= GRIP_COST;
     }
 
+    /**
+     * Whether a grip would improve on a Slowness already on the target, {@code amplifier} and {@code remaining}
+     * ticks left ({@link Integer#MAX_VALUE} for an endless one): unless that Slowness is both at least as strong and
+     * at least as long. A weaker but longer grip still takes over when a stronger Slowness ends.
+     */
+    public static boolean improvesOn(int amplifier, int remaining) {
+        return amplifier < GRIP_LEVEL || remaining < GRIP_TICKS;
+    }
+
     /** How many blocks beside the mined one a reserve of {@code stored} BU pays for, at most {@link #SPREAD}. */
     public static int spreads(int stored) {
         return Math.max(0, Math.min(SPREAD, stored / SPREAD_COST));

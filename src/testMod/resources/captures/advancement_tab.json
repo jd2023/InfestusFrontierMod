@@ -1,5 +1,6 @@
 {
   "commands": [
+    "forceload add 93 99 106 123",
     "advancement revoke @s everything",
     "gamemode survival @s",
     "fill 94 -61 100 106 -61 100 infestusfrontier:living_substrate[stage=mature]",

@@ -98,10 +98,17 @@ final class LivingTools {
 
     /**
      * A Grasping fang that has hurt {@code target} grips it: Slowness {@link LivingTool#GRIP_LEVEL} for
-     * {@link LivingTool#GRIP_TICKS} ticks, {@link LivingTool#GRIP_COST} BU from the reserve; a dry fang only cuts.
+     * {@link LivingTool#GRIP_TICKS} ticks, {@link LivingTool#GRIP_COST} BU from the reserve; a dry fang only cuts. A
+     * target the hit killed, or one whose Slowness is already at least as strong and as long, costs nothing.
      */
     static void grip(ItemStack stack, LivingEntity target) {
         if (target.level().isClientSide || stack.get(EquipmentModule.TOOL_MUTATION.get()) != ToolMutation.GRASPING)
+            return;
+        if (target.isDeadOrDying()) return;
+        MobEffectInstance held = target.getEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        if (held != null
+                && !LivingTool.improvesOn(
+                        held.getAmplifier(), held.isInfiniteDuration() ? Integer.MAX_VALUE : held.getDuration()))
             return;
         Optional<BiomassTank> reserve = Reserves.of(stack);
         if (reserve.isEmpty() || !LivingTool.grips(reserve.get().stored().units())) return;
