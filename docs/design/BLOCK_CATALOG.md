@@ -394,13 +394,13 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 ### T0-07 — Bio-Furnace
 - **Does:** A living kiln: a charred carapace whose seams glow with heat, a deep firebox mouth with bone fangs over banked coals, a flesh chimney. While it smelts, fire rises behind the fangs, it lights its surroundings as a lit vanilla furnace does (light 13), and flames and smoke come from its mouth and chimney. Initially slower and more fuel-hungry than a vanilla furnace, but it accumulates permanent processing experience.
 - **Input → output:** A normal smelting ingredient + biomass → its normal smelting result. Starting target: 16 seconds per item; no free ore multiplication or extra XP from recooking outputs. Also four dust of one metal + 40 BU → one ingot of that metal, with its raw item's smelting experience ([Items](ITEM_CATALOG.md#first-release-the-automated-mineral-workshop)); the one slot takes dust or an ore, one kind at a time.
-- **Create:** 1 furnace + 1 Organ Bud + 2 Membrane Sheets.
+- **Create:** Grow it from an Organ Bud on substrate: supply 1 furnace + 2 Membrane Sheets. Not crafted. The sheets come from the Membrane Rack, so the Rack comes first.
 - **Growth:** Choose speed or biomass economy at each level. L1 permits a Char Gland Feed treatment for solid-fuel feeding; Hearth Lungs improve combustion. Mouths automate loading; a T3 Thermal Mantle enables hotter recipes on this same core.
 
 ### T0-08 — Awakening Cradle
 - **Does:** Turns crafted dormant bio equipment into living equipment. Holds one armor piece, tool or weapon at a time: a violet flower whose petals close into a bud around a silk cocoon while it works; the cocoon glows (light 7) and beats like a heart.
 - **Input → output:** Dormant equipment + Spore Culture + biomass → awakened equipment with the same identity. It does not supply free healing or an infinite personal fuel reserve.
-- **Create:** 1 Organ Bud + 2 Bone Plates + 2 Membrane Sheets.
+- **Create:** Grow it from an Organ Bud on substrate: supply 2 Bone Plates + 2 Membrane Sheets. Not crafted. The plates and sheets come from the Loom and the Rack, so both come first.
 - **Growth:** Choose shorter awakening or lower biomass cost. Honey Culture treatment reduces awakening's processing biomass cost, not the wearer's starvation pain. Later mutation converts the cradle into a Healing Dock, preserving its history.
 
 ### T0-09 — Seed Pouch
@@ -448,7 +448,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 
 ### T0-16 — Organ Bud
 - **Does:** A planted, dormant organ blank that grows workshop organs in place. A bud alone performs no processing.
-- **Input → output:** The chosen organ's materials, supplied by hand → that organ, occupying the bud's position. Shipped growths (data: `recipe/growth/`): Digestive Sac, Biomass Bladder, Culture Bowl, Membrane Rack and Bone Loom. Growing is the only route to these five; the other workshop organs are still crafted until they get their own growth. String starts a Rack and bones start a Loom; sticks go to the organ the bud has chosen.
+- **Input → output:** The chosen organ's materials, supplied by hand → that organ, occupying the bud's position. Shipped growths (data: `recipe/growth/`): Digestive Sac, Biomass Bladder, Culture Bowl, Membrane Rack, Bone Loom, Bio-Furnace and Awakening Cradle. Growing is the only route to these seven; the other organs are crafted until they get their own growth. String starts a Rack, bones a Loom, a furnace a Bio-Furnace and a Bone Plate a Cradle; sticks and Membrane Sheets go to the organ the bud has chosen. Only the Furnace and the Cradle ask for prepared materials.
 - **Create:** Grow in the Culture Bowl, or craft 1 Spore Culture + 2 rotten flesh + 1 bone meal.
 - **Growth:** Right-click with an empty hand to read the chosen organ and what it still needs; sneak with an empty hand to choose another organ until something is supplied; right-click with a material to supply it. The organ grows the moment the last material is in, on a Living Substrate foundation. Supplied items are consumed once, when the organ grows; a refusal (wrong item, no foundation, unreadable save) loses nothing, and the bud keeps what it holds across saves. Breaking a bud drops it and every supplied item. The choice is fixed once something is supplied.
 

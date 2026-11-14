@@ -1,0 +1,8 @@
+{
+  "type": "infestusfrontier:organ_growth",
+  "organ": "infestusfrontier:bio_furnace",
+  "materials": [
+    { "item": "minecraft:furnace", "count": 1 },
+    { "item": "infestusfrontier:membrane_sheet", "count": 2 }
+  ]
+}

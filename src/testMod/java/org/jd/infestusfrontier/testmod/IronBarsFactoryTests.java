@@ -813,7 +813,7 @@ public final class IronBarsFactoryTests {
                 "infestusfrontier:dust_smelting/iron",
                 "infestusfrontier:mineral_gizzard",
                 "infestusfrontier:washing_kidney",
-                "infestusfrontier:bio_furnace",
+                "infestusfrontier:growth/bio_furnace",
                 "infestusfrontier:shaping_palm",
                 "infestusfrontier:mouth",
                 "infestusfrontier:yield_lobe",

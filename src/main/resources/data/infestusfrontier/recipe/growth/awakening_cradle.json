@@ -1,0 +1,8 @@
+{
+  "type": "infestusfrontier:organ_growth",
+  "organ": "infestusfrontier:awakening_cradle",
+  "materials": [
+    { "item": "infestusfrontier:bone_plate", "count": 2 },
+    { "item": "infestusfrontier:membrane_sheet", "count": 2 }
+  ]
+}

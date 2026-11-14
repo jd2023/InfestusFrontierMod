@@ -43,8 +43,8 @@
       "text": "entry.infestusfrontier.contact.bio_furnace.grows"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:bio_furnace",
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/bio_furnace",
       "text": "entry.infestusfrontier.contact.bio_furnace.craft"
     }
   ]

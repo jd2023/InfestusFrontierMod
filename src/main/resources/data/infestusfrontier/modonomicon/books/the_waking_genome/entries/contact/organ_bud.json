@@ -66,6 +66,16 @@
       "type": "infestusfrontier:organ_growth",
       "recipe_id_1": "infestusfrontier:growth/bone_loom",
       "title1": "block.infestusfrontier.bone_loom"
+    },
+    {
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/awakening_cradle",
+      "title1": "block.infestusfrontier.awakening_cradle"
+    },
+    {
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/bio_furnace",
+      "title1": "block.infestusfrontier.bio_furnace"
     }
   ]
 }

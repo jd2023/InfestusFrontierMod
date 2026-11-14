@@ -49,8 +49,8 @@
       "text": "entry.infestusfrontier.contact.awakening_cradle.fuel"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:awakening_cradle",
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/awakening_cradle",
       "text": "entry.infestusfrontier.contact.awakening_cradle.craft"
     }
   ]

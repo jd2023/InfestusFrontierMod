@@ -56,7 +56,7 @@ Watch each machine idle, start working, finish, and wait for more ingredients. T
 
 ## 6. Put the biomass to useful work
 
-Craft a **Bio-Furnace** from **furnace + Organ Bud + two Membrane Sheets**. Supply biomass and smelt some cobblestone or raw ore.
+Grow a **Bio-Furnace** from another bud: **furnace + two Membrane Sheets** from your Rack (give the furnace first). Supply biomass and smelt some cobblestone or raw ore.
 
 Queue **64 items** while you continue building: its second growth stage begins after 64 completed smelts.
 
@@ -138,7 +138,7 @@ Point a **Sensor Polyp** at storage and connect its redstone output to a visible
 
 ## 13. Awaken and refuel living armor
 
-Craft a dormant armor piece using rotten flesh in the usual armor pattern. Build an **Awakening Cradle**, then supply the piece, Spore Culture, and biomass.
+Craft a dormant armor piece using rotten flesh in the usual armor pattern. Grow an **Awakening Cradle** from a bud: **two Bone Plates + two Membrane Sheets** (give a plate first). Then supply the piece, Spore Culture, and biomass.
 
 Fill the awakened piece through the Bladder's equipment slot. Wear it and inspect it in third person. Later, supply a **Fuel Papilla** through a biomass line and stand on it wearing an underfilled piece.
 

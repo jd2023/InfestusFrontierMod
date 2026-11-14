@@ -21,7 +21,7 @@ Bone Loom from buds, then prepare membrane and bone components with them.
 biomass; spend it on selected ground growth, preparation or equipment. Keep food
 and planting stock instead of digesting the whole inventory.
 
-Craft one dormant piece, awaken it in the Cradle, fill it at the Bladder and wear
+Grow the Bio-Furnace and the Cradle from buds with the sheets and plates the Rack and Loom make. Craft one dormant piece, awaken it in the Cradle, fill it at the Bladder and wear
 it during ordinary activity. A first host-grown graft can provide light or armor healing
 without a completed creature genome.
 

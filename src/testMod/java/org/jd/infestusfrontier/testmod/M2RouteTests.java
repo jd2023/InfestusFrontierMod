@@ -6,24 +6,34 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.organ.OrganHistory;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.equipment.EquipmentModule;
+import org.jd.infestusfrontier.equipment.api.Reserves;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
+import org.jd.infestusfrontier.storage.BiomassBladderMenu;
 import org.jd.infestusfrontier.storage.StorageModule;
 
-/** The M2 workshop routes: grow the starter organs from buds, digest ten wheat and store a bucket; grow the Rack and Loom and make a first sheet and plate. */
+/**
+ * The M2 workshop routes: grow the starter organs from buds, digest ten wheat and store a bucket; grow the Rack and
+ * Loom and make a first sheet and plate; grow the Furnace and the Cradle from the sheets and plates, smelt, awaken a
+ * piece and refuel it.
+ */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class M2RouteTests {
@@ -134,6 +144,133 @@ public final class M2RouteTests {
             h.assertTrue(output(h, loom).is(ProcessingModule.BONE_PLATE.get()), "the first Bone Plate");
             h.succeed();
         });
+    }
+
+    /**
+     * The route from construction materials to equipment: a Rack and a Loom grown from starter materials make four
+     * sheets and two plates; those grow a Bio-Furnace (a furnace and two sheets) and an Awakening Cradle (two plates and
+     * two sheets); the Furnace smelts raw iron, the Cradle wakes a crafted Dormant Thorax, and a grown Bladder refuels
+     * the awakened piece. Biomass arrives in buckets, as the Digestive Sac's route above delivers it.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 2800)
+    public static void growthRouteFromMaterialsToAnAwakenedRefueledPiece(GameTestHelper h) {
+        BlockPos rack = grownBud(h, 1, List.of(new ItemStack(Items.STRING, 4), new ItemStack(Items.STICK, 2)));
+        BlockPos loom = grownBud(h, 3, List.of(new ItemStack(Items.BONE, 2), new ItemStack(Items.STICK, 2)));
+        BlockPos bladder = grownBud(h, 5, List.of(new ItemStack(Items.GLASS, 2), new ItemStack(Items.SLIME_BALL)));
+        BlockPos furnaceBud = budAt(h, 7);
+        BlockPos cradleBud = budAt(h, 9);
+        h.assertBlockPresent(ProcessingModule.MEMBRANE_RACK.get(), rack);
+        h.assertBlockPresent(ProcessingModule.BONE_LOOM.get(), loom);
+        h.assertBlockPresent(StorageModule.BIOMASS_BLADDER.get(), bladder);
+
+        load(h, rack, Items.ROTTEN_FLESH, 4);
+        load(h, rack, Items.STRING, 4);
+        load(h, rack, Items.WATER_BUCKET, 1);
+        load(h, loom, Items.BONE, 2);
+        load(h, loom, StorageModule.BIOMASS_BUCKET.get(), 1);
+        h.runAtTickTime(1750, () -> {
+            // A taker's hand holds what it takes, so each organ gets its own taker.
+            Player sheetTaker = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            sheetTaker.setShiftKeyDown(true);
+            EcologyTests.use(h, sheetTaker, rack, Direction.UP);
+            Player plateTaker = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            plateTaker.setShiftKeyDown(true);
+            EcologyTests.use(h, plateTaker, loom, Direction.UP);
+            h.assertValueEqual(
+                    sheetTaker.getInventory().countItem(ProcessingModule.MEMBRANE_SHEET.get()), 4, "four sheets");
+            h.assertValueEqual(plateTaker.getInventory().countItem(ProcessingModule.BONE_PLATE.get()), 2, "two plates");
+
+            // A furnace and two sheets grow a Bio-Furnace; two plates and two sheets grow a Cradle.
+            grow(h, furnaceBud, new ItemStack(Items.FURNACE), new ItemStack(ProcessingModule.MEMBRANE_SHEET.get(), 2));
+            grow(
+                    h,
+                    cradleBud,
+                    new ItemStack(ProcessingModule.BONE_PLATE.get(), 2),
+                    new ItemStack(ProcessingModule.MEMBRANE_SHEET.get(), 2));
+            h.assertBlockPresent(ProcessingModule.BIO_FURNACE.get(), furnaceBud);
+            h.assertBlockPresent(ProcessingModule.AWAKENING_CRADLE.get(), cradleBud);
+
+            // Smelting spends biomass on a normal recipe; the Cradle wakes a crafted piece with a crafted culture.
+            load(h, furnaceBud, Items.RAW_IRON, 1);
+            load(h, furnaceBud, StorageModule.BIOMASS_BUCKET.get(), 1);
+            ItemStack culture =
+                    M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
+            ItemStack thorax = dormantThorax(h);
+            Player loader = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            for (ItemStack stack : List.of(thorax, culture)) {
+                loader.setItemInHand(InteractionHand.MAIN_HAND, stack);
+                EcologyTests.use(h, loader, cradleBud, Direction.UP);
+            }
+            load(h, cradleBud, StorageModule.BIOMASS_BUCKET.get(), 1);
+            load(h, bladder, StorageModule.BIOMASS_BUCKET.get(), 1);
+        });
+        h.runAtTickTime(2450, () -> {
+            h.assertTrue(output(h, furnaceBud).is(Items.IRON_INGOT), "the grown furnace smelted an iron ingot");
+            ItemStack woken = output(h, cradleBud);
+            h.assertTrue(woken.is(EquipmentModule.AWAKENED_THORAX.get()), "the grown cradle woke the thorax");
+            Player taker = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            taker.setShiftKeyDown(true);
+            EcologyTests.use(h, taker, cradleBud, Direction.UP);
+            h.assertValueEqual(
+                    taker.getInventory().countItem(EquipmentModule.AWAKENED_THORAX.get()), 1, "the piece is taken");
+            ItemStack piece = taker.getInventory().items.stream()
+                    .filter(stack -> stack.is(EquipmentModule.AWAKENED_THORAX.get()))
+                    .findFirst()
+                    .orElseThrow();
+            var wokenReserve = Reserves.of(piece).orElseThrow();
+            h.assertValueEqual(wokenReserve.stored(), Biomass.ZERO, "the cradle's piece wakes empty");
+            h.assertValueEqual(wokenReserve.capacity(), EquipmentModule.RESERVE_CAPACITY, "with a 40 BU reserve");
+            Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            BiomassBladderMenu menu = (BiomassBladderMenu)
+                    ((MenuProvider) h.getBlockEntity(bladder)).createMenu(1, player.getInventory(), player);
+            menu.slots.get(0).set(piece);
+            h.assertTrue(menu.clickMenuButton(player, BiomassBladderMenu.FILL_BUTTON), "fill handled");
+            h.assertValueEqual(
+                    Reserves.of(menu.slots.get(0).getItem()).orElseThrow().stored(),
+                    Biomass.of(40),
+                    "the awakened piece holds its 40 BU");
+            h.succeed();
+        });
+    }
+
+    /** A ground of Living Substrate at {@code x} with a bud crafted from starter materials on it; the bud's position. */
+    private static BlockPos budAt(GameTestHelper h, int x) {
+        BlockPos ground = new BlockPos(x, 1, 1);
+        h.setBlock(ground, EcologyModule.LIVING_SUBSTRATE.get());
+        ItemStack culture =
+                M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
+        ItemStack bud = M1RouteTests.craft(
+                h,
+                List.of(culture, rotten(), rotten(), new ItemStack(Items.BONE_MEAL)),
+                OrganModule.ORGAN_BUD_ITEM.get());
+        place(h, EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0), bud, ground);
+        h.assertBlockPresent(OrganModule.ORGAN_BUD.get(), ground.above());
+        return ground.above();
+    }
+
+    /** A bud at {@code x} grown into its organ by supplying {@code materials}; the organ's position. */
+    private static BlockPos grownBud(GameTestHelper h, int x, List<ItemStack> materials) {
+        BlockPos bud = budAt(h, x);
+        grow(h, bud, materials.toArray(new ItemStack[0]));
+        return bud;
+    }
+
+    /** One item per use, as a player loads a batch organ by hand. */
+    private static void load(GameTestHelper h, BlockPos organ, Item item, int count) {
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, item, count);
+        for (int i = 0; i < count; i++) EcologyTests.use(h, player, organ, Direction.UP);
+    }
+
+    /** The Dormant Thorax of the crafting table's chest pattern: eight rotten flesh around a gap. */
+    private static ItemStack dormantThorax(GameTestHelper h) {
+        List<ItemStack> grid = new java.util.ArrayList<>();
+        for (int i = 0; i < 9; i++) grid.add(i == 1 ? ItemStack.EMPTY : rotten());
+        CraftingInput input = CraftingInput.of(3, 3, grid);
+        var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, h.getLevel());
+        h.assertTrue(recipe.isPresent(), "the chest pattern crafts a piece");
+        ItemStack piece = recipe.get().value().assemble(input, h.getLevel().registryAccess());
+        h.assertTrue(piece.is(EquipmentModule.DORMANT_THORAX.get()), "a Dormant Thorax");
+        return piece;
     }
 
     private static ItemStack output(GameTestHelper h, BlockPos organ) {
