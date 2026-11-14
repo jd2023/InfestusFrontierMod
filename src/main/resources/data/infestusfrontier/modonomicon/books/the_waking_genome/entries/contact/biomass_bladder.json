@@ -38,8 +38,8 @@
       "text": "entry.infestusfrontier.contact.biomass_bladder.use"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:biomass_bladder",
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/biomass_bladder",
       "text": "entry.infestusfrontier.contact.biomass_bladder.craft"
     }
   ]

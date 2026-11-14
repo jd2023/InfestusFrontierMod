@@ -38,8 +38,8 @@
       "text": "entry.infestusfrontier.contact.digestive_sac.use"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:digestive_sac",
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/digestive_sac",
       "text": "entry.infestusfrontier.contact.digestive_sac.craft"
     },
     {

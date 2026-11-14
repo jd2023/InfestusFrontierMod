@@ -132,9 +132,15 @@ public final class OrganTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void budHasNoBlockEntity(GameTestHelper h) {
+    public static void budHoldsNothingUntilItIsSupplied(GameTestHelper h) {
         h.setBlock(BUD, OrganModule.ORGAN_BUD.get());
-        h.assertTrue(h.getLevel().getBlockEntity(h.absolutePos(BUD)) == null, "a bud keeps no block entity");
+        var bud = h.getLevel().getBlockEntity(h.absolutePos(BUD));
+        h.assertTrue(bud != null, "a bud keeps what it is supplied, so it has a block entity");
+        h.assertTrue(
+                bud.saveWithFullMetadata(h.getLevel().registryAccess())
+                        .getList("supplied", 10)
+                        .isEmpty(),
+                "and holds nothing");
         h.succeed();
     }
 }

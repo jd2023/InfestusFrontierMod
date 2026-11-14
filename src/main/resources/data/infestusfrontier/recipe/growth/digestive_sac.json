@@ -1,0 +1,8 @@
+{
+  "type": "infestusfrontier:organ_growth",
+  "organ": "infestusfrontier:digestive_sac",
+  "materials": [
+    { "item": "minecraft:rotten_flesh", "count": 2 },
+    { "item": "minecraft:bowl" }
+  ]
+}

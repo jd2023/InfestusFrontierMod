@@ -41,6 +41,21 @@
       "type": "modonomicon:crafting_recipe",
       "recipe_id_1": "infestusfrontier:organ_bud",
       "text": "entry.infestusfrontier.contact.organ_bud.craft"
+    },
+    {
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/digestive_sac",
+      "title1": "block.infestusfrontier.digestive_sac"
+    },
+    {
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/biomass_bladder",
+      "title1": "block.infestusfrontier.biomass_bladder"
+    },
+    {
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/culture_bowl",
+      "title1": "block.infestusfrontier.culture_bowl"
     }
   ]
 }

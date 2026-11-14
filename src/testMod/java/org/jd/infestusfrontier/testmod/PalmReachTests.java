@@ -646,7 +646,8 @@ public final class PalmReachTests {
                 .thenSucceed();
     }
 
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    /** Spends the server's whole admission budget for a tick, so it runs alone: a Palm pressing in that tick is refused. */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "palm_reach_budget")
     public static void whenThisTicksNetworkWorkIsSpentAnActionRefusesAndChangesNothing(GameTestHelper h) {
         PalmNet.Rig rig = rig(h, 5, MouthMode.BOTH, MouthMode.BOTH, stack(Items.OAK_PLANKS, 20));
         later(h, () -> {

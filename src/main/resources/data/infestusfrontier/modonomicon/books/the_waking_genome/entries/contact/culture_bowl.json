@@ -48,8 +48,8 @@
       "title1": "block.infestusfrontier.organ_bud"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:culture_bowl",
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/culture_bowl",
       "text": "entry.infestusfrontier.contact.culture_bowl.craft"
     }
   ]

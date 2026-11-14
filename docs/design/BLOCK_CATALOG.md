@@ -356,7 +356,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 ### T0-02 — Culture Bowl
 - **Does:** Grows small batches of construction cultures on a shallow, rooted dish. Its first batches are slow and loaded by hand.
 - **Input → output:** 1 mushroom + 1 wheat seed + 100 mB water → 1 Spore Culture; 1 Spore Culture + 2 rotten flesh + 1 bone meal → an Organ Bud. No biomass input is needed to start this supply chain.
-- **Create:** 1 flower pot + 1 Spore Culture + 1 wheat seed; place on substrate.
+- **Create:** Grow it from an Organ Bud on substrate: supply 1 flower pot + 1 Spore Culture + 1 wheat seed. Not crafted.
 - **Growth:** Choose shorter incubation or lower water use. A Honey Culture treatment accepts honey as an alternative nutrient; an Intake Mouth later automates supplies.
 - **Operation:** Any hand opens the Bowl screen: stored water and biomass, the slots, progress. Ingredients go in one at a time by hand or by the stack from a hopper, one slot per kind; a batch starts on its own when the slots hold a recipe, and spare items wait for the next. Water and measured biomass buckets deposit 1000 mB/BU and return their empty bucket. Sneak-use with both hands empty collects one stack. Sneak-use a clock or glass bottle to spend an earned choice on incubation or water economy respectively. Sneak to place beside the Bowl. Break and replace the Bowl to move its single saved core, owner, contents and history.
 - **Baseline:** One batch requires 1200 loaded server ticks (60 seconds at 20 TPS). Each incubation or water choice reduces its base requirement by 10%, capped at 30% after three choices; round water down to whole mB. This gives pure L3 incubation 840 ticks or pure L3 water costs of 70/35 mB. These are calculated initial tuning values, not playtest timings. The Bowl holds nine item slots, one 2000 mB water tank and one 2000 BU biomass tank so whole buckets fit without discarding a remainder. It performs no export and pauses when its substrate is absent. Recipes and quantities are owned by Items.
@@ -364,7 +364,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 ### T0-03 — Digestive Sac
 - **Does:** A stomach: a bean-shaped sac with a window of glowing green acid and a thick-lipped mouth on its gullet. It converts unwanted organic matter into the first usable biomass; while it digests it squeezes, the acid sloshes and it gurgles. Food-rich inputs give more than woody scraps; mineral blocks are not food.
 - **Input → output:** Item Catalog's starter/native feed recipes → biomass with their exact water costs. No mineral feed or unlisted fish/leaf recipe; future fibrous diets require explicit recipes.
-- **Create:** 1 Organ Bud + 2 rotten flesh + 1 bowl.
+- **Create:** Grow it from an Organ Bud on substrate: supply 2 rotten flesh + 1 bowl. Not crafted.
 - **Growth:** Choose processing speed or biomass recovery. Elastic Gel treatment accepts fibrous leaves; add Intake/Output Mouths for a continuous feed line. It stops accepting batches when output has no room.
 - **Hand controls:** Wheat, rotten flesh and empty buckets operate the Sac. Any other use opens its screen: status, a feed slot that holds one stack and is also reachable by hoppers and pipes, the progress vein and the tank. Sneak to build against it.
 - **Baseline:** The starter Sac retains up to 1,000 mB biomass and owns one batch. Hand-feeding atomically reserves one item and its complete output before work starts; loaded work pauses when uprooted and never catches up offline. If the feeder disconnects before completion, the Sac retains their achievement credit and pauses new feeds until they return; stored biomass remains transferable.
@@ -372,7 +372,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 ### T0-04 — Biomass Bladder
 - **Does:** A one-block, translucent feed tank for a first workshop. The contents visibly rise inside its fleshy shell.
 - **Input → output:** Biomass from buckets or an attached organ → stored biomass, then bucket or organ output. A manual UI service slot accepts one bio-equipment piece; **Fill** transfers only its missing fuel from the tank, without healing or mutation. This is the T0 refueling route. Other fluids are refused.
-- **Create:** 1 Organ Bud + 2 glass + 1 slime ball; an early leather replacement for the slime ball makes a smaller bladder.
+- **Create:** Grow it from an Organ Bud on substrate: supply 2 glass + 1 slime ball. Not crafted. A leather replacement for the slime ball that makes a smaller bladder is a proposal, not shipped.
 - **Growth:** Skeletal Graft treatment reinforces its capacity. It can later become a Biomass Reservoir Cell without discarding its stored feed.
 - **Hand controls:** Buckets transfer biomass; any other use opens its screen. Sneak to build against it.
 - **Baseline:** The slime-built starter Bladder holds 4,000 mB. Full tanks refuse unchanged. Biomass is an ordinary fluid: vanilla buckets and any mod's pipes move it through the standard fluid capability. Equipment-fill actions are limited to four per player in any 20-tick window; excess is refused without a queue or resource loss.
@@ -447,10 +447,10 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 - **Growth:** None. More advanced treatment increases the affected area or reduces reagent use; it does not turn this block into a resource producer.
 
 ### T0-16 — Organ Bud
-- **Does:** A planted, dormant organ blank used to grow several early machines in place. A bud alone performs no processing.
-- **Input → output:** The chosen organ's construction ingredients → that organ, occupying the bud's position.
+- **Does:** A planted, dormant organ blank that grows workshop organs in place. A bud alone performs no processing.
+- **Input → output:** The chosen organ's materials, supplied by hand → that organ, occupying the bud's position. Shipped growths (data: `recipe/growth/`): Digestive Sac, Biomass Bladder and Culture Bowl. Growing is the only route to these three; the other workshop organs are still crafted until they get their own growth.
 - **Create:** Grow in the Culture Bowl, or craft 1 Spore Culture + 2 rotten flesh + 1 bone meal.
-- **Growth:** Applying the remaining ingredients of a listed organ recipe is an alternative to crafting that organ as an item. Failed or incomplete grafts leave the bud intact.
+- **Growth:** Right-click with an empty hand to read the chosen organ and what it still needs; sneak with an empty hand to choose another organ until something is supplied; right-click with a material to supply it. The organ grows the moment the last material is in, on a Living Substrate foundation. Supplied items are consumed once, when the organ grows; a refusal (wrong item, no foundation, unreadable save) loses nothing, and the bud keeps what it holds across saves. Breaking a bud drops it and every supplied item. The choice is fixed once something is supplied.
 
 ## Logistics requirements
 

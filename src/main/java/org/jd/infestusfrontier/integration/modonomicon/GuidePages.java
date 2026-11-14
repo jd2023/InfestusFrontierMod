@@ -11,15 +11,19 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import org.jd.infestusfrontier.InfestusFrontier;
 
-/** The guide's own page types. Data under {@code modonomicon/books} names them by {@link OrganBatchPage#TYPE}. */
+/** The guide's own page types. Data under {@code modonomicon/books} names them by {@link OrganBatchPage#TYPE} and {@link OrganGrowthPage#TYPE}. */
 public final class GuidePages {
     private GuidePages() {}
 
     public static void register(IEventBus modBus) {
         LoaderRegistry.registerPageLoader(OrganBatchPage.TYPE, OrganBatchPage::fromJson, OrganBatchPage::fromNetwork);
+        LoaderRegistry.registerPageLoader(
+                OrganGrowthPage.TYPE, OrganGrowthPage::fromJson, OrganGrowthPage::fromNetwork);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             modBus.addListener((FMLClientSetupEvent event) -> PageRendererRegistry.registerPageRenderer(
                     OrganBatchPage.TYPE, page -> new OrganBatchPageRenderer((OrganBatchPage) page)));
+            modBus.addListener((FMLClientSetupEvent event) -> PageRendererRegistry.registerPageRenderer(
+                    OrganGrowthPage.TYPE, page -> new OrganGrowthPageRenderer((OrganGrowthPage) page)));
             ResourceLocation cover =
                     ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "the_waking_genome");
             ModelResourceLocation model = ModelResourceLocation.standalone(cover.withPrefix("item/"));

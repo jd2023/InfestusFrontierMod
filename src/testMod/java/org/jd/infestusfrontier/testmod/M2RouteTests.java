@@ -23,7 +23,7 @@ import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.storage.StorageModule;
 
-/** The whole M2 workshop route in one test: craft the organs, grow a culture, digest ten wheat, store a bucket. */
+/** The whole M2 workshop route in one test: craft the buds, grow the three organs from them, grow a culture, digest ten wheat, store a bucket. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class M2RouteTests {
@@ -37,40 +37,25 @@ public final class M2RouteTests {
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 1500)
     public static void m2Route(GameTestHelper h) {
-        ItemStack culture1 =
-                M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
-        ItemStack culture2 =
-                M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
-        ItemStack bud1 = M1RouteTests.craft(
-                h,
-                List.of(culture1, rotten(), rotten(), new ItemStack(Items.BONE_MEAL)),
-                OrganModule.ORGAN_BUD_ITEM.get());
-        ItemStack bud2 = M1RouteTests.craft(
-                h,
-                List.of(culture2, rotten(), rotten(), new ItemStack(Items.BONE_MEAL)),
-                OrganModule.ORGAN_BUD_ITEM.get());
-        ItemStack sac = M1RouteTests.craft(
-                h,
-                List.of(bud1, rotten(), rotten(), new ItemStack(Items.BOWL)),
-                ProcessingModule.DIGESTIVE_SAC_ITEM.get());
-        ItemStack bladder = M1RouteTests.craft(
-                h,
-                List.of(bud2, new ItemStack(Items.GLASS), new ItemStack(Items.GLASS), new ItemStack(Items.SLIME_BALL)),
-                StorageModule.BIOMASS_BLADDER_ITEM.get());
-        ItemStack culture3 =
-                M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
-        ItemStack bowl = M1RouteTests.craft(
-                h,
-                List.of(new ItemStack(Items.FLOWER_POT), culture3, seeds()),
-                ProcessingModule.CULTURE_BOWL_ITEM.get());
-
+        BlockPos[] grounds = {SAC_GROUND, BLADDER_GROUND, BOWL_GROUND};
+        for (BlockPos ground : grounds) h.setBlock(ground, EcologyModule.LIVING_SUBSTRATE.get());
         Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-        h.setBlock(SAC_GROUND, EcologyModule.LIVING_SUBSTRATE.get());
-        h.setBlock(BLADDER_GROUND, EcologyModule.LIVING_SUBSTRATE.get());
-        h.setBlock(BOWL_GROUND, EcologyModule.LIVING_SUBSTRATE.get());
-        place(h, builder, sac, SAC_GROUND);
-        place(h, builder, bladder, BLADDER_GROUND);
-        place(h, builder, bowl, BOWL_GROUND);
+        for (BlockPos ground : grounds) {
+            ItemStack culture =
+                    M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
+            ItemStack bud = M1RouteTests.craft(
+                    h,
+                    List.of(culture, rotten(), rotten(), new ItemStack(Items.BONE_MEAL)),
+                    OrganModule.ORGAN_BUD_ITEM.get());
+            place(h, builder, bud, ground);
+            h.assertBlockPresent(OrganModule.ORGAN_BUD.get(), ground.above());
+        }
+        // The bowl's spore culture is the only material that is itself crafted.
+        ItemStack bowlCulture =
+                M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
+        grow(h, SAC, new ItemStack(Items.ROTTEN_FLESH, 2), new ItemStack(Items.BOWL));
+        grow(h, BLADDER, new ItemStack(Items.GLASS, 2), new ItemStack(Items.SLIME_BALL));
+        grow(h, BOWL, new ItemStack(Items.FLOWER_POT), bowlCulture, seeds());
         h.assertBlockPresent(ProcessingModule.DIGESTIVE_SAC.get(), SAC);
         h.assertBlockPresent(StorageModule.BIOMASS_BLADDER.get(), BLADDER);
         h.assertBlockPresent(ProcessingModule.CULTURE_BOWL.get(), BOWL);
@@ -119,6 +104,16 @@ public final class M2RouteTests {
 
     private static ItemStack seeds() {
         return new ItemStack(Items.WHEAT_SEEDS);
+    }
+
+    /** Hands every material to the bud at {@code bud}, one right click each; the last one grows the organ. */
+    private static void grow(GameTestHelper h, BlockPos bud, ItemStack... materials) {
+        for (ItemStack material : materials) {
+            Player supplier = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            supplier.setItemInHand(InteractionHand.MAIN_HAND, material);
+            EcologyTests.use(h, supplier, bud, Direction.UP);
+            h.assertTrue(supplier.getMainHandItem().isEmpty(), "the bud took " + material);
+        }
     }
 
     private static void place(GameTestHelper h, Player player, ItemStack stack, BlockPos ground) {

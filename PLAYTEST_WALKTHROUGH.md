@@ -26,12 +26,15 @@ Leave room for several machines and paths between them. Most organs need Living 
 
 ## 4. Start producing and storing biomass
 
-Craft an **Organ Bud** from **Spore Culture + two rotten flesh + bone meal**. Use buds to make:
+Craft an **Organ Bud** from **Spore Culture + two rotten flesh + bone meal**. Organs are grown from buds, not crafted. Place a bud on Living Substrate and right-click it with an empty hand to see which organ it grows and what it still needs (sneak with an empty hand to choose another organ). Right-click it with the materials; the organ grows in place when the last one is in:
 
-- **Digestive Sac:** Bud + two rotten flesh + bowl.
-- **Biomass Bladder:** Bud + two glass + slime ball.
+- **Digestive Sac:** two rotten flesh + bowl.
+- **Biomass Bladder:** two glass + slime ball.
+- **Culture Bowl:** flower pot + Spore Culture + wheat seeds.
 
-Place them beside each other on substrate. Feed wheat to the Sac.
+Grow the Sac and the Bladder beside each other. Feed wheat to the Sac.
+
+**Check:** A wrong item changes nothing. Break a half-fed bud: the bud and every supplied item drop once.
 
 **Check:** Wheat becomes biomass—100 BU per wheat—and the adjacent Bladder fills automatically. Try taking out a biomass bucket once you have 1,000 BU.
 

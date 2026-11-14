@@ -83,7 +83,7 @@ The initial book is offered once on first join, retained as a pending claim if i
 | T0-01 — Living Substrate | ST-01 | Convert one exposed eligible ground cell. | Basic → young → mature; selected cells only, no endless autonomous expansion. |
 | ST-03 — A Mature Foundation | T0-01 | Deliberately mature one selected cell through its two growth treatments. | Functional tissue grafts; variety does not require destroying its vegetation. |
 | T0-02 — Culture Bowl | T0-01 | Run one rooted culture batch. | Renewable construction cultures and the slow early Fusion Binder recipe. |
-| T0-16 — Organ Bud | ST-01 | Craft or grow one bud. | Craft an organ as an item or grow it from a planted bud with the same ingredients. |
+| T0-16 — Organ Bud | ST-01 | Craft or grow one bud. | The Digestive Sac, Biomass Bladder and Culture Bowl are grown from a planted bud by supplying their materials; they are not crafted. |
 | T0-03 — Digestive Sac | ALL(T0-01,T0-16) | Digest one organic batch into retained biomass. | First fuel; woody-feed limits; an output-full pause rather than spills. |
 | T0-04 — Biomass Bladder | ALL(T0-03,T0-16) | Store biomass and deliver a measured amount to a starter organ. | Buckets/direct connections; its manual Fill slot fuels the first awakened piece without a later mutation. |
 | T0-05 — Membrane Rack | T0-01 | Produce a Membrane Sheet from supplied organic material, string and water. | Flexible building skins, equipment and organ walls. |

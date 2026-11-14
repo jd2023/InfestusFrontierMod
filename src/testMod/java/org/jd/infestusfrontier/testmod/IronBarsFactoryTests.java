@@ -820,7 +820,7 @@ public final class IronBarsFactoryTests {
                 "infestusfrontier:feeding_lobe",
                 "infestusfrontier:vascular_junction",
                 "infestusfrontier:reservoir_cell",
-                "infestusfrontier:biomass_bladder",
+                "infestusfrontier:growth/biomass_bladder",
                 "infestusfrontier:capsule_stem",
                 "infestusfrontier:activating/synaptic_gel",
                 "infestusfrontier:activating/contractile_fiber",

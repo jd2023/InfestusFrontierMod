@@ -1,0 +1,8 @@
+{
+  "type": "infestusfrontier:organ_growth",
+  "organ": "infestusfrontier:biomass_bladder",
+  "materials": [
+    { "item": "minecraft:glass", "count": 2 },
+    { "item": "minecraft:slime_ball" }
+  ]
+}

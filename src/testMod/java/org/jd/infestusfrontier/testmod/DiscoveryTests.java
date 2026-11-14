@@ -38,6 +38,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.discovery.PendingCredits;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.integration.modonomicon.OrganBatchPage;
+import org.jd.infestusfrontier.integration.modonomicon.OrganGrowthPage;
 import org.jd.infestusfrontier.processing.api.OrganBatchCompletedEvent;
 import org.jd.infestusfrontier.storage.StorageModule;
 import org.jd.infestusfrontier.storage.api.BiomassBucketEvent;
@@ -172,6 +173,38 @@ public final class DiscoveryTests {
                 recipes,
                 List.of(id("culturing/spore_culture"), id("culturing/organ_bud")),
                 "one page per batch recipe");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
+    public static void organEntriesTeachGrowingFromABud(GameTestHelper h) {
+        var entries =
+                BookDataManager.get().getBook(BOOK).getCategory(id("contact")).getEntries();
+        for (String organ : List.of("digestive_sac", "biomass_bladder", "culture_bowl")) {
+            var entry = entries.get(id("contact/" + organ));
+            h.assertTrue(entry != null, organ + " entry loaded");
+            List<ResourceLocation> shown = entry.getPages().stream()
+                    .filter(page -> page instanceof OrganGrowthPage)
+                    .map(page -> ((OrganGrowthPage) page).getRecipeId1())
+                    .toList();
+            h.assertValueEqual(shown, List.of(id("growth/" + organ)), organ + " shows how it grows");
+            h.assertTrue(
+                    entry.getPages().stream()
+                            .noneMatch(page ->
+                                    page instanceof com.klikli_dev.modonomicon.book.page.BookCraftingRecipePage),
+                    organ + " is not crafted");
+            h.assertTrue(
+                    h.getLevel().getRecipeManager().byKey(id("growth/" + organ)).isPresent(),
+                    "the growth shown exists: " + organ);
+        }
+        List<ResourceLocation> budShows = entries.get(id("contact/organ_bud")).getPages().stream()
+                .filter(page -> page instanceof OrganGrowthPage)
+                .map(page -> ((OrganGrowthPage) page).getRecipeId1())
+                .toList();
+        h.assertValueEqual(
+                budShows,
+                List.of(id("growth/digestive_sac"), id("growth/biomass_bladder"), id("growth/culture_bowl")),
+                "the Bud entry shows every growth");
         h.succeed();
     }
 

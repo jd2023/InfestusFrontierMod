@@ -20,7 +20,6 @@ import org.jd.infestusfrontier.equipment.EquipmentModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
-import org.jd.infestusfrontier.storage.StorageModule;
 
 /** The workshop recipes and the advancements that reveal them in the recipe book. */
 @GameTestHolder("infestusfrontier_tests")
@@ -57,11 +56,6 @@ public final class DiscoveryDataTests {
         Item culture = EcologyModule.SPORE_CULTURE.get();
         Item bud = OrganModule.ORGAN_BUD_ITEM.get();
         resolves(h, List.of(culture, Items.ROTTEN_FLESH, Items.ROTTEN_FLESH, Items.BONE_MEAL), bud);
-        resolves(
-                h,
-                List.of(bud, Items.ROTTEN_FLESH, Items.ROTTEN_FLESH, Items.BOWL),
-                ProcessingModule.DIGESTIVE_SAC_ITEM.get());
-        resolves(h, List.of(bud, Items.GLASS, Items.GLASS, Items.SLIME_BALL), StorageModule.BIOMASS_BLADDER_ITEM.get());
         Item sheet = ProcessingModule.MEMBRANE_SHEET.get();
         resolves(
                 h,
@@ -87,22 +81,10 @@ public final class DiscoveryDataTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void cultureBowlRecipeResolves(GameTestHelper h) {
-        resolves(
-                h,
-                List.of(Items.FLOWER_POT, EcologyModule.SPORE_CULTURE.get(), Items.WHEAT_SEEDS),
-                ProcessingModule.CULTURE_BOWL_ITEM.get());
-        h.succeed();
-    }
-
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void recipeUnlockAdvancementsExist(GameTestHelper h) {
         for (String path : List.of(
                 "spore_culture",
                 "organ_bud",
-                "digestive_sac",
-                "biomass_bladder",
-                "culture_bowl",
                 "activation_cyst",
                 "vascular_junction",
                 "mouth",

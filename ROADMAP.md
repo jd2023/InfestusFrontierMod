@@ -22,7 +22,7 @@
 
 ## M2 — Feed a workshop and make equipment
 
-**Status:** Workshop and equipment implemented. Growing organs from simpler living forms remains incomplete.
+**Status:** Workshop and equipment implemented. The Bowl, Sac and Bladder grow from Organ Buds; the other workshop organs are still crafted.
 
 **Content:**
 - [x] Culture Bowl, Digestive Sac, Biomass Bladder and Organ Bud.
@@ -30,7 +30,8 @@
 - [x] Dormant and awakened helmet, chestplate, leggings and boots.
 - [x] Dormant and living pick, hatchet, spade, hoe and fang weapon.
 - [x] Synaptic Probe diagnostics, workshop recipes, guide entries and advancements.
-- [ ] Grow workshop organs from living buds using prepared materials; retain crafting for starter ingredients.
+- [x] Grow the Culture Bowl, Digestive Sac and Biomass Bladder from living buds using starter materials; Buds stay craftable.
+- [ ] Grow the Membrane Rack, Bone Loom, Awakening Cradle and Bio-Furnace from living buds using prepared materials.
 
 **Steps:**
 1. Supply organic matter and water to the Digestive Sac. Store the resulting biomass.

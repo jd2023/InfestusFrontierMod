@@ -1,0 +1,9 @@
+{
+  "type": "infestusfrontier:organ_growth",
+  "organ": "infestusfrontier:culture_bowl",
+  "materials": [
+    { "item": "minecraft:flower_pot" },
+    { "item": "infestusfrontier:spore_culture" },
+    { "item": "minecraft:wheat_seeds" }
+  ]
+}

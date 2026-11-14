@@ -3,7 +3,19 @@
   "pools": [
     {
       "rolls": 1,
-      "entries": [{ "type": "minecraft:item", "name": "infestusfrontier:organ_bud" }],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "infestusfrontier:organ_bud",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "source": "block_entity",
+              "include": ["infestusfrontier:unreadable_save"]
+            }
+          ]
+        }
+      ],
       "conditions": [{ "condition": "minecraft:survives_explosion" }]
     }
   ]
