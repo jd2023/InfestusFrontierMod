@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.storage;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -74,9 +75,77 @@ public final class ItemCapsuleMenu extends OrganMenu {
         }
     }
 
-    /** The first row the view starts at, shared with the synced ints. */
+    /**
+     * What one update reads of the tree: the store, its counts, the kinds with the reserves kept of each shown cell
+     * and the root's growth cost, all read once together. The kinds are the store's shared list: copy before editing.
+     */
+    private record Frame(
+            Optional<CapsuleTree> store,
+            int slots,
+            int used,
+            int fed,
+            int cost,
+            List<ItemStack> kinds,
+            int row,
+            int[] reserved) {
+        static Frame of(Tree tree, int wanted) {
+            Optional<CapsuleTree> store = tree.usable();
+            List<ItemStack> kinds = store.map(CapsuleTree::kinds).orElse(List.of());
+            int row = Ledger.clampRow(wanted, kinds.size());
+            int[] reserved = new int[VIEW];
+            if (store.isPresent())
+                for (int cell = 0; cell < VIEW; cell++)
+                    reserved[cell] = store.get().kindReserved(Ledger.entry(row, cell));
+            Optional<CapsuleStemBlockEntity> root = tree.root();
+            int cost = root.map(stem -> stem.nextCost(stem.getLevel())).orElse(0);
+            return new Frame(
+                    store,
+                    store.map(CapsuleTree::slots).orElse(0),
+                    store.map(CapsuleTree::used).orElse(0),
+                    root.map(stem -> Math.min(stem.fed(), cost)).orElse(0),
+                    cost,
+                    kinds,
+                    row,
+                    reserved);
+        }
+
+        ItemStack kind(int cell) {
+            int entry = Ledger.entry(row, cell);
+            return entry >= 0 && entry < kinds.size() ? kinds.get(entry).copy() : ItemStack.EMPTY;
+        }
+    }
+
+    /**
+     * The first row the view starts at, shared with the synced ints, and the frame of the update in progress. A
+     * broadcast reads one frame for every int and cell it sends; anything outside a broadcast, a click above all,
+     * reads the tree as it is then.
+     */
     private static final class View {
+        private final Tree tree;
         int row;
+        Frame frame;
+
+        View(Tree tree) {
+            this.tree = tree;
+        }
+
+        /** The update's frame, or a fresh one when none is in progress. */
+        Frame frame() {
+            return frame != null ? frame : Frame.of(tree, row);
+        }
+
+        void update(Runnable broadcast) {
+            if (frame != null || tree.organ().isEmpty()) {
+                broadcast.run();
+                return;
+            }
+            frame = Frame.of(tree, row);
+            try {
+                broadcast.run();
+            } finally {
+                frame = null;
+            }
+        }
     }
 
     private final Tree tree;
@@ -87,21 +156,24 @@ public final class ItemCapsuleMenu extends OrganMenu {
     private final ItemStack[] shown = new ItemStack[VIEW];
 
     ItemCapsuleMenu(int id, Inventory inventory, BlockEntity organ, Supplier<Optional<CapsuleTree>> store) {
-        this(id, inventory, new Tree(Optional.of(organ), store), at(organ), new View());
+        this(id, inventory, new View(new Tree(Optional.of(organ), store)), at(organ));
     }
 
     public ItemCapsuleMenu(int id, Inventory inventory, RegistryFriendlyByteBuf extra) {
-        this(id, inventory, new Tree(Optional.empty(), Optional::empty), at(inventory, extra), new View());
+        this(id, inventory, new View(new Tree(Optional.empty(), Optional::empty)), at(inventory, extra));
     }
 
-    private ItemCapsuleMenu(int id, Inventory inventory, Tree tree, ContainerLevelAccess access, View view) {
+    private ItemCapsuleMenu(int id, Inventory inventory, View view, ContainerLevelAccess access) {
         super(
                 StorageModule.ITEM_CAPSULE_MENU.get(),
                 id,
                 access,
-                tree.organ().map(organ -> organ.getBlockState().getBlock()).orElse(StorageModule.ITEM_CAPSULE.get()),
-                data(tree, view));
-        this.tree = tree;
+                view.tree
+                        .organ()
+                        .map(organ -> organ.getBlockState().getBlock())
+                        .orElse(StorageModule.ITEM_CAPSULE.get()),
+                data(view));
+        this.tree = view.tree;
         this.view = view;
         ItemStack[] copy = new ItemStack[VIEW];
         Arrays.fill(copy, ItemStack.EMPTY);
@@ -112,8 +184,9 @@ public final class ItemCapsuleMenu extends OrganMenu {
 
             @Override
             public ItemStack get(int cell) {
-                return tree.organ().isEmpty()
-                        ? copy[cell]
+                if (tree.organ().isEmpty()) return copy[cell];
+                return view.frame != null
+                        ? view.frame.kind(cell)
                         : tree.usable().map(store -> store.kind(entry(cell))).orElse(ItemStack.EMPTY);
             }
 
@@ -179,30 +252,29 @@ public final class ItemCapsuleMenu extends OrganMenu {
         remember();
     }
 
-    private static ContainerData data(Tree tree, View view) {
-        if (tree.organ().isEmpty()) return new SimpleContainerData(RESERVED_DATA + VIEW);
+    private static ContainerData data(View view) {
+        if (view.tree.organ().isEmpty()) return new SimpleContainerData(RESERVED_DATA + VIEW);
         IntSupplier[] reads = new IntSupplier[RESERVED_DATA + VIEW];
-        reads[0] = () -> tree.usable().map(CapsuleTree::slots).orElse(0);
-        reads[1] = () -> tree.usable().map(CapsuleTree::used).orElse(0);
-        reads[2] = () -> tree.root()
-                .map(root -> Math.min(root.fed(), root.nextCost(root.getLevel())))
-                .orElse(0);
-        reads[3] = () -> tree.root().map(root -> root.nextCost(root.getLevel())).orElse(0);
-        reads[4] = tree::kinds;
-        reads[ROW_DATA] = () -> Ledger.clampRow(view.row, tree.kinds());
+        reads[0] = () -> view.frame().slots();
+        reads[1] = () -> view.frame().used();
+        reads[2] = () -> view.frame().fed();
+        reads[3] = () -> view.frame().cost();
+        reads[KINDS_DATA] = () -> view.frame().kinds().size();
+        reads[ROW_DATA] = () -> view.frame().row();
         for (int cell = 0; cell < VIEW; cell++) {
             int which = cell;
-            reads[RESERVED_DATA + cell] = () -> tree.usable()
-                    .map(store -> store.kindReserved(
-                            Ledger.entry(Ledger.clampRow(view.row, store.kinds().size()), which)))
-                    .orElse(0);
+            reads[RESERVED_DATA + cell] = () -> view.frame().reserved()[which];
         }
         return reading(reads);
     }
 
-    /** How many of view cell {@code cell}'s kind the Larders' reserves keep, as the server last sent it. */
+    /** How many of view cell {@code cell}'s kind the Larders' reserves keep: the tree's now, the client's as sent. */
     public int reserved(int cell) {
-        return synced(RESERVED_DATA + cell);
+        return tree.organ().isEmpty()
+                ? synced(RESERVED_DATA + cell)
+                : tree.usable()
+                        .map(store -> store.kindReserved(Ledger.entry(shownRow(), cell)))
+                        .orElse(0);
     }
 
     /** Keeps the kind each cell shows after the client was sent it. */
@@ -215,14 +287,23 @@ public final class ItemCapsuleMenu extends OrganMenu {
 
     @Override
     public void broadcastChanges() {
-        super.broadcastChanges();
-        remember();
+        view.update(() -> {
+            super.broadcastChanges();
+            remember();
+        });
     }
 
     @Override
     public void broadcastFullState() {
-        super.broadcastFullState();
-        remember();
+        view.update(() -> {
+            super.broadcastFullState();
+            remember();
+        });
+    }
+
+    @Override
+    public void sendAllDataToRemote() {
+        view.update(super::sendAllDataToRemote);
     }
 
     /** How many kinds the tree holds: its own on the server, as last sent on the client. */

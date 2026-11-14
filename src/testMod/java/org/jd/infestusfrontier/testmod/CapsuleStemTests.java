@@ -1024,6 +1024,38 @@ public final class CapsuleStemTests {
         h.succeed();
     }
 
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", batch = "capsule_menu_update")
+    public static void aBroadcastDoesNotKeepWhatItReadForTheNextClickOrUpdate(GameTestHelper h) {
+        plant(h, FORKING);
+        growAll(h);
+        ItemStore store = store(h, ROOT);
+        store.insert(stack(Items.BONE, 100), false);
+        MenuPlayer player = new MenuPlayer(h.getLevel());
+        BlockPos at = h.absolutePos(ROOT);
+        player.moveTo(at.getX() + 0.5, at.getY(), at.getZ() - 1.5);
+        player.openMenu((MenuProvider) h.getBlockEntity(ROOT), at);
+        MenuPlayer other = new MenuPlayer(h.getLevel());
+        other.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 2.5);
+        other.openMenu((MenuProvider) h.getBlockEntity(ROOT), at);
+        AbstractContainerMenu second = other.containerMenu;
+        ItemCapsuleMenu menu = (ItemCapsuleMenu) player.containerMenu;
+        menu.broadcastChanges();
+        h.assertValueEqual(menu.getSlot(0).getItem().getCount(), 100, "the first update shows the stock");
+        h.assertTrue(menu.used() > 0, "and the compartments in use");
+        second.clicked(0, 0, ClickType.PICKUP, other);
+        menu.broadcastChanges();
+        h.assertValueEqual(menu.getSlot(0).getItem().getCount(), 36, "the next update shows what another took");
+        second.clicked(0, 0, ClickType.QUICK_MOVE, other);
+        h.assertValueEqual(store.count(stack(Items.BONE, 1)), 0, "another viewer takes the rest");
+        menu.clicked(0, 0, ClickType.PICKUP, player);
+        h.assertTrue(menu.getCarried().isEmpty(), "a click after the last update finds the stock gone");
+        menu.broadcastChanges();
+        h.assertValueEqual(menu.used(), 0, "and the next update shows nothing in use");
+        other.closeContainer();
+        player.closeContainer();
+        h.succeed();
+    }
+
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void theClientRefusesAnotherKindOverAnEntryAndHoldsClicksWhileScrolling(GameTestHelper h) {
         MenuPlayer player = new MenuPlayer(h.getLevel());
