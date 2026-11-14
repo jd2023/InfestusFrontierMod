@@ -34,12 +34,14 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -82,6 +84,9 @@ public final class CapsuleStemTests {
     private static final long FORKING = 7;
 
     private static final long EASTWARD = 8;
+
+    /** Client update only: neither neighbour nor shape updates, which would load a chunk across an edge. */
+    private static final int NO_UPDATES = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
 
     private CapsuleStemTests() {}
 
@@ -423,6 +428,88 @@ public final class CapsuleStemTests {
             }
             h.assertValueEqual(capsules, pods.size(), "every pod dropped as an item");
             h.assertValueEqual(bones, 100, "with their items");
+            h.succeed();
+        });
+    }
+
+    /** The capsule items dropped in the test, whole: how many, and the bones they carry. */
+    private static int[] droppedCapsules(GameTestHelper h) {
+        int capsules = 0, bones = 0, grades = 0;
+        for (ItemEntity drop : h.getEntities(EntityType.ITEM)) {
+            ItemStack item = drop.getItem();
+            if (!item.is(StorageModule.ITEM_CAPSULE_ITEM.get())) continue;
+            capsules += item.getCount();
+            CapsuleStock carried = item.get(StorageModule.CAPSULE_STOCK.get());
+            if (carried == null) continue;
+            grades += carried.grade();
+            for (ItemStack held : carried.held()) if (held.is(Items.BONE)) bones += held.getCount();
+        }
+        return new int[] {capsules, bones, grades};
+    }
+
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "capsule_unload",
+            timeoutTicks = 200)
+    public static void aCellBrokenBeforeItsDeathTickAfterItsRootIsGoneShedsItsPodsOnce(GameTestHelper h) {
+        for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) h.setBlock(new BlockPos(x, 0, z), Blocks.STONE);
+        plant(h, FORKING);
+        growAll(h);
+        List<BlockPos> pods = pods(h);
+        int cells = stems(h).size();
+        BlockPos hanging = cellOf(h, pods.getFirst());
+        int onCell = (int)
+                pods.stream().filter(pod -> cellOf(h, pod).equals(hanging)).count();
+        h.assertTrue(isStem(h, hanging) && onCell >= 1, "a cell carries a pod");
+        Player grafter = EcologyTests.holding(h, GameType.SURVIVAL, EcologyModule.SKELETAL_GRAFT.get(), 1);
+        EcologyTests.useHeld(h, grafter, pods.getFirst(), facing(h, pods.getFirst()));
+        store(h, ROOT).insert(stack(Items.BONE, 100), false);
+        h.getLevel().destroyBlock(h.absolutePos(ROOT), true);
+        h.assertValueEqual(pods(h).size(), pods.size(), "the pods stand for a moment");
+        h.getLevel().destroyBlock(h.absolutePos(hanging), true); // before its own death tick
+        h.assertValueEqual(pods(h).size(), pods.size() - onCell, "its pods are shed with it");
+        h.assertValueEqual(droppedCapsules(h)[0], onCell, "each as one item");
+        h.runAfterDelay(4 * cells + 10, () -> {
+            h.assertValueEqual(stems(h).size(), 0, "the stem is dead");
+            h.assertValueEqual(pods(h).size(), 0, "no pod stands");
+            int[] dropped = droppedCapsules(h);
+            h.assertValueEqual(dropped[0], pods.size(), "every pod dropped once");
+            h.assertValueEqual(dropped[1], 100, "with its items");
+            h.assertValueEqual(dropped[2], 1, "and the grade of the grafted pod");
+            h.succeed();
+        });
+    }
+
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "capsule_unload",
+            timeoutTicks = 400)
+    public static void anUnreadableRootThatLeavesDoesNotStrandItsLoadedCells(GameTestHelper h) {
+        for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) h.setBlock(new BlockPos(x, 0, z), Blocks.STONE);
+        plant(h, FORKING);
+        growAll(h);
+        int pods = pods(h).size();
+        store(h, ROOT).insert(stack(Items.BONE, 100), false);
+        BlockEntity root = h.getBlockEntity(ROOT);
+        CompoundTag saved = root.saveWithFullMetadata(h.getLevel().registryAccess());
+        ListTag planned = saved.getCompound("plan").getList("cells", 10);
+        CompoundTag bad = planned.getCompound(1).copy();
+        bad.putInt("parent", 5);
+        planned.set(1, bad);
+        root.loadWithComponents(saved, h.getLevel().registryAccess());
+        int cells = stems(h).size();
+        recheck(h);
+        h.runAfterDelay(5, () -> {
+            h.assertValueEqual(stems(h).size(), cells, "an unreadable root is not a dead one");
+            h.assertValueEqual(pods(h).size(), pods, "its pods stay");
+            h.getLevel().destroyBlock(h.absolutePos(ROOT), true);
+        });
+        h.runAfterDelay(100 + 5 * cells + 20 /* a cell asks again every 100 ticks */, () -> {
+            h.assertValueEqual(stems(h).size(), 0, "its cells find it gone and die");
+            h.assertValueEqual(pods(h).size(), 0, "and shed their pods");
+            h.assertValueEqual(droppedCapsules(h)[0], pods, "each once");
             h.succeed();
         });
     }
@@ -1222,6 +1309,84 @@ public final class CapsuleStemTests {
                                 level.getBlockState(pos).is(StorageModule.ITEM_CAPSULE.get()), "every pod is shed");
                 })
                 .thenExecute(() -> {
+                    for (BlockPos pos : BlockPos.betweenClosed(root.offset(-2, -1, -2), root.offset(3, 8, 2)))
+                        level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                    level.setChunkForced(kept.x, kept.z, false);
+                    level.setChunkForced(near.x, near.z, false);
+                    level.setChunkForced(far.x, far.z, false);
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * A pod out of reach when its cell leaves a dead tree is not forced to load: it stays until its chunk is back, then
+     * finds its cell and root gone and drops whole, once.
+     */
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "capsule_unload",
+            timeoutTicks = 1200)
+    public static void aPodOutOfReachWhenItsCellLeavesADeadTreeDropsWhenItsChunkIsBack(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos origin = h.absolutePos(BlockPos.ZERO);
+        BlockPos anchor = new BlockPos((origin.getX() & ~15) + 192000, 80, (origin.getZ() & ~15) + 224200);
+        BlockPos root = anchor.east(47);
+        BlockPos east = root.above().east(); // seed 8 grows its first pod east, into the next chunk
+        ChunkPos kept = new ChunkPos(anchor);
+        ChunkPos near = new ChunkPos(root);
+        ChunkPos far = new ChunkPos(east);
+        TestChunks.force(level, kept);
+        TestChunks.force(level, near);
+        TestChunks.force(level, far);
+        level.setBlockAndUpdate(
+                root.below(), EcologyModule.LIVING_SUBSTRATE.get().defaultBlockState());
+        CapsuleStemBlock.plant(level, root, EASTWARD);
+        for (int i = 0; i < 3; i++) BoneMealItem.growCrop(new ItemStack(Items.BONE_MEAL), level, root);
+        h.assertTrue(level.getBlockState(east).is(StorageModule.ITEM_CAPSULE.get()), "seed 8 grows its first pod east");
+        AABB around = new AABB(east).inflate(6);
+        h.startSequence()
+                .thenExecute(() -> {
+                    ((ItemStore) level.getCapability(Capabilities.ItemHandler.BLOCK, root, Direction.UP))
+                            .insert(stack(Items.BONE, 50), false);
+                    // the root's chunk stays loaded as the kept chunk's border; the pod's goes
+                    level.setChunkForced(near.x, near.z, false);
+                    level.setChunkForced(far.x, far.z, false);
+                })
+                .thenWaitUntil(() -> h.assertTrue(
+                        level.hasChunkAt(root) && !level.hasChunkAt(east),
+                        "the root stays loaded, the pod's chunk goes"))
+                .thenExecute(() -> {
+                    // no neighbour or shape updates: the root and its cell sit in the chunk's last column, and an
+                    // update east would load the far chunk
+                    level.setBlock(root, Blocks.AIR.defaultBlockState(), NO_UPDATES);
+                    level.setBlock(root.above(), Blocks.AIR.defaultBlockState(), NO_UPDATES);
+                    h.assertFalse(level.hasChunkAt(east), "the pod's chunk is still out of reach");
+                })
+                .thenExecute(() -> {
+                    TestChunks.force(level, near);
+                    TestChunks.force(level, far);
+                    h.assertTrue(
+                            level.getBlockState(east).is(StorageModule.ITEM_CAPSULE.get()),
+                            "the pod waited in its chunk");
+                    // a touch before the pod's own check must not let it go of its root
+                    level.getCapability(Capabilities.ItemHandler.BLOCK, east, Direction.UP)
+                            .getSlots();
+                })
+                .thenWaitUntil(() -> h.assertFalse(
+                        level.getBlockState(east).is(StorageModule.ITEM_CAPSULE.get()), "the pod is shed when back"))
+                .thenExecute(() -> {
+                    int capsules = 0, bones = 0;
+                    for (ItemEntity drop : level.getEntitiesOfClass(ItemEntity.class, around)) {
+                        ItemStack item = drop.getItem();
+                        if (!item.is(StorageModule.ITEM_CAPSULE_ITEM.get())) continue;
+                        capsules += item.getCount();
+                        CapsuleStock carried = item.get(StorageModule.CAPSULE_STOCK.get());
+                        if (carried != null)
+                            for (ItemStack held : carried.held()) if (held.is(Items.BONE)) bones += held.getCount();
+                    }
+                    h.assertValueEqual(capsules, 2, "both pods of the cell dropped once");
+                    h.assertValueEqual(bones, 50, "with their items");
                     for (BlockPos pos : BlockPos.betweenClosed(root.offset(-2, -1, -2), root.offset(3, 8, 2)))
                         level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                     level.setChunkForced(kept.x, kept.z, false);

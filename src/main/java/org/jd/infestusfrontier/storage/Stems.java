@@ -22,7 +22,9 @@ final class Stems {
      * The store of {@code pod}'s tree, or of the pod alone; empty while the pod is unreadable or out of reach. A pod
      * whose root stands in a chunk out of reach is served alone, over a span that names the root's chunk, so it is
      * read again on every use until the root is back; a pod whose root is gone, or whose tree does not reach it,
-     * lets go of the root and stands alone.
+     * lets go of the root and stands alone while the stem cell it hangs on stands. It keeps its hang when the root is
+     * still there but unreadable, or when its cell is gone or out of reach: {@link ItemCapsuleBlock#tick} judges such
+     * a pod.
      */
     static Optional<CapsuleTree> of(ItemCapsuleBlockEntity pod) {
         Level level = pod.getLevel();
@@ -33,8 +35,17 @@ final class Stems {
         if (rootPos.isPresent() && level.hasChunkAt(rootPos.get())) {
             Optional<CapsuleTree> tree = rootAt(level, rootPos.get()).flatMap(CapsuleStemBlockEntity::tree);
             if (tree.isPresent() && pod.store() == tree.get()) return tree;
-            pod.hangOn(Optional.empty());
-            rootPos = Optional.empty();
+            BlockPos support = pod.getBlockPos()
+                    .relative(pod.getBlockState()
+                            .getValue(ItemCapsuleBlock.FACING)
+                            .getOpposite());
+            boolean unreadableRoot = cellAt(level, rootPos.get())
+                    .filter(named -> !named.isReadable())
+                    .isPresent();
+            if (!unreadableRoot && cellAt(level, support).isPresent()) {
+                pod.hangOn(Optional.empty());
+                rootPos = Optional.empty();
+            }
         }
         List<BlockPos> span =
                 rootPos.map(root -> List.of(pod.getBlockPos(), root)).orElse(List.of(pod.getBlockPos()));
@@ -61,6 +72,27 @@ final class Stems {
         return level.getBlockEntity(pos) instanceof CapsuleStemBlockEntity cell && cell.isRoot()
                 ? Optional.of(cell)
                 : Optional.empty();
+    }
+
+    /** What is known of a tree from one of its cells' places: see {@link #fate}. */
+    enum Fate {
+        /** A readable root there plans the cell. */
+        STANDS,
+        /** The root's chunk is in reach and no readable root there plans the cell: the tree is gone. */
+        GONE,
+        /** The root's chunk is out of reach, or its data did not read: nothing can be told, and nothing is judged. */
+        UNKNOWN
+    }
+
+    /**
+     * Whether the tree rooted at {@code rootPos} still holds the cell at {@code cellPos}. A root out of reach is not a
+     * dead one, nor is a root whose data did not read: it keeps its bytes and its tree.
+     */
+    static Fate fate(LevelReader level, BlockPos rootPos, BlockPos cellPos) {
+        if (!level.hasChunkAt(rootPos)) return Fate.UNKNOWN;
+        Optional<CapsuleStemBlockEntity> named = cellAt(level, rootPos);
+        if (named.isPresent() && !named.get().isReadable()) return Fate.UNKNOWN;
+        return named.filter(root -> root.isRoot() && root.owns(cellPos)).isPresent() ? Fate.STANDS : Fate.GONE;
     }
 
     /** The stem cell standing at {@code pos}, whatever tree it belongs to. */

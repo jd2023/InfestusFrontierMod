@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -373,12 +374,20 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
         return true;
     }
 
-    /** A pod back in reach tells its root, so the tree's store is read again with it. */
+    /**
+     * A pod back in reach tells its root, so the tree's store is read again with it, and checks that the cell it hangs
+     * on is not gone with its tree ({@link ItemCapsuleBlock#tick}): a pod loaded after its tree died could not be
+     * told. The check is asked for once the chunk's ticks are registered, which they may not be while it loads.
+     */
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && !level.isClientSide)
-            root.flatMap(pos -> Stems.rootAt(level, pos)).ifPresent(CapsuleStemBlockEntity::touch);
+        if (!(level instanceof ServerLevel server) || root.isEmpty()) return;
+        Stems.rootAt(level, root.get()).ifPresent(CapsuleStemBlockEntity::touch);
+        server.getServer().execute(() -> {
+            if (!isRemoved() && server.hasChunkAt(worldPosition))
+                server.scheduleTick(worldPosition, getBlockState().getBlock(), 1);
+        });
     }
 
     /** A pod that goes with its chunk takes the tree's store with it; the rest refuse until it is read again. */

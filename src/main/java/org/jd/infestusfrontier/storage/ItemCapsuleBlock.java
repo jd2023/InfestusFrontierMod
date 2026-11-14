@@ -4,6 +4,8 @@ import com.mojang.serialization.MapCodec;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -152,6 +154,30 @@ public class ItemCapsuleBlock extends BaseEntityBlock {
                 && level.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity pod)
             pod.root().flatMap(rootPos -> Stems.rootAt(level, rootPos)).ifPresent(CapsuleStemBlockEntity::touch);
         super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
+    /**
+     * A pod that hangs on a root and has lost the cell it hangs on, while its tree is gone, drops as an item, whole: its
+     * cell left while it could not be told, or its chunk was out of reach when the tree died. A pod whose cell stands
+     * is judged by the cell ({@link CapsuleStemBlock#tick}); one whose tree stands waits for the cell to regrow.
+     * Nothing can be told while the cell's or the root's chunk is out of reach, or the root's data did not read, so
+     * the pod asks again later; chunks are never loaded to ask.
+     */
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (!(level.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity pod)
+                || pod.root().isEmpty()) return;
+        BlockPos cell = pos.relative(state.getValue(FACING).getOpposite());
+        if (!level.hasChunkAt(cell)) {
+            level.scheduleTick(pos, this, CapsuleStemBlockEntity.RECHECK_TICKS);
+            return;
+        }
+        if (Stems.cellAt(level, cell).isPresent()) return;
+        switch (Stems.fate(level, pod.root().get(), cell)) {
+            case GONE -> level.destroyBlock(pos, true);
+            case UNKNOWN -> level.scheduleTick(pos, this, CapsuleStemBlockEntity.RECHECK_TICKS);
+            case STANDS -> {}
+        }
     }
 
     /** A Creative player who breaks a pod holding items or grown still gets them back, as with a shulker box. */
