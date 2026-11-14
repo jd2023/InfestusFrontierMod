@@ -180,7 +180,7 @@ public final class DiscoveryTests {
     public static void organEntriesTeachGrowingFromABud(GameTestHelper h) {
         var entries =
                 BookDataManager.get().getBook(BOOK).getCategory(id("contact")).getEntries();
-        for (String organ : List.of("digestive_sac", "biomass_bladder", "culture_bowl")) {
+        for (String organ : List.of("digestive_sac", "biomass_bladder", "culture_bowl", "membrane_rack", "bone_loom")) {
             var entry = entries.get(id("contact/" + organ));
             h.assertTrue(entry != null, organ + " entry loaded");
             List<ResourceLocation> shown = entry.getPages().stream()
@@ -197,13 +197,28 @@ public final class DiscoveryTests {
                     h.getLevel().getRecipeManager().byKey(id("growth/" + organ)).isPresent(),
                     "the growth shown exists: " + organ);
         }
+        for (var batch : java.util.Map.of("membrane_rack", "membrane_sheet", "bone_loom", "bone_plate")
+                .entrySet()) {
+            List<ResourceLocation> batches = entries.get(id("contact/" + batch.getKey())).getPages().stream()
+                    .filter(page -> page instanceof OrganBatchPage)
+                    .map(page -> ((OrganBatchPage) page).getRecipeId1())
+                    .toList();
+            h.assertTrue(
+                    batches.contains(id("preparing/" + batch.getValue())),
+                    batch.getKey() + " still shows its first production batch");
+        }
         List<ResourceLocation> budShows = entries.get(id("contact/organ_bud")).getPages().stream()
                 .filter(page -> page instanceof OrganGrowthPage)
                 .map(page -> ((OrganGrowthPage) page).getRecipeId1())
                 .toList();
         h.assertValueEqual(
                 budShows,
-                List.of(id("growth/digestive_sac"), id("growth/biomass_bladder"), id("growth/culture_bowl")),
+                List.of(
+                        id("growth/digestive_sac"),
+                        id("growth/biomass_bladder"),
+                        id("growth/culture_bowl"),
+                        id("growth/membrane_rack"),
+                        id("growth/bone_loom")),
                 "the Bud entry shows every growth");
         h.succeed();
     }

@@ -49,8 +49,8 @@
       "title1": "entry.infestusfrontier.contact.membrane_rack.leather"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:membrane_rack",
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/membrane_rack",
       "text": "entry.infestusfrontier.contact.membrane_rack.craft"
     }
   ]

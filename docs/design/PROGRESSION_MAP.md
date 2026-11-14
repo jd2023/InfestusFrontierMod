@@ -14,8 +14,8 @@ player the readings to find the bottleneck, not a layout that balances itself.
 ## 1. SR0 — Start beside a vanilla home
 
 **Build:** make Spore Culture from ordinary ingredients. Establish selected Living
-Substrate, Culture Bowl, Digestive Sac and Biomass Bladder. Prepare membrane and
-bone components with Membrane Rack and Bone Loom.
+Substrate, Culture Bowl, Digestive Sac and Biomass Bladder. Grow the Membrane Rack and
+Bone Loom from buds, then prepare membrane and bone components with them.
 
 **First loop:** hand-supply permitted organic matter and water to the Sac; store
 biomass; spend it on selected ground growth, preparation or equipment. Keep food

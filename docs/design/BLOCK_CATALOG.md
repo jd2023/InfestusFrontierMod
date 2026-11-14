@@ -380,14 +380,14 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 ### T0-05 — Membrane Rack
 - **Does:** Stretches cultivated skin over a bone rack to make the common flexible construction material.
 - **Input → output:** Rotten flesh + string + water → Membrane Sheets; leather can replace flesh for a slower, low-biomass recipe.
-- **Create:** 2 sticks + 2 bones + 1 Spore Culture.
+- **Create:** Grow it from an Organ Bud on substrate: supply 4 string + 2 sticks. Not crafted. Neither material is a Sheet or Plate, so the first Sheet stays reachable.
 - **Operation:** Load ingredients by hand or by hopper and water by bucket; a batch starts on its own; any other use opens the screen. Sneak-use with both hands empty collects one stack, taking finished output first and otherwise returning unused inputs.
 - **Growth:** Choose batch speed or water economy. Add a Hearth Lung for faster drying; thermal membranes are a later, distinct Nether-grown material, not an automatic level reward.
 
 ### T0-06 — Bone Loom
 - **Does:** Grows curved plates and load-bearing ribs from existing calcium, rather than fabricating mineral mass from biomass.
 - **Input → output:** 1 bone + 50 BU → 1 Bone Plate. Bone blocks require a separately accounted calcium recipe, not an assumed unpacking into nine bones. A calcite recipe uses extra biomass to supply the organic binder.
-- **Create:** 1 Organ Bud + 2 bones + 2 sticks.
+- **Create:** Grow it from an Organ Bud on substrate: supply 2 bones + 2 sticks. Not crafted. Neither material is a Plate or a Sheet, so the first Plate stays reachable.
 - **Operation:** Load bones by hand or by hopper and biomass by bucket; a batch starts on its own; any other use opens the screen. Sneak-use with both hands empty collects one stack, taking finished output first and otherwise returning unused inputs. Biomass buckets share the portable-transfer admission and successful-transfer discovery rules.
 - **Growth:** Choose speed or biomass economy. Ferrocyte Paste treatment produces reinforced plates using additional prepared iron; adding frame blocks increases batch size, not mineral yield.
 
@@ -448,7 +448,7 @@ Available from ordinary Overworld materials. No completed genome, electricity or
 
 ### T0-16 — Organ Bud
 - **Does:** A planted, dormant organ blank that grows workshop organs in place. A bud alone performs no processing.
-- **Input → output:** The chosen organ's materials, supplied by hand → that organ, occupying the bud's position. Shipped growths (data: `recipe/growth/`): Digestive Sac, Biomass Bladder and Culture Bowl. Growing is the only route to these three; the other workshop organs are still crafted until they get their own growth.
+- **Input → output:** The chosen organ's materials, supplied by hand → that organ, occupying the bud's position. Shipped growths (data: `recipe/growth/`): Digestive Sac, Biomass Bladder, Culture Bowl, Membrane Rack and Bone Loom. Growing is the only route to these five; the other workshop organs are still crafted until they get their own growth. String starts a Rack and bones start a Loom; sticks go to the organ the bud has chosen.
 - **Create:** Grow in the Culture Bowl, or craft 1 Spore Culture + 2 rotten flesh + 1 bone meal.
 - **Growth:** Right-click with an empty hand to read the chosen organ and what it still needs; sneak with an empty hand to choose another organ until something is supplied; right-click with a material to supply it. The organ grows the moment the last material is in, on a Living Substrate foundation. Supplied items are consumed once, when the organ grows; a refusal (wrong item, no foundation, unreadable save) loses nothing, and the bud keeps what it holds across saves. Breaking a bud drops it and every supplied item. The choice is fixed once something is supplied.
 

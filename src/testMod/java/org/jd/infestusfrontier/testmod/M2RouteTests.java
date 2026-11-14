@@ -23,7 +23,7 @@ import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.storage.StorageModule;
 
-/** The whole M2 workshop route in one test: craft the buds, grow the three organs from them, grow a culture, digest ten wheat, store a bucket. */
+/** The M2 workshop routes: grow the starter organs from buds, digest ten wheat and store a bucket; grow the Rack and Loom and make a first sheet and plate. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class M2RouteTests {
@@ -92,6 +92,57 @@ public final class M2RouteTests {
                 h.succeed();
             });
         });
+    }
+
+    /**
+     * The construction-material route: two buds crafted from starter materials, a Rack and a Loom grown from them by
+     * hand (neither growth needs a sheet or a plate), then a first Membrane Sheet and a first Bone Plate.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 600)
+    public static void constructionMaterialsRoute(GameTestHelper h) {
+        BlockPos rackGround = new BlockPos(1, 1, 1);
+        BlockPos loomGround = new BlockPos(3, 1, 1);
+        BlockPos rack = rackGround.above();
+        BlockPos loom = loomGround.above();
+        Player builder = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        for (BlockPos ground : List.of(rackGround, loomGround)) {
+            h.setBlock(ground, EcologyModule.LIVING_SUBSTRATE.get());
+            ItemStack culture =
+                    M1RouteTests.craft(h, List.of(rotten(), mushroom(), seeds()), EcologyModule.SPORE_CULTURE.get());
+            ItemStack bud = M1RouteTests.craft(
+                    h,
+                    List.of(culture, rotten(), rotten(), new ItemStack(Items.BONE_MEAL)),
+                    OrganModule.ORGAN_BUD_ITEM.get());
+            place(h, builder, bud, ground);
+        }
+        grow(h, rack, new ItemStack(Items.STRING, 4), new ItemStack(Items.STICK, 2));
+        grow(h, loom, new ItemStack(Items.BONE, 2), new ItemStack(Items.STICK, 2));
+        h.assertBlockPresent(ProcessingModule.MEMBRANE_RACK.get(), rack);
+        h.assertBlockPresent(ProcessingModule.BONE_LOOM.get(), loom);
+        for (ItemStack stack : List.of(rotten(), new ItemStack(Items.STRING), new ItemStack(Items.WATER_BUCKET))) {
+            Player loader = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            loader.setItemInHand(InteractionHand.MAIN_HAND, stack);
+            EcologyTests.use(h, loader, rack, Direction.UP);
+        }
+        for (ItemStack stack : List.of(new ItemStack(Items.BONE), new ItemStack(StorageModule.BIOMASS_BUCKET.get()))) {
+            Player loader = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+            loader.setItemInHand(InteractionHand.MAIN_HAND, stack);
+            EcologyTests.use(h, loader, loom, Direction.UP);
+        }
+        h.runAtTickTime(450, () -> {
+            h.assertTrue(output(h, rack).is(ProcessingModule.MEMBRANE_SHEET.get()), "the first Membrane Sheet");
+            h.assertTrue(output(h, loom).is(ProcessingModule.BONE_PLATE.get()), "the first Bone Plate");
+            h.succeed();
+        });
+    }
+
+    private static ItemStack output(GameTestHelper h, BlockPos organ) {
+        var registries = h.getLevel().registryAccess();
+        var tag = h.getBlockEntity(organ).saveWithoutMetadata(registries);
+        return BatchOrganContents.CODEC
+                .parse(registries.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), tag.get("contents"))
+                .getOrThrow()
+                .output();
     }
 
     private static ItemStack rotten() {

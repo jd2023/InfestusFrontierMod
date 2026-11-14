@@ -1,0 +1,8 @@
+{
+  "type": "infestusfrontier:organ_growth",
+  "organ": "infestusfrontier:membrane_rack",
+  "materials": [
+    { "item": "minecraft:string", "count": 4 },
+    { "item": "minecraft:stick", "count": 2 }
+  ]
+}

@@ -83,11 +83,11 @@ The initial book is offered once on first join, retained as a pending claim if i
 | T0-01 — Living Substrate | ST-01 | Convert one exposed eligible ground cell. | Basic → young → mature; selected cells only, no endless autonomous expansion. |
 | ST-03 — A Mature Foundation | T0-01 | Deliberately mature one selected cell through its two growth treatments. | Functional tissue grafts; variety does not require destroying its vegetation. |
 | T0-02 — Culture Bowl | T0-01 | Run one rooted culture batch. | Renewable construction cultures and the slow early Fusion Binder recipe. |
-| T0-16 — Organ Bud | ST-01 | Craft or grow one bud. | The Digestive Sac, Biomass Bladder and Culture Bowl are grown from a planted bud by supplying their materials; they are not crafted. |
+| T0-16 — Organ Bud | ST-01 | Craft or grow one bud. | The Digestive Sac, Biomass Bladder, Culture Bowl, Membrane Rack and Bone Loom are grown from a planted bud by supplying their materials; they are not crafted. |
 | T0-03 — Digestive Sac | ALL(T0-01,T0-16) | Digest one organic batch into retained biomass. | First fuel; woody-feed limits; an output-full pause rather than spills. |
 | T0-04 — Biomass Bladder | ALL(T0-03,T0-16) | Store biomass and deliver a measured amount to a starter organ. | Buckets/direct connections; its manual Fill slot fuels the first awakened piece without a later mutation. |
-| T0-05 — Membrane Rack | T0-01 | Produce a Membrane Sheet from supplied organic material, string and water. | Flexible building skins, equipment and organ walls. |
-| T0-06 — Bone Loom | ALL(T0-03,T0-16) | Grow a Bone Plate from real calcium feed. | Structural parts; biomass binds mineral rather than creating it. |
+| T0-05 — Membrane Rack | ALL(T0-01,T0-16) | Grow a Rack from a bud (string and sticks), then produce a Membrane Sheet from supplied organic material, string and water. | Flexible building skins, equipment and organ walls. |
+| T0-06 — Bone Loom | ALL(T0-03,T0-16) | Grow a Loom from a bud (bones and sticks), then grow a Bone Plate from real calcium feed. | Structural parts; biomass binds mineral rather than creating it. |
 | T0-07 — Bio-Furnace | ALL(T0-03,T0-05,T0-16) | Complete a normal smelting recipe. | A weak hand-fed furnace that can retain its history through later growth and multiblock expansion. |
 | T0-08 — Awakening Cradle | ALL(T0-05,T0-06,T0-16) | Form the cradle and awaken one dormant equipment piece. | Early living armor/tools and host-grown rank-I grafts without a genetics laboratory. |
 | T0-09 — Seed Pouch | T0-05 | Deposit planting stock and set a reserve. | Keep replanting material separate from food and digestion. |

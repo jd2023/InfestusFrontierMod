@@ -31,6 +31,8 @@ Craft an **Organ Bud** from **Spore Culture + two rotten flesh + bone meal**. Or
 - **Digestive Sac:** two rotten flesh + bowl.
 - **Biomass Bladder:** two glass + slime ball.
 - **Culture Bowl:** flower pot + Spore Culture + wheat seeds.
+- **Membrane Rack:** four string + two sticks (give string first).
+- **Bone Loom:** two bones + two sticks.
 
 Grow the Sac and the Bladder beside each other. Feed wheat to the Sac.
 
@@ -40,13 +42,13 @@ Grow the Sac and the Bladder beside each other. Feed wheat to the Sac.
 
 ## 5. Build the material-making workshop
 
-Add these organs, using the guide's recipes:
+Grow a **Membrane Rack** and a **Bone Loom** from two more buds, then use the guide's batch recipes:
 
 | Organ | First operation to try |
 |---|---|
 | Culture Bowl | Red mushroom + wheat seeds + water → Spore Culture |
 | Membrane Rack | Rotten flesh + string + water → Membrane Sheet |
-| Bone Loom | Bone + biomass → Bone Plate |
+| Bone Loom | Bone + biomass → Bone Plate (fill a bucket at the Sac for the biomass) |
 
 Watch each machine idle, start working, finish, and wait for more ingredients. Try feeding one through a hopper.
 

@@ -44,8 +44,8 @@
       "title1": "item.infestusfrontier.bone_plate"
     },
     {
-      "type": "modonomicon:crafting_recipe",
-      "recipe_id_1": "infestusfrontier:bone_loom",
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/bone_loom",
       "text": "entry.infestusfrontier.contact.bone_loom.craft"
     }
   ]

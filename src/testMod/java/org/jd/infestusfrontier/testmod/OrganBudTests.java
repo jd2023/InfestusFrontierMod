@@ -108,7 +108,15 @@ public final class OrganBudTests {
                         List.of(
                                 new ItemStack(Items.FLOWER_POT),
                                 new ItemStack(EcologyModule.SPORE_CULTURE.get()),
-                                new ItemStack(Items.WHEAT_SEEDS))));
+                                new ItemStack(Items.WHEAT_SEEDS))),
+                new Growth(
+                        "membrane_rack",
+                        ProcessingModule.MEMBRANE_RACK.get(),
+                        List.of(new ItemStack(Items.STRING, 4), new ItemStack(Items.STICK, 2))),
+                new Growth(
+                        "bone_loom",
+                        ProcessingModule.BONE_LOOM.get(),
+                        List.of(new ItemStack(Items.BONE, 2), new ItemStack(Items.STICK, 2))));
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
@@ -149,8 +157,8 @@ public final class OrganBudTests {
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void unusedItemsAndEmptyHandsChangeNothing(GameTestHelper h) {
         plant(h, GROUND);
-        ItemStack left = feed(h, BUD, new ItemStack(Items.STICK, 4));
-        h.assertValueEqual(left.getCount(), 4, "a stick is not a material");
+        ItemStack left = feed(h, BUD, new ItemStack(Items.DIRT, 4));
+        h.assertValueEqual(left.getCount(), 4, "dirt is not a material");
         look(h, BUD, false);
         look(h, BUD, false);
         h.assertValueEqual(supplied(h, BUD), 0, "nothing was supplied");
@@ -238,9 +246,13 @@ public final class OrganBudTests {
         look(h, BUD, false);
         h.assertValueEqual(saved(h, BUD).getString("organ"), "infestusfrontier:biomass_bladder", "the first organ");
         look(h, BUD, true);
-        h.assertValueEqual(saved(h, BUD).getString("organ"), "infestusfrontier:culture_bowl", "sneaking: the next");
+        h.assertValueEqual(saved(h, BUD).getString("organ"), "infestusfrontier:bone_loom", "sneaking: the next");
+        look(h, BUD, true);
+        h.assertValueEqual(saved(h, BUD).getString("organ"), "infestusfrontier:culture_bowl", "and the next");
         look(h, BUD, true);
         h.assertValueEqual(saved(h, BUD).getString("organ"), "infestusfrontier:digestive_sac", "and the next");
+        look(h, BUD, true);
+        h.assertValueEqual(saved(h, BUD).getString("organ"), "infestusfrontier:membrane_rack", "and the last");
         look(h, BUD, true);
         h.assertValueEqual(saved(h, BUD).getString("organ"), "infestusfrontier:biomass_bladder", "then round again");
         feed(h, BUD, new ItemStack(Items.ROTTEN_FLESH, 1));
@@ -257,11 +269,15 @@ public final class OrganBudTests {
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void growthRecipesAskOnlyForStarterMaterials(GameTestHelper h) {
         List<RecipeHolder<OrganGrowthRecipe>> all = OrganGrowthRecipe.all(h.getLevel());
-        h.assertValueEqual(all.size(), 3, "the Sac, the Bladder and the Bowl grow from a bud");
+        h.assertValueEqual(all.size(), 5, "the Sac, Bladder, Bowl, Rack and Loom grow from a bud");
         for (RecipeHolder<OrganGrowthRecipe> holder : all) {
             for (SizedIngredient material : holder.value().materials())
                 for (ItemStack stack : material.getItems()) {
                     ResourceLocation item = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                    h.assertFalse(
+                            stack.is(ProcessingModule.MEMBRANE_SHEET.get())
+                                    || stack.is(ProcessingModule.BONE_PLATE.get()),
+                            holder.id() + " must not need what the Rack or the Loom make");
                     h.assertTrue(
                             item.getNamespace().equals("minecraft") || stack.is(EcologyModule.SPORE_CULTURE.get()),
                             holder.id() + " asks for " + item + ", which a new player cannot get from plain materials");
@@ -271,11 +287,13 @@ public final class OrganBudTests {
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
-    public static void theThreeOrgansAreNoLongerCrafted(GameTestHelper h) {
+    public static void theFiveOrgansAreNoLongerCrafted(GameTestHelper h) {
         List<Item> grown = List.of(
                 ProcessingModule.DIGESTIVE_SAC_ITEM.get(),
                 StorageModule.BIOMASS_BLADDER_ITEM.get(),
-                ProcessingModule.CULTURE_BOWL_ITEM.get());
+                ProcessingModule.CULTURE_BOWL_ITEM.get(),
+                ProcessingModule.MEMBRANE_RACK_ITEM.get(),
+                ProcessingModule.BONE_LOOM_ITEM.get());
         for (var holder : h.getLevel().getRecipeManager().getAllRecipesFor(RecipeType.CRAFTING)) {
             ItemStack result = holder.value().getResultItem(h.getLevel().registryAccess());
             h.assertFalse(grown.contains(result.getItem()), holder.id() + " still crafts " + result);
@@ -290,11 +308,15 @@ public final class OrganBudTests {
         List<Item> items = List.of(
                 ProcessingModule.DIGESTIVE_SAC_ITEM.get(),
                 StorageModule.BIOMASS_BLADDER_ITEM.get(),
-                ProcessingModule.CULTURE_BOWL_ITEM.get());
+                ProcessingModule.CULTURE_BOWL_ITEM.get(),
+                ProcessingModule.MEMBRANE_RACK_ITEM.get(),
+                ProcessingModule.BONE_LOOM_ITEM.get());
         List<Block> blocks = List.of(
                 ProcessingModule.DIGESTIVE_SAC.get(),
                 StorageModule.BIOMASS_BLADDER.get(),
-                ProcessingModule.CULTURE_BOWL.get());
+                ProcessingModule.CULTURE_BOWL.get(),
+                ProcessingModule.MEMBRANE_RACK.get(),
+                ProcessingModule.BONE_LOOM.get());
         for (int i = 0; i < items.size(); i++) {
             BlockPos ground = new BlockPos(x, 1, 1);
             x += 2;
@@ -318,12 +340,12 @@ public final class OrganBudTests {
     }
 
     /**
-     * The demo's Organ Bud exhibit: a fresh bud, a half-fed one and a fed one, and the starter chest stocking every
+     * The demo's Organ Bud exhibit: a fresh bud, half-fed and fed ones, including the Rack and the Loom, and the starter chest stocking every
      * material. Each bud grows its organ when used as its sign says.
      */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 300)
     public static void theDemoExhibitGrowsBudsAndStocksTheirMaterials(GameTestHelper h) {
-        DemoExhibit yard = new DemoExhibit(new BlockPos(13, -61, -42), new BlockPos(19, -59, -41), 50);
+        DemoExhibit yard = new DemoExhibit(new BlockPos(13, -61, -42), new BlockPos(23, -59, -41), 50);
         DemoExhibit stock = new DemoExhibit(new BlockPos(14, -61, -37), new BlockPos(14, -59, -35), 51);
         yard.force(h);
         stock.force(h);
@@ -336,12 +358,21 @@ public final class OrganBudTests {
                     BlockPos fresh = yard.at(new BlockPos(14, -60, -41));
                     BlockPos half = yard.at(new BlockPos(16, -60, -41));
                     BlockPos fed = yard.at(new BlockPos(18, -60, -41));
-                    for (BlockPos bud : List.of(fresh, half, fed))
+                    BlockPos halfRack = yard.at(new BlockPos(20, -60, -41));
+                    BlockPos fedLoom = yard.at(new BlockPos(22, -60, -41));
+                    for (BlockPos bud : List.of(fresh, half, fed, halfRack, fedLoom))
                         h.assertTrue(level.getBlockState(bud).is(OrganModule.ORGAN_BUD.get()), "a bud at " + bud);
                     var chest = (net.minecraft.world.level.block.entity.ChestBlockEntity)
                             level.getBlockEntity(stock.at(new BlockPos(14, -60, -36)));
-                    for (Item material :
-                            List.of(Items.ROTTEN_FLESH, Items.BOWL, Items.GLASS, Items.SLIME_BALL, Items.FLOWER_POT))
+                    for (Item material : List.of(
+                            Items.ROTTEN_FLESH,
+                            Items.BOWL,
+                            Items.GLASS,
+                            Items.SLIME_BALL,
+                            Items.FLOWER_POT,
+                            Items.STICK,
+                            Items.STRING,
+                            Items.BONE))
                         h.assertTrue(chest != null && chest.countItem(material) >= 2, "the chest holds " + material);
                     feedAt(h, half, new ItemStack(Items.BOWL));
                     h.assertTrue(
@@ -356,13 +387,29 @@ public final class OrganBudTests {
                     h.assertTrue(
                             level.getBlockState(fed).is(StorageModule.BIOMASS_BLADDER.get()),
                             "the fed bud grows when clicked");
+                    h.assertTrue(
+                            feedAt(h, halfRack, new ItemStack(Items.STICK, 2)).isEmpty(),
+                            "the half-fed rack bud takes its two sticks");
+                    h.assertTrue(
+                            level.getBlockState(halfRack).is(ProcessingModule.MEMBRANE_RACK.get()),
+                            "the half-fed bud grows a Rack");
+                    level.getBlockState(fedLoom)
+                            .useWithoutItem(
+                                    level,
+                                    player,
+                                    new BlockHitResult(
+                                            Vec3.atCenterOf(fedLoom).add(0, 0.5, 0), Direction.UP, fedLoom, false));
+                    h.assertTrue(
+                            level.getBlockState(fedLoom).is(ProcessingModule.BONE_LOOM.get()),
+                            "the fed bud grows a Loom");
                     for (ItemStack material : growths().get(2).materials())
                         h.assertTrue(feedAt(h, fresh, material.copy()).isEmpty(), "the fresh bud takes " + material);
                     h.assertTrue(
                             level.getBlockState(fresh).is(ProcessingModule.CULTURE_BOWL.get()),
                             "the fresh bud grows a bowl");
                     // The grown organs leave the way a player takes them out, so the network forgets them.
-                    for (BlockPos organ : List.of(fresh, half, fed)) level.destroyBlock(organ, false);
+                    for (BlockPos organ : List.of(fresh, half, fed, halfRack, fedLoom))
+                        level.destroyBlock(organ, false);
                     yard.tidy(h);
                     stock.tidy(h);
                     yard.forget(h);
