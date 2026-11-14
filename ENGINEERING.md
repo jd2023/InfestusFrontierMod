@@ -79,6 +79,8 @@ Use focused checks for the changed behavior. Pure accounting and branching rules
 bash scripts/verify.sh
 ```
 
+Each capture run writes screenshots and `report.json` to its own `build/captures/<run id>/` (the negative fixture uses `build/captures-negative/<run id>/`), so a focused run never erases the evidence of an earlier one. The run id is a timestamp, or `-PcaptureRun=NAME`; an existing run directory is never reused. The capture commands print their run directory, and verification reads only it. Old run directories are not pruned; delete them by hand.
+
 Under ktask, run focused checks during development. The supervisor owns the configured full check, independent review, commits and delivery. Do not start a second manual workflow. Documents and art categories have no project checks; assess their deliverables directly. Outside ktask, run checks appropriate to the change and report their actual scope.
 
 The full check is `scripts/verify.sh`; read its current commands rather than copying them into task descriptions. Build settings and dependency versions live in Gradle files. Use the configured system JDK and Java release target. Dependency changes need matching build, server and client evidence.

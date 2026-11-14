@@ -41,7 +41,13 @@ def captureScenarioDir = layout.projectDirectory.dir('src/testMod/resources/capt
 def captureScenarios = fileTree(captureScenarioDir) { include '*.json' }.files.collect { it.name - '.json' }.sort()
 // -PcaptureOnly=a,b photographs and verifies only those scenarios; scripts/verify.sh runs all.
 def captureOnly = providers.gradleProperty('captureOnly').map { it.split(',') as List }.getOrElse(captureScenarios)
+// Every run writes to its own build/captures/<run id>/ so a later run never erases the evidence of an earlier one.
+// The id is chosen when the build executes (not when it is configured, which the configuration cache would reuse);
+// -PcaptureRun=NAME picks it, and a run directory that already exists is never reused.
 def captureOutput = layout.buildDirectory.dir('captures')
+def captureRun = gradle.sharedServices.registerIfAbsent('captureRun', CaptureRun) {
+    parameters.requested = providers.gradleProperty('captureRun').orElse('')
+}
 // The negative fixture lives outside captureScenarioDir, so no capture run photographs it or discovers it.
 def captureNegativeDir = layout.projectDirectory.dir('src/testMod/resources/captures_negative')
 def captureNegativeOutput = layout.buildDirectory.dir('captures-negative')
@@ -110,7 +116,7 @@ neoForge {
             sourceSet = sourceSets.testMod
             gameDirectory = project.file('runs/capture')
             loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
-            systemProperty 'infestusfrontier.capture.dir', captureOutput.get().asFile.absolutePath
+            systemProperty 'infestusfrontier.capture.dir', captureOutput.get().asFile.absolutePath // root; prepareCapture names the run
             systemProperty 'infestusfrontier.capture.scenarios', captureOnly.join(',')
             jvmArgument '-Xmx3G'
         }
@@ -120,7 +126,7 @@ neoForge {
             sourceSet = sourceSets.testMod
             gameDirectory = project.file('runs/capture-negative')
             loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
-            systemProperty 'infestusfrontier.capture.dir', captureNegativeOutput.get().asFile.absolutePath
+            systemProperty 'infestusfrontier.capture.dir', captureNegativeOutput.get().asFile.absolutePath // root; prepareCaptureNegative names the run
             systemProperty 'infestusfrontier.capture.folder', 'captures_negative'
             systemProperty 'infestusfrontier.capture.scenarios', 'unloaded_position'
             jvmArgument '-Xmx3G'
@@ -258,12 +264,22 @@ tasks.register('verifyAll') {
     dependsOn ':core:check', ':ui:check', tasks.named('build'), distribution, tasks.named('runGameTestServer')
 }
 
+// The id of this build's capture runs, created when the first capture task executes.
+abstract class CaptureRun implements org.gradle.api.services.BuildService<Params> {
+    interface Params extends org.gradle.api.services.BuildServiceParameters {
+        Property<String> getRequested()
+    }
+    final String id = parameters.requested.getOrElse('') ?: new Date().format('yyyyMMdd-HHmmss')
+}
+
 // Every capture must exist, show no missing texture, not be a flat frame, and match its golden when one exists.
 abstract class VerifyCaptures extends DefaultTask {
     @InputDirectory abstract DirectoryProperty getScenarios()
     @Input abstract ListProperty<String> getSelected()
     @InputDirectory @org.gradle.api.tasks.Optional abstract DirectoryProperty getGoldens()
-    @InputDirectory abstract DirectoryProperty getCaptures()
+    /** Root holding one directory per run; only this build's run directory is read. */
+    @org.gradle.api.tasks.Internal abstract DirectoryProperty getCaptureRoot()
+    @org.gradle.api.tasks.Internal abstract Property<CaptureRun> getRun()
     /**
      * A view with "icons": [ids...] names what the hotbar holds, left to right. Each icon's visual centroid must sit
      * within 1.5 px of its slot centre and nothing may be drawn outside the 16 px square. World views are shot at GUI
@@ -301,9 +317,9 @@ abstract class VerifyCaptures extends DefaultTask {
     }
 
     @TaskAction void verify() {
-        File root = captures.get().asFile
+        File root = new File(captureRoot.get().asFile, run.get().id)
         File reportFile = new File(root, 'report.json')
-        if (!reportFile.file) throw new GradleException("The capture client wrote no report at ${reportFile}")
+        if (!reportFile.file) throw new GradleException("The capture client wrote no report at ${reportFile}; screenshots and report of this run belong in ${root}")
         def report = new groovy.json.JsonSlurper().parse(reportFile)
         if (report.failure) throw new GradleException("Capture client failed: ${report.failure}")
         List<String> problems = []
@@ -351,8 +367,8 @@ abstract class VerifyCaptures extends DefaultTask {
                 checked++
             }
         }
-        if (problems) throw new GradleException("Capture checks failed:\n  " + problems.join('\n  '))
-        logger.lifecycle("Captures verified: ${checked} images under ${root}")
+        if (problems) throw new GradleException("Capture checks failed (run output ${root}):\n  " + problems.join('\n  '))
+        logger.lifecycle("Captures verified: ${checked} images; screenshots under ${root}, report ${reportFile}")
     }
 
     // Timed sequences inspect every pixel of every frame; compile this hot loop without Groovy boxing.
@@ -373,21 +389,28 @@ abstract class VerifyCaptures extends DefaultTask {
     }
 }
 
-// Fresh world and output each run; fixed client options and FML config so the client never shows a first-run screen.
-def registerPrepare = { String taskName, String runName, Provider<Directory> outputDir ->
+// Fresh world and a new output directory each run; fixed client options and FML config so the client never shows a
+// first-run screen. The client reads its run directory name from capture-run.txt in the game directory.
+def registerPrepare = { String taskName, String runName, Provider<Directory> outputRoot ->
     tasks.register(taskName) {
         def world = layout.projectDirectory.dir("runs/${runName}/saves/capture").asFile
-        def output = outputDir.get().asFile
+        def root = outputRoot.get().asFile
         def runDir = layout.projectDirectory.dir("runs/${runName}").asFile
         def options = layout.projectDirectory.file('src/testMod/capture/options.txt').asFile
         def fml = layout.projectDirectory.file('src/testMod/capture/fml.toml').asFile
         inputs.files(options, fml)
+        usesService(captureRun)
         outputs.upToDateWhen { false }
         doLast {
-            [world, output].each { it.deleteDir() }
+            File output = new File(root, captureRun.get().id)
+            if (output.exists())
+                throw new GradleException("The capture run directory ${output} already exists; earlier evidence is never overwritten. Choose another -PcaptureRun name.")
+            world.deleteDir()
             new File(runDir, 'config').mkdirs()
             new File(runDir, 'options.txt').text = options.text
             new File(runDir, 'config/fml.toml').text = fml.text
+            new File(runDir, 'capture-run.txt').text = output.name
+            logger.lifecycle("${taskName}: this run writes screenshots and report.json under ${output}")
         }
     }
 }
@@ -431,7 +454,9 @@ tasks.register('verifyCaptures', VerifyCaptures) {
     dependsOn tasks.named('runCapture')
     scenarios = captureScenarioDir
     selected = captureOnly
-    captures = captureOutput
+    captureRoot = captureOutput
+    run = captureRun
+    usesService(captureRun)
     def goldenDir = captureScenarioDir.dir('golden')
     if (goldenDir.asFile.directory) goldens = goldenDir
 }
@@ -443,12 +468,13 @@ tasks.register('verifyCaptureFailure') {
     group = 'verification'
     description = 'Checks that a demo command at an unloaded position fails the capture client.'
     dependsOn tasks.named('runCaptureNegative')
-    def report = captureNegativeOutput.map { it.file('report.json') }
+    def root = captureNegativeOutput.get().asFile
+    usesService(captureRun)
     def fixture = captureNegativeDir.file('unloaded_position.json')
     inputs.file(fixture)
     outputs.upToDateWhen { false }
     doLast {
-        File reportFile = report.get().asFile
+        File reportFile = new File(new File(root, captureRun.get().id), 'report.json')
         if (!reportFile.file) throw new GradleException("The negative capture wrote no report at ${reportFile}")
         def parsed = new groovy.json.JsonSlurper().parse(reportFile)
         if (!parsed.failure)
@@ -456,6 +482,6 @@ tasks.register('verifyCaptureFailure') {
         if (!parsed.failure.contains('argument.pos.unloaded'))
             throw new GradleException("The negative capture failed for another reason: ${parsed.failure}")
         if (parsed.captures) throw new GradleException('The negative capture photographed a view after its failure')
-        println "Negative capture failed as required: ${parsed.failure}"
+        println "Negative capture failed as required: ${parsed.failure} (report ${reportFile})"
     }
 }

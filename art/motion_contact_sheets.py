@@ -1,14 +1,15 @@
 """Summarize timed in-game captures without altering the source evidence.
 
-Run after verifyCaptures: python3 art/motion_contact_sheets.py.
+Run after verifyCaptures: python3 art/motion_contact_sheets.py build/captures/RUN (the run directory verifyCaptures reported).
 Writes eight evenly spaced, timestamped frames per organ under build/art/motion.
 """
 import json
 import re
+import sys
 from pathlib import Path
 from PIL import Image, ImageDraw
 
-ROOT = Path('build/captures')
+ROOT = Path(sys.argv[1])
 OUT = Path('build/art/motion')
 
 
