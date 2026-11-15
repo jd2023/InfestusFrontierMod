@@ -308,6 +308,8 @@ class ItemCapsuleBlockEntity extends BlockEntity implements MenuProvider, GeoBlo
         root = pos;
         detach();
         setChanged();
+        if (pos.isPresent() && level instanceof ServerLevel server)
+            server.scheduleTick(worldPosition, getBlockState().getBlock(), CapsuleStemBlockEntity.RECHECK_TICKS);
     }
 
     boolean isReadable() {

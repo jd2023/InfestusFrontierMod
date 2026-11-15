@@ -160,24 +160,22 @@ public class ItemCapsuleBlock extends BaseEntityBlock {
      * A pod that hangs on a root and has lost the cell it hangs on, while its tree is gone, drops as an item, whole: its
      * cell left while it could not be told, or its chunk was out of reach when the tree died. A pod whose cell stands
      * is judged by the cell ({@link CapsuleStemBlock#tick}); one whose tree stands waits for the cell to regrow.
-     * Nothing can be told while the cell's or the root's chunk is out of reach, or the root's data did not read, so
-     * the pod asks again later; chunks are never loaded to ask.
+     * Nothing can be told while the cell's or the root's chunk is out of reach, or the root's data did not read, and
+     * chunks are never loaded to ask. So the pod asks again every {@link CapsuleStemBlockEntity#RECHECK_TICKS} for as
+     * long as it hangs on a root: a chunk that leaves reach without unloading keeps its scheduled ticks and its block
+     * entities, and gets no {@link ItemCapsuleBlockEntity#onLoad} when it is back, so the pending check is all that
+     * tells such a pod its tree died meanwhile.
      */
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!(level.getBlockEntity(pos) instanceof ItemCapsuleBlockEntity pod)
                 || pod.root().isEmpty()) return;
         BlockPos cell = pos.relative(state.getValue(FACING).getOpposite());
-        if (!level.hasChunkAt(cell)) {
-            level.scheduleTick(pos, this, CapsuleStemBlockEntity.RECHECK_TICKS);
-            return;
-        }
-        if (Stems.cellAt(level, cell).isPresent()) return;
-        switch (Stems.fate(level, pod.root().get(), cell)) {
-            case GONE -> level.destroyBlock(pos, true);
-            case UNKNOWN -> level.scheduleTick(pos, this, CapsuleStemBlockEntity.RECHECK_TICKS);
-            case STANDS -> {}
-        }
+        boolean gone = level.hasChunkAt(cell)
+                && Stems.cellAt(level, cell).isEmpty()
+                && Stems.fate(level, pod.root().get(), cell) == Stems.Fate.GONE;
+        if (gone) level.destroyBlock(pos, true);
+        else level.scheduleTick(pos, this, CapsuleStemBlockEntity.RECHECK_TICKS);
     }
 
     /** A Creative player who breaks a pod holding items or grown still gets them back, as with a shulker box. */

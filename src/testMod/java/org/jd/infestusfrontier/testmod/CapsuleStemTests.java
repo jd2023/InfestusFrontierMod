@@ -1353,6 +1353,12 @@ public final class CapsuleStemTests {
     /**
      * A pod out of reach when its cell leaves a dead tree is not forced to load: it stays until its chunk is back, then
      * finds its cell and root gone and drops whole, once.
+     *
+     * <p>The pod's chunk only borders the kept chunks, so when it is unforced it leaves reach ({@code hasChunkAt}) but
+     * the server keeps it in memory at a lower ticket level: it is not unloaded, and forced back it is promoted with
+     * the same block entity, which gets no {@code onLoad}. The pod's check must therefore already be pending in its
+     * chunk's scheduled ticks. It once was only when the tick scheduled as the pod grew had not run yet, which a
+     * slower setup spent: the pod then stayed until the test timed out, in about 5 of 12 runs.
      */
     @GameTest(
             templateNamespace = "infestusfrontier_tests",
@@ -1371,6 +1377,10 @@ public final class CapsuleStemTests {
         TestChunks.force(level, kept);
         TestChunks.force(level, near);
         TestChunks.force(level, far);
+        // a floor for the pods' drops: the pods are shed at ticks of their own, and the empty world lets the first
+        // fall out of reach before the last is shed
+        for (BlockPos pos : BlockPos.betweenClosed(root.offset(-2, -1, -2), root.offset(3, -1, 2)))
+            level.setBlockAndUpdate(pos, Blocks.STONE.defaultBlockState());
         level.setBlockAndUpdate(
                 root.below(), EcologyModule.LIVING_SUBSTRATE.get().defaultBlockState());
         CapsuleStemBlock.plant(level, root, EASTWARD);
@@ -1407,6 +1417,9 @@ public final class CapsuleStemTests {
                 })
                 .thenWaitUntil(() -> h.assertFalse(
                         level.getBlockState(east).is(StorageModule.ITEM_CAPSULE.get()), "the pod is shed when back"))
+                // the cell's other pod hangs on a higher cell that dies on its own tick, which may come after this one
+                .thenWaitUntil(() -> h.assertTrue(
+                        droppedCapsules(level, around) >= 2, "the cell's other pod is shed as its cell dies"))
                 .thenExecute(() -> {
                     int capsules = 0, bones = 0;
                     for (ItemEntity drop : level.getEntitiesOfClass(ItemEntity.class, around)) {
@@ -1426,6 +1439,15 @@ public final class CapsuleStemTests {
                     level.setChunkForced(far.x, far.z, false);
                 })
                 .thenSucceed();
+    }
+
+    /** The capsule items lying in {@code area}. */
+    private static int droppedCapsules(ServerLevel level, AABB area) {
+        int capsules = 0;
+        for (ItemEntity drop : level.getEntitiesOfClass(ItemEntity.class, area))
+            if (drop.getItem().is(StorageModule.ITEM_CAPSULE_ITEM.get()))
+                capsules += drop.getItem().getCount();
+        return capsules;
     }
 
     /** Opens the Mouth's screen and presses {@code button} {@code times} times. */
