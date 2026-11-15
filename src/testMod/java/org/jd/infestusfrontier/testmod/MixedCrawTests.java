@@ -930,7 +930,7 @@ public final class MixedCrawTests {
     public static void aCrawInATreeSurvivesItsChunkLeavingAndComingBack(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         BlockPos origin = h.absolutePos(BlockPos.ZERO);
-        BlockPos anchor = new BlockPos((origin.getX() & ~15) + 192000, 80, (origin.getZ() & ~15) + 224200);
+        BlockPos anchor = new BlockPos((origin.getX() & ~15) + 192000, 80, (origin.getZ() & ~15) + 224264);
         BlockPos root = anchor.east(47);
         BlockPos east = root.above().east();
         ChunkPos kept = new ChunkPos(anchor);
