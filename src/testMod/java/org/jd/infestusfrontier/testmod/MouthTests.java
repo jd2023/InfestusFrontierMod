@@ -533,32 +533,55 @@ public final class MouthTests {
         // one giving Mouth and nineteen taking Mouths in a 5 by 4 block, each under a store that says yes when asked
         // and then refuses the items; once a remainder is held, the stores refuse even when asked
         Counter.reset();
+        BlockPos source = new BlockPos(1, Y, 1);
         for (int x = 1; x <= 5; x++)
             for (int z = 1; z <= 4; z++) {
                 BlockPos at = new BlockPos(x, Y, z);
                 mouth(h, at, x == 1 && z == 1 ? MouthMode.OUTPUT : MouthMode.INTAKE);
                 if (x != 1 || z != 1) h.setBlock(at.above(), Blocks.LODESTONE);
             }
-        store(h, new BlockPos(1, Y, 1), new ItemStack(Items.BONE, 64));
+        store(h, source, new ItemStack(Items.BONE, 64));
+        int[] held = new int[2]; // the remainder and what is left in the source when the stores start refusing
         h.startSequence()
                 .thenIdle(50)
                 .thenExecute(() -> {
-                    Counter.refuseAll = true;
-                    Counter.max = 0;
+                    // phase one: the Mouth extracts, asks a store, tries to insert for real and keeps what is refused
+                    Counter.Phase first = Counter.first;
+                    h.assertTrue(first.simulated > 0, "the Mouth asked a store before inserting");
+                    h.assertTrue(first.executed > 0, "the Mouth attempted a real insertion, saw " + first.executed);
+                    h.assertTrue(
+                            first.max <= 18,
+                            "at most 16 offers and one simulated/executed delivery a pulse, saw " + first.max
+                                    + " inserts in a tick");
+                    int[] carried = new int[1];
+                    configure(h, source, control -> carried[0] = control.menu().carried());
+                    int left = count(h, source, Items.BONE);
+                    h.assertTrue(left < 64, "the Mouth extracted from the source, which holds " + left);
+                    h.assertTrue(carried[0] > 0, "the Mouth retains a remainder, saw " + carried[0]);
+                    h.assertValueEqual(left + carried[0], 64, "nothing delivered, so what left the source is carried");
+                    h.assertValueEqual(
+                            left + carried[0] + delivered(h),
+                            64,
+                            "every bone is in the source, the remainder or a destination");
+                    held[0] = carried[0];
+                    held[1] = left;
+                    Counter.refuse();
                 })
                 .thenIdle(120)
                 .thenExecute(() -> {
+                    // phase two: every store refuses even when asked, so the held remainder is only retried
+                    Counter.Phase refused = Counter.second;
                     h.assertTrue(
-                            Counter.max <= 18,
-                            "at most 16 offers and one simulated/executed delivery a pulse, saw " + Counter.max
-                                    + " inserts in a tick");
+                            refused.simulated > 0 && refused.ticks >= 3,
+                            "the held remainder was retried, saw " + refused.simulated + " asks over " + refused.ticks
+                                    + " ticks");
+                    h.assertTrue(
+                            refused.max <= 16, "at most 16 offers a retry, saw " + refused.max + " inserts in a tick");
                     int[] carried = new int[1];
-                    configure(
-                            h,
-                            new BlockPos(1, Y, 1),
-                            control -> carried[0] = control.menu().carried());
-                    h.assertValueEqual(
-                            count(h, new BlockPos(1, Y, 1), Items.BONE) + carried[0], 64, "every bone is somewhere");
+                    configure(h, source, control -> carried[0] = control.menu().carried());
+                    h.assertValueEqual(carried[0], held[0], "the same remainder is retained");
+                    h.assertValueEqual(count(h, source, Items.BONE), held[1], "nothing more is taken from the source");
+                    h.assertValueEqual(delivered(h), 0, "nothing reached a destination");
                     Counter.reset();
                 })
                 .thenSucceed();
@@ -637,7 +660,8 @@ public final class MouthTests {
 
     /**
      * A store on lodestone, for the offer budget test only (batch mouth_offers runs alone): it counts every insert
-     * per tick, says yes to a simulated insert until {@link #refuseAll}, and never takes the items.
+     * per tick as simulated or executed, says yes to a simulated insert until {@link Counter#refuse}, and never takes
+     * the items.
      */
     @SubscribeEvent
     public static void countingStore(RegisterCapabilitiesEvent event) {
@@ -656,7 +680,7 @@ public final class MouthTests {
 
                     @Override
                     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-                        Counter.hit(level.getGameTime());
+                        Counter.hit(level.getGameTime(), simulate);
                         return simulate && !Counter.refuseAll ? ItemStack.EMPTY : stack;
                     }
 
@@ -678,25 +702,56 @@ public final class MouthTests {
                 Blocks.LODESTONE);
     }
 
-    private static final class Counter {
-        static boolean refuseAll;
-        static long tick = -1;
-        static int now;
-        static int max;
+    /** Every bone in the nineteen destinations of the offer budget test. */
+    private static int delivered(GameTestHelper h) {
+        int total = 0;
+        for (int x = 1; x <= 5; x++)
+            for (int z = 1; z <= 4; z++) if (x != 1 || z != 1) total += count(h, new BlockPos(x, Y, z), Items.BONE);
+        return total;
+    }
 
-        static void hit(long time) {
-            if (time != tick) {
-                tick = time;
-                now = 0;
+    /** Inserts into the counting stores, told apart as simulated or executed, for each phase of the budget test. */
+    private static final class Counter {
+        static Phase first = new Phase();
+        static Phase second = new Phase();
+        static Phase phase = first;
+        static boolean refuseAll;
+
+        /** Simulated and executed inserts, the most in one tick, and the ticks with any. */
+        static final class Phase {
+            int simulated;
+            int executed;
+            int max;
+            int ticks;
+            long tick = -1;
+            int now;
+
+            void hit(long time, boolean simulate) {
+                if (time != tick) {
+                    tick = time;
+                    now = 0;
+                    ticks++;
+                }
+                if (simulate) simulated++;
+                else executed++;
+                max = Math.max(max, ++now);
             }
-            max = Math.max(max, ++now);
+        }
+
+        static void hit(long time, boolean simulate) {
+            phase.hit(time, simulate);
+        }
+
+        static void refuse() {
+            refuseAll = true;
+            phase = second;
         }
 
         static void reset() {
+            first = new Phase();
+            second = new Phase();
+            phase = first;
             refuseAll = false;
-            tick = -1;
-            now = 0;
-            max = 0;
         }
     }
 
