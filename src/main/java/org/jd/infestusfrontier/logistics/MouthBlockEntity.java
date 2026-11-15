@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.jd.infestusfrontier.core.logistics.Candidates;
 import org.jd.infestusfrontier.core.logistics.Delivery;
 import org.jd.infestusfrontier.core.logistics.NetworkIndex;
 import org.jd.infestusfrontier.foundation.Persistence;
@@ -72,7 +73,11 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
 
     private int sourceCursor;
     /** Where the next search for a taker starts in the ordered takers; carried from pulse to pulse. */
-    private int cursor;
+    private final Candidates takers = new Candidates();
+    /** The same for an organ's pushes and pulls through this Mouth: each asks takers or givers from its own place. */
+    private final Candidates pushes = new Candidates();
+
+    private final Candidates pulls = new Candidates();
 
     private int turn;
 
@@ -96,6 +101,14 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
 
     void turned() {
         turn++;
+    }
+
+    Candidates pushes() {
+        return pushes;
+    }
+
+    Candidates pulls() {
+        return pulls;
     }
 
     boolean deny() {
@@ -222,28 +235,25 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
     private record Taker(Route route, int room) {}
 
     /**
-     * The first taker in {@code order}, from {@link #cursor} on and wrapping, whose store takes some of {@code stack}
+     * The first taker in the window {@link #takers} gives from {@code order}, whose store takes some of {@code stack}
      * now. Every candidate costs one offer, including a filtered or unavailable endpoint. When the
      * budget runs out the cursor keeps its place, so the next pulse asks the takers after it: every taker is asked
      * within a few pulses however many refuse ahead of it. An acceptance sends the cursor back to the top.
      */
     private Optional<Taker> taker(List<Route> order, ItemStack stack) {
-        int size = order.size();
-        if (size == 0) return Optional.empty();
-        int start = Math.floorMod(cursor, size);
-        for (int step = 0; step < size && offers > 0; step++) {
-            int index = (start + step) % size;
-            Route route = order.get(index);
+        int asked = 0;
+        for (Route route : takers.window(order, offers)) {
             offers--;
-            cursor = (index + 1) % size;
+            asked++;
             Optional<MouthBlockEntity> mouth = destination(route.pos());
             if (mouth.isEmpty() || !mouth.get().wants(stack)) continue;
             int room = mouth.get().room(stack);
             if (room > 0) {
-                cursor = 0;
+                takers.moved();
                 return Optional.of(new Taker(route, room));
             }
         }
+        takers.refused(asked);
         return Optional.empty();
     }
 

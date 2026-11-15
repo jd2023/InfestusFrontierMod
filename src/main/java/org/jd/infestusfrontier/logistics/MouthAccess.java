@@ -1,15 +1,14 @@
 package org.jd.infestusfrontier.logistics;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.core.logistics.Candidates;
 import org.jd.infestusfrontier.core.logistics.Delivery;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.logistics.api.ItemAccess;
@@ -18,7 +17,8 @@ import org.jd.infestusfrontier.logistics.api.ItemAccess;
  * The transactions an organ makes through the Mouth under it. The far Mouths come from the shared topology and are
  * read live; a far Mouth in an unloaded chunk gives and takes nothing, and no chunk is loaded to find out. One call
  * takes one network work admission and looks at no more than {@link ItemAccess#CANDIDATES} far Mouths, however many
- * kinds it moves.
+ * kinds it moves. The window of far Mouths a call looks at follows {@link Candidates}: a call that moved nothing, or a
+ * simulated push that would move nothing, passes the Mouths it asked, so a later call reaches the ones behind.
  */
 final class MouthAccess implements ItemAccess {
     private final MouthBlockEntity mouth;
@@ -71,11 +71,15 @@ final class MouthAccess implements ItemAccess {
         List<ItemStack> none = wants.stream().map(w -> ItemStack.EMPTY).toList();
         Admission admission = admit(takes(), NOT_TAKING);
         if (admission instanceof Admission.Shut shut) return new Drawn(none, false, Optional.of(shut.why()));
-        List<MouthBlockEntity> sources =
-                ordered(((Admission.Open) admission).peers(), far -> far.mode().gives());
-        Set<MouthBlockEntity> looked = new HashSet<>();
+        List<MouthBlockEntity> sources = mouth.pulls()
+                .window(
+                        ordered(
+                                ((Admission.Open) admission).peers(),
+                                far -> far.mode().gives()),
+                        CANDIDATES);
         List<ItemStack> drawn = new ArrayList<>();
         boolean asked = false;
+        boolean moved = false;
         for (Want want : wants) {
             ItemStack kind = want.kind().copyWithCount(1);
             int room = kind.isEmpty() || !mouth.wants(kind)
@@ -89,15 +93,16 @@ final class MouthAccess implements ItemAccess {
             int got = 0;
             for (MouthBlockEntity far : sources) {
                 if (got >= room) break;
-                if (!looked.contains(far)) {
-                    if (looked.size() >= CANDIDATES) continue;
-                    looked.add(far);
-                }
                 got += far.release(kind, room - got).getCount();
             }
             drawn.add(got == 0 ? ItemStack.EMPTY : kind.copyWithCount(got));
-            if (got > 0) mouth.turned();
+            if (got > 0) {
+                moved = true;
+                mouth.turned();
+            }
         }
+        if (moved) mouth.pulls().moved();
+        else if (asked) mouth.pulls().refused(sources.size());
         return new Drawn(drawn, true, asked || wants.isEmpty() ? Optional.empty() : Optional.of(TURNED_AWAY));
     }
 
@@ -106,11 +111,15 @@ final class MouthAccess implements ItemAccess {
         List<ItemStack> kept = offers.stream().map(o -> o.stack().copy()).toList();
         Admission admission = admit(gives(), NOT_GIVING);
         if (admission instanceof Admission.Shut shut) return new Sent(kept, false, Optional.of(shut.why()));
-        List<MouthBlockEntity> takers =
-                ordered(((Admission.Open) admission).peers(), far -> far.mode().takes());
-        Set<MouthBlockEntity> looked = new HashSet<>();
+        List<MouthBlockEntity> takers = mouth.pushes()
+                .window(
+                        ordered(
+                                ((Admission.Open) admission).peers(),
+                                far -> far.mode().takes()),
+                        CANDIDATES);
         List<ItemStack> rests = new ArrayList<>();
         boolean asked = false;
+        boolean moved = false;
         for (Offer offer : offers) {
             ItemStack stack = offer.stack();
             int count = stack.getCount();
@@ -121,10 +130,6 @@ final class MouthAccess implements ItemAccess {
             if (allowed > 0) asked = true;
             for (MouthBlockEntity far : takers) {
                 if (left <= 0) break;
-                if (!looked.contains(far)) {
-                    if (looked.size() >= CANDIDATES) continue;
-                    looked.add(far);
-                }
                 ItemStack part = stack.copyWithCount(left);
                 if (!far.wants(part)) continue;
                 int room = Math.min(far.room(part), left);
@@ -134,8 +139,14 @@ final class MouthAccess implements ItemAccess {
                         : room - far.accept(stack.copyWithCount(room)).getCount();
             }
             rests.add(stack.isEmpty() ? ItemStack.EMPTY : stack.copyWithCount(count - (allowed - left)));
-            if (left < allowed && !simulate) mouth.turned();
+            if (left < allowed) {
+                moved = true;
+                if (!simulate) mouth.turned();
+            }
         }
+        if (moved) {
+            if (!simulate) mouth.pushes().moved();
+        } else if (asked) mouth.pushes().refused(takers.size());
         return new Sent(rests, true, asked || offers.isEmpty() ? Optional.empty() : Optional.of(TURNED_AWAY));
     }
 }
