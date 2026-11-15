@@ -420,7 +420,8 @@ tasks.named('runCapture') {
     dependsOn prepareCapture
     mustRunAfter tasks.named('runGameTestServer')
     outputs.upToDateWhen { false }
-    timeout = java.time.Duration.ofMinutes(30)
+    // 65 scenarios take about 26 minutes on an idle machine and over 30 when other builds share it.
+    timeout = java.time.Duration.ofMinutes(45)
 }
 tasks.named('runCaptureNegative') {
     dependsOn prepareCaptureNegative

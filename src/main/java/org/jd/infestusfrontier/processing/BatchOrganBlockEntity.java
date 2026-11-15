@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -86,6 +87,11 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
     private float experience;
     /** True while something changed since the last look for a recipe, so a tick looks again at most once per change. */
     private boolean retry = true;
+    /**
+     * The recipe manager the last look was made with. A completed data reload installs a new manager and a failed one
+     * keeps the old, so a different manager means the recipes changed: the next tick looks once more, for every book.
+     */
+    private RecipeManager recipes;
     /**
      * Bit {@code n} is set while a batch ready to start or to finish has no room for its result in output slot
      * {@code n}; {@link #DIRTY_FULL} while a washing batch has no room for its dirty water.
@@ -251,6 +257,7 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
 
     static void serverTick(Level level, BlockPos pos, BlockState state, BatchOrganBlockEntity organ) {
         organ.show();
+        organ.noticeReload(level);
         if (organ.unreadable.isPresent() || !Organs.hasFoundation(level, pos)) return;
         if (organ.batch.isEmpty() && organ.retry) organ.start();
         if (organ.batch.isEmpty()) return;
@@ -266,6 +273,13 @@ final class BatchOrganBlockEntity extends BlockEntity implements BiomassHandler,
             return true;
         });
         organ.setChanged();
+    }
+
+    private void noticeReload(Level level) {
+        RecipeManager current = level.getRecipeManager();
+        if (current == recipes) return;
+        recipes = current;
+        retry = true;
     }
 
     /**
