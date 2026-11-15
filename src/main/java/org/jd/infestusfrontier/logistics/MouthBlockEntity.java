@@ -59,9 +59,6 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
                             .forGetter(Saved::remainder))
             .apply(instance, Saved::new));
 
-    /** A Mouth that takes, found on this Mouth's network. */
-    private record Route(BlockPos pos) {}
-
     private final SimpleContainer filter = new SimpleContainer(FILTER_SLOTS);
     private boolean deny;
     private int amount;
@@ -155,6 +152,12 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         if (level == null || unreadable.isPresent()) return;
         priority = Delivery.nextPriority(priority, up);
         setChanged();
+        reordered();
+    }
+
+    /** The order of this Mouth's network is stale. */
+    private void reordered() {
+        if (level instanceof ServerLevel server) NetworkTopology.get(server).reordered(server, worldPosition);
     }
 
     // --- the pulse ---
@@ -188,12 +191,13 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
 
     private boolean deliverRemainder() {
         if (remainder.isEmpty()) return false;
-        Optional<Taker> target = taker(ordered(), remainder);
+        Optional<List<BlockPos>> order = takers();
+        if (order.isEmpty()) return false;
+        Optional<Taker> target = taker(order.get(), remainder);
         if (target.isEmpty()) return false;
         int before = remainder.getCount();
-        remainder = destination(target.get().route().pos())
-                .map(m -> m.accept(remainder))
-                .orElse(remainder);
+        remainder =
+                destination(target.get().pos()).map(m -> m.accept(remainder)).orElse(remainder);
         if (remainder.getCount() != before) setChanged();
         return remainder.getCount() < before;
     }
@@ -201,13 +205,14 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
     private boolean extract() {
         IItemHandler source = partner();
         if (source == null || source.getSlots() == 0) return false;
-        List<Route> order = ordered();
-        if (order.isEmpty()) return false;
+        Optional<List<BlockPos>> order = takers();
+        if (order.isEmpty() || order.get().isEmpty()) return false;
         int slots = source.getSlots();
         sourceCursor = Math.floorMod(sourceCursor, slots);
         int look = Math.min(SOURCE_SLOTS, slots);
         for (int n = 0; n < look && offers > 0; n++) {
             int slot = (sourceCursor + n) % slots;
+            RoutingCounts.add(RoutingCounts.Step.INVENTORY, 1);
             ItemStack offered = source.extractItem(slot, TRANSFER_SIZE, true);
             if (offered.isEmpty() || !permits(offered)) continue;
             int allowed = amount == 0
@@ -215,13 +220,12 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
                     : Delivery.outputAllowance(amount, ItemStores.count(source, offered), offered.getCount());
             if (allowed == 0) continue;
             ItemStack wanted = offered.copyWithCount(allowed);
-            Optional<Taker> taker = taker(order, wanted);
+            Optional<Taker> taker = taker(order.get(), wanted);
             if (taker.isEmpty()) continue;
+            RoutingCounts.add(RoutingCounts.Step.INVENTORY, 1);
             ItemStack taken = source.extractItem(slot, taker.get().room(), false);
             if (taken.isEmpty()) continue;
-            remainder = destination(taker.get().route().pos())
-                    .map(m -> m.accept(taken))
-                    .orElse(taken);
+            remainder = destination(taker.get().pos()).map(m -> m.accept(taken)).orElse(taken);
             sourceCursor = slot;
             turn++;
             setChanged();
@@ -232,7 +236,7 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     /** A taker that accepted {@code room} items in a simulated insert. */
-    private record Taker(Route route, int room) {}
+    private record Taker(BlockPos pos, int room) {}
 
     /**
      * The first taker in the window {@link #takers} gives from {@code order}, whose store takes some of {@code stack}
@@ -240,58 +244,46 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
      * budget runs out the cursor keeps its place, so the next pulse asks the takers after it: every taker is asked
      * within a few pulses however many refuse ahead of it. An acceptance sends the cursor back to the top.
      */
-    private Optional<Taker> taker(List<Route> order, ItemStack stack) {
+    private Optional<Taker> taker(List<BlockPos> order, ItemStack stack) {
         int asked = 0;
-        for (Route route : takers.window(order, offers)) {
+        for (BlockPos pos : takers.window(order, offers)) {
             offers--;
             asked++;
-            Optional<MouthBlockEntity> mouth = destination(route.pos());
+            if (pos.equals(worldPosition)) continue;
+            Optional<MouthBlockEntity> mouth = destination(pos);
             if (mouth.isEmpty() || !mouth.get().wants(stack)) continue;
             int room = mouth.get().room(stack);
             if (room > 0) {
                 takers.moved();
-                return Optional.of(new Taker(route, room));
+                return Optional.of(new Taker(pos, room));
             }
         }
         takers.refused(asked);
         return Optional.empty();
     }
 
-    private List<Route> ordered() {
-        List<Delivery.Destination<Route>> candidates = new ArrayList<>();
-        for (Route route : routes()) {
-            Optional<MouthBlockEntity> mouth = destination(route.pos());
-            if (mouth.isPresent())
-                candidates.add(new Delivery.Destination<>(route, mouth.get().priority()));
-        }
-        return Delivery.order(candidates, turn);
-    }
-
-    /** Shared component membership; endpoint mode, filters and inventories are always read live. */
-    private List<Route> routes() {
-        List<Route> found = new ArrayList<>();
-        for (BlockPos peer : peers().orElse(List.of()))
-            if (destination(peer).filter(mouth -> mouth.mode().takes()).isPresent()) found.add(new Route(peer));
-        return found;
+    /** The Mouths that take, in the order they are asked now; see {@link NetworkTopology#itemEndpoints}. */
+    private Optional<List<BlockPos>> takers() {
+        return network().flatMap(this::endpoints).map(found -> found.takers().ordered(turn));
     }
 
     /**
-     * The other Mouths of this Mouth's network, or empty while the network is not ready. They may stand in unloaded
+     * The ranked Mouths of {@code network}, or empty while they cannot be paid for now. They may stand in unloaded
      * chunks: the topology is saved knowledge, and an unloaded Mouth is told by {@link #destination}.
      */
-    Optional<List<BlockPos>> peers() {
+    Optional<ItemEndpoints> endpoints(NetworkIndex.Component<NetworkTopology.Node> network) {
+        return NetworkTopology.get((ServerLevel) level).itemEndpoints((ServerLevel) level, network);
+    }
+
+    /** This Mouth's network, when it is ready to be read. */
+    Optional<NetworkIndex.Component<NetworkTopology.Node>> network() {
         Optional<NetworkIndex.Component<NetworkTopology.Node>> component =
                 NetworkTopology.get((ServerLevel) level).network((ServerLevel) level, worldPosition, null);
-        if (component.isEmpty() || component.get().status() != NetworkIndex.Status.READY) return Optional.empty();
-        List<BlockPos> found = new ArrayList<>();
-        for (NetworkTopology.Node node : component.get().nodes()) {
-            if (node.pos().equals(worldPosition) || node.faces() != (63 ^ NetworkTopology.bit(Direction.UP))) continue;
-            found.add(node.pos());
-        }
-        return Optional.of(found);
+        return component.filter(found -> found.status() == NetworkIndex.Status.READY);
     }
 
     Optional<MouthBlockEntity> destination(BlockPos pos) {
+        RoutingCounts.add(RoutingCounts.Step.LOOKUPS, 1);
         if (!level.hasChunkAt(pos)) return Optional.empty();
         return level.getBlockEntity(pos) instanceof MouthBlockEntity mouth ? Optional.of(mouth) : Optional.empty();
     }
@@ -308,6 +300,7 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         if (unreadable.isPresent() || !mode().takes() || !permits(stack)) return 0;
         IItemHandler store = partner();
         if (store == null) return 0;
+        RoutingCounts.add(RoutingCounts.Step.INVENTORY, 1);
         int allowed = Delivery.intakeRoom(amount, amount == 0 ? 0 : ItemStores.count(store, stack), stack.getCount());
         if (allowed == 0) return 0;
         return allowed
@@ -325,6 +318,7 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         if (unreadable.isPresent() || !mode().gives() || !permits(kind) || limit <= 0) return ItemStack.EMPTY;
         IItemHandler store = partner();
         if (store == null) return ItemStack.EMPTY;
+        RoutingCounts.add(RoutingCounts.Step.INVENTORY, 1);
         int allowed = amount == 0
                 ? limit
                 : Math.min(limit, Delivery.outputAllowance(amount, ItemStores.count(store, kind), limit));
@@ -357,6 +351,7 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
         int room = room(stack);
         if (room == 0) return stack;
         IItemHandler store = partner();
+        RoutingCounts.add(RoutingCounts.Step.INVENTORY, 1);
         int inserted = room
                 - ItemStores.insert(store, stack.copyWithCount(room), false).getCount();
         return stack.copyWithCount(stack.getCount() - inserted);
@@ -422,7 +417,10 @@ final class MouthBlockEntity extends BlockEntity implements MenuProvider {
                                     : ItemStack.EMPTY);
         deny = saved.deny();
         amount = saved.amount();
-        priority = saved.priority();
+        if (priority != saved.priority()) {
+            priority = saved.priority();
+            reordered();
+        }
         remainder = saved.remainder().copy();
     }
 

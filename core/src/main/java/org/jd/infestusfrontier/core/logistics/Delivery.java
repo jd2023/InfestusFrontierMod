@@ -1,10 +1,8 @@
 package org.jd.infestusfrontier.core.logistics;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-/** The order an output Mouth offers items to destinations, and how much each side of a transfer allows. */
+/** What a Mouth's settings allow: the amounts and priorities it can be set to, and how much each side of a transfer takes. */
 public final class Delivery {
     public static final int MIN_PRIORITY = -4;
     public static final int MAX_PRIORITY = 4;
@@ -15,28 +13,6 @@ public final class Delivery {
 
     /** One intake Mouth on the network. */
     public record Destination<T>(T id, int priority) {}
-
-    /**
-     * Highest priority first. Equal-priority destinations take turns: the group starts at
-     * {@code turn} modulo its size. Ties keep their input order otherwise.
-     */
-    public static <T> List<T> order(List<Destination<T>> destinations, int turn) {
-        List<Destination<T>> sorted = new ArrayList<>(destinations);
-        sorted.sort(Comparator.comparingInt(d -> -d.priority()));
-        List<T> out = new ArrayList<>(sorted.size());
-        int start = 0;
-        while (start < sorted.size()) {
-            int end = start;
-            Destination<T> first = sorted.get(start);
-            while (end < sorted.size() && sorted.get(end).priority() == first.priority()) end++;
-            int size = end - start;
-            int offset = Math.floorMod(turn, size);
-            for (int i = 0; i < size; i++)
-                out.add(sorted.get(start + (offset + i) % size).id());
-            start = end;
-        }
-        return List.copyOf(out);
-    }
 
     /** How many an intake may add to a store holding {@code present}: up to {@code amount}, or any with 0. */
     public static int intakeRoom(int amount, int present, int offered) {

@@ -2,33 +2,9 @@ package org.jd.infestusfrontier.core.logistics;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class DeliveryTest {
-    private static Delivery.Destination<String> d(String id, int priority) {
-        return new Delivery.Destination<>(id, priority);
-    }
-
-    @Test
-    void priorityBeatsDiscoveryOrder() {
-        assertEquals(List.of("far-high", "near-low"), Delivery.order(List.of(d("near-low", 0), d("far-high", 2)), 0));
-    }
-
-    @Test
-    void equalPriorityStartsInDiscoveryOrder() {
-        assertEquals(List.of("b", "a"), Delivery.order(List.of(d("b", 0), d("a", 0)), 0));
-    }
-
-    @Test
-    void equalDestinationsTakeTurns() {
-        var group = List.of(d("a", 0), d("b", 0), d("c", 0), d("z", -1));
-        assertEquals(List.of("a", "b", "c", "z"), Delivery.order(group, 0));
-        assertEquals(List.of("b", "c", "a", "z"), Delivery.order(group, 1));
-        assertEquals(List.of("c", "a", "b", "z"), Delivery.order(group, 5));
-        assertEquals(List.of("c", "a", "b", "z"), Delivery.order(group, -1));
-    }
-
     @Test
     void intakeFillsUpToItsAmount() {
         assertEquals(8, Delivery.intakeRoom(0, 1000, 8), "no rule");

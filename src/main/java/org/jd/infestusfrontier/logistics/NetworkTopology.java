@@ -90,6 +90,8 @@ final class NetworkTopology extends SavedData {
     private final Map<Node, Set<Long>> frontierChunks = new HashMap<>();
     private final Set<Long> loading = new HashSet<>();
     private final Map<NetworkIndex.Component<Node>, Integer> turns = new IdentityHashMap<>();
+    private final Map<NetworkIndex.Component<Node>, ItemEndpoints> items = new IdentityHashMap<>();
+    private final Map<NetworkIndex.Component<Node>, long[]> missing = new IdentityHashMap<>();
 
     int turn(NetworkIndex.Component<Node> component) {
         return turns.getOrDefault(component, 0);
@@ -153,7 +155,10 @@ final class NetworkTopology extends SavedData {
                 }
             }
         }
-        if (used > 0) endpoints.clear();
+        if (used > 0) {
+            endpoints.clear();
+            missing.clear();
+        }
         NetworkWork.discovered(level, used);
     }
 
@@ -168,6 +173,29 @@ final class NetworkTopology extends SavedData {
         ports = List.copyOf(result);
         endpoints.put(component, ports);
         return ports;
+    }
+
+    /**
+     * The ranked Mouths of an item component, shared by every Mouth and organ on it. Built once per component from its
+     * nodes, which costs one discovery work unit a node, so a component that cannot be paid for now answers empty and
+     * the caller retries; only membership and order are kept, everything else is read live. It goes with its component
+     * and when a Mouth of it changes priority.
+     */
+    Optional<ItemEndpoints> itemEndpoints(ServerLevel level, NetworkIndex.Component<Node> component) {
+        ItemEndpoints found = items.get(component);
+        if (found != null) return Optional.of(found);
+        int cost = component.nodes().size();
+        if (NetworkWork.discovery(level, cost) < cost) return Optional.empty();
+        NetworkWork.discovered(level, cost);
+        if (items.size() >= 256) items.clear();
+        ItemEndpoints built = ItemEndpoints.build(level, component);
+        items.put(component, built);
+        return Optional.of(built);
+    }
+
+    /** A Mouth's priority changed: the order of its network is stale. */
+    void reordered(ServerLevel level, BlockPos pos) {
+        network(level, pos, null).ifPresent(items::remove);
     }
 
     static NetworkTopology get(ServerLevel level) {
@@ -251,9 +279,15 @@ final class NetworkTopology extends SavedData {
     private boolean shouldRefresh(ServerLevel level, NetworkIndex.Component<Node> component) {
         if (component.status() == NetworkIndex.Status.UNAVAILABLE) return component.retryDue(level.getGameTime(), 20);
         if (component.status() != NetworkIndex.Status.READY) return false;
-        for (Node node : component.nodes())
-            for (long chunk : frontierChunks.getOrDefault(node, Set.of()))
-                if (level.hasChunk(ChunkPos.getX(chunk), ChunkPos.getZ(chunk))) return true;
+        long[] chunks = missing.get(component);
+        if (chunks == null) {
+            if (missing.size() >= 256) missing.clear();
+            Set<Long> found = new HashSet<>();
+            for (Node node : component.nodes()) found.addAll(frontierChunks.getOrDefault(node, Set.of()));
+            chunks = found.stream().mapToLong(Long::longValue).toArray();
+            missing.put(component, chunks);
+        }
+        for (long chunk : chunks) if (level.hasChunk(ChunkPos.getX(chunk), ChunkPos.getZ(chunk))) return true;
         return false;
     }
 
@@ -308,6 +342,8 @@ final class NetworkTopology extends SavedData {
             watchers.clear();
             boundaries.clear();
             endpoints.clear();
+            items.clear();
+            missing.clear();
             capabilityWatches.clear();
             dirtyEndpoints.clear();
             turns.clear();
@@ -325,6 +361,8 @@ final class NetworkTopology extends SavedData {
         if (nodes != null) for (Node node : nodes) graph.invalidate(node);
         if (loading.size() >= 256) {
             graph.clear();
+            items.clear();
+            missing.clear();
             loading.clear();
         }
         loading.add(chunk.toLong());

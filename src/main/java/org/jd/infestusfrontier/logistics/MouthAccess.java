@@ -3,13 +3,13 @@ package org.jd.infestusfrontier.logistics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.core.logistics.Candidates;
 import org.jd.infestusfrontier.core.logistics.Delivery;
+import org.jd.infestusfrontier.core.logistics.NetworkIndex;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.logistics.api.ItemAccess;
 
@@ -39,31 +39,36 @@ final class MouthAccess implements ItemAccess {
 
     /** Whether a call may use the network now. */
     private sealed interface Admission {
-        record Open(List<BlockPos> peers) implements Admission {}
+        record Open(ItemEndpoints endpoints) implements Admission {}
 
         record Shut(Refusal why) implements Admission {}
     }
 
-    /** The far Mouths of the network, or the reason the network cannot be used now; spends the admission. */
+    /**
+     * The ranked Mouths of the network, or the reason it cannot be used now. A call is refused before the Mouths are
+     * read, and spends the admission only when the network is ready.
+     */
     private Admission admit(boolean direction, Refusal wrongWay) {
         if (!(mouth.getLevel() instanceof ServerLevel level)) return new Admission.Shut(BUSY);
         if (mouth.isUnreadable()) return new Admission.Shut(Persistence.CORRUPT);
         if (!direction) return new Admission.Shut(wrongWay);
-        Optional<List<BlockPos>> peers = mouth.peers();
-        if (peers.isEmpty()) return new Admission.Shut(NETWORK);
+        Optional<NetworkIndex.Component<NetworkTopology.Node>> network = mouth.network();
+        if (network.isEmpty()) return new Admission.Shut(NETWORK);
         if (!NetworkWork.take(level)) return new Admission.Shut(BUSY);
-        return new Admission.Open(peers.get());
+        Optional<ItemEndpoints> endpoints = mouth.endpoints(network.get());
+        return endpoints.isPresent() ? new Admission.Open(endpoints.get()) : new Admission.Shut(BUSY);
     }
 
-    /** The loaded far Mouths that pass {@code use}, in the order they are asked: highest priority first, equals by turns. */
-    private List<MouthBlockEntity> ordered(List<BlockPos> peers, Predicate<MouthBlockEntity> use) {
-        List<Delivery.Destination<MouthBlockEntity>> found = new ArrayList<>();
-        for (BlockPos peer : peers) {
-            Optional<MouthBlockEntity> far = mouth.destination(peer);
-            if (far.isPresent() && use.test(far.get()))
-                found.add(new Delivery.Destination<>(far.get(), far.get().priority()));
+    /** The loaded far Mouths among {@code window} that give or take as asked now; one lookup each, never this Mouth. */
+    private List<MouthBlockEntity> loaded(List<BlockPos> window, boolean giving) {
+        List<MouthBlockEntity> found = new ArrayList<>(window.size());
+        for (BlockPos pos : window) {
+            if (pos.equals(mouth.getBlockPos())) continue;
+            Optional<MouthBlockEntity> far = mouth.destination(pos);
+            if (far.isPresent()
+                    && (giving ? far.get().mode().gives() : far.get().mode().takes())) found.add(far.get());
         }
-        return Delivery.order(found, mouth.turn());
+        return found;
     }
 
     @Override
@@ -71,12 +76,16 @@ final class MouthAccess implements ItemAccess {
         List<ItemStack> none = wants.stream().map(w -> ItemStack.EMPTY).toList();
         Admission admission = admit(takes(), NOT_TAKING);
         if (admission instanceof Admission.Shut shut) return new Drawn(none, false, Optional.of(shut.why()));
-        List<MouthBlockEntity> sources = mouth.pulls()
-                .window(
-                        ordered(
-                                ((Admission.Open) admission).peers(),
-                                far -> far.mode().gives()),
-                        CANDIDATES);
+        List<BlockPos> window = wants.isEmpty()
+                ? List.of()
+                : mouth.pulls()
+                        .window(
+                                ((Admission.Open) admission)
+                                        .endpoints()
+                                        .givers()
+                                        .ordered(mouth.turn()),
+                                CANDIDATES);
+        List<MouthBlockEntity> sources = loaded(window, true);
         List<ItemStack> drawn = new ArrayList<>();
         boolean asked = false;
         boolean moved = false;
@@ -102,7 +111,7 @@ final class MouthAccess implements ItemAccess {
             }
         }
         if (moved) mouth.pulls().moved();
-        else if (asked) mouth.pulls().refused(sources.size());
+        else if (asked) mouth.pulls().refused(window.size());
         return new Drawn(drawn, true, asked || wants.isEmpty() ? Optional.empty() : Optional.of(TURNED_AWAY));
     }
 
@@ -111,12 +120,16 @@ final class MouthAccess implements ItemAccess {
         List<ItemStack> kept = offers.stream().map(o -> o.stack().copy()).toList();
         Admission admission = admit(gives(), NOT_GIVING);
         if (admission instanceof Admission.Shut shut) return new Sent(kept, false, Optional.of(shut.why()));
-        List<MouthBlockEntity> takers = mouth.pushes()
-                .window(
-                        ordered(
-                                ((Admission.Open) admission).peers(),
-                                far -> far.mode().takes()),
-                        CANDIDATES);
+        List<BlockPos> window = offers.isEmpty()
+                ? List.of()
+                : mouth.pushes()
+                        .window(
+                                ((Admission.Open) admission)
+                                        .endpoints()
+                                        .takers()
+                                        .ordered(mouth.turn()),
+                                CANDIDATES);
+        List<MouthBlockEntity> takers = loaded(window, false);
         List<ItemStack> rests = new ArrayList<>();
         boolean asked = false;
         boolean moved = false;
@@ -146,7 +159,7 @@ final class MouthAccess implements ItemAccess {
         }
         if (moved) {
             if (!simulate) mouth.pushes().moved();
-        } else if (asked) mouth.pushes().refused(takers.size());
+        } else if (asked) mouth.pushes().refused(window.size());
         return new Sent(rests, true, asked || offers.isEmpty() ? Optional.empty() : Optional.of(TURNED_AWAY));
     }
 }
