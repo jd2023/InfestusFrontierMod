@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "bend=false,facing=north": {
+      "model": "infestusfrontier:block/root_cell"
+    },
+    "bend=true,facing=north": {
+      "model": "infestusfrontier:block/root_cell_bend"
+    },
+    "bend=false,facing=east": {
+      "model": "infestusfrontier:block/root_cell",
+      "y": 90
+    },
+    "bend=true,facing=east": {
+      "model": "infestusfrontier:block/root_cell_bend",
+      "y": 90
+    },
+    "bend=false,facing=south": {
+      "model": "infestusfrontier:block/root_cell",
+      "y": 180
+    },
+    "bend=true,facing=south": {
+      "model": "infestusfrontier:block/root_cell_bend",
+      "y": 180
+    },
+    "bend=false,facing=west": {
+      "model": "infestusfrontier:block/root_cell",
+      "y": 270
+    },
+    "bend=true,facing=west": {
+      "model": "infestusfrontier:block/root_cell_bend",
+      "y": 270
+    }
+  }
+}

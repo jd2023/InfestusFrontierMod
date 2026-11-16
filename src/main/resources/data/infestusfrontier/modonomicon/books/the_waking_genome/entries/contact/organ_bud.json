@@ -81,6 +81,11 @@
       "type": "infestusfrontier:organ_growth",
       "recipe_id_1": "infestusfrontier:growth/leaching_pod",
       "title1": "block.infestusfrontier.leaching_pod"
+    },
+    {
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/tunnel_root",
+      "title1": "block.infestusfrontier.tunnel_root"
     }
   ]
 }

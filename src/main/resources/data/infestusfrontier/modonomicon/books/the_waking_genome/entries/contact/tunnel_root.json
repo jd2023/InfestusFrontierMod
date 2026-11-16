@@ -1,0 +1,63 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.tunnel_root.name",
+  "description": "entry.infestusfrontier.contact.tunnel_root.description",
+  "icon": "infestusfrontier:tunnel_root",
+  "x": 3,
+  "y": 4,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/leaching_pod"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/organ_bud"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/tunnel_root"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.tunnel_root.name",
+      "text": "entry.infestusfrontier.contact.tunnel_root.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.tunnel_root.step",
+      "text": "entry.infestusfrontier.contact.tunnel_root.step_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.tunnel_root.steer",
+      "text": "entry.infestusfrontier.contact.tunnel_root.steer_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.tunnel_root.stops",
+      "text": "entry.infestusfrontier.contact.tunnel_root.stops_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.tunnel_root.recover",
+      "text": "entry.infestusfrontier.contact.tunnel_root.recover_text"
+    },
+    {
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/tunnel_root",
+      "text": "entry.infestusfrontier.contact.tunnel_root.craft"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:root_segment",
+      "text": "entry.infestusfrontier.contact.tunnel_root.segment"
+    }
+  ]
+}

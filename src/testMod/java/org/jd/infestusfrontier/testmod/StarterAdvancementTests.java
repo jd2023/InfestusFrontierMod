@@ -72,6 +72,8 @@ public final class StarterAdvancementTests {
             "bone_plate",
             "bio_furnace",
             "leaching_pod",
+            "tunnel_root",
+            "root_bend",
             "planting_proboscis",
             "harvest_corolla",
             "supplied_sac",

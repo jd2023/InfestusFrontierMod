@@ -98,10 +98,11 @@ adjacent Leached Rock as glass does.
 The first excavating organ. One head cuts a level tunnel one block wide and two
 high. The player supplies every step.
 
-- **Parts:** a Tunnel Root head and Root Segments. The head stands at the
-  working face. Each step consumes one segment, which becomes a flush root cell
-  in the tunnel floor behind the head. The root therefore runs the length of
-  the tunnel.
+- **Parts:** a Tunnel Root head, grown from an Organ Bud, and Root Segments.
+  The head stands at the working face. Each step consumes one segment, which
+  becomes a flush root cell in the tunnel floor under the head's new place,
+  behind it after the next step. The root therefore runs the length of the
+  tunnel.
 - **Supply:** the player loads segments (up to 16) and biomass into the head by
   hand. It has no vein connection.
 - **Work:** one step every 20 seconds. A step breaks the two blocks ahead, puts

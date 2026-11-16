@@ -1,6 +1,7 @@
 {
   "values": [
     "infestusfrontier:living_substrate",
-    "infestusfrontier:living_wall"
+    "infestusfrontier:living_wall",
+    "infestusfrontier:root_cell"
   ]
 }

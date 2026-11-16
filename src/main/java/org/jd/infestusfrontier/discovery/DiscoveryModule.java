@@ -68,6 +68,9 @@ public final class DiscoveryModule {
                         output.accept(OrganModule.ORGAN_BUD_ITEM.get());
                         output.accept(MiningModule.LEACHING_POD_ITEM.get());
                         output.accept(MiningModule.LEACHED_ROCK_ITEM.get());
+                        output.accept(MiningModule.TUNNEL_ROOT_ITEM.get());
+                        output.accept(MiningModule.ROOT_SEGMENT.get());
+                        output.accept(MiningModule.ROOT_CELL_ITEM.get());
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BLADDER_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BUCKET.get());

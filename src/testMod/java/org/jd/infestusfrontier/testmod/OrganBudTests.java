@@ -134,7 +134,14 @@ public final class OrganBudTests {
                         List.of(
                                 new ItemStack(Items.SPIDER_EYE),
                                 new ItemStack(Items.ROTTEN_FLESH, 4),
-                                new ItemStack(Items.BONE_MEAL, 4))));
+                                new ItemStack(Items.BONE_MEAL, 4))),
+                new Growth(
+                        "tunnel_root",
+                        MiningModule.TUNNEL_ROOT.get(),
+                        List.of(
+                                new ItemStack(Items.STONE_PICKAXE),
+                                new ItemStack(Items.BONE, 4),
+                                new ItemStack(Items.ROTTEN_FLESH, 4))));
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
@@ -269,7 +276,8 @@ public final class OrganBudTests {
                 "culture_bowl",
                 "digestive_sac",
                 "leaching_pod",
-                "membrane_rack");
+                "membrane_rack",
+                "tunnel_root");
         look(h, BUD, false);
         h.assertValueEqual(saved(h, BUD).getString("organ"), "infestusfrontier:" + order.get(0), "the first organ");
         for (int i = 1; i <= order.size(); i++) {
@@ -294,7 +302,9 @@ public final class OrganBudTests {
     public static void growthRecipesAskOnlyForStarterMaterials(GameTestHelper h) {
         List<RecipeHolder<OrganGrowthRecipe>> all = OrganGrowthRecipe.all(h.getLevel());
         h.assertValueEqual(
-                all.size(), 8, "the Sac, Bladder, Bowl, Rack, Loom, Furnace, Cradle and Pod grow from a bud");
+                all.size(),
+                9,
+                "the Sac, Bladder, Bowl, Rack, Loom, Furnace, Cradle, Pod and Tunnel Root grow from a bud");
         for (RecipeHolder<OrganGrowthRecipe> holder : all) {
             boolean prepared = holder.value().organ().getPath().equals("bio_furnace")
                     || holder.value().organ().getPath().equals("awakening_cradle");

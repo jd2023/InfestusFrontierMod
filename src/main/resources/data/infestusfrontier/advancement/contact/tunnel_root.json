@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/organ_bud",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:tunnel_root"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.tunnel_root.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.tunnel_root.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "cut": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:tunnel_root"
+      }
+    }
+  }
+}

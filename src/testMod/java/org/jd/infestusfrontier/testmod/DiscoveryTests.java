@@ -113,6 +113,7 @@ public final class DiscoveryTests {
                 "awakening_cradle",
                 "bio_furnace",
                 "leaching_pod",
+                "tunnel_root",
                 "dormant_pieces",
                 "living_tools",
                 "living_fang",
@@ -232,7 +233,8 @@ public final class DiscoveryTests {
                         id("growth/bone_loom"),
                         id("growth/awakening_cradle"),
                         id("growth/bio_furnace"),
-                        id("growth/leaching_pod")),
+                        id("growth/leaching_pod"),
+                        id("growth/tunnel_root")),
                 "the Bud entry shows every growth");
         h.succeed();
     }
@@ -446,6 +448,7 @@ public final class DiscoveryTests {
                 "awakening_cradle",
                 "bio_furnace",
                 "leaching_pod",
+                "tunnel_root",
                 "dormant_pieces",
                 "living_tools",
                 "living_fang",
@@ -480,6 +483,7 @@ public final class DiscoveryTests {
                 "awakening_cradle",
                 "bio_furnace",
                 "leaching_pod",
+                "tunnel_root",
                 "dormant_thorax",
                 "awakened_thorax",
                 "dormant_pick",

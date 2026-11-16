@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "infestusfrontier:block/root_cell_bend",
+    "bottom": "infestusfrontier:block/root_cell_side",
+    "side": "infestusfrontier:block/root_cell_side",
+    "particle": "infestusfrontier:block/root_cell_side"
+  }
+}
