@@ -1,0 +1,15 @@
+{
+  "parent": "infestusfrontier:contact/organ_bud",
+  "display": {
+    "icon": { "id": "infestusfrontier:leaching_pod" },
+    "title": { "translate": "advancement.infestusfrontier.contact.leaching_pod.title" },
+    "description": { "translate": "advancement.infestusfrontier.contact.leaching_pod.description" },
+    "frame": "task"
+  },
+  "criteria": {
+    "leached": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": { "organ": "infestusfrontier:leaching_pod" }
+    }
+  }
+}

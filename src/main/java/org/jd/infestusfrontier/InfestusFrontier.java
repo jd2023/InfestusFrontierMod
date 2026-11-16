@@ -12,6 +12,7 @@ import org.jd.infestusfrontier.integration.modonomicon.GuidePages;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.mineral.MineralModule;
+import org.jd.infestusfrontier.mining.MiningModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.StorageModule;
@@ -26,6 +27,7 @@ public final class InfestusFrontier {
         OrganModule.register(modBus);
         StorageModule.register(modBus);
         MineralModule.register(modBus);
+        MiningModule.register(modBus);
         ProcessingModule.register(modBus);
         LogisticsModule.register(modBus);
         CultivationModule.register(modBus);

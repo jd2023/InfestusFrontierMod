@@ -1,0 +1,48 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.leaching_pod.name",
+  "description": "entry.infestusfrontier.contact.leaching_pod.description",
+  "icon": "infestusfrontier:leaching_pod",
+  "x": 2,
+  "y": 3,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/organ_bud"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/organ_bud"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/leaching_pod"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.leaching_pod.name",
+      "text": "entry.infestusfrontier.contact.leaching_pod.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.leaching_pod.ground",
+      "text": "entry.infestusfrontier.contact.leaching_pod.ground_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.leaching_pod.rock",
+      "text": "entry.infestusfrontier.contact.leaching_pod.rock_text"
+    },
+    {
+      "type": "infestusfrontier:organ_growth",
+      "recipe_id_1": "infestusfrontier:growth/leaching_pod",
+      "text": "entry.infestusfrontier.contact.leaching_pod.craft"
+    }
+  ]
+}

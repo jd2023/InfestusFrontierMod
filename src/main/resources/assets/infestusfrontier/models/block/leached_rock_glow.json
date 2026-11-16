@@ -1,0 +1,64 @@
+{
+  "render_type": "minecraft:translucent",
+  "ambientocclusion": false,
+  "textures": {
+    "all": "infestusfrontier:block/leached_rock_glow",
+    "particle": "infestusfrontier:block/leached_rock_glow"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#all",
+          "cullface": "down",
+          "neoforge_data": {
+            "block_light": 9
+          }
+        },
+        "up": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#all",
+          "cullface": "up",
+          "neoforge_data": {
+            "block_light": 9
+          }
+        },
+        "north": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#all",
+          "cullface": "north",
+          "neoforge_data": {
+            "block_light": 9
+          }
+        },
+        "south": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#all",
+          "cullface": "south",
+          "neoforge_data": {
+            "block_light": 9
+          }
+        },
+        "west": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#all",
+          "cullface": "west",
+          "neoforge_data": {
+            "block_light": 9
+          }
+        },
+        "east": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#all",
+          "cullface": "east",
+          "neoforge_data": {
+            "block_light": 9
+          }
+        }
+      }
+    }
+  ]
+}

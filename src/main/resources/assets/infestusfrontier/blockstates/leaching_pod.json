@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "spent=false": {
+      "model": "infestusfrontier:block/leaching_pod"
+    },
+    "spent=true": {
+      "model": "infestusfrontier:block/leaching_pod_spent"
+    }
+  }
+}

@@ -28,6 +28,7 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.ecology.EcologyModule;
+import org.jd.infestusfrontier.mining.MiningModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.OrganGrowthRecipe;
 import org.jd.infestusfrontier.processing.ProcessingModule;
@@ -126,7 +127,14 @@ public final class OrganBudTests {
                         ProcessingModule.AWAKENING_CRADLE.get(),
                         List.of(
                                 new ItemStack(ProcessingModule.BONE_PLATE.get(), 2),
-                                new ItemStack(ProcessingModule.MEMBRANE_SHEET.get(), 2))));
+                                new ItemStack(ProcessingModule.MEMBRANE_SHEET.get(), 2))),
+                new Growth(
+                        "leaching_pod",
+                        MiningModule.LEACHING_POD.get(),
+                        List.of(
+                                new ItemStack(Items.SPIDER_EYE),
+                                new ItemStack(Items.ROTTEN_FLESH, 4),
+                                new ItemStack(Items.BONE_MEAL, 4))));
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
@@ -260,6 +268,7 @@ public final class OrganBudTests {
                 "bone_loom",
                 "culture_bowl",
                 "digestive_sac",
+                "leaching_pod",
                 "membrane_rack");
         look(h, BUD, false);
         h.assertValueEqual(saved(h, BUD).getString("organ"), "infestusfrontier:" + order.get(0), "the first organ");
@@ -284,7 +293,8 @@ public final class OrganBudTests {
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void growthRecipesAskOnlyForStarterMaterials(GameTestHelper h) {
         List<RecipeHolder<OrganGrowthRecipe>> all = OrganGrowthRecipe.all(h.getLevel());
-        h.assertValueEqual(all.size(), 7, "the Sac, Bladder, Bowl, Rack, Loom, Furnace and Cradle grow from a bud");
+        h.assertValueEqual(
+                all.size(), 8, "the Sac, Bladder, Bowl, Rack, Loom, Furnace, Cradle and Pod grow from a bud");
         for (RecipeHolder<OrganGrowthRecipe> holder : all) {
             boolean prepared = holder.value().organ().getPath().equals("bio_furnace")
                     || holder.value().organ().getPath().equals("awakening_cradle");

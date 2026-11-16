@@ -112,6 +112,7 @@ public final class DiscoveryTests {
                 "bone_loom",
                 "awakening_cradle",
                 "bio_furnace",
+                "leaching_pod",
                 "dormant_pieces",
                 "living_tools",
                 "living_fang",
@@ -187,7 +188,8 @@ public final class DiscoveryTests {
                 "membrane_rack",
                 "bone_loom",
                 "bio_furnace",
-                "awakening_cradle")) {
+                "awakening_cradle",
+                "leaching_pod")) {
             var entry = entries.get(id("contact/" + organ));
             h.assertTrue(entry != null, organ + " entry loaded");
             List<ResourceLocation> shown = entry.getPages().stream()
@@ -229,7 +231,8 @@ public final class DiscoveryTests {
                         id("growth/membrane_rack"),
                         id("growth/bone_loom"),
                         id("growth/awakening_cradle"),
-                        id("growth/bio_furnace")),
+                        id("growth/bio_furnace"),
+                        id("growth/leaching_pod")),
                 "the Bud entry shows every growth");
         h.succeed();
     }
@@ -442,6 +445,7 @@ public final class DiscoveryTests {
                 "bone_loom",
                 "awakening_cradle",
                 "bio_furnace",
+                "leaching_pod",
                 "dormant_pieces",
                 "living_tools",
                 "living_fang",
@@ -475,6 +479,7 @@ public final class DiscoveryTests {
                 "bone_plate",
                 "awakening_cradle",
                 "bio_furnace",
+                "leaching_pod",
                 "dormant_thorax",
                 "awakened_thorax",
                 "dormant_pick",

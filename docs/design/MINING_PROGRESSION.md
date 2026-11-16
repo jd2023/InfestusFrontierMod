@@ -64,8 +64,8 @@ Where each stage becomes available:
 A single-use organ for early exploration. It does not excavate. It weakens soft
 ground so the player can dig a wide pit by hand and see the ore in it.
 
-- **Use:** load the pod with biomass and plant it on Living Substrate. It cannot
-  be picked up again.
+- **Use:** grow it from an Organ Bud on Living Substrate; the growth materials
+  pay for its 16 charges. It cannot be picked up again.
 - **Work:** each second it converts one horizontal layer below it, a disc 7
   blocks in diameter (at most 37 blocks). The first layer includes the substrate
   it stands on.

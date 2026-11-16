@@ -21,6 +21,7 @@ import org.jd.infestusfrontier.equipment.EquipmentModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.mineral.MineralModule;
+import org.jd.infestusfrontier.mining.MiningModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.AutomaticWorkEvent;
 import org.jd.infestusfrontier.organ.api.WorkshopActionEvent;
@@ -65,6 +66,8 @@ public final class DiscoveryModule {
                         output.accept(EcologyModule.SPHINCTER_DOOR_ITEM.get());
                         output.accept(EcologyModule.LIVING_SUBSTRATE_ITEM.get());
                         output.accept(OrganModule.ORGAN_BUD_ITEM.get());
+                        output.accept(MiningModule.LEACHING_POD_ITEM.get());
+                        output.accept(MiningModule.LEACHED_ROCK_ITEM.get());
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BLADDER_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BUCKET.get());

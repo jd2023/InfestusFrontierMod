@@ -1,0 +1,9 @@
+{
+  "type": "infestusfrontier:organ_growth",
+  "organ": "infestusfrontier:leaching_pod",
+  "materials": [
+    { "item": "minecraft:rotten_flesh", "count": 4 },
+    { "item": "minecraft:bone_meal", "count": 4 },
+    { "item": "minecraft:spider_eye" }
+  ]
+}

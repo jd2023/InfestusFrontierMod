@@ -56,7 +56,7 @@ The colony starts helping underground and gains two more renewable supplies. Eve
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
-| 7 | MINE-1 | Plant a one-use organ that turns soft ground below it into see-through rock that breaks by hand | The player clears a 7-wide pit with bare hands and sees every ore in it before reaching it | BASE-2 | planned |
+| 7 | MINE-1 | Plant a one-use organ that turns soft ground below it into see-through rock that breaks by hand | The player clears a 7-wide pit with bare hands and sees every ore in it before reaching it | BASE-2 | done |
 | 8 | MINE-2 | Drive a slow level tunnel by feeding a root one step at a time and steering it | The player cuts a tunnel with a turn, walks it, collects the drops and recovers from every stop reason | BASE-2 | planned |
 | 9 | WOOD-1 | Keep a grove that replants a sapling after each tree is cut by hand | The player fells a tree, walks away and returns to a new sapling | BASE-3 | none |
 | 10 | WOOD-2 | Leave a grove to fell its own trees and send the logs to storage | Four trees are harvested ten times with no hand work and the sapling stock never runs out | WOOD-1 | none |
