@@ -39,7 +39,7 @@ import org.jd.infestusfrontier.ecology.api.TreeInfectionSnapshot;
 import org.slf4j.Logger;
 
 /**
- * One dimension's tree infection work (VEGETATION_INFECTION.md, "Tree boundaries"): at most {@value #JOBS} jobs,
+ * One dimension's tree infection work: at most {@value #JOBS} jobs,
  * each discovering one rooted tree and then converting it, log by log and leaf by leaf, out of budgets every
  * dimension shares, {@value #READS_PER_TICK} discovery reads and {@value #REPLACEMENTS_PER_TICK} replacements a
  * server tick, held on the overworld's instance. A tree touched while a job already claims its root is not a second

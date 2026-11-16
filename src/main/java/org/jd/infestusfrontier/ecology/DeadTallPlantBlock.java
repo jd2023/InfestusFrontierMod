@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
  * What a two-block plant leaves when substrate growth kills it: vanilla's own {@link DoublePlantBlock}, so the halves
  * support each other, vanish together and break through the same player and neighbour paths as the living plant, with
  * no bone meal response. The family's one property besides the half is {@code source}, the plant it was, and the loot
- * table answers it with that plant's own drop rules (VEGETATION_INFECTION.md, "Shipped: tall plants").
+ * table answers it with that plant's own drop rules.
  *
  * <p>Appearance is never saved. Vanilla seeds a double plant's look from its lower half's position, so both halves
  * pick the same turn of the blockstate's list; {@link #tintIndexAt} does the same for the block colour.

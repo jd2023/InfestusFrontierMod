@@ -56,7 +56,7 @@ import org.jd.infestusfrontier.ecology.SubstrateStage;
 import org.jd.infestusfrontier.ecology.UndergrowthSource;
 import org.jd.infestusfrontier.ecology.WitheredSaplingBlock;
 
-/** Shrubs, short grass, ferns and saplings withered by substrate growth: VEGETATION_INFECTION.md. */
+/** Shrubs, short grass, ferns and saplings withered by substrate growth. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class WitheredShrubTests {

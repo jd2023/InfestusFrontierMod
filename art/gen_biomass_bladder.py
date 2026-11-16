@@ -6,7 +6,7 @@ Writes geo/block/biomass_bladder.geo.json, animations/block/biomass_bladder.anim
 textures/block_entity/biomass_bladder.png and _glowmask.png, textures/block/biomass_bladder.png (break particle)
 and art/biomass_bladder.bbmodel.
 
-A bladder (BLOCK_CATALOG T0-04): a translucent sac of feed swelling out of a lip of flesh on a clawed root foot and
+A bladder: a translucent sac of feed swelling out of a lip of flesh on a clawed root foot and
 closing in under a flesh collar, where a lipped port puckers over a dark throat; bone ribs bow down its four corners
 over the seams where its membrane plates meet. The sac is no box: each side is a plate leaning out from the cup to the
 waist and one leaning in to the collar, as the Seed Pouch's and the Compost Gland's are, and the ribs breathe with it.

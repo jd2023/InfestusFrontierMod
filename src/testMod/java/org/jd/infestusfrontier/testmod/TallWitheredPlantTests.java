@@ -53,7 +53,7 @@ import org.jd.infestusfrontier.ecology.TallFlowerSource;
 import org.jd.infestusfrontier.ecology.TallUndergrowthSource;
 import org.jd.infestusfrontier.ecology.TallWitheredFlowerBlock;
 
-/** Tall plants withered by substrate growth: VEGETATION_INFECTION.md, the two-block mappings. */
+/** Tall plants withered by substrate growth. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class TallWitheredPlantTests {

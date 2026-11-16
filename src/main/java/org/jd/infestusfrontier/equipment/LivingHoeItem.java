@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
-/** A Living Hoe (ITEM_CATALOG I016): a vanilla hoe of the living tier that carries a biomass reserve, mends from it while carried; a hoe takes no Contractile graft. */
+/** A Living Hoe: a vanilla hoe of the living tier that carries a biomass reserve, mends from it while carried; a hoe takes no Contractile graft. */
 final class LivingHoeItem extends HoeItem {
     LivingHoeItem(Properties properties) {
         super(LivingTiers.LIVING, properties);

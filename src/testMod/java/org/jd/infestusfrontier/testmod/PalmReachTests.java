@@ -58,7 +58,7 @@ import org.jd.infestusfrontier.storage.api.ItemStore;
 import org.jd.infestusfrontier.testmod.ShapingPalmTests.MenuPlayer;
 
 /**
- * The Shaping Palm's reach through its Mouth (BLOCK_CATALOG T1-41, stage 2). The Palm gets Reach from a Contractile
+ * The Shaping Palm's reach through its Mouth. The Palm gets Reach from a Contractile
  * Fiber and reaches storage only through the Mouth under it and the Item Veins that join that Mouth to a Mouth on a
  * store. Its screen's three buttons act on that network alone. Every test counts items across the grid and the stores,
  * so a refused, partial or competing action shows a lost or duplicated item. The Palm stands at (2, 2, 2).

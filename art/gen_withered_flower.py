@@ -2,8 +2,7 @@
 
     python3 art/gen_withered_flower.py
 
-One block family stands in for every small flower substrate growth kills (docs/design/VEGETATION_INFECTION.md,
-"Visual variety with few assets"). Three silhouettes: a bent stalk with a hanging spent head, a forked dry stalk
+One block family stands in for every small flower substrate growth kills. Three silhouettes: a bent stalk with a hanging spent head, a forked dry stalk
 with small seed pods, and a low collapsed bloom with curled petals. Each is a grey cutout on a transparent 64x64
 tile, exported from the image-model sources recorded in CREDITS.txt; the block colour tints it ash, bone, brown or plum
 by position, so the textures carry shape and shading only. The blockstate lists the three models turned four ways

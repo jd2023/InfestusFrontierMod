@@ -1,7 +1,7 @@
 package org.jd.infestusfrontier.core.storage;
 
 /**
- * The compartments of an item store (BLOCK_CATALOG T1-09): each holds one kind of item, up to its own limit of
+ * The compartments of an item store: each holds one kind of item, up to its own limit of
  * stacks of it, since a grown capsule holds more than a young one. Items of a kind go to the compartments already
  * holding it, in order, and only then to the first empty one, so a kind never spreads over compartments while one of
  * them has room.

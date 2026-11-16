@@ -3,7 +3,7 @@ package org.jd.infestusfrontier.core.equipment;
 import java.util.List;
 
 /**
- * The Fuel Papilla's arithmetic (BLOCK_CATALOG T1-36): a one-second batch delivers at most {@link #RATE} BU and costs
+ * The Fuel Papilla's arithmetic: a one-second batch delivers at most {@link #RATE} BU and costs
  * the delivered amount plus ceil(delivered / 5) BU of overhead.
  */
 public final class Refuel {

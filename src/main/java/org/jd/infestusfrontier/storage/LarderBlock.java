@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.core.storage.PodKind;
 
 /**
- * A Larder (BLOCK_CATALOG T1-09): a Mixed Craw mutated with Sealing Resin while empty, three compartments of the
+ * A Larder: a Mixed Craw mutated with Sealing Resin while empty, three compartments of the
  * Craw's depth, each with a label and a reserve that no external extraction takes. It keeps its grade, its facing and
  * its tree; no item turns it back.
  */

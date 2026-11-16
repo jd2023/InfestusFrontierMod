@@ -1,4 +1,4 @@
-"""Vascular Junction (BLOCK_CATALOG T1-04): a heart. A dark muscular body with four chambers swelling at its corners
+"""Vascular Junction: a heart. A dark muscular body with four chambers swelling at its corners
 and a crown bulging in two steps under the top mouth, laced with vessels, carries a sphincter on each of its six
 faces: thick lips across, thin lips upright, open at the corners, over a dark throat sunk in the body; the ring
 gapes to draw in, puckers to push out and shrinks to a bud when closed. The lobed body that beats and the lipped

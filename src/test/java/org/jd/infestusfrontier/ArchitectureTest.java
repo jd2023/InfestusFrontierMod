@@ -19,7 +19,7 @@ import com.tngtech.archunit.library.dependencies.SliceIdentifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-/** The module rules of ENGINEERING.md "Architecture", checked on the compiled mod. */
+/** The module rules of docs/ARCHITECTURE.md "Modules", checked on the compiled mod. */
 class ArchitectureTest {
     private static final String ROOT = "org.jd.infestusfrontier";
     private static JavaClasses mod;

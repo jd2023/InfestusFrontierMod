@@ -6,7 +6,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 
 /**
- * The permanent branch a living tool or fang has taken (ITEM_CATALOG I016, I018): one per item, installed by a
+ * The permanent branch a living tool or fang has taken: one per item, installed by a
  * graft in the Cradle, never removed. Carried on the item as {@link EquipmentModule#TOOL_MUTATION}.
  */
 public enum ToolMutation implements StringRepresentable {

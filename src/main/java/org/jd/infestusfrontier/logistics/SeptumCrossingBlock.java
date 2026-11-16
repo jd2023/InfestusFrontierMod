@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jd.infestusfrontier.logistics.api.PortSwitch;
 
 /**
- * A vein cell with two straight passages of one carrier that cross without joining (BLOCK_CATALOG T1-05). It holds
+ * A vein cell with two straight passages of one carrier that cross without joining. It holds
  * nothing: what enters a face of a passage leaves by the opposite face, into the next cell, organ or crossing. No
  * passage runs along {@link #AXIS}; the two faces on that axis show both lumens, and the probe on a face turns the
  * crossing so that face is one of them.

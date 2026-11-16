@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A tendon in the corner of a one-block step that joins the vein cell below it (or above it, on a ceiling) to the
- * vein cell beside it (BLOCK_CATALOG T1-06). Both ends are vein cells of its carrier; it holds nothing and passes
+ * vein cell beside it. Both ends are vein cells of its carrier; it holds nothing and passes
  * what enters one end on to the other. It drops off, like a torch, when either end stops being such a cell.
  */
 public final class VascularStitchBlock extends Block {

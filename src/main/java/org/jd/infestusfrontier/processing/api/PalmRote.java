@@ -15,7 +15,7 @@ import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /**
- * The saved and carried state of a Shaping Palm that has Rote (BLOCK_CATALOG T1-41, stage 3): its one {@link Pattern},
+ * The saved and carried state of a Shaping Palm that has Rote: its one {@link Pattern},
  * the {@link Cycle} under way, the four-stack tray the products wait in, its biomass, and the cycles it has completed.
  * A value: stacks are copied in and out, and two states are equal when every stack matches item for item and component
  * for component. A Palm without Rote has none.

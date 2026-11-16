@@ -1,7 +1,6 @@
 # The Waking Genome — progression and advancement tree
 
 Proposed page prerequisites, advancement triggers and teaching content.
-Recipes: [Items](ITEM_CATALOG.md). Structures: [Blocks](BLOCK_CATALOG.md).
 Equipment: [Armor](ARMOR_EVOLUTION.md). Cell anatomy: [Substrate](LIVING_SUBSTRATE_MUTATIONS.md).
 
 ## 1. How the tree works
@@ -10,7 +9,7 @@ The book is a branching map, not a list of mandatory quests. Completing a parent
 
 Tables use these columns; mutation-family rows share the installation trigger described in their section:
 
-- **Node:** stable ID and the title shown in the book. `T2-06`, for example, is also the Mutation Chamber's catalog ID.
+- **Node:** stable ID and the title shown in the book. IDs such as `T2-06` are permanent and belong to this document.
 - **Open after:** completed prerequisite nodes. `ALL(A,B)` requires both; `ANY(A,B)` accepts either. A single ID requires that one parent. `START` has no prerequisite.
 - **Complete by:** the observable action that earns the advancement. Merely reading a page is never evidence of building, operating or understanding a machine.
 - **Teaches / unlocks:** the new construction, behavior or choice explained by that node. Its child pages open when it completes; their precise dependencies are in their own rows.
@@ -134,9 +133,9 @@ The two storage steps use the `infestusfrontier:workshop_action` trigger, which 
 
 **Steward rule.** The steward of a Planting Proboscis, a Harvest Corolla, a Digestive Sac or a Shaping Palm is the last player who placed it or loaded it by hand (a seed into the Proboscis, an item into the Sac, a change to the Palm's grid or a press of one of its buttons); an organ nobody has tended is claimed by the first player who opens its screen. A Palm's work is a finished cycle that spent a fetched item (the cycle remembers it, saved and carried with its tray) and delivered its products to the tray; a cycle that waits for tray room credits nothing until it delivers. Nearness, a biomass bucket, and opening the screen of an organ that already has a steward change nothing. Breaking the organ forgets its steward; fake players are never stewards. Work is credited to the steward only; an organ with none credits nobody. A Sac batch taken from the feed slot is credited to the steward, so First Biomass follows it too; the batch is *automatic* only when a Mouth delivered the item it took. A steward who is offline gets the credit on the next login, one per organ and kind, through the same bounded store as batch credits. Failed work (no biomass, no bed, no ripe crop, a full output, a full Sac) and reloading credit nothing. The guide states this rule on the four organs' entries.
 
-ST-02 uses Item Catalog I010's Synaptic Probe recipe; no amethyst console is needed to configure the first organ. Sample Pouch and vial recipes appear with early collection instructions. Looking identifies a source; creature DNA requires actual death loot, and plant DNA requires consumed harvested material.
+ST-02 uses the Synaptic Probe recipe; no amethyst console is needed to configure the first organ. Sample Pouch and vial recipes appear with early collection instructions. Looking identifies a source; creature DNA requires actual death loot, and plant DNA requires consumed harvested material.
 
-Each producer's page lists its Item Catalog recipes, required ingredients and downstream consumers. Gels, fusion media and prepared grafts are recipe subpages of their owning organs, not extra rank badges. JEI links the same preparation chain in both directions.
+Each producer's page lists its recipes, required ingredients and downstream consumers. Gels, fusion media and prepared grafts are recipe subpages of their owning organs, not extra rank badges. JEI links the same preparation chain in both directions.
 
 ## 4. Circulation, storage and a living landscape
 
@@ -636,7 +635,7 @@ Completing a suit demonstration acknowledges its first working rank. Its II and 
 
 ## 17. Handheld tools and weapons
 
-Tool/weapon forms and preparation candidates belong to Item Catalog I015–I018/I038. Enchantments and armor ritual costs follow Armor Evolution. They are optional instructional leaves, not assumed personal-rank requirements.
+Tool/weapon forms and preparation candidates are defined with the living tools. Enchantments and armor ritual costs follow Armor Evolution. They are optional instructional leaves, not assumed personal-rank requirements.
 
 | Node | Open after | Complete by | Teaches / unlocks |
 |---|---|---|---|
@@ -661,7 +660,7 @@ Each unlocked page includes a small working example, the required cells/parts an
 | A young cell cannot become a vein | “Mature this selected cell first.” Link to ST-03; show the next growth treatment. |
 | A route is blocked | “East outlet closed” or “Destination full,” with the selected endpoint. Link to T1-04/T1-12 or CI-05, not a generic “network invalid.” |
 | A raw ingot is placed in an armor treatment | “Needs Ferrocyte Paste, not an iron ingot.” Link to AR-05 and its preparation recipe. |
-| Raw ingredients are offered as a tissue upgrade | “Prepare Capillary Gel in Activation Cyst.” Link to T1-30 and the exact Item Catalog recipe, without consuming the rejected ingredient. |
+| Raw ingredients are offered as a tissue upgrade | “Prepare Capillary Gel in Activation Cyst.” Link to T1-30 and the exact recipe, without consuming the rejected ingredient. |
 | Hungry armor injures its wearer | “Fuel empty; symbiosis incomplete.” Show the affected pieces, refueling route and adaptation status. At the one-heart floor, say hunger damage has stopped but unfueled abilities remain off. After symbiosis, fuel shortage causes no armor pain. |
 | A mutation's DNA is incomplete | “Turtle genome: missing coverage shown in this bank.” Link to GE-16 and its supported specimen routes. Do not ask for unrelated samples. |
 | The piece's learning is capped | “Learning capacity full: {used}/{capacity}.” Show paid counter reduction (AR-16) and valid forward fusions; neither exchanges branches. |

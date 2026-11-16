@@ -1,7 +1,7 @@
 package org.jd.infestusfrontier.core.defense;
 
 /**
- * The Spine Sentry's arithmetic (BLOCK_CATALOG T2-30): a rooted lash that strikes one hostile within reach each
+ * The Spine Sentry's arithmetic: a rooted lash that strikes one hostile within reach each
  * pulse, pays biomass for every strike, keeps what its kills drop in a small store, and rests while it cannot pay or
  * cannot keep.
  */

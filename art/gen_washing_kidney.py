@@ -1,4 +1,4 @@
-"""Washing Kidney (BLOCK_CATALOG T2-24): a bean of two lobes that rinses what the Gizzard left behind. Two soft blue-grey
+"""Washing Kidney: a bean of two lobes that rinses what the Gizzard left behind. Two soft blue-grey
 lobes stand side by side on a root foot, each a bean (its belly swelling outward, its ends drawn in towards the middle,
 a puff of muscle turned corner-out over its flank), parted by a narrow gap. A tall pale clean-water sac crowns the left
 lobe and a squat murky dirty-water sac the right; a duct leads from each sac to the bone sieve that stands in the gap

@@ -1,7 +1,7 @@
 package org.jd.infestusfrontier.core.storage;
 
 /**
- * The view of an item store's kinds (BLOCK_CATALOG T1-09): every kind the store holds is one entry with its whole
+ * The view of an item store's kinds: every kind the store holds is one entry with its whole
  * count, the entries sorted and laid in rows of {@value #COLUMNS}, with one open entry after the last kind for a new
  * kind. {@value #ROWS} rows show at a time; the view starts at a row and never scrolls past the open entry.
  */

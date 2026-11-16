@@ -37,7 +37,7 @@ import org.jd.infestusfrontier.organ.api.Organs;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * One cell of a Capsule Stem (BLOCK_CATALOG T1-09): the planted root, a trunk cell, a bud or a branch. Only the root
+ * One cell of a Capsule Stem: the planted root, a trunk cell, a bud or a branch. Only the root
  * is placed, on an organ foundation ({@link Organs#FOUNDATIONS}); the rest grow from bone meal on any cell, pods
  * with them. Any cell opens the tree's screen. A cell is tissue: broken, it leaves Dead Tissue and is regrown from
  * the root's plan; a root broken, or left without its foundation, kills its tree, cell by cell from the bottom, and

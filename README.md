@@ -7,10 +7,10 @@ Minecraft 1.21.1 / NeoForge mod. Grow and evolve a living industrial colony acro
 | [VISION.md](VISION.md) | Product direction and permanent rules |
 | [ROADMAP.md](ROADMAP.md) | Milestones, current status and player outcomes |
 | [AGENTS.md](AGENTS.md) | Shared repository rules and role reading map |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical decisions every feature conforms to |
 | [ENGINEERING.md](ENGINEERING.md) | Development and repair |
 | [REVIEW.md](REVIEW.md) | Independent review and validation |
-| [docs/design/](docs/design/) | Detailed designs awaiting consolidation; VISION takes precedence |
-| [DOCUMENTATION_REVIEW.md](DOCUMENTATION_REVIEW.md) | Temporary consolidation report |
+| [docs/design/](docs/design/) | Designs by topic: mining, forestry, animal farming, armor, substrate, guide tree, progression map. VISION takes precedence |
 
 ROADMAP_OLD.md is retained for owner comparison only. LICENSE.txt and CREDITS.txt hold licensing and asset records.
 
@@ -20,4 +20,6 @@ bash scripts/demo.sh         # playable demo
 bash scripts/verify.sh       # full code check
 ```
 
-Build requirements and focused commands are in ENGINEERING. For ktask on another computer, apply the versioned role instructions with `python3 scripts/configure_ktask.py`; this configures roles but does not start tasks.
+Focused commands are in ENGINEERING.
+
+Ktask configuration is local to each computer. `config/ktask-roles.json` records what each role reads for code, document and art tasks. After cloning on a computer that will run tasks, apply it with `python3 scripts/configure_ktask.py`; add `--refresh-pending` to update pending tasks. Neither starts a task or changes models or checks. Review lenses replace the ordinary review prompt, so give them their own reading instructions before using them.

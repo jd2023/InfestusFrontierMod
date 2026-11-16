@@ -1,4 +1,4 @@
-"""Mineral Gizzard (BLOCK_CATALOG T2-23): a grinding muscle. A squat grey-plum belly on a root foot, wrapped in two
+"""Mineral Gizzard: a grinding muscle. A squat grey-plum belly on a root foot, wrapped in two
 courses of ridged muscle, carries a thick-lipped hopper on top with two bone millstones in it, and a low bone chute at
 the front where the ground dust drifts out over the foot. The two millstones in their lipped hopper and the drift of
 dust at the chute are the cues: what goes in and what comes out. The Compost Gland beside it is a tall bloated sac; this

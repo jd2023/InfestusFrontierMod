@@ -11,7 +11,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** A Living Hatchet (ITEM_CATALOG I016): a vanilla axe of the living tier that carries a biomass reserve, mends from it while carried, and breaks the blocks round the one it mines once grafted Contractile. */
+/** A Living Hatchet: a vanilla axe of the living tier that carries a biomass reserve, mends from it while carried, and breaks the blocks round the one it mines once grafted Contractile. */
 final class LivingHatchetItem extends AxeItem {
     LivingHatchetItem(Properties properties) {
         super(LivingTiers.LIVING, properties);

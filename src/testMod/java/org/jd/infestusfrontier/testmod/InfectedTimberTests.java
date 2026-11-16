@@ -57,7 +57,7 @@ import org.jd.infestusfrontier.ecology.InfectedLogBlock;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.storage.StorageModule;
 
-/** Infected Logs, Blighted Leaves and the Infected Planks old worlds keep: VEGETATION_INFECTION.md, "Trees". */
+/** Infected Logs, Blighted Leaves and the Infected Planks old worlds keep. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class InfectedTimberTests {

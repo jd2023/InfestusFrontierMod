@@ -136,7 +136,7 @@ public final class LogisticsModule {
 
     public static final DeferredItem<BlockItem> VASCULAR_STITCH_ITEM = ITEMS.registerSimpleBlockItem(VASCULAR_STITCH);
 
-    /** The treatments that grow a vein out of a mature cell; the Cyst makes them (ITEM_CATALOG I021 to I023, I028). */
+    /** The treatments that grow a vein out of a mature cell; the Cyst makes them. */
     public static final DeferredItem<Item> CAPILLARY_GEL =
             ITEMS.registerItem("capillary_gel", properties -> new GraftItem(properties, () -> BIOMASS_VEIN.get()));
 

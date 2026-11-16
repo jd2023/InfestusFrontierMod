@@ -35,7 +35,7 @@ import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * One cell of a Biomass Reservoir (BLOCK_CATALOG T1-07). Touching cells form one body only as a full rectangular box
+ * One cell of a Biomass Reservoir. Touching cells form one body only as a full rectangular box
  * ({@link org.jd.infestusfrontier.core.storage.Body}); the six side properties say which faces join a cell of the
  * same body, and {@link #FILL} is the level of the cell's layer in sixteenths. A cell stands on a foundation, on
  * another cell or on a block that pumps into it from below. Buckets move biomass, anything else opens the screen,

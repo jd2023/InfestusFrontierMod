@@ -60,7 +60,7 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 
 /**
- * The Shaping Palm's Rote (BLOCK_CATALOG T1-41, stage 3): the Synaptic Gel that gives it, Select, and the cycle that
+ * The Shaping Palm's Rote: the Synaptic Gel that gives it, Select, and the cycle that
  * repeats one vanilla craft on 10 BU and 40 ticks. Every test counts items and biomass across the grid, the cycle, the
  * tray, the store and the player, so a repeat, a loss or a duplicate shows. The Palm stands at (2, 2, 2) on substrate.
  */

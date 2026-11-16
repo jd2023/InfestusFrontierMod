@@ -2,8 +2,7 @@
 
     python3 art/gen_tall_withered_plants.py
 
-Substrate growth kills a sunflower, lilac, rose bush, peony, tall grass or large fern into a two-block plant
-(docs/design/VEGETATION_INFECTION.md, "Shipped: tall plants"). Three shapes cover all six: one dry tall-flower stalk
+Substrate growth kills a sunflower, lilac, rose bush, peony, tall grass or large fern into a two-block plant. Three shapes cover all six: one dry tall-flower stalk
 with a spent seed head for the four flowers, one dry tall-grass tuft and one large-fern clump. Each is drawn on one
 64x128 grey canvas, so the stalk runs unbroken across the seam, and cut into a lower and an upper 64x64 cutout. The
 block colour tints it by the lower half's position (ash, bone, brown, plum for flowers; straw, bone, ash, dry brown for

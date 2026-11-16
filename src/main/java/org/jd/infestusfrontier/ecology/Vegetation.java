@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 /**
- * What stands on a host decides whether the host can become a cell, and what becomes of it when it does
- * (VEGETATION_INFECTION.md). Spore Culture and the bone-meal wave both convert ground through {@link #convert}, so
+ * What stands on a host decides whether the host can become a cell, and what becomes of it when it does.
+ * Spore Culture and the bone-meal wave both convert ground through {@link #convert}, so
  * a plant is accounted for before the ground under it changes and vanilla's support update finds a dead plant that
  * stands on substrate, never a live one to uproot and drop. Limits: ENGINEERING.md, "Vegetation infection".
  */

@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 /**
- * A wall cell mutated into translucent living membrane held by a bone frame (BLOCK_CATALOG T0-12). It is vanilla glass
+ * A wall cell mutated into translucent living membrane held by a bone frame. It is vanilla glass
  * underneath: the faces between two windows are not drawn. The six link properties say which neighbours are windows,
  * so the frame runs only round the outside of a pane, and joined windows read as one. Grown, never placed: broken, it
  * dies into Dead Tissue.

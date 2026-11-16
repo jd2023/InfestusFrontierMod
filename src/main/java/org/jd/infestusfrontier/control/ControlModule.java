@@ -42,7 +42,7 @@ public final class ControlModule {
                     () -> BlockEntityType.Builder.of(SensorPolypBlockEntity::new, SENSOR_POLYP.get())
                             .build(null));
 
-    /** A mature substrate cell mutated into a flush pressure plate (BLOCK_CATALOG T1-40). */
+    /** A mature substrate cell mutated into a flush pressure plate. */
     public static final DeferredBlock<TreadReceptorBlock> TREAD_RECEPTOR = BLOCKS.registerBlock(
             "tread_receptor",
             TreadReceptorBlock::new,

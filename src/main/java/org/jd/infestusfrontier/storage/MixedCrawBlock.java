@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.core.storage.PodKind;
 
 /**
- * A Mixed Craw (BLOCK_CATALOG T1-09): a pod mutated with Elastic Gel while empty, four compartments of one kind each at
+ * A Mixed Craw: a pod mutated with Elastic Gel while empty, four compartments of one kind each at
  * a quarter of a bulk pod's depth. It keeps its grade, its facing and its tree; no item turns it back.
  */
 public final class MixedCrawBlock extends ItemCapsuleBlock {

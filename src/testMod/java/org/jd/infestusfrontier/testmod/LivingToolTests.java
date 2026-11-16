@@ -38,7 +38,7 @@ import org.jd.infestusfrontier.storage.BiomassBladderMenu;
 import org.jd.infestusfrontier.storage.StorageModule;
 
 /**
- * Bone tools from plates (ITEM_CATALOG I015), the Cradle that wakes them (I016), the reserve they mend from, and the
+ * Bone tools from plates, the Cradle that wakes them, the reserve they mend from, and the
  * Contractile graft that breaks the blocks round the one they mine.
  */
 @GameTestHolder("infestusfrontier_tests")

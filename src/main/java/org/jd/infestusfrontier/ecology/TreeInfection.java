@@ -21,8 +21,8 @@ import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.ecology.TreeDiscovery;
 
 /**
- * How ground conversion reaches a tree, which blocks a tree is made of, and what one block of an admitted tree becomes
- * (VEGETATION_INFECTION.md, "Trees"). A wave cell or a cultured cell touches a tree through {@link #touch}: beside the
+ * How ground conversion reaches a tree, which blocks a tree is made of, and what one block of an admitted tree becomes.
+ * A wave cell or a cultured cell touches a tree through {@link #touch}: beside the
  * cell, level with it or one step up or down, stands a root, an upright trunk log on host ground or a cell. Only such
  * a root starts a job; a lying log, a log on sand or planks, a stripped log, wood, planks and an Infected Log never do,
  * and no other covered ground becomes a host. Twelve reads and up to twelve more below them, all in loaded chunks.

@@ -33,7 +33,7 @@ import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 
 /**
- * The papilla's one-packet buffer of {@value #CAPACITY_BU} BU and its feeding (BLOCK_CATALOG T1-36): once a second,
+ * The papilla's one-packet buffer of {@value #CAPACITY_BU} BU and its feeding: once a second,
  * one living player standing on the cell has the selected worn awakened pieces filled up to the set limit, at most
  * {@value Refuel#RATE} BU in all, paying ceil(delivered / 5) BU more as overhead. It is no reservoir: veins, a
  * Junction or a bucket keep the buffer topped up, and a Filter Valve keeps the source's reserve. One entity query a

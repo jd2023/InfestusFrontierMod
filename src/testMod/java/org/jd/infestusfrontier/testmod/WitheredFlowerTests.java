@@ -32,7 +32,7 @@ import org.jd.infestusfrontier.ecology.LivingSubstrateBlock;
 import org.jd.infestusfrontier.ecology.SubstrateStage;
 import org.jd.infestusfrontier.ecology.WitheredFlowerBlock;
 
-/** Flowers withered by substrate growth: VEGETATION_INFECTION.md, the Withered Flower mapping. */
+/** Flowers withered by substrate growth. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class WitheredFlowerTests {

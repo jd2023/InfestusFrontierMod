@@ -48,8 +48,8 @@ import org.slf4j.Logger;
 /**
  * Armor and tool identity and fuel. Four dormant pieces are crafted from rotten flesh (G0 in ARMOR_EVOLUTION.md); the
  * Cradle awakens each into its awakened form (G1), which carries a {@link #RESERVE} of biomass. The Fuel Papilla
- * fills that reserve from the ground. Four dormant tools are crafted from Bone Plates (ITEM_CATALOG I015); the Cradle
- * wakes each into its living form (I016), which carries the same reserve, mends from it and takes one
+ * fills that reserve from the ground. Four dormant tools are crafted from Bone Plates; the Cradle
+ * wakes each into its living form, which carries the same reserve, mends from it and takes one
  * {@link #TOOL_MUTATION} by a graft in the Cradle; the Dormant and Living Fang (I017, I018) are the same for a blade.
  */
 public final class EquipmentModule {
@@ -160,7 +160,7 @@ public final class EquipmentModule {
     public static final DeferredItem<SwordItem> LIVING_FANG = ITEMS.register(
             "living_fang", () -> new LivingFangItem(living(SwordItem.createAttributes(LivingTiers.LIVING, 2, -2.4F))));
 
-    /** The dormant tools and the fang in the catalog's order. */
+    /** The dormant tools and the fang in their fixed order. */
     public static final List<DeferredItem<? extends Item>> DORMANT_TOOLS =
             List.of(DORMANT_PICK, DORMANT_HATCHET, DORMANT_SPADE, DORMANT_HOE, DORMANT_FANG);
     /** The living tools and the fang in the same order. */

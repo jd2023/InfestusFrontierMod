@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Blocks;
 
 /**
  * The two-block flower a Tall Withered Flower was before infection: the one thing it keeps, because its harvest is
- * that flower's own drop (VEGETATION_INFECTION.md, "Harvest rules"). Appearance is not kept here; the blockstate and
+ * that flower's own drop. Appearance is not kept here; the blockstate and
  * the block colour draw it from the position.
  */
 public enum TallFlowerSource implements StringRepresentable {

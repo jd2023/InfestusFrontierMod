@@ -28,7 +28,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A two-high doorway mutated from a wall (BLOCK_CATALOG T1-29): a muscular rim whose membrane blades close like an
+ * A two-high doorway mutated from a wall: a muscular rim whose membrane blades close like an
  * iris. It is a vanilla door, so its two halves stay one doorway; the lower half keeps the block entity that draws and
  * animates the whole iris, the upper half draws nothing of its own. Closed, a membrane four pixels thick fills the
  * doorway; open, nothing stops a walker. Grown, never placed: broken, it dies into Dead Tissue.

@@ -10,8 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Bounded, incremental discovery of one rooted tree: the logs joined to a root log and the foliage those logs hold
- * (VEGETATION_INFECTION.md, "Tree boundaries"). A tree's logs are of one kind, the root's: logs of that kind join
+ * Bounded, incremental discovery of one rooted tree: the logs joined to a root log and the foliage those logs hold.
+ * A tree's logs are of one kind, the root's: logs of that kind join
  * through any of their 26 neighbours, as vanilla's diagonal branches and leaning trunks do. A leaf belongs to the tree
  * when it stands face to face with a log of the tree at leaf distance 1, or with a claimed leaf at one more than that
  * leaf's distance: the gradient vanilla's own distance rule writes. The kinds of leaf the trunk touches at distance 1

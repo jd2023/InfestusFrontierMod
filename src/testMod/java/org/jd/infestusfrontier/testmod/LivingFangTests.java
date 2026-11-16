@@ -32,7 +32,7 @@ import org.jd.infestusfrontier.processing.ProcessingModule;
 import org.jd.infestusfrontier.processing.api.BatchOrganContents;
 import org.jd.infestusfrontier.storage.StorageModule;
 
-/** The Dormant Fang from plates (ITEM_CATALOG I017), the Living Fang (I018) and its Grasping graft. */
+/** The Dormant Fang from plates, the Living Fang and its Grasping graft. */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class LivingFangTests {

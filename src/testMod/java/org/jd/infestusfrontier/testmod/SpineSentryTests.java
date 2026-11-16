@@ -27,7 +27,7 @@ import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 
 /**
- * The Spine Sentry (BLOCK_CATALOG T2-30): it lashes hostiles in sight for biomass, keeps what they drop, and rests
+ * The Spine Sentry: it lashes hostiles in sight for biomass, keeps what they drop, and rests
  * dry, full or blind. Zoglins stand in for hostiles: they never burn in the sun and always drop rotten flesh.
  */
 @GameTestHolder("infestusfrontier_tests")

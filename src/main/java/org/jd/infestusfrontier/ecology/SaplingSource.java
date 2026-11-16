@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Blocks;
 
 /**
  * The sapling a Withered Sapling was before infection: the one thing it keeps, because its harvest is that sapling's
- * own loot table (VEGETATION_INFECTION.md, "Harvest rules"). The tint is the species' muted tone, so the six can be
+ * own loot table. The tint is the species' muted tone, so the six can be
  * told apart; the block never grows into a tree.
  */
 public enum SaplingSource implements StringRepresentable {

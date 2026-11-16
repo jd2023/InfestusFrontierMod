@@ -1,4 +1,4 @@
-"""Shaping Palm (BLOCK_CATALOG T1-41): a living hand that keeps a crafting grid. An open hand of pink muscle lies palm
+"""Shaping Palm: a living hand that keeps a crafting grid. An open hand of pink muscle lies palm
 up on a root foot, its heel to the front. Four fingers rise along the back of the palm and curl forward over it, and
 a thumb splays from a fleshy mound at the side and turns in; every tip is ivory. In the cup of
 the palm lies an ivory plate with nine studs in three rows of three: the crafting grid it keeps. The studs are the

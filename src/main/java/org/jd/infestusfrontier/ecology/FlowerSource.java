@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Blocks;
 
 /**
  * The flower a Withered Flower was before infection: the one thing it keeps, because its harvest is that flower's own
- * loot table (VEGETATION_INFECTION.md, "Harvest rules"). Appearance is not kept here; the blockstate draws it from the
+ * loot table. Appearance is not kept here; the blockstate draws it from the
  * position.
  */
 public enum FlowerSource implements StringRepresentable {

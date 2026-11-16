@@ -63,7 +63,7 @@ public final class EcologyModule {
      */
     public static final DeferredItem<Item> DEAD_TISSUE = ITEMS.registerSimpleItem("dead_tissue");
     /**
-     * A small flower killed by substrate growth under it (VEGETATION_INFECTION.md). No item: it is only ever grown,
+     * A small flower killed by substrate growth under it. No item: it is only ever grown,
      * and breaking it gives the flower it was.
      */
     public static final DeferredBlock<WitheredFlowerBlock> WITHERED_FLOWER = BLOCKS.registerBlock(
@@ -236,25 +236,23 @@ public final class EcologyModule {
     }
 
     /**
-     * Hardens a Living Wall into a Ribbed Wall and a Sphincter Door into a Clenched Door (ITEM_CATALOG I050, BLOCK_CATALOG
-     * T1-29).
+     * Hardens a Living Wall into a Ribbed Wall and a Sphincter Door into a Clenched Door.
      */
     public static final DeferredItem<Item> SKELETAL_GRAFT = ITEMS.registerItem(
             "skeletal_graft",
             properties ->
                     new WallGraftItem(properties, Map.of(LIVING_WALL, RIBBED_WALL, SPHINCTER_DOOR, CLENCHED_DOOR)));
     /**
-     * Hardens a Ribbed Wall into a Calcified Wall and a Clenched Door into a Calcified Door (ITEM_CATALOG I131, BLOCK_CATALOG
-     * T1-29).
+     * Hardens a Ribbed Wall into a Calcified Wall and a Clenched Door into a Calcified Door.
      */
     public static final DeferredItem<Item> CALCIFYING_GRAFT = ITEMS.registerItem(
             "calcifying_graft",
             properties ->
                     new WallGraftItem(properties, Map.of(RIBBED_WALL, CALCIFIED_WALL, CLENCHED_DOOR, CALCIFIED_DOOR)));
-    /** Turns a wall cell into a Membrane Window (BLOCK_CATALOG T0-12). */
+    /** Turns a wall cell into a Membrane Window. */
     public static final DeferredItem<Item> MEMBRANE_WINDOW_ITEM =
             ITEMS.registerItem("membrane_window", properties -> new OpeningGraftItem(properties, false));
-    /** Turns a two-high wall into a Sphincter Door (BLOCK_CATALOG T1-29). */
+    /** Turns a two-high wall into a Sphincter Door. */
     public static final DeferredItem<Item> SPHINCTER_DOOR_ITEM =
             ITEMS.registerItem("sphincter_door", properties -> new OpeningGraftItem(properties, true));
 

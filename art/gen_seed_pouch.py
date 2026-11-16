@@ -1,4 +1,4 @@
-"""Seed Pouch (BLOCK_CATALOG T0-09): a seed sac. A plump pod of veined leathery skin, widest at its waist and
+"""Seed Pouch: a seed sac. A plump pod of veined leathery skin, widest at its waist and
 tapering to a pinched neck, squats on a clawed root foot; its front splits into two lobes that part a little as it
 breathes; a membrane cord pinches the neck and the mouth flares open in four lips round a crowned heap of seeds,
 two more spilt over its shoulders. The heaped mouth of seeds and the split lobes are the cues: grown, not potted.

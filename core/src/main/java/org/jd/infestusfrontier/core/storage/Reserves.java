@@ -5,7 +5,7 @@ import java.util.List;
 import org.jd.infestusfrontier.core.logistics.Delivery;
 
 /**
- * The reserve of a Larder compartment (BLOCK_CATALOG T1-09): a count of its kind that no external extraction takes. A
+ * The reserve of a Larder compartment: a count of its kind that no external extraction takes. A
  * compartment gives {@link #automatable} and keeps {@link #reserved}; the two always add up to what it holds.
  */
 public final class Reserves {

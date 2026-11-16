@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Blocks;
 
 /**
  * The one-block undergrowth a Blighted Undergrowth was before infection: short grass or a fern. It is all the block
- * keeps, because its harvest is that plant's own drop (VEGETATION_INFECTION.md, "Harvest rules").
+ * keeps, because its harvest is that plant's own drop.
  */
 public enum UndergrowthSource implements StringRepresentable {
     SHORT_GRASS("short_grass", Blocks.SHORT_GRASS),

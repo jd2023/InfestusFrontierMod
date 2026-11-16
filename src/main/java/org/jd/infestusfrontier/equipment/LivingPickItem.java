@@ -11,7 +11,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** A Living Pick (ITEM_CATALOG I016): a vanilla pickaxe of the living tier that carries a biomass reserve, mends from it while carried, and breaks the blocks round the one it mines once grafted Contractile. */
+/** A Living Pick: a vanilla pickaxe of the living tier that carries a biomass reserve, mends from it while carried, and breaks the blocks round the one it mines once grafted Contractile. */
 final class LivingPickItem extends PickaxeItem {
     LivingPickItem(Properties properties) {
         super(LivingTiers.LIVING, properties);

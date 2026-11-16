@@ -10,7 +10,7 @@ import org.jd.infestusfrontier.core.equipment.LivingTool;
 import org.jd.infestusfrontier.processing.ProcessingModule;
 
 /**
- * The two bone tool tiers (ITEM_CATALOG I015, I016). A dormant tool has fewer uses and slower mining than wood,
+ * The two bone tool tiers. A dormant tool has fewer uses and slower mining than wood,
  * with the same harvest eligibility. A living one mines what a stone tool mines, and a better harvest
  * tier waits for mineral fusion. A dormant tool is repaired with Bone Plates on an anvil; a living one mends itself
  * from its reserve and takes no anvil repair.

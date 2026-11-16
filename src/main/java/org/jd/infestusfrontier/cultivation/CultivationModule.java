@@ -59,7 +59,7 @@ public final class CultivationModule {
                     "cultivation_tissue",
                     () -> BlockEntityType.Builder.of(CultivationTissueBlockEntity::new, CULTIVATION_TISSUE.get())
                             .build(null));
-    /** Grows a bed out of a mature cell; the Bowl and the Cyst make it (ITEM_CATALOG I033). */
+    /** Grows a bed out of a mature cell; the Bowl and the Cyst make it. */
     public static final DeferredItem<Item> ROOTING_GEL =
             ITEMS.registerItem("rooting_gel", properties -> new GraftItem(properties, () -> CULTIVATION_TISSUE.get()));
 

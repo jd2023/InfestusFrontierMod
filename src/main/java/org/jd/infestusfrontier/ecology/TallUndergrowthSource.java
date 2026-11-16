@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Blocks;
 
 /**
  * The two-block undergrowth a Tall Blighted Undergrowth was before infection: tall grass or a large fern. It is all
- * the block keeps, because its harvest is that plant's own drop (VEGETATION_INFECTION.md, "Harvest rules").
+ * the block keeps, because its harvest is that plant's own drop.
  */
 public enum TallUndergrowthSource implements StringRepresentable {
     TALL_GRASS("tall_grass", Blocks.TALL_GRASS),

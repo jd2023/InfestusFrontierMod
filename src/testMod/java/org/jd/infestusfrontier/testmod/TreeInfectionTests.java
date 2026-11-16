@@ -58,7 +58,7 @@ import org.jd.infestusfrontier.ecology.SubstrateStage;
 import org.jd.infestusfrontier.ecology.api.TreeInfectionSnapshot;
 
 /**
- * Standing trees infected by substrate growth: VEGETATION_INFECTION.md, "Trees". Trees here are built as the demo
+ * Standing trees infected by substrate growth. Trees here are built as the demo
  * builds them: a trunk on grass, leaf layers at the vanilla distances. Each test clears what it built in the far yard
  * it used, so the saved test world holds no tree the next run could find.
  */

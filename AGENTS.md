@@ -9,7 +9,7 @@ All roles follow this file and [VISION.md](VISION.md).
 - Validation: REVIEW's acceptance and evidence rules, applied to the task's category.
 - Planning: [ROADMAP.md](ROADMAP.md). Put concrete implementation work in ktask.
 
-VISION owns product direction. ROADMAP owns milestones and status. Older specifications do not override them. ROADMAP_OLD and docs/archive are historical references, not instructions. Do not read them unless the task needs history.
+VISION owns product direction. ROADMAP owns milestones and status. Older specifications do not override them. ROADMAP_OLD is a historical reference, not instructions. Do not read it unless the task needs history.
 
 ## Git
 

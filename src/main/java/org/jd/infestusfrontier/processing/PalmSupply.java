@@ -13,7 +13,7 @@ import org.jd.infestusfrontier.logistics.api.LogisticsCapabilities;
 import org.jd.infestusfrontier.processing.api.PalmContents;
 
 /**
- * What a Palm may do with the Mouth under it (BLOCK_CATALOG T1-41, stage 2). The Palm keeps no store, link or
+ * What a Palm may do with the Mouth under it. The Palm keeps no store, link or
  * position: the Mouth under it is its one door to the Item Vein network, and logistics decides what that door gives and
  * takes ({@link ItemAccess}). Each action is one transaction of at most nine requests. It moves only what the
  * network really gave or took, so a refused or partial action loses and duplicates nothing.

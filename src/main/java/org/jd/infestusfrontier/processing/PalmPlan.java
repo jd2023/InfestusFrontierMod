@@ -16,7 +16,7 @@ import org.jd.infestusfrontier.processing.api.PalmContents;
 import org.jd.infestusfrontier.processing.api.PalmRote;
 
 /**
- * What a Palm's pattern makes, asked of the vanilla crafting recipes (BLOCK_CATALOG T1-41, stage 3), and where those
+ * What a Palm's pattern makes, asked of the vanilla crafting recipes, and where those
  * products go in its tray. One recipe lookup per call of {@link #resolve}; the Palm makes it at Select and when a cycle
  * is about to start, never in a quiet tick.
  */

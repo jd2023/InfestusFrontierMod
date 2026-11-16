@@ -3,7 +3,7 @@
 Proposed player projects. SR0–SR9 are guide chapters, not player/base ranks.
 Progress depends on actual materials, working organs and dimension-native production.
 Initial implementation covers SR0–SR7; SR8–SR9 remain the expansion horizon.
-Catalogs own recipes and numerical baselines; this document owns player projects.
+Recipes and numbers live in the recipe data; this document owns player projects.
 
 Owner, 2026-10-24: factory management is a core part of the game, and a fully
 balanced system is a challenge to set up. A line that runs is easy; one where every
@@ -84,8 +84,8 @@ reaches it until it has Rote); reach storage through the Mouth under it and the 
 buttons you press); then
 let it repeat one chosen recipe on biomass through Feeding and Yield Lobes (shipped: a Synaptic Gel gives it Rote,
 Select records the pattern). Each step
-keeps the hand path. See [Blocks](BLOCK_CATALOG.md#t1-09--item-capsule-and-capsule-stem)
-and [T1-41](BLOCK_CATALOG.md#t1-41--shaping-palm). Recursive orders wait for the Request Cortex.
+keeps the hand path. See Blocks
+and T1-41. Recursive orders wait for the Request Cortex.
 
 **Control:** protect seed/restart reserves, then distribute surplus. Full destinations
 pause suppliers. Reflex Knot and Selector Ganglion use ready/held/blocked states;
@@ -145,7 +145,7 @@ biomass and a settling cycle; smelt four dust per ingot in the Bio-Furnace. The 
 needs no electricity and no genome. Dirty water, Rock Residue and Tailings have
 finite buffers and a sink at this stage; a full buffer pauses the line. Direct
 smelting stays cheaper per ingot; the dust waits for later smelters. Numbers:
-[Items](ITEM_CATALOG.md#first-release-the-automated-mineral-workshop). Leaching,
+Items. Leaching,
 intact extraction, planned mines and the Separator come after it.
 
 **Later mineral workshop:** Grasping Root moves one intact specimen to Work Bed;
@@ -199,7 +199,7 @@ The developed Electrocyte Stack powers industrial loads; Charge Sac buffers it.
 Conductive Tissue carries it. Precision Sequencer and Ion Separator perform their
 listed preparation tasks, not every earlier operation.
 
-Improve [ore recovery and smelting](ITEM_CATALOG.md#ore-dust-and-recovery)
+Improve ore recovery and smelting
 independently; stockpile compatible dust for a later smelter.
 
 **Layouts:** direct smelting, partial treatment plus stockpiling, parallel specialist
@@ -253,7 +253,7 @@ The dragon encounter does not substitute for this workshop.
 
 ## 7. SR6 — Connect three productive sites
 
-| Site | Local catalog work | Export | Imports/support |
+| Site | Local work | Export | Imports/support |
 |---|---|---|---|
 | Overworld agriculture | Food, ordinary crops, wood, diverse stock | Meals, specialist farm products | Industrial surplus and thermal/spatial products |
 | Nether industrial base | Renewable local biomass/power, thermal manufacturing, Nether DNA, bulk refining | Biomass/energy surplus, lining, plates, refined materials | Specialist crops and spatial products |
@@ -297,7 +297,7 @@ separate. Display reserve endurance at current net drain.
 **Completion projects:** a traversable deep mine feeding a selected ore route;
 an expedition/refueling network; a supplied specialist equipment workshop; or
 production meeting a specified energy/space/output target. Completing every
-optional catalog entry is not assumed.
+optional organ is not assumed.
 
 ## 9. SR8–SR9 — Fold and Manyfold horizon
 

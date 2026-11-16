@@ -38,7 +38,7 @@ import org.jd.infestusfrontier.storage.api.CapsuleStock;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * An Item Capsule (BLOCK_CATALOG T1-09): the pod of a Capsule Stem, one kind of item in bulk, its outer face toward
+ * An Item Capsule: the pod of a Capsule Stem, one kind of item in bulk, its outer face toward
  * {@link #FACING} showing what it holds. A stem grows pods on its trunk cells; a pod pressed by hand on a trunk cell
  * joins that tree, anywhere else it stands alone. Any hand opens the pod's own screen ({@link ItemCapsulePodMenu}):
  * a stack in or out and a treatment well; the stem's cells open the whole tree. A Skeletal Graft, used on the pod or

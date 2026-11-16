@@ -1,4 +1,4 @@
-"""Compost Gland (BLOCK_CATALOG T1-19): a fermentation gut. A bloated belly of sickly olive-plum flesh, its flanks
+"""Compost Gland: a fermentation gut. A bloated belly of sickly olive-plum flesh, its flanks
 bulging out over a clawed root foot, carries a thick-lipped maw on top with scraps mounded in it; low at the
 front a bone spout has spilt a crust of bone meal over the foot's edge. The gaping maw of scraps above and the
 meal-crusted spout below are the cues: what goes in and what comes out.

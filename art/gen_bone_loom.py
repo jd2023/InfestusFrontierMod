@@ -1,4 +1,4 @@
-"""Bone Loom (BLOCK_CATALOG T0-06): a ribcage loom. A muscle mound on a root foot carries a short vertebral spine at
+"""Bone Loom: a ribcage loom. A muscle mound on a root foot carries a short vertebral spine at
 its back; three curved ribs rise from each flank through the edges of a bone plate woven in three strips between them
 and curl in over it, an open cage, with a marrow shuttle and its bone needle riding the plate. The curved ribs and the plate being woven
 are the cues; the Membrane Rack beside it is two straight posts and a skin.

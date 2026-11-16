@@ -42,7 +42,7 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * A Shaping Palm (BLOCK_CATALOG T1-41): the nine stacks of a crafting grid that stay in the organ when its screen
+ * A Shaping Palm: the nine stacks of a crafting grid that stay in the organ when its screen
  * closes, and whether it has been given Reach, the right to use the Mouth under it as its door to the Item Vein
  * network. A craft at the screen is the crafting
  * table's own, taken by the player ({@link ShapingPalmMenu}). A Palm with Rote (stage 3) also keeps one recorded

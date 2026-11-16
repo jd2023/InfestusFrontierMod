@@ -10,7 +10,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
 /**
- * A Living Fang (ITEM_CATALOG I018): a vanilla sword of the living tier that carries a biomass reserve, mends from it
+ * A Living Fang: a vanilla sword of the living tier that carries a biomass reserve, mends from it
  * while carried, and grips what it hits once grafted Grasping.
  */
 final class LivingFangItem extends SwordItem {

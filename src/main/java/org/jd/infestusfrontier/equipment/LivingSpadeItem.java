@@ -11,7 +11,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** A Living Spade (ITEM_CATALOG I016): a vanilla shovel of the living tier that carries a biomass reserve, mends from it while carried, and breaks the blocks round the one it mines once grafted Contractile. */
+/** A Living Spade: a vanilla shovel of the living tier that carries a biomass reserve, mends from it while carried, and breaks the blocks round the one it mines once grafted Contractile. */
 final class LivingSpadeItem extends ShovelItem {
     LivingSpadeItem(Properties properties) {
         super(LivingTiers.LIVING, properties);

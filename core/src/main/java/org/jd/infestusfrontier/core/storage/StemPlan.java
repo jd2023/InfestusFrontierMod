@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.Random;
 
 /**
- * The grown shape of one Capsule Stem (BLOCK_CATALOG T1-09): the stem cells and the pods a root has grown, as offsets
+ * The grown shape of one Capsule Stem: the stem cells and the pods a root has grown, as offsets
  * from the root, in the order they grew. A root plants as one cell and grows one step at a time; every step is drawn
  * from the plan's seed, so the same root in the same room grows the same tree, and a tree whose cells were broken is
  * regrown from the plan cell by cell.

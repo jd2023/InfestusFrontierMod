@@ -1,4 +1,4 @@
-"""Spine Sentry (BLOCK_CATALOG T2-30): a rooted lash. A muscle mound on a clawed root foot, its flanks sloping up and
+"""Spine Sentry: a rooted lash. A muscle mound on a clawed root foot, its flanks sloping up and
 four tendons straining up to a bone collar, carries a bone socket from which a jointed spine rises, three plated
 segments, each barbed on its back, and a black thorn, coiled upright like a cobra. Idle it sways;
 working it swings wide from side to side, whipping down at what stands near, once a pulse.

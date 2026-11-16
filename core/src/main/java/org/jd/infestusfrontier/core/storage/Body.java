@@ -3,7 +3,7 @@ package org.jd.infestusfrontier.core.storage;
 import java.util.Optional;
 
 /**
- * The rules of a storage body (BLOCK_CATALOG T1-07 and T1-09): touching cells form one body only as a full
+ * The rules of a storage body: touching cells form one body only as a full
  * rectangular box, grown by whole rows and layers; a cell that would leave a gap waits outside on its own. Contents
  * live in the cells; a body fills its bottom layer first, evenly across it, and drains its top layer first, so every
  * cell shows the one level.

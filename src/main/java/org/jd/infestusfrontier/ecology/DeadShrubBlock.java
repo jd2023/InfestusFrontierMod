@@ -14,8 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * What a shrub, short grass, fern or sapling leaves when substrate growth kills it: a plain {@link BushBlock}, so it
  * stands where its plant stood and breaks through the same player and neighbour paths. Inert: no block entity, no
  * ticks, no growth, no berry picking, no contact damage and no bone meal response. Each family keeps only what its
- * harvest needs and the loot table answers it with the plant's own drop rules (VEGETATION_INFECTION.md, "Shipped:
- * shrubs, grass and saplings").
+ * harvest needs and the loot table answers it with the plant's own drop rules.
  *
  * <p>Appearance is never saved: the blockstate lists the family's looks and vanilla picks one by the position's seed.
  */

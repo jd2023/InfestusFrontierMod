@@ -2,7 +2,7 @@
 
 Per-piece development, permanent branches and metabolism.
 Frame statistics and mutation values are proposed balance.
-Preparation recipes: [Items](ITEM_CATALOG.md). Service structures: [Blocks](BLOCK_CATALOG.md).
+Preparation recipes: Items. Service structures: Blocks.
 
 ## 1. Four independent pieces
 
@@ -237,7 +237,7 @@ End-native medium. Recipes and slot limits still apply. No activity threshold
 is required to install a mutation.
 
 Prepare a target/expression-specific Mutation Graft, then install it on the existing
-piece. [Item Catalog](ITEM_CATALOG.md#mutation-grafts) owns the recipe quantities.
+piece. Recipe quantities are set in the recipe data when each graft is built.
 Host-grown introductory grafts have a Bowl/Cradle route; creature-derived grafts
 require complete matching genomes and physical stock. Wings incorporate a real
 Elytra once. Automatic player feeding and powered flight are late progression.
