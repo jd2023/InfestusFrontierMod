@@ -138,6 +138,9 @@ The Rootstock is a Tunnel Root head with the Stairs mutation, expanded into a
 multiblock. It keeps the head's history. Installed organs keep their own
 histories and upgrades.
 
+The first Stairs genetic construct uses a completed pig genome and Overworld
+materials. Applying it consumes the construct and biomass; the genome is kept.
+
 The result is a lit staircase with three blocks of headroom over each tread.
 One section descends at most 32 blocks. A new section needs a new approval.
 
