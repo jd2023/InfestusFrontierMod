@@ -56,8 +56,8 @@ The colony starts helping underground and gains two more renewable supplies. Eve
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
-| 7 | MINE-1 | Plant a one-use organ that turns soft ground below it into see-through rock that breaks by hand | The player clears a 7-wide pit with bare hands and sees every ore in it before reaching it | BASE-2 | none |
-| 8 | MINE-2 | Drive a slow level tunnel by feeding a root one step at a time and steering it | The player cuts a tunnel with a turn, walks it, collects the drops and recovers from every stop reason | BASE-2 | none |
+| 7 | MINE-1 | Plant a one-use organ that turns soft ground below it into see-through rock that breaks by hand | The player clears a 7-wide pit with bare hands and sees every ore in it before reaching it | BASE-2 | planned |
+| 8 | MINE-2 | Drive a slow level tunnel by feeding a root one step at a time and steering it | The player cuts a tunnel with a turn, walks it, collects the drops and recovers from every stop reason | BASE-2 | planned |
 | 9 | WOOD-1 | Keep a grove that replants a sapling after each tree is cut by hand | The player fells a tree, walks away and returns to a new sapling | BASE-3 | none |
 | 10 | WOOD-2 | Leave a grove to fell its own trees and send the logs to storage | Four trees are harvested ten times with no hand work and the sapling stock never runs out | WOOD-1 | none |
 | 11 | ANIMAL-1 | Keep a pen that feeds and breeds its animals up to a set number | Two cows become the set number from supplied wheat, then wheat use stops | BASE-3 | none |
@@ -71,10 +71,10 @@ Organs and tools start to improve with use, and the player starts researching DN
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
 | 14 | EVOLVE-1 | Earn experience on the furnace and the pick by using them, and pick one permanent upgrade path for each | Two furnaces on different paths behave differently; the choice survives saving and moving the block and cannot be undone | BASE-2 | none |
-| 15 | GENE-1 | Collect DNA samples from creatures and plants and see each species' research progress | One species reaches fully researched from samples the player gathered | BASE-3 | none |
-| 16 | GENE-2 | Produce the material for one mutation from a researched species and apply it to an organ or tool | The target gains the new ability; the material and energy are used up; the research is kept | GENE-1 | none |
-| 17 | MINE-3 | Mark a staircase, supply a mine and let it dig to a chosen depth while it sends the rock to storage | One marked section is dug with no hand work; the player walks to the bottom; all rock is in storage; the mine stops and resumes cleanly | MINE-2, GENE-2 | none |
-| 18 | MINE-4 | Dig level tunnels from the bottom of a staircase, with several cutting faces sharing one supply line | Two faces run at once from one supply; one is starved on purpose and resumes; nothing is lost | MINE-3 | none |
+| 15 | GENE-1 | Collect DNA samples from creatures and plants and see each species' research progress | One species reaches fully researched from samples the player gathered | BASE-3 | planned |
+| 16 | GENE-2 | Produce the material for one mutation from a researched species and apply it to an organ or tool | The target gains the new ability; the material and energy are used up; the research is kept | GENE-1 | planned |
+| 17 | MINE-3 | Mark a staircase, supply a mine and let it dig to a chosen depth while it sends the rock to storage | One marked section is dug with no hand work; the player walks to the bottom; all rock is in storage; the mine stops and resumes cleanly | MINE-2, GENE-2 | planned |
+| 18 | MINE-4 | Dig level tunnels from the bottom of a staircase, with several cutting faces sharing one supply line | Two faces run at once from one supply; one is starved on purpose and resumes; nothing is lost | MINE-3 | planned |
 | 19 | ANIMAL-4 | Grow meat in an organ with no animals, once that animal's DNA is fully researched | Beef is produced with no cow loaded anywhere | GENE-1 | none |
 | 20 | WOOD-3 | Keep one tree alive and fed, and take special wood, resin and fruit from it without cutting it down | A fed tree yields all three at the split the player set, stops when unfed and resumes | WOOD-2 | none |
 | 21 | EVOLVE-4 | Grow the ore grinder into a larger body with more capacity, and rebuild it in a new shape | The larger grinder handles more ore per minute; taking it apart and rebuilding keeps its experience and path | BASE-4, EVOLVE-1 | none |

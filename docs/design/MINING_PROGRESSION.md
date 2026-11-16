@@ -22,6 +22,8 @@ is a starting value, not measured balance.
 8. Every job is finite and player-authorized. Nothing scans, extends or loads
    chunks without a bound.
 9. Earlier stages stay useful. A later method does not replace them.
+10. Unloading never damages, kills or resets an organ. Save its state and job
+    progress, pause while required chunks are unloaded, and resume when they load.
 
 ## The whole picture
 
@@ -79,8 +81,8 @@ ground so the player can dig a wide pit by hand and see the ore in it.
 - **Cost and end:** a layer that converts at least one block uses one biomass
   charge. The pod holds 16 charges and never works more than 16 layers below
   itself. When the charges or the layers run out it dies and leaves a husk.
-- **Stops early:** a position in an unloaded chunk ends the job at the previous
-  layer.
+- **Unloaded chunks:** pause until the required chunks load, then resume from
+  saved progress without repeating conversions or charges.
 
 Done when: a pod planted on a substrate patch over stone leaves a pit the player
 can clear with bare hands, with every ore block in it still in place and
