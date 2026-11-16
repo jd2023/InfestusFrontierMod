@@ -46,7 +46,6 @@ Not here: the behavior, recipes and numbers of a single block or item. Code, dat
 - Limits are shared, not per machine: a budget per dimension under a ceiling for the whole server. Adding machines, ports or dimensions never adds server work beyond that ceiling. `TickQuota` and `WindowQuota` in `core.foundation` are the admission primitives.
 - Idle costs nothing. Mass-placed tissue has no block entity and no random tick; it uses scheduled ticks only while active and goes dormant by itself.
 - Work is driven by a change, not by polling. Refused work retries when its inputs change, or after a bounded delay when the other side cannot notify. `RetryGate` is the primitive.
-- Never scan the world or a radius for something to do. Work on explicit, finite, loaded targets.
 - Long work is a job: admitted whole or refused whole against a cap, then advanced by a per-tick quota dealt fairly across jobs.
 - Above a limit, refuse and say so. Never act on a truncated search as if it were complete. Never grow a queue to absorb overload.
 - A data tag alone never authorizes arbitrarily large work; size limits still apply.

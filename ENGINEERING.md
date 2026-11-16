@@ -69,7 +69,7 @@ New or changed gameplay is complete when it has:
 - a labeled, usable exhibit in a demo scenario under `src/testMod/resources/captures/`;
 - tests for the changed behavior.
 
-The guide never presents a planned ability as available. Do not describe shipped behavior in a design document; the code, the tests and the guide own it.
+The in-game guide and advancements cover implemented gameplay only. Keep planned progression in ROADMAP.md. Do not describe shipped behavior in a design document; the code, the tests and the guide own it.
 
 ```bash
 bash scripts/demo.sh                          # demo world with every exhibit

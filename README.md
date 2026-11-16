@@ -10,7 +10,9 @@ Minecraft 1.21.1 / NeoForge mod. Grow and evolve a living industrial colony acro
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical decisions every feature conforms to |
 | [ENGINEERING.md](ENGINEERING.md) | Development and repair |
 | [REVIEW.md](REVIEW.md) | Independent review and validation |
-| [docs/design/](docs/design/) | Designs by topic: mining, forestry, animal farming, armor, substrate, guide tree, progression map. VISION takes precedence |
+| [docs/design/](docs/design/) | Designs by topic: mining, forestry, animal farming, armor and substrate. VISION takes precedence |
+
+ROADMAP owns planned progression. The in-game guide and advancements cover implemented gameplay only.
 
 ROADMAP_OLD.md is retained for owner comparison only. LICENSE.txt and CREDITS.txt hold licensing and asset records.
 
