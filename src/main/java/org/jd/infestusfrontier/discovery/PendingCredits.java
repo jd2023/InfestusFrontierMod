@@ -18,10 +18,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
+import org.jd.infestusfrontier.genetics.GeneticsModule;
 import org.slf4j.Logger;
 
 /**
- * Batch credits and automatic-work credits for players who were offline when their organ finished or worked. Held on
+ * Batch credits, automatic-work credits and completed-genome credits for players who were offline when their organ
+ * finished, worked or completed a genome. Held on
  * the overworld, one credit per player, organ and kind and at most {@link #LIMIT} in all: past that a new credit is refused and logged, so no player's
  * credit ever evicts another's and the list we save is always one we can read back. A player's credits fire on
  * login and are forgotten. A credit list that cannot be read is kept as it was.
@@ -39,14 +41,21 @@ public final class PendingCredits extends SavedData {
 
     /**
      * {@code automatic} tells work an organ did on its own for its steward apart from a batch a player started;
-     * {@code recipe} is the recipe a batch ran, so a credit for a grinding does not stand for a washing.
+     * {@code recipe} is the recipe a batch ran, so a credit for a grinding does not stand for a washing; {@code genome}
+     * is the species whose genome the organ, a DNA Bank, completed.
      */
-    private record Credit(UUID player, ResourceLocation organ, boolean automatic, Optional<ResourceLocation> recipe) {
+    private record Credit(
+            UUID player,
+            ResourceLocation organ,
+            boolean automatic,
+            Optional<ResourceLocation> recipe,
+            Optional<ResourceLocation> genome) {
         static final Codec<Credit> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                         UUIDUtil.CODEC.fieldOf("player").forGetter(Credit::player),
                         ResourceLocation.CODEC.fieldOf("organ").forGetter(Credit::organ),
                         Codec.BOOL.optionalFieldOf("automatic", false).forGetter(Credit::automatic),
-                        ResourceLocation.CODEC.optionalFieldOf("recipe").forGetter(Credit::recipe))
+                        ResourceLocation.CODEC.optionalFieldOf("recipe").forGetter(Credit::recipe),
+                        ResourceLocation.CODEC.optionalFieldOf("genome").forGetter(Credit::genome))
                 .apply(instance, Credit::new));
     }
 
@@ -78,12 +87,17 @@ public final class PendingCredits extends SavedData {
 
     /** Remembers that a batch of {@code recipe}, when it names one, finished in {@code organ} for {@code player}. */
     public void remember(UUID player, ResourceLocation organ, Optional<ResourceLocation> recipe) {
-        remember(new Credit(player, organ, false, recipe));
+        remember(new Credit(player, organ, false, recipe, Optional.empty()));
     }
 
     /** Remembers that {@code organ} worked on its own for {@code player}. */
     public void rememberAutomatic(UUID player, ResourceLocation organ) {
-        remember(new Credit(player, organ, true, Optional.empty()));
+        remember(new Credit(player, organ, true, Optional.empty(), Optional.empty()));
+    }
+
+    /** Remembers that a DNA Bank completed the genome of {@code species} for {@code player}. */
+    public void rememberGenome(UUID player, ResourceLocation species) {
+        remember(new Credit(player, GeneticsModule.DNA_BANK.getId(), true, Optional.empty(), Optional.of(species)));
     }
 
     private void remember(Credit credit) {
@@ -103,7 +117,11 @@ public final class PendingCredits extends SavedData {
         for (Iterator<Credit> it = credits.iterator(); it.hasNext(); ) {
             Credit credit = it.next();
             if (!credit.player().equals(player.getUUID())) continue;
-            if (credit.automatic()) DiscoveryModule.AUTOMATIC_WORK.get().trigger(player, credit.organ());
+            if (credit.genome().isPresent())
+                DiscoveryModule.GENOME_COMPLETED
+                        .get()
+                        .trigger(player, credit.genome().get());
+            else if (credit.automatic()) DiscoveryModule.AUTOMATIC_WORK.get().trigger(player, credit.organ());
             else DiscoveryModule.ORGAN_BATCH_COMPLETED.get().trigger(player, credit.organ(), credit.recipe());
             it.remove();
             changed = true;
@@ -124,11 +142,18 @@ public final class PendingCredits extends SavedData {
 
     /** True when {@code player} has a batch credit for a batch of {@code recipe} finished in {@code organ}. */
     public boolean holds(UUID player, ResourceLocation organ, ResourceLocation recipe) {
-        return credits.contains(new Credit(player, organ, false, Optional.of(recipe)));
+        return credits.contains(new Credit(player, organ, false, Optional.of(recipe), Optional.empty()));
     }
 
     public boolean holdsAutomatic(UUID player, ResourceLocation organ) {
-        return credits.contains(new Credit(player, organ, true, Optional.empty()));
+        return credits.contains(new Credit(player, organ, true, Optional.empty(), Optional.empty()));
+    }
+
+    /** True when {@code player} has a credit for a completed genome of {@code species}. */
+    public boolean holdsGenome(UUID player, ResourceLocation species) {
+        return credits.stream()
+                .anyMatch(credit ->
+                        credit.player().equals(player) && credit.genome().equals(Optional.of(species)));
     }
 
     @Override

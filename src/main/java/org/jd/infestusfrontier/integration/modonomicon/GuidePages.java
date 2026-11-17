@@ -11,7 +11,10 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import org.jd.infestusfrontier.InfestusFrontier;
 
-/** The guide's own page types. Data under {@code modonomicon/books} names them by {@link OrganBatchPage#TYPE} and {@link OrganGrowthPage#TYPE}. */
+/**
+ * The guide's own page types. Data under {@code modonomicon/books} names them by {@link OrganBatchPage#TYPE},
+ * {@link OrganGrowthPage#TYPE} and {@link DnaSamplePage#TYPE}.
+ */
 public final class GuidePages {
     private GuidePages() {}
 
@@ -19,11 +22,14 @@ public final class GuidePages {
         LoaderRegistry.registerPageLoader(OrganBatchPage.TYPE, OrganBatchPage::fromJson, OrganBatchPage::fromNetwork);
         LoaderRegistry.registerPageLoader(
                 OrganGrowthPage.TYPE, OrganGrowthPage::fromJson, OrganGrowthPage::fromNetwork);
+        LoaderRegistry.registerPageLoader(DnaSamplePage.TYPE, DnaSamplePage::fromJson, DnaSamplePage::fromNetwork);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             modBus.addListener((FMLClientSetupEvent event) -> PageRendererRegistry.registerPageRenderer(
                     OrganBatchPage.TYPE, page -> new OrganBatchPageRenderer((OrganBatchPage) page)));
             modBus.addListener((FMLClientSetupEvent event) -> PageRendererRegistry.registerPageRenderer(
                     OrganGrowthPage.TYPE, page -> new OrganGrowthPageRenderer((OrganGrowthPage) page)));
+            modBus.addListener((FMLClientSetupEvent event) -> PageRendererRegistry.registerPageRenderer(
+                    DnaSamplePage.TYPE, page -> new DnaSamplePageRenderer((DnaSamplePage) page)));
             ResourceLocation cover =
                     ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "the_waking_genome");
             ModelResourceLocation model = ModelResourceLocation.standalone(cover.withPrefix("item/"));

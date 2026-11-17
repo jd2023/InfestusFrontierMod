@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/dna_sample",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:dna_bank"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.pig_genome.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.pig_genome.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "completed": {
+      "trigger": "infestusfrontier:genome_completed",
+      "conditions": {
+        "species": "minecraft:pig"
+      }
+    }
+  }
+}

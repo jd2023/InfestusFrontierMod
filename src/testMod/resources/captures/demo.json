@@ -1663,7 +1663,22 @@
     "setblock 169 -60 -48 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"DRAFT\"','\"the preview shows\"','\"the shape to cut,\"','\"never the ore\"']}}",
     "setblock 160 -60 -48 chest[facing=south]{Items:[{Slot:0,id:\"infestusfrontier:surveyed_tissue\",count:4},{Slot:1,id:\"infestusfrontier:structure_grower\",count:1},{Slot:2,id:\"infestusfrontier:root_segment\",count:32},{Slot:3,id:\"minecraft:cobblestone_stairs\",count:32},{Slot:4,id:\"minecraft:torch\",count:16},{Slot:5,id:\"minecraft:stone_pickaxe\",count:1},{Slot:6,id:\"infestusfrontier:surgical_blade\",count:1}]}",
     "setblock 159 -60 -48 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"Survey supplies\"','\"markers, a grower,\"','\"segments, stairs,\"','\"torches, a pick\"']}}",
-    "setblock 36 -60 -47 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"SURVEYED MINE\"','\"staircase, gallery\"','\"north-east,\"','\"x 154-172\"']}}"
+    "setblock 36 -60 -47 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['\"SURVEYED MINE\"','\"staircase, gallery\"','\"north-east,\"','\"x 154-172\"']}}",
+    "fill 132 -61 -24 146 -61 -18 grass_block",
+    "fill 132 -60 -24 136 -60 -24 oak_fence",
+    "fill 132 -60 -20 136 -60 -20 oak_fence",
+    "fill 132 -60 -23 132 -60 -21 oak_fence",
+    "fill 136 -60 -23 136 -60 -21 oak_fence",
+    "fill 138 -61 -23 140 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 139 -60 -22 infestusfrontier:dna_bank{tank:{stored:1500,capacity:2000},samples:{id:\"infestusfrontier:pig_dna_sample\",count:8},genomes:[{species:\"minecraft:pig\",points:20}]}",
+    "fill 142 -61 -23 144 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 143 -60 -22 infestusfrontier:dna_bank{tank:{stored:2000,capacity:2000},samples:{},genomes:[]}",
+    "setblock 146 -60 -22 chest[facing=south]{Items:[{Slot:0,id:\"infestusfrontier:sampling_needle\",count:1},{Slot:1,id:\"infestusfrontier:dna_bank\",count:1},{Slot:2,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:3,id:\"infestusfrontier:surgical_blade\",count:1},{Slot:4,id:\"minecraft:iron_nugget\",count:4},{Slot:5,id:\"minecraft:bone\",count:4},{Slot:6,id:\"minecraft:glass_bottle\",count:4}]}",
+    "setblock 134 -60 -19 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"PIG PEN\"','\"right-click the\"','\"pig with the\"','\"Sampling Needle\"']}}",
+    "setblock 139 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"DNA BANK\"','\"extracts pig\"','\"samples into\"','\"the pig genome\"']}}",
+    "setblock 143 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"YOUR BANK\"','\"load the samples\"','\"you took from\"','\"the pig\"']}}",
+    "setblock 146 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"DNA supplies\"','\"needle, bank,\"','\"biomass and\"','\"a blade\"']}}",
+    "summon pig 134.5 -60 -21.5 {PersistenceRequired:1b}"
   ],
   "play": [
     "advancement revoke @s from infestusfrontier:contact/root"

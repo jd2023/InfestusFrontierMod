@@ -93,6 +93,28 @@ final class OrganTriggers {
         }
     }
 
+    /** Fires with {@code {species: id}} when a DNA Bank completes that species' genome for its steward. */
+    static final class GenomeCompleted extends SimpleCriterionTrigger<GenomeCompleted.Instance> {
+        @Override
+        public Codec<Instance> codec() {
+            return Instance.CODEC;
+        }
+
+        void trigger(ServerPlayer player, ResourceLocation species) {
+            trigger(player, instance -> instance.species().equals(species));
+        }
+
+        record Instance(Optional<ContextAwarePredicate> player, ResourceLocation species)
+                implements SimpleCriterionTrigger.SimpleInstance {
+            static final Codec<Instance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                            EntityPredicate.ADVANCEMENT_CODEC
+                                    .optionalFieldOf("player")
+                                    .forGetter(Instance::player),
+                            ResourceLocation.CODEC.fieldOf("species").forGetter(Instance::species))
+                    .apply(instance, Instance::new));
+        }
+    }
+
     /** Fires with {@code {block: id, inserted: boolean}} when a bucket moves biomass at an organ block. */
     static final class BiomassBucket extends SimpleCriterionTrigger<BiomassBucket.Instance> {
         @Override

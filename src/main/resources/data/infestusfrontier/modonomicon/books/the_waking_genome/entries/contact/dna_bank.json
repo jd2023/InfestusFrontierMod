@@ -1,0 +1,71 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.dna_bank.name",
+  "description": "entry.infestusfrontier.contact.dna_bank.description",
+  "icon": "infestusfrontier:dna_bank",
+  "x": 4,
+  "y": 4,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/organ_bud"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/organ_bud"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/sampling_needle"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/pig_dna_sample"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/dna_bank"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.dna_bank.name",
+      "text": "entry.infestusfrontier.contact.dna_bank.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.dna_bank.sample",
+      "text": "entry.infestusfrontier.contact.dna_bank.sample_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.dna_bank.extract",
+      "text": "entry.infestusfrontier.contact.dna_bank.extract_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.dna_bank.keep",
+      "text": "entry.infestusfrontier.contact.dna_bank.keep_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.dna_bank.stops",
+      "text": "entry.infestusfrontier.contact.dna_bank.stops_text"
+    },
+    {
+      "type": "infestusfrontier:dna_sample",
+      "recipe_id_1": "infestusfrontier:dna/pig"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:sampling_needle",
+      "recipe_id_2": "infestusfrontier:dna_bank",
+      "text": "entry.infestusfrontier.contact.dna_bank.craft"
+    }
+  ]
+}

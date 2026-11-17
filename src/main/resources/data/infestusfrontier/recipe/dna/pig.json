@@ -1,0 +1,8 @@
+{
+  "type": "infestusfrontier:dna_sample",
+  "species": "minecraft:pig",
+  "sample": { "id": "infestusfrontier:pig_dna_sample", "count": 1 },
+  "points": 10,
+  "biomass": 100,
+  "ticks": 100
+}

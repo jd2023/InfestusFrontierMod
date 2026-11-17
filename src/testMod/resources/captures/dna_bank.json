@@ -1,0 +1,113 @@
+{
+  "commands": [
+    "forceload add 128 -28 150 -14",
+    "advancement grant @s through infestusfrontier:contact/organ_bud",
+    "fill 132 -61 -24 146 -61 -18 grass_block",
+    "fill 132 -60 -24 136 -60 -24 oak_fence",
+    "fill 132 -60 -20 136 -60 -20 oak_fence",
+    "fill 132 -60 -23 132 -60 -21 oak_fence",
+    "fill 136 -60 -23 136 -60 -21 oak_fence",
+    "fill 138 -61 -23 140 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 139 -60 -22 infestusfrontier:dna_bank{tank:{stored:1500,capacity:2000},samples:{id:\"infestusfrontier:pig_dna_sample\",count:8},genomes:[{species:\"minecraft:pig\",points:20}]}",
+    "fill 142 -61 -23 144 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 143 -60 -22 infestusfrontier:dna_bank{tank:{stored:2000,capacity:2000},samples:{},genomes:[]}",
+    "setblock 146 -60 -22 chest[facing=south]{Items:[{Slot:0,id:\"infestusfrontier:sampling_needle\",count:1},{Slot:1,id:\"infestusfrontier:dna_bank\",count:1},{Slot:2,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:3,id:\"infestusfrontier:surgical_blade\",count:1},{Slot:4,id:\"minecraft:iron_nugget\",count:4},{Slot:5,id:\"minecraft:bone\",count:4},{Slot:6,id:\"minecraft:glass_bottle\",count:4}]}",
+    "setblock 134 -60 -19 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"PIG PEN\"','\"right-click the\"','\"pig with the\"','\"Sampling Needle\"']}}",
+    "setblock 139 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"DNA BANK\"','\"extracts pig\"','\"samples into\"','\"the pig genome\"']}}",
+    "setblock 143 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"YOUR BANK\"','\"load the samples\"','\"you took from\"','\"the pig\"']}}",
+    "setblock 146 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"DNA supplies\"','\"needle, bank,\"','\"biomass and\"','\"a blade\"']}}",
+    "summon pig 134.5 -60 -21.5 {PersistenceRequired:1b}"
+  ],
+  "views": [
+    {
+      "x": 139.5,
+      "y": -56.0,
+      "z": -13.0,
+      "yaw": 180,
+      "pitch": 30,
+      "name": "dna_bank_exhibit"
+    },
+    {
+      "x": 134.5,
+      "y": -59.4,
+      "z": -15.5,
+      "yaw": 180,
+      "pitch": 15,
+      "name": "dna_bank_pen_sign"
+    },
+    {
+      "x": 142.0,
+      "y": -59.4,
+      "z": -15.5,
+      "yaw": 180,
+      "pitch": 15,
+      "name": "dna_bank_signs"
+    },
+    {
+      "x": 141.0,
+      "y": -59.0,
+      "z": -19.6,
+      "yaw": 150,
+      "pitch": 28,
+      "name": "dna_bank_model"
+    },
+    {
+      "x": 139.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "dna_bank_screen",
+      "use": [
+        139,
+        -60,
+        -22
+      ]
+    },
+    {
+      "x": 143.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "dna_bank_screen_empty",
+      "use": [
+        143,
+        -60,
+        -22
+      ]
+    },
+    {
+      "x": 139.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "book_dna_bank",
+      "gui": true,
+      "book": "infestusfrontier:contact/dna_bank"
+    },
+    {
+      "x": 139.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "book_dna_bank_sample",
+      "gui": true,
+      "book": "infestusfrontier:contact/dna_bank",
+      "page": 4
+    },
+    {
+      "x": 139.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "book_dna_bank_craft",
+      "gui": true,
+      "book": "infestusfrontier:contact/dna_bank",
+      "page": 6
+    }
+  ]
+}

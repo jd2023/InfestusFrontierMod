@@ -1,0 +1,27 @@
+{
+  "parent": "infestusfrontier:contact/organ_bud",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:pig_dna_sample"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.dna_sample.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.dna_sample.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "sampled": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "infestusfrontier:pig_dna_sample"
+          }
+        ]
+      }
+    }
+  }
+}

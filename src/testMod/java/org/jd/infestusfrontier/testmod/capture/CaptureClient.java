@@ -58,6 +58,12 @@ final class CaptureClient {
     private static final int STAGE_TIMEOUT_TICKS = 800;
     private static final int SETTLE_TICKS = 40;
     private static final int MOVE_TICKS = 10;
+    /**
+     * Ticks before a block use whose screen has not opened is sent again. The server ignores a use that arrives before
+     * it has heard the client accept the view's teleport, which a busy machine can delay past {@link #MOVE_TICKS}.
+     */
+    private static final int USE_RETRY_TICKS = 40;
+
     private static final int ACTION_START_TICKS = 25; // the opened screen is settled
     private static final int ACTION_GAP_TICKS = 8;
     private static final int WORLD_SCALE = 2; // the HUD stays small in a world shot
@@ -108,6 +114,9 @@ final class CaptureClient {
 
     private int nextActionTick;
     private boolean triggered;
+    /** The view's block use has opened its container screen; it is never sent again after that. */
+    private boolean useAnswered;
+
     private int tabShownTick = -1;
     private int scrolledTick = -1;
     private long toastSeenAt = -1;
@@ -164,6 +173,7 @@ final class CaptureClient {
                 case FRAME, GRABBING -> {
                     holdInAir(minecraft);
                     holdAim(minecraft);
+                    if (stage == Stage.FRAME) useAgainIfUnanswered(minecraft);
                 }
                 case DISCONNECT -> disconnect(minecraft);
                 case STOP -> stop(minecraft);
@@ -240,6 +250,17 @@ final class CaptureClient {
         if (minecraft.options.guiScale().get() == scale) return;
         minecraft.options.guiScale().set(scale);
         minecraft.resizeDisplay();
+    }
+
+    /** Sends the view's block use again while its screen has never opened, every {@link #USE_RETRY_TICKS}. */
+    private void useAgainIfUnanswered(Minecraft minecraft) {
+        Scenario.View view = currentView();
+        if (view.use().isEmpty() || useAnswered) return;
+        if (minecraft.screen instanceof AbstractContainerScreen<?>) {
+            useAnswered = true;
+            return;
+        }
+        if (ticksInStage % USE_RETRY_TICKS == 0) useBlock(minecraft, view.use().get(), view.holding());
     }
 
     private Scenario.View currentView() {
@@ -529,6 +550,7 @@ final class CaptureClient {
 
     private void advance(Minecraft minecraft) {
         triggered = false;
+        useAnswered = false;
         tabShownTick = -1;
         scrolledTick = -1;
         toastSeenAt = -1;

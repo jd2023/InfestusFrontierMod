@@ -76,6 +76,8 @@ public final class StarterAdvancementTests {
             "root_bend",
             "cut_to_storage",
             "surveyed_step",
+            "dna_sample",
+            "pig_genome",
             "planting_proboscis",
             "harvest_corolla",
             "supplied_sac",

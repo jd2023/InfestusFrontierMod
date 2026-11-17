@@ -8,6 +8,8 @@
 # Capsule Tree and a chest to a Rote Palm by Item Veins; four Palms (east, x 140 to 152, z -40) show each Mouth symbol.
 # Capsule Stems need an Infected Log: turn a tree in the Woodland plot (x 79 to 115), cut its log and craft at the table
 # beside the supplies chest; the Timber plot (x 62) and the Capsule Stem exhibit (x 80, z -33) have tables and parts too.
+# The DNA exhibit (x 132 to 146, z -24 to -18): sample the penned pig with the needle from its chest and load the
+# empty bank; the bank beside it completes the pig genome on its own.
 # The tab starts empty, with no advancement granted.
 # Play, then close the window. The world is rebuilt on every run; your options.txt in runs/demo is kept.
 set -euo pipefail

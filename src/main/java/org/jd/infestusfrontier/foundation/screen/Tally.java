@@ -5,7 +5,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.jd.infestusfrontier.ui.Bounds;
 
-/** One line of ink on the panel, read from a supplier every frame, with a longer story in its tooltip. */
+/**
+ * One line of ink on the panel, read from a supplier every frame, with a longer story in its tooltip. A line whose text
+ * is empty shows no tooltip.
+ */
 public final class Tally extends Part {
     private static final int LINE = 9;
     private final Supplier<Component> text;
@@ -23,6 +26,6 @@ public final class Tally extends Part {
         Component words = text.get();
         setMessage(words);
         Draw.ink(graphics, words, getX(), getY());
-        tip(story.get());
+        tip(words.getString().isEmpty() ? null : story.get()); // a blank line has nothing to explain
     }
 }

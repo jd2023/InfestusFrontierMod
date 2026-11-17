@@ -18,6 +18,8 @@ import org.jd.infestusfrontier.cultivation.CultivationModule;
 import org.jd.infestusfrontier.defense.DefenseModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.equipment.EquipmentModule;
+import org.jd.infestusfrontier.genetics.GeneticsModule;
+import org.jd.infestusfrontier.genetics.api.GenomeCompletedEvent;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
 import org.jd.infestusfrontier.mineral.MineralModule;
@@ -46,6 +48,8 @@ public final class DiscoveryModule {
             TRIGGERS.register("workshop_action", OrganTriggers.WorkshopAction::new);
     static final DeferredHolder<CriterionTrigger<?>, OrganTriggers.BiomassBucket> BIOMASS_BUCKET =
             TRIGGERS.register("biomass_bucket", OrganTriggers.BiomassBucket::new);
+    static final DeferredHolder<CriterionTrigger<?>, OrganTriggers.GenomeCompleted> GENOME_COMPLETED =
+            TRIGGERS.register("genome_completed", OrganTriggers.GenomeCompleted::new);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register(
             "main",
@@ -76,6 +80,9 @@ public final class DiscoveryModule {
                         output.accept(MiningModule.COLLECTION_CILIA_ITEM.get());
                         output.accept(MiningModule.SURVEYED_TISSUE_ITEM.get());
                         output.accept(MiningModule.STRUCTURE_GROWER_ITEM.get());
+                        output.accept(GeneticsModule.SAMPLING_NEEDLE.get());
+                        output.accept(GeneticsModule.PIG_DNA_SAMPLE.get());
+                        output.accept(GeneticsModule.DNA_BANK_ITEM.get());
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BLADDER_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BUCKET.get());
@@ -154,6 +161,7 @@ public final class DiscoveryModule {
         NeoForge.EVENT_BUS.addListener(DiscoveryModule::onAutomaticWork);
         NeoForge.EVENT_BUS.addListener(DiscoveryModule::onWorkshopAction);
         NeoForge.EVENT_BUS.addListener(DiscoveryModule::onBucket);
+        NeoForge.EVENT_BUS.addListener(DiscoveryModule::onGenomeCompleted);
         NeoForge.EVENT_BUS.addListener(DiscoveryModule::onLogin);
     }
 
@@ -179,6 +187,13 @@ public final class DiscoveryModule {
     private static void onBucket(BiomassBucketEvent event) {
         if (event.player() instanceof ServerPlayer player)
             BIOMASS_BUCKET.get().trigger(player, event.block(), event.inserted());
+    }
+
+    /** Fires for an online steward; an offline steward's credit waits in {@link PendingCredits}. */
+    private static void onGenomeCompleted(GenomeCompletedEvent event) {
+        ServerPlayer steward = event.level().getServer().getPlayerList().getPlayer(event.steward());
+        if (steward != null) GENOME_COMPLETED.get().trigger(steward, event.species());
+        else PendingCredits.get(event.level()).rememberGenome(event.steward(), event.species());
     }
 
     private static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {

@@ -8,6 +8,7 @@ import org.jd.infestusfrontier.defense.DefenseModule;
 import org.jd.infestusfrontier.discovery.DiscoveryModule;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.equipment.EquipmentModule;
+import org.jd.infestusfrontier.genetics.GeneticsModule;
 import org.jd.infestusfrontier.integration.modonomicon.GuidePages;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.logistics.LogisticsModule;
@@ -28,6 +29,7 @@ public final class InfestusFrontier {
         StorageModule.register(modBus);
         MineralModule.register(modBus);
         MiningModule.register(modBus);
+        GeneticsModule.register(modBus);
         ProcessingModule.register(modBus);
         LogisticsModule.register(modBus);
         CultivationModule.register(modBus);
