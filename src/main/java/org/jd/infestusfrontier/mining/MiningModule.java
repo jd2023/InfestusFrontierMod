@@ -1,6 +1,7 @@
 package org.jd.infestusfrontier.mining;
 
 import com.mojang.logging.LogUtils;
+import java.util.List;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -29,6 +30,8 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.foundation.TickQuota;
 import org.jd.infestusfrontier.core.mining.Fracturing;
+import org.jd.infestusfrontier.core.mining.Surveying;
+import org.jd.infestusfrontier.foundation.render.GhostBoxRenderer;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -36,7 +39,8 @@ import org.slf4j.Logger;
 
 /**
  * Owner of mining: the Leaching Pod and the Leached Rock it leaves, the Tunnel Root with its Root Segments and the
- * root cells it lays, and the stationary cutting organs: the Fracture Jaw, the Work Bed and the Collection Cilia.
+ * root cells it lays, the stationary cutting organs: the Fracture Jaw, the Work Bed and the Collection Cilia, and
+ * surveyed sections: the Surveyed Tissue marker that holds a plan and the Structure Grower that builds it.
  */
 public final class MiningModule {
     static final Logger LOGGER = LogUtils.getLogger();
@@ -209,6 +213,60 @@ public final class MiningModule {
             COLLECTION_CILIA_CONTENTS = COMPONENTS.registerComponentType(
                     "collection_cilia", builder -> builder.persistent(CollectionCiliaContents.CODEC.codec()));
 
+    /** Stairs a Structure Grower lays as treads; it also needs them to be plain stair blocks. */
+    public static final TagKey<Item> MINE_TREADS = TagKey.create(
+            Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "mine_treads"));
+
+    /** A flush marker at a section's entrance that holds its plan and draws its preview. Crafted. */
+    public static final DeferredBlock<SurveyedTissueBlock> SURVEYED_TISSUE = BLOCKS.registerBlock(
+            "surveyed_tissue",
+            SurveyedTissueBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_GREEN)
+                    .strength(SurveyedTissueBlock.HARDNESS)
+                    .sound(SoundType.ROOTED_DIRT));
+
+    public static final DeferredItem<BlockItem> SURVEYED_TISSUE_ITEM = ITEMS.registerSimpleBlockItem(SURVEYED_TISSUE);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SurveyedTissueBlockEntity>> SURVEYED_TISSUE_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "surveyed_tissue",
+                    () -> BlockEntityType.Builder.of(SurveyedTissueBlockEntity::new, SURVEYED_TISSUE.get())
+                            .build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<SurveyMenu>> SURVEY_MENU =
+            MENUS.register("surveyed_tissue", () -> IMenuTypeExtension.create(SurveyMenu::new));
+
+    /** The steps the Structure Growers of one dimension build each tick, together. */
+    static final DeferredHolder<AttachmentType<?>, AttachmentType<TickQuota>> GROWER_STEPS = ATTACHMENTS.register(
+            "grower_steps",
+            () -> AttachmentType.builder(() -> new TickQuota(Surveying.STEPS_PER_TICK))
+                    .build());
+
+    /** An organ on Surveyed Tissue that builds the approved plan's root cells, treads and lights. Crafted. */
+    public static final DeferredBlock<StructureGrowerBlock> STRUCTURE_GROWER = BLOCKS.registerBlock(
+            "structure_grower",
+            StructureGrowerBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_BROWN)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
+                    .sound(SoundType.ROOTED_DIRT)
+                    .noOcclusion());
+
+    public static final DeferredItem<BlockItem> STRUCTURE_GROWER_ITEM = ITEMS.registerSimpleBlockItem(STRUCTURE_GROWER);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StructureGrowerBlockEntity>>
+            STRUCTURE_GROWER_ENTITY = BLOCK_ENTITIES.register(
+                    "structure_grower",
+                    () -> BlockEntityType.Builder.of(StructureGrowerBlockEntity::new, STRUCTURE_GROWER.get())
+                            .build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<StructureGrowerMenu>> STRUCTURE_GROWER_MENU =
+            MENUS.register("structure_grower", () -> IMenuTypeExtension.create(StructureGrowerMenu::new));
+    /** What a broken grower carries on its item: its stock and the steps it has built. */
+    static final DeferredHolder<DataComponentType<?>, DataComponentType<StructureGrowerContents>>
+            STRUCTURE_GROWER_CONTENTS = COMPONENTS.registerComponentType(
+                    "structure_grower", builder -> builder.persistent(StructureGrowerContents.CODEC.codec()));
+
+    /** Blocks from a marker within which its preview is drawn: past the far end of the longest route. */
+    private static final int PREVIEW_DISTANCE = 96;
+
     private MiningModule() {}
 
     public static void register(IEventBus modBus) {
@@ -226,16 +284,40 @@ public final class MiningModule {
                     (jaw, side) -> BiomassFluids.handler(jaw));
             event.registerBlockEntity(BiomassCapabilities.BLOCK, COLLECTION_CILIA_ENTITY.get(), (cilia, side) -> cilia);
             event.registerBlockEntity(
+                    Capabilities.ItemHandler.BLOCK, STRUCTURE_GROWER_ENTITY.get(), (grower, side) -> grower.intake());
+            event.registerBlockEntity(
                     Capabilities.FluidHandler.BLOCK,
                     COLLECTION_CILIA_ENTITY.get(),
                     (cilia, side) -> BiomassFluids.handler(cilia));
         });
-        if (FMLEnvironment.dist == Dist.CLIENT)
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            GhostBoxRenderer.register(modBus, SURVEYED_TISSUE_ENTITY, MiningModule::preview, PREVIEW_DISTANCE);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(TUNNEL_ROOT_MENU.get(), TunnelRootScreen::new);
                 event.register(FRACTURE_JAW_MENU.get(), WorkOrganScreen::new);
                 event.register(COLLECTION_CILIA_MENU.get(), WorkOrganScreen::new);
                 event.register(WORK_BED_MENU.get(), WorkBedScreen::new);
+                event.register(SURVEY_MENU.get(), SurveyScreen::new);
+                event.register(STRUCTURE_GROWER_MENU.get(), StructureGrowerScreen::new);
             });
+        }
+    }
+
+    /**
+     * A marker's preview in colour: amber while a draft, green once approved; root cells and treads stronger than the
+     * passage, lights yellow. Client only.
+     */
+    private static List<GhostBoxRenderer.Ghost> preview(SurveyedTissueBlockEntity marker) {
+        return SurveyPreview.of(marker).stream()
+                .map(box -> new GhostBoxRenderer.Ghost(box.box(), colour(box)))
+                .toList();
+    }
+
+    private static int colour(SurveyPreview.Box box) {
+        return switch (box.part()) {
+            case ROOT, TREAD -> box.approved() ? 0x7040C070 : 0x70E0A030;
+            case PASSAGE -> box.approved() ? 0x2860E090 : 0x28F0C060;
+            case LIGHT -> 0xC0FFF080;
+        };
     }
 }

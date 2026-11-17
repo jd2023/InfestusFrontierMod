@@ -1,0 +1,70 @@
+package org.jd.infestusfrontier.mining;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
+import net.minecraft.world.item.ItemStack;
+import org.jd.infestusfrontier.core.mining.GrowerProgress;
+import org.jd.infestusfrontier.core.mining.Surveying;
+
+/**
+ * Everything a Structure Grower owns: its Root Segments, treads and lights, and its progress, whose steps are its
+ * history. Where it stands in a plan is the marker's, not the grower's. Saved on the block entity and carried on the
+ * item when the grower is broken. The stacks are copies.
+ */
+record StructureGrowerContents(ItemStack segments, ItemStack treads, ItemStack lights, GrowerProgress progress) {
+    static final StructureGrowerContents EMPTY =
+            new StructureGrowerContents(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, GrowerProgress.START);
+
+    StructureGrowerContents {
+        segments = segments.copy();
+        treads = treads.copy();
+        lights = lights.copy();
+    }
+
+    /** The saved numbers before they are judged; impossible ones are a decode error, never an exception. */
+    private record Raw(ItemStack segments, ItemStack treads, ItemStack lights, int steps, int ticks) {}
+
+    static final MapCodec<StructureGrowerContents> CODEC = RecordCodecBuilder.<Raw>mapCodec(instance -> instance.group(
+                            ItemStack.OPTIONAL_CODEC.fieldOf("segments").forGetter(Raw::segments),
+                            ItemStack.OPTIONAL_CODEC.fieldOf("treads").forGetter(Raw::treads),
+                            ItemStack.OPTIONAL_CODEC.fieldOf("lights").forGetter(Raw::lights),
+                            Codec.INT.fieldOf("steps").forGetter(Raw::steps),
+                            Codec.INT.fieldOf("ticks").forGetter(Raw::ticks))
+                    .apply(instance, Raw::new))
+            .flatXmap(StructureGrowerContents::read, contents -> DataResult.success(contents.raw()));
+
+    /** The saved keys, for taking them off a tag that a carried grower's item also holds. */
+    static final String[] KEYS = {"segments", "treads", "lights", "steps", "ticks"};
+
+    private Raw raw() {
+        return new Raw(segments, treads, lights, progress.steps(), progress.ticks());
+    }
+
+    private static DataResult<StructureGrowerContents> read(Raw raw) {
+        if (raw.steps() < 0) return DataResult.error(() -> "steps " + raw.steps());
+        if (raw.ticks() < 0 || raw.ticks() > Surveying.GROW_TICKS)
+            return DataResult.error(() -> "ticks " + raw.ticks());
+        StructureGrowerContents contents = new StructureGrowerContents(
+                raw.segments(), raw.treads(), raw.lights(), new GrowerProgress(raw.steps(), raw.ticks()));
+        Optional<String> problem = contents.problem();
+        return problem.isPresent() ? DataResult.error(problem::get) : DataResult.success(contents);
+    }
+
+    /** Why these contents cannot be a grower's, or empty when they can. */
+    Optional<String> problem() {
+        if (!segments.isEmpty() && (!segments.is(MiningModule.ROOT_SEGMENT.get()) || over(segments)))
+            return Optional.of("segments " + segments);
+        if (!treads.isEmpty() && (!StructureGrowerBlockEntity.tread(treads) || over(treads)))
+            return Optional.of("treads " + treads);
+        if (!lights.isEmpty() && (!StructureGrowerBlockEntity.light(lights) || over(lights)))
+            return Optional.of("lights " + lights);
+        return Optional.empty();
+    }
+
+    private static boolean over(ItemStack stack) {
+        return stack.getCount() > Math.min(Surveying.MAX_STOCK, stack.getMaxStackSize());
+    }
+}

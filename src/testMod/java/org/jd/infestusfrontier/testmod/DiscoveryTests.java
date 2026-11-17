@@ -154,7 +154,8 @@ public final class DiscoveryTests {
                 "larder",
                 "shaping_palm",
                 "iron_bars_factory",
-                "fracture_jaw"))
+                "fracture_jaw",
+                "surveyed_mine"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();
@@ -498,7 +499,9 @@ public final class DiscoveryTests {
                 "shaping_palm",
                 "fracture_jaw",
                 "work_bed",
-                "collection_cilia"))
+                "collection_cilia",
+                "surveyed_tissue",
+                "structure_grower"))
             h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");
         h.succeed();
     }

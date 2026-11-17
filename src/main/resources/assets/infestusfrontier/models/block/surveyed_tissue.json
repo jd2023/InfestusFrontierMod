@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "infestusfrontier:block/surveyed_tissue_top",
+    "bottom": "infestusfrontier:block/root_cell_side",
+    "side": "infestusfrontier:block/surveyed_tissue_side",
+    "particle": "infestusfrontier:block/surveyed_tissue_side"
+  }
+}

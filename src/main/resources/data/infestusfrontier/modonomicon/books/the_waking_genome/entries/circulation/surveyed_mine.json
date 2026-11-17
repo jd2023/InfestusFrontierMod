@@ -1,0 +1,73 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.surveyed_mine.name",
+  "description": "entry.infestusfrontier.circulation.surveyed_mine.description",
+  "icon": "infestusfrontier:surveyed_tissue",
+  "x": 8,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/fracture_jaw"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/cut_to_storage"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/surveyed_tissue"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/structure_grower"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.surveyed_mine.name",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.surveyed_mine.staircase",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.staircase_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.surveyed_mine.route",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.route_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.surveyed_mine.preview",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.preview_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.surveyed_mine.grower",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.grower_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.surveyed_mine.stops",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.stops_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.surveyed_mine.recover",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.recover_text"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:surveyed_tissue",
+      "recipe_id_2": "infestusfrontier:structure_grower",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.craft"
+    }
+  ]
+}

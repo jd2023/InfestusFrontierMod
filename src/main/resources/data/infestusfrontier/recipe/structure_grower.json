@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:organ_bud"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "infestusfrontier:bone_plate"
+    },
+    {
+      "item": "infestusfrontier:root_segment"
+    },
+    {
+      "item": "infestusfrontier:root_segment"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:structure_grower",
+    "count": 1
+  }
+}

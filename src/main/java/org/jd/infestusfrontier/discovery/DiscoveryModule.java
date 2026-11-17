@@ -74,6 +74,8 @@ public final class DiscoveryModule {
                         output.accept(MiningModule.FRACTURE_JAW_ITEM.get());
                         output.accept(MiningModule.WORK_BED_ITEM.get());
                         output.accept(MiningModule.COLLECTION_CILIA_ITEM.get());
+                        output.accept(MiningModule.SURVEYED_TISSUE_ITEM.get());
+                        output.accept(MiningModule.STRUCTURE_GROWER_ITEM.get());
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BLADDER_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BUCKET.get());

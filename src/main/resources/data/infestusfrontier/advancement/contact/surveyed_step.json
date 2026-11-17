@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/cut_to_storage",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:structure_grower"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.surveyed_step.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.surveyed_step.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "grown": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:structure_grower"
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "infestusfrontier:block/surveyed_tissue"
+    },
+    "facing=east": {
+      "model": "infestusfrontier:block/surveyed_tissue",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "infestusfrontier:block/surveyed_tissue",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "infestusfrontier:block/surveyed_tissue",
+      "y": 270
+    }
+  }
+}

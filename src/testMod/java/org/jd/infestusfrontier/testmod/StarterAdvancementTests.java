@@ -75,6 +75,7 @@ public final class StarterAdvancementTests {
             "tunnel_root",
             "root_bend",
             "cut_to_storage",
+            "surveyed_step",
             "planting_proboscis",
             "harvest_corolla",
             "supplied_sac",
@@ -454,7 +455,7 @@ public final class StarterAdvancementTests {
     }
 
     /** The shipped English text, read from the mod's own files; the server's resource manager holds data only. */
-    private static JsonObject lang() {
+    static JsonObject lang() {
         Path file = ModList.get()
                 .getModFileById("infestusfrontier")
                 .getFile()

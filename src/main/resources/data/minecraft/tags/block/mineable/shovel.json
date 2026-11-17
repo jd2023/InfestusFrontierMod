@@ -2,6 +2,7 @@
   "values": [
     "infestusfrontier:living_substrate",
     "infestusfrontier:living_wall",
-    "infestusfrontier:root_cell"
+    "infestusfrontier:root_cell",
+    "infestusfrontier:surveyed_tissue"
   ]
 }
