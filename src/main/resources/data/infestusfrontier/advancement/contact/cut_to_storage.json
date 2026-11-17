@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/tunnel_root",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:fracture_jaw"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.cut_to_storage.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.cut_to_storage.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "collected": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:collection_cilia"
+      }
+    }
+  }
+}

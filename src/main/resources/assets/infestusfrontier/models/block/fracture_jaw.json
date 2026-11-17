@@ -1,0 +1,128 @@
+{
+  "textures": {
+    "skin": "infestusfrontier:block/fracture_jaw",
+    "particle": "infestusfrontier:block/fracture_jaw"
+  },
+  "elements": [
+    {
+      "from": [1, 0, 2],
+      "to": [15, 2, 15],
+      "faces": {
+        "up": {
+          "uv": [3.25, 5.5, 6.75, 8.75],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [6.75, 5.5, 10.25, 8.75],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [0.0, 8.75, 3.25, 9.25],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [3.25, 8.75, 6.75, 9.25],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [6.75, 8.75, 10.0, 9.25],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [10.0, 8.75, 13.5, 9.25],
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "from": [2, 2, 4],
+      "to": [14, 12, 15],
+      "faces": {
+        "up": {
+          "uv": [2.75, 0.0, 5.75, 2.75],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [5.75, 0.0, 8.75, 2.75],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [0.0, 2.75, 2.75, 5.25],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [2.75, 2.75, 5.75, 5.25],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [5.75, 2.75, 8.5, 5.25],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [8.5, 2.75, 11.5, 5.25],
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "from": [3, 8, 0],
+      "to": [13, 12, 4],
+      "faces": {
+        "up": {
+          "uv": [1.0, 9.5, 3.5, 10.5],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [3.5, 9.5, 6.0, 10.5],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [0.0, 10.5, 1.0, 11.5],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [1.0, 10.5, 3.5, 11.5],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [3.5, 10.5, 4.5, 11.5],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [4.5, 10.5, 7.0, 11.5],
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "from": [3, 2, 0],
+      "to": [13, 5, 4],
+      "faces": {
+        "up": {
+          "uv": [8.25, 9.5, 10.75, 10.5],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [10.75, 9.5, 13.25, 10.5],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [7.25, 10.5, 8.25, 11.25],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [8.25, 10.5, 10.75, 11.25],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [10.75, 10.5, 11.75, 11.25],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [11.75, 10.5, 14.25, 11.25],
+          "texture": "#skin"
+        }
+      }
+    }
+  ]
+}

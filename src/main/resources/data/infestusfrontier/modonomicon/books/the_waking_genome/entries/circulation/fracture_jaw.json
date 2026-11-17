@@ -1,0 +1,77 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.fracture_jaw.name",
+  "description": "entry.infestusfrontier.circulation.fracture_jaw.description",
+  "icon": "infestusfrontier:fracture_jaw",
+  "x": 7,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/mineral_gizzard"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/tunnel_root"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/fracture_jaw"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/work_bed"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/collection_cilia"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.fracture_jaw.name",
+      "text": "entry.infestusfrontier.circulation.fracture_jaw.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.fracture_jaw.cut",
+      "text": "entry.infestusfrontier.circulation.fracture_jaw.cut_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.fracture_jaw.bed",
+      "text": "entry.infestusfrontier.circulation.fracture_jaw.bed_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.fracture_jaw.cilia",
+      "text": "entry.infestusfrontier.circulation.fracture_jaw.cilia_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.fracture_jaw.stops",
+      "text": "entry.infestusfrontier.circulation.fracture_jaw.stops_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.fracture_jaw.recover",
+      "text": "entry.infestusfrontier.circulation.fracture_jaw.recover_text"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:fracture_jaw",
+      "recipe_id_2": "infestusfrontier:work_bed",
+      "text": "entry.infestusfrontier.circulation.fracture_jaw.craft"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:collection_cilia",
+      "text": "entry.infestusfrontier.circulation.fracture_jaw.craft_cilia"
+    }
+  ]
+}

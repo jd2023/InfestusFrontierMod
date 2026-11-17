@@ -16,19 +16,27 @@ import net.minecraft.world.level.material.MapColor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
+import org.jd.infestusfrontier.core.foundation.TickQuota;
+import org.jd.infestusfrontier.core.mining.Fracturing;
 import org.jd.infestusfrontier.organ.api.Organs;
+import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
+import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
 
 /**
- * Owner of mining: the Leaching Pod and the Leached Rock it leaves, and the Tunnel Root with its Root Segments and the
- * root cells it lays.
+ * Owner of mining: the Leaching Pod and the Leached Rock it leaves, the Tunnel Root with its Root Segments and the
+ * root cells it lays, and the stationary cutting organs: the Fracture Jaw, the Work Bed and the Collection Cilia.
  */
 public final class MiningModule {
     static final Logger LOGGER = LogUtils.getLogger();
@@ -40,6 +48,8 @@ public final class MiningModule {
             DeferredRegister.create(Registries.MENU, InfestusFrontier.MOD_ID);
     private static final DeferredRegister.DataComponents COMPONENTS =
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, InfestusFrontier.MOD_ID);
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
+            DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, InfestusFrontier.MOD_ID);
 
     /** Ground a Leaching Pod may weaken; the pod also needs it soft enough, loose of fluid and free of a block entity. */
     public static final TagKey<Block> LEACHABLE = TagKey.create(
@@ -121,6 +131,84 @@ public final class MiningModule {
             COMPONENTS.registerComponentType(
                     "tunnel_root", builder -> builder.persistent(TunnelRootContents.CODEC.codec()));
 
+    /** The cuts the Fracture Jaws of one dimension share each tick. */
+    static final DeferredHolder<AttachmentType<?>, AttachmentType<TickQuota>> JAW_CUTS = ATTACHMENTS.register(
+            "jaw_cuts",
+            () -> AttachmentType.builder(() -> new TickQuota(Fracturing.CUTS_PER_TICK))
+                    .build());
+
+    /** A stationary cutter: it cuts the block in front of it into the Work Bed behind it. Crafted from a bud. */
+    public static final DeferredBlock<FractureJawBlock> FRACTURE_JAW = BLOCKS.registerBlock(
+            "fracture_jaw",
+            FractureJawBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_WHITE)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
+                    .sound(SoundType.BONE_BLOCK)
+                    .noOcclusion());
+
+    public static final DeferredItem<BlockItem> FRACTURE_JAW_ITEM = ITEMS.registerSimpleBlockItem(FRACTURE_JAW);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FractureJawBlockEntity>> FRACTURE_JAW_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "fracture_jaw",
+                    () -> BlockEntityType.Builder.of(FractureJawBlockEntity::new, FRACTURE_JAW.get())
+                            .build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<WorkOrganMenu>> FRACTURE_JAW_MENU = MENUS.register(
+            "fracture_jaw",
+            () -> IMenuTypeExtension.create(
+                    (id, inventory, extra) -> new WorkOrganMenu(WorkOrganMenu.Kind.JAW, id, inventory, extra)));
+    /** What a broken jaw carries on its item: its biomass and the cuts it has made. */
+    static final DeferredHolder<DataComponentType<?>, DataComponentType<FractureJawContents>> FRACTURE_JAW_CONTENTS =
+            COMPONENTS.registerComponentType(
+                    "fracture_jaw", builder -> builder.persistent(FractureJawContents.CODEC.codec()));
+
+    /** A living trough that holds what a jaw cuts. Crafted from a bud. */
+    public static final DeferredBlock<WorkBedBlock> WORK_BED = BLOCKS.registerBlock(
+            "work_bed",
+            WorkBedBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_PINK)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion());
+
+    public static final DeferredItem<BlockItem> WORK_BED_ITEM = ITEMS.registerSimpleBlockItem(WORK_BED);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WorkBedBlockEntity>> WORK_BED_ENTITY =
+            BLOCK_ENTITIES.register(
+                    "work_bed",
+                    () -> BlockEntityType.Builder.of(WorkBedBlockEntity::new, WORK_BED.get())
+                            .build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<WorkBedMenu>> WORK_BED_MENU =
+            MENUS.register("work_bed", () -> IMenuTypeExtension.create(WorkBedMenu::new));
+    /** What a broken bed carries on its item: what it holds and what it has received. */
+    static final DeferredHolder<DataComponentType<?>, DataComponentType<WorkBedContents>> WORK_BED_CONTENTS =
+            COMPONENTS.registerComponentType("work_bed", builder -> builder.persistent(WorkBedContents.CODEC.codec()));
+
+    /** Organ standing on a Mouth that sweeps a Work Bed into the Item Vein network. Crafted from a bud. */
+    public static final DeferredBlock<CollectionCiliaBlock> COLLECTION_CILIA = BLOCKS.registerBlock(
+            "collection_cilia",
+            CollectionCiliaBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PINK)
+                    .strength(Organs.HARDNESS, Organs.BLAST_RESISTANCE)
+                    .sound(SoundType.SLIME_BLOCK)
+                    .noOcclusion());
+
+    public static final DeferredItem<BlockItem> COLLECTION_CILIA_ITEM = ITEMS.registerSimpleBlockItem(COLLECTION_CILIA);
+    static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CollectionCiliaBlockEntity>>
+            COLLECTION_CILIA_ENTITY = BLOCK_ENTITIES.register(
+                    "collection_cilia",
+                    () -> BlockEntityType.Builder.of(CollectionCiliaBlockEntity::new, COLLECTION_CILIA.get())
+                            .build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<WorkOrganMenu>> COLLECTION_CILIA_MENU = MENUS.register(
+            "collection_cilia",
+            () -> IMenuTypeExtension.create(
+                    (id, inventory, extra) -> new WorkOrganMenu(WorkOrganMenu.Kind.CILIA, id, inventory, extra)));
+    /** What broken cilia carry on their item: their biomass and the items they have sent. */
+    static final DeferredHolder<DataComponentType<?>, DataComponentType<CollectionCiliaContents>>
+            COLLECTION_CILIA_CONTENTS = COMPONENTS.registerComponentType(
+                    "collection_cilia", builder -> builder.persistent(CollectionCiliaContents.CODEC.codec()));
+
     private MiningModule() {}
 
     public static void register(IEventBus modBus) {
@@ -129,8 +217,25 @@ public final class MiningModule {
         BLOCK_ENTITIES.register(modBus);
         MENUS.register(modBus);
         COMPONENTS.register(modBus);
+        ATTACHMENTS.register(modBus);
+        modBus.addListener((RegisterCapabilitiesEvent event) -> {
+            event.registerBlockEntity(BiomassCapabilities.BLOCK, FRACTURE_JAW_ENTITY.get(), (jaw, side) -> jaw);
+            event.registerBlockEntity(
+                    Capabilities.FluidHandler.BLOCK,
+                    FRACTURE_JAW_ENTITY.get(),
+                    (jaw, side) -> BiomassFluids.handler(jaw));
+            event.registerBlockEntity(BiomassCapabilities.BLOCK, COLLECTION_CILIA_ENTITY.get(), (cilia, side) -> cilia);
+            event.registerBlockEntity(
+                    Capabilities.FluidHandler.BLOCK,
+                    COLLECTION_CILIA_ENTITY.get(),
+                    (cilia, side) -> BiomassFluids.handler(cilia));
+        });
         if (FMLEnvironment.dist == Dist.CLIENT)
-            modBus.addListener(
-                    (RegisterMenuScreensEvent event) -> event.register(TUNNEL_ROOT_MENU.get(), TunnelRootScreen::new));
+            modBus.addListener((RegisterMenuScreensEvent event) -> {
+                event.register(TUNNEL_ROOT_MENU.get(), TunnelRootScreen::new);
+                event.register(FRACTURE_JAW_MENU.get(), WorkOrganScreen::new);
+                event.register(COLLECTION_CILIA_MENU.get(), WorkOrganScreen::new);
+                event.register(WORK_BED_MENU.get(), WorkBedScreen::new);
+            });
     }
 }

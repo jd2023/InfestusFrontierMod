@@ -27,6 +27,9 @@
     "infestusfrontier:mineral_gizzard",
     "infestusfrontier:washing_kidney",
     "infestusfrontier:shaping_palm",
-    "infestusfrontier:tunnel_root"
+    "infestusfrontier:tunnel_root",
+    "infestusfrontier:fracture_jaw",
+    "infestusfrontier:work_bed",
+    "infestusfrontier:collection_cilia"
   ]
 }

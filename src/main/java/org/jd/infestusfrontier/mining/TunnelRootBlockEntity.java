@@ -6,7 +6,6 @@ import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.SectionPos;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -27,7 +26,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Fallable;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -228,8 +226,8 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
         Optional<Refusal> blocked = blocked(level, pos, ahead);
         Optional<List<ItemStack>> after = Optional.empty();
         if (blocked.isEmpty()) {
-            List<ItemStack> drops = new ArrayList<>(loot(level, ahead.above()));
-            drops.addAll(loot(level, ahead));
+            List<ItemStack> drops = new ArrayList<>(Cutting.loot(level, ahead.above()));
+            drops.addAll(Cutting.loot(level, ahead));
             after = contents().outputWith(drops);
             if (after.isEmpty()) blocked = Optional.of(Tunnelling.OUTPUT_FULL);
         }
@@ -247,7 +245,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
         if (progress.finished()) return Optional.of(Tunnelling.FULL_LENGTH);
         if (segments.getStackInSlot(0).isEmpty()) return Optional.of(Tunnelling.NO_SEGMENT);
         if (!tank.stored().atLeast(Biomass.of(Tunnelling.STEP_BIOMASS_BU))) return Optional.of(Tunnelling.NO_BIOMASS);
-        if (!loaded(level, pos)) return Optional.of(Tunnelling.UNLOADED);
+        if (!Cutting.loaded(level, pos, REACH)) return Optional.of(Tunnelling.UNLOADED);
         BlockPos top = ahead.above();
         BlockPos floor = ahead.below();
         if (level.isOutsideBuildHeight(top.above()) || level.isOutsideBuildHeight(floor))
@@ -268,35 +266,14 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
         return below.is(MiningModule.ROOT_CELL.get()) || below.is(Organs.FOUNDATIONS);
     }
 
-    /** True when every chunk within {@link #REACH} of the head is loaded. The head forces none. */
-    private static boolean loaded(ServerLevel level, BlockPos pos) {
-        int lowX = SectionPos.blockToSectionCoord(pos.getX() - REACH);
-        int highX = SectionPos.blockToSectionCoord(pos.getX() + REACH);
-        int lowZ = SectionPos.blockToSectionCoord(pos.getZ() - REACH);
-        int highZ = SectionPos.blockToSectionCoord(pos.getZ() + REACH);
-        for (int x = lowX; x <= highX; x++) for (int z = lowZ; z <= highZ; z++) if (!level.hasChunk(x, z)) return false;
-        return true;
-    }
-
-    /**
-     * Why the block at {@code cut} cannot be cut, or empty when it can (air included). A piston arm is refused: removing
-     * it breaks its piston with drops whatever the update flags, so the piston would drop loose or twice.
-     */
+    /** Why the block at {@code cut} cannot be cut, or empty when it can (air included). */
     private static Optional<Refusal> cuttable(ServerLevel level, BlockPos cut) {
-        BlockState state = level.getBlockState(cut);
-        if (!state.getFluidState().isEmpty()) return Optional.of(Tunnelling.FLUID);
-        if (state.isAir()) return Optional.empty();
-        if (state.hasBlockEntity() || state.getBlock() instanceof PistonHeadBlock)
-            return Optional.of(Tunnelling.UNSUPPORTED);
-        if (!withinGrade(state, level, cut)) return Optional.of(Tunnelling.TOO_HARD);
-        return Optional.empty();
-    }
-
-    /** True for a breakable block a stone pickaxe harvests: one that needs no tool, or one stone is enough for. */
-    static boolean withinGrade(BlockState state, Level level, BlockPos pos) {
-        return state.getDestroySpeed(level, pos) >= 0
-                && (!state.requiresCorrectToolForDrops()
-                        || new ItemStack(Items.STONE_PICKAXE).isCorrectToolForDrops(state));
+        return switch (Cutting.judge(level, cut)) {
+            case CLEAR, CUTTABLE -> Optional.empty();
+            case FLUID -> Optional.of(Tunnelling.FLUID);
+            case UNSUPPORTED -> Optional.of(Tunnelling.UNSUPPORTED);
+            case TOO_HARD -> Optional.of(Tunnelling.TOO_HARD);
+        };
     }
 
     /** True when fluid stands next to either cut block, which would flow into the tunnel. */
@@ -315,13 +292,6 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
     private static boolean floor(ServerLevel level, BlockPos floor) {
         BlockState state = level.getBlockState(floor);
         return state.is(MiningModule.TUNNEL_FLOOR) && state.getFluidState().isEmpty() && !state.hasBlockEntity();
-    }
-
-    /** The ordinary drops of the block at {@code cut}, rolled once in its real loot context with a stone pickaxe. */
-    private static List<ItemStack> loot(ServerLevel level, BlockPos cut) {
-        BlockState state = level.getBlockState(cut);
-        if (state.isAir()) return List.of();
-        return Block.getDrops(state, level, cut, null, null, new ItemStack(Items.STONE_PICKAXE));
     }
 
     /**

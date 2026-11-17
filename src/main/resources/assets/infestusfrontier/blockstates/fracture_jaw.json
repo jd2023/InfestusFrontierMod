@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "infestusfrontier:block/fracture_jaw"
+    },
+    "facing=east": {
+      "model": "infestusfrontier:block/fracture_jaw",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "infestusfrontier:block/fracture_jaw",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "infestusfrontier:block/fracture_jaw",
+      "y": 270
+    }
+  }
+}

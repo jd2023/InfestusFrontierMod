@@ -1,0 +1,86 @@
+{
+  "commands": [
+    "forceload add 122 -64 160 -48",
+    "fill 123 -61 -59 136 -61 -52 dirt",
+    "fill 125 -60 -58 127 -52 -58 glass",
+    "fill 125 -60 -57 125 -52 -57 glass",
+    "fill 127 -60 -57 127 -52 -57 glass",
+    "fill 126 -60 -57 126 -53 -57 gravel",
+    "setblock 126 -61 -56 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 126 -61 -55 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 127 -61 -56 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 128 -61 -56 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 126 -60 -56 infestusfrontier:fracture_jaw[facing=north]{tank:{stored:600,capacity:2000},cuts:0,ticks:0}",
+    "setblock 126 -60 -55 infestusfrontier:work_bed",
+    "setblock 127 -61 -55 infestusfrontier:mouth[mode=output]",
+    "setblock 127 -60 -55 infestusfrontier:collection_cilia[facing=west]{tank:{stored:200,capacity:1000},sent:0}",
+    "fill 128 -61 -55 131 -61 -55 infestusfrontier:item_vein",
+    "setblock 132 -61 -55 infestusfrontier:mouth[mode=intake]",
+    "setblock 132 -60 -55 chest[facing=south]",
+    "setblock 127 -60 -56 infestusfrontier:vascular_junction[east=intake,west=outlet,south=outlet]",
+    "setblock 128 -60 -56 infestusfrontier:biomass_bladder[fill=3]{tank:{stored:3000,reserved:0,capacity:4000}}",
+    "setblock 124 -60 -54 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"FRACTURE JAW\"','\"cuts the gravel\"','\"in front into\"','\"the Work Bed\"']}}",
+    "setblock 127 -60 -53 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"COLLECTION\"','\"CILIA on a Mouth\"','\"send the bed\"','\"down the veins\"']}}",
+    "setblock 132 -60 -53 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"STORAGE\"','\"cut gravel and\"','\"flint arrive\"','\"here\"']}}",
+    "setblock 129 -60 -57 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"BIOMASS\"','\"the bladder feeds\"','\"jaw and cilia\"','\"by the junction\"']}}",
+    "setblock 135 -60 -55 chest[facing=south]{Items:[{Slot:0,id:\"infestusfrontier:fracture_jaw\",count:1},{Slot:1,id:\"infestusfrontier:work_bed\",count:1},{Slot:2,id:\"infestusfrontier:collection_cilia\",count:1},{Slot:3,id:\"infestusfrontier:mouth\",count:2},{Slot:4,id:\"infestusfrontier:item_vein\",count:8},{Slot:5,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:6,id:\"infestusfrontier:surgical_blade\",count:1},{Slot:7,id:\"minecraft:gravel\",count:16}]}",
+    "setblock 135 -60 -53 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"Cutting supplies\"','\"organs, Mouths,\"','\"veins, biomass\"','\"and a blade\"']}}"
+  ],
+  "views": [
+    {
+      "x": 129.5,
+      "y": -55.0,
+      "z": -49.0,
+      "yaw": 160,
+      "pitch": 40,
+      "name": "fracture_jaw_chain"
+    },
+    {
+      "x": 124.5,
+      "y": -59.0,
+      "z": -53.5,
+      "yaw": 215,
+      "pitch": 25,
+      "name": "fracture_jaw_models"
+    },
+    {
+      "x": 126.5,
+      "y": -60.0,
+      "z": -53.0,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "fracture_jaw_screen",
+      "use": [
+        126,
+        -60,
+        -56
+      ]
+    },
+    {
+      "x": 126.5,
+      "y": -60.0,
+      "z": -53.0,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "work_bed_screen",
+      "use": [
+        126,
+        -60,
+        -55
+      ]
+    },
+    {
+      "x": 128.5,
+      "y": -60.0,
+      "z": -53.0,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "collection_cilia_screen",
+      "use": [
+        127,
+        -60,
+        -55
+      ]
+    }
+  ]
+}

@@ -98,27 +98,6 @@ record TunnelRootContents(
         int incoming = 0;
         for (ItemStack drop : drops) incoming = Math.addExact(incoming, drop.getCount());
         if (!Tunnelling.fits(outputItems(), incoming)) return Optional.empty();
-        List<ItemStack> slots = new ArrayList<>(output.size());
-        for (ItemStack stack : output) slots.add(stack.copy());
-        for (ItemStack drop : drops) {
-            ItemStack left = drop.copy();
-            for (ItemStack slot : slots) {
-                if (left.isEmpty()) break;
-                if (slot.isEmpty() || !ItemStack.isSameItemSameComponents(slot, left)) continue;
-                int moved = Math.min(left.getCount(), slot.getMaxStackSize() - slot.getCount());
-                slot.grow(moved);
-                left.shrink(moved);
-            }
-            if (left.isEmpty()) continue;
-            int free = indexOfEmpty(slots);
-            if (free < 0) return Optional.empty();
-            slots.set(free, left);
-        }
-        return Optional.of(slots);
-    }
-
-    private static int indexOfEmpty(List<ItemStack> slots) {
-        for (int slot = 0; slot < slots.size(); slot++) if (slots.get(slot).isEmpty()) return slot;
-        return -1;
+        return Cutting.merged(output, drops);
     }
 }

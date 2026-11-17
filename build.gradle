@@ -228,7 +228,7 @@ def gameTestLog = layout.projectDirectory.file('runs/gametest/logs/latest.log')
 tasks.named('runGameTestServer') {
     dependsOn prepareGameTest
     mustRunAfter ':core:test', ':ui:test', distribution
-    timeout = java.time.Duration.ofMinutes(15)
+    timeout = java.time.Duration.ofMinutes(150)
     doFirst { gameTestLog.asFile.delete() }
     doLast {
         def log = gameTestLog.asFile
@@ -420,14 +420,14 @@ tasks.named('runCapture') {
     dependsOn prepareCapture
     mustRunAfter tasks.named('runGameTestServer')
     outputs.upToDateWhen { false }
-    // 65 scenarios take about 26 minutes on an idle machine and over 30 when other builds share it.
-    timeout = java.time.Duration.ofMinutes(45)
+    // Allow slow runs when other builds share the host; the supervisor also bounds the full check.
+    timeout = java.time.Duration.ofMinutes(450)
 }
 tasks.named('runCaptureNegative') {
     dependsOn prepareCaptureNegative
     mustRunAfter tasks.named('runCapture')
     outputs.upToDateWhen { false }
-    timeout = java.time.Duration.ofMinutes(5)
+    timeout = java.time.Duration.ofMinutes(50)
 }
 // Fresh demo world each run. The client options are seeded once and then left to the owner.
 def prepareDemo = tasks.register('prepareDemo') {

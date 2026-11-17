@@ -74,6 +74,7 @@ public final class StarterAdvancementTests {
             "leaching_pod",
             "tunnel_root",
             "root_bend",
+            "cut_to_storage",
             "planting_proboscis",
             "harvest_corolla",
             "supplied_sac",
