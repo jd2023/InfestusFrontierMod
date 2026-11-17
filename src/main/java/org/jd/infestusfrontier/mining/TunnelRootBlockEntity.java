@@ -10,6 +10,7 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -28,10 +29,13 @@ import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.core.mining.RootMutation;
+import org.jd.infestusfrontier.core.mining.RootMutations;
 import org.jd.infestusfrontier.core.mining.Steer;
 import org.jd.infestusfrontier.core.mining.TunnelProgress;
 import org.jd.infestusfrontier.core.mining.Tunnelling;
@@ -42,6 +46,7 @@ import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.organ.api.Steward;
 import org.jd.infestusfrontier.organ.api.Stewarded;
+import org.jd.infestusfrontier.organ.api.WorkshopActionEvent;
 import org.jd.infestusfrontier.storage.StorageModule;
 
 /**
@@ -50,7 +55,9 @@ import org.jd.infestusfrontier.storage.StorageModule;
  * them, pays one segment and {@value Tunnelling#STEP_BIOMASS_BU} BU, and moves into the cut. Everything a step reads
  * and changes is judged first, so a step is done whole in one tick or not at all; a stopped head keeps its step due,
  * names the reason and looks again after {@value Tunnelling#RETRY_TICKS} ticks, or at once when its supplies change.
- * Nothing is fed to it by veins, hoppers or pipes: it has no capability. It loads no chunk.
+ * Nothing is fed to it by veins, hoppers or pipes: it has no capability. It loads no chunk. A genetic construct
+ * applied by hand gives it a permanent mutation, see {@link #mutate}; a head with Stairs is a Descending Rootstock.
+ * Mutations change none of the steps it takes by hand.
  *
  * <p>Moving is a new block entity at the cut: this one hands it its whole saved state, steward included, and leaves.
  */
@@ -86,6 +93,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
     private BiomassTank tank = TunnelRootContents.EMPTY.tank();
     private TunnelProgress progress = TunnelProgress.START;
     private Steer steer = Steer.STRAIGHT;
+    private RootMutations mutations = RootMutations.NONE;
     private Optional<CompoundTag> unreadable = Optional.empty();
     private final Steward steward = new Steward();
     /** Why the last try did not step. Not saved: the next try tells again. */
@@ -124,6 +132,10 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     Steer steer() {
         return steer;
+    }
+
+    RootMutations mutations() {
+        return mutations;
     }
 
     Optional<Refusal> stop() {
@@ -192,6 +204,54 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
                 hand, ItemUtils.createFilledResult(player.getItemInHand(hand), player, new ItemStack(Items.BUCKET)));
         if (level != null) level.playSound(null, worldPosition, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1F, 1F);
         supplied();
+        return Optional.empty();
+    }
+
+    // ---- mutation ----
+
+    /**
+     * Applies the construct in {@code hand} for its mutation, or names why not and takes nothing. The head must stand
+     * on its root, must not have the mutation yet, must already be a Rootstock for a mutation that needs one, and its
+     * tank must hold the mutation's biomass. Then it takes one construct and that biomass once and keeps the mutation
+     * for good. Its segments, output, cells, steering and steward stay as they were: a mutation permits an operation
+     * and supplies nothing that operation uses.
+     */
+    void mutate(Player player, InteractionHand hand, RootMutation mutation) {
+        Optional<Refusal> refused = mutationRefusal(mutation);
+        if (refused.isPresent()) {
+            Refusals.show(player, refused.get());
+            return;
+        }
+        ItemStack held = player.getItemInHand(hand);
+        if (!player.getAbilities().instabuild) held.shrink(1);
+        tank = ((Outcome.Done<BiomassTank>) tank.drain(Biomass.of(mutation.biomassUnits()))).value();
+        mutations = mutations.with(mutation);
+        steward.assign(player);
+        supplied();
+        if (level != null)
+            level.playSound(null, worldPosition, SoundEvents.ROOTED_DIRT_PLACE, SoundSource.BLOCKS, 1F, 0.6F);
+        player.displayClientMessage(
+                Component.translatable(
+                        "infestusfrontier.tunnel_root.mutated",
+                        Component.translatable("gui.infestusfrontier.tunnel_root.mutation." + mutation.id())),
+                true);
+        if (player instanceof ServerPlayer server)
+            NeoForge.EVENT_BUS.post(new WorkshopActionEvent(
+                    server,
+                    mutation == RootMutation.STAIRS
+                            ? WorkshopActionEvent.Action.STAIRS_INSTALLED
+                            : WorkshopActionEvent.Action.WIDER_SECTION_INSTALLED));
+    }
+
+    /** Why {@code mutation} cannot be applied now, or empty when it can. Reads, changes nothing. */
+    private Optional<Refusal> mutationRefusal(RootMutation mutation) {
+        if (unreadable.isPresent()) return Optional.of(Persistence.CORRUPT);
+        if (!(level instanceof ServerLevel server) || !rooted(server, worldPosition))
+            return Optional.of(Tunnelling.UNROOTED);
+        Optional<Refusal> refused = mutations.refusal(mutation);
+        if (refused.isPresent()) return refused;
+        if (!tank.stored().atLeast(Biomass.of(mutation.biomassUnits())))
+            return Optional.of(Tunnelling.MUTATION_BIOMASS);
         return Optional.empty();
     }
 
@@ -321,7 +381,8 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
                 after,
                 ((Outcome.Done<BiomassTank>) tank.drain(Biomass.of(Tunnelling.STEP_BIOMASS_BU))).value(),
                 progress.stepped(),
-                Steer.STRAIGHT));
+                Steer.STRAIGHT,
+                mutations));
         stop = Optional.empty();
 
         CompoundTag carried = saveWithoutMetadata(level.registryAccess());
@@ -343,7 +404,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
     TunnelRootContents contents() {
         List<ItemStack> held = new ArrayList<>(Tunnelling.OUTPUT_SLOTS);
         for (int slot = 0; slot < Tunnelling.OUTPUT_SLOTS; slot++) held.add(output.getStackInSlot(slot));
-        return new TunnelRootContents(segments.getStackInSlot(0), held, tank, progress, steer);
+        return new TunnelRootContents(segments.getStackInSlot(0), held, tank, progress, steer, mutations);
     }
 
     private void restore(TunnelRootContents contents) {
@@ -353,6 +414,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
         tank = contents.tank();
         progress = contents.progress();
         steer = contents.steer();
+        mutations = contents.mutations();
     }
 
     @Override
@@ -408,7 +470,8 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     @Override
     public void removeComponentsFromTag(CompoundTag tag) {
-        for (String key : List.of("segments", "output", "tank", "cells", "ticks", "steer")) tag.remove(key);
+        for (String key : List.of("segments", "output", "tank", "cells", "ticks", "steer", "mutations"))
+            tag.remove(key);
     }
 
     @Override

@@ -74,4 +74,13 @@ class ResearchTest {
         assertThrows(IllegalArgumentException.class, () -> new Genome(" ", 1));
         assertThrows(IllegalArgumentException.class, () -> Research.NONE.extracted(PIG, 0));
     }
+
+    @Test
+    void aConstructNamesTheFirstGenomeThatIsNotComplete() {
+        Research research = Research.NONE.extracted(PIG, Genetics.COMPLETE).extracted("minecraft:cow", 40);
+        assertEquals(Optional.empty(), research.lacking(List.of(PIG)));
+        assertEquals(Optional.of("minecraft:cow"), research.lacking(List.of(PIG, "minecraft:cow")));
+        assertEquals(Optional.of("minecraft:sheep"), research.lacking(List.of("minecraft:sheep", PIG)));
+        assertEquals(Genetics.COMPLETE, research.points(PIG), "asking keeps the record");
+    }
 }

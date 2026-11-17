@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/pig_genome",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:stairs_construct"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.genetic_construct.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.genetic_construct.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "construct_produced": {
+      "trigger": "infestusfrontier:workshop_action",
+      "conditions": {
+        "action": "construct_produced"
+      }
+    }
+  }
+}

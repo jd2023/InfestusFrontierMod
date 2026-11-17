@@ -1,5 +1,6 @@
 package org.jd.infestusfrontier.mining;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.IntSupplier;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -13,6 +14,8 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.core.mining.RootMutation;
+import org.jd.infestusfrontier.core.mining.RootMutations;
 import org.jd.infestusfrontier.core.mining.Steer;
 import org.jd.infestusfrontier.core.mining.Tunnelling;
 import org.jd.infestusfrontier.foundation.menu.OrganMenu;
@@ -20,14 +23,14 @@ import org.jd.infestusfrontier.ui.Sheet;
 
 /**
  * The Tunnel Root screen's server half: the segment slot, the four take-only output slots, and as synced ints the
- * biomass, the steering, the cells laid, the stop and the seconds to the next step. Buttons 0, 1 and 2 steer the next
+ * biomass, the steering, the cells laid, the stop, the seconds to the next step and the installed mutations. Buttons 0, 1 and 2 steer the next
  * step straight, left and right; the block entity checks and applies the choice.
  */
 public final class TunnelRootMenu extends OrganMenu {
     public static final int STRAIGHT_BUTTON = 0;
     public static final int LEFT_BUTTON = 1;
     public static final int RIGHT_BUTTON = 2;
-    static final int STRIPS = 2;
+    static final int STRIPS = 3;
     /** The output wells sit on the second row, this far apart. */
     static final int OUTPUT_PITCH = Sheet.SLOT.width() + Sheet.GAP;
 
@@ -37,7 +40,8 @@ public final class TunnelRootMenu extends OrganMenu {
     private static final int CELLS = 3;
     private static final int STOP = 4;
     private static final int SECONDS = 5;
-    private static final int SYNCED = 6;
+    private static final int MUTATIONS = 6;
+    private static final int SYNCED = 7;
     private static final int TICKS_PER_SECOND = 20;
 
     private final Optional<TunnelRootBlockEntity> head;
@@ -94,6 +98,7 @@ public final class TunnelRootMenu extends OrganMenu {
         reads[STOP] = () ->
                 head.stop().map(stop -> Tunnelling.STOPS.indexOf(stop) + 1).orElse(0);
         reads[SECONDS] = () -> (head.progress().ticksLeft() + TICKS_PER_SECOND - 1) / TICKS_PER_SECOND;
+        reads[MUTATIONS] = () -> head.mutations().bits();
         return reads;
     }
 
@@ -140,5 +145,10 @@ public final class TunnelRootMenu extends OrganMenu {
     /** Seconds until the next step is due. */
     public int seconds() {
         return synced(SECONDS);
+    }
+
+    /** The head's mutations, as last synced, in their fixed order. */
+    public List<RootMutation> mutations() {
+        return RootMutations.fromBits(synced(MUTATIONS));
     }
 }

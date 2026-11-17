@@ -1,0 +1,11 @@
+{
+  "type": "infestusfrontier:genetic_construct",
+  "genomes": ["minecraft:pig"],
+  "materials": [
+    { "item": "infestusfrontier:bone_plate", "count": 4 },
+    { "item": "infestusfrontier:membrane_sheet", "count": 2 },
+    { "item": "minecraft:iron_ingot", "count": 2 }
+  ],
+  "biomass": 500,
+  "result": { "id": "infestusfrontier:wider_section_construct", "count": 1 }
+}

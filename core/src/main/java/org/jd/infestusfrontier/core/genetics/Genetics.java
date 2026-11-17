@@ -25,6 +25,8 @@ public final class Genetics {
     public static final int NEEDLE_USES = 64;
     /** Ticks a player waits between two samples with a needle. */
     public static final int SAMPLE_COOLDOWN_TICKS = 20;
+    /** Material slots of the bank's construct section: the most materials one construct recipe names. */
+    public static final int MATERIAL_SLOTS = 3;
 
     /** The bank does not stand on a loaded organ foundation. */
     public static final Refusal UNROOTED = new Refusal("dna_bank.unrooted");
@@ -47,6 +49,17 @@ public final class Genetics {
     /** Every stop of a bank, in a fixed order: a screen names one by its index. */
     public static final List<Refusal> STOPS =
             List.of(UNROOTED, UNKNOWN_SAMPLE, GENOME_COMPLETE, RESEARCH_FULL, NO_BIOMASS);
+
+    /** The materials in the construct slots are not those of any construct recipe; they stay. */
+    public static final Refusal NO_CONSTRUCT = new Refusal("dna_bank.no_construct");
+    /** A genome the construct needs is not complete in this bank; nothing is paid. */
+    public static final Refusal GENOME_INCOMPLETE = new Refusal("dna_bank.genome_incomplete");
+    /** The construct slot holds something the new construct cannot join. */
+    public static final Refusal CONSTRUCT_FULL = new Refusal("dna_bank.construct_full");
+
+    /** Every reason a construct is not produced, in a fixed order: a screen names one by its index. */
+    public static final List<Refusal> CONSTRUCT_STOPS =
+            List.of(UNROOTED, NO_CONSTRUCT, GENOME_INCOMPLETE, NO_BIOMASS, CONSTRUCT_FULL);
 
     private Genetics() {}
 }

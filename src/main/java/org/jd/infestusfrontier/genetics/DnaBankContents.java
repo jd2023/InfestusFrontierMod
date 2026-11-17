@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.resources.ResourceLocation;
@@ -17,19 +18,35 @@ import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /**
- * Everything a DNA Bank owns: the samples waiting in its slot, its biomass, its research (the genomes it keeps) and
- * the extraction under way, paid for. Saved on the block entity and carried on the item when the bank is broken, so
- * research belongs to the bank wherever it goes. The stack is a copy.
+ * Everything a DNA Bank owns: the samples waiting in its slot, its biomass, its research (the genomes it keeps), the
+ * extraction under way, paid for, the materials in its construct slots and the constructs it has made and not yet
+ * given out. Saved on the block entity and carried on the item when the bank is broken, so research and constructs
+ * belong to the bank wherever it goes. A bank saved before it had construct slots reads with them empty. The stacks
+ * are copies.
  */
-record DnaBankContents(ItemStack samples, BiomassTank tank, Research research, Optional<Extraction> job) {
+record DnaBankContents(
+        ItemStack samples,
+        BiomassTank tank,
+        Research research,
+        Optional<Extraction> job,
+        List<ItemStack> materials,
+        ItemStack construct) {
+    static final List<ItemStack> NO_MATERIALS = List.of(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY);
+
     static final DnaBankContents EMPTY = new DnaBankContents(
             ItemStack.EMPTY,
             BiomassTank.empty(Biomass.of(Genetics.BIOMASS_CAPACITY_BU)),
             Research.NONE,
-            Optional.empty());
+            Optional.empty(),
+            NO_MATERIALS,
+            ItemStack.EMPTY);
 
     DnaBankContents {
         samples = samples.copy();
+        List<ItemStack> copies = new ArrayList<>(materials.size());
+        for (ItemStack stack : materials) copies.add(stack.copy());
+        materials = List.copyOf(copies);
+        construct = construct.copy();
     }
 
     /** A genome as saved: a species id and its points, judged when read. */
@@ -51,13 +68,26 @@ record DnaBankContents(ItemStack samples, BiomassTank tank, Research research, O
     }
 
     /** The saved values before they are judged; impossible ones are a decode error, never an exception. */
-    private record Raw(ItemStack samples, BiomassTank tank, List<RawGenome> genomes, Optional<RawJob> job) {}
+    private record Raw(
+            ItemStack samples,
+            BiomassTank tank,
+            List<RawGenome> genomes,
+            Optional<RawJob> job,
+            List<ItemStack> materials,
+            ItemStack construct) {}
 
     static final MapCodec<DnaBankContents> CODEC = RecordCodecBuilder.<Raw>mapCodec(instance -> instance.group(
                             ItemStack.OPTIONAL_CODEC.fieldOf("samples").forGetter(Raw::samples),
                             BiomassCodecs.TANK.fieldOf("tank").forGetter(Raw::tank),
                             RawGenome.CODEC.listOf().fieldOf("genomes").forGetter(Raw::genomes),
-                            RawJob.CODEC.optionalFieldOf("job").forGetter(Raw::job))
+                            RawJob.CODEC.optionalFieldOf("job").forGetter(Raw::job),
+                            ItemStack.OPTIONAL_CODEC
+                                    .listOf()
+                                    .optionalFieldOf("materials", NO_MATERIALS)
+                                    .forGetter(Raw::materials),
+                            ItemStack.OPTIONAL_CODEC
+                                    .optionalFieldOf("construct", ItemStack.EMPTY)
+                                    .forGetter(Raw::construct))
                     .apply(instance, Raw::new))
             .flatXmap(DnaBankContents::read, contents -> DataResult.success(contents.raw()));
 
@@ -72,7 +102,9 @@ record DnaBankContents(ItemStack samples, BiomassTank tank, Research research, O
                         ResourceLocation.parse(extraction.species()),
                         extraction.points(),
                         extraction.ticks(),
-                        extraction.elapsed())));
+                        extraction.elapsed())),
+                materials,
+                construct);
     }
 
     private static DataResult<DnaBankContents> read(Raw raw) {
@@ -100,8 +132,9 @@ record DnaBankContents(ItemStack samples, BiomassTank tank, Research research, O
                 raw.tank(),
                 new Research(genomes),
                 raw.job()
-                        .map(job ->
-                                new Extraction(job.species().toString(), job.points(), job.ticks(), job.elapsed())));
+                        .map(job -> new Extraction(job.species().toString(), job.points(), job.ticks(), job.elapsed())),
+                raw.materials(),
+                raw.construct());
         Optional<String> problem = contents.problem();
         return problem.isPresent() ? DataResult.error(problem::get) : DataResult.success(contents);
     }
@@ -114,6 +147,10 @@ record DnaBankContents(ItemStack samples, BiomassTank tank, Research research, O
                 || !tank.reserved().isZero()) return Optional.of("tank " + tank);
         if (job.isPresent() && research.refusal(job.get().species()).isPresent())
             return Optional.of("job " + job.get() + " that the research refuses");
+        if (materials.size() != Genetics.MATERIAL_SLOTS) return Optional.of("material slots " + materials.size());
+        for (ItemStack stack : materials)
+            if (stack.getCount() > stack.getMaxStackSize()) return Optional.of("material stack " + stack);
+        if (construct.getCount() > construct.getMaxStackSize()) return Optional.of("construct stack " + construct);
         return Optional.empty();
     }
 }

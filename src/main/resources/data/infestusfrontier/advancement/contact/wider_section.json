@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/rootstock",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:wider_section_construct"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.wider_section.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.wider_section.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "wider_section_installed": {
+      "trigger": "infestusfrontier:workshop_action",
+      "conditions": {
+        "action": "wider_section_installed"
+      }
+    }
+  }
+}

@@ -26,6 +26,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.genetics.Genetics;
 import org.jd.infestusfrontier.genetics.api.DnaSampleRecipe;
+import org.jd.infestusfrontier.genetics.api.GeneticConstructRecipe;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
@@ -33,8 +34,10 @@ import org.slf4j.Logger;
 
 /**
  * Owner of DNA research: the Sampling Needle that takes DNA samples from living creatures, the samples, and the DNA
- * Bank that extracts them and keeps each species' genome. Which creature gives which sample, and what extracting it
- * costs and adds, is recipe data: {@link DnaSampleRecipe}.
+ * Bank that extracts them, keeps each species' genome and produces genetic constructs from complete genomes. Which
+ * creature gives which sample, and what extracting it costs and adds, is recipe data: {@link DnaSampleRecipe}; which
+ * genomes and materials make which construct is {@link GeneticConstructRecipe}. The constructs belong to the features
+ * whose hosts take them.
  */
 public final class GeneticsModule {
     static final Logger LOGGER = LogUtils.getLogger();
@@ -58,6 +61,17 @@ public final class GeneticsModule {
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<DnaSampleRecipe>> DNA_SAMPLE_SERIALIZER =
             RECIPE_SERIALIZERS.register("dna_sample", DnaSampleRecipe.Serializer::new);
+
+    /** Which complete genomes and materials a DNA Bank turns into which genetic construct; data under {@code recipe/construct}. */
+    public static final DeferredHolder<RecipeType<?>, RecipeType<GeneticConstructRecipe>> GENETIC_CONSTRUCT =
+            RECIPE_TYPES.register(
+                    "genetic_construct",
+                    () -> RecipeType.simple(
+                            ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "genetic_construct")));
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GeneticConstructRecipe>>
+            GENETIC_CONSTRUCT_SERIALIZER =
+                    RECIPE_SERIALIZERS.register("genetic_construct", GeneticConstructRecipe.Serializer::new);
 
     /** A hand tool that takes one DNA sample from a living creature a recipe names. Crafted. */
     public static final DeferredItem<SamplingNeedleItem> SAMPLING_NEEDLE = ITEMS.registerItem(
@@ -86,7 +100,10 @@ public final class GeneticsModule {
                             .build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<DnaBankMenu>> DNA_BANK_MENU =
             MENUS.register("dna_bank", () -> IMenuTypeExtension.create(DnaBankMenu::new));
-    /** What a broken bank carries on its item: its samples, its biomass, its research and the extraction under way. */
+    /**
+     * What a broken bank carries on its item: its samples, its biomass, its research, the extraction under way, its
+     * construct materials and the constructs it made.
+     */
     static final DeferredHolder<DataComponentType<?>, DataComponentType<DnaBankContents>> DNA_BANK_CONTENTS =
             COMPONENTS.registerComponentType("dna_bank", builder -> builder.persistent(DnaBankContents.CODEC.codec()));
 

@@ -83,6 +83,8 @@ public final class DiscoveryModule {
                         output.accept(GeneticsModule.SAMPLING_NEEDLE.get());
                         output.accept(GeneticsModule.PIG_DNA_SAMPLE.get());
                         output.accept(GeneticsModule.DNA_BANK_ITEM.get());
+                        output.accept(MiningModule.STAIRS_CONSTRUCT.get());
+                        output.accept(MiningModule.WIDER_SECTION_CONSTRUCT.get());
                         output.accept(ProcessingModule.DIGESTIVE_SAC_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BLADDER_ITEM.get());
                         output.accept(StorageModule.BIOMASS_BUCKET.get());

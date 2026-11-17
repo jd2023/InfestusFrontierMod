@@ -115,6 +115,7 @@ public final class DiscoveryTests {
                 "leaching_pod",
                 "tunnel_root",
                 "dna_bank",
+                "genetic_constructs",
                 "dormant_pieces",
                 "living_tools",
                 "living_fang",
@@ -453,6 +454,7 @@ public final class DiscoveryTests {
                 "leaching_pod",
                 "tunnel_root",
                 "dna_bank",
+                "genetic_constructs",
                 "dormant_pieces",
                 "living_tools",
                 "living_fang",
@@ -506,7 +508,9 @@ public final class DiscoveryTests {
                 "structure_grower",
                 "sampling_needle",
                 "pig_dna_sample",
-                "dna_bank"))
+                "dna_bank",
+                "stairs_construct",
+                "wider_section_construct"))
             h.assertTrue(advancements.get(id("acquired/" + item)) != null, "acquired/" + item + " exists");
         h.succeed();
     }

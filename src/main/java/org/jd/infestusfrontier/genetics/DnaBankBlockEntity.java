@@ -1,5 +1,6 @@
 package org.jd.infestusfrontier.genetics;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
@@ -9,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -33,11 +35,13 @@ import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.foundation.Persistence;
 import org.jd.infestusfrontier.foundation.Refusals;
 import org.jd.infestusfrontier.genetics.api.DnaSampleRecipe;
+import org.jd.infestusfrontier.genetics.api.GeneticConstructRecipe;
 import org.jd.infestusfrontier.genetics.api.GenomeCompletedEvent;
 import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.organ.api.Steward;
 import org.jd.infestusfrontier.organ.api.Stewarded;
+import org.jd.infestusfrontier.organ.api.WorkshopActionEvent;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 
 /**
@@ -48,7 +52,9 @@ import org.jd.infestusfrontier.storage.api.BiomassHandler;
  * leave the sample and the biomass where they are, name the reason, and look again after
  * {@value Genetics#RETRY_TICKS} ticks or at once when its supplies change. Research only grows and stays with the bank.
  * Samples arrive by hand and through its item handler, which takes only samples the research accepts and gives
- * nothing back; biomass by bucket, pipe or vein. It reads only its own block and the one under it, and loads no chunk.
+ * nothing back; biomass by bucket, pipe or vein. At its screen the player also produces genetic constructs from the
+ * materials in its construct slots, see {@link #produce}. It reads only its own block and the one under it, and loads
+ * no chunk.
  */
 final class DnaBankBlockEntity extends BlockEntity implements BiomassHandler, Stewarded, MenuProvider {
     private final ItemStackHandler samples = new ItemStackHandler(1) {
@@ -65,6 +71,32 @@ final class DnaBankBlockEntity extends BlockEntity implements BiomassHandler, St
         @Override
         protected void onContentsChanged(int slot) {
             supplied();
+        }
+    };
+
+    /** The construct section's material slots: only items some construct recipe takes. */
+    private final ItemStackHandler materials = new ItemStackHandler(Genetics.MATERIAL_SLOTS) {
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return unreadable.isEmpty() && level != null && GeneticConstructRecipe.usesMaterial(level, stack);
+        }
+
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+    };
+
+    /** The constructs the bank has made. Only production puts them here; the screen's slot takes them out. */
+    private final ItemStackHandler construct = new ItemStackHandler(1) {
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return false;
+        }
+
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
         }
     };
 
@@ -89,6 +121,14 @@ final class DnaBankBlockEntity extends BlockEntity implements BiomassHandler, St
 
     ItemStackHandler samples() {
         return samples;
+    }
+
+    ItemStackHandler materials() {
+        return materials;
+    }
+
+    ItemStackHandler construct() {
+        return construct;
     }
 
     Research research() {
@@ -292,10 +332,74 @@ final class DnaBankBlockEntity extends BlockEntity implements BiomassHandler, St
         return Optional.empty();
     }
 
+    // ---- genetic constructs ----
+
+    /**
+     * The construct the materials in the slots make now, with the slot each material comes from, or why none is made.
+     * Judged whole and refused whole: a lost foundation, materials no recipe names, a genome the construct needs that
+     * is not complete here, too little biomass, or a construct slot the result cannot join. Reads, changes nothing.
+     */
+    Outcome<GeneticConstructRecipe.Match> production() {
+        if (unreadable.isPresent()) return Outcome.refused(Persistence.CORRUPT);
+        if (level == null || !Organs.hasFoundation(level, worldPosition)) return Outcome.refused(Genetics.UNROOTED);
+        Optional<GeneticConstructRecipe.Match> match = GeneticConstructRecipe.matching(level, materialStacks());
+        if (match.isEmpty()) return Outcome.refused(Genetics.NO_CONSTRUCT);
+        GeneticConstructRecipe recipe = match.get().recipe();
+        if (research.lacking(recipe.species()).isPresent()) return Outcome.refused(Genetics.GENOME_INCOMPLETE);
+        if (!tank.stored().atLeast(recipe.biomass())) return Outcome.refused(Genetics.NO_BIOMASS);
+        if (joined(recipe.result()).isEmpty()) return Outcome.refused(Genetics.CONSTRUCT_FULL);
+        return Outcome.done(match.get());
+    }
+
+    /**
+     * Produces one construct for {@code player} at the screen, or names why not and changes nothing. It takes each
+     * material's count from its slot and the recipe's biomass once, and puts the construct in the construct slot. The
+     * research is only read: every genome stays as it was, so the bank makes the construct again from new materials.
+     */
+    void produce(ServerPlayer player) {
+        Outcome<GeneticConstructRecipe.Match> planned = production();
+        if (planned instanceof Outcome.Refused<GeneticConstructRecipe.Match> refused) {
+            Refusals.show(player, refused.refusal());
+            return;
+        }
+        GeneticConstructRecipe.Match match = ((Outcome.Done<GeneticConstructRecipe.Match>) planned).value();
+        GeneticConstructRecipe recipe = match.recipe();
+        ItemStack made = joined(recipe.result()).orElseThrow();
+        for (int n = 0; n < recipe.materials().size(); n++) {
+            int slot = match.slots().get(n);
+            ItemStack left = materials.getStackInSlot(slot).copy();
+            left.shrink(recipe.materials().get(n).count());
+            materials.setStackInSlot(slot, left);
+        }
+        tank = ((Outcome.Done<BiomassTank>) tank.drain(recipe.biomass())).value();
+        construct.setStackInSlot(0, made);
+        steward.assign(player);
+        setChanged();
+        if (level != null)
+            level.playSound(null, worldPosition, SoundEvents.BREWING_STAND_BREW, SoundSource.BLOCKS, 0.8F, 0.9F);
+        NeoForge.EVENT_BUS.post(new WorkshopActionEvent(player, WorkshopActionEvent.Action.CONSTRUCT_PRODUCED));
+    }
+
+    private List<ItemStack> materialStacks() {
+        List<ItemStack> stacks = new ArrayList<>(Genetics.MATERIAL_SLOTS);
+        for (int slot = 0; slot < Genetics.MATERIAL_SLOTS; slot++) stacks.add(materials.getStackInSlot(slot));
+        return stacks;
+    }
+
+    /** The construct slot with {@code result} added, or empty when it cannot join what is there. */
+    private Optional<ItemStack> joined(ItemStack result) {
+        ItemStack held = construct.getStackInSlot(0);
+        if (held.isEmpty()) return Optional.of(result.copy());
+        if (!ItemStack.isSameItemSameComponents(held, result)
+                || Math.addExact(held.getCount(), result.getCount()) > held.getMaxStackSize()) return Optional.empty();
+        return Optional.of(held.copyWithCount(held.getCount() + result.getCount()));
+    }
+
     // ---- saved state ----
 
     DnaBankContents contents() {
-        return new DnaBankContents(samples.getStackInSlot(0), tank, research, job);
+        return new DnaBankContents(
+                samples.getStackInSlot(0), tank, research, job, materialStacks(), construct.getStackInSlot(0));
     }
 
     private void restore(DnaBankContents contents) {
@@ -303,6 +407,9 @@ final class DnaBankBlockEntity extends BlockEntity implements BiomassHandler, St
         tank = contents.tank();
         research = contents.research();
         job = contents.job();
+        for (int slot = 0; slot < Genetics.MATERIAL_SLOTS; slot++)
+            materials.setStackInSlot(slot, contents.materials().get(slot).copy());
+        construct.setStackInSlot(0, contents.construct().copy());
     }
 
     @Override
@@ -358,7 +465,7 @@ final class DnaBankBlockEntity extends BlockEntity implements BiomassHandler, St
 
     @Override
     public void removeComponentsFromTag(CompoundTag tag) {
-        for (String key : List.of("samples", "tank", "genomes", "job")) tag.remove(key);
+        for (String key : List.of("samples", "tank", "genomes", "job", "materials", "construct")) tag.remove(key);
     }
 
     @Override

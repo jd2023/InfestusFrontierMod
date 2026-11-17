@@ -1,11 +1,14 @@
 package org.jd.infestusfrontier.mining;
 
+import java.util.List;
 import java.util.Locale;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.core.mining.RootMutation;
 import org.jd.infestusfrontier.core.mining.Tunnelling;
 import org.jd.infestusfrontier.foundation.screen.OrganScreen;
 import org.jd.infestusfrontier.foundation.screen.Tally;
@@ -15,8 +18,8 @@ import org.jd.infestusfrontier.ui.Sheet;
 
 /**
  * The head's screen: the segment well and the steering button on the first row, the output wells on the second, then
- * a line for what the head is doing (or why it stopped) and a line for the length of its root. The tank shows its
- * biomass.
+ * a line for what the head is doing (or why it stopped), a line for the length of its root and a line naming its
+ * mutations. The tank shows its biomass.
  */
 final class TunnelRootScreen extends OrganScreen<TunnelRootMenu> {
     private static final String KEY = "gui.infestusfrontier.tunnel_root.";
@@ -61,7 +64,26 @@ final class TunnelRootScreen extends OrganScreen<TunnelRootMenu> {
                 width,
                 () -> Component.translatable(KEY + "cells", menu.cells(), Tunnelling.MAX_CELLS),
                 () -> Component.translatable(KEY + "cells.story")));
+        add(new Tally(
+                Sheet.FIRST_PART_X,
+                STATUS_Y + 2 * LINE,
+                width,
+                this::mutations,
+                () -> Component.translatable(KEY + "mutations.story")));
         label();
+    }
+
+    /** "Mutations: none", or the installed mutations in their fixed order. */
+    private Component mutations() {
+        List<RootMutation> installed = menu.mutations();
+        if (installed.isEmpty()) return Component.translatable(KEY + "mutations.none");
+        MutableComponent names = Component.empty();
+        for (int n = 0; n < installed.size(); n++) {
+            if (n > 0) names.append(", ");
+            names.append(
+                    Component.translatable(KEY + "mutation." + installed.get(n).id()));
+        }
+        return Component.translatable(KEY + "mutations", names);
     }
 
     /** The condition part of a stop's key, {@code tunnel_root.<condition>}, for its short label. */

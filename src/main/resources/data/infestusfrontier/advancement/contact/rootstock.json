@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/genetic_construct",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:tunnel_root"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.rootstock.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.rootstock.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "stairs_installed": {
+      "trigger": "infestusfrontier:workshop_action",
+      "conditions": {
+        "action": "stairs_installed"
+      }
+    }
+  }
+}

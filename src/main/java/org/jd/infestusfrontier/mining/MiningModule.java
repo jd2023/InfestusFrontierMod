@@ -30,6 +30,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.core.foundation.TickQuota;
 import org.jd.infestusfrontier.core.mining.Fracturing;
+import org.jd.infestusfrontier.core.mining.RootMutation;
 import org.jd.infestusfrontier.core.mining.Surveying;
 import org.jd.infestusfrontier.foundation.render.GhostBoxRenderer;
 import org.jd.infestusfrontier.organ.api.Organs;
@@ -38,8 +39,8 @@ import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
 
 /**
- * Owner of mining: the Leaching Pod and the Leached Rock it leaves, the Tunnel Root with its Root Segments and the
- * root cells it lays, the stationary cutting organs: the Fracture Jaw, the Work Bed and the Collection Cilia, and
+ * Owner of mining: the Leaching Pod and the Leached Rock it leaves, the Tunnel Root with its Root Segments, the
+ * root cells it lays and the genetic constructs that mutate it, the stationary cutting organs: the Fracture Jaw, the Work Bed and the Collection Cilia, and
  * surveyed sections: the Surveyed Tissue marker that holds a plan and the Structure Grower that builds it.
  */
 public final class MiningModule {
@@ -121,7 +122,8 @@ public final class MiningModule {
                     .sound(SoundType.ROOTED_DIRT)
                     .noOcclusion());
 
-    public static final DeferredItem<BlockItem> TUNNEL_ROOT_ITEM = ITEMS.registerSimpleBlockItem(TUNNEL_ROOT);
+    public static final DeferredItem<TunnelRootItem> TUNNEL_ROOT_ITEM =
+            ITEMS.registerItem("tunnel_root", properties -> new TunnelRootItem(TUNNEL_ROOT.get(), properties));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TunnelRootBlockEntity>> TUNNEL_ROOT_ENTITY =
             BLOCK_ENTITIES.register(
                     "tunnel_root",
@@ -130,7 +132,22 @@ public final class MiningModule {
     public static final DeferredHolder<MenuType<?>, MenuType<TunnelRootMenu>> TUNNEL_ROOT_MENU =
             MENUS.register("tunnel_root", () -> IMenuTypeExtension.create(TunnelRootMenu::new));
 
-    /** What a broken head carries on its item: everything it held and the cells it has laid. */
+    /** Constructs a hand stack holds at most. */
+    static final int CONSTRUCT_STACK = 16;
+
+    /** The genetic construct for Stairs, produced in a DNA Bank; applied to a head it makes a Rootstock. */
+    public static final DeferredItem<ConstructItem> STAIRS_CONSTRUCT = ITEMS.registerItem(
+            "stairs_construct",
+            properties -> new ConstructItem(RootMutation.STAIRS, properties),
+            new Item.Properties().stacksTo(CONSTRUCT_STACK));
+
+    /** The genetic construct for Wider Section, produced in a DNA Bank; applied to a Rootstock. */
+    public static final DeferredItem<ConstructItem> WIDER_SECTION_CONSTRUCT = ITEMS.registerItem(
+            "wider_section_construct",
+            properties -> new ConstructItem(RootMutation.WIDER_SECTION, properties),
+            new Item.Properties().stacksTo(CONSTRUCT_STACK));
+
+    /** What a broken head carries on its item: everything it held, the cells it has laid and its mutations. */
     static final DeferredHolder<DataComponentType<?>, DataComponentType<TunnelRootContents>> TUNNEL_ROOT_CONTENTS =
             COMPONENTS.registerComponentType(
                     "tunnel_root", builder -> builder.persistent(TunnelRootContents.CODEC.codec()));

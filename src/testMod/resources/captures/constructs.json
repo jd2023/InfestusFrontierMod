@@ -1,0 +1,115 @@
+{
+  "commands": [
+    "forceload add 144 -28 166 -14",
+    "advancement grant @s through infestusfrontier:contact/organ_bud",
+    "fill 148 -61 -24 162 -61 -18 grass_block",
+    "fill 149 -61 -23 151 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 150 -60 -22 infestusfrontier:dna_bank{tank:{stored:2000,capacity:2000},samples:{},genomes:[{species:\"minecraft:pig\",points:100}],materials:[{id:\"minecraft:porkchop\",count:2},{id:\"infestusfrontier:bone_plate\",count:2},{id:\"minecraft:cobblestone_stairs\",count:4}],construct:{}}",
+    "fill 153 -61 -23 155 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 154 -60 -22 infestusfrontier:tunnel_root[facing=north]{segments:{},output:[{},{},{},{}],tank:{stored:2000,capacity:2000},cells:0,ticks:0,steer:0}",
+    "fill 157 -61 -23 159 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 158 -60 -22 infestusfrontier:tunnel_root[facing=north]{segments:{},output:[{},{},{},{}],tank:{stored:2000,capacity:2000},cells:0,ticks:0,steer:0,mutations:[\"stairs\"]}",
+    "setblock 161 -60 -22 chest[facing=south]{Items:[{Slot:0,id:\"infestusfrontier:stairs_construct\",count:1},{Slot:1,id:\"infestusfrontier:wider_section_construct\",count:1},{Slot:2,id:\"minecraft:porkchop\",count:2},{Slot:3,id:\"infestusfrontier:bone_plate\",count:6},{Slot:4,id:\"minecraft:cobblestone_stairs\",count:4},{Slot:5,id:\"infestusfrontier:membrane_sheet\",count:2},{Slot:6,id:\"minecraft:iron_ingot\",count:2},{Slot:7,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:8,id:\"infestusfrontier:surgical_blade\",count:1}]}",
+    "setblock 150 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"CONSTRUCTS\"','\"pig genome done:\"','\"press Produce\"','\"for Stairs\"']}}",
+    "setblock 154 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"TUNNEL ROOT\"','\"apply Stairs:\"','\"it becomes a\"','\"Rootstock\"']}}",
+    "setblock 158 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"ROOTSTOCK\"','\"has Stairs:\"','\"apply Wider\"','\"Section here\"']}}",
+    "setblock 161 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"Constructs and\"','\"materials for\"','\"two more, and\"','\"biomass\"']}}"
+  ],
+  "views": [
+    {
+      "x": 155.5,
+      "y": -56.0,
+      "z": -13.0,
+      "yaw": 180,
+      "pitch": 30,
+      "name": "constructs_exhibit"
+    },
+    {
+      "x": 152.0,
+      "y": -59.4,
+      "z": -15.5,
+      "yaw": 180,
+      "pitch": 15,
+      "name": "constructs_signs_bank"
+    },
+    {
+      "x": 159.5,
+      "y": -59.4,
+      "z": -15.5,
+      "yaw": 180,
+      "pitch": 15,
+      "name": "constructs_signs_heads"
+    },
+    {
+      "x": 150.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "constructs_bank_screen",
+      "use": [
+        150,
+        -60,
+        -22
+      ]
+    },
+    {
+      "x": 154.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "constructs_head_screen",
+      "use": [
+        154,
+        -60,
+        -22
+      ]
+    },
+    {
+      "x": 158.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "constructs_rootstock_screen",
+      "use": [
+        158,
+        -60,
+        -22
+      ]
+    },
+    {
+      "x": 150.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "book_genetic_constructs",
+      "gui": true,
+      "book": "infestusfrontier:contact/genetic_constructs"
+    },
+    {
+      "x": 150.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "book_genetic_constructs_stairs",
+      "gui": true,
+      "book": "infestusfrontier:contact/genetic_constructs",
+      "page": 2
+    },
+    {
+      "x": 150.5,
+      "y": -60.0,
+      "z": -19.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "book_genetic_constructs_wider",
+      "gui": true,
+      "book": "infestusfrontier:contact/genetic_constructs",
+      "page": 4
+    }
+  ]
+}

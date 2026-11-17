@@ -5,9 +5,9 @@ import net.minecraft.util.StringRepresentable;
 import net.neoforged.bus.api.Event;
 
 /**
- * Posted on the NeoForge bus once when a player, at a screen, does something that earns a workshop milestone and the
- * game has checked that it worked: a stack stored in a Capsule Tree, a Shaping Palm craft that used items its Mouth
- * fetched. A refused or empty action posts nothing. Actions an organ does for its steward are
+ * Posted on the NeoForge bus once when a player, at a screen or by hand, does something that earns a workshop
+ * milestone and the game has checked that it worked: a stack stored in a Capsule Tree, a Shaping Palm craft that used
+ * items its Mouth fetched, a genetic construct produced or applied. A refused or empty action posts nothing. Actions an organ does for its steward are
  * {@link AutomaticWorkEvent}s.
  */
 public final class WorkshopActionEvent extends Event {
@@ -16,7 +16,13 @@ public final class WorkshopActionEvent extends Event {
         /** A stack went into a pod of a standing Capsule Stem tree, by hand. */
         TREE_STORED("tree_stored"),
         /** A Shaping Palm craft took the result with at least one ingredient the Palm's Mouth had fetched. */
-        PALM_CRAFT_FROM_STORAGE("palm_craft_from_storage");
+        PALM_CRAFT_FROM_STORAGE("palm_craft_from_storage"),
+        /** A DNA Bank produced a genetic construct at the player's screen. */
+        CONSTRUCT_PRODUCED("construct_produced"),
+        /** The player applied Stairs to a Tunnel Root head, which became a Descending Rootstock. */
+        STAIRS_INSTALLED("stairs_installed"),
+        /** The player applied Wider Section to a Rootstock. */
+        WIDER_SECTION_INSTALLED("wider_section_installed");
 
         private final String id;
 

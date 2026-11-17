@@ -50,6 +50,15 @@ public final class Tunnelling {
     /** Loading by hand: the head already holds all the segments it can. */
     public static final Refusal SEGMENTS_FULL = new Refusal("tunnel_root.segments_full");
 
+    /** Applying a construct: the head already has that mutation. */
+    public static final Refusal MUTATION_INSTALLED = new Refusal("tunnel_root.mutation_installed");
+    /** Applying a construct: the mutation needs a Rootstock, a head with Stairs. */
+    public static final Refusal NOT_ROOTSTOCK = new Refusal("tunnel_root.not_rootstock");
+    /** Applying a construct: the head's tank holds less biomass than the mutation costs. */
+    public static final Refusal MUTATION_BIOMASS = new Refusal("tunnel_root.mutation_biomass");
+    /** Applying a construct: only a Tunnel Root head takes it. */
+    public static final Refusal NOT_A_HEAD = new Refusal("tunnel_root.not_a_head");
+
     /** Every stop, in a fixed order: a screen names one by its index. */
     public static final List<Refusal> STOPS = List.of(
             UNROOTED,

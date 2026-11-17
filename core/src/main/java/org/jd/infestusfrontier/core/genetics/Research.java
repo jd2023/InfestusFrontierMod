@@ -39,6 +39,11 @@ public record Research(List<Genome> genomes) {
         return genome(species).map(Genome::complete).orElse(false);
     }
 
+    /** The first of {@code species} whose genome is not complete here, or empty when every one is. */
+    public Optional<String> lacking(List<String> species) {
+        return species.stream().filter(wanted -> !complete(wanted)).findFirst();
+    }
+
     /** Why a sample of {@code species} cannot be extracted here now, or empty when it can. */
     public Optional<Refusal> refusal(String species) {
         Optional<Genome> genome = genome(species);

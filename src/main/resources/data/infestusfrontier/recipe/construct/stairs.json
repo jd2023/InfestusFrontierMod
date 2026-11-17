@@ -1,0 +1,11 @@
+{
+  "type": "infestusfrontier:genetic_construct",
+  "genomes": ["minecraft:pig"],
+  "materials": [
+    { "item": "minecraft:porkchop", "count": 2 },
+    { "item": "infestusfrontier:bone_plate", "count": 2 },
+    { "item": "minecraft:cobblestone_stairs", "count": 4 }
+  ],
+  "biomass": 250,
+  "result": { "id": "infestusfrontier:stairs_construct", "count": 1 }
+}

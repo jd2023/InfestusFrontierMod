@@ -1678,7 +1678,19 @@
     "setblock 139 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"DNA BANK\"','\"extracts pig\"','\"samples into\"','\"the pig genome\"']}}",
     "setblock 143 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"YOUR BANK\"','\"load the samples\"','\"you took from\"','\"the pig\"']}}",
     "setblock 146 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"DNA supplies\"','\"needle, bank,\"','\"biomass and\"','\"a blade\"']}}",
-    "summon pig 134.5 -60 -21.5 {PersistenceRequired:1b}"
+    "summon pig 134.5 -60 -21.5 {PersistenceRequired:1b}",
+    "fill 148 -61 -24 162 -61 -18 grass_block",
+    "fill 149 -61 -23 151 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 150 -60 -22 infestusfrontier:dna_bank{tank:{stored:2000,capacity:2000},samples:{},genomes:[{species:\"minecraft:pig\",points:100}],materials:[{id:\"minecraft:porkchop\",count:2},{id:\"infestusfrontier:bone_plate\",count:2},{id:\"minecraft:cobblestone_stairs\",count:4}],construct:{}}",
+    "fill 153 -61 -23 155 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 154 -60 -22 infestusfrontier:tunnel_root[facing=north]{segments:{},output:[{},{},{},{}],tank:{stored:2000,capacity:2000},cells:0,ticks:0,steer:0}",
+    "fill 157 -61 -23 159 -61 -21 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 158 -60 -22 infestusfrontier:tunnel_root[facing=north]{segments:{},output:[{},{},{},{}],tank:{stored:2000,capacity:2000},cells:0,ticks:0,steer:0,mutations:[\"stairs\"]}",
+    "setblock 161 -60 -22 chest[facing=south]{Items:[{Slot:0,id:\"infestusfrontier:stairs_construct\",count:1},{Slot:1,id:\"infestusfrontier:wider_section_construct\",count:1},{Slot:2,id:\"minecraft:porkchop\",count:2},{Slot:3,id:\"infestusfrontier:bone_plate\",count:6},{Slot:4,id:\"minecraft:cobblestone_stairs\",count:4},{Slot:5,id:\"infestusfrontier:membrane_sheet\",count:2},{Slot:6,id:\"minecraft:iron_ingot\",count:2},{Slot:7,id:\"infestusfrontier:biomass_bucket\",count:2},{Slot:8,id:\"infestusfrontier:surgical_blade\",count:1}]}",
+    "setblock 150 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"CONSTRUCTS\"','\"pig genome done:\"','\"press Produce\"','\"for Stairs\"']}}",
+    "setblock 154 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"TUNNEL ROOT\"','\"apply Stairs:\"','\"it becomes a\"','\"Rootstock\"']}}",
+    "setblock 158 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"ROOTSTOCK\"','\"has Stairs:\"','\"apply Wider\"','\"Section here\"']}}",
+    "setblock 161 -60 -20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"Constructs and\"','\"materials for\"','\"two more, and\"','\"biomass\"']}}"
   ],
   "play": [
     "advancement revoke @s from infestusfrontier:contact/root"

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.world.item.ItemStack;
 import org.jd.infestusfrontier.core.foundation.Biomass;
+import org.jd.infestusfrontier.core.mining.RootMutation;
+import org.jd.infestusfrontier.core.mining.RootMutations;
 import org.jd.infestusfrontier.core.mining.Steer;
 import org.jd.infestusfrontier.core.mining.TunnelProgress;
 import org.jd.infestusfrontier.core.mining.Tunnelling;
@@ -17,17 +19,24 @@ import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /**
  * Everything a Tunnel Root head owns: its segments, its output, its biomass, its progress (the cells it has laid are
- * its history) and the steering of its next step. Saved on the block entity, carried on the item when the head is
- * broken, and handed from the old block entity to the new one when the head moves. The stacks are copies.
+ * its history), the steering of its next step and its permanent mutations. Saved on the block entity, carried on the
+ * item when the head is broken, and handed from the old block entity to the new one when the head moves. A head saved
+ * before it could mutate reads with none. The stacks are copies.
  */
 record TunnelRootContents(
-        ItemStack segments, List<ItemStack> output, BiomassTank tank, TunnelProgress progress, Steer steer) {
+        ItemStack segments,
+        List<ItemStack> output,
+        BiomassTank tank,
+        TunnelProgress progress,
+        Steer steer,
+        RootMutations mutations) {
     static final TunnelRootContents EMPTY = new TunnelRootContents(
             ItemStack.EMPTY,
             List.of(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY),
             BiomassTank.empty(Biomass.of(Tunnelling.BIOMASS_CAPACITY_BU)),
             TunnelProgress.START,
-            Steer.STRAIGHT);
+            Steer.STRAIGHT,
+            RootMutations.NONE);
 
     TunnelRootContents {
         segments = segments.copy();
@@ -37,7 +46,14 @@ record TunnelRootContents(
     }
 
     /** The saved numbers before they are judged; impossible ones are a decode error, never an exception. */
-    private record Raw(ItemStack segments, List<ItemStack> output, BiomassTank tank, int cells, int ticks, int steer) {}
+    private record Raw(
+            ItemStack segments,
+            List<ItemStack> output,
+            BiomassTank tank,
+            int cells,
+            int ticks,
+            int steer,
+            List<String> mutations) {}
 
     static final MapCodec<TunnelRootContents> CODEC = RecordCodecBuilder.<Raw>mapCodec(instance -> instance.group(
                             ItemStack.OPTIONAL_CODEC.fieldOf("segments").forGetter(Raw::segments),
@@ -45,12 +61,23 @@ record TunnelRootContents(
                             BiomassCodecs.TANK.fieldOf("tank").forGetter(Raw::tank),
                             Codec.INT.fieldOf("cells").forGetter(Raw::cells),
                             Codec.INT.fieldOf("ticks").forGetter(Raw::ticks),
-                            Codec.INT.fieldOf("steer").forGetter(Raw::steer))
+                            Codec.INT.fieldOf("steer").forGetter(Raw::steer),
+                            Codec.STRING
+                                    .listOf()
+                                    .optionalFieldOf("mutations", List.of())
+                                    .forGetter(Raw::mutations))
                     .apply(instance, Raw::new))
             .flatXmap(TunnelRootContents::read, contents -> DataResult.success(contents.raw()));
 
     private Raw raw() {
-        return new Raw(segments, output, tank, progress.cells(), progress.ticks(), steer.ordinal());
+        return new Raw(
+                segments,
+                output,
+                tank,
+                progress.cells(),
+                progress.ticks(),
+                steer.ordinal(),
+                mutations.installed().stream().map(RootMutation::id).toList());
     }
 
     private static DataResult<TunnelRootContents> read(Raw raw) {
@@ -60,8 +87,21 @@ record TunnelRootContents(
             return DataResult.error(() -> "ticks " + raw.ticks());
         Optional<Steer> steer = Steer.at(raw.steer());
         if (steer.isEmpty()) return DataResult.error(() -> "steer " + raw.steer());
+        List<RootMutation> mutations = new ArrayList<>(raw.mutations().size());
+        for (String id : raw.mutations()) {
+            Optional<RootMutation> mutation = RootMutation.byId(id);
+            if (mutation.isEmpty()) return DataResult.error(() -> "mutation " + id);
+            mutations.add(mutation.get());
+        }
+        Optional<String> wrong = RootMutations.problem(mutations);
+        if (wrong.isPresent()) return DataResult.error(() -> "mutations " + wrong.get());
         TunnelRootContents contents = new TunnelRootContents(
-                raw.segments(), raw.output(), raw.tank(), new TunnelProgress(raw.cells(), raw.ticks()), steer.get());
+                raw.segments(),
+                raw.output(),
+                raw.tank(),
+                new TunnelProgress(raw.cells(), raw.ticks()),
+                steer.get(),
+                new RootMutations(mutations));
         Optional<String> problem = contents.problem();
         return problem.isPresent() ? DataResult.error(problem::get) : DataResult.success(contents);
     }

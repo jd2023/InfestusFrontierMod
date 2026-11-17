@@ -1,0 +1,67 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.genetic_constructs.name",
+  "description": "entry.infestusfrontier.contact.genetic_constructs.description",
+  "icon": "infestusfrontier:stairs_construct",
+  "x": 5,
+  "y": 4,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/dna_bank"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/pig_genome"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/stairs_construct"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:acquired/wider_section_construct"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.genetic_constructs.name",
+      "text": "entry.infestusfrontier.contact.genetic_constructs.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.genetic_constructs.produce",
+      "text": "entry.infestusfrontier.contact.genetic_constructs.produce_text"
+    },
+    {
+      "type": "infestusfrontier:genetic_construct",
+      "recipe_id_1": "infestusfrontier:construct/stairs",
+      "title1": "entry.infestusfrontier.contact.genetic_constructs.stairs"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.genetic_constructs.stairs",
+      "text": "entry.infestusfrontier.contact.genetic_constructs.stairs_text"
+    },
+    {
+      "type": "infestusfrontier:genetic_construct",
+      "recipe_id_1": "infestusfrontier:construct/wider_section",
+      "title1": "entry.infestusfrontier.contact.genetic_constructs.wider"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.genetic_constructs.wider",
+      "text": "entry.infestusfrontier.contact.genetic_constructs.wider_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.genetic_constructs.refusals",
+      "text": "entry.infestusfrontier.contact.genetic_constructs.refusals_text"
+    }
+  ]
+}

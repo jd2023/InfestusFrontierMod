@@ -71,11 +71,17 @@ final class CaptureClient {
     private static final int READY_RADIUS = 2; // chunks around the view that must have arrived from the server
     private static final long TOAST_DWELL_MILLIS = 1500; // a toast slides in over 600 ms
     private static final int READY_FRAMES = 10; // consecutive frames with nothing left to compile
+    /**
+     * The world holds still for the camera. Random ticks stay off: a demo sapling that grew into a tree by chance once
+     * filled a view with its leaves, and crops and leaves would likewise change between runs. Scheduled ticks and block
+     * entities, which the colony's work uses, keep running.
+     */
     private static final List<String> BASELINE = List.of(
             "gamerule sendCommandFeedback false",
             "gamerule doDaylightCycle false",
             "gamerule doWeatherCycle false",
             "gamerule doMobSpawning false",
+            "gamerule randomTickSpeed 0",
             "time set noon",
             "weather clear");
     /**

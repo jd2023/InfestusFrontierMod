@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "infestusfrontier:item/wider_section_construct"
+  }
+}

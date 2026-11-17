@@ -32,9 +32,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * The head of a Tunnel Root, a starter organ grown from an Organ Bud. It faces the way it cuts. The player feeds it
  * Root Segments and biomass by hand, steers its next step at its screen and empties its output; every twenty seconds
- * it cuts the two blocks ahead, lays a root cell under them and moves in. Segments and biomass buckets load it, any
- * other hand opens its screen and sneaking builds against it. Broken, it comes out whole with what it holds and the
- * cells it has laid.
+ * it cuts the two blocks ahead, lays a root cell under them and moves in. Segments and biomass buckets load it, a
+ * genetic construct mutates it, any other hand opens its screen and sneaking builds against it. Broken, it comes out
+ * whole with what it holds, the cells it has laid and its mutations.
  */
 public final class TunnelRootBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -112,9 +112,15 @@ public final class TunnelRootBlock extends BaseEntityBlock {
             Player player,
             InteractionHand hand,
             BlockHitResult hit) {
-        if (level.getBlockEntity(pos) instanceof TunnelRootBlockEntity head && TunnelRootBlockEntity.loads(stack)) {
-            if (!level.isClientSide) head.load(player, hand);
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        if (level.getBlockEntity(pos) instanceof TunnelRootBlockEntity head) {
+            if (stack.getItem() instanceof ConstructItem construct) {
+                if (!level.isClientSide) head.mutate(player, hand, construct.mutation());
+                return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            }
+            if (TunnelRootBlockEntity.loads(stack)) {
+                if (!level.isClientSide) head.load(player, hand);
+                return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            }
         }
         return Organs.openScreen(stack, level, pos, player);
     }
