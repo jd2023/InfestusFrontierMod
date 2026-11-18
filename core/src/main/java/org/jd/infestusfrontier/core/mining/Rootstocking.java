@@ -12,7 +12,8 @@ import org.jd.infestusfrontier.core.foundation.Refusal;
  * Work Bed Collection Cilia sweep. The Rootstock orders: it names the next block of the next step of the approved
  * staircase, top down, and only of that step, so the root never goes past the last built tread. The jaw cuts it, the
  * cilia export it and the grower builds the step once it is clear; the Rootstock counts each step built as its own
- * advance. It cuts, carries and builds nothing itself. Every number is a starting value, not measured balance.
+ * advance. It cuts, carries and builds nothing itself. Once the landing is built it orders its gallery faces the same
+ * way, see {@link Galleries}. Every number is a starting value, not measured balance.
  */
 public final class Rootstocking {
     /** Loaded ticks between two looks of a minehead at its parts and its next step, for its screen. */
@@ -70,14 +71,20 @@ public final class Rootstocking {
         return List.copyOf(cells);
     }
 
-    /** The block on top of {@code step}'s highest block: a block there that falls would drop into the cut. */
-    public static Offset overhead(PlanStep step) {
-        return cutOrder(step).get(0).above(1);
+    /**
+     * The blocks on top of {@code step}'s columns: a block there that falls would drop into the cut. For each block of
+     * the step, the block over it when that is not part of the step.
+     */
+    public static List<Offset> overheads(PlanStep step) {
+        List<Offset> cells = step.cleared();
+        List<Offset> over = new ArrayList<>();
+        for (Offset cell : cells) if (!cells.contains(cell.above(1))) over.add(cell.above(1));
+        return List.copyOf(over);
     }
 
-    /** The block under {@code step}'s root cell, which must be solid ground. */
-    public static Offset ground(PlanStep step) {
-        return step.root().above(-1);
+    /** The blocks under {@code step}'s root cells, which must all be solid ground. */
+    public static List<Offset> grounds(PlanStep step) {
+        return step.roots().stream().map(root -> root.above(-1)).toList();
     }
 
     /**

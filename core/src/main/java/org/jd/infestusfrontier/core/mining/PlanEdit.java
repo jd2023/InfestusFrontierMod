@@ -16,7 +16,9 @@ public enum PlanEdit {
     SECOND_EARLIER,
     SECOND_LATER,
     /** Lights on and off. */
-    LIGHTS;
+    LIGHTS,
+    /** A route one column wide and three wide, the Wider Section, and back. */
+    WIDTH;
 
     /** The edit at {@code index}, or empty when no edit has it: a screen button id. */
     public static Optional<PlanEdit> at(int index) {

@@ -139,6 +139,72 @@ class MinePlanTest {
         assertEquals(0, stairs(16, false).needs().lights());
     }
 
+    private static MinePlan wide(int length, Turn first, Turn second) {
+        return new MinePlan(PlanShape.ROUTE, length, first, second, false, true);
+    }
+
+    @Test
+    void aWideRouteIsThreeAcrossAndThreeHighWithARootCellUnderEachColumn() {
+        MinePlan longest = wide(Surveying.MAX_ROUTE_LENGTH, Turn.NONE, Turn.NONE);
+        List<PlanStep> steps = longest.steps();
+        assertEquals(64, steps.size(), "as long as a narrow route");
+        for (PlanStep step : steps) {
+            int n = step.number();
+            assertEquals(new Offset(n, 0, 0), step.root());
+            assertEquals(List.of(new Offset(n, -1, 0), new Offset(n, 1, 0)), step.flanks(), "a root left and right");
+            assertEquals(9, step.passage().size(), "three columns three high");
+            for (Offset root : step.roots())
+                for (int up = 1; up <= Surveying.WIDE_HEADROOM; up++)
+                    assertTrue(step.passage().contains(root.above(up)), "clear over " + root + " at " + up);
+            assertEquals(12, step.cleared().size(), "four times the cuts of a narrow step");
+        }
+        MinePlan narrow = route(Surveying.MAX_ROUTE_LENGTH, Turn.NONE, Turn.NONE);
+        assertEquals(3, narrow.steps().get(0).cleared().size(), "a narrow step cuts three");
+        assertEquals(new MinePlan.Needs(192, 0, 0), longest.needs(), "three segments a step");
+        assertEquals(new MinePlan.Needs(64, 0, 0), narrow.needs(), "one segment a step");
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new MinePlan(PlanShape.STAIRCASE, 4, Turn.NONE, Turn.NONE, false, true),
+                "a staircase is never wide");
+    }
+
+    @Test
+    void aWideRouteTurnsWithoutPlanningABlockTwice() {
+        MinePlan plan = wide(6, new Turn(Steer.RIGHT, 3), Turn.NONE);
+        Set<Offset> seen = new HashSet<>();
+        for (PlanStep step : plan.steps())
+            for (Offset cell : step.cleared()) assertTrue(seen.add(cell), "planned once: " + cell);
+        PlanStep corner = plan.steps().get(2);
+        assertTrue(corner.bend());
+        assertEquals(List.of(new Offset(4, 0, 0)), corner.flanks(), "the turn's outer root; its inner one is held");
+        PlanStep after = plan.steps().get(3);
+        assertEquals(new Offset(3, 1, 0), after.root(), "on to the right");
+        assertEquals(List.of(new Offset(4, 1, 0)), after.flanks(), "beside it, the root not held yet");
+        assertEquals(new MinePlan.Needs(16, 0, 0), plan.needs(), "a segment for each root cell planned");
+        // two turns a cell apart double back onto the first leg's columns
+        assertThrows(IllegalArgumentException.class, () -> wide(6, new Turn(Steer.RIGHT, 2), new Turn(Steer.RIGHT, 3)));
+        assertEquals(
+                route(6, new Turn(Steer.RIGHT, 2), new Turn(Steer.RIGHT, 3)),
+                route(6, new Turn(Steer.RIGHT, 2), new Turn(Steer.RIGHT, 3)).edit(PlanEdit.WIDTH, false),
+                "a route that would double back on itself is not widened");
+        MinePlan apart = wide(8, new Turn(Steer.RIGHT, 2), new Turn(Steer.RIGHT, 4));
+        assertEquals(apart, apart.edit(PlanEdit.SECOND_EARLIER, false), "nor is a wide one's turn moved onto it");
+        assertEquals(8, apart.steps().size(), "two cells apart, the legs share only their flanks");
+    }
+
+    @Test
+    void theWidthIsARouteSettingThatLightsTheOuterWall() {
+        MinePlan narrow = route(16, Turn.NONE, Turn.NONE);
+        MinePlan widened = narrow.edit(PlanEdit.WIDTH, false);
+        assertTrue(widened.wide());
+        assertFalse(widened.edit(PlanEdit.WIDTH, false).wide(), "and back");
+        assertFalse(widened.edit(PlanEdit.SHAPE, false).wide(), "a staircase drops the width");
+        assertEquals(stairs(8, false), stairs(8, false).edit(PlanEdit.WIDTH, false), "a staircase has none");
+        MinePlan lit = widened.edit(PlanEdit.LIGHTS, false);
+        assertEquals(Optional.of(new Offset(8, -1, 2)), lit.steps().get(7).light(), "on the left column, head high");
+        assertEquals(widened.edit(PlanEdit.LONGER, false).length(), 17, "it is edited like any route");
+    }
+
     @Test
     void theDraftIsEditedWithinItsLimits() {
         MinePlan plan = MinePlan.START;

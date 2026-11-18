@@ -1,22 +1,29 @@
 package org.jd.infestusfrontier.core.mining;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A surveyed section, relative to its marker: its shape, its length (the blocks a staircase descends, or the cells a
- * route runs), a route's two turn slots and whether it is lit. It is geometry only: it names the blocks to clear and
- * what goes in them, never what the ground holds. A value outside the limits does not construct, so impossible saved
- * numbers are refused, not repaired.
+ * route runs), a route's two turn slots, whether it is lit and whether a route is wide. It is geometry only: it names
+ * the blocks to clear and what goes in them, never what the ground holds. A value outside the limits does not
+ * construct, so impossible saved numbers are refused, not repaired.
  *
  * <p>A staircase of depth {@code d} has {@code d} steps, each a root cell with a tread on it and
  * {@value Surveying#STAIR_HEADROOM} clear blocks over the tread, one block further on and one lower each time, then a
  * landing: a root cell {@code d} blocks under the marker with the same headroom. A route of length {@code n} has
  * {@code n} root cells level with the marker, each with {@value Surveying#ROUTE_HEADROOM} clear blocks over it, turning
  * a quarter at each turn's cell.
+ *
+ * <p>A wide route is the Wider Section: each step is three columns across the way it leaves, a root cell in the floor
+ * of each and {@value Surveying#WIDE_HEADROOM} clear blocks over it. Where it turns, a column an earlier step already
+ * holds is not planned again. A wide route whose next root cell lies in an earlier step, as where it doubles back on
+ * itself, does not construct.
  */
-public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boolean lit) {
+public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boolean lit, boolean wide) {
     /** A new marker's draft: a short unlit staircase. */
     public static final MinePlan START = new MinePlan(PlanShape.STAIRCASE, 8, Turn.NONE, Turn.NONE, false);
 
@@ -24,10 +31,18 @@ public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boo
         if (length < 1 || length > longest(shape)) throw new IllegalArgumentException("Length: " + length);
         if (shape == PlanShape.STAIRCASE && (first.present() || second.present()))
             throw new IllegalArgumentException("A staircase does not turn");
+        if (shape == PlanShape.STAIRCASE && wide) throw new IllegalArgumentException("A staircase is not wide");
         for (Turn turn : List.of(first, second))
             if (turn.present() && turn.at() >= length) throw new IllegalArgumentException("Turn past the end: " + turn);
         if (first.present() && second.present() && first.at() >= second.at())
             throw new IllegalArgumentException("Turns out of order: " + first + ", " + second);
+        if (wide && route(length, first, second, false, true).isEmpty())
+            throw new IllegalArgumentException("A wide route runs into itself");
+    }
+
+    /** A plan one column wide. */
+    public MinePlan(PlanShape shape, int length, Turn first, Turn second, boolean lit) {
+        this(shape, length, first, second, lit, false);
     }
 
     /** The greatest length a plan of {@code shape} may have. */
@@ -39,7 +54,9 @@ public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boo
 
     /** Every step in building order. */
     public List<PlanStep> steps() {
-        return shape == PlanShape.STAIRCASE ? staircase() : route();
+        return shape == PlanShape.STAIRCASE
+                ? staircase()
+                : route(length, first, second, lit, wide).orElseThrow();
     }
 
     private List<PlanStep> staircase() {
@@ -54,8 +71,14 @@ public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boo
         return steps;
     }
 
-    private List<PlanStep> route() {
+    /**
+     * The steps of a route, or empty when a wide one runs into itself: a step's root cell in a column an earlier step
+     * holds. Each column is the root cell and the blocks over it; a column an earlier step holds is left out.
+     */
+    private static Optional<List<PlanStep>> route(int length, Turn first, Turn second, boolean lit, boolean wide) {
+        int headroom = wide ? Surveying.WIDE_HEADROOM : Surveying.ROUTE_HEADROOM;
         List<PlanStep> steps = new ArrayList<>(length);
+        Set<Offset> held = new HashSet<>();
         Offset at = new Offset(0, 0, 0);
         int heading = 0;
         for (int number = 1; number <= length; number++) {
@@ -64,10 +87,22 @@ public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boo
             for (Turn turn : List.of(first, second))
                 if (turn.present() && turn.at() == number) leaving += turn.quarter();
             leaving = Math.floorMod(leaving, 4);
-            steps.add(step(number, at, Optional.empty(), at, Surveying.ROUTE_HEADROOM, heading, leaving));
+            if (!held.add(at)) return Optional.empty();
+            List<Offset> flanks = new ArrayList<>(2);
+            if (wide)
+                for (Offset flank : List.of(at.along(leaving + 3), at.along(leaving + 1)))
+                    if (held.add(flank)) flanks.add(flank);
+            List<Offset> passage = new ArrayList<>((1 + flanks.size()) * headroom);
+            List<Offset> columns = new ArrayList<>(flanks);
+            columns.add(0, at);
+            for (Offset column : columns) for (int up = 1; up <= headroom; up++) passage.add(column.above(up));
+            Offset lamp = wide ? at.along(leaving + 3) : at;
+            Optional<Offset> light =
+                    lit && number % Surveying.LIGHT_SPACING == 0 ? Optional.of(lamp.above(2)) : Optional.empty();
+            steps.add(new PlanStep(number, at, flanks, Optional.empty(), passage, light, heading, leaving));
             heading = leaving;
         }
-        return steps;
+        return Optional.of(steps);
     }
 
     /** A step whose walking surface is {@code floor}; its light, if any, is at head height, two blocks over it. */
@@ -77,7 +112,7 @@ public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boo
         for (int up = 1; up <= headroom; up++) passage.add(floor.above(up));
         Optional<Offset> light =
                 lit && number % Surveying.LIGHT_SPACING == 0 ? Optional.of(floor.above(2)) : Optional.empty();
-        return new PlanStep(number, root, tread, passage, light, arrived, leaving);
+        return new PlanStep(number, root, List.of(), tread, passage, light, arrived, leaving);
     }
 
     /** The root cell of the last step: the landing of a staircase, the end of a route. */
@@ -92,19 +127,22 @@ public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boo
         int treads = 0;
         int lights = 0;
         for (PlanStep step : steps()) {
-            segments++;
+            segments += step.roots().size();
             if (step.tread().isPresent()) treads++;
             if (step.light().isPresent()) lights++;
         }
         return new Needs(segments, treads, lights);
     }
 
-    /** Root Segments, treads and lights. */
+    /** Root Segments, one for each root cell, treads and lights. */
     public record Needs(int segments, int treads, int lights) {}
 
     // ---- editing a draft ----
 
-    /** This draft changed as asked, by one block or by {@value Surveying#LONG_EDIT} when {@code far}, or unchanged. */
+    /**
+     * This draft changed as asked, by one block or by {@value Surveying#LONG_EDIT} when {@code far}, or unchanged:
+     * also when a wide route would run into itself.
+     */
     public MinePlan edit(PlanEdit edit, boolean far) {
         int by = far ? Surveying.LONG_EDIT : 1;
         return switch (edit) {
@@ -115,32 +153,31 @@ public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boo
                                 PlanShape.STAIRCASE, Math.min(length, Surveying.MAX_DEPTH), Turn.NONE, Turn.NONE, lit);
             case SHORTER -> resized(length - by);
             case LONGER -> resized(length + by);
-            case FIRST_WAY -> withFirst(nextWay(first, true));
-            case FIRST_EARLIER -> withFirst(moved(first, -by, true));
-            case FIRST_LATER -> withFirst(moved(first, by, true));
-            case SECOND_WAY -> withSecond(nextWay(second, false));
-            case SECOND_EARLIER -> withSecond(moved(second, -by, false));
-            case SECOND_LATER -> withSecond(moved(second, by, false));
-            case LIGHTS -> new MinePlan(shape, length, first, second, !lit);
+            case FIRST_WAY -> or(length, nextWay(first, true), second, wide);
+            case FIRST_EARLIER -> or(length, moved(first, -by, true), second, wide);
+            case FIRST_LATER -> or(length, moved(first, by, true), second, wide);
+            case SECOND_WAY -> or(length, first, nextWay(second, false), wide);
+            case SECOND_EARLIER -> or(length, first, moved(second, -by, false), wide);
+            case SECOND_LATER -> or(length, first, moved(second, by, false), wide);
+            case LIGHTS -> new MinePlan(shape, length, first, second, !lit, wide);
+            case WIDTH -> shape == PlanShape.ROUTE ? or(length, first, second, !wide) : this;
         };
     }
 
     /** At {@code wanted} cells, kept within the shape's limits; a turn the new end passes is dropped. */
     private MinePlan resized(int wanted) {
         int clamped = Math.max(1, Math.min(longest(shape), wanted));
-        return new MinePlan(shape, clamped, within(first, clamped), within(second, clamped), lit);
+        return or(clamped, within(first, clamped), within(second, clamped), wide);
     }
 
     private static Turn within(Turn turn, int length) {
         return turn.present() && turn.at() >= length ? Turn.NONE : turn;
     }
 
-    private MinePlan withFirst(Turn turn) {
-        return new MinePlan(shape, length, turn, second, lit);
-    }
-
-    private MinePlan withSecond(Turn turn) {
-        return new MinePlan(shape, length, first, turn, lit);
+    /** This plan with these numbers, or unchanged when a wide route would run into itself. */
+    private MinePlan or(int length, Turn first, Turn second, boolean wide) {
+        if (wide && route(length, first, second, false, true).isEmpty()) return this;
+        return new MinePlan(shape, length, first, second, lit, wide);
     }
 
     /** The lowest and highest cells the slot may turn at, after the other turn's limits; low > high when none. */

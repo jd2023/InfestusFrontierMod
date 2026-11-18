@@ -110,6 +110,27 @@ neoForge {
             systemProperty 'neoforge.gameTestServer.forceExit', 'false'
             jvmArgument '-Xmx2G' // the gate's processes have fixed heaps; a leak fails here, not on the machine
         }
+        // Two GameTest servers over one world: the first leaves jobs mid-way and stops, the second restarts from disk.
+        gameTestRestartBefore {
+            type = 'gameTestServer'
+            sourceSet = sourceSets.testMod
+            gameDirectory = project.file('runs/gametest-restart')
+            loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'infestusfrontier_restart'
+            systemProperty 'neoforge.gameTestServer.forceExit', 'false'
+            systemProperty 'infestusfrontier.restart.phase', 'before'
+            jvmArgument '-Xmx2G'
+        }
+        gameTestRestartAfter {
+            type = 'gameTestServer'
+            sourceSet = sourceSets.testMod
+            gameDirectory = project.file('runs/gametest-restart')
+            loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'infestusfrontier_restart'
+            systemProperty 'neoforge.gameTestServer.forceExit', 'false'
+            systemProperty 'infestusfrontier.restart.phase', 'after'
+            jvmArgument '-Xmx2G'
+        }
         // Disposable client that photographs every scenario in src/testMod/resources/captures.
         capture {
             client()
@@ -237,6 +258,33 @@ tasks.named('runGameTestServer') {
     }
 }
 
+// The restart runs share runs/gametest-restart: the first starts from a fresh world, the second reads what it saved.
+def restartLog = layout.projectDirectory.file('runs/gametest-restart/logs/latest.log')
+def resetGameTestRestart = tasks.register('resetGameTestRestart', Delete) {
+    delete layout.projectDirectory.dir('runs/gametest-restart/world'),
+            layout.projectDirectory.file('runs/gametest-restart/gallery-restart.properties')
+}
+def prepareGameTestRestart = tasks.register('prepareGameTestRestart', Copy) {
+    dependsOn resetGameTestRestart
+    from 'src/testMod/server.properties'
+    into layout.projectDirectory.dir('runs/gametest-restart')
+}
+['runGameTestRestartBefore', 'runGameTestRestartAfter'].each { name ->
+    tasks.named(name) {
+        mustRunAfter tasks.named('runGameTestServer')
+        timeout = java.time.Duration.ofMinutes(30)
+        outputs.upToDateWhen { false }
+        doFirst { restartLog.asFile.delete() }
+        doLast {
+            def log = restartLog.asFile
+            if (!log.exists() || !(log.text =~ /All \d+ required tests passed/))
+                throw new GradleException("The restart GameTest server did not report its tests passed; see ${log}")
+        }
+    }
+}
+tasks.named('runGameTestRestartBefore') { dependsOn prepareGameTestRestart }
+tasks.named('runGameTestRestartAfter') { dependsOn tasks.named('runGameTestRestartBefore') }
+
 // Feature screens declare parts; only the kit in foundation/screen draws.
 tasks.register('verifyScreenKit') {
     def screens = fileTree('src/main/java') { include '**/*Screen.java'; exclude '**/foundation/screen/**' }
@@ -261,7 +309,8 @@ tasks.named('check') { dependsOn 'verifyVisualAssets' }
 tasks.register('verifyAll') {
     group = 'verification'
     description = 'The gate: pure tests, boundaries, shipped JAR contents, GameTests in a real server.'
-    dependsOn ':core:check', ':ui:check', tasks.named('build'), distribution, tasks.named('runGameTestServer')
+    dependsOn ':core:check', ':ui:check', tasks.named('build'), distribution, tasks.named('runGameTestServer'),
+            tasks.named('runGameTestRestartAfter')
 }
 
 // The id of this build's capture runs, created when the first capture task executes.

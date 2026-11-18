@@ -36,6 +36,7 @@ import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.core.mining.Counts;
 import org.jd.infestusfrontier.core.mining.Fracturing;
+import org.jd.infestusfrontier.core.mining.Galleries;
 import org.jd.infestusfrontier.core.mining.RootMutation;
 import org.jd.infestusfrontier.core.mining.RootMutations;
 import org.jd.infestusfrontier.core.mining.Rootstocking;
@@ -68,6 +69,11 @@ import org.jd.infestusfrontier.storage.StorageModule;
  * builds as its own advance, and every {@value Rootstocking#CHECK_TICKS} loaded ticks looks at its parts and its next
  * step to name what holds the minehead up. Its segments, output, cells, biomass, mutations and steward stay as they
  * were; broken and placed again it comes back with them and with its advance.
+ *
+ * <p>Once its staircase's landing is built the minehead also looks, on the same beat, for its gallery faces
+ * ({@link Galleries}), names what holds each one up and tells each face's grower it is one of its faces. A jaw of a
+ * face asks through that grower, see {@link #orderFace}; the minehead gives its faces cuts in turn. What it knows of its
+ * faces is not saved: the next look tells again.
  *
  * <p>Moving is a new block entity at the cut: this one hands it its whole saved state, steward included, and leaves.
  */
@@ -119,6 +125,10 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
     private int built;
     /** Steps the minehead's section has in all, as last looked at. Not saved. */
     private int steps;
+    /** The minehead's gallery faces as last looked at, in the order they take turns. Not saved. */
+    private List<Minehead.FaceLook> faces = List.of();
+    /** The face whose turn it is to be given a cut. Not saved: after a reload the first face goes first. */
+    private int turn;
 
     TunnelRootBlockEntity(BlockPos pos, BlockState state) {
         super(MiningModule.TUNNEL_ROOT_ENTITY.get(), pos, state);
@@ -176,6 +186,10 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     int steps() {
         return steps;
+    }
+
+    List<Minehead.FaceLook> faces() {
+        return faces;
     }
 
     Optional<Refusal> stop() {
@@ -319,7 +333,11 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     // ---- the minehead ----
 
-    /** Every {@value Rootstocking#CHECK_TICKS} loaded ticks, or at once after a change, names what holds it up. */
+    /**
+     * Every {@value Rootstocking#CHECK_TICKS} loaded ticks, or at once after a change, names what holds it up; once its
+     * landing is built, also its gallery faces: it looks at each, names what holds it up and tells its grower it is one
+     * of this minehead's faces.
+     */
     private void oversee(ServerLevel level, BlockPos pos, Direction facing) {
         if (retry > 0) {
             retry--;
@@ -327,12 +345,64 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
         }
         retry = Rootstocking.CHECK_TICKS;
         stop = Minehead.status(level, pos, facing);
-        Optional<Survey> survey =
-                level.getBlockEntity(Minehead.marker(pos, facing)) instanceof SurveyedTissueBlockEntity marker
-                        ? marker.survey()
+        Optional<SurveyedTissueBlockEntity> marker =
+                level.getBlockEntity(Minehead.marker(pos, facing)) instanceof SurveyedTissueBlockEntity found
+                        ? Optional.of(found)
                         : Optional.empty();
+        Optional<Survey> survey = marker.flatMap(SurveyedTissueBlockEntity::survey);
         built = survey.map(Survey::built).orElse(0);
         steps = survey.map(s -> s.plan().steps().size()).orElse(0);
+        faces = List.of();
+        if (marker.isEmpty() || survey.isEmpty() || !survey.get().finished()) return;
+        Outcome<List<SurveyedTissueBlockEntity>> walked = Minehead.galleries(level, marker.get());
+        if (walked instanceof Outcome.Refused<List<SurveyedTissueBlockEntity>>(Refusal why)) {
+            stop = Optional.of(why);
+            return;
+        }
+        List<Minehead.FaceLook> looked = new ArrayList<>();
+        for (SurveyedTissueBlockEntity face : ((Outcome.Done<List<SurveyedTissueBlockEntity>>) walked).value()) {
+            Minehead.FaceLook look = Minehead.look(level, face, mutations);
+            looked.add(look);
+            if (level.getBlockEntity(look.grower()) instanceof StructureGrowerBlockEntity grower)
+                grower.commission(pos, level.getGameTime());
+        }
+        faces = List.copyOf(looked);
+        if (turn >= faces.size()) turn = 0;
+        if (!faces.isEmpty() && stop.equals(Optional.of(Rootstocking.FINISHED))) stop = Optional.empty();
+        if (faces.stream().filter(Minehead.FaceLook::ready).count() >= 2)
+            steward.worked(level, MiningModule.SHARED_FACES);
+    }
+
+    /**
+     * The block a jaw of the gallery face whose grower stands at {@code grower} is to cut now, or
+     * {@link Fracturing#NO_ORDER}: the face is not one of this minehead's as last looked at, something holds it up, its
+     * next step is clear and waits for the grower, or another face that can cut has its turn first. A face given a cut
+     * passes the turn to the next face.
+     */
+    Outcome<BlockPos> orderFace(ServerLevel level, BlockPos grower) {
+        int index = -1;
+        for (int face = 0; face < faces.size(); face++)
+            if (faces.get(face).grower().equals(grower)) index = face;
+        if (!rootstock() || index < 0 || !level.hasChunkAt(grower.below())) return Outcome.refused(Fracturing.NO_ORDER);
+        if (!(level.getBlockEntity(grower.below()) instanceof SurveyedTissueBlockEntity marker)
+                || !(Minehead.face(level, marker) instanceof Outcome.Done<Minehead.Face>(Minehead.Face face))
+                || !(Minehead.faceCut(level, face, mutations)
+                        instanceof Outcome.Done<Optional<BlockPos>>(Optional<BlockPos> cut))
+                || cut.isEmpty()) return Outcome.refused(Fracturing.NO_ORDER);
+        boolean[] ready = new boolean[faces.size()];
+        for (int other = 0; other < ready.length; other++)
+            ready[other] = faces.get(other).ready();
+        if (!Galleries.admitted(turn, index, ready)) return Outcome.refused(Fracturing.NO_ORDER);
+        turn = Galleries.after(index, faces.size());
+        return Outcome.done(cut.get());
+    }
+
+    /** A gallery face of this minehead built its next step: credit for the gallery, and for a wide step its width. */
+    void galleryAdvanced(ServerLevel level, boolean wide) {
+        if (unreadable.isPresent()) return;
+        retry = 0;
+        steward.worked(level, MiningModule.GALLERY_STEP);
+        if (wide) steward.worked(level, MiningModule.WIDE_GALLERY_STEP);
     }
 
     /**

@@ -1,0 +1,68 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.mining_galleries.name",
+  "description": "entry.infestusfrontier.circulation.mining_galleries.description",
+  "icon": "infestusfrontier:fracture_jaw",
+  "x": 10,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/descending_rootstock"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/staircase_landing"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/wider_section"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mining_galleries.name",
+      "text": "entry.infestusfrontier.circulation.mining_galleries.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mining_galleries.junction",
+      "text": "entry.infestusfrontier.circulation.mining_galleries.junction_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mining_galleries.face",
+      "text": "entry.infestusfrontier.circulation.mining_galleries.face_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mining_galleries.share",
+      "text": "entry.infestusfrontier.circulation.mining_galleries.share_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mining_galleries.pause",
+      "text": "entry.infestusfrontier.circulation.mining_galleries.pause_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mining_galleries.wide",
+      "text": "entry.infestusfrontier.circulation.mining_galleries.wide_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.mining_galleries.limits",
+      "text": "entry.infestusfrontier.circulation.mining_galleries.limits_text"
+    },
+    {
+      "type": "infestusfrontier:genetic_construct",
+      "recipe_id_1": "infestusfrontier:construct/wider_section",
+      "title1": "entry.infestusfrontier.circulation.mining_galleries.wide"
+    }
+  ]
+}

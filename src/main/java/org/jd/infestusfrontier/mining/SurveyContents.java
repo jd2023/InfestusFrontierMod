@@ -13,7 +13,8 @@ import org.jd.infestusfrontier.core.mining.Turn;
 
 /**
  * How a Surveyed Tissue marker saves its {@link Survey}: the plan's numbers, whether it is approved and how many of its
- * steps are built. Impossible numbers are a decode error, never an exception, so the marker keeps them unread.
+ * steps are built. Impossible numbers are a decode error, never an exception, so the marker keeps them unread. A
+ * marker saved before routes could be wide reads as one column wide.
  */
 final class SurveyContents {
     private record Raw(
@@ -25,7 +26,8 @@ final class SurveyContents {
             int secondAt,
             boolean lit,
             boolean approved,
-            int built) {}
+            int built,
+            boolean wide) {}
 
     static final MapCodec<Survey> CODEC = RecordCodecBuilder.<Raw>mapCodec(instance -> instance.group(
                             Codec.INT.fieldOf("shape").forGetter(Raw::shape),
@@ -36,7 +38,8 @@ final class SurveyContents {
                             Codec.INT.fieldOf("second_at").forGetter(Raw::secondAt),
                             Codec.BOOL.fieldOf("lit").forGetter(Raw::lit),
                             Codec.BOOL.fieldOf("approved").forGetter(Raw::approved),
-                            Codec.INT.fieldOf("built").forGetter(Raw::built))
+                            Codec.INT.fieldOf("built").forGetter(Raw::built),
+                            Codec.BOOL.optionalFieldOf("wide", false).forGetter(Raw::wide))
                     .apply(instance, Raw::new))
             .flatXmap(SurveyContents::read, survey -> DataResult.success(raw(survey)));
 
@@ -53,7 +56,8 @@ final class SurveyContents {
                 plan.second().at(),
                 plan.lit(),
                 survey.approved(),
-                survey.built());
+                survey.built(),
+                plan.wide());
     }
 
     private static DataResult<Survey> read(Raw raw) {
@@ -68,7 +72,8 @@ final class SurveyContents {
                             raw.length(),
                             new Turn(first.get(), raw.firstAt()),
                             new Turn(second.get(), raw.secondAt()),
-                            raw.lit()),
+                            raw.lit(),
+                            raw.wide()),
                     raw.approved(),
                     raw.built()));
         } catch (IllegalArgumentException e) {

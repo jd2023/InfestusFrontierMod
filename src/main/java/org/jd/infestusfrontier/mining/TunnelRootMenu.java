@@ -1,5 +1,6 @@
 package org.jd.infestusfrontier.mining;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.IntSupplier;
@@ -16,6 +17,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.core.mining.Fracturing;
+import org.jd.infestusfrontier.core.mining.Galleries;
 import org.jd.infestusfrontier.core.mining.RootMutation;
 import org.jd.infestusfrontier.core.mining.RootMutations;
 import org.jd.infestusfrontier.core.mining.Rootstocking;
@@ -29,8 +31,8 @@ import org.jd.infestusfrontier.ui.Sheet;
  * The Tunnel Root screen's server half: the segment slot, the four take-only output slots, and as synced ints the
  * biomass, the steering, the cells laid, the stop, the seconds to the next step and the installed mutations; for a
  * Rootstock working as a minehead also that it is one, the steps it has advanced and its section's built and planned
- * steps. Buttons 0, 1 and 2 steer the next step straight, left and right; the block entity checks and applies the
- * choice.
+ * steps, and for each of its gallery faces what holds it up, its built and planned steps and whether it is wide.
+ * Buttons 0, 1 and 2 steer the next step straight, left and right; the block entity checks and applies the choice.
  */
 public final class TunnelRootMenu extends OrganMenu {
     public static final int STRAIGHT_BUTTON = 0;
@@ -51,7 +53,12 @@ public final class TunnelRootMenu extends OrganMenu {
     private static final int DESCENDED = 8;
     private static final int BUILT = 9;
     private static final int STEPS = 10;
-    private static final int SYNCED = 11;
+    private static final int FACES = 11;
+    /** Each face's stop, built steps, planned steps and width, from here on. */
+    private static final int FACE_DATA = 12;
+
+    private static final int PER_FACE = 4;
+    private static final int SYNCED = FACE_DATA + PER_FACE * Galleries.MAX_FACES;
     private static final int TICKS_PER_SECOND = 20;
 
     /**
@@ -61,6 +68,7 @@ public final class TunnelRootMenu extends OrganMenu {
     public static final List<Refusal> STOPS = Stream.of(
                     Tunnelling.STOPS,
                     Rootstocking.STOPS,
+                    Galleries.STOPS,
                     Fracturing.STOPS,
                     Surveying.STOPS,
                     WorkOrganMenu.Kind.CILIA.stops)
@@ -126,7 +134,26 @@ public final class TunnelRootMenu extends OrganMenu {
         reads[DESCENDED] = head::descended;
         reads[BUILT] = head::built;
         reads[STEPS] = head::steps;
+        reads[FACES] = () -> head.faces().size();
+        for (int face = 0; face < Galleries.MAX_FACES; face++) {
+            int index = face;
+            int at = FACE_DATA + PER_FACE * face;
+            reads[at] = () -> face(head, index)
+                    .flatMap(Minehead.FaceLook::stop)
+                    .map(stop -> STOPS.indexOf(stop) + 1)
+                    .orElse(0);
+            reads[at + 1] =
+                    () -> face(head, index).map(Minehead.FaceLook::built).orElse(0);
+            reads[at + 2] =
+                    () -> face(head, index).map(Minehead.FaceLook::steps).orElse(0);
+            reads[at + 3] =
+                    () -> face(head, index).map(look -> look.wide() ? 1 : 0).orElse(0);
+        }
         return reads;
+    }
+
+    private static Optional<Minehead.FaceLook> face(TunnelRootBlockEntity head, int index) {
+        return index < head.faces().size() ? Optional.of(head.faces().get(index)) : Optional.empty();
     }
 
     @Override
@@ -190,6 +217,24 @@ public final class TunnelRootMenu extends OrganMenu {
     /** Steps the minehead's section has in all: its treads and its landing. */
     public int steps() {
         return synced(STEPS);
+    }
+
+    /** One gallery face as last synced: what holds it up (empty while it works), its built and planned steps, its width. */
+    public record Face(Optional<Refusal> stop, int built, int steps, boolean wide) {}
+
+    /** The minehead's gallery faces as last synced, in the order they take turns. */
+    public List<Face> faces() {
+        List<Face> faces = new ArrayList<>();
+        for (int face = 0; face < Math.min(synced(FACES), Galleries.MAX_FACES); face++) {
+            int at = FACE_DATA + PER_FACE * face;
+            int stop = synced(at) - 1;
+            faces.add(new Face(
+                    stop >= 0 && stop < STOPS.size() ? Optional.of(STOPS.get(stop)) : Optional.empty(),
+                    synced(at + 1),
+                    synced(at + 2),
+                    synced(at + 3) == 1));
+        }
+        return List.copyOf(faces);
     }
 
     /** The head's mutations, as last synced, in their fixed order. */

@@ -77,7 +77,7 @@ final class SurveyedTissueBlockEntity extends BlockEntity implements MenuProvide
 
     private boolean inWorld() {
         for (PlanStep step : survey.plan().steps()) {
-            if (level.isOutsideBuildHeight(at(step.root()).below())) return false;
+            for (Offset root : step.roots()) if (level.isOutsideBuildHeight(at(root).below())) return false;
             for (Offset cell : step.cleared()) if (level.isOutsideBuildHeight(at(cell))) return false;
         }
         return true;

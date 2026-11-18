@@ -11,7 +11,7 @@ import org.jd.infestusfrontier.core.mining.Survey;
 
 /**
  * What a marker's preview shows: the steps of its plan not built yet, as boxes relative to the marker. Each step is
- * its root cell, its tread, its clear passage and its light. Drawn from the plan's numbers alone; nothing here reads
+ * its root cells, its tread, its clear passage and its light. Drawn from the plan's numbers alone; nothing here reads
  * the ground, so the preview shows the shape that will be cleared and built, never what lies inside it.
  */
 final class SurveyPreview {
@@ -39,10 +39,10 @@ final class SurveyPreview {
         List<PlanStep> steps = survey.plan().steps();
         List<Box> boxes = new ArrayList<>();
         for (PlanStep step : steps.subList(survey.built(), steps.size())) {
-            boxes.add(new Box(cell(marker, step.root()), Part.ROOT, survey.approved()));
+            for (Offset root : step.roots()) boxes.add(new Box(cell(marker, root), Part.ROOT, survey.approved()));
             step.tread().ifPresent(tread -> boxes.add(new Box(cell(marker, tread), Part.TREAD, survey.approved())));
-            AABB passage = cell(marker, step.passage().get(0))
-                    .minmax(cell(marker, step.passage().get(step.passage().size() - 1)));
+            AABB passage = cell(marker, step.passage().get(0));
+            for (Offset block : step.passage()) passage = passage.minmax(cell(marker, block));
             boxes.add(new Box(passage, Part.PASSAGE, survey.approved()));
             step.light()
                     .ifPresent(light -> boxes.add(

@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/mining_gallery",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:structure_grower"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.shared_faces.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.shared_faces.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "shared": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:shared_faces"
+      }
+    }
+  }
+}

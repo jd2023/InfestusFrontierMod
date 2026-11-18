@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/staircase_landing",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:tunnel_root"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.mining_gallery.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.mining_gallery.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "stepped": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:gallery_step"
+      }
+    }
+  }
+}

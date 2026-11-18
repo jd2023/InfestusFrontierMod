@@ -138,6 +138,15 @@ public final class MiningModule {
     /** The work it is credited with when the step built is its section's landing. */
     public static final ResourceLocation ROOTSTOCK_LANDING =
             ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "rootstock_landing");
+    /** The work a Rootstock is credited with for each step a face of its galleries builds. */
+    public static final ResourceLocation GALLERY_STEP =
+            ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "gallery_step");
+    /** The work it is credited with when that step is one of the Wider Section. */
+    public static final ResourceLocation WIDE_GALLERY_STEP =
+            ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "wide_gallery_step");
+    /** The work it is credited with when it looks and finds two or more of its gallery faces ready to cut. */
+    public static final ResourceLocation SHARED_FACES =
+            ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "shared_faces");
 
     /** Constructs a hand stack holds at most. */
     static final int CONSTRUCT_STACK = 16;

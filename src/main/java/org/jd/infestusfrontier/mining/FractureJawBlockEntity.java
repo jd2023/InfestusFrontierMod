@@ -31,9 +31,10 @@ import org.jd.infestusfrontier.storage.api.BiomassHandler;
 
 /**
  * The work of a Fracture Jaw. Every {@value Fracturing#CUT_TICKS} loaded ticks it tries one cut: the block in front of
- * it, or, when a Descending Rootstock stands in front, the block that Rootstock orders, at a stone pickaxe's grade,
- * rolled once in its ordinary loot into the Work Bed behind it, for {@value Fracturing#CUT_BIOMASS_BU} BU. It never
- * moves; it looks beyond the block in front only at a Rootstock's order. Everything a cut
+ * it, or, when a Descending Rootstock stands in front, the block that Rootstock orders, or, when the Structure Grower of
+ * a gallery face stands in front, the block that face's minehead orders; at a stone pickaxe's grade, rolled once in
+ * its ordinary loot into the Work Bed behind it, for {@value Fracturing#CUT_BIOMASS_BU} BU. It never moves; it looks
+ * beyond the block in front only at a minehead's order. Everything a cut
  * reads and changes is judged first, so a cut is done whole in one tick or not at all; a stopped jaw keeps its cut
  * due, names the reason and looks again after {@value Fracturing#RETRY_TICKS} ticks, or at once when biomass arrives.
  * The jaws of a dimension share {@value Fracturing#CUTS_PER_TICK} cuts a tick. Biomass reaches it by bucket, pipe or
@@ -151,7 +152,7 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
 
     /**
      * The block the jaw at {@code pos} is to cut into the bed at {@code back} now: {@code front}, or the block the
-     * Rootstock standing there orders; or why it cannot cut. Reads loaded positions only and changes nothing.
+     * Rootstock or gallery face standing there orders; or why it cannot cut. Reads loaded positions only and changes nothing.
      */
     private Outcome<BlockPos> judge(ServerLevel level, BlockPos pos, BlockPos front, BlockPos back) {
         if (!Organs.hasFoundation(level, pos)) return Outcome.refused(Fracturing.UNROOTED);
@@ -160,9 +161,11 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
             return Outcome.refused(Fracturing.NO_BED);
         if (!tank.stored().atLeast(Biomass.of(Fracturing.CUT_BIOMASS_BU)))
             return Outcome.refused(Fracturing.NO_BIOMASS);
-        Outcome<BlockPos> target = level.getBlockEntity(front) instanceof TunnelRootBlockEntity head && head.rootstock()
-                ? head.order(level)
-                : Outcome.done(front);
+        BlockEntity ahead = level.getBlockEntity(front);
+        Outcome<BlockPos> target;
+        if (ahead instanceof TunnelRootBlockEntity head && head.rootstock()) target = head.order(level);
+        else if (ahead instanceof StructureGrowerBlockEntity grower) target = grower.order(level);
+        else target = Outcome.done(front);
         if (!(target instanceof Outcome.Done<BlockPos>(BlockPos cut))) return target;
         if (!Cutting.loaded(level, cut, CUT_REACH)) return Outcome.refused(Fracturing.UNLOADED);
         Optional<Refusal> verdict = switch (Cutting.judge(level, cut)) {

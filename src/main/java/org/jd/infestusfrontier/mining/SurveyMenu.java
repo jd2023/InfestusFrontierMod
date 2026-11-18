@@ -19,7 +19,8 @@ import org.jd.infestusfrontier.core.mining.Turn;
 import org.jd.infestusfrontier.foundation.menu.OrganMenu;
 
 /**
- * The Surveyed Tissue screen's server half. It holds no slots of its own: as synced ints it shows the plan's numbers,
+ * The Surveyed Tissue screen's server half. It holds no slots of its own: as synced ints it shows the plan's numbers
+ * and width,
  * whether it is approved, how many steps are built and which way the marker faces. Button {@code n} below
  * {@link #EDITS} asks for edit {@code n}; the next {@link #EDITS} ask for the same edits by a long stride; then
  * {@link #APPROVE}. The marker checks and applies each.
@@ -42,7 +43,8 @@ public final class SurveyMenu extends OrganMenu {
     /** 1 while the marker's saved state is readable. */
     private static final int READABLE = 10;
 
-    private static final int SYNCED = 11;
+    private static final int WIDE = 11;
+    private static final int SYNCED = 12;
 
     private final Optional<SurveyedTissueBlockEntity> marker;
 
@@ -81,6 +83,7 @@ public final class SurveyMenu extends OrganMenu {
         reads[BUILT] = () -> marker.survey().map(Survey::built).orElse(0);
         reads[FACING] = () -> marker.facing().get2DDataValue();
         reads[READABLE] = () -> marker.survey().isPresent() ? 1 : 0;
+        reads[WIDE] = () -> plan(marker).wide() ? 1 : 0;
         return reads;
     }
 
@@ -127,7 +130,8 @@ public final class SurveyMenu extends OrganMenu {
                             synced(LENGTH),
                             new Turn(first.get(), synced(FIRST_AT)),
                             new Turn(second.get(), synced(SECOND_AT)),
-                            synced(LIT) == 1),
+                            synced(LIT) == 1,
+                            synced(WIDE) == 1),
                     synced(APPROVED) == 1,
                     synced(BUILT)));
         } catch (IllegalArgumentException partlySynced) {

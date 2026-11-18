@@ -20,7 +20,9 @@ import org.jd.infestusfrontier.ui.Sheet;
  * The head's screen: the segment well and the steering button on the first row, the output wells on the second, then
  * a line for what the head is doing (or why it stopped), a line for the length of its root and a line naming its
  * mutations. The tank shows its biomass. A Rootstock working as a minehead shows instead the step its section is at,
- * or which part holds it up with the full reason in the tooltip, and the steps it has advanced.
+ * or which part holds it up with the full reason in the tooltip, and the steps it has advanced; with galleries, a
+ * line in place of the mutations counts its faces at work and paused, its tooltip naming each face's step or what
+ * holds it up, and the mutations move to a fourth line.
  */
 final class TunnelRootScreen extends OrganScreen<TunnelRootMenu> {
     private static final String KEY = "gui.infestusfrontier.tunnel_root.";
@@ -69,9 +71,46 @@ final class TunnelRootScreen extends OrganScreen<TunnelRootMenu> {
                 Sheet.FIRST_PART_X,
                 STATUS_Y + 2 * LINE,
                 width,
-                this::mutations,
+                () -> galleries() ? faces() : mutations(),
+                () -> galleries() ? faceStory() : Component.translatable(KEY + "mutations.story")));
+        add(new Tally(
+                Sheet.FIRST_PART_X,
+                STATUS_Y + 3 * LINE,
+                width,
+                () -> galleries() ? mutations() : Component.empty(),
                 () -> Component.translatable(KEY + "mutations.story")));
         label();
+    }
+
+    /** True for a minehead with gallery faces: its third line counts them and its fourth names its mutations. */
+    private boolean galleries() {
+        return menu.minehead() && !menu.faces().isEmpty();
+    }
+
+    /** "Faces: 2 at work, 1 paused". */
+    private Component faces() {
+        List<TunnelRootMenu.Face> faces = menu.faces();
+        long paused = faces.stream().filter(face -> face.stop().isPresent()).count();
+        return Component.translatable(KEY + "faces", faces.size() - paused, paused);
+    }
+
+    /** One line per face: its width and step, or the part that holds it up and why. */
+    private Component faceStory() {
+        MutableComponent story = Component.translatable(KEY + "faces.story");
+        List<TunnelRootMenu.Face> faces = menu.faces();
+        for (int n = 0; n < faces.size(); n++) {
+            TunnelRootMenu.Face face = faces.get(n);
+            Component width = Component.translatable(KEY + (face.wide() ? "face.wide" : "face.narrow"));
+            Component state = face.stop()
+                    .<Component>map(stop -> Component.translatable(
+                            KEY + "face.paused",
+                            Component.translatable(KEY + "part." + owner(stop)),
+                            Component.translatable("infestusfrontier.refusal." + stop.key())))
+                    .orElseGet(() -> Component.translatable(
+                            KEY + "face.working", Math.min(face.built() + 1, face.steps()), face.steps()));
+            story.append("\n").append(Component.translatable(KEY + "face", n + 1, width, state));
+        }
+        return story;
     }
 
     /** What the head is doing or why it stopped; for a minehead, its section's step or the part that holds it up. */
@@ -80,8 +119,11 @@ final class TunnelRootScreen extends OrganScreen<TunnelRootMenu> {
             return menu.stop()
                     .map(stop ->
                             Component.translatable(KEY + "paused", Component.translatable(KEY + "part." + owner(stop))))
-                    .orElseGet(() -> Component.translatable(
-                            KEY + "mining", Math.min(menu.built() + 1, menu.steps()), menu.steps()));
+                    .orElseGet(() -> menu.faces().isEmpty()
+                            ? Component.translatable(
+                                    KEY + "mining", Math.min(menu.built() + 1, menu.steps()), menu.steps())
+                            : Component.translatable(
+                                    KEY + "galleries", menu.faces().size()));
         return menu.stop()
                 .map(stop -> Component.translatable(
                         KEY + "stopped", Component.translatable(KEY + "stop." + condition(stop))))

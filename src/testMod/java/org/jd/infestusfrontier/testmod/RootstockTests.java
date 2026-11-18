@@ -656,8 +656,8 @@ public final class RootstockTests {
         PlanStep first = site.plan().steps().get(0);
         BlockPos top = site.plan(Rootstocking.cutOrder(first).get(0));
         BlockPos beside = site.plan(first.tread().orElseThrow()).east();
-        BlockPos over = site.plan(Rootstocking.overhead(first));
-        BlockPos ground = site.plan(Rootstocking.ground(first));
+        BlockPos over = site.plan(Rootstocking.overheads(first).get(0));
+        BlockPos ground = site.plan(Rootstocking.grounds(first).get(0));
         Player player = EcologyTests.holding(h, net.minecraft.world.level.GameType.SURVIVAL, Items.AIR, 0);
         site.level.setBlockAndUpdate(beside, Blocks.WATER.defaultBlockState());
         h.startSequence()

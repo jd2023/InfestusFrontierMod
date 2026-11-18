@@ -21,7 +21,7 @@ import org.jd.infestusfrontier.ui.Sheet;
 
 /**
  * The marker's screen: four rows of buttons that shape the draft (shape and length, the first turn, the second turn,
- * lights and approval), then lines for the plan, where it ends, what it needs and how far it is built. Shift asks for a
+ * lights, approval and a route's width), then lines for the plan, where it ends, what it needs and how far it is built. Shift asks for a
  * long stride. The plan itself is drawn in the world, from the marker. Nothing is decided here.
  */
 final class SurveyScreen extends OrganScreen<SurveyMenu> {
@@ -55,11 +55,12 @@ final class SurveyScreen extends OrganScreen<SurveyMenu> {
             {PlanEdit.SHAPE, PlanEdit.SHORTER, PlanEdit.LONGER},
             {PlanEdit.FIRST_WAY, PlanEdit.FIRST_EARLIER, PlanEdit.FIRST_LATER},
             {PlanEdit.SECOND_WAY, PlanEdit.SECOND_EARLIER, PlanEdit.SECOND_LATER},
-            {PlanEdit.LIGHTS}
+            {PlanEdit.LIGHTS, null, PlanEdit.WIDTH}
         };
         for (int r = 0; r < rows.length; r++)
             for (int c = 0; c < rows[r].length; c++) {
                 PlanEdit edit = rows[r][c];
+                if (edit == null) continue; // the approve button's place
                 Button button = button(
                         Sheet.LEFT_X + c * COLUMN_PITCH,
                         ROW_Y + r * ROW_PITCH,
@@ -123,9 +124,10 @@ final class SurveyScreen extends OrganScreen<SurveyMenu> {
                 turns.add(
                         Component.translatable(KEY + "turn." + turn.way().name().toLowerCase(Locale.ROOT), turn.at())
                                 .getString());
+        String route = plan.wide() ? "wide_route" : "route";
         return turns.isEmpty()
-                ? Component.translatable(KEY + "route", plan.length())
-                : Component.translatable(KEY + "route.turns", plan.length(), String.join(", ", turns));
+                ? Component.translatable(KEY + route, plan.length())
+                : Component.translatable(KEY + route + ".turns", plan.length(), String.join(", ", turns));
     }
 
     private static Component status(Survey survey) {
@@ -170,6 +172,7 @@ final class SurveyScreen extends OrganScreen<SurveyMenu> {
             case FIRST_WAY -> Component.translatable(KEY + "first." + way(plan.first()));
             case SECOND_WAY -> Component.translatable(KEY + "second." + way(plan.second()));
             case LIGHTS -> Component.translatable(KEY + (plan.lit() ? "lit" : "unlit"));
+            case WIDTH -> Component.translatable(KEY + (plan.wide() ? "wide" : "narrow"));
             default -> Component.translatable(KEY + "edit." + name(edit));
         };
     }

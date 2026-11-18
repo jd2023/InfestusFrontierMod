@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/wider_section",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:wider_section_construct"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.wide_gallery.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.wide_gallery.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "widened": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:wide_gallery_step"
+      }
+    }
+  }
+}

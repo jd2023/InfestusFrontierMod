@@ -19,6 +19,8 @@ public final class Surveying {
     public static final int STAIR_HEADROOM = 3;
     /** Clear blocks over each root cell of a level route, as in a Tunnel Root's tunnel. */
     public static final int ROUTE_HEADROOM = 2;
+    /** Clear blocks over each root cell of a wide route: the Wider Section is three across and three high. */
+    public static final int WIDE_HEADROOM = 3;
     /** A lit plan puts a light on every step whose number is a multiple of this. */
     public static final int LIGHT_SPACING = 8;
     /** How far one long press of a length or turn button moves it. */

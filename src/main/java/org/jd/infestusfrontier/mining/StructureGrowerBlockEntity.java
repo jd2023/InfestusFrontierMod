@@ -35,8 +35,11 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.core.mining.Fracturing;
 import org.jd.infestusfrontier.core.mining.GrowerProgress;
+import org.jd.infestusfrontier.core.mining.Offset;
 import org.jd.infestusfrontier.core.mining.PlanStep;
+import org.jd.infestusfrontier.core.mining.Rootstocking;
 import org.jd.infestusfrontier.core.mining.Survey;
 import org.jd.infestusfrontier.core.mining.Surveying;
 import org.jd.infestusfrontier.foundation.Persistence;
@@ -55,7 +58,9 @@ import org.jd.infestusfrontier.organ.api.Stewarded;
  * or at once when its stock changes. It never cuts, never collects and never touches a built step again, so whatever
  * the player does there stays. The growers of a dimension share {@value Surveying#STEPS_PER_TICK} steps a tick. Stock
  * arrives by hand, at its screen, or through its item handler, which only takes. It loads no chunk. In a Descending
- * Rootstock's minehead it builds just the same, and tells the Rootstock behind it of each step it built.
+ * Rootstock's minehead it builds just the same, and tells the Rootstock behind it of each step it built. On a gallery
+ * face it builds a wide step's three root cells together, for a segment each, and tells the minehead that last named
+ * it one of its faces; jaws facing it ask that minehead, through {@link #order}, which block to cut.
  */
 final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded, MenuProvider {
     /** Blocks around each block a step reads or changes whose chunks must be loaded: its neighbours, which it updates. */
@@ -72,6 +77,16 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
     private Optional<Refusal> stop = Optional.empty();
     /** Loaded ticks before a stopped grower looks again. */
     private int retry;
+    /**
+     * The Rootstock whose gallery face this grower is, as that minehead last said; not saved, it says so again within
+     * {@value Rootstocking#CHECK_TICKS} loaded ticks. Older than {@link #COMMISSION_TICKS} it no longer counts.
+     */
+    private Optional<BlockPos> minehead = Optional.empty();
+    /** The game time the minehead last said so. */
+    private long commissioned;
+
+    /** Game ticks a minehead's word that this grower is one of its faces holds. */
+    private static final int COMMISSION_TICKS = 2 * Rootstocking.CHECK_TICKS;
 
     StructureGrowerBlockEntity(BlockPos pos, BlockState state) {
         super(MiningModule.STRUCTURE_GROWER_ENTITY.get(), pos, state);
@@ -152,6 +167,34 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
         return level != null && level.getBlockEntity(worldPosition.below()) instanceof SurveyedTissueBlockEntity marker
                 ? Optional.of(marker)
                 : Optional.empty();
+    }
+
+    // ---- a gallery face ----
+
+    /** The minehead at {@code head} found this grower on one of its gallery faces at game time {@code now}. */
+    void commission(BlockPos head, long now) {
+        minehead = Optional.of(head);
+        commissioned = now;
+    }
+
+    /** The Rootstock whose gallery face this grower is, while its word is fresh and it stands loaded and readable. */
+    private Optional<TunnelRootBlockEntity> minehead(ServerLevel level) {
+        if (minehead.isEmpty() || level.getGameTime() - commissioned > COMMISSION_TICKS) return Optional.empty();
+        BlockPos head = minehead.get();
+        return level.hasChunkAt(head)
+                        && level.getBlockEntity(head) instanceof TunnelRootBlockEntity rootstock
+                        && rootstock.rootstock()
+                ? Optional.of(rootstock)
+                : Optional.empty();
+    }
+
+    /**
+     * The block a jaw facing this grower is to cut now: the one its minehead orders for this face, or
+     * {@link Fracturing#NO_ORDER} when no minehead orders one.
+     */
+    Outcome<BlockPos> order(ServerLevel level) {
+        Optional<TunnelRootBlockEntity> head = minehead(level);
+        return head.isPresent() ? head.get().orderFace(level, worldPosition) : Outcome.refused(Fracturing.NO_ORDER);
     }
 
     /** The stock changed: a stopped grower looks again on its next tick. */
@@ -239,8 +282,11 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
         grower.tryGrow(server);
     }
 
-    /** A step judged buildable: the marker, and where each of its blocks goes and what goes there, bottom up. */
-    private record Build(SurveyedTissueBlockEntity marker, List<Placement> placements) {}
+    /**
+     * A step judged buildable: the marker, where each of its blocks goes and what goes there, bottom up, the segments
+     * its root cells take and whether it is a step of the Wider Section.
+     */
+    private record Build(SurveyedTissueBlockEntity marker, List<Placement> placements, int segments, boolean wide) {}
 
     private record Placement(BlockPos pos, BlockState state) {}
 
@@ -267,21 +313,25 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
      * ground is judged first, then whether a creature stands in the way, then the stock, then the wall for a light.
      */
     private Outcome<Build> judge(ServerLevel level, SurveyedTissueBlockEntity marker, PlanStep step) {
-        BlockPos root = marker.at(step.root());
+        List<BlockPos> roots = step.roots().stream().map(marker::at).toList();
         List<BlockPos> cleared = step.cleared().stream().map(marker::at).toList();
         for (BlockPos cell : cleared)
             if (!Cutting.loaded(level, cell, REACH)) return Outcome.refused(Surveying.UNLOADED);
-        if (!Cutting.loaded(level, root.below(), REACH)) return Outcome.refused(Surveying.UNLOADED);
+        for (BlockPos root : roots)
+            if (!Cutting.loaded(level, root.below(), REACH)) return Outcome.refused(Surveying.UNLOADED);
         for (BlockPos cell : cleared) if (!level.getFluidState(cell).isEmpty()) return Outcome.refused(Surveying.FLUID);
         for (BlockPos cell : cleared)
             if (!level.getBlockState(cell).isAir()) return Outcome.refused(Surveying.NOT_CLEAR);
-        if (!level.getBlockState(root.below()).isFaceSturdy(level, root.below(), Direction.UP))
-            return Outcome.refused(Surveying.NO_GROUND);
+        for (BlockPos root : roots)
+            if (!level.getBlockState(root.below()).isFaceSturdy(level, root.below(), Direction.UP))
+                return Outcome.refused(Surveying.NO_GROUND);
         Optional<BlockPos> treadAt = step.tread().map(marker::at);
-        for (BlockPos solid : treadAt.isPresent() ? List.of(root, treadAt.get()) : List.of(root))
+        List<BlockPos> solids = new ArrayList<>(roots);
+        treadAt.ifPresent(solids::add);
+        for (BlockPos solid : solids)
             if (!level.isUnobstructed(null, Shapes.block().move(solid.getX(), solid.getY(), solid.getZ())))
                 return Outcome.refused(Surveying.CREATURE);
-        if (segments.getStackInSlot(0).isEmpty()) return Outcome.refused(Surveying.NO_SEGMENT);
+        if (segments.getStackInSlot(0).getCount() < roots.size()) return Outcome.refused(Surveying.NO_SEGMENT);
         if (treadAt.isPresent() && treads.getStackInSlot(0).isEmpty()) return Outcome.refused(Surveying.NO_TREAD);
         if (step.light().isPresent() && lights.getStackInSlot(0).isEmpty()) return Outcome.refused(Surveying.NO_LIGHT);
 
@@ -290,7 +340,9 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
         Direction leaving = heading(forward, step.leaving());
         List<Placement> placements = new ArrayList<>();
         placements.add(new Placement(
-                root, step.bend() ? RootCellBlock.bend(arrived, leaving) : RootCellBlock.straight(leaving)));
+                roots.get(0), step.bend() ? RootCellBlock.bend(arrived, leaving) : RootCellBlock.straight(leaving)));
+        for (Offset flank : step.flanks())
+            placements.add(new Placement(marker.at(flank), RootCellBlock.straight(leaving)));
         if (treadAt.isPresent()) {
             BlockState tread = ((BlockItem) treads.getStackInSlot(0).getItem())
                     .getBlock()
@@ -304,11 +356,12 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
             if (light.isEmpty()) return Outcome.refused(Surveying.NO_WALL);
             placements.add(light.get());
         }
-        return Outcome.done(new Build(marker, placements));
+        return Outcome.done(
+                new Build(marker, placements, roots.size(), !step.flanks().isEmpty()));
     }
 
     /** The way {@code quarters} quarter turns clockwise of {@code forward}. */
-    private static Direction heading(Direction forward, int quarters) {
+    static Direction heading(Direction forward, int quarters) {
         Direction way = forward;
         for (int n = 0; n < quarters; n++) way = way.getClockWise();
         return way;
@@ -332,13 +385,17 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
         }
         boolean treaded = build.placements().stream().anyMatch(p -> p.state().getBlock() instanceof StairBlock);
         boolean lit = build.placements().stream().anyMatch(p -> p.state().is(Blocks.WALL_TORCH));
-        segments.extractItem(0, 1, false);
+        segments.extractItem(0, build.segments(), false);
         if (treaded) treads.extractItem(0, 1, false);
         if (lit) lights.extractItem(0, 1, false);
         build.marker().grown();
-        Minehead.rootstockOf(level, build.marker())
-                .ifPresent(head -> head.advanced(
-                        level, build.marker().survey().map(Survey::finished).orElse(false)));
+        Optional<TunnelRootBlockEntity> staircase = Minehead.rootstockOf(level, build.marker());
+        if (staircase.isPresent())
+            staircase
+                    .get()
+                    .advanced(
+                            level, build.marker().survey().map(Survey::finished).orElse(false));
+        else minehead(level).ifPresent(head -> head.galleryAdvanced(level, build.wide()));
         progress = progress.grown();
         stop = Optional.empty();
         setChanged();
