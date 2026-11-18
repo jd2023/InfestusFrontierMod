@@ -119,6 +119,9 @@ final class CaptureClient {
     private int actionsSent;
 
     private int nextActionTick;
+    /** The container id the sent actions went to, -1 before the first. */
+    private int actionMenu = -1;
+
     private boolean triggered;
     /** The view's block use has opened its container screen; it is never sent again after that. */
     private boolean useAnswered;
@@ -411,10 +414,18 @@ final class CaptureClient {
         if (!view.press().isEmpty() || !view.quickMove().isEmpty()) {
             if (!(minecraft.screen instanceof AbstractContainerScreen<?> screen)) return;
             if (ticksInStage < ACTION_START_TICKS) return;
+            int menu = screen.getMenu().containerId;
+            // A use sent again before the first one's screen arrived can open a second menu. The server answers every
+            // use before any action, which follows the first screen, so it closed the menu those actions named and
+            // ignored them: send them again to this one, after it settles.
+            if (actionsSent > 0 && menu != actionMenu) {
+                LOGGER.info("INFESTUS_CAPTURE_REOPENED menu={} after actions to menu={}", menu, actionMenu);
+                actionsSent = 0;
+                nextActionTick = ticksInStage + ACTION_START_TICKS;
+            }
             int total = view.press().size() + view.quickMove().size();
             if (actionsSent < total) {
                 if (ticksInStage < nextActionTick) return;
-                int menu = screen.getMenu().containerId;
                 if (actionsSent < view.press().size())
                     minecraft.gameMode.handleInventoryButtonClick(
                             menu, view.press().get(actionsSent));
@@ -426,6 +437,7 @@ final class CaptureClient {
                             ClickType.QUICK_MOVE,
                             minecraft.player);
                 actionsSent++;
+                actionMenu = menu;
                 nextActionTick = ticksInStage + ACTION_GAP_TICKS;
                 return;
             }
@@ -563,6 +575,7 @@ final class CaptureClient {
         buttonMenu = -1;
         actionsSent = 0;
         nextActionTick = 0;
+        actionMenu = -1;
         if (minecraft.screen instanceof AbstractContainerScreen<?> && minecraft.player != null)
             minecraft.player.closeContainer();
         else if (minecraft.screen != null) minecraft.setScreen(null);
@@ -592,7 +605,7 @@ final class CaptureClient {
 
     private void stop(Minecraft minecraft) throws IOException {
         if (minecraft.level != null || minecraft.player != null || !(minecraft.screen instanceof TitleScreen)) return;
-        writeReport(null);
+        writeReport(outputDir, report, null);
         LOGGER.info("INFESTUS_CAPTURE_DONE captures={}", report.size());
         enter(Stage.DONE);
         minecraft.stop();
@@ -601,7 +614,7 @@ final class CaptureClient {
     private void fail(Minecraft minecraft, Exception e) {
         LOGGER.error("INFESTUS_CAPTURE_FAILURE stage={}", stage, e);
         try {
-            writeReport(stage + ": " + e);
+            writeReport(outputDir, report, stage + ": " + e);
         } catch (IOException io) {
             LOGGER.error("INFESTUS_CAPTURE_FAILURE report", io);
         }
@@ -609,10 +622,11 @@ final class CaptureClient {
         minecraft.stop();
     }
 
-    private void writeReport(String failure) throws IOException {
+    /** The run's {@code report.json}: the captures taken and, when the run failed, why. */
+    static void writeReport(Path outputDir, JsonArray captures, String failure) throws IOException {
         Files.createDirectories(outputDir);
         JsonObject root = new JsonObject();
-        root.add("captures", report);
+        root.add("captures", captures);
         if (failure != null) root.addProperty("failure", failure);
         Files.writeString(outputDir.resolve("report.json"), root.toString(), StandardCharsets.UTF_8);
     }

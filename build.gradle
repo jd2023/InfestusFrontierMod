@@ -51,6 +51,7 @@ def captureRun = gradle.sharedServices.registerIfAbsent('captureRun', CaptureRun
 // The negative fixture lives outside captureScenarioDir, so no capture run photographs it or discovers it.
 def captureNegativeDir = layout.projectDirectory.dir('src/testMod/resources/captures_negative')
 def captureNegativeOutput = layout.buildDirectory.dir('captures-negative')
+def captureLoadFailureOutput = layout.buildDirectory.dir('captures-load-failure')
 
 // Optional runtime mods for manual play: ./gradlew runClient -PwithJei -PwithCurios
 def withJei = providers.gradleProperty('withJei').isPresent()
@@ -150,6 +151,17 @@ neoForge {
             systemProperty 'infestusfrontier.capture.dir', captureNegativeOutput.get().asFile.absolutePath // root; prepareCaptureNegative names the run
             systemProperty 'infestusfrontier.capture.folder', 'captures_negative'
             systemProperty 'infestusfrontier.capture.scenarios', 'unloaded_position'
+            jvmArgument '-Xmx3G'
+        }
+        // Disposable client whose only scenario has more views than Scenario.MAX_VIEWS, so mod loading fails.
+        captureLoadFailure {
+            client()
+            sourceSet = sourceSets.testMod
+            gameDirectory = project.file('runs/capture-load-failure')
+            loadedMods = [mods.infestusfrontier, mods.infestusfrontier_tests]
+            systemProperty 'infestusfrontier.capture.dir', captureLoadFailureOutput.get().asFile.absolutePath // root; prepareCaptureLoadFailure names the run
+            systemProperty 'infestusfrontier.capture.folder', 'captures_negative'
+            systemProperty 'infestusfrontier.capture.scenarios', 'too_many_views'
             jvmArgument '-Xmx3G'
         }
         // Playable client in a fresh world built from the capture scenario src/testMod/resources/captures/demo.json.
@@ -465,6 +477,7 @@ def registerPrepare = { String taskName, String runName, Provider<Directory> out
 }
 def prepareCapture = registerPrepare('prepareCapture', 'capture', captureOutput)
 def prepareCaptureNegative = registerPrepare('prepareCaptureNegative', 'capture-negative', captureNegativeOutput)
+def prepareCaptureLoadFailure = registerPrepare('prepareCaptureLoadFailure', 'capture-load-failure', captureLoadFailureOutput)
 tasks.named('runCapture') {
     dependsOn prepareCapture
     mustRunAfter tasks.named('runGameTestServer')
@@ -477,6 +490,13 @@ tasks.named('runCaptureNegative') {
     mustRunAfter tasks.named('runCapture')
     outputs.upToDateWhen { false }
     timeout = java.time.Duration.ofMinutes(50)
+}
+tasks.named('runCaptureLoadFailure') {
+    dependsOn prepareCaptureLoadFailure
+    mustRunAfter tasks.named('runCaptureNegative')
+    outputs.upToDateWhen { false }
+    // The client only starts and loads mods. A client that waits on the loading error screen fails here.
+    timeout = java.time.Duration.ofMinutes(20)
 }
 // Fresh demo world each run. The client options are seeded once and then left to the owner.
 def prepareDemo = tasks.register('prepareDemo') {
@@ -533,5 +553,28 @@ tasks.register('verifyCaptureFailure') {
             throw new GradleException("The negative capture failed for another reason: ${parsed.failure}")
         if (parsed.captures) throw new GradleException('The negative capture photographed a view after its failure')
         println "Negative capture failed as required: ${parsed.failure} (report ${reportFile})"
+    }
+}
+
+// The gate's proof that a scenario which fails to load ends the capture client: NeoForge shows its loading error screen,
+// and the client must still write a report naming the scenario error and exit instead of waiting for a person.
+tasks.register('verifyCaptureLoadFailure') {
+    group = 'verification'
+    description = 'Checks that a capture scenario over the view limit fails the capture client during mod loading.'
+    dependsOn tasks.named('runCaptureLoadFailure')
+    def root = captureLoadFailureOutput.get().asFile
+    usesService(captureRun)
+    inputs.file(captureNegativeDir.file('too_many_views.json'))
+    outputs.upToDateWhen { false }
+    doLast {
+        File reportFile = new File(new File(root, captureRun.get().id), 'report.json')
+        if (!reportFile.file) throw new GradleException("The load-failure capture wrote no report at ${reportFile}")
+        def parsed = new groovy.json.JsonSlurper().parse(reportFile)
+        if (!parsed.failure)
+            throw new GradleException('The load-failure capture did not fail: a scenario over the view limit loaded')
+        if (!parsed.failure.startsWith('LOADING: ') || !parsed.failure.contains('a scenario has 1 to '))
+            throw new GradleException("The load-failure capture failed for another reason: ${parsed.failure}")
+        if (parsed.captures) throw new GradleException('The load-failure capture photographed a view')
+        println "Load-failure capture failed as required: ${parsed.failure} (report ${reportFile})"
     }
 }

@@ -21,8 +21,12 @@ public final class TestClient {
             if (captureDir != null) {
                 // The build names this run's directory in capture-run.txt, so no run reuses another's output.
                 Path runName = FMLPaths.GAMEDIR.get().resolve("capture-run.txt");
+                Path outputDir =
+                        Path.of(captureDir).resolve(Files.readString(runName).trim());
+                // From here on a failed mod load ends the run with a report instead of waiting on the error screen.
+                LoadingFailureWatch.start(outputDir);
                 new CaptureClient(
-                        Path.of(captureDir).resolve(Files.readString(runName).trim()),
+                        outputDir,
                         Scenario.loadAll(
                                 System.getProperty("infestusfrontier.capture.folder", "captures"),
                                 System.getProperty("infestusfrontier.capture.scenarios", "")));
