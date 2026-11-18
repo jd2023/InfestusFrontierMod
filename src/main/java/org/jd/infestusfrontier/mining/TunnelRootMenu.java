@@ -3,6 +3,7 @@ package org.jd.infestusfrontier.mining;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.IntSupplier;
+import java.util.stream.Stream;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,17 +15,22 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.core.mining.Fracturing;
 import org.jd.infestusfrontier.core.mining.RootMutation;
 import org.jd.infestusfrontier.core.mining.RootMutations;
+import org.jd.infestusfrontier.core.mining.Rootstocking;
 import org.jd.infestusfrontier.core.mining.Steer;
+import org.jd.infestusfrontier.core.mining.Surveying;
 import org.jd.infestusfrontier.core.mining.Tunnelling;
 import org.jd.infestusfrontier.foundation.menu.OrganMenu;
 import org.jd.infestusfrontier.ui.Sheet;
 
 /**
  * The Tunnel Root screen's server half: the segment slot, the four take-only output slots, and as synced ints the
- * biomass, the steering, the cells laid, the stop, the seconds to the next step and the installed mutations. Buttons 0, 1 and 2 steer the next
- * step straight, left and right; the block entity checks and applies the choice.
+ * biomass, the steering, the cells laid, the stop, the seconds to the next step and the installed mutations; for a
+ * Rootstock working as a minehead also that it is one, the steps it has advanced and its section's built and planned
+ * steps. Buttons 0, 1 and 2 steer the next step straight, left and right; the block entity checks and applies the
+ * choice.
  */
 public final class TunnelRootMenu extends OrganMenu {
     public static final int STRAIGHT_BUTTON = 0;
@@ -41,8 +47,26 @@ public final class TunnelRootMenu extends OrganMenu {
     private static final int STOP = 4;
     private static final int SECONDS = 5;
     private static final int MUTATIONS = 6;
-    private static final int SYNCED = 7;
+    private static final int MINEHEAD = 7;
+    private static final int DESCENDED = 8;
+    private static final int BUILT = 9;
+    private static final int STEPS = 10;
+    private static final int SYNCED = 11;
     private static final int TICKS_PER_SECOND = 20;
+
+    /**
+     * Every stop the head names, in a fixed order: a Tunnel Root's, then a minehead's own and those of the organs it
+     * shows. The menu sends one by its index.
+     */
+    public static final List<Refusal> STOPS = Stream.of(
+                    Tunnelling.STOPS,
+                    Rootstocking.STOPS,
+                    Fracturing.STOPS,
+                    Surveying.STOPS,
+                    WorkOrganMenu.Kind.CILIA.stops)
+            .flatMap(List::stream)
+            .distinct()
+            .toList();
 
     private final Optional<TunnelRootBlockEntity> head;
 
@@ -95,10 +119,13 @@ public final class TunnelRootMenu extends OrganMenu {
         reads[CAPACITY] = () -> head.tank().capacity().units();
         reads[STEER] = () -> head.steer().ordinal();
         reads[CELLS] = () -> head.progress().cells();
-        reads[STOP] = () ->
-                head.stop().map(stop -> Tunnelling.STOPS.indexOf(stop) + 1).orElse(0);
+        reads[STOP] = () -> head.stop().map(stop -> STOPS.indexOf(stop) + 1).orElse(0);
         reads[SECONDS] = () -> (head.progress().ticksLeft() + TICKS_PER_SECOND - 1) / TICKS_PER_SECOND;
         reads[MUTATIONS] = () -> head.mutations().bits();
+        reads[MINEHEAD] = () -> head.minehead() ? 1 : 0;
+        reads[DESCENDED] = head::descended;
+        reads[BUILT] = head::built;
+        reads[STEPS] = head::steps;
         return reads;
     }
 
@@ -132,9 +159,7 @@ public final class TunnelRootMenu extends OrganMenu {
     /** Why the head stopped, as last synced, or empty while it works. */
     public Optional<Refusal> stop() {
         int index = synced(STOP) - 1;
-        return index >= 0 && index < Tunnelling.STOPS.size()
-                ? Optional.of(Tunnelling.STOPS.get(index))
-                : Optional.empty();
+        return index >= 0 && index < STOPS.size() ? Optional.of(STOPS.get(index)) : Optional.empty();
     }
 
     /** The translation key of the reason the head stopped, or empty while it works. */
@@ -145,6 +170,26 @@ public final class TunnelRootMenu extends OrganMenu {
     /** Seconds until the next step is due. */
     public int seconds() {
         return synced(SECONDS);
+    }
+
+    /** True while the head works as a Rootstock's minehead, as last synced. */
+    public boolean minehead() {
+        return synced(MINEHEAD) == 1;
+    }
+
+    /** Staircase steps built under the Rootstock's order: its minehead history. */
+    public int descended() {
+        return synced(DESCENDED);
+    }
+
+    /** Steps of the minehead's section built, as last looked at. */
+    public int built() {
+        return synced(BUILT);
+    }
+
+    /** Steps the minehead's section has in all: its treads and its landing. */
+    public int steps() {
+        return synced(STEPS);
     }
 
     /** The head's mutations, as last synced, in their fixed order. */

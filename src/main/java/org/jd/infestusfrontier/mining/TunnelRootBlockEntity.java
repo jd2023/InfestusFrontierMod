@@ -34,9 +34,13 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.foundation.Refusal;
+import org.jd.infestusfrontier.core.mining.Counts;
+import org.jd.infestusfrontier.core.mining.Fracturing;
 import org.jd.infestusfrontier.core.mining.RootMutation;
 import org.jd.infestusfrontier.core.mining.RootMutations;
+import org.jd.infestusfrontier.core.mining.Rootstocking;
 import org.jd.infestusfrontier.core.mining.Steer;
+import org.jd.infestusfrontier.core.mining.Survey;
 import org.jd.infestusfrontier.core.mining.TunnelProgress;
 import org.jd.infestusfrontier.core.mining.Tunnelling;
 import org.jd.infestusfrontier.core.storage.BiomassTank;
@@ -58,6 +62,12 @@ import org.jd.infestusfrontier.storage.StorageModule;
  * Nothing is fed to it by veins, hoppers or pipes: it has no capability. It loads no chunk. A genetic construct
  * applied by hand gives it a permanent mutation, see {@link #mutate}; a head with Stairs is a Descending Rootstock.
  * Mutations change none of the steps it takes by hand.
+ *
+ * <p>A Rootstock that faces a Surveyed Tissue marker is a minehead ({@link Minehead}) and takes no steps: it stays
+ * where it is, orders its Fracture Jaw's cuts through {@link #order}, counts each staircase step its Structure Grower
+ * builds as its own advance, and every {@value Rootstocking#CHECK_TICKS} loaded ticks looks at its parts and its next
+ * step to name what holds the minehead up. Its segments, output, cells, biomass, mutations and steward stay as they
+ * were; broken and placed again it comes back with them and with its advance.
  *
  * <p>Moving is a new block entity at the cut: this one hands it its whole saved state, steward included, and leaves.
  */
@@ -94,12 +104,21 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
     private TunnelProgress progress = TunnelProgress.START;
     private Steer steer = Steer.STRAIGHT;
     private RootMutations mutations = RootMutations.NONE;
+    /** Staircase steps built under this Rootstock's order: its minehead history. */
+    private int descended;
+
     private Optional<CompoundTag> unreadable = Optional.empty();
     private final Steward steward = new Steward();
     /** Why the last try did not step. Not saved: the next try tells again. */
     private Optional<Refusal> stop = Optional.empty();
     /** Loaded ticks before a stopped head looks again. */
     private int retry;
+    /** True while the head works as a minehead. Not saved: the next tick tells again. */
+    private boolean minehead;
+    /** Steps of the minehead's section built, as last looked at. Not saved: the marker owns them. */
+    private int built;
+    /** Steps the minehead's section has in all, as last looked at. Not saved. */
+    private int steps;
 
     TunnelRootBlockEntity(BlockPos pos, BlockState state) {
         super(MiningModule.TUNNEL_ROOT_ENTITY.get(), pos, state);
@@ -136,6 +155,27 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     RootMutations mutations() {
         return mutations;
+    }
+
+    /** True for a readable head with Stairs: a Descending Rootstock. */
+    boolean rootstock() {
+        return unreadable.isEmpty() && mutations.rootstock();
+    }
+
+    int descended() {
+        return descended;
+    }
+
+    boolean minehead() {
+        return minehead;
+    }
+
+    int built() {
+        return built;
+    }
+
+    int steps() {
+        return steps;
     }
 
     Optional<Refusal> stop() {
@@ -259,6 +299,12 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     static void serverTick(Level level, BlockPos pos, BlockState state, TunnelRootBlockEntity head) {
         if (head.unreadable.isPresent() || !(level instanceof ServerLevel server)) return;
+        Direction facing = state.getValue(TunnelRootBlock.FACING);
+        head.minehead = head.mutations.rootstock() && Minehead.faces(level, pos, facing);
+        if (head.minehead) {
+            head.oversee(server, pos, facing);
+            return;
+        }
         if (!head.progress.due()) {
             head.progress = head.progress.waited();
             head.setChanged();
@@ -269,6 +315,49 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
             return;
         }
         head.tryStep(server, pos, state);
+    }
+
+    // ---- the minehead ----
+
+    /** Every {@value Rootstocking#CHECK_TICKS} loaded ticks, or at once after a change, names what holds it up. */
+    private void oversee(ServerLevel level, BlockPos pos, Direction facing) {
+        if (retry > 0) {
+            retry--;
+            return;
+        }
+        retry = Rootstocking.CHECK_TICKS;
+        stop = Minehead.status(level, pos, facing);
+        Optional<Survey> survey =
+                level.getBlockEntity(Minehead.marker(pos, facing)) instanceof SurveyedTissueBlockEntity marker
+                        ? marker.survey()
+                        : Optional.empty();
+        built = survey.map(Survey::built).orElse(0);
+        steps = survey.map(s -> s.plan().steps().size()).orElse(0);
+    }
+
+    /**
+     * The block the jaw behind this Rootstock is to cut now, or {@link Fracturing#NO_ORDER} when it orders none: it is
+     * no minehead, something holds the minehead up, or the next step is clear and waits for the grower.
+     */
+    Outcome<BlockPos> order(ServerLevel level) {
+        Direction facing = getBlockState().getValue(TunnelRootBlock.FACING);
+        if (!rootstock() || !Minehead.faces(level, worldPosition, facing)) return Outcome.refused(Fracturing.NO_ORDER);
+        if (Minehead.order(level, worldPosition, facing) instanceof Outcome.Done<Minehead.Order>(Minehead.Order now)
+                && now.cut().isPresent()) return Outcome.done(now.cut().get());
+        return Outcome.refused(Fracturing.NO_ORDER);
+    }
+
+    /**
+     * The grower built the next step of this minehead's section: the root advanced one step, once. {@code landed}
+     * when that step was the landing.
+     */
+    void advanced(ServerLevel level, boolean landed) {
+        if (unreadable.isPresent()) return;
+        descended = Counts.more(descended, 1);
+        retry = 0;
+        setChanged();
+        steward.worked(level, MiningModule.ROOTSTOCK_STEP);
+        if (landed) steward.worked(level, MiningModule.ROOTSTOCK_LANDING);
     }
 
     /** The way the next step goes: as steered from where the head faces. */
@@ -321,7 +410,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
     }
 
     /** True while the head stands on its root: a root cell, or the foundation it was grown or placed on. */
-    private static boolean rooted(ServerLevel level, BlockPos pos) {
+    static boolean rooted(ServerLevel level, BlockPos pos) {
         BlockState below = level.getBlockState(pos.below());
         return below.is(MiningModule.ROOT_CELL.get()) || below.is(Organs.FOUNDATIONS);
     }
@@ -382,7 +471,8 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
                 ((Outcome.Done<BiomassTank>) tank.drain(Biomass.of(Tunnelling.STEP_BIOMASS_BU))).value(),
                 progress.stepped(),
                 Steer.STRAIGHT,
-                mutations));
+                mutations,
+                descended));
         stop = Optional.empty();
 
         CompoundTag carried = saveWithoutMetadata(level.registryAccess());
@@ -404,7 +494,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
     TunnelRootContents contents() {
         List<ItemStack> held = new ArrayList<>(Tunnelling.OUTPUT_SLOTS);
         for (int slot = 0; slot < Tunnelling.OUTPUT_SLOTS; slot++) held.add(output.getStackInSlot(slot));
-        return new TunnelRootContents(segments.getStackInSlot(0), held, tank, progress, steer, mutations);
+        return new TunnelRootContents(segments.getStackInSlot(0), held, tank, progress, steer, mutations, descended);
     }
 
     private void restore(TunnelRootContents contents) {
@@ -415,6 +505,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
         progress = contents.progress();
         steer = contents.steer();
         mutations = contents.mutations();
+        descended = contents.descended();
     }
 
     @Override
@@ -470,13 +561,16 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     @Override
     public void removeComponentsFromTag(CompoundTag tag) {
-        for (String key : List.of("segments", "output", "tank", "cells", "ticks", "steer", "mutations"))
+        for (String key : List.of("segments", "output", "tank", "cells", "ticks", "steer", "mutations", "descended"))
             tag.remove(key);
     }
 
+    /** A head with Stairs is titled a Descending Rootstock. */
     @Override
     public Component getDisplayName() {
-        return getBlockState().getBlock().getName();
+        return mutations.rootstock()
+                ? Component.translatable("container.infestusfrontier.descending_rootstock")
+                : getBlockState().getBlock().getName();
     }
 
     @Override

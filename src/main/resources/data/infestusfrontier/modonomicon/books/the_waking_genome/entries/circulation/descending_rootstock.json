@@ -1,0 +1,75 @@
+{
+  "category": "infestusfrontier:circulation",
+  "name": "entry.infestusfrontier.circulation.descending_rootstock.name",
+  "description": "entry.infestusfrontier.circulation.descending_rootstock.description",
+  "icon": "infestusfrontier:tunnel_root",
+  "x": 9,
+  "y": 1,
+  "parents": [
+    {
+      "entry": "infestusfrontier:circulation/surveyed_mine"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:or",
+    "children": [
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/rootstock"
+      },
+      {
+        "type": "modonomicon:advancement",
+        "advancement_id": "infestusfrontier:contact/surveyed_step"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.descending_rootstock.name",
+      "text": "entry.infestusfrontier.circulation.descending_rootstock.use"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.descending_rootstock.assembly",
+      "text": "entry.infestusfrontier.circulation.descending_rootstock.assembly_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.descending_rootstock.supply",
+      "text": "entry.infestusfrontier.circulation.descending_rootstock.supply_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.descending_rootstock.work",
+      "text": "entry.infestusfrontier.circulation.descending_rootstock.work_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.descending_rootstock.stops",
+      "text": "entry.infestusfrontier.circulation.descending_rootstock.stops_text"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.descending_rootstock.recover",
+      "text": "entry.infestusfrontier.circulation.descending_rootstock.recover_text"
+    },
+    {
+      "type": "infestusfrontier:genetic_construct",
+      "recipe_id_1": "infestusfrontier:construct/stairs",
+      "title1": "entry.infestusfrontier.circulation.descending_rootstock.stairs"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:fracture_jaw",
+      "recipe_id_2": "infestusfrontier:collection_cilia",
+      "text": "entry.infestusfrontier.circulation.descending_rootstock.craft_cutting"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:surveyed_tissue",
+      "recipe_id_2": "infestusfrontier:structure_grower",
+      "text": "entry.infestusfrontier.circulation.descending_rootstock.craft_building"
+    }
+  ]
+}

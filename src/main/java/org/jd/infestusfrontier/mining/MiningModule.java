@@ -132,6 +132,13 @@ public final class MiningModule {
     public static final DeferredHolder<MenuType<?>, MenuType<TunnelRootMenu>> TUNNEL_ROOT_MENU =
             MENUS.register("tunnel_root", () -> IMenuTypeExtension.create(TunnelRootMenu::new));
 
+    /** The work a Descending Rootstock is credited with for each staircase step built under its order. */
+    public static final ResourceLocation ROOTSTOCK_STEP =
+            ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "descending_rootstock");
+    /** The work it is credited with when the step built is its section's landing. */
+    public static final ResourceLocation ROOTSTOCK_LANDING =
+            ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "rootstock_landing");
+
     /** Constructs a hand stack holds at most. */
     static final int CONSTRUCT_STACK = 16;
 

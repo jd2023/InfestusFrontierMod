@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/rootstock",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:tunnel_root"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.descending_rootstock.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.descending_rootstock.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "descended": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:descending_rootstock"
+      }
+    }
+  }
+}

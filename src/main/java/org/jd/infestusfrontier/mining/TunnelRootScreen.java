@@ -19,7 +19,8 @@ import org.jd.infestusfrontier.ui.Sheet;
 /**
  * The head's screen: the segment well and the steering button on the first row, the output wells on the second, then
  * a line for what the head is doing (or why it stopped), a line for the length of its root and a line naming its
- * mutations. The tank shows its biomass.
+ * mutations. The tank shows its biomass. A Rootstock working as a minehead shows instead the step its section is at,
+ * or which part holds it up with the full reason in the tooltip, and the steps it has advanced.
  */
 final class TunnelRootScreen extends OrganScreen<TunnelRootMenu> {
     private static final String KEY = "gui.infestusfrontier.tunnel_root.";
@@ -51,19 +52,19 @@ final class TunnelRootScreen extends OrganScreen<TunnelRootMenu> {
                 Sheet.FIRST_PART_X,
                 STATUS_Y,
                 width,
-                () -> menu.stop()
-                        .map(stop -> Component.translatable(
-                                KEY + "stopped", Component.translatable(KEY + "stop." + condition(stop))))
-                        .orElseGet(() -> Component.translatable(KEY + "next", menu.seconds())),
+                this::status,
                 () -> menu.stopKey()
                         .<Component>map(Component::translatable)
-                        .orElseGet(() -> Component.translatable(KEY + "status.story"))));
+                        .orElseGet(() ->
+                                Component.translatable(KEY + (menu.minehead() ? "minehead.story" : "status.story")))));
         add(new Tally(
                 Sheet.FIRST_PART_X,
                 STATUS_Y + LINE,
                 width,
-                () -> Component.translatable(KEY + "cells", menu.cells(), Tunnelling.MAX_CELLS),
-                () -> Component.translatable(KEY + "cells.story")));
+                () -> menu.minehead()
+                        ? Component.translatable(KEY + "descended", menu.descended())
+                        : Component.translatable(KEY + "cells", menu.cells(), Tunnelling.MAX_CELLS),
+                () -> Component.translatable(KEY + (menu.minehead() ? "descended.story" : "cells.story"))));
         add(new Tally(
                 Sheet.FIRST_PART_X,
                 STATUS_Y + 2 * LINE,
@@ -71,6 +72,25 @@ final class TunnelRootScreen extends OrganScreen<TunnelRootMenu> {
                 this::mutations,
                 () -> Component.translatable(KEY + "mutations.story")));
         label();
+    }
+
+    /** What the head is doing or why it stopped; for a minehead, its section's step or the part that holds it up. */
+    private Component status() {
+        if (menu.minehead())
+            return menu.stop()
+                    .map(stop ->
+                            Component.translatable(KEY + "paused", Component.translatable(KEY + "part." + owner(stop))))
+                    .orElseGet(() -> Component.translatable(
+                            KEY + "mining", Math.min(menu.built() + 1, menu.steps()), menu.steps()));
+        return menu.stop()
+                .map(stop -> Component.translatable(
+                        KEY + "stopped", Component.translatable(KEY + "stop." + condition(stop))))
+                .orElseGet(() -> Component.translatable(KEY + "next", menu.seconds()));
+    }
+
+    /** The owner part of a stop's key, {@code <owner>.<condition>}: which part of the minehead holds it up. */
+    private static String owner(Refusal stop) {
+        return stop.key().substring(0, stop.key().indexOf('.'));
     }
 
     /** "Mutations: none", or the installed mutations in their fixed order. */

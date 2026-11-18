@@ -5,7 +5,8 @@ import org.jd.infestusfrontier.core.foundation.Refusal;
 
 /**
  * The fixed limits of a Fracture Jaw and its Work Bed, and the reasons a jaw stops. A jaw stands still and cuts the one
- * block in front of it into the Work Bed behind it. Every number is a starting value, not measured balance.
+ * block in front of it into the Work Bed behind it; when a Descending Rootstock stands in front, the block that
+ * Rootstock orders instead. Every number is a starting value, not measured balance.
  */
 public final class Fracturing {
     /** Loaded server ticks between two cuts: three seconds. */
@@ -41,10 +42,12 @@ public final class Fracturing {
     public static final Refusal FRAGILE = new Refusal("fracture_jaw.fragile");
     /** The drops of the cut do not fit the Work Bed. */
     public static final Refusal BED_FULL = new Refusal("fracture_jaw.bed_full");
+    /** The Rootstock in front orders no cut now: its screen says why. */
+    public static final Refusal NO_ORDER = new Refusal("fracture_jaw.no_order");
 
     /** Every stop, in a fixed order: a screen names one by its index. */
-    public static final List<Refusal> STOPS =
-            List.of(UNROOTED, NO_BED, NO_BIOMASS, UNLOADED, NOTHING, TOO_HARD, UNSUPPORTED, FLUID, FRAGILE, BED_FULL);
+    public static final List<Refusal> STOPS = List.of(
+            UNROOTED, NO_BED, NO_BIOMASS, UNLOADED, NOTHING, TOO_HARD, UNSUPPORTED, FLUID, FRAGILE, BED_FULL, NO_ORDER);
 
     private Fracturing() {}
 }

@@ -119,6 +119,14 @@ final class DemoExhibit {
     /** Tidies the yard, then builds the exhibit from its own demo commands; a command that fails fails the test. */
     void build(GameTestHelper h) {
         tidy(h);
+        place(h);
+    }
+
+    /**
+     * Builds the exhibit from its own demo commands without tidying first, for an exhibit that joins another one
+     * replayed in the same yard; a command that fails fails the test.
+     */
+    void place(GameTestHelper h) {
         ServerLevel level = h.getLevel();
         CommandSourceStack source = level.getServer().createCommandSourceStack().withLevel(level);
         for (String command : commands()) {

@@ -54,7 +54,8 @@ import org.jd.infestusfrontier.organ.api.Stewarded;
  * counts it. Otherwise it changes nothing, names the reason and looks again after {@value Surveying#RETRY_TICKS} ticks,
  * or at once when its stock changes. It never cuts, never collects and never touches a built step again, so whatever
  * the player does there stays. The growers of a dimension share {@value Surveying#STEPS_PER_TICK} steps a tick. Stock
- * arrives by hand, at its screen, or through its item handler, which only takes. It loads no chunk.
+ * arrives by hand, at its screen, or through its item handler, which only takes. It loads no chunk. In a Descending
+ * Rootstock's minehead it builds just the same, and tells the Rootstock behind it of each step it built.
  */
 final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded, MenuProvider {
     /** Blocks around each block a step reads or changes whose chunks must be loaded: its neighbours, which it updates. */
@@ -116,6 +117,10 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
     @Override
     public Steward steward() {
         return steward;
+    }
+
+    boolean unreadable() {
+        return unreadable.isPresent();
     }
 
     ItemStackHandler segments() {
@@ -331,6 +336,9 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
         if (treaded) treads.extractItem(0, 1, false);
         if (lit) lights.extractItem(0, 1, false);
         build.marker().grown();
+        Minehead.rootstockOf(level, build.marker())
+                .ifPresent(head -> head.advanced(
+                        level, build.marker().survey().map(Survey::finished).orElse(false)));
         progress = progress.grown();
         stop = Optional.empty();
         setChanged();

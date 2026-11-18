@@ -9,6 +9,7 @@ import com.klikli_dev.modonomicon.data.BookDataManager;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
@@ -832,7 +833,8 @@ public final class FractureJawTests {
 
     /**
      * Each organ is crafted from an Organ Bud and Overworld materials; the guide's entry teaches them and shows their
-     * recipes; the discovery flags and the milestone exist.
+     * recipes; the discovery flags and the milestone exist; every stop the jaw names has its short label and its
+     * sentence.
      */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void recipesMakeTheOrgansAndTheGuideTeachesThem(GameTestHelper h) {
@@ -879,6 +881,15 @@ public final class FractureJawTests {
                 shown,
                 List.of(id("fracture_jaw"), id("work_bed"), id("collection_cilia")),
                 "the guide renders all three recipes from recipe data");
+        var lang = StarterAdvancementTests.lang();
+        for (Refusal stop : Fracturing.STOPS) {
+            String label = "gui.infestusfrontier.fracture_jaw.stop."
+                    + stop.key().substring(stop.key().indexOf('.') + 1).toLowerCase(Locale.ROOT);
+            for (String wording : List.of(label, key(stop)))
+                h.assertTrue(
+                        lang.has(wording) && !lang.get(wording).getAsString().isBlank(),
+                        "the jaw's stop is worded: " + wording);
+        }
         h.succeed();
     }
 

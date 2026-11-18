@@ -31,8 +31,9 @@ import org.jd.infestusfrontier.storage.api.BiomassHandler;
 
 /**
  * The work of a Fracture Jaw. Every {@value Fracturing#CUT_TICKS} loaded ticks it tries one cut: the block in front of
- * it, at a stone pickaxe's grade, rolled once in its ordinary loot into the Work Bed behind it, for
- * {@value Fracturing#CUT_BIOMASS_BU} BU. It never moves and never looks beyond the block in front. Everything a cut
+ * it, or, when a Descending Rootstock stands in front, the block that Rootstock orders, at a stone pickaxe's grade,
+ * rolled once in its ordinary loot into the Work Bed behind it, for {@value Fracturing#CUT_BIOMASS_BU} BU. It never
+ * moves; it looks beyond the block in front only at a Rootstock's order. Everything a cut
  * reads and changes is judged first, so a cut is done whole in one tick or not at all; a stopped jaw keeps its cut
  * due, names the reason and looks again after {@value Fracturing#RETRY_TICKS} ticks, or at once when biomass arrives.
  * The jaws of a dimension share {@value Fracturing#CUTS_PER_TICK} cuts a tick. Biomass reaches it by bucket, pipe or
@@ -41,6 +42,8 @@ import org.jd.infestusfrontier.storage.api.BiomassHandler;
 final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler, Stewarded, MenuProvider {
     /** Blocks from the jaw whose chunks a cut needs: the bed, the cut, its neighbours and the blocks their updates reach. */
     private static final int REACH = 3;
+    /** Blocks around an ordered cut whose chunks it needs: its neighbours and the blocks their updates reach. */
+    private static final int CUT_REACH = 2;
 
     private BiomassTank tank = FractureJawContents.EMPTY.tank();
     private JawProgress progress = JawProgress.START;
@@ -58,6 +61,10 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
     @Override
     public Steward steward() {
         return steward;
+    }
+
+    boolean unreadable() {
+        return unreadable.isPresent();
     }
 
     JawProgress progress() {
@@ -113,22 +120,22 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
     }
 
     private void tryCut(ServerLevel level, BlockPos pos, Direction facing) {
-        BlockPos front = pos.relative(facing);
         BlockPos back = pos.relative(facing.getOpposite());
-        Optional<Refusal> blocked = blocked(level, pos, front, back);
-        if (blocked.isPresent()) {
-            stopped(blocked.get());
+        Outcome<BlockPos> judged = judge(level, pos, pos.relative(facing), back);
+        if (judged instanceof Outcome.Refused<BlockPos>(Refusal why)) {
+            stopped(why);
             return;
         }
+        BlockPos cut = ((Outcome.Done<BlockPos>) judged).value();
         // admitted before the roll, so a cut over the shared limit rolls nothing
         if (!level.getData(MiningModule.JAW_CUTS).take(level.getGameTime())) return;
         WorkBedBlockEntity bed = (WorkBedBlockEntity) level.getBlockEntity(back);
-        Optional<WorkBedContents> after = bed.with(Cutting.loot(level, front));
+        Optional<WorkBedContents> after = bed.with(Cutting.loot(level, cut));
         if (after.isEmpty()) {
             stopped(Fracturing.BED_FULL);
             return;
         }
-        level.destroyBlock(front, false);
+        level.destroyBlock(cut, false);
         bed.restore(after.get());
         tank = ((Outcome.Done<BiomassTank>) tank.drain(Biomass.of(Fracturing.CUT_BIOMASS_BU))).value();
         progress = progress.cut();
@@ -143,25 +150,31 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
     }
 
     /**
-     * Why the jaw at {@code pos} cannot cut {@code front} into the bed at {@code back} now, or empty when it can. Reads
-     * loaded positions only and changes nothing.
+     * The block the jaw at {@code pos} is to cut into the bed at {@code back} now: {@code front}, or the block the
+     * Rootstock standing there orders; or why it cannot cut. Reads loaded positions only and changes nothing.
      */
-    private Optional<Refusal> blocked(ServerLevel level, BlockPos pos, BlockPos front, BlockPos back) {
-        if (!Organs.hasFoundation(level, pos)) return Optional.of(Fracturing.UNROOTED);
-        if (!Cutting.loaded(level, pos, REACH)) return Optional.of(Fracturing.UNLOADED);
+    private Outcome<BlockPos> judge(ServerLevel level, BlockPos pos, BlockPos front, BlockPos back) {
+        if (!Organs.hasFoundation(level, pos)) return Outcome.refused(Fracturing.UNROOTED);
+        if (!Cutting.loaded(level, pos, REACH)) return Outcome.refused(Fracturing.UNLOADED);
         if (!(level.getBlockEntity(back) instanceof WorkBedBlockEntity bed) || bed.unreadable())
-            return Optional.of(Fracturing.NO_BED);
-        if (!tank.stored().atLeast(Biomass.of(Fracturing.CUT_BIOMASS_BU))) return Optional.of(Fracturing.NO_BIOMASS);
-        Optional<Refusal> verdict = switch (Cutting.judge(level, front)) {
+            return Outcome.refused(Fracturing.NO_BED);
+        if (!tank.stored().atLeast(Biomass.of(Fracturing.CUT_BIOMASS_BU)))
+            return Outcome.refused(Fracturing.NO_BIOMASS);
+        Outcome<BlockPos> target = level.getBlockEntity(front) instanceof TunnelRootBlockEntity head && head.rootstock()
+                ? head.order(level)
+                : Outcome.done(front);
+        if (!(target instanceof Outcome.Done<BlockPos>(BlockPos cut))) return target;
+        if (!Cutting.loaded(level, cut, CUT_REACH)) return Outcome.refused(Fracturing.UNLOADED);
+        Optional<Refusal> verdict = switch (Cutting.judge(level, cut)) {
             case CUTTABLE -> Optional.empty();
             case CLEAR -> Optional.of(Fracturing.NOTHING);
             case FLUID -> Optional.of(Fracturing.FLUID);
             case UNSUPPORTED -> Optional.of(Fracturing.UNSUPPORTED);
             case TOO_HARD -> Optional.of(Fracturing.TOO_HARD);
         };
-        if (verdict.isPresent()) return verdict;
-        if (Cutting.touchesFragile(level, front)) return Optional.of(Fracturing.FRAGILE);
-        return Optional.empty();
+        if (verdict.isPresent()) return Outcome.refused(verdict.get());
+        if (Cutting.touchesFragile(level, cut)) return Outcome.refused(Fracturing.FRAGILE);
+        return target;
     }
 
     // ---- saved state ----

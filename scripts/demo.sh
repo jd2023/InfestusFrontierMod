@@ -12,6 +12,9 @@
 # empty bank; the bank beside it completes the pig genome on its own.
 # The construct exhibit (x 148 to 162, z -24 to -18): press Produce at the bank with the complete pig genome, then apply
 # the Stairs Construct to the plain Tunnel Root head and the Wider Section Construct to the Rootstock beside it.
+# The staircase mine (x 17 to 26, z -14 to 2, south of the Iron Bars Factory): climb the ladder to the minehead on the
+# hill, open the Rootstock, and watch the jaw cut the next steps through the glass; spoil fills the chest beside the
+# hill and raw iron runs the veins into the factory's Gizzard. Walk down the staircase to the landing.
 # The tab starts empty, with no advancement granted.
 # Play, then close the window. The world is rebuilt on every run; your options.txt in runs/demo is kept.
 set -euo pipefail

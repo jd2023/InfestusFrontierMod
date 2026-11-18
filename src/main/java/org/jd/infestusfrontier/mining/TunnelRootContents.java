@@ -19,9 +19,11 @@ import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /**
  * Everything a Tunnel Root head owns: its segments, its output, its biomass, its progress (the cells it has laid are
- * its history), the steering of its next step and its permanent mutations. Saved on the block entity, carried on the
+ * its history), the steering of its next step, its permanent mutations and, as a Descending Rootstock, the staircase
+ * steps it has advanced, its minehead history. Saved on the block entity, carried on the
  * item when the head is broken, and handed from the old block entity to the new one when the head moves. A head saved
- * before it could mutate reads with none. The stacks are copies.
+ * before it could mutate reads with none, and one saved before it could descend with no steps advanced. The stacks are
+ * copies.
  */
 record TunnelRootContents(
         ItemStack segments,
@@ -29,14 +31,16 @@ record TunnelRootContents(
         BiomassTank tank,
         TunnelProgress progress,
         Steer steer,
-        RootMutations mutations) {
+        RootMutations mutations,
+        int descended) {
     static final TunnelRootContents EMPTY = new TunnelRootContents(
             ItemStack.EMPTY,
             List.of(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY),
             BiomassTank.empty(Biomass.of(Tunnelling.BIOMASS_CAPACITY_BU)),
             TunnelProgress.START,
             Steer.STRAIGHT,
-            RootMutations.NONE);
+            RootMutations.NONE,
+            0);
 
     TunnelRootContents {
         segments = segments.copy();
@@ -53,7 +57,8 @@ record TunnelRootContents(
             int cells,
             int ticks,
             int steer,
-            List<String> mutations) {}
+            List<String> mutations,
+            int descended) {}
 
     static final MapCodec<TunnelRootContents> CODEC = RecordCodecBuilder.<Raw>mapCodec(instance -> instance.group(
                             ItemStack.OPTIONAL_CODEC.fieldOf("segments").forGetter(Raw::segments),
@@ -65,7 +70,8 @@ record TunnelRootContents(
                             Codec.STRING
                                     .listOf()
                                     .optionalFieldOf("mutations", List.of())
-                                    .forGetter(Raw::mutations))
+                                    .forGetter(Raw::mutations),
+                            Codec.INT.optionalFieldOf("descended", 0).forGetter(Raw::descended))
                     .apply(instance, Raw::new))
             .flatXmap(TunnelRootContents::read, contents -> DataResult.success(contents.raw()));
 
@@ -77,7 +83,8 @@ record TunnelRootContents(
                 progress.cells(),
                 progress.ticks(),
                 steer.ordinal(),
-                mutations.installed().stream().map(RootMutation::id).toList());
+                mutations.installed().stream().map(RootMutation::id).toList(),
+                descended);
     }
 
     private static DataResult<TunnelRootContents> read(Raw raw) {
@@ -101,7 +108,8 @@ record TunnelRootContents(
                 raw.tank(),
                 new TunnelProgress(raw.cells(), raw.ticks()),
                 steer.get(),
-                new RootMutations(mutations));
+                new RootMutations(mutations),
+                raw.descended());
         Optional<String> problem = contents.problem();
         return problem.isPresent() ? DataResult.error(problem::get) : DataResult.success(contents);
     }
@@ -120,6 +128,8 @@ record TunnelRootContents(
         if (items > Tunnelling.OUTPUT_ITEMS) return Optional.of("output items " + items);
         if (tank.capacity().units() != Tunnelling.BIOMASS_CAPACITY_BU
                 || !tank.reserved().isZero()) return Optional.of("tank " + tank);
+        if (descended < 0) return Optional.of("descended " + descended);
+        if (descended > 0 && !mutations.rootstock()) return Optional.of("descended without Stairs " + descended);
         return Optional.empty();
     }
 

@@ -157,7 +157,8 @@ public final class DiscoveryTests {
                 "shaping_palm",
                 "iron_bars_factory",
                 "fracture_jaw",
-                "surveyed_mine"))
+                "surveyed_mine",
+                "descending_rootstock"))
             h.assertTrue(
                     circulation.getEntries().containsKey(id("circulation/" + entry)), "entry " + entry + " loaded");
         h.succeed();

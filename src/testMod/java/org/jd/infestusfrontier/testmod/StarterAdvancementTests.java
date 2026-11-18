@@ -81,6 +81,8 @@ public final class StarterAdvancementTests {
             "genetic_construct",
             "rootstock",
             "wider_section",
+            "descending_rootstock",
+            "staircase_landing",
             "planting_proboscis",
             "harvest_corolla",
             "supplied_sac",

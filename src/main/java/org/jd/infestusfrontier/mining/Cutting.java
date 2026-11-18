@@ -13,6 +13,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
@@ -68,13 +69,18 @@ final class Cutting {
     /**
      * True when a fragile block touches {@code cut}: one that vanilla breaks loose when it is pushed or loses its
      * support (push reaction DESTROY: torches, signs, ladders, plants, carpets, doors, lanterns, redstone parts), or a
-     * rail. Such a block may rest on the cut and fall off with drops once it is gone, so the cut is refused. Reads the
-     * six neighbours; changes nothing.
+     * rail. Such a block may rest on the cut and fall off with drops once it is gone, so the cut is refused. A wall
+     * torch hung on another block does not rest on the cut, such as a staircase light beside the next step's cut.
+     * Reads the six neighbours; changes nothing.
      */
     static boolean touchesFragile(Level level, BlockPos cut) {
         for (Direction side : Direction.values()) {
-            BlockState neighbour = level.getBlockState(cut.relative(side));
+            BlockPos next = cut.relative(side);
+            BlockState neighbour = level.getBlockState(next);
             if (neighbour.isAir() || neighbour.getBlock() instanceof LiquidBlock) continue;
+            if (neighbour.getBlock() instanceof WallTorchBlock
+                    && !next.relative(neighbour.getValue(WallTorchBlock.FACING).getOpposite())
+                            .equals(cut)) continue;
             if (neighbour.getPistonPushReaction() == PushReaction.DESTROY || neighbour.is(BlockTags.RAILS)) return true;
         }
         return false;

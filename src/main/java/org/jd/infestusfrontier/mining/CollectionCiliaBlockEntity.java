@@ -60,6 +60,10 @@ final class CollectionCiliaBlockEntity extends BlockEntity implements BiomassHan
         return steward;
     }
 
+    boolean unreadable() {
+        return unreadable.isPresent();
+    }
+
     int sent() {
         return sent;
     }

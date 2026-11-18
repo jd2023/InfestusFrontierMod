@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/descending_rootstock",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:root_segment"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.staircase_landing.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.staircase_landing.description"
+    },
+    "frame": "goal"
+  },
+  "criteria": {
+    "landed": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:rootstock_landing"
+      }
+    }
+  }
+}
