@@ -3,7 +3,9 @@
 Status: proposed. This document is the complete picture of mining: every stage
 from the first hand-dug pit to an ore-seeking root, the organs each stage uses,
 and how mined material reaches the workshop. It is self-contained. Every number
-is a starting value, not measured balance.
+is a starting value, not measured balance. The rules below include the owner’s
+mining revisions; they are requirements, not a claim that the current game
+already implements them.
 
 ## Principles
 
@@ -24,6 +26,15 @@ is a starting value, not measured balance.
 9. Earlier stages stay useful. A later method does not replace them.
 10. Unloading never damages, kills or resets an organ. Save its state and job
     progress, pause while required chunks are unloaded, and resume when they load.
+11. Accidents are part of mining. Do not stop before water, lava, falling blocks
+    or missing ground. Do not add automatic bridges, seals or hazard detours.
+12. A mining organ dies and breaks when its supporting block is gone. This is
+    destruction, not a recoverable pause. A planned movement may transfer it
+    between supported positions; it must not create support over a gap to
+    rescue itself. Unloaded support is unknown, not missing.
+13. From the first automated staircase onward, every mining method requires a
+    physical multiblock with separate cutting, collection, construction and
+    transport parts. Mutations alone cannot turn one block into a whole mine.
 
 ## The whole picture
 
@@ -36,7 +47,7 @@ Every mine does the same seven jobs. Progression changes who does each one.
 | Cut | Player | Player, by hand | Root head | Fracture Jaw | Several jaws | Boring Jaws | Boring Jaw |
 | Collect | Player | Nothing drops | Player empties the head | Collection Cilia | Cilia per face | Cilia per face | Cilia |
 | Carry out | Player | — | Player | Item Veins | Shared veins and junctions | Veins and buffers | Veins |
-| Build access and light | Player | — | Root cells, optional light | Structure Grower | Structure Grower | Structure Grower | Structure Grower |
+| Build access and light | Player | Glowing root column | Root cells, optional light | Structure Grower | Structure Grower | Structure Grower | Structure Grower |
 | Power | — | Loaded biomass | Hand-fed biomass | Biomass by vein | Biomass by vein | Steam and biomass | Electricity and biomass |
 
 What leaves the mine is the same at every stage: ordinary drops, split into ore
@@ -76,22 +87,32 @@ ground so the player can dig a wide pit by hand and see the ore in it.
   depth. Ores, fluids, blocks with a block entity and everything outside the tag
   stay untouched.
 - **Result:** each converted block becomes Leached Rock: translucent, breaks
-  almost instantly by hand, drops nothing. A random share of blocks glow
-  faintly. Leached Rock is solid, so no fluid moves until the player breaks it.
+  almost instantly by hand and drops nothing. Leached Rock does not glow.
+  Leached Rock is solid, so no fluid moves until the player breaks it.
+- **Root and light:** as treatment moves down, the pod grows a continuous root
+  column beneath itself. The column lights the treated depth and remains after
+  work ends. It is the installation’s only light source; there are no glowing
+  rock variants. It uses ordinary block lighting, not light through solid rock.
 - **Cost and end:** a layer that converts at least one block uses one biomass
   charge. The pod holds 16 charges and never works more than 16 layers below
-  itself. When the charges or the layers run out it dies and leaves a husk.
+  itself. When the charges or the layers run out it stops permanently, leaving
+  the pod and glowing root column in their final state. It cannot be recharged.
+- **Support:** breaking the block directly below the pod destroys the pod with
+  no drops, whether it is working or finished. The column must not make the
+  pod exempt from this rule. Column survival after a lower section is broken
+  remains to be decided; it must not duplicate materials or restore the pod.
 - **Unloaded chunks:** pause until the required chunks load, then resume from
   saved progress without repeating conversions or charges.
 
 Done when: a pod planted on a substrate patch over stone leaves a pit the player
 can clear with bare hands, with every ore block in it still in place and
-visible before the player reaches it.
+visible before the player reaches it. The finished root column lights the
+cleared depth. Removing the pod’s support destroys it without drops.
 
-Implementation is cheap: one block entity, at most 37 block changes per second
-for 16 seconds, no entities and no drops. Use a few blockstate glow variants
-with low light levels, not per-block random light, and cull faces between
-adjacent Leached Rock as glass does.
+The root column must leave ores untouched. Its placement through ores, cavities
+and fluids needs a concrete design before implementation; it cannot silently
+destroy ore or gain hazard protection. Cull faces between adjacent Leached Rock
+as glass does.
 
 ## Stage 2 — Tunnel Root
 
@@ -108,17 +129,30 @@ high. The player supplies every step.
 - **Work:** one step every 20 seconds. A step breaks the two blocks ahead, puts
   their ordinary drops in the head's buffer, lays one root cell and moves the
   head forward one block.
-- **Steering:** before a step the player sets straight, left or right. The
-  tunnel stays level and follows the four horizontal directions.
+- **Steering:** separate left, straight and right buttons replace the cycling
+  button. Left and right are relative to the head, never the camera. Show the
+  current heading, the next heading and an in-world arrow for the next cut.
+  The tunnel stays level and follows the four horizontal directions.
+- **Movement:** show the head reaching forward, gripping and pulling its body
+  into the next cell. Turns visibly rotate toward the next cut. The working
+  cycle must read as crawling, not a block disappearing and reappearing.
+- **Screen:** put heading and steering first, then the next-step progress,
+  biomass, segments and output. Show the full stop reason directly, rather
+  than hiding the useful explanation in a tooltip.
 - **Cutting grade:** equal to a stone pickaxe. Harder blocks stop the head.
 - **Limits:** 64 root cells per root. A one-stack buffer; the player empties it.
 - **Pauses, with a reason shown on the head:** no segment or biomass; full
-  buffer; a block above its grade or with a block entity; fluid touching the
-  next cut; no floor ahead; a falling block above the cut; an unloaded chunk.
-  The player fixes the cause and the head continues. Nothing is lost.
+  buffer; a block above its grade or with a block entity; an unloaded chunk.
+  The player fixes these causes and the head continues.
+- **Accidents:** water, lava, falling blocks and a missing floor do not veto a
+  step. Let normal world behavior happen. If the head advances without a
+  supporting block, it dies and breaks. A Root Segment does not create a
+  floating floor to save it. Recovery from an accident is the player’s job.
 
-Done when: a player can drive a tunnel with at least one turn, walk its full
-length, collect its drops, and recover from each pause reason.
+Done when: a player can steer a tunnel with a clear preview and visible crawling,
+walk its intact length, collect its drops, and recover from each supply pause.
+Opening water or unstable ground is allowed. Removing support destroys the
+organ rather than displaying a pause reason.
 
 ## Stage 3 — Descending Root
 
@@ -153,10 +187,11 @@ A first expedition:
    for ore and spoil.
 3. Start. The jaw cuts each face, collection clears it, the grower extends the
    root, treads and light.
-4. Resolve stoppages. The pause reasons of stage 2 apply, plus missing
-   construction stock and full export. A jaw without output space waits. The
-   root never advances past the last safe tread. An exposed cavity pauses the
-   job; it does not authorize a bridge or a detour.
+4. Resolve supply stoppages. Missing construction stock and full export pause
+   work. A jaw without output space waits. Environmental hazards do not
+   pause work: opening a cavity or fluid pocket can wreck the installation.
+   Construction follows the marked staircase; it does not add a rescue bridge
+   or detour. Any organ that loses support dies and breaks.
 5. Reach the landing. Explore, mine by hand, or authorize another section.
 
 Done when: one supplied assembly finishes a section, the player walks to the
@@ -192,36 +227,51 @@ starved and resumes, and no material is lost or duplicated.
 ## Stage 5 — Bulk excavation
 
 Steam from the Nether base drives larger methods. Each solves a different job
-and reuses the stage 3 organs. All remain finite, surveyed plans.
+and reuses the stage 3 organs in a physical multiblock. All remain finite,
+surveyed plans. Shafts and trenches must leave a route the player can walk
+through and climb out of. The player supplies ladders or climbing parts,
+torches or living lights, and the materials for landings and access. The
+Structure Grower installs them as work advances; missing stock pauses work.
+This builds the planned access, not protection from mining accidents.
 
 | Method | What it is | Shape and limit | Needs |
 |---|---|---|---|
 | Boring Jaw | A Fracture Jaw upgraded with thermal parts. Keeps the jaw's history | Cuts up to diamond-pickaxe grade; serves any method below or a gallery | Steam, larger output buffers |
 | Descending Cradle | A 3×3 platform that lowers itself one layer at a time with jaws underneath. Carries a rider | A vertical 3×3 shaft, at most 64 deep per approval, with a climbable lit side | Steam, access and light stock |
-| Strata Maw | A Rootstock specialized for trenching from a surface line | A strip 1 wide, at most 32 long and 32 deep per approval | Boring Jaw, spoil storage |
-| Digestion Crucible | A sealed pit that leaches host rock and leaves ore standing. The stage 1 pod as an industrial process | A lined pit at most 9×9 and 16 deep; ore is then mined by hand or by a jaw | Leaching charges, fluid drains for spent medium |
+| Strata Maw | A Rootstock multiblock specialized for trenching from a surface line | A strip 1 wide, at most 32 long and 32 deep per approval, with lit access and a climbable way out | Boring Jaw, spoil storage, access and light stock |
+| Digestion Crucible | A lined multiblock pit with treatment and drain organs that leaches host rock and leaves ore standing. The stage 1 pod as an industrial process | A lined pit at most 9×9 and 16 deep; ore is then mined by hand or by a jaw | Leaching charges, fluid drains for spent medium |
 
 More volume always costs more cutting work, energy, construction stock,
 collection and spoil handling. No method is a free increase in volume.
 
-Done when: each method completes one approved plan, stops cleanly on full
-output or lost steam, and resumes without loss. The Cradle additionally needs a
+Done when: each multiblock completes one approved plan, installs its supplied
+access and lights, stops cleanly on full output, missing stock or lost steam,
+and resumes without loss from those supply pauses. The player can explore and
+exit the intact shafts and trenches. Hazards can damage access and organs;
+loss of support destroys an organ. The Cradle additionally needs a
 measured performance test of its moving platform before it is built.
 
 ## Stage 6 — Ore-sensing root
 
-The only stage that looks for ore. A sensing mutation lets a root choose its
-own route toward ore it detects.
+The only stage that looks for ore. A sensing mutation adds ore detection to a
+mining multiblock; it is not a standalone automatic miner. The installation
+still needs a jaw, collection, a Structure Grower, transport and supplied
+access and lighting.
 
 - **Approval:** the player marks a finite volume, at most 32×32×32, around a
   gallery landing. The root never leaves it.
 - **Sensing:** the head detects ore blocks within 8 blocks, checking a fixed
   number of positions per tick. It reports what it sensed before it moves.
 - **Routing:** it cuts a walkable 1×2 passage toward the nearest sensed ore,
-  mines the connected ore blocks at ordinary yield, then senses again. With
-  nothing in range it advances along the player's fallback direction.
+  branches from the existing tunnel to reach ore, mines connected ore blocks
+  at ordinary yield, then senses again. Every branch remains connected and
+  large enough for the player to walk through and explore ahead of the mine.
+  Vertical routes need supplied stairs or ladders; all routes need supplied
+  lights. No inaccessible ore holes or isolated teleported cuts. With nothing
+  in range it advances along the player's fallback direction.
 - **Stops:** the pause reasons of stage 2, the volume boundary, and a total
-  length of 256 root cells.
+  length of 256 root cells across the connected branches. Environmental
+  hazards remain accidents; sensing does not grant hazard avoidance.
 - **Cost:** a completed Nether genome and its genetic construct to mutate the
   root; continuous electrical power while sensing; biomass for cutting. Running
   it costs several times a Descending Root per block cut.
@@ -236,7 +286,7 @@ Not designed yet. Each needs its own method on top of the stages above.
 
 | Place | New problem |
 |---|---|
-| Oceans and flooded ground | Sealing and draining a face before cutting |
+| Oceans and flooded ground | Player-built sealing and drainage; ordinary miners do not automatically avoid floods |
 | Nether | Lava, heat-resistant parts, open caverns |
 | End | Cutting over the void, anchored access |
 | Later dimensions | To be defined with the dimension |

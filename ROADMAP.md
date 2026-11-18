@@ -50,6 +50,13 @@ empty world, and nothing new is worth building until it works.
 | 5 | BASE-5 | Defend the base with organs that shoot ground and air threats | A supplied defender kills a mob and stops when its ammunition runs out | — | done |
 | 6 | BASE-6 | Play from an empty world to a self-supplying farm using only the guide | A new player reaches BASE-3 in Survival without creative items or outside help, and the farm restarts by itself after its supply is cut | — | none |
 
+Mining revision: `done` on MINE-1 through MINE-4 records the earlier behavior.
+The revised requirements in `docs/design/MINING_PROGRESSION.md` still need
+implementation and acceptance: crawling animation, clear steering, mining
+accidents, destruction on lost support, and the pod’s glowing root column.
+All later automated methods require physical multiblocks and supplied,
+walkable access with lighting.
+
 ## Phase 2 — First mining, wood and animals
 
 The colony starts helping underground and gains two more renewable supplies. Everything here uses only what Phase 1 provides. The three groups are independent and can be built in any order.
@@ -97,8 +104,8 @@ Design gap: what the player makes here that is worth staying for, and how the ba
 | 29 | NETHER-4 | Boil water with lava to make steam and run a machine on it | One machine runs on steam; closing the outlet triggers the pressure relief instead of a failure | NETHER-2 | none |
 | 30 | NETHER-5 | Research Nether creatures' DNA in a lab built in the Nether | One Nether species is fully researched there | NETHER-1, GENE-1 | none |
 | 31 | MINE-5 | Cut hard rock that the first cutter cannot, using a steam-driven cutter | A staircase mine passes through rock that stopped MINE-3 | MINE-3, NETHER-4 | none |
-| 32 | MINE-6 | Sink a vertical shaft on a platform that lowers itself and carries the player | A shaft is dug to a marked depth; the player rides down and climbs out | MINE-5 | none |
-| 33 | MINE-7 | Cut a long narrow trench down from a line on the surface | A marked trench is dug to its depth and stops there | MINE-5 | none |
+| 32 | MINE-6 | Sink a vertical shaft on a platform that lowers itself and carries the player | A supplied multiblock digs a shaft to a marked depth and installs lights and climbing access; the player rides down and climbs out | MINE-5 | none |
+| 33 | MINE-7 | Cut a long narrow trench down from a line on the surface | A supplied multiblock digs a marked trench to its depth, installs lights and access, and stops there; the player walks in and climbs out | MINE-5 | none |
 | 34 | MINE-8 | Dissolve the rock in a sealed pit and leave the ore standing | A marked pit is cleared of rock; every ore block remains; spent liquid is drained to storage | MINE-1, NETHER-2 | none |
 | 35 | NETHER-6 | Run the Nether base with no deliveries from the Overworld and send goods back | The base runs an hour and restarts after a full shutdown on its own reserves, and exports lining and plates | NETHER-1 to NETHER-4 | none |
 
@@ -115,7 +122,7 @@ Open decision for POWER-5: whether a vessel ruptures at random or fails visibly 
 | 38 | POWER-3 | Get more DNA progress from each sample by adding an electric reading step | The same sample gives more research progress with the step than without | POWER-1, GENE-1 | none |
 | 39 | POWER-4 | Start and stop machines on a schedule and read the factory's state on a display | A line runs only in its set window; a display shows which store is full and which machine is blocked | POWER-1 | none |
 | 40 | POWER-5 | Contain a biomass leak from an overloaded vessel | An overloaded vessel fails in the way the design decides; a catch basin collects the spill and nothing outside it is harmed | NETHER-4 | none |
-| 41 | MINE-9 | Let a root find and follow ore by itself inside a volume the player marks | The root reaches and mines ore it sensed, never leaves the volume, and stops when its electricity is cut | MINE-4, POWER-1, NETHER-5 | none |
+| 41 | MINE-9 | Let a root find and follow ore by itself inside a volume the player marks | The multiblock branches toward sensed ore within the volume, builds connected lit passages the player can explore, and stops sensing when electricity is cut | MINE-4, POWER-1, NETHER-5 | none |
 
 ## Phase 6 — The End base
 
