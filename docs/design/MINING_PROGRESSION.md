@@ -39,6 +39,52 @@ already implements them.
     physical multiblock with separate cutting, collection, construction and
     transport parts. Mutations alone cannot turn one block into a whole mine.
 
+## Finished mine appearance — to be implemented
+
+A finished mine looks like a passage grown by a living creature. Excavation
+leaves a visible route from the entrance to each working face. Most natural
+rock remains exposed; tissue follows the route instead of covering every wall.
+
+- **Floor root:** connected root cells trace the route. Supply and export
+  connections remain visible and use the existing separate carriers for items
+  and biomass. A decorative root never grants transport by itself.
+- **Bone ribs:** supplied ribs frame entrances, junctions and larger passages.
+  Larger assemblies use thicker ribs. They do not prevent cave-ins, fluids or
+  loss of support, and they preserve the route's usable headroom and width.
+- **Lights:** small luminous organs grow at intervals from supplied materials.
+  The Structure Grower installs them as excavation advances. Ordinary lighting
+  applies. The early Tunnel Root's lighting remains an optional mutation.
+- **Access:** grown treads meet the rock along stairs. Shafts have a climbable
+  tendon and small landings within the approved plan. Tendons, landings and
+  lights need supplied stock, just like other construction. Torches and ladders
+  remain usable alternatives. Nothing adds rescue bridges over exposed gaps.
+- **Cut surfaces:** the jaw leaves scrape marks and sparse tissue at the fresh
+  face. Use bounded surface detail tied to the installed mine parts; do not
+  replace every exposed rock block or hide ore behind decorative tissue.
+- **Branches:** a thicker main route leads to smaller ore branches. Every
+  branch stays connected, lit and walkable, including its junctions. The player
+  can follow the roots and explore ahead of the working face.
+- **Accident remains:** severed root cells and surviving constructed tissue
+  show where the mine broke. They are the actual blocks left by the accident,
+  not newly spawned debris or extra resources. Destroyed organs stay destroyed;
+  no decorative remnant restores their inventory or keeps them working.
+- **Collection motion:** cilia visibly draw cut fragments into their intake.
+  Local pulses or bulges at active transport connections suggest material
+  passing through roots. Animate confirmed work only. Keep transport passive
+  and direct as required by the architecture; veins gain no cargo inventory,
+  travelling item entities, per-item tracking or extra network scans.
+
+Ore and spoil remain ordinary items with ordinary yields. Their biological
+appearance comes from excavation, collection and the constructed passages.
+
+Acceptance: inspect real-game captures of a working face, a staircase, a shaft
+landing, a trench, an ore branch junction and a damaged route as those methods
+are implemented. Show collection and movement in multiple animation phases.
+Walk each intact route to verify clearance, climbing access and lighting.
+Missing construction stock must pause work; decoration must not mask hazards,
+change ore yields or create support over missing ground. Reuse established
+models and animation sources under `art/` and record generated asset provenance.
+
 ## The whole picture
 
 Every mine does the same seven jobs. Progression changes who does each one.

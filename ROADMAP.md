@@ -56,7 +56,9 @@ The revised requirements in `docs/design/MINING_PROGRESSION.md` still need
 implementation and acceptance: crawling animation, clear steering, mining
 accidents, destruction on lost support, and the pod’s glowing root column.
 All later automated methods require physical multiblocks and supplied,
-walkable access with lighting.
+walkable access with lighting. The same pending task includes the finished
+mine appearance specified in the mining design: floor roots, bone ribs, grown
+access, sparse excavation scars and visible collection motion.
 
 ## Phase 2 — First mining, wood and animals
 
