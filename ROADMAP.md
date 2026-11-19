@@ -50,7 +50,8 @@ empty world, and nothing new is worth building until it works.
 | 5 | BASE-5 | Defend the base with organs that shoot ground and air threats | A supplied defender kills a mob and stops when its ammunition runs out | — | done |
 | 6 | BASE-6 | Play from an empty world to a self-supplying farm using only the guide | A new player reaches BASE-3 in Survival without creative items or outside help, and the farm restarts by itself after its supply is cut | — | none |
 
-Mining revision: `done` on MINE-1 through MINE-4 records the earlier behavior.
+Mining revision — **to be implemented**, Ktask #71 (pending).
+`done` on MINE-1 through MINE-4 records the earlier behavior.
 The revised requirements in `docs/design/MINING_PROGRESSION.md` still need
 implementation and acceptance: crawling animation, clear steering, mining
 accidents, destruction on lost support, and the pod’s glowing root column.

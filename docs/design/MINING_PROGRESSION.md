@@ -1,6 +1,9 @@
 # Mining progression
 
-Status: proposed. This document is the complete picture of mining: every stage
+Status: to be implemented. The owner-approved revisions are pending in Ktask
+task #71; no gameplay implementation was completed by its first attempt.
+
+This document is the complete picture of mining: every stage
 from the first hand-dug pit to an ore-seeking root, the organs each stage uses,
 and how mined material reaches the workshop. It is self-contained. Every number
 is a starting value, not measured balance. The rules below include the owner’s
