@@ -1210,7 +1210,7 @@
   "entry.infestusfrontier.contact.nether_power.name": "Nether Power",
   "entry.infestusfrontier.contact.nether_power.description": "Grow one plant from heat into electricity.",
   "entry.infestusfrontier.contact.nether_power.title0": "Start with heat",
-  "entry.infestusfrontier.contact.nether_power.text0": "Grow a Thermal Heart on Living Substrate in the Nether. Place a Heat Collector against it so the pale connection face points into the heart, with lava below the collector. It gathers 20 heat each second. Add physical chambers to the same core as your needs grow.",
+  "entry.infestusfrontier.contact.nether_power.text0": "Power starts as a multiblock: a Thermal Heart on Living Substrate and a Heat Collector facing into it, with lava below the collector. Only the Nether supplies heat. The heart alone produces nothing. Add boiler and generating chambers to grow the same body.",
   "entry.infestusfrontier.contact.nether_power.title1": "Boil and generate",
   "entry.infestusfrontier.contact.nether_power.text1": "Place a Boiler Chamber against the core and supply water through its outer faces. Each batch uses 10 water and 10 heat to make 40 steam. Add a Generating Chamber to turn 20 steam into 40 FE. A Pressure Outlet exposes steam to fluid pipes. Full stores pause production; nothing explodes or spills.",
   "entry.infestusfrontier.contact.nether_power.title2": "Carry power home",

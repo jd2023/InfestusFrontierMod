@@ -90,6 +90,7 @@ final class CaptureClient {
      */
     /** Every scenario starts from the same state, whatever the one before it changed. */
     private static final List<String> RESET = List.of(
+            "execute in minecraft:overworld run tp @s 0 -60 0",
             "tick unfreeze",
             "clear @s",
             "kill @e[type=item]",
@@ -244,7 +245,14 @@ final class CaptureClient {
         Scenario scenario = scenarios.get(scenarioIndex);
         Scenario.View view = scenario.views().get(viewIndex);
         String tp = String.format(
-                Locale.ROOT, "tp @s %.3f %.3f %.3f %.2f %.2f", view.x(), view.y(), view.z(), view.yaw(), view.pitch());
+                Locale.ROOT,
+                "execute in %s run tp @s %.3f %.3f %.3f %.2f %.2f",
+                view.dimension(),
+                view.x(),
+                view.y(),
+                view.z(),
+                view.yaw(),
+                view.pitch());
         FlatWorld.command(minecraft, tp);
         minecraft.options.hideGui = !view.gui();
         guiScale(minecraft, view.opensScreen() ? SCREEN_SCALE : WORLD_SCALE);
@@ -376,6 +384,8 @@ final class CaptureClient {
 
     /** The chunks around the view have arrived from the server. Sections behind the camera are never compiled. */
     private static boolean chunksArrived(Minecraft minecraft, Scenario.View view) {
+        if (minecraft.level == null
+                || !minecraft.level.dimension().location().toString().equals(view.dimension())) return false;
         int cx = SectionPos.blockToSectionCoord(Mth.floor(view.x()));
         int cz = SectionPos.blockToSectionCoord(Mth.floor(view.z()));
         for (int dx = -READY_RADIUS; dx <= READY_RADIUS; dx++) {

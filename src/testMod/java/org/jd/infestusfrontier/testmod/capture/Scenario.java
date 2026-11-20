@@ -36,10 +36,13 @@ record Scenario(String name, List<String> commands, List<String> play, List<View
      * advancement id shows. {@code scroll} drags the Advancements tab by that many pixels, as a mouse drag does, so a
      * branch off the edge comes into view. {@code press} lists menu buttons the client presses on the screen the view
      * opened, then {@code quickMove} lists slots it shift-clicks, one every few ticks: the server judges each as it
-     * judges a player's. A wait that does not end fails the capture.
+     * judges a player's. {@code dimension} defaults to the Overworld and controls the teleport and chunk-readiness
+     * check; setup commands for other dimensions use explicit {@code execute in}. A wait that does not end fails
+     * the capture.
      */
     record View(
             String name,
+            String dimension,
             double x,
             double y,
             double z,
@@ -128,6 +131,11 @@ record Scenario(String name, List<String> commands, List<String> play, List<View
                     throw new IOException(name + ": feed needs holding in view " + viewName);
                 views.add(new View(
                         viewName,
+                        v.has("dimension")
+                                ? net.minecraft.resources.ResourceLocation.parse(
+                                                v.get("dimension").getAsString())
+                                        .toString()
+                                : "minecraft:overworld",
                         v.get("x").getAsDouble(),
                         v.get("y").getAsDouble(),
                         v.get("z").getAsDouble(),

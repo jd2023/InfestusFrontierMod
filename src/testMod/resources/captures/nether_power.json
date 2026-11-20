@@ -1,0 +1,123 @@
+{
+  "commands": [
+    "forceload add 220 22 228 29",
+    "execute in minecraft:the_nether run forceload add 16 0 47 31",
+    "execute in minecraft:the_nether run function infestusfrontier_tests:nether_power_demo"
+  ],
+  "views": [
+    {
+      "name": "live_heat_screen",
+      "dimension": "minecraft:the_nether",
+      "x": 22.5,
+      "y": 80,
+      "z": 14,
+      "yaw": 0,
+      "pitch": 20,
+      "use": [
+        22,
+        80,
+        16
+      ]
+    },
+    {
+      "name": "live_steam_screen",
+      "dimension": "minecraft:the_nether",
+      "x": 31.5,
+      "y": 80,
+      "z": 14,
+      "yaw": 0,
+      "pitch": 20,
+      "use": [
+        31,
+        80,
+        16
+      ]
+    },
+    {
+      "name": "live_electric_screen",
+      "dimension": "minecraft:the_nether",
+      "x": 40.5,
+      "y": 80,
+      "z": 14,
+      "yaw": 0,
+      "pitch": 20,
+      "use": [
+        40,
+        80,
+        16
+      ]
+    },
+    {
+      "name": "heat_body_front",
+      "dimension": "minecraft:the_nether",
+      "x": 20,
+      "y": 82,
+      "z": 13,
+      "yaw": -35,
+      "pitch": 20
+    },
+    {
+      "name": "heat_body_back",
+      "dimension": "minecraft:the_nether",
+      "x": 25,
+      "y": 82,
+      "z": 19,
+      "yaw": 145,
+      "pitch": 20
+    },
+    {
+      "name": "steam_body_front",
+      "dimension": "minecraft:the_nether",
+      "x": 28,
+      "y": 83,
+      "z": 12,
+      "yaw": -30,
+      "pitch": 25
+    },
+    {
+      "name": "steam_body_back",
+      "dimension": "minecraft:the_nether",
+      "x": 34,
+      "y": 83,
+      "z": 24,
+      "yaw": 155,
+      "pitch": 30
+    },
+    {
+      "name": "electric_body_front",
+      "dimension": "minecraft:the_nether",
+      "x": 37,
+      "y": 83,
+      "z": 12,
+      "yaw": -35,
+      "pitch": 25
+    },
+    {
+      "name": "electric_body_back",
+      "dimension": "minecraft:the_nether",
+      "x": 43,
+      "y": 83,
+      "z": 20,
+      "yaw": 145,
+      "pitch": 25
+    },
+    {
+      "name": "workshop_overview",
+      "dimension": "minecraft:the_nether",
+      "x": 29,
+      "y": 85,
+      "z": 7,
+      "yaw": 0,
+      "pitch": 20
+    },
+    {
+      "name": "portal_home",
+      "dimension": "minecraft:overworld",
+      "x": 220,
+      "y": -59,
+      "z": 19,
+      "yaw": -35,
+      "pitch": 15
+    }
+  ]
+}

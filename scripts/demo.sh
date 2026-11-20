@@ -18,7 +18,10 @@
 # The mining galleries (x 37 to 53, z 8 to 23): a minehead whose staircase is done cuts a wide 3x3 gallery with three
 # jaws and a 1x2 gallery with one, both on one biomass line and one export line; watch each face through its glass,
 # open the Rootstock on the hill to see both faces, and find the cut in the chest on the platform east of the hill.
-# The tab starts empty, with no advancement granted.
+# The power district (x 197 to 228, z 7 to 29) has the receiver and Vigil Nest. Enter the portal at
+# x 223, z 24 for the working Nether workshop: Heat Body, Steam Body and Electric Body, with supplied
+# boilers, a steam-driven mining jaw, a nest and spare parts. All power starts in a physical multiblock.
+# Carry capsules/cells back through the portal; add chambers to grow the same core.
 # Play, then close the window. The world is rebuilt on every run; your options.txt in runs/demo is kept.
 set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."

@@ -22,10 +22,11 @@ import net.neoforged.neoforge.common.NeoForge;
  * {@code forceload add} until the server has those chunks loaded, so the {@code setblock} and {@code fill} commands
  * that follow never meet an unloaded position. A command that still reports one (the vanilla "That position is not
  * loaded") is a failure: {@link #check} throws, so the exhibit it would have built cannot go missing unseen.
+ * Unqualified setup targets the Overworld; an {@code execute in} prefix selects the dimension to await.
  */
 final class CommandFeed {
-    private static final Pattern FORCELOAD_ADD =
-            Pattern.compile("^forceload add (-?\\d+) (-?\\d+)(?: (-?\\d+) (-?\\d+))?$");
+    private static final Pattern FORCELOAD_ADD = Pattern.compile(
+            "^(?:execute in (?<dimension>[a-z0-9_.-]+:[a-z0-9_./-]+) run )?forceload add (?<x1>-?\\d+) (?<z1>-?\\d+)(?: (?<x2>-?\\d+) (?<z2>-?\\d+))?$");
     private static final String UNLOADED = "argument.pos.unloaded";
     /** Ticks the server's reply to a command may take to reach the client. */
     private static final int REPLY_TICKS = 5;
@@ -36,6 +37,8 @@ final class CommandFeed {
     private final Deque<String> recent = new ArrayDeque<>();
     private final List<String> unloaded = new ArrayList<>();
     private List<ChunkPos> awaited = List.of();
+    private net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> awaitedDimension =
+            net.minecraft.world.level.Level.OVERWORLD;
     private CompletableFuture<Boolean> loadCheck;
     private int quietTicks;
 
@@ -75,15 +78,22 @@ final class CommandFeed {
         recent.addLast(command);
         if (recent.size() > RECENT) recent.removeFirst();
         Matcher force = FORCELOAD_ADD.matcher(command);
-        if (force.matches()) awaited = chunks(force);
+        if (force.matches()) {
+            awaited = chunks(force);
+            awaitedDimension = force.group("dimension") == null
+                    ? net.minecraft.world.level.Level.OVERWORLD
+                    : net.minecraft.resources.ResourceKey.create(
+                            net.minecraft.core.registries.Registries.DIMENSION,
+                            net.minecraft.resources.ResourceLocation.parse(force.group("dimension")));
+        }
         return false;
     }
 
     private static List<ChunkPos> chunks(Matcher force) {
-        int x1 = Integer.parseInt(force.group(1));
-        int z1 = Integer.parseInt(force.group(2));
-        int x2 = force.group(3) == null ? x1 : Integer.parseInt(force.group(3));
-        int z2 = force.group(4) == null ? z1 : Integer.parseInt(force.group(4));
+        int x1 = Integer.parseInt(force.group("x1"));
+        int z1 = Integer.parseInt(force.group("z1"));
+        int x2 = force.group("x2") == null ? x1 : Integer.parseInt(force.group("x2"));
+        int z2 = force.group("z2") == null ? z1 : Integer.parseInt(force.group("z2"));
         List<ChunkPos> chunks = new ArrayList<>();
         for (int x = Math.min(x1, x2) >> 4; x <= Math.max(x1, x2) >> 4; x++)
             for (int z = Math.min(z1, z2) >> 4; z <= Math.max(z1, z2) >> 4; z++) chunks.add(new ChunkPos(x, z));
@@ -96,8 +106,10 @@ final class CommandFeed {
         if (server == null) throw new IllegalStateException("A forceload needs the integrated server");
         if (loadCheck == null) {
             List<ChunkPos> chunks = awaited;
+            var dimension = awaitedDimension;
             loadCheck = server.submit(() -> {
-                ServerLevel level = server.overworld();
+                ServerLevel level = server.getLevel(dimension);
+                if (level == null) throw new IllegalStateException("Missing demo dimension " + dimension.location());
                 return chunks.stream().allMatch(chunk -> level.hasChunk(chunk.x, chunk.z));
             });
         }

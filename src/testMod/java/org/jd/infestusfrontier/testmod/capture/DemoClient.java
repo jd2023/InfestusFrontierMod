@@ -68,7 +68,8 @@ final class DemoClient {
                                 minecraft,
                                 String.format(
                                         Locale.ROOT,
-                                        "tp @s %.3f %.3f %.3f %.2f %.2f",
+                                        "execute in %s run tp @s %.3f %.3f %.3f %.2f %.2f",
+                                        view.dimension(),
                                         view.x(),
                                         view.y(),
                                         view.z(),

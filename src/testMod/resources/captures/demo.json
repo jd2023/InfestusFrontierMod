@@ -1857,7 +1857,10 @@
     "setblock 200 -60 16 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"VIGIL NEST\"','\"Open: choose chunks\"','\"then Wake / rest\"','\"Biomass pays upkeep\"']}}",
     "setblock 210 -60 15 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"POWER RECEIVER\"','\"Hot capsules in\"','\"Heat; empty cells\"','\"in Cell to charge\"']}}",
     "setblock 216 -60 15 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"NETHER HEART\"','\"This one is cold.\"','\"Build it in Nether\"','\"with lava below fin\"']}}",
-    "setblock 214 -60 20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"STEAM DRIVER\"','\"This supplied jaw\"','\"can cut diamond.\"','\"Refill through pipes\"']}}"
+    "setblock 214 -60 20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"STEAM DRIVER\"','\"This supplied jaw\"','\"can cut diamond.\"','\"Refill through pipes\"']}}",
+    "forceload add 220 22 228 29",
+    "execute in minecraft:the_nether run forceload add 16 0 47 31",
+    "execute in minecraft:the_nether run function infestusfrontier_tests:nether_power_demo"
   ],
   "play": [
     "advancement revoke @s from infestusfrontier:contact/root"
