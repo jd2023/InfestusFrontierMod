@@ -150,6 +150,6 @@ Nothing is duplicated, nothing is lost, and the player is told why work stopped,
 These are intended directions. Each needs a reviewed design under [design/](design/) before work starts.
 
 - **Multiblock organs.** The original core keeps identity, history, branch and contents. Parts are real placed blocks that store only their role and their core. Only the core ticks. All ports share the core's reservations and work budget. A missing or unloaded part pauses the body; it is never dismantled automatically. Rebuilding never resets or duplicates the core.
-- **Chunk loading.** The only acceptable form is a separate, explicit, paid, capped service the player builds. Travel, freight and routes never load chunks, and progression never requires it.
+- **Chunk loading.** The only acceptable form is a separate, explicit, paid, capped service the player builds. Unattended supply across dimensions can depend on this service. Travel, freight and mining routes never load chunks themselves. Unloaded systems still pause without offline work or catch-up.
 - **Freight between sites.** A reserved batch with one accounted owner that waits locally until both ends are loaded. This is a different model from the passive vein network. Each base runs on local production and does not need another base loaded.
 - **Ownership.** The steward decides credit only. There is no access or team model yet; do not assume one.

@@ -29,10 +29,10 @@ Every milestone has one status:
 | Phase 1 | A colony that feeds itself, playable from nothing | 1–6 |
 | Phase 2 | A dug pit and tunnel, a wood farm, an animal farm | 7–13 |
 | Phase 3 | Upgrade paths, DNA research, mutation, an automated mine | 14–24 |
-| Phase 4 | A Nether base, steam, heavy mining | 25–35 |
-| Phase 5 | Electricity, better ore and DNA yield, the ore-seeking root | 36–41 |
-| Phase 6 | An End base and space-bending materials | 42–45 |
-| Phase 7 | Travel and freight between bases | 46–51 |
+| Phase 4 | A Nether base, steam, paid chunk loading, heavy mining | 25–36 |
+| Phase 5 | Electricity, better ore and DNA yield, the ore-seeking root | 37–42 |
+| Phase 6 | An End base and space-bending materials | 43–46 |
+| Phase 7 | Travel and freight between bases | 47–51 |
 | Phase 8 | A finished, balanced, stable game | 52–56 |
 
 ## Phase 1 — The Overworld colony
@@ -93,6 +93,13 @@ Organs and tools start to improve with use, and the player starts researching DN
 
 The player builds a second, larger base where heat is free. It gives heat-proof materials and steam, and steam unlocks the heavy mining methods.
 
+Paid chunk loading arrives with steam, before heavy mining, so the Nether
+supply base can work while the player is elsewhere. It is a separate, supplied
+service with a bounded area; miners and transport never load chunks themselves.
+Its energy cost, area limit and restart reserve still need design. The early
+energy connection between dimensions also needs design; loading alone does not
+move energy.
+
 Design gap: what the player makes here that is worth staying for, and how the base feeds itself, are not designed. Settle both before NETHER-1.
 
 | Step | ID | Player can | Done when | Needs | Status |
@@ -102,12 +109,13 @@ Design gap: what the player makes here that is worth staying for, and how the ba
 | 27 | WOOD-4 | Grow wood in the Nether from giant fungus | A Nether grove supplies stems with no logs brought from the Overworld | WOOD-2, NETHER-1 | none |
 | 28 | NETHER-3 | Rebuild the furnace into a hotter one that makes hardened plates and smelts faster | A hardened plate is made; the furnace keeps its experience and path | NETHER-2, EVOLVE-1 | none |
 | 29 | NETHER-4 | Boil water with lava to make steam and run a machine on it | One machine runs on steam; closing the outlet triggers the pressure relief instead of a failure | NETHER-2 | none |
-| 30 | NETHER-5 | Research Nether creatures' DNA in a lab built in the Nether | One Nether species is fully researched there | NETHER-1, GENE-1 | none |
-| 31 | MINE-5 | Cut hard rock that the first cutter cannot, using a steam-driven cutter | A staircase mine passes through rock that stopped MINE-3 | MINE-3, NETHER-4 | none |
-| 32 | MINE-6 | Sink a vertical shaft on a platform that lowers itself and carries the player | A supplied multiblock digs a shaft to a marked depth and installs lights and climbing access; the player rides down and climbs out | MINE-5 | none |
-| 33 | MINE-7 | Cut a long narrow trench down from a line on the surface | A supplied multiblock digs a marked trench to its depth, installs lights and access, and stops there; the player walks in and climbs out | MINE-5 | none |
-| 34 | MINE-8 | Dissolve the rock in a sealed pit and leave the ore standing | A marked pit is cleared of rock; every ore block remains; spent liquid is drained to storage | MINE-1, NETHER-2 | none |
-| 35 | NETHER-6 | Run the Nether base with no deliveries from the Overworld and send goods back | The base runs an hour and restarts after a full shutdown on its own reserves, and exports lining and plates | NETHER-1 to NETHER-4 | none |
+| 30 | LINK-4 | Keep a chosen Nether supply outpost running while working in another dimension, for a running cost | Only the chosen capped area stays loaded; its plant works and pays locally while the player is in the Overworld; unpaid loading stops, and paid loading restores correctly after a server restart | NETHER-4 | none |
+| 31 | NETHER-5 | Research Nether creatures' DNA in a lab built in the Nether | One Nether species is fully researched there | NETHER-1, GENE-1 | none |
+| 32 | MINE-5 | Cut hard rock that the first cutter cannot, using a steam-driven cutter | A staircase mine passes through rock that stopped MINE-3 | MINE-3, NETHER-4 | none |
+| 33 | MINE-6 | Sink a vertical shaft on a platform that lowers itself and carries the player | A supplied multiblock digs a shaft to a marked depth and installs lights and climbing access; the player rides down and climbs out | MINE-5 | none |
+| 34 | MINE-7 | Cut a long narrow trench down from a line on the surface | A supplied multiblock digs a marked trench to its depth, installs lights and access, and stops there; the player walks in and climbs out | MINE-5 | none |
+| 35 | MINE-8 | Dissolve the rock in a sealed pit and leave the ore standing | A marked pit is cleared of rock; every ore block remains; spent liquid is drained to storage | MINE-1, NETHER-2 | none |
+| 36 | NETHER-6 | Run the Nether base with no deliveries from the Overworld and send goods back | The base runs an hour and restarts after a full shutdown on its own reserves, and exports lining and plates | NETHER-1 to NETHER-4 | none |
 
 ## Phase 5 — Electricity
 
@@ -117,12 +125,12 @@ Open decision for POWER-5: whether a vessel ruptures at random or fails visibly 
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
-| 36 | POWER-1 | Generate electricity from biomass, carry it through the base, store it and run one machine on it | A machine runs from stored charge after the generator is turned off, then stops when the charge is gone | BASE-3 | none |
-| 37 | POWER-2 | Get more metal from each ore by adding an electric separation step | The same ore gives more ingots with the step than without; the step costs electricity, water and waste space, and skipping it stays cheaper per ingot | POWER-1, BASE-4, NETHER-3 | none |
-| 38 | POWER-3 | Get more DNA progress from each sample by adding an electric reading step | The same sample gives more research progress with the step than without | POWER-1, GENE-1 | none |
-| 39 | POWER-4 | Start and stop machines on a schedule and read the factory's state on a display | A line runs only in its set window; a display shows which store is full and which machine is blocked | POWER-1 | none |
-| 40 | POWER-5 | Contain a biomass leak from an overloaded vessel | An overloaded vessel fails in the way the design decides; a catch basin collects the spill and nothing outside it is harmed | NETHER-4 | none |
-| 41 | MINE-9 | Let a root find and follow ore by itself inside a volume the player marks | The multiblock branches toward sensed ore within the volume, builds connected lit passages the player can explore, and stops sensing when electricity is cut | MINE-4, POWER-1, NETHER-5 | none |
+| 37 | POWER-1 | Generate electricity from biomass, carry it through the base, store it and run one machine on it | A machine runs from stored charge after the generator is turned off, then stops when the charge is gone | BASE-3 | none |
+| 38 | POWER-2 | Get more metal from each ore by adding an electric separation step | The same ore gives more ingots with the step than without; the step costs electricity, water and waste space, and skipping it stays cheaper per ingot | POWER-1, BASE-4, NETHER-3 | none |
+| 39 | POWER-3 | Get more DNA progress from each sample by adding an electric reading step | The same sample gives more research progress with the step than without | POWER-1, GENE-1 | none |
+| 40 | POWER-4 | Start and stop machines on a schedule and read the factory's state on a display | A line runs only in its set window; a display shows which store is full and which machine is blocked | POWER-1 | none |
+| 41 | POWER-5 | Contain a biomass leak from an overloaded vessel | An overloaded vessel fails in the way the design decides; a catch basin collects the spill and nothing outside it is harmed | NETHER-4 | none |
+| 42 | MINE-9 | Let a root find and follow ore by itself inside a volume the player marks | The multiblock branches toward sensed ore within the volume, builds connected lit passages the player can explore, and stops sensing when electricity is cut | MINE-4, POWER-1, NETHER-5 | none |
 
 ## Phase 6 — The End base
 
@@ -130,10 +138,10 @@ The third base. The End gives materials that bend space, which make travel and f
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
-| 42 | END-1 | Anchor colony ground over the void and farm chorus on it with electricity | A chorus farm covers its own biomass and water use for three harvests | POWER-1, NETHER-2 | none |
-| 43 | END-2 | Make the End's own space-bending membrane locally | A batch is made from local chorus; it does not require End DNA research | END-1 | none |
-| 44 | END-3 | Research End creatures' DNA and give equipment a spatial ability | One End species is fully researched and one armor piece gains a spatial ability | END-1, GENE-2, EVOLVE-2 | none |
-| 45 | END-4 | Run the End base with no deliveries from the other bases | The base runs an hour and restarts after a full shutdown on its own reserves | END-1, END-2 | none |
+| 43 | END-1 | Anchor colony ground over the void and farm chorus on it with electricity | A chorus farm covers its own biomass and water use for three harvests | POWER-1, NETHER-2 | none |
+| 44 | END-2 | Make the End's own space-bending membrane locally | A batch is made from local chorus; it does not require End DNA research | END-1 | none |
+| 45 | END-3 | Research End creatures' DNA and give equipment a spatial ability | One End species is fully researched and one armor piece gains a spatial ability | END-1, GENE-2, EVOLVE-2 | none |
+| 46 | END-4 | Run the End base with no deliveries from the other bases | The base runs an hour and restarts after a full shutdown on its own reserves | END-1, END-2 | none |
 
 ## Phase 7 — Connecting the bases
 
@@ -141,10 +149,9 @@ Three bases become one colony when players and goods move between them.
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
-| 46 | LINK-1 | Travel between two bases through a built gate | A player steps in at one base and arrives safely at the other | END-2 | none |
-| 47 | LINK-2 | Ship items and fluids between bases | A batch sent while the far base is unloaded arrives once, whole, when it loads | LINK-1 | none |
-| 48 | LINK-3 | See what is stored at every base from one place | The view shows local stock and stock in transit separately | LINK-2 | none |
-| 49 | LINK-4 | Keep one chosen outpost running while away, for a running cost | The outpost works while the player is elsewhere and stops when the cost is not paid | LINK-1 | none |
+| 47 | LINK-1 | Travel between two bases through a built gate | A player steps in at one base and arrives safely at the other | END-2 | none |
+| 48 | LINK-2 | Ship items and fluids between bases | A batch sent while the far base is unloaded arrives once, whole, when it loads | LINK-1 | none |
+| 49 | LINK-3 | See what is stored at every base from one place | The view shows local stock and stock in transit separately | LINK-2 | none |
 | 50 | LINK-5 | Recall lost armor to a base | An armor piece dropped on death returns to its nest | END-3 | none |
 | 51 | LINK-6 | Make one product that needs all three bases | The product is made with one input from each dimension, shipped by LINK-2 | LINK-2, NETHER-6, END-4 | none |
 
