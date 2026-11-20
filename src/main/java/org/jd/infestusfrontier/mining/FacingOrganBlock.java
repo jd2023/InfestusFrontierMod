@@ -12,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -31,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * a foundation facing away from the player. A bucket moves biomass, any other hand opens the screen and sneaking builds
  * against it.
  */
-abstract class FacingOrganBlock extends BaseEntityBlock {
+abstract class FacingOrganBlock extends MiningOrganBlock {
     static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
     private final Map<Direction, VoxelShape> shapes;

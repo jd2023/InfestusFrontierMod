@@ -13,7 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -23,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -32,25 +32,43 @@ import org.jetbrains.annotations.Nullable;
 /**
  * The head of a Tunnel Root, a starter organ grown from an Organ Bud. It faces the way it cuts. The player feeds it
  * Root Segments and biomass by hand, steers its next step at its screen and empties its output; every twenty seconds
- * it cuts the two blocks ahead, lays a root cell under them and moves in. Segments and biomass buckets load it, a
+ * it cuts the two blocks ahead, lays a root cell under them and crawls in. Segments and biomass buckets load it, a
  * genetic construct mutates it, any other hand opens its screen and sneaking builds against it. Broken, it comes out
- * whole with what it holds, the cells it has laid and its mutations.
+ * whole with what it holds, the cells it has laid and its mutations; left without the block under it, it dies and
+ * leaves nothing. {@link #STEER} is the way its next step goes, which its model leans towards and its preview marks;
+ * {@link #STRIDE} is the way its last step went while it still crawls into its cell.
  */
-public final class TunnelRootBlock extends BaseEntityBlock {
+public final class TunnelRootBlock extends MiningOrganBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Stride> STEER =
+            EnumProperty.create("steer", Stride.class, way -> way != Stride.REST);
+    public static final EnumProperty<Stride> STRIDE = EnumProperty.create("stride", Stride.class);
 
     private static final MapCodec<TunnelRootBlock> CODEC = simpleCodec(TunnelRootBlock::new);
 
-    /** The model's boxes facing north, as {x1, y1, z1, x2, y2, z2}: foot, body, crown and the snout it cuts with. */
+    /**
+     * The model's rest boxes facing north, as {x1, y1, z1, x2, y2, z2}: foot, body, crown, the snout it cuts with, its
+     * tip and the two hooks that grip the rock.
+     */
     private static final double[][] BOXES = {
-        {2, 0, 3, 14, 2, 15}, {3, 2, 4, 13, 9, 14}, {4, 9, 6, 12, 12, 13}, {5, 2, 1, 11, 7, 4}, {6, 3, 0, 10, 6, 1}
+        {2, 0, 3, 14, 2, 15},
+        {3, 2, 4, 13, 9, 14},
+        {4, 9, 6, 12, 12, 13},
+        {5, 2.1, 0.75, 11, 7.1, 4.75},
+        {6, 3, 0.25, 10, 6, 1.25},
+        {4.6, 3.5, 0.1, 5.6, 5.5, 2.1},
+        {10.4, 3.5, 0.1, 11.4, 5.5, 2.1}
     };
 
     private static final Map<Direction, VoxelShape> SHAPES = FacingShapes.of(BOXES);
 
     TunnelRootBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition
+                .any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(STEER, Stride.STRAIGHT)
+                .setValue(STRIDE, Stride.REST));
     }
 
     @Override
@@ -60,12 +78,12 @@ public final class TunnelRootBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, STEER, STRIDE);
     }
 
     @Override
     protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     @Override

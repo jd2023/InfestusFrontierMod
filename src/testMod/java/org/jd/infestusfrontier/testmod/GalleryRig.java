@@ -222,7 +222,7 @@ final class GalleryRig {
                 ("infestusfrontier:surveyed_tissue[facing=north]{shape:0,length:%d,first_way:0,first_at:0,"
                                 + "second_way:0,second_at:0,lit:0b,approved:1b,built:%d}")
                         .formatted(DEPTH, DEPTH + 1));
-        MinePlan stairs = new MinePlan(PlanShape.STAIRCASE, DEPTH, Turn.NONE, Turn.NONE, false);
+        MinePlan stairs = new MinePlan(PlanShape.STAIRCASE, DEPTH, Turn.NONE, Turn.NONE);
         for (PlanStep step : stairs.steps()) {
             for (Offset cell : step.passage()) set(stairs(cell), "air");
             set(stairs(step.root()), "infestusfrontier:root_cell[facing=north,bend=false]");
@@ -245,8 +245,12 @@ final class GalleryRig {
         set(CHEST, "chest[facing=north]");
     }
 
-    /** The marker of a route of {@code length} cells from the landing, and its grower holding {@code segments}. */
+    /**
+     * The marker of a route of {@code length} cells from the landing, and its grower holding {@code segments} and the
+     * torches and Bone Plates the route's lights and ribs take.
+     */
     void face(Face face, int length, Turn first, Turn second, boolean wide, int segments) {
+        MinePlan.Needs needs = new MinePlan(PlanShape.ROUTE, length, first, second, wide).needs();
         set(
                 face.marker,
                 ("infestusfrontier:surveyed_tissue[facing=%s]{shape:1,length:%d,first_way:%d,first_at:%d,"
@@ -261,11 +265,13 @@ final class GalleryRig {
                                 wide ? "1b" : "0b"));
         set(
                 face.grower(),
-                ("infestusfrontier:structure_grower{segments:%s,treads:{},lights:{},steps:0,ticks:0}")
+                ("infestusfrontier:structure_grower{segments:%s,treads:{},lights:%s,ribs:%s,steps:0,ticks:0}")
                         .formatted(
                                 segments > 0
                                         ? "{id:\"infestusfrontier:root_segment\",count:%d}".formatted(segments)
-                                        : "{}"));
+                                        : "{}",
+                                "{id:\"minecraft:torch\",count:%d}".formatted(needs.lights()),
+                                "{id:\"infestusfrontier:bone_plate\",count:%d}".formatted(needs.ribs())));
     }
 
     /** A jaw with an empty tank on the biomass line, its bed, and its cilia with a full tank on an export Mouth. */
@@ -307,7 +313,6 @@ final class GalleryRig {
                         : new Turn(
                                 org.jd.infestusfrontier.core.mining.Steer.values()[saved.getInt("second_way")],
                                 saved.getInt("second_at")),
-                false,
                 saved.getBoolean("wide"));
     }
 

@@ -58,6 +58,7 @@ import org.jd.infestusfrontier.logistics.MouthMode;
 import org.jd.infestusfrontier.logistics.Port;
 import org.jd.infestusfrontier.logistics.VascularJunctionBlock;
 import org.jd.infestusfrontier.logistics.api.ItemAccess;
+import org.jd.infestusfrontier.mining.CollectionCiliaBlock;
 import org.jd.infestusfrontier.mining.MiningModule;
 import org.jd.infestusfrontier.mining.WorkBedMenu;
 import org.jd.infestusfrontier.mining.WorkOrganMenu;
@@ -378,8 +379,8 @@ public final class FractureJawTests {
                     s.level.setBlock(s.at(0, 0, -1), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
                 }),
                 new Leave(
-                        "water",
-                        Fracturing.FLUID,
+                        "water alone: nothing to cut",
+                        Fracturing.NOTHING,
                         s -> s.set(0, 0, -1, Blocks.WATER),
                         s -> s.set(0, 0, -1, Blocks.STONE)),
                 new Leave(
@@ -412,6 +413,44 @@ public final class FractureJawTests {
                         slots(site.saved(Site.BED)), List.of("minecraft:cobblestone 1"), "the torch gone, it cuts"))
                 .thenExecute(() -> {
                     h.assertValueEqual(site.loose(), 0, "nothing loose");
+                    site.release();
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * Every stationary mining organ dies with the block it stands on. A player digs out the jaw's and the bed's
+     * substrate, the cilia's Mouth and the grower's marker; each organ breaks on its next tick and leaves nothing: no
+     * organ item and nothing it held. Losing its ground is destruction, not a pause.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void miningOrgansDieWithTheirGroundAndDropNothing(GameTestHelper h) {
+        Site site = Site.of(h, 9);
+        site.jaw();
+        site.cilia(MouthMode.OUTPUT);
+        site.feed(Site.JAW, 1000);
+        BlockPos marker = new BlockPos(-3, -1, 0);
+        BlockPos grower = marker.above();
+        site.set(-3, -2, 0, Blocks.STONE);
+        site.set(-3, -1, 0, MiningModule.SURVEYED_TISSUE.get());
+        site.set(-3, 0, 0, MiningModule.STRUCTURE_GROWER.get());
+        ServerPlayer miner = TestDrops.miner(h, new ItemStack(Items.DIAMOND_PICKAXE));
+        for (BlockPos ground : List.of(Site.JAW.below(), Site.BED.below(), Site.MOUTH, marker))
+            h.assertTrue(miner.gameMode.destroyBlock(site.at(ground)), "a player digs out " + ground);
+        h.startSequence()
+                .thenWaitUntil(() -> {
+                    for (BlockPos organ : List.of(Site.JAW, Site.BED, Site.CILIA, grower))
+                        h.assertTrue(
+                                site.level.getBlockState(site.at(organ)).isAir(), "the organ at " + organ + " died");
+                })
+                .thenExecute(() -> {
+                    for (ItemEntity item : site.level.getEntitiesOfClass(ItemEntity.class, site.yard()))
+                        h.assertFalse(
+                                item.getItem().is(MiningModule.FRACTURE_JAW_ITEM.get())
+                                        || item.getItem().is(MiningModule.WORK_BED_ITEM.get())
+                                        || item.getItem().is(MiningModule.COLLECTION_CILIA_ITEM.get())
+                                        || item.getItem().is(MiningModule.STRUCTURE_GROWER_ITEM.get()),
+                                "no organ comes out of it: " + item.getItem());
                     site.release();
                 })
                 .thenSucceed();
@@ -513,6 +552,7 @@ public final class FractureJawTests {
     /**
      * Collection waits without losing or doubling anything: a Mouth that does not give and a full chest each stop the
      * cilia with their reason while the cut material stays in the bed; once the chest has room it all arrives, once.
+     * The cilia show work only for the sweep that moved something: not while refused, and not once the bed is empty.
      */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 8 * WAIT)
     public static void aClosedMouthOrFullStorageKeepsTheCutInTheBed(GameTestHelper h) {
@@ -531,6 +571,7 @@ public final class FractureJawTests {
                         site.stop(Site.CILIA, player), Optional.of(key(ItemAccess.NOT_GIVING)), "the Mouth is closed"))
                 .thenExecute(() -> {
                     h.assertValueEqual(site.held(Items.COBBLESTONE), 10, "all ten still in the bed");
+                    h.assertFalse(drawing(site), "a refused sweep shows no work");
                     site.mouth(Site.MOUTH, MouthMode.OUTPUT);
                 })
                 .thenWaitUntil(() -> h.assertValueEqual(
@@ -541,6 +582,7 @@ public final class FractureJawTests {
                             List.of("minecraft:cobblestone 10", "minecraft:coal 3"),
                             "the bed keeps it all");
                     h.assertValueEqual(stored(site.saved(Site.CILIA)), 1000, "a sweep that moved nothing is free");
+                    h.assertFalse(drawing(site), "and shows no work");
                     h.assertValueEqual(site.loose(), 0, "nothing loose");
                     site.chest().setItem(0, ItemStack.EMPTY);
                     site.chest().setItem(1, ItemStack.EMPTY);
@@ -552,9 +594,23 @@ public final class FractureJawTests {
                     h.assertValueEqual(site.saved(Site.CILIA).getInt("sent"), 13, "sent counts what left");
                     h.assertValueEqual(stored(site.saved(Site.CILIA)), 1000 - Collecting.SWEEP_BIOMASS_BU, "one paid");
                     h.assertValueEqual(site.loose(), 0, "nothing loose");
+                    h.assertTrue(drawing(site), "the sweep that moved them shows work");
+                })
+                .thenWaitUntil(() -> h.assertFalse(drawing(site), "the next sweep finds the bed empty and stops"))
+                .thenExecute(() -> {
+                    h.assertValueEqual(site.saved(Site.CILIA).getInt("sent"), 13, "it sent nothing more");
+                    h.assertValueEqual(
+                            stored(site.saved(Site.CILIA)),
+                            1000 - Collecting.SWEEP_BIOMASS_BU,
+                            "and paid nothing more");
                     site.release();
                 })
                 .thenSucceed();
+    }
+
+    /** True while the cilia's block state shows them drawing material in, which only a sweep that moved items sets. */
+    private static boolean drawing(Site site) {
+        return site.state(1, 0, 1).getValue(CollectionCiliaBlock.WORKING);
     }
 
     // ---- saved state ----

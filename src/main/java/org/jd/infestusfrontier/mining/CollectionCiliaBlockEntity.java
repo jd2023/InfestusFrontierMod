@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jd.infestusfrontier.core.foundation.Biomass;
@@ -32,6 +33,12 @@ import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.organ.api.Steward;
 import org.jd.infestusfrontier.organ.api.Stewarded;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
  * The work of Collection Cilia. Every {@value Collecting#SWEEP_TICKS} loaded ticks they offer the first
@@ -39,9 +46,18 @@ import org.jd.infestusfrontier.storage.api.BiomassHandler;
  * they stand on ({@link ItemAccess}): logistics decides which far Mouths take what, and really moves it before the
  * call returns. Exactly what was taken leaves the bed; the rest stays there. A sweep that moved something costs
  * {@value Collecting#SWEEP_BIOMASS_BU} BU, which it must have before it starts. The cilia hold no items, so nothing
- * they handle can spill, vanish or double. Biomass reaches them by bucket, pipe or vein. They load no chunk.
+ * they handle can spill, vanish or double. Biomass reaches them by bucket, pipe or vein. They load no chunk. While the
+ * last sweep moved something their block state says so, and the client shows the fronds drawing fragments into the
+ * intake and a pulse running down into the Mouth; nothing else is sent for it.
  */
-final class CollectionCiliaBlockEntity extends BlockEntity implements BiomassHandler, Stewarded, MenuProvider {
+final class CollectionCiliaBlockEntity extends BlockEntity
+        implements BiomassHandler, Stewarded, MenuProvider, GeoBlockEntity {
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation DRAWING = RawAnimation.begin().thenLoop("drawing");
+    /** Ticks the model blends from one clip into the next. */
+    private static final int BLEND_TICKS = 4;
+
+    private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     private BiomassTank tank = CollectionCiliaContents.EMPTY.tank();
     private int sent;
     private Optional<CompoundTag> unreadable = Optional.empty();
@@ -109,7 +125,11 @@ final class CollectionCiliaBlockEntity extends BlockEntity implements BiomassHan
         if (cilia.unreadable.isPresent() || !(level instanceof ServerLevel server)) return;
         if (--cilia.wait > 0) return;
         cilia.wait = Collecting.SWEEP_TICKS;
+        int before = cilia.sent;
         cilia.stop = cilia.sweep(server, pos, state.getValue(FacingOrganBlock.FACING));
+        boolean drew = cilia.sent != before;
+        if (state.getValue(CollectionCiliaBlock.WORKING) != drew)
+            level.setBlock(pos, state.setValue(CollectionCiliaBlock.WORKING, drew), Block.UPDATE_CLIENTS);
     }
 
     /** One sweep from the bed in front into the network. Returns why it moved nothing, or empty. */
@@ -159,6 +179,25 @@ final class CollectionCiliaBlockEntity extends BlockEntity implements BiomassHan
             if (ItemStack.isSameItemSameComponents(bed.slots().getStackInSlot(slot), like))
                 held = Counts.more(held, bed.slots().getStackInSlot(slot).getCount());
         return held;
+    }
+
+    // ---- appearance ----
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(
+                this,
+                "sweep",
+                BLEND_TICKS,
+                state -> state.setAndContinue(
+                        state.getAnimatable().getBlockState().getValue(CollectionCiliaBlock.WORKING)
+                                ? DRAWING
+                                : IDLE)));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableCache;
     }
 
     // ---- saved state ----

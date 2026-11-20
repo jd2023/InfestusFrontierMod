@@ -1,0 +1,54 @@
+{
+  "commands": [
+    "forceload add 296 316 344 332",
+    "fill 296 -61 316 344 -50 332 air",
+    "fill 296 -62 316 344 -62 332 grass_block",
+    "kill @e[type=item]",
+    "tick unfreeze",
+    "setblock 300 -61 320 infestusfrontier:mouth[mode=output]",
+    "setblock 300 -60 320 infestusfrontier:collection_cilia[facing=north]",
+    "setblock 300 -61 319 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 300 -60 319 infestusfrontier:work_bed",
+    "setblock 304 -61 320 infestusfrontier:mouth[mode=output]",
+    "setblock 304 -60 320 infestusfrontier:collection_cilia[facing=north]{tank:{stored:1000,capacity:1000},sent:0}",
+    "setblock 304 -61 319 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 304 -60 319 infestusfrontier:work_bed",
+    "fill 305 -61 320 306 -61 320 infestusfrontier:item_vein",
+    "setblock 307 -61 320 infestusfrontier:mouth[mode=intake]",
+    "setblock 307 -60 320 chest"
+  ],
+  "views": [
+    {
+      "name": "rest",
+      "x": 301.3,
+      "y": -59.3,
+      "z": 321.6,
+      "yaw": 150,
+      "pitch": 25,
+      "frames": 6,
+      "frameTicks": 8
+    },
+    {
+      "name": "drawing",
+      "x": 305.3,
+      "y": -59.3,
+      "z": 321.6,
+      "yaw": 150,
+      "pitch": 25,
+      "frames": 10,
+      "frameTicks": 2,
+      "trigger": "data merge block 304 -60 319 {slots:[{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64}],received:576}"
+    },
+    {
+      "name": "drawing_side",
+      "x": 306.4,
+      "y": -60.8,
+      "z": 320.1,
+      "yaw": 90,
+      "pitch": 16,
+      "frames": 10,
+      "frameTicks": 2,
+      "trigger": "data merge block 304 -60 319 {slots:[{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64},{id:\"minecraft:cobblestone\",count:64}],received:576}"
+    }
+  ]
+}

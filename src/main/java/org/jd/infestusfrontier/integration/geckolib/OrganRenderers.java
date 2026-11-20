@@ -58,7 +58,11 @@ public final class OrganRenderers {
         register(modBus, name, blockEntity, item, BLOCK, overlay);
     }
 
-    private static <B extends BlockEntity & GeoBlockEntity, I extends Item & GeoItem> void register(
+    /**
+     * As {@link #register(IEventBus, String, Supplier, Supplier, AABB)}, with {@code overlay} drawn after the model each
+     * frame: a model that reaches past its block and shows something beside it.
+     */
+    public static <B extends BlockEntity & GeoBlockEntity, I extends Item & GeoItem> void register(
             IEventBus modBus,
             String name,
             Supplier<BlockEntityType<B>> blockEntity,

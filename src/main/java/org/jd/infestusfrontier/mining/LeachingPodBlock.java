@@ -12,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,15 +30,16 @@ import org.jd.infestusfrontier.organ.api.Organs;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A one-use organ that weakens the ground below it, a layer a second, so a pit can be dug by hand and its ore seen.
- * It is grown from an Organ Bud on a foundation and cannot be picked up again: broken, it leaves nothing. Any use reads
- * its progress; sneaking builds against it. {@link #SPENT} is the husk of a pod that finished its work, and only
- * finishing it spends a pod.
+ * A one-use organ that weakens the ground below it, a layer a second, so a pit can be dug by hand and its ore seen,
+ * and grows a glowing root down its own column that lights the pit. It is grown from an Organ Bud on a foundation and
+ * cannot be picked up again: broken, it leaves nothing. It dies with the block below it, its root or its foundation,
+ * whether working or finished, and that too leaves nothing. Any use reads its progress; sneaking builds against it.
+ * {@link #SPENT} is a pod that finished its work: it stays, with its pore closed, and no longer ticks.
  */
-public final class LeachingPodBlock extends BaseEntityBlock {
+public final class LeachingPodBlock extends MiningOrganBlock {
     public static final BooleanProperty SPENT = BooleanProperty.create("spent");
 
-    /** Soft enough to clear a husk by hand; unlike an organ it gives nothing back. */
+    /** Soft enough to clear by hand; unlike an organ it gives nothing back. */
     static final float HARDNESS = 1.0F;
 
     static final float BLAST_RESISTANCE = 3.0F;

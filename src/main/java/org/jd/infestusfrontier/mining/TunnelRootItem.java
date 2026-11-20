@@ -3,16 +3,19 @@ package org.jd.infestusfrontier.mining;
 import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 import org.jd.infestusfrontier.core.mining.RootMutation;
+import org.jd.infestusfrontier.integration.geckolib.OrganItem;
 
-/** A Tunnel Root head as an item. A head broken with mutations carries them, and the tooltip names them. */
-public final class TunnelRootItem extends BlockItem {
+/**
+ * A Tunnel Root head as an item, drawn with the head's own model at rest. A head broken with mutations carries them,
+ * and the tooltip names them.
+ */
+public final class TunnelRootItem extends OrganItem {
     TunnelRootItem(Block block, Properties properties) {
-        super(block, properties);
+        super(block, properties, "idle");
     }
 
     @Override

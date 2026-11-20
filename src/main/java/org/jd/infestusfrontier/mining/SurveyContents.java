@@ -14,7 +14,8 @@ import org.jd.infestusfrontier.core.mining.Turn;
 /**
  * How a Surveyed Tissue marker saves its {@link Survey}: the plan's numbers, whether it is approved and how many of its
  * steps are built. Impossible numbers are a decode error, never an exception, so the marker keeps them unread. A
- * marker saved before routes could be wide reads as one column wide.
+ * marker saved before routes could be wide reads as one column wide; one saved when lights were a choice keeps its plan
+ * and is lit, as every plan now is.
  */
 final class SurveyContents {
     private record Raw(
@@ -24,7 +25,6 @@ final class SurveyContents {
             int firstAt,
             int secondWay,
             int secondAt,
-            boolean lit,
             boolean approved,
             int built,
             boolean wide) {}
@@ -36,7 +36,6 @@ final class SurveyContents {
                             Codec.INT.fieldOf("first_at").forGetter(Raw::firstAt),
                             Codec.INT.fieldOf("second_way").forGetter(Raw::secondWay),
                             Codec.INT.fieldOf("second_at").forGetter(Raw::secondAt),
-                            Codec.BOOL.fieldOf("lit").forGetter(Raw::lit),
                             Codec.BOOL.fieldOf("approved").forGetter(Raw::approved),
                             Codec.INT.fieldOf("built").forGetter(Raw::built),
                             Codec.BOOL.optionalFieldOf("wide", false).forGetter(Raw::wide))
@@ -54,7 +53,6 @@ final class SurveyContents {
                 plan.first().at(),
                 plan.second().way().ordinal(),
                 plan.second().at(),
-                plan.lit(),
                 survey.approved(),
                 survey.built(),
                 plan.wide());
@@ -72,7 +70,6 @@ final class SurveyContents {
                             raw.length(),
                             new Turn(first.get(), raw.firstAt()),
                             new Turn(second.get(), raw.secondAt()),
-                            raw.lit(),
                             raw.wide()),
                     raw.approved(),
                     raw.built()));

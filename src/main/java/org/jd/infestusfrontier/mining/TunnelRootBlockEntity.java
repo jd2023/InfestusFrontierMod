@@ -24,7 +24,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Fallable;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -53,6 +52,12 @@ import org.jd.infestusfrontier.organ.api.Steward;
 import org.jd.infestusfrontier.organ.api.Stewarded;
 import org.jd.infestusfrontier.organ.api.WorkshopActionEvent;
 import org.jd.infestusfrontier.storage.StorageModule;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
  * The work of a Tunnel Root head. Every {@value Tunnelling#STEP_TICKS} loaded ticks it tries one step: it turns as
@@ -60,6 +65,9 @@ import org.jd.infestusfrontier.storage.StorageModule;
  * them, pays one segment and {@value Tunnelling#STEP_BIOMASS_BU} BU, and moves into the cut. Everything a step reads
  * and changes is judged first, so a step is done whole in one tick or not at all; a stopped head keeps its step due,
  * names the reason and looks again after {@value Tunnelling#RETRY_TICKS} ticks, or at once when its supplies change.
+ * Only its supplies, its grade, its length and unloaded chunks stop it. It cuts into water and lava, under gravel and
+ * over holes as the player steered it: fluid in the cut is simply left to flow, and over a missing floor it lays no
+ * cell, steps onto nothing and dies. Its steering is its block state, which the client shows.
  * Nothing is fed to it by veins, hoppers or pipes: it has no capability. It loads no chunk. A genetic construct
  * applied by hand gives it a permanent mutation, see {@link #mutate}; a head with Stairs is a Descending Rootstock.
  * Mutations change none of the steps it takes by hand.
@@ -77,7 +85,21 @@ import org.jd.infestusfrontier.storage.StorageModule;
  *
  * <p>Moving is a new block entity at the cut: this one hands it its whole saved state, steward included, and leaves.
  */
-final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, MenuProvider {
+final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, MenuProvider, GeoBlockEntity {
+    /** At rest the head leans towards its next cut: straight, left or right. */
+    private static final RawAnimation REST = RawAnimation.begin().thenLoop("idle");
+
+    private static final RawAnimation AIM_LEFT = RawAnimation.begin().thenLoop("aim_left");
+    private static final RawAnimation AIM_RIGHT = RawAnimation.begin().thenLoop("aim_right");
+    /** Just moved: it reaches into the new cell, grips and pulls its body in, turning on a turn, then holds still. */
+    private static final RawAnimation CRAWL = RawAnimation.begin().thenPlayAndHold("crawl");
+
+    private static final RawAnimation CRAWL_LEFT = RawAnimation.begin().thenPlayAndHold("crawl_left");
+    private static final RawAnimation CRAWL_RIGHT = RawAnimation.begin().thenPlayAndHold("crawl_right");
+    /** Ticks the model blends from one clip into the next. */
+    private static final int BLEND_TICKS = 4;
+
+    private final AnimatableInstanceCache animatableCache = GeckoLibUtil.createInstanceCache(this);
     /** Blocks from the head whose chunks a step needs: the cut, its neighbours, and the blocks their updates reach. */
     private static final int REACH = 3;
 
@@ -108,7 +130,6 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     private BiomassTank tank = TunnelRootContents.EMPTY.tank();
     private TunnelProgress progress = TunnelProgress.START;
-    private Steer steer = Steer.STRAIGHT;
     private RootMutations mutations = RootMutations.NONE;
     /** Staircase steps built under this Rootstock's order: its minehead history. */
     private int descended;
@@ -159,8 +180,10 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
         return progress;
     }
 
+    /** The way the next step goes, as its block state says. */
     Steer steer() {
-        return steer;
+        return restoredSteer.orElseGet(
+                () -> getBlockState().getValue(TunnelRootBlock.STEER).steer());
     }
 
     RootMutations mutations() {
@@ -204,8 +227,10 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     /** Sets the way of the next step. Refused, changing nothing, while the saved state is unreadable. */
     void steer(Steer way) {
-        if (unreadable.isPresent() || steer == way) return;
-        steer = way;
+        if (unreadable.isPresent() || level == null || steer() == way) return;
+        level.setBlock(
+                worldPosition, getBlockState().setValue(TunnelRootBlock.STEER, Stride.of(way)), Block.UPDATE_CLIENTS);
+        restoredSteer = Optional.empty();
         supplied();
     }
 
@@ -267,7 +292,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
      * Applies the construct in {@code hand} for its mutation, or names why not and takes nothing. The head must stand
      * on its root, must not have the mutation yet, must already be a Rootstock for a mutation that needs one, and its
      * tank must hold the mutation's biomass. Then it takes one construct and that biomass once and keeps the mutation
-     * for good. Its segments, output, cells, steering and steward stay as they were: a mutation permits an operation
+     * for good. Its segments, output, cells and steward stay as they were: a mutation permits an operation
      * and supplies nothing that operation uses.
      */
     void mutate(Player player, InteractionHand hand, RootMutation mutation) {
@@ -313,6 +338,13 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     static void serverTick(Level level, BlockPos pos, BlockState state, TunnelRootBlockEntity head) {
         if (head.unreadable.isPresent() || !(level instanceof ServerLevel server)) return;
+        if (head.restoredSteer.isPresent()) {
+            state = state.setValue(TunnelRootBlock.STEER, Stride.of(head.restoredSteer.get()));
+            head.restoredSteer = Optional.empty();
+            level.setBlock(pos, state, Block.UPDATE_CLIENTS);
+        }
+        if (state.getValue(TunnelRootBlock.STRIDE) != Stride.REST && head.progress.ticks() >= Tunnelling.CRAWL_TICKS)
+            level.setBlock(pos, state.setValue(TunnelRootBlock.STRIDE, Stride.REST), Block.UPDATE_CLIENTS);
         Direction facing = state.getValue(TunnelRootBlock.FACING);
         head.minehead = head.mutations.rootstock() && Minehead.faces(level, pos, facing);
         if (head.minehead) {
@@ -432,11 +464,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     /** The way the next step goes: as steered from where the head faces. */
     private Direction way(Direction facing) {
-        return switch (steer) {
-            case STRAIGHT -> facing;
-            case LEFT -> facing.getCounterClockWise();
-            case RIGHT -> facing.getClockWise();
-        };
+        return MiningDirections.turn(facing, steer().quarters());
     }
 
     private void tryStep(ServerLevel level, BlockPos pos, BlockState state) {
@@ -473,9 +501,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
             Optional<Refusal> refused = cuttable(level, cut);
             if (refused.isPresent()) return refused;
         }
-        if (fluidTouches(level, ahead)) return Optional.of(Tunnelling.FLUID);
-        if (level.getBlockState(top.above()).getBlock() instanceof Fallable) return Optional.of(Tunnelling.FALLING);
-        if (!floor(level, floor)) return Optional.of(Tunnelling.NO_FLOOR);
+        if (!missing(level, floor) && !floor(level, floor)) return Optional.of(Tunnelling.NO_FLOOR);
         return Optional.empty();
     }
 
@@ -489,22 +515,14 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
     private static Optional<Refusal> cuttable(ServerLevel level, BlockPos cut) {
         return switch (Cutting.judge(level, cut)) {
             case CLEAR, CUTTABLE -> Optional.empty();
-            case FLUID -> Optional.of(Tunnelling.FLUID);
             case UNSUPPORTED -> Optional.of(Tunnelling.UNSUPPORTED);
             case TOO_HARD -> Optional.of(Tunnelling.TOO_HARD);
         };
     }
 
-    /** True when fluid stands next to either cut block, which would flow into the tunnel. */
-    private static boolean fluidTouches(ServerLevel level, BlockPos ahead) {
-        BlockPos top = ahead.above();
-        for (BlockPos cut : List.of(ahead, top))
-            for (Direction side : Direction.values()) {
-                BlockPos next = cut.relative(side);
-                if (next.equals(ahead) || next.equals(top)) continue;
-                if (!level.getFluidState(next).isEmpty()) return true;
-            }
-        return false;
+    /** True for a floor that is not there: air, fluid, or anything open a root cell would float over. */
+    private static boolean missing(ServerLevel level, BlockPos floor) {
+        return level.getBlockState(floor).canBeReplaced();
     }
 
     /** True for plain ground a root cell may replace: tagged, dry, no block entity. */
@@ -515,65 +533,107 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
 
     /**
      * Takes the judged step: clears the cut, lays the cell, pays, and moves the head with everything it owns into the
-     * cut. The lower cut block goes first and quietly, so neither cut block's removal can update the other into a
-     * second, loose drop (a door's halves, a lantern hanging from the upper block, a torch standing on the lower one).
-     * The lower block's outside neighbours get their updates when the head moves in.
+     * cut, where it shows the stride it took while it crawls in. The lower cut block goes first and quietly, so neither
+     * cut block's removal can update the other into a second, loose drop (a door's halves, a lantern hanging from the
+     * upper block, a torch standing on the lower one); a waterlogged block leaves its fluid, as breaking it would. The
+     * lower block's outside neighbours get their updates when the head moves in. Over a missing floor no cell is laid
+     * and no segment paid, and the head, standing on nothing, dies.
      */
     private void step(ServerLevel level, BlockPos pos, BlockState state, Direction way, List<ItemStack> after) {
         Direction facing = state.getValue(TunnelRootBlock.FACING);
         BlockPos ahead = pos.relative(way);
         BlockState lower = level.getBlockState(ahead);
-        if (!lower.isAir()) {
+        if (!Cutting.open(lower)) {
             level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, ahead, Block.getId(lower));
-            level.setBlock(ahead, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+            level.setBlock(
+                    ahead, lower.getFluidState().createLegacyBlock(), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
             level.gameEvent(GameEvent.BLOCK_DESTROY, ahead, GameEvent.Context.of(lower));
         }
-        level.destroyBlock(ahead.above(), false);
-        level.setBlock(ahead.below(), RootCellBlock.straight(way), Block.UPDATE_ALL);
+        if (!Cutting.open(level.getBlockState(ahead.above()))) level.destroyBlock(ahead.above(), false);
+        boolean laid = !missing(level, ahead.below());
+        if (laid) level.setBlock(ahead.below(), RootCellBlock.straight(way), Block.UPDATE_ALL);
         if (way != facing && level.getBlockState(pos.below()).is(MiningModule.ROOT_CELL.get()))
             level.setBlock(pos.below(), RootCellBlock.bend(facing, way), Block.UPDATE_ALL);
 
         ItemStack paid = segments.getStackInSlot(0).copy();
-        paid.shrink(1);
+        if (laid) paid.shrink(1);
         restore(new TunnelRootContents(
                 paid,
                 after,
                 ((Outcome.Done<BiomassTank>) tank.drain(Biomass.of(Tunnelling.STEP_BIOMASS_BU))).value(),
                 progress.stepped(),
-                Steer.STRAIGHT,
+                Optional.of(Steer.STRAIGHT),
                 mutations,
                 descended));
         stop = Optional.empty();
 
         CompoundTag carried = saveWithoutMetadata(level.registryAccess());
-        level.setBlock(ahead, state.setValue(TunnelRootBlock.FACING, way), Block.UPDATE_ALL);
+        level.setBlock(
+                ahead,
+                state.setValue(TunnelRootBlock.FACING, way)
+                        .setValue(TunnelRootBlock.STEER, Stride.STRAIGHT)
+                        .setValue(TunnelRootBlock.STRIDE, state.getValue(TunnelRootBlock.STEER)),
+                Block.UPDATE_ALL);
         if (!(level.getBlockEntity(ahead) instanceof TunnelRootBlockEntity moved)) {
             MiningModule.LOGGER.error("Tunnel Root at {} could not move into {}; it stays", pos, ahead);
             return;
         }
+        carried.remove("steer");
         moved.loadWithComponents(carried, level.registryAccess());
         moved.setChanged();
         restore(TunnelRootContents.EMPTY); // this block entity leaves: nothing stays behind to drop or duplicate
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         level.playSound(null, ahead, SoundEvents.ROOTED_DIRT_BREAK, SoundSource.BLOCKS, 0.8F, 0.8F);
         moved.steward.worked(level, MiningModule.TUNNEL_ROOT.getId());
+        if (!MiningOrganBlock.supported(level, ahead)) MiningOrganBlock.die(level, ahead);
+    }
+
+    // ---- appearance ----
+
+    /** The client shows the crawl while the block state names a stride, else the lean towards the next cut. */
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "crawl", BLEND_TICKS, state -> state.setAndContinue(shown())));
+    }
+
+    private RawAnimation shown() {
+        BlockState state = getBlockState();
+        return switch (state.getValue(TunnelRootBlock.STRIDE)) {
+            case STRAIGHT -> CRAWL;
+            case LEFT -> CRAWL_LEFT;
+            case RIGHT -> CRAWL_RIGHT;
+            case REST ->
+                switch (state.getValue(TunnelRootBlock.STEER)) {
+                    case LEFT -> AIM_LEFT;
+                    case RIGHT -> AIM_RIGHT;
+                    case REST, STRAIGHT -> REST;
+                };
+        };
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableCache;
     }
 
     // ---- saved state ----
 
+    private Optional<Steer> restoredSteer = Optional.empty();
+
     TunnelRootContents contents() {
         List<ItemStack> held = new ArrayList<>(Tunnelling.OUTPUT_SLOTS);
         for (int slot = 0; slot < Tunnelling.OUTPUT_SLOTS; slot++) held.add(output.getStackInSlot(slot));
-        return new TunnelRootContents(segments.getStackInSlot(0), held, tank, progress, steer, mutations, descended);
+        return new TunnelRootContents(
+                segments.getStackInSlot(0), held, tank, progress, Optional.of(steer()), mutations, descended);
     }
 
     private void restore(TunnelRootContents contents) {
+        restoredSteer = contents.steer();
         segments.setStackInSlot(0, contents.segments().copy());
         for (int slot = 0; slot < Tunnelling.OUTPUT_SLOTS; slot++)
             output.setStackInSlot(slot, contents.output().get(slot).copy());
         tank = contents.tank();
         progress = contents.progress();
-        steer = contents.steer();
         mutations = contents.mutations();
         descended = contents.descended();
     }

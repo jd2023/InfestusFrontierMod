@@ -10,7 +10,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -24,17 +23,16 @@ import org.jd.infestusfrontier.organ.api.Stewarded;
 
 /**
  * The work of a Leaching Pod. Every {@value Leaching#LAYER_TICKS} loaded ticks it converts one whole layer: the
- * eligible blocks of a 7-wide disc, one layer further below the pod each time. A layer is worked whole in one tick or
- * not at all, so the saved {@link LeachingProgress} always matches the ground: a reload neither repeats a layer nor
- * pays for it twice. While the chunks the layer touches or updates are not all loaded the pod waits and tries again
- * after a second; it loads nothing. Only finishing its layers or charges spends the pod.
+ * eligible blocks of a 7-wide disc, one layer further below the pod each time. The block in the pod's own column becomes
+ * its glowing root while the root above it is unbroken, and Leached Rock once the root has ended; the root never grows
+ * into anything the pod would not convert. A layer is worked whole in one tick or not at all, so the saved
+ * {@link LeachingProgress} always matches the ground: a reload neither repeats a layer nor pays for it twice. While the
+ * chunks the layer touches or updates are not all loaded the pod waits and tries again after a second; it loads
+ * nothing. Finishing its layers or charges stops it for good, the pod and its root left as they are.
  */
 final class LeachingPodBlockEntity extends BlockEntity implements Stewarded {
     /** Blocks beyond the disc whose chunks must also be loaded: a conversion updates its neighbours. */
     private static final int UPDATE_REACH = 1;
-
-    /** Of this many rolls one gives the brightest glow look, two the dimmer one and the rest none. */
-    private static final int GLOW_ROLLS = 20;
 
     private static final MapCodec<LeachingProgress> SAVED = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Codec.INT.fieldOf("layers").forGetter(LeachingProgress::layers),
@@ -101,11 +99,16 @@ final class LeachingPodBlockEntity extends BlockEntity implements Stewarded {
         }
         waitingForGround = false;
         int y = pos.getY() - 1 - progress.layers();
+        BlockPos column = new BlockPos(pos.getX(), y, pos.getZ());
+        BlockState above = level.getBlockState(column.above());
+        boolean rooting = above.is(MiningModule.LEACHING_POD.get()) || above.is(MiningModule.LEACHING_ROOT.get());
         int converted = 0;
         for (Leaching.Cell cell : Leaching.DISC) {
             BlockPos target = new BlockPos(pos.getX() + cell.dx(), y, pos.getZ() + cell.dz());
-            if (leachable(level, target) && level.setBlock(target, leached(level.getRandom()), Block.UPDATE_ALL))
-                converted++;
+            BlockState into = rooting && target.equals(column)
+                    ? MiningModule.LEACHING_ROOT.get().defaultBlockState()
+                    : MiningModule.LEACHED_ROCK.get().defaultBlockState();
+            if (leachable(level, target) && level.setBlock(target, into, Block.UPDATE_ALL)) converted++;
         }
         progress = progress.worked(converted);
         setChanged();
@@ -116,7 +119,7 @@ final class LeachingPodBlockEntity extends BlockEntity implements Stewarded {
         if (progress.finished()) spend(level, pos, state);
     }
 
-    /** The finished pod becomes a husk, which does not tick. */
+    /** The finished pod stays as it is, its pore closed; it no longer ticks. */
     private static void spend(ServerLevel level, BlockPos pos, BlockState state) {
         level.setBlock(pos, state.setValue(LeachingPodBlock.SPENT, true), Block.UPDATE_ALL);
     }
@@ -139,12 +142,6 @@ final class LeachingPodBlockEntity extends BlockEntity implements Stewarded {
                 && Leaching.softEnough(state.getDestroySpeed(level, target))
                 && state.getFluidState().isEmpty()
                 && !state.hasBlockEntity();
-    }
-
-    private static BlockState leached(RandomSource random) {
-        int roll = random.nextInt(GLOW_ROLLS);
-        int glow = roll == 0 ? 2 : roll <= 2 ? 1 : 0;
-        return MiningModule.LEACHED_ROCK.get().defaultBlockState().setValue(LeachedRockBlock.GLOW, glow);
     }
 
     @Override

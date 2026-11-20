@@ -2,15 +2,22 @@ package org.jd.infestusfrontier.core.mining;
 
 import java.util.Optional;
 
-/** Which way the next step of a Tunnel Root goes, relative to where the head faces. One step, then straight again. */
+/**
+ * Which way the next step of a Tunnel Root goes, relative to where the head faces, never to where the player looks. One
+ * step, then straight again.
+ */
 public enum Steer {
     STRAIGHT,
     LEFT,
     RIGHT;
 
-    /** The setting after this one, as a single screen button cycles them. */
-    public Steer next() {
-        return values()[(ordinal() + 1) % values().length];
+    /** Quarter turns clockwise this way adds to the heading. */
+    public int quarters() {
+        return switch (this) {
+            case STRAIGHT -> 0;
+            case LEFT -> 3;
+            case RIGHT -> 1;
+        };
     }
 
     /** The setting at {@code index}, or empty when no setting has it: a screen button id or a saved number. */

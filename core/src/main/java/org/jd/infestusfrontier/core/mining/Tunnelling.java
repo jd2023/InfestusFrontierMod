@@ -5,8 +5,9 @@ import org.jd.infestusfrontier.core.foundation.Refusal;
 
 /**
  * The fixed limits of a Tunnel Root and the reasons it stops. A step cuts the two blocks ahead of the head, lays one
- * root cell in the floor under the cut and moves the head into it. Every number is a starting value, not measured
- * balance.
+ * root cell in the floor under the cut and moves the head into it. Only supply, its grade, its length and unloaded
+ * chunks stop it: water, lava, falling blocks and a missing floor are accidents, not stops. A head that steps over a
+ * missing floor lays no cell there and dies. Every number is a starting value, not measured balance.
  */
 public final class Tunnelling {
     /** Loaded server ticks between two steps: twenty seconds. */
@@ -25,6 +26,8 @@ public final class Tunnelling {
     public static final int OUTPUT_ITEMS = 64;
     /** Kinds of item the output buffer keeps apart, so a cut of two different blocks fits an empty buffer. */
     public static final int OUTPUT_SLOTS = 4;
+    /** Loaded ticks a head takes to crawl into the cell it just cut, as it shows: two seconds. */
+    public static final int CRAWL_TICKS = 40;
 
     /** The floor under the head is neither a root cell nor an organ foundation. */
     public static final Refusal UNROOTED = new Refusal("tunnel_root.unrooted");
@@ -39,12 +42,11 @@ public final class Tunnelling {
     public static final Refusal TOO_HARD = new Refusal("tunnel_root.too_hard");
     /** A block ahead holds a block entity, or the cut leaves the world. */
     public static final Refusal UNSUPPORTED = new Refusal("tunnel_root.unsupported");
-    /** Fluid is in the cut or touches it. */
-    public static final Refusal FLUID = new Refusal("tunnel_root.fluid");
-    /** The floor under the cut is not plain ground a root cell may replace. */
+    /**
+     * The floor under the cut is a solid block a root cell may not replace: ore, a block entity or anything that is not
+     * plain ground. A missing floor is no stop: the head steps over it and dies.
+     */
     public static final Refusal NO_FLOOR = new Refusal("tunnel_root.no_floor");
-    /** A block that falls stands on top of the cut. */
-    public static final Refusal FALLING = new Refusal("tunnel_root.falling");
     /** The drops of the cut do not fit the output buffer. */
     public static final Refusal OUTPUT_FULL = new Refusal("tunnel_root.output_full");
     /** Loading by hand: the head already holds all the segments it can. */
@@ -61,17 +63,7 @@ public final class Tunnelling {
 
     /** Every stop, in a fixed order: a screen names one by its index. */
     public static final List<Refusal> STOPS = List.of(
-            UNROOTED,
-            FULL_LENGTH,
-            NO_SEGMENT,
-            NO_BIOMASS,
-            UNLOADED,
-            TOO_HARD,
-            UNSUPPORTED,
-            FLUID,
-            NO_FLOOR,
-            FALLING,
-            OUTPUT_FULL);
+            UNROOTED, FULL_LENGTH, NO_SEGMENT, NO_BIOMASS, UNLOADED, TOO_HARD, UNSUPPORTED, NO_FLOOR, OUTPUT_FULL);
 
     private Tunnelling() {}
 

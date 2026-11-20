@@ -24,13 +24,17 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.MultifaceBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.Shapes;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jd.infestusfrontier.core.foundation.Outcome;
@@ -51,12 +55,13 @@ import org.jd.infestusfrontier.organ.api.Stewarded;
 /**
  * The work of a Structure Grower. Every {@value Surveying#GROW_TICKS} loaded ticks it tries to build the next step of
  * the approved plan of the Surveyed Tissue under it: a root cell in the step's floor, a tread on that cell on a
- * staircase, and a wall torch at head height where the plan has a light. It builds only when every block of the step
- * is already clear and loaded, the root cell has solid ground under it, no creature stands in the way, a wall holds
- * the light and its stock covers the whole step; then it builds the step whole in one tick, pays for it and the marker
- * counts it. Otherwise it changes nothing, names the reason and looks again after {@value Surveying#RETRY_TICKS} ticks,
- * or at once when its stock changes. It never cuts, never collects and never touches a built step again, so whatever
- * the player does there stays. The growers of a dimension share {@value Surveying#STEPS_PER_TICK} steps a tick. Stock
+ * staircase, a light where the plan has one, bone ribs where the plan frames the step and a cut scar where it marks
+ * one. It builds only when every block of the step is already clear, of anything but fluid, and loaded, no creature
+ * stands in the way and its stock covers the whole step; then it builds the step whole in one tick, pays for what it
+ * placed and the marker counts it. Over missing ground it leaves the root cell and its tread out: an accident is built
+ * through, never bridged. Otherwise it changes nothing, names the reason and looks again after
+ * {@value Surveying#RETRY_TICKS} ticks, or at once when its stock changes. It never cuts, never collects and never
+ * touches a built step again, so whatever the player does there stays. The growers of a dimension share {@value Surveying#STEPS_PER_TICK} steps a tick. Stock
  * arrives by hand, at its screen, or through its item handler, which only takes. It loads no chunk. In a Descending
  * Rootstock's minehead it builds just the same, and tells the Rootstock behind it of each step it built. On a gallery
  * face it builds a wide step's three root cells together, for a segment each, and tells the minehead that last named
@@ -69,6 +74,7 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
     private final ItemStackHandler segments = stock(stack -> stack.is(MiningModule.ROOT_SEGMENT.get()));
     private final ItemStackHandler treads = stock(StructureGrowerBlockEntity::tread);
     private final ItemStackHandler lights = stock(StructureGrowerBlockEntity::light);
+    private final ItemStackHandler ribStock = stock(StructureGrowerBlockEntity::rib);
 
     private GrowerProgress progress = GrowerProgress.START;
     private Optional<CompoundTag> unreadable = Optional.empty();
@@ -119,14 +125,19 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
                 && !item.getBlock().defaultBlockState().hasBlockEntity();
     }
 
-    /** True for what a grower hangs as a light: a torch. */
+    /** True for what a grower lights a step with: a torch, or what it grows a Lumen Node from. */
     static boolean light(ItemStack stack) {
-        return stack.is(Items.TORCH);
+        return stack.is(Items.TORCH) || stack.is(MiningModule.LIVING_LIGHTS);
+    }
+
+    /** True for what a grower frames a step with, one a column: Bone Plates. */
+    static boolean rib(ItemStack stack) {
+        return stack.is(MiningModule.MINE_RIBS);
     }
 
     /** True for what the grower takes from a hand. */
     static boolean loads(ItemStack stack) {
-        return stack.is(MiningModule.ROOT_SEGMENT.get()) || tread(stack) || light(stack);
+        return stack.is(MiningModule.ROOT_SEGMENT.get()) || tread(stack) || light(stack) || rib(stack);
     }
 
     @Override
@@ -148,6 +159,10 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
 
     ItemStackHandler lights() {
         return lights;
+    }
+
+    ItemStackHandler ribStock() {
+        return ribStock;
     }
 
     GrowerProgress progress() {
@@ -205,7 +220,7 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
 
     /** The grower's stock seen from outside: it takes what each slot takes and gives nothing back. */
     IItemHandler intake() {
-        List<ItemStackHandler> slots = List.of(segments, treads, lights);
+        List<ItemStackHandler> slots = List.of(segments, treads, lights, ribStock);
         return new IItemHandler() {
             @Override
             public int getSlots() {
@@ -248,7 +263,9 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
             return;
         }
         ItemStack held = player.getItemInHand(hand);
-        ItemStackHandler into = held.is(MiningModule.ROOT_SEGMENT.get()) ? segments : tread(held) ? treads : lights;
+        ItemStackHandler into = held.is(MiningModule.ROOT_SEGMENT.get())
+                ? segments
+                : tread(held) ? treads : light(held) ? lights : ribStock;
         ItemStack left = into.insertItem(0, held.copy(), false);
         int taken = held.getCount() - left.getCount();
         if (taken == 0) {
@@ -262,7 +279,8 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
                         "infestusfrontier.structure_grower.loaded",
                         segments.getStackInSlot(0).getCount(),
                         treads.getStackInSlot(0).getCount(),
-                        lights.getStackInSlot(0).getCount()),
+                        lights.getStackInSlot(0).getCount(),
+                        ribStock.getStackInSlot(0).getCount()),
                 true);
     }
 
@@ -283,10 +301,17 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
     }
 
     /**
-     * A step judged buildable: the marker, where each of its blocks goes and what goes there, bottom up, the segments
-     * its root cells take and whether it is a step of the Wider Section.
+     * A step judged buildable: the marker, where each of its blocks goes and what goes there, bottom up, what it pays
+     * from each stock, and whether it is a step of the Wider Section.
      */
-    private record Build(SurveyedTissueBlockEntity marker, List<Placement> placements, int segments, boolean wide) {}
+    private record Build(
+            SurveyedTissueBlockEntity marker,
+            List<Placement> placements,
+            int segments,
+            int treads,
+            int lights,
+            int ribs,
+            boolean wide) {}
 
     private record Placement(BlockPos pos, BlockState state) {}
 
@@ -309,8 +334,12 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
     }
 
     /**
-     * Whether {@code step} can be built now, and what it places. Reads loaded positions only and changes nothing. The
-     * ground is judged first, then whether a creature stands in the way, then the stock, then the wall for a light.
+     * Whether {@code step} can be built now, and what it places. Reads loaded positions only and changes nothing. Every
+     * block of the step must be clear, though fluid may stand in it: the grower builds into it as a player would. A
+     * root cell with no solid ground under it is left out, with the tread on it, and not paid: the grower never
+     * bridges a gap. Then whether a creature stands in the way, then the stock: segments for the grounded root cells,
+     * a tread, a light, and ribs for a framed step. A light, ribs and a scar go only where a wall or a ceiling holds
+     * them and the cell is dry; where none can, they are left out and not paid.
      */
     private Outcome<Build> judge(ServerLevel level, SurveyedTissueBlockEntity marker, PlanStep step) {
         List<BlockPos> roots = step.roots().stream().map(marker::at).toList();
@@ -319,62 +348,183 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
             if (!Cutting.loaded(level, cell, REACH)) return Outcome.refused(Surveying.UNLOADED);
         for (BlockPos root : roots)
             if (!Cutting.loaded(level, root.below(), REACH)) return Outcome.refused(Surveying.UNLOADED);
-        for (BlockPos cell : cleared) if (!level.getFluidState(cell).isEmpty()) return Outcome.refused(Surveying.FLUID);
         for (BlockPos cell : cleared)
-            if (!level.getBlockState(cell).isAir()) return Outcome.refused(Surveying.NOT_CLEAR);
-        for (BlockPos root : roots)
-            if (!level.getBlockState(root.below()).isFaceSturdy(level, root.below(), Direction.UP))
-                return Outcome.refused(Surveying.NO_GROUND);
-        Optional<BlockPos> treadAt = step.tread().map(marker::at);
-        List<BlockPos> solids = new ArrayList<>(roots);
+            if (!Cutting.open(level.getBlockState(cell))) return Outcome.refused(Surveying.NOT_CLEAR);
+        List<BlockPos> grounded = roots.stream()
+                .filter(root -> level.getBlockState(root.below()).isFaceSturdy(level, root.below(), Direction.UP))
+                .toList();
+        Optional<BlockPos> treadAt = step.tread().map(marker::at).filter(tread -> grounded.contains(tread.below()));
+        List<BlockPos> solids = new ArrayList<>(grounded);
         treadAt.ifPresent(solids::add);
         for (BlockPos solid : solids)
             if (!level.isUnobstructed(null, Shapes.block().move(solid.getX(), solid.getY(), solid.getZ())))
                 return Outcome.refused(Surveying.CREATURE);
-        if (segments.getStackInSlot(0).getCount() < roots.size()) return Outcome.refused(Surveying.NO_SEGMENT);
+        if (segments.getStackInSlot(0).getCount() < grounded.size()) return Outcome.refused(Surveying.NO_SEGMENT);
         if (treadAt.isPresent() && treads.getStackInSlot(0).isEmpty()) return Outcome.refused(Surveying.NO_TREAD);
-        if (step.light().isPresent() && lights.getStackInSlot(0).isEmpty()) return Outcome.refused(Surveying.NO_LIGHT);
 
         Direction forward = marker.facing();
-        Direction arrived = heading(forward, step.arrived());
-        Direction leaving = heading(forward, step.leaving());
+        Direction arrived = MiningDirections.turn(forward, step.arrived());
+        Direction leaving = MiningDirections.turn(forward, step.leaving());
+        Optional<BlockPos> lightAt = step.light().map(marker::at);
+        Optional<Placement> light = lightAt.flatMap(at -> light(level, at, leaving, cleared));
+        if (light.isPresent() && lights.getStackInSlot(0).isEmpty()) return Outcome.refused(Surveying.NO_LIGHT);
+        List<Placement> ribs = step.framed() ? ribs(level, marker, step, cleared, lightAt, leaving) : List.of();
+        int ribsPaid = (int) ribs.stream()
+                .map(rib -> columnOf(marker, step, rib.pos()))
+                .distinct()
+                .count();
+        if (ribStock.getStackInSlot(0).getCount() < ribsPaid) return Outcome.refused(Surveying.NO_RIB);
+
         List<Placement> placements = new ArrayList<>();
-        placements.add(new Placement(
-                roots.get(0), step.bend() ? RootCellBlock.bend(arrived, leaving) : RootCellBlock.straight(leaving)));
-        for (Offset flank : step.flanks())
-            placements.add(new Placement(marker.at(flank), RootCellBlock.straight(leaving)));
+        for (BlockPos root : grounded) {
+            BlockState cell = root.equals(roots.get(0)) && step.bend()
+                    ? RootCellBlock.bend(arrived, leaving)
+                    : RootCellBlock.straight(leaving);
+            placements.add(new Placement(root, cell));
+        }
         if (treadAt.isPresent()) {
             BlockState tread = ((BlockItem) treads.getStackInSlot(0).getItem())
                     .getBlock()
                     .defaultBlockState()
                     .setValue(StairBlock.FACING, forward.getOpposite())
-                    .setValue(StairBlock.HALF, Half.BOTTOM);
+                    .setValue(StairBlock.HALF, Half.BOTTOM)
+                    .setValue(
+                            StairBlock.WATERLOGGED,
+                            level.getFluidState(treadAt.get()).is(Fluids.WATER));
             placements.add(new Placement(treadAt.get(), Block.updateFromNeighbourShapes(tread, level, treadAt.get())));
         }
-        if (step.light().isPresent()) {
-            Optional<Placement> light = light(level, marker.at(step.light().get()), leaving);
-            if (light.isEmpty()) return Outcome.refused(Surveying.NO_WALL);
-            placements.add(light.get());
-        }
-        return Outcome.done(
-                new Build(marker, placements, roots.size(), !step.flanks().isEmpty()));
+        light.ifPresent(placements::add);
+        placements.addAll(ribs);
+        if (step.scarred())
+            scar(level, marker, step, cleared, ribs, lightAt, leaving).ifPresent(placements::add);
+        return Outcome.done(new Build(
+                marker,
+                placements,
+                grounded.size(),
+                treadAt.isPresent() ? 1 : 0,
+                light.isPresent() ? 1 : 0,
+                ribsPaid,
+                !step.flanks().isEmpty()));
     }
 
-    /** The way {@code quarters} quarter turns clockwise of {@code forward}. */
-    static Direction heading(Direction forward, int quarters) {
-        Direction way = forward;
-        for (int n = 0; n < quarters; n++) way = way.getClockWise();
-        return way;
-    }
-
-    /** A wall torch at {@code at} on the wall left of {@code travel}, else on the right; empty when neither holds it. */
-    private static Optional<Placement> light(ServerLevel level, BlockPos at, Direction travel) {
-        for (Direction wall : List.of(travel.getCounterClockWise(), travel.getClockWise())) {
-            BlockState torch =
-                    Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, wall.getOpposite());
-            if (torch.canSurvive(level, at)) return Optional.of(new Placement(at, torch));
+    /**
+     * The light at {@code at}: from living-light stock a Lumen Node hung from the ceiling, else on the wall left of
+     * {@code travel}, else on the right; from torches a wall torch on either wall. Empty when the cell holds fluid or
+     * nothing holds the light: it is left out, not bridged or propped.
+     */
+    private Optional<Placement> light(ServerLevel level, BlockPos at, Direction travel, List<BlockPos> cleared) {
+        if (!level.getBlockState(at).isAir()) return Optional.empty();
+        List<Direction> walls = List.of(travel.getCounterClockWise(), travel.getClockWise());
+        if (lights.getStackInSlot(0).is(Items.TORCH)) {
+            for (Direction wall : walls) {
+                BlockState torch =
+                        Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, wall.getOpposite());
+                if (!cleared.contains(at.relative(wall)) && torch.canSurvive(level, at))
+                    return Optional.of(new Placement(at, torch));
+            }
+            return Optional.empty();
         }
+        BlockState node = MiningModule.LUMEN_NODE.get().defaultBlockState();
+        List<BlockState> hung = new ArrayList<>();
+        hung.add(node.setValue(LumenNodeBlock.FACE, AttachFace.CEILING).setValue(LumenNodeBlock.FACING, travel));
+        for (Direction wall : walls)
+            hung.add(node.setValue(LumenNodeBlock.FACE, AttachFace.WALL)
+                    .setValue(LumenNodeBlock.FACING, wall.getOpposite()));
+        for (BlockState state : hung)
+            if (!cleared.contains(at.relative(LumenNodeBlock.support(state))) && state.canSurvive(level, at))
+                return Optional.of(new Placement(at, state));
         return Optional.empty();
+    }
+
+    /**
+     * The bone ribs of a framed step: on each dry, empty passage cell but the light's, a rib on each side wall and, on
+     * a column's top cell, the ceiling, where that face is outside the step and holds it and is not ore. Thick on a
+     * step of the Wider Section. They have no collision, so the passage keeps its headroom and width.
+     */
+    private static List<Placement> ribs(
+            ServerLevel level,
+            SurveyedTissueBlockEntity marker,
+            PlanStep step,
+            List<BlockPos> cleared,
+            Optional<BlockPos> light,
+            Direction leaving) {
+        BlockState rib = MiningModule.BONE_RIB
+                .get()
+                .defaultBlockState()
+                .setValue(BoneRibBlock.AXIS, leaving.getAxis())
+                .setValue(BoneRibBlock.THICK, !step.flanks().isEmpty());
+        List<Placement> ribs = new ArrayList<>();
+        for (Offset column : step.roots()) {
+            BlockPos top = topOf(marker, step, column);
+            for (Offset offset : step.passage()) {
+                BlockPos cell = marker.at(offset);
+                if (columnOf(marker, step, cell) != step.roots().indexOf(column)
+                        || light.equals(Optional.of(cell))
+                        || !level.getBlockState(cell).isAir()) continue;
+                List<Direction> sides = new ArrayList<>(List.of(leaving.getCounterClockWise(), leaving.getClockWise()));
+                if (cell.equals(top)) sides.add(Direction.UP);
+                BlockState faced = rib;
+                for (Direction side : sides)
+                    if (holds(level, cell, side, cleared))
+                        faced = faced.setValue(MultifaceBlock.getFaceProperty(side), true);
+                if (faced != rib) ribs.add(new Placement(cell, faced));
+            }
+        }
+        return ribs;
+    }
+
+    /**
+     * The cut scar of a scarred step: on the lowest passage cell of its outermost column on the scar's side, against that
+     * wall, when the cell is dry and empty and holds no rib or light, and the wall holds it and is not ore.
+     */
+    private static Optional<Placement> scar(
+            ServerLevel level,
+            SurveyedTissueBlockEntity marker,
+            PlanStep step,
+            List<BlockPos> cleared,
+            List<Placement> ribs,
+            Optional<BlockPos> light,
+            Direction leaving) {
+        Direction side = MiningDirections.turn(leaving, step.scarSide());
+        BlockPos root = marker.at(step.root());
+        BlockPos outer = root.relative(side);
+        BlockPos column = step.roots().stream().map(marker::at).anyMatch(outer::equals) ? outer : root;
+        BlockPos cell = column.above(step.tread().isPresent() ? 2 : 1);
+        boolean taken = light.equals(Optional.of(cell))
+                || ribs.stream().anyMatch(rib -> rib.pos().equals(cell));
+        if (taken || !level.getBlockState(cell).isAir() || !holds(level, cell, side, cleared)) return Optional.empty();
+        return Optional.of(new Placement(
+                cell,
+                MiningModule.CUT_SCAR.get().defaultBlockState().setValue(MultifaceBlock.getFaceProperty(side), true)));
+    }
+
+    /** True when the block on {@code side} of {@code cell} lies outside the step, holds a growth and is not ore. */
+    private static boolean holds(ServerLevel level, BlockPos cell, Direction side, List<BlockPos> cleared) {
+        BlockPos wall = cell.relative(side);
+        BlockState state = level.getBlockState(wall);
+        return !cleared.contains(wall)
+                && !state.is(Tags.Blocks.ORES)
+                && MultifaceBlock.canAttachTo(level, side, wall, state);
+    }
+
+    /** The index among the step's root cells of the column {@code cell} stands over. */
+    private static int columnOf(SurveyedTissueBlockEntity marker, PlanStep step, BlockPos cell) {
+        List<Offset> roots = step.roots();
+        for (int n = 0; n < roots.size(); n++) {
+            BlockPos root = marker.at(roots.get(n));
+            if (root.getX() == cell.getX() && root.getZ() == cell.getZ()) return n;
+        }
+        return -1;
+    }
+
+    /** The highest passage cell over {@code column}. */
+    private static BlockPos topOf(SurveyedTissueBlockEntity marker, PlanStep step, Offset column) {
+        BlockPos top = marker.at(column);
+        for (Offset offset : step.passage()) {
+            BlockPos cell = marker.at(offset);
+            if (cell.getX() == top.getX() && cell.getZ() == top.getZ() && cell.getY() > top.getY()) top = cell;
+        }
+        return top;
     }
 
     /** Places the judged step from the bottom up, pays for it and has the marker count it. */
@@ -383,11 +533,10 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
             level.setBlock(placement.pos(), placement.state(), Block.UPDATE_ALL);
             level.gameEvent(GameEvent.BLOCK_PLACE, placement.pos(), GameEvent.Context.of(placement.state()));
         }
-        boolean treaded = build.placements().stream().anyMatch(p -> p.state().getBlock() instanceof StairBlock);
-        boolean lit = build.placements().stream().anyMatch(p -> p.state().is(Blocks.WALL_TORCH));
         segments.extractItem(0, build.segments(), false);
-        if (treaded) treads.extractItem(0, 1, false);
-        if (lit) lights.extractItem(0, 1, false);
+        treads.extractItem(0, build.treads(), false);
+        lights.extractItem(0, build.lights(), false);
+        ribStock.extractItem(0, build.ribs(), false);
         build.marker().grown();
         Optional<TunnelRootBlockEntity> staircase = Minehead.rootstockOf(level, build.marker());
         if (staircase.isPresent())
@@ -399,8 +548,10 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
         progress = progress.grown();
         stop = Optional.empty();
         setChanged();
-        level.playSound(
-                null, build.placements().get(0).pos(), SoundEvents.ROOTED_DIRT_PLACE, SoundSource.BLOCKS, 1F, 1F);
+        BlockPos sound = build.placements().isEmpty()
+                ? build.marker().getBlockPos()
+                : build.placements().get(0).pos();
+        level.playSound(null, sound, SoundEvents.ROOTED_DIRT_PLACE, SoundSource.BLOCKS, 1F, 1F);
         steward.worked(level, MiningModule.STRUCTURE_GROWER.getId());
     }
 
@@ -408,13 +559,18 @@ final class StructureGrowerBlockEntity extends BlockEntity implements Stewarded,
 
     StructureGrowerContents contents() {
         return new StructureGrowerContents(
-                segments.getStackInSlot(0), treads.getStackInSlot(0), lights.getStackInSlot(0), progress);
+                segments.getStackInSlot(0),
+                treads.getStackInSlot(0),
+                lights.getStackInSlot(0),
+                ribStock.getStackInSlot(0),
+                progress);
     }
 
     private void restore(StructureGrowerContents contents) {
         segments.setStackInSlot(0, contents.segments().copy());
         treads.setStackInSlot(0, contents.treads().copy());
         lights.setStackInSlot(0, contents.lights().copy());
+        ribStock.setStackInSlot(0, contents.ribs().copy());
         progress = contents.progress();
     }
 

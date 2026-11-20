@@ -42,24 +42,24 @@
     "fill 101 -60 -55 104 -58 -52 stone",
     "setblock 102 -59 -52 air",
     "setblock 102 -61 -52 infestusfrontier:living_substrate[stage=mature]",
-    "setblock 103 -60 -53 water",
+    "setblock 102 -61 -53 iron_ore",
     "setblock 102 -60 -52 infestusfrontier:tunnel_root[facing=north]{segments:{id:\"infestusfrontier:root_segment\",count:8},output:[{},{},{},{}],tank:{stored:500,capacity:2000},cells:0,ticks:400,steer:0}",
-    "setblock 102 -60 -50 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"FLUID\"','\"water beside\"','\"the cut: block\"','\"it or drain it\"']}}",
+    "setblock 102 -60 -50 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"ORE FLOOR\"','\"a root cell\"','\"may not replace\"','\"ore: mine it\"']}}",
     "fill 105 -61 -55 107 -61 -53 dirt",
     "fill 105 -60 -55 107 -58 -52 stone",
     "setblock 106 -59 -52 air",
     "setblock 106 -61 -52 infestusfrontier:living_substrate[stage=mature]",
-    "setblock 106 -58 -53 gravel",
+    "setblock 107 -59 -53 water",
     "setblock 106 -60 -52 infestusfrontier:tunnel_root[facing=north]{segments:{id:\"infestusfrontier:root_segment\",count:8},output:[{},{},{},{}],tank:{stored:500,capacity:2000},cells:0,ticks:400,steer:0}",
-    "setblock 106 -60 -50 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"LOOSE ABOVE\"','\"gravel on top\"','\"of the cut:\"','\"mine it\"']}}",
+    "setblock 106 -60 -50 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"WATER: NO STOP\"','\"it cuts in and\"','\"floods its\"','\"tunnel\"']}}",
     "fill 109 -61 -55 111 -61 -53 dirt",
     "fill 109 -60 -55 111 -58 -52 stone",
     "setblock 110 -59 -52 air",
     "setblock 110 -61 -52 infestusfrontier:living_substrate[stage=mature]",
     "setblock 110 -61 -53 air",
-    "setblock 110 -60 -52 infestusfrontier:tunnel_root[facing=north]{segments:{id:\"infestusfrontier:root_segment\",count:8},output:[{},{},{},{}],tank:{stored:500,capacity:2000},cells:0,ticks:400,steer:0}",
-    "setblock 110 -60 -50 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"NO FLOOR\"','\"hole under the\"','\"cut: place\"','\"cobblestone\"']}}",
-    "setblock 84 -60 -50 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"TUNNEL ROOT\"','\"each head names\"','\"why it stopped;\"','\"fix it: it goes on\"']}}",
+    "setblock 110 -60 -52 infestusfrontier:tunnel_root[facing=north]{segments:{id:\"infestusfrontier:root_segment\",count:8},output:[{},{},{},{}],tank:{stored:500,capacity:2000},cells:0,ticks:200,steer:0}",
+    "setblock 110 -60 -50 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"HOLE: NO STOP\"','\"it crawls onto\"','\"nothing and\"','\"dies\"']}}",
+    "setblock 84 -60 -50 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"TUNNEL ROOT\"','\"supply stops\"','\"wait; accidents\"','\"do not\"']}}",
     "setblock 114 -60 -52 chest[facing=south]{Items:[{Slot:0,id:\"infestusfrontier:root_segment\",count:32},{Slot:1,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:2,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:3,id:\"infestusfrontier:bone_plate\",count:4},{Slot:9,id:\"minecraft:bone\",count:8},{Slot:4,id:\"minecraft:rotten_flesh\",count:8},{Slot:5,id:\"minecraft:stone_pickaxe\",count:1},{Slot:6,id:\"infestusfrontier:organ_bud\",count:2},{Slot:7,id:\"minecraft:cobblestone\",count:16},{Slot:8,id:\"minecraft:stick\",count:8}]}",
     "setblock 114 -60 -50 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"Root supplies\"','\"segments, biomass\"','\"bud materials\"','\"and cobblestone\"']}}",
     "setblock 118 -61 -52 infestusfrontier:living_substrate[stage=mature]",
@@ -120,6 +120,30 @@
         -60,
         -52
       ]
+    },
+    {
+      "x": 94.5,
+      "y": -60.0,
+      "z": -50.5,
+      "yaw": 180,
+      "pitch": 20,
+      "name": "tunnel_root_steer_screen",
+      "use": [
+        94,
+        -60,
+        -52
+      ],
+      "press": [
+        1
+      ]
+    },
+    {
+      "x": 95.6,
+      "y": -58.6,
+      "z": -50.6,
+      "yaw": 160,
+      "pitch": 35,
+      "name": "tunnel_root_steered_left"
     }
   ]
 }

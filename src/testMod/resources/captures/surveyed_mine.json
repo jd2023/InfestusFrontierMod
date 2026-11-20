@@ -38,7 +38,7 @@
     "setblock 156 -53 -53 infestusfrontier:root_cell[facing=north,bend=false]",
     "setblock 156 -52 -53 cobblestone_stairs[facing=south,half=bottom]",
     "setblock 156 -50 -50 infestusfrontier:surveyed_tissue[facing=north]{shape:0,length:6,first_way:0,first_at:0,second_way:0,second_at:0,lit:0b,approved:1b,built:3}",
-    "setblock 156 -49 -50 infestusfrontier:structure_grower{segments:{id:\"infestusfrontier:root_segment\",count:16},treads:{id:\"minecraft:cobblestone_stairs\",count:16},lights:{},steps:3,ticks:0}",
+    "setblock 156 -49 -50 infestusfrontier:structure_grower{segments:{id:\"infestusfrontier:root_segment\",count:16},treads:{id:\"infestusfrontier:root_tread\",count:16},lights:{id:\"minecraft:glow_lichen\",count:4},ribs:{id:\"infestusfrontier:bone_plate\",count:4},steps:3,ticks:0}",
     "fill 156 -60 -48 156 -50 -48 ladder[facing=south]",
     "setblock 154 -60 -48 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"STAIRCASE\"','\"approved, 6 deep;\"','\"the grower lays\"','\"root and treads\"']}}",
     "fill 162 -62 -59 169 -59 -51 stone",
@@ -78,7 +78,7 @@
     "setblock 164 -61 -53 infestusfrontier:root_cell[facing=east,bend=true]",
     "setblock 165 -61 -53 infestusfrontier:root_cell[facing=east,bend=false]",
     "setblock 164 -61 -50 infestusfrontier:surveyed_tissue[facing=north]{shape:1,length:10,first_way:2,first_at:3,second_way:1,second_at:6,lit:1b,approved:1b,built:4}",
-    "setblock 164 -60 -50 infestusfrontier:structure_grower{segments:{id:\"infestusfrontier:root_segment\",count:12},treads:{},lights:{id:\"minecraft:torch\",count:2},steps:4,ticks:0}",
+    "setblock 164 -60 -50 infestusfrontier:structure_grower{segments:{id:\"infestusfrontier:root_segment\",count:12},treads:{},lights:{id:\"minecraft:torch\",count:2},ribs:{id:\"infestusfrontier:bone_plate\",count:4},steps:4,ticks:0}",
     "setblock 162 -60 -49 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"GALLERY\"','\"lit route, turns\"','\"right then left;\"','\"a torch at cell 8\"']}}",
     "fill 170 -60 -61 172 -50 -49 stone",
     "setblock 171 -53 -53 diamond_ore",
@@ -87,8 +87,8 @@
     "setblock 171 -50 -50 infestusfrontier:surveyed_tissue[facing=north]{shape:0,length:8,first_way:0,first_at:0,second_way:0,second_at:0,lit:0b,approved:0b,built:0}",
     "fill 171 -60 -48 171 -50 -48 ladder[facing=south]",
     "setblock 169 -60 -48 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"DRAFT\"','\"the preview shows\"','\"the shape to cut,\"','\"never the ore\"']}}",
-    "setblock 160 -60 -48 chest[facing=south]{Items:[{Slot:0,id:\"infestusfrontier:surveyed_tissue\",count:4},{Slot:1,id:\"infestusfrontier:structure_grower\",count:1},{Slot:2,id:\"infestusfrontier:root_segment\",count:32},{Slot:3,id:\"minecraft:cobblestone_stairs\",count:32},{Slot:4,id:\"minecraft:torch\",count:16},{Slot:5,id:\"minecraft:stone_pickaxe\",count:1},{Slot:6,id:\"infestusfrontier:surgical_blade\",count:1}]}",
-    "setblock 159 -60 -48 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"Survey supplies\"','\"markers, a grower,\"','\"segments, stairs,\"','\"torches, a pick\"']}}"
+    "setblock 160 -60 -48 chest[facing=south]{Items:[{Slot:0,id:\"infestusfrontier:surveyed_tissue\",count:4},{Slot:1,id:\"infestusfrontier:structure_grower\",count:1},{Slot:2,id:\"infestusfrontier:root_segment\",count:32},{Slot:3,id:\"minecraft:cobblestone_stairs\",count:32},{Slot:4,id:\"minecraft:torch\",count:16},{Slot:7,id:\"infestusfrontier:bone_plate\",count:16},{Slot:8,id:\"minecraft:glow_lichen\",count:16},{Slot:9,id:\"infestusfrontier:root_tread\",count:16},{Slot:5,id:\"minecraft:stone_pickaxe\",count:1},{Slot:6,id:\"infestusfrontier:surgical_blade\",count:1}]}",
+    "setblock 159 -60 -48 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"Survey supplies\"','\"markers, a grower,\"','\"segments, treads,\"','\"lights, plates\"']}}"
   ],
   "views": [
     {

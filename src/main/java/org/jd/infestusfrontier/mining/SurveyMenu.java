@@ -36,15 +36,14 @@ public final class SurveyMenu extends OrganMenu {
     private static final int FIRST_AT = 3;
     private static final int SECOND_WAY = 4;
     private static final int SECOND_AT = 5;
-    private static final int LIT = 6;
-    private static final int APPROVED = 7;
-    private static final int BUILT = 8;
-    private static final int FACING = 9;
+    private static final int APPROVED = 6;
+    private static final int BUILT = 7;
+    private static final int FACING = 8;
     /** 1 while the marker's saved state is readable. */
-    private static final int READABLE = 10;
+    private static final int READABLE = 9;
 
-    private static final int WIDE = 11;
-    private static final int SYNCED = 12;
+    private static final int WIDE = 10;
+    private static final int SYNCED = 11;
 
     private final Optional<SurveyedTissueBlockEntity> marker;
 
@@ -77,7 +76,6 @@ public final class SurveyMenu extends OrganMenu {
         reads[FIRST_AT] = () -> plan(marker).first().at();
         reads[SECOND_WAY] = () -> plan(marker).second().way().ordinal();
         reads[SECOND_AT] = () -> plan(marker).second().at();
-        reads[LIT] = () -> plan(marker).lit() ? 1 : 0;
         reads[APPROVED] =
                 () -> marker.survey().map(survey -> survey.approved() ? 1 : 0).orElse(0);
         reads[BUILT] = () -> marker.survey().map(Survey::built).orElse(0);
@@ -130,7 +128,6 @@ public final class SurveyMenu extends OrganMenu {
                             synced(LENGTH),
                             new Turn(first.get(), synced(FIRST_AT)),
                             new Turn(second.get(), synced(SECOND_AT)),
-                            synced(LIT) == 1,
                             synced(WIDE) == 1),
                     synced(APPROVED) == 1,
                     synced(BUILT)));

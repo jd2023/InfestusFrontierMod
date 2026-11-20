@@ -32,14 +32,16 @@ class TunnellingTest {
         List<String> keys = Tunnelling.STOPS.stream().map(stop -> stop.key()).toList();
         assertEquals(keys.size(), new HashSet<>(keys).size(), "no two stops share a key");
         for (String key : keys) assertTrue(key.startsWith("tunnel_root."), key);
-        assertEquals(11, keys.size());
+        assertEquals(9, keys.size());
+        for (String hazard : List.of("tunnel_root.fluid", "tunnel_root.falling"))
+            assertFalse(keys.contains(hazard), "an accident is not a stop: " + hazard);
     }
 
     @Test
-    void steeringCyclesStraightLeftRightAndReadsOnlyKnownNumbers() {
-        assertEquals(Steer.LEFT, Steer.STRAIGHT.next());
-        assertEquals(Steer.RIGHT, Steer.LEFT.next());
-        assertEquals(Steer.STRAIGHT, Steer.RIGHT.next());
+    void steeringTurnsRelativeToTheHeadAndReadsOnlyKnownNumbers() {
+        assertEquals(0, Steer.STRAIGHT.quarters());
+        assertEquals(3, Steer.LEFT.quarters(), "left is a quarter anticlockwise");
+        assertEquals(1, Steer.RIGHT.quarters(), "right is a quarter clockwise");
         assertEquals(Optional.of(Steer.RIGHT), Steer.at(2));
         assertEquals(Optional.empty(), Steer.at(3));
         assertEquals(Optional.empty(), Steer.at(-1));

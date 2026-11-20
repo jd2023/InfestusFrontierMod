@@ -1,7 +1,8 @@
 # Mining progression
 
-Status: to be implemented. The owner-approved revisions are pending in Ktask
-task #71; no gameplay implementation was completed by its first attempt.
+Status: stages 1–4 and their finished appearance are implemented and reviewed.
+The code, tests and guide own that behavior. Stages 5 and 6 are not built: their
+shafts, trenches, tendons, landings and ore branches wait for MINE-5 to MINE-9.
 
 This document is the complete picture of mining: every stage
 from the first hand-dug pit to an ore-seeking root, the organs each stage uses,
@@ -39,7 +40,7 @@ already implements them.
     physical multiblock with separate cutting, collection, construction and
     transport parts. Mutations alone cannot turn one block into a whole mine.
 
-## Finished mine appearance — to be implemented
+## Finished mine appearance
 
 A finished mine looks like a passage grown by a living creature. Excavation
 leaves a visible route from the entrance to each working face. Most natural
@@ -156,12 +157,15 @@ ground so the player can dig a wide pit by hand and see the ore in it.
 Done when: a pod planted on a substrate patch over stone leaves a pit the player
 can clear with bare hands, with every ore block in it still in place and
 visible before the player reaches it. The finished root column lights the
-cleared depth. Removing the pod’s support destroys it without drops.
+cleared ground alongside its length. An obstacle can leave deeper layers dark. Removing the pod’s support destroys it without drops.
 
-The root column must leave ores untouched. Its placement through ores, cavities
-and fluids needs a concrete design before implementation; it cannot silently
-destroy ore or gain hazard protection. Cull faces between adjacent Leached Rock
-as glass does.
+The root column must leave ores untouched. Implementation choice for owner
+review: it grows only into a block the pod
+converts in its own column, directly under the root above it: the first ore,
+fluid, cavity or other block the pod leaves alone ends it for good, and the
+column below is plain Leached Rock. Proposal, pending owner review: each part of
+the column stands by itself, so breaking one leaves the rest and drops nothing.
+Cull faces between adjacent Leached Rock as glass does.
 
 ## Stage 2 — Tunnel Root
 

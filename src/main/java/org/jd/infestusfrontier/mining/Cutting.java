@@ -26,11 +26,9 @@ import net.minecraft.world.level.material.PushReaction;
 final class Cutting {
     /** What a block is to a cutter. */
     enum Verdict {
-        /** Air: there is nothing to cut. */
+        /** Air or fluid alone: there is nothing to cut. */
         CLEAR,
         CUTTABLE,
-        /** The block holds fluid. */
-        FLUID,
         /** The block holds a block entity, or is a piston arm. */
         UNSUPPORTED,
         /** A stone pickaxe does not harvest it, or nothing breaks it. */
@@ -40,16 +38,21 @@ final class Cutting {
     private Cutting() {}
 
     /**
-     * What the block at {@code cut} is to a stone-grade cutter. A piston arm is refused: removing it breaks its piston
-     * with drops whatever the update flags, so the piston would drop loose or twice.
+     * What the block at {@code cut} is to a stone-grade cutter. Fluid is no reason to stop: a cell of fluid alone has
+     * nothing to cut, and a waterlogged block is cut like any other, leaving its fluid behind. A piston arm is refused:
+     * removing it breaks its piston with drops whatever the update flags, so the piston would drop loose or twice.
      */
     static Verdict judge(Level level, BlockPos cut) {
         BlockState state = level.getBlockState(cut);
-        if (!state.getFluidState().isEmpty()) return Verdict.FLUID;
-        if (state.isAir()) return Verdict.CLEAR;
+        if (open(state)) return Verdict.CLEAR;
         if (state.hasBlockEntity() || state.getBlock() instanceof PistonHeadBlock) return Verdict.UNSUPPORTED;
         if (!withinGrade(state, level, cut)) return Verdict.TOO_HARD;
         return Verdict.CUTTABLE;
+    }
+
+    /** True for a cell with nothing in it to cut and nothing a grower must wait for: air, or fluid alone. */
+    static boolean open(BlockState state) {
+        return state.isAir() || state.getBlock() instanceof LiquidBlock;
     }
 
     /** True for a breakable block a stone pickaxe harvests: one that needs no tool, or one stone is enough for. */
@@ -70,17 +73,22 @@ final class Cutting {
      * True when a fragile block touches {@code cut}: one that vanilla breaks loose when it is pushed or loses its
      * support (push reaction DESTROY: torches, signs, ladders, plants, carpets, doors, lanterns, redstone parts), or a
      * rail. Such a block may rest on the cut and fall off with drops once it is gone, so the cut is refused. A wall
-     * torch hung on another block does not rest on the cut, such as a staircase light beside the next step's cut.
+     * torch or a Lumen Node hung on another block does not rest on the cut, such as a light beside the next step's cut. A
+     * mine's own grown ribs and scars drop nothing when their wall goes, so they never hold a cut up.
      * Reads the six neighbours; changes nothing.
      */
     static boolean touchesFragile(Level level, BlockPos cut) {
         for (Direction side : Direction.values()) {
             BlockPos next = cut.relative(side);
             BlockState neighbour = level.getBlockState(next);
-            if (neighbour.isAir() || neighbour.getBlock() instanceof LiquidBlock) continue;
+            if (neighbour.isAir()
+                    || neighbour.getBlock() instanceof LiquidBlock
+                    || neighbour.is(MiningModule.MINE_GROWTHS)) continue;
             if (neighbour.getBlock() instanceof WallTorchBlock
                     && !next.relative(neighbour.getValue(WallTorchBlock.FACING).getOpposite())
                             .equals(cut)) continue;
+            if (neighbour.getBlock() instanceof LumenNodeBlock
+                    && !next.relative(LumenNodeBlock.support(neighbour)).equals(cut)) continue;
             if (neighbour.getPistonPushReaction() == PushReaction.DESTROY || neighbour.is(BlockTags.RAILS)) return true;
         }
         return false;

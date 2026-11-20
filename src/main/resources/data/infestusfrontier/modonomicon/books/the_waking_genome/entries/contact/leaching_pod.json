@@ -40,6 +40,11 @@
       "text": "entry.infestusfrontier.contact.leaching_pod.rock_text"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.leaching_pod.root",
+      "text": "entry.infestusfrontier.contact.leaching_pod.root_text"
+    },
+    {
       "type": "infestusfrontier:organ_growth",
       "recipe_id_1": "infestusfrontier:growth/leaching_pod",
       "text": "entry.infestusfrontier.contact.leaching_pod.craft"

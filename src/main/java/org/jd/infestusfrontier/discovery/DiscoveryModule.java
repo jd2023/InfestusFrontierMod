@@ -75,6 +75,7 @@ public final class DiscoveryModule {
                         output.accept(MiningModule.TUNNEL_ROOT_ITEM.get());
                         output.accept(MiningModule.ROOT_SEGMENT.get());
                         output.accept(MiningModule.ROOT_CELL_ITEM.get());
+                        output.accept(MiningModule.ROOT_TREAD_ITEM.get());
                         output.accept(MiningModule.FRACTURE_JAW_ITEM.get());
                         output.accept(MiningModule.WORK_BED_ITEM.get());
                         output.accept(MiningModule.COLLECTION_CILIA_ITEM.get());

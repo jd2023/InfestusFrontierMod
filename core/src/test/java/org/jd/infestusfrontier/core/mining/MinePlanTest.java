@@ -9,12 +9,12 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class MinePlanTest {
-    private static MinePlan stairs(int depth, boolean lit) {
-        return new MinePlan(PlanShape.STAIRCASE, depth, Turn.NONE, Turn.NONE, lit);
+    private static MinePlan stairs(int depth) {
+        return new MinePlan(PlanShape.STAIRCASE, depth, Turn.NONE, Turn.NONE);
     }
 
     private static MinePlan route(int length, Turn first, Turn second) {
-        return new MinePlan(PlanShape.ROUTE, length, first, second, false);
+        return new MinePlan(PlanShape.ROUTE, length, first, second);
     }
 
     private static MinePlan edits(MinePlan plan, PlanEdit... edits) {
@@ -24,7 +24,7 @@ class MinePlanTest {
 
     @Test
     void aStaircaseDescendsOneBlockAStepToALandingItsDepthBelowTheMarker() {
-        List<PlanStep> steps = stairs(3, false).steps();
+        List<PlanStep> steps = stairs(3).steps();
         assertEquals(4, steps.size(), "three treads and a landing");
         for (int n = 1; n <= 3; n++) {
             PlanStep step = steps.get(n - 1);
@@ -44,19 +44,19 @@ class MinePlanTest {
                 List.of(new Offset(4, 0, -2), new Offset(4, 0, -1), new Offset(4, 0, 0)),
                 landing.passage(),
                 "three clear blocks over the landing");
-        assertEquals(new Offset(4, 0, -3), stairs(3, false).end());
-        assertEquals(new MinePlan.Needs(4, 3, 0), stairs(3, false).needs());
+        assertEquals(new Offset(4, 0, -3), stairs(3).end());
+        assertEquals(new MinePlan.Needs(4, 3, 1, 2), stairs(3).needs(), "a light and ribs at the landing");
     }
 
     @Test
     void aStaircaseDescendsAtMostThirtyTwoBlocks() {
-        MinePlan deepest = stairs(Surveying.MAX_DEPTH, false);
+        MinePlan deepest = stairs(Surveying.MAX_DEPTH);
         assertEquals(-32, deepest.end().up());
         int lowest = 0;
         for (PlanStep step : deepest.steps()) for (Offset cell : step.cleared()) lowest = Math.min(lowest, cell.up());
         assertEquals(-32, lowest, "nothing is cleared below the landing");
-        assertThrows(IllegalArgumentException.class, () -> stairs(Surveying.MAX_DEPTH + 1, false));
-        assertThrows(IllegalArgumentException.class, () -> stairs(0, false));
+        assertThrows(IllegalArgumentException.class, () -> stairs(Surveying.MAX_DEPTH + 1));
+        assertThrows(IllegalArgumentException.class, () -> stairs(0));
         assertEquals(deepest, deepest.edit(PlanEdit.LONGER, false), "longer stops at the limit");
         assertEquals(deepest, deepest.edit(PlanEdit.LONGER, true));
     }
@@ -71,7 +71,7 @@ class MinePlanTest {
             assertEquals(Optional.empty(), step.tread());
             assertEquals(List.of(step.root().above(1), step.root().above(2)), step.passage(), "two clear blocks");
         }
-        assertEquals(new MinePlan.Needs(64, 0, 0), longest.needs());
+        assertEquals(new MinePlan.Needs(64, 0, 8, 2), longest.needs(), "eight lights, ribs at both ends");
         assertThrows(IllegalArgumentException.class, () -> route(Surveying.MAX_ROUTE_LENGTH + 1, Turn.NONE, Turn.NONE));
         assertEquals(longest, longest.edit(PlanEdit.LONGER, true), "longer stops at the limit");
     }
@@ -106,7 +106,7 @@ class MinePlanTest {
         assertThrows(IllegalArgumentException.class, () -> route(5, new Turn(Steer.LEFT, 3), new Turn(Steer.LEFT, 2)));
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MinePlan(PlanShape.STAIRCASE, 5, new Turn(Steer.LEFT, 2), Turn.NONE, false));
+                () -> new MinePlan(PlanShape.STAIRCASE, 5, new Turn(Steer.LEFT, 2), Turn.NONE));
         for (Steer a : List.of(Steer.LEFT, Steer.RIGHT))
             for (Steer b : List.of(Steer.LEFT, Steer.RIGHT))
                 for (int first = 1; first < 9; first++)
@@ -120,27 +120,52 @@ class MinePlanTest {
     }
 
     @Test
-    void aLitPlanPutsALightAtHeadHeightOnEveryEighthStep() {
-        List<PlanStep> steps = stairs(16, true).steps();
+    void everyPlanPutsALightAtHeadHeightOnEveryEighthStepAndItsLast() {
+        List<PlanStep> steps = stairs(16).steps();
         for (PlanStep step : steps) {
-            boolean lit = step.number() % Surveying.LIGHT_SPACING == 0;
+            boolean lit = step.number() % Surveying.LIGHT_SPACING == 0 || step.number() == steps.size();
             assertEquals(lit, step.light().isPresent(), "step " + step.number());
             if (lit) {
-                assertEquals(step.passage().get(1), step.light().get(), "head height, in the passage");
+                assertEquals(step.passage().get(2), step.light().get(), "the top of the passage, under the ceiling");
                 assertTrue(step.cleared().contains(step.light().get()));
             }
         }
-        assertEquals(new MinePlan.Needs(17, 16, 2), stairs(16, true).needs());
-        assertEquals(
-                2,
-                new MinePlan(PlanShape.ROUTE, 20, Turn.NONE, Turn.NONE, true)
-                        .needs()
-                        .lights());
-        assertEquals(0, stairs(16, false).needs().lights());
+        assertEquals(new MinePlan.Needs(17, 16, 3, 2), stairs(16).needs(), "the landing is lit too");
+        assertEquals(3, route(20, Turn.NONE, Turn.NONE).needs().lights(), "steps 8 and 16 and the route's end");
+        assertEquals(2, route(16, Turn.NONE, Turn.NONE).needs().lights(), "the end is one of the eighth steps");
+        assertEquals(1, route(1, Turn.NONE, Turn.NONE).needs().lights(), "a one-cell route is its own junction");
+    }
+
+    @Test
+    void ribsFrameTheEntranceAndTheJunctionAndEveryFourthStepOfAWideRoute() {
+        List<PlanStep> stair = stairs(6).steps();
+        for (PlanStep step : stair)
+            assertEquals(step.number() == 1 || step.number() == 7, step.framed(), "stair step " + step.number());
+        List<PlanStep> narrow = route(10, Turn.NONE, Turn.NONE).steps();
+        for (PlanStep step : narrow)
+            assertEquals(step.number() == 1 || step.number() == 10, step.framed(), "route step " + step.number());
+        List<PlanStep> wide = wide(10, Turn.NONE, Turn.NONE).steps();
+        for (PlanStep step : wide)
+            assertEquals(
+                    step.number() == 1 || step.number() == 10 || step.number() % Surveying.RIB_SPACING == 0,
+                    step.framed(),
+                    "wide step " + step.number());
+        assertEquals(12, wide(10, Turn.NONE, Turn.NONE).needs().ribs(), "a rib for each column of four framed steps");
+    }
+
+    @Test
+    void everyThirdStepIsScarredOnAlternateWalls() {
+        List<PlanStep> steps = route(12, Turn.NONE, Turn.NONE).steps();
+        for (PlanStep step : steps)
+            assertEquals(step.number() % Surveying.SCAR_SPACING == 0, step.scarred(), "step " + step.number());
+        assertEquals(3, steps.get(2).scarSide(), "the first scar on the left");
+        assertEquals(1, steps.get(5).scarSide(), "the second on the right");
+        assertEquals(3, steps.get(8).scarSide());
+        assertThrows(IllegalStateException.class, () -> steps.get(0).scarSide(), "an unscarred step has no wall");
     }
 
     private static MinePlan wide(int length, Turn first, Turn second) {
-        return new MinePlan(PlanShape.ROUTE, length, first, second, false, true);
+        return new MinePlan(PlanShape.ROUTE, length, first, second, true);
     }
 
     @Test
@@ -160,11 +185,11 @@ class MinePlanTest {
         }
         MinePlan narrow = route(Surveying.MAX_ROUTE_LENGTH, Turn.NONE, Turn.NONE);
         assertEquals(3, narrow.steps().get(0).cleared().size(), "a narrow step cuts three");
-        assertEquals(new MinePlan.Needs(192, 0, 0), longest.needs(), "three segments a step");
-        assertEquals(new MinePlan.Needs(64, 0, 0), narrow.needs(), "one segment a step");
+        assertEquals(192, longest.needs().segments(), "three segments a step");
+        assertEquals(64, narrow.needs().segments(), "one segment a step");
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MinePlan(PlanShape.STAIRCASE, 4, Turn.NONE, Turn.NONE, false, true),
+                () -> new MinePlan(PlanShape.STAIRCASE, 4, Turn.NONE, Turn.NONE, true),
                 "a staircase is never wide");
     }
 
@@ -180,7 +205,7 @@ class MinePlanTest {
         PlanStep after = plan.steps().get(3);
         assertEquals(new Offset(3, 1, 0), after.root(), "on to the right");
         assertEquals(List.of(new Offset(4, 1, 0)), after.flanks(), "beside it, the root not held yet");
-        assertEquals(new MinePlan.Needs(16, 0, 0), plan.needs(), "a segment for each root cell planned");
+        assertEquals(16, plan.needs().segments(), "a segment for each root cell planned");
         // two turns a cell apart double back onto the first leg's columns
         assertThrows(IllegalArgumentException.class, () -> wide(6, new Turn(Steer.RIGHT, 2), new Turn(Steer.RIGHT, 3)));
         assertEquals(
@@ -199,9 +224,11 @@ class MinePlanTest {
         assertTrue(widened.wide());
         assertFalse(widened.edit(PlanEdit.WIDTH, false).wide(), "and back");
         assertFalse(widened.edit(PlanEdit.SHAPE, false).wide(), "a staircase drops the width");
-        assertEquals(stairs(8, false), stairs(8, false).edit(PlanEdit.WIDTH, false), "a staircase has none");
-        MinePlan lit = widened.edit(PlanEdit.LIGHTS, false);
-        assertEquals(Optional.of(new Offset(8, -1, 2)), lit.steps().get(7).light(), "on the left column, head high");
+        assertEquals(stairs(8), stairs(8).edit(PlanEdit.WIDTH, false), "a staircase has none");
+        assertEquals(
+                Optional.of(new Offset(8, -1, 3)), widened.steps().get(7).light(), "on the left column, at the top");
+        assertEquals(
+                Optional.of(new Offset(8, 0, 2)), narrow.steps().get(7).light(), "a narrow route's top is head high");
         assertEquals(widened.edit(PlanEdit.LONGER, false).length(), 17, "it is edited like any route");
     }
 
@@ -213,7 +240,6 @@ class MinePlanTest {
         assertEquals(16, plan.edit(PlanEdit.LONGER, true).length());
         assertEquals(1, plan.edit(PlanEdit.SHORTER, true).length(), "never shorter than one");
         assertEquals(plan, plan.edit(PlanEdit.FIRST_WAY, false), "a staircase does not turn");
-        assertTrue(plan.edit(PlanEdit.LIGHTS, false).lit());
 
         MinePlan route = plan.edit(PlanEdit.SHAPE, false);
         assertEquals(PlanShape.ROUTE, route.shape());
@@ -235,21 +261,21 @@ class MinePlanTest {
         MinePlan back = both.edit(PlanEdit.SHAPE, false);
         assertEquals(PlanShape.STAIRCASE, back.shape());
         assertEquals(Turn.NONE, back.first(), "a staircase keeps no turns");
-        MinePlan long_ = new MinePlan(PlanShape.ROUTE, 50, Turn.NONE, Turn.NONE, false);
+        MinePlan long_ = new MinePlan(PlanShape.ROUTE, 50, Turn.NONE, Turn.NONE);
         assertEquals(Surveying.MAX_DEPTH, long_.edit(PlanEdit.SHAPE, false).length(), "a staircase is cut to 32");
-        MinePlan single = new MinePlan(PlanShape.ROUTE, 1, Turn.NONE, Turn.NONE, false);
+        MinePlan single = new MinePlan(PlanShape.ROUTE, 1, Turn.NONE, Turn.NONE);
         assertEquals(single, single.edit(PlanEdit.FIRST_WAY, false), "a one-cell route has nowhere to turn");
-        MinePlan full = new MinePlan(PlanShape.ROUTE, 3, new Turn(Steer.LEFT, 1), new Turn(Steer.LEFT, 2), false);
+        MinePlan full = new MinePlan(PlanShape.ROUTE, 3, new Turn(Steer.LEFT, 1), new Turn(Steer.LEFT, 2));
         assertEquals(full, full.edit(PlanEdit.FIRST_LATER, false), "no room between the turns");
     }
 
     @Test
     void thePlanReadsNothingButItsOwnNumbers() {
-        assertEquals(stairs(5, true).steps(), stairs(5, true).steps(), "the same plan gives the same geometry");
+        assertEquals(stairs(5).steps(), stairs(5).steps(), "the same plan gives the same geometry");
         for (var component : MinePlan.class.getRecordComponents())
             assertTrue(
                     List.of(PlanShape.class, int.class, Turn.class, boolean.class)
                             .contains(component.getType()),
-                    "geometry from shape, length, turns and lights only: " + component);
+                    "geometry from shape, length, turns and width only: " + component);
     }
 }

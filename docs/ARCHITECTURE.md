@@ -77,7 +77,7 @@ Not here: the behavior, recipes and numbers of a single block or item. Code, dat
 
 ## Organs
 
-- An organ stands on a loaded foundation block and works only while it has one.
+- An organ stands on a loaded foundation block and works only while it has one. A mining organ whose supporting block is gone dies: it breaks and drops nothing. Unloaded support is unknown, not missing.
 - All organs share one interaction rule: a hand or ordinary item opens the screen, an applicable tool or ingredient performs its action, sneaking lets the player build against the organ.
 - An organ broken by a player comes out whole, carrying its contents and its history. Grown tissue is different: it never moves, and breaking it does not return it.
 - An organ's history is what it has done. It is assigned to one organ and never copied or merged.
@@ -107,7 +107,7 @@ Not here: the behavior, recipes and numbers of a single block or item. Code, dat
 - Unsupported content gets no guessed conversion and no guessed loot. Leave it and do not consume the player's input. Never convert a block that has an inventory or block entity.
 - Drops come from loot tables in the real loot context, so tools and enchantments apply. One break rolls one table.
 - The engine cannot tell a player's build from natural terrain. Eligibility must be an explicit block rule, usually a tag.
-- Excavation removes real terrain and stops with a named reason at fluids, cavities, protected blocks, full outputs and unloaded chunks.
+- Excavation removes real terrain and stops with a named reason at protected blocks, full outputs, missing supply and unloaded chunks. Fluids, falling blocks and cavities are accidents, not stops: mining neither avoids, seals nor bridges them (owner decision in [design/MINING_PROGRESSION.md](design/MINING_PROGRESSION.md)).
 
 ## Client
 

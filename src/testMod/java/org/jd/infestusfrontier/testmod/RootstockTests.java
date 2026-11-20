@@ -211,7 +211,7 @@ public final class RootstockTests {
         /**
          * Stone for the staircase, as high as {@code hill} blocks over the marker's level, and the whole supplied
          * minehead: {@code bladder} BU for the jaw and cilia, and {@code segments} and {@code treads} in the stock
-         * chest.
+         * chest, with the torches and Bone Plates the plan's lights and ribs take.
          */
         void rig(int hill, int bladder, int segments, int treads) {
             fill(new BlockPos(-2, -depth - 3, -depth - 3), new BlockPos(2, hill - 1, -2), "stone");
@@ -241,23 +241,24 @@ public final class RootstockTests {
             set(new BlockPos(5, -1, 4), filtered("intake", "minecraft:cobblestone"));
             set(SPOIL_CHEST, "chest[facing=north]");
             set(new BlockPos(3, -1, 4), "infestusfrontier:mouth[mode=output]");
-            set(
-                    STOCK_CHEST,
-                    "chest[facing=north]{Items:[%s%s]}"
-                            .formatted(
-                                    segments > 0
-                                            ? "{Slot:0,id:\"infestusfrontier:root_segment\",count:%d}"
-                                                    .formatted(segments)
-                                            : "",
-                                    treads > 0
-                                            ? "%s{Slot:1,id:\"minecraft:cobblestone_stairs\",count:%d}"
-                                                    .formatted(segments > 0 ? "," : "", treads)
-                                            : ""));
+            List<String> stock = new ArrayList<>();
+            if (segments > 0) stock.add("{Slot:0,id:\"infestusfrontier:root_segment\",count:%d}".formatted(segments));
+            if (treads > 0) stock.add("{Slot:1,id:\"minecraft:cobblestone_stairs\",count:%d}".formatted(treads));
+            stock.add("{Slot:2,id:\"minecraft:torch\",count:%d}"
+                    .formatted(plan().needs().lights()));
+            stock.add("{Slot:3,id:\"infestusfrontier:bone_plate\",count:%d}"
+                    .formatted(plan().needs().ribs()));
+            set(STOCK_CHEST, "chest[facing=north]{Items:[%s]}".formatted(String.join(",", stock)));
             fill(new BlockPos(2, -1, -1), new BlockPos(3, -1, -1), "infestusfrontier:item_vein");
             fill(new BlockPos(3, -1, 0), new BlockPos(3, -1, 2), "infestusfrontier:item_vein");
             set(
                     new BlockPos(1, -1, -1),
-                    filtered("intake", "infestusfrontier:root_segment", "minecraft:cobblestone_stairs"));
+                    filtered(
+                            "intake",
+                            "infestusfrontier:root_segment",
+                            "minecraft:cobblestone_stairs",
+                            "minecraft:torch",
+                            "infestusfrontier:bone_plate"));
             set(HOPPER, "hopper[facing=west]");
         }
 
@@ -269,7 +270,7 @@ public final class RootstockTests {
 
         /** The staircase the marker holds, as approved. */
         MinePlan plan() {
-            return new MinePlan(PlanShape.STAIRCASE, depth, Turn.NONE, Turn.NONE, false);
+            return new MinePlan(PlanShape.STAIRCASE, depth, Turn.NONE, Turn.NONE);
         }
 
         /** Where {@code offset} of the plan lies. */
@@ -359,7 +360,7 @@ public final class RootstockTests {
                 }
                 for (int up = 1; up <= Surveying.STAIR_HEADROOM; up++)
                     h.assertTrue(
-                            level.getBlockState(plan(floor.above(up))).isAir(),
+                            open(level, plan(floor.above(up))),
                             "step " + step.number() + ": clear " + up + " over its floor");
             }
         }
@@ -386,6 +387,16 @@ public final class RootstockTests {
         h.assertTrue(level.getBlockEntity(head) instanceof MenuProvider, "a Rootstock at " + head);
         return (TunnelRootMenu)
                 ((MenuProvider) level.getBlockEntity(head)).createMenu(0, player.getInventory(), player);
+    }
+
+    /**
+     * True for a passage block a player moves through: air, or what a grower grows in a passage with no collision, its
+     * ribs, scars and lights. Fluid does not count as open here.
+     */
+    static boolean open(ServerLevel level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return state.getFluidState().isEmpty()
+                && state.getCollisionShape(level, pos).isEmpty();
     }
 
     private static String key(Refusal stop) {
@@ -646,48 +657,51 @@ public final class RootstockTests {
     }
 
     /**
-     * Water beside the next step, gravel on top of it and a cavity under its root cell each pause the minehead with
-     * its reason before anything is cut; with each put right, it cuts the step.
+     * Water beside the first step and a cavity under the second step's root cell pause nothing: they are accidents. The
+     * minehead cuts on and names no reason; the water runs into the stairs; over the cavity the grower lays neither
+     * root cell nor tread and pays for neither, so nothing bridges the gap; and the section goes on to its landing.
      */
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 30 * BLOCK_TICKS)
-    public static void unsafeGroundPausesTheMineheadBeforeItCuts(GameTestHelper h) {
-        Site site = Site.of(h, 4, 1);
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 40 * BLOCK_TICKS)
+    public static void hazardsAreAccidentsTheMineheadCutsIntoWithoutABridge(GameTestHelper h) {
+        Site site = Site.of(h, 4, 3);
         site.rig(4, 3000, 4, 4); // a hillside: the first step is in the rock up to its headroom
-        PlanStep first = site.plan().steps().get(0);
-        BlockPos top = site.plan(Rootstocking.cutOrder(first).get(0));
-        BlockPos beside = site.plan(first.tread().orElseThrow()).east();
-        BlockPos over = site.plan(Rootstocking.overheads(first).get(0));
-        BlockPos ground = site.plan(Rootstocking.grounds(first).get(0));
-        Player player = EcologyTests.holding(h, net.minecraft.world.level.GameType.SURVIVAL, Items.AIR, 0);
+        List<PlanStep> steps = site.plan().steps();
+        BlockPos beside = site.plan(steps.get(0).tread().orElseThrow()).east();
+        BlockPos root = site.plan(steps.get(1).root());
+        BlockPos tread = site.plan(steps.get(1).tread().orElseThrow());
         site.level.setBlockAndUpdate(beside, Blocks.WATER.defaultBlockState());
+        site.level.setBlockAndUpdate(root.below(), Blocks.AIR.defaultBlockState());
+        site.level.setBlockAndUpdate(root.below(2), Blocks.AIR.defaultBlockState());
+        Player player = EcologyTests.holding(h, net.minecraft.world.level.GameType.SURVIVAL, Items.AIR, 0);
         h.startSequence()
-                .thenWaitUntil(() -> h.assertValueEqual(
-                        site.status(player), Optional.of(key(Rootstocking.FLUID)), "water beside the step"))
-                .thenIdle(Fracturing.CUT_TICKS)
+                .thenWaitUntil(() -> h.assertValueEqual(site.built(), 2, "two steps built, the second over the gap"))
                 .thenExecute(() -> {
-                    h.assertTrue(site.level.getBlockState(top).is(Blocks.STONE), "nothing cut");
-                    site.level.setBlockAndUpdate(beside, Blocks.STONE.defaultBlockState());
-                    site.level.setBlockAndUpdate(over, Blocks.GRAVEL.defaultBlockState());
+                    h.assertFalse(site.level.getFluidState(beside).isEmpty(), "the water is still there");
+                    h.assertFalse(
+                            site.level.getBlockState(root).is(MiningModule.ROOT_CELL.get()),
+                            "no root cell over the cavity");
+                    h.assertFalse(
+                            site.level.getBlockState(tread).getBlock() instanceof StairBlock,
+                            "and no tread floating on nothing");
+                    h.assertTrue(site.level.getBlockState(root.below()).isAir(), "the cavity stays open");
+                    h.assertValueEqual(
+                            site.stocked(MiningModule.ROOT_SEGMENT.get())
+                                    + site.held(STOCK_CHEST, MiningModule.ROOT_SEGMENT.get()),
+                            3,
+                            "one segment paid, for the first step only");
                 })
-                .thenWaitUntil(() -> h.assertValueEqual(
-                        site.status(player), Optional.of(key(Rootstocking.FALLING)), "gravel on top of the step"))
-                .thenIdle(Fracturing.CUT_TICKS)
+                .thenWaitUntil(() ->
+                        h.assertValueEqual(site.built(), site.plan().steps().size(), "the landing"))
                 .thenExecute(() -> {
-                    h.assertTrue(site.level.getBlockState(top).is(Blocks.STONE), "nothing cut");
-                    site.level.setBlockAndUpdate(over, Blocks.STONE.defaultBlockState());
-                    site.level.setBlockAndUpdate(ground, Blocks.AIR.defaultBlockState());
-                })
-                .thenWaitUntil(() -> h.assertValueEqual(
-                        site.status(player), Optional.of(key(Rootstocking.CAVITY)), "a cavity under the step"))
-                .thenIdle(Fracturing.CUT_TICKS)
-                .thenExecute(() -> {
-                    h.assertTrue(site.level.getBlockState(top).is(Blocks.STONE), "nothing cut");
-                    site.level.setBlockAndUpdate(ground, Blocks.STONE.defaultBlockState());
-                })
-                .thenWaitUntil(() -> h.assertTrue(site.level.getBlockState(top).isAir(), "put right, it cuts"))
-                .thenExecute(() -> {
-                    h.assertTrue(site.level.getBlockState(over).is(Blocks.STONE), "and leaves the rock above");
-                    h.assertValueEqual(site.loose(), 0, "nothing fell loose");
+                    h.assertTrue(
+                            site.level
+                                    .getBlockState(site.plan(steps.get(3).root()))
+                                    .is(MiningModule.ROOT_CELL.get()),
+                            "the landing has its root cell");
+                    h.assertTrue(
+                            site.status(player).isEmpty()
+                                    || site.status(player).equals(Optional.of(key(Rootstocking.FINISHED))),
+                            "no hazard was ever a reason: " + site.status(player));
                     site.release();
                 })
                 .thenSucceed();
@@ -1041,7 +1055,7 @@ public final class RootstockTests {
                             level.getBlockState(mine.at(DEMO_HEAD)).is(MiningModule.TUNNEL_ROOT.get()),
                             "the Rootstock stands at the minehead");
                     BlockPos marker = mine.at(DEMO_HEAD.north().below());
-                    MinePlan plan = new MinePlan(PlanShape.STAIRCASE, 8, Turn.NONE, Turn.NONE, true);
+                    MinePlan plan = new MinePlan(PlanShape.STAIRCASE, 8, Turn.NONE, Turn.NONE);
                     for (PlanStep step : plan.steps().subList(4, plan.steps().size()))
                         for (Offset cell : step.cleared()) {
                             BlockState state = level.getBlockState(

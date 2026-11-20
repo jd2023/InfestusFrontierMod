@@ -55,6 +55,7 @@ import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.mining.MiningModule;
 import org.jd.infestusfrontier.mining.RootCellBlock;
+import org.jd.infestusfrontier.mining.Stride;
 import org.jd.infestusfrontier.mining.TunnelRootBlock;
 import org.jd.infestusfrontier.mining.TunnelRootMenu;
 import org.jd.infestusfrontier.organ.OrganModule;
@@ -233,7 +234,10 @@ public final class TunnelRootTests {
      * output. The same organ keeps its supplies, output, cells and steward through every move, and its steward earns
      * the first cut and, walking through the bend, the turn.
      */
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 3 * STEP_WAIT + 60)
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            timeoutTicks = 3 * STEP_WAIT + 60 + Tunnelling.CRAWL_TICKS) // and one crawl watched to its end
     public static void aHeadCutsALevelTunnelWithATurnAndLaysAFlushRoot(GameTestHelper h) {
         Site site = Site.of(h, 0);
         site.plant(Direction.NORTH);
@@ -246,14 +250,32 @@ public final class TunnelRootTests {
         h.startSequence()
                 .thenWaitUntil(() -> h.assertValueEqual(site.head(), site.at(0, 0, -1), "the first step, north"))
                 .thenExecute(() -> {
+                    h.assertValueEqual(
+                            headState(site).getValue(TunnelRootBlock.STRIDE), Stride.STRAIGHT, "it crawls in straight");
                     TunnelRootMenu menu = site.menu(steward);
                     h.assertTrue(menu.clickMenuButton(steward, TunnelRootMenu.LEFT_BUTTON), "the screen steers");
                     h.assertValueEqual(site.menu(steward).steer(), Steer.LEFT, "the next step goes left");
+                    h.assertValueEqual(
+                            headState(site).getValue(TunnelRootBlock.STEER), Stride.LEFT, "the head leans left");
                     site.due();
                 })
                 .thenWaitUntil(() -> h.assertValueEqual(site.head(), site.at(-1, 0, -1), "the turned step, west"))
                 .thenExecute(() -> {
                     h.assertValueEqual(site.menu(steward).steer(), Steer.STRAIGHT, "after a turn, straight again");
+                    BlockState turned = headState(site);
+                    h.assertValueEqual(turned.getValue(TunnelRootBlock.STRIDE), Stride.LEFT, "it crawls round left");
+                    h.assertValueEqual(turned.getValue(TunnelRootBlock.STEER), Stride.STRAIGHT, "steered on");
+                    h.assertValueEqual(turned.getValue(TunnelRootBlock.FACING), Direction.WEST, "facing west");
+                    h.assertTrue(site.saved().getInt("ticks") < Tunnelling.CRAWL_TICKS, "still crawling in");
+                })
+                .thenWaitUntil(() -> h.assertValueEqual(
+                        headState(site).getValue(TunnelRootBlock.STRIDE), Stride.REST, "the crawl ends at rest"))
+                .thenExecute(() -> {
+                    h.assertValueEqual(site.head(), site.at(-1, 0, -1), "at rest where it crawled to");
+                    int waited = site.saved().getInt("ticks");
+                    h.assertTrue(
+                            waited >= Tunnelling.CRAWL_TICKS && waited < Tunnelling.STEP_TICKS,
+                            "it rests once its crawl's time is up, before the next step: " + waited);
                     site.due();
                 })
                 .thenWaitUntil(() -> h.assertValueEqual(site.head(), site.at(-2, 0, -1), "straight on, west"))
@@ -313,6 +335,11 @@ public final class TunnelRootTests {
                     site.release();
                 })
                 .thenSucceed();
+    }
+
+    /** The head's block state, which the client animates. */
+    private static BlockState headState(Site site) {
+        return site.level.getBlockState(site.head());
     }
 
     private static void stand(ServerPlayer player, BlockPos cell) {
@@ -432,7 +459,7 @@ public final class TunnelRootTests {
                     h.assertValueEqual(site.head(), site.start, "it stays");
                     h.assertValueEqual(site.stop(player), Optional.of(key(stop)), "and still names " + stop);
                     CompoundTag stopped = site.saved();
-                    for (String key : List.of("segments", "output", "tank", "cells", "steer"))
+                    for (String key : List.of("segments", "output", "tank", "cells"))
                         h.assertValueEqual(stopped.get(key), spoiled.get(key), "stopped, it keeps its " + key);
                     h.assertValueEqual(site.loose(), 0, "nothing dropped");
                     fix.accept(site);
@@ -531,37 +558,142 @@ public final class TunnelRootTests {
                 List.of("minecraft:cobblestone 1"));
     }
 
+    /** Ore in the floor under the cut: a root cell may not replace it, so the head waits until it is mined out. */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 3 * STEP_WAIT)
-    public static void fluidBesideTheCutStopsUntilItIsGone(GameTestHelper h) {
-        stopsThenResumes(
-                h,
-                7,
-                Tunnelling.FLUID,
-                site -> site.set(1, 1, -1, Blocks.WATER),
-                site -> site.set(1, 1, -1, Blocks.STONE),
-                TWO_STONE);
-    }
-
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 3 * STEP_WAIT)
-    public static void aLooseBlockOnTheCutStopsUntilItIsGone(GameTestHelper h) {
-        stopsThenResumes(
-                h,
-                8,
-                Tunnelling.FALLING,
-                site -> site.set(0, 2, -1, Blocks.GRAVEL),
-                site -> site.set(0, 2, -1, Blocks.STONE),
-                TWO_STONE);
-    }
-
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 3 * STEP_WAIT)
-    public static void aHoleUnderTheCutStopsUntilItIsFilled(GameTestHelper h) {
+    public static void oreUnderTheCutStopsUntilItIsGone(GameTestHelper h) {
         stopsThenResumes(
                 h,
                 9,
                 Tunnelling.NO_FLOOR,
-                site -> site.set(0, -1, -1, Blocks.AIR),
-                site -> site.set(0, -1, -1, Blocks.COBBLESTONE),
+                site -> site.set(0, -1, -1, Blocks.IRON_ORE),
+                site -> site.set(0, -1, -1, Blocks.STONE),
                 TWO_STONE);
+    }
+
+    // ---- accidents ----
+
+    /**
+     * {@code spoil} puts a hazard by the next step. The head does not stop for it: it takes the step as steered,
+     * names no reason, and the world does what it does. {@code after} checks what the accident left.
+     */
+    private static void takesTheStepAnyway(
+            GameTestHelper h, int slot, Consumer<Site> spoil, List<String> drops, Consumer<Site> after) {
+        Site site = Site.of(h, slot);
+        site.plant(Direction.NORTH);
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        site.supply(player);
+        spoil.accept(site);
+        site.due();
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertValueEqual(site.head(), site.at(0, 0, -1), "it steps all the same"))
+                .thenExecute(() -> {
+                    h.assertValueEqual(site.stop(player), Optional.empty(), "and names no stop");
+                    CompoundTag tag = site.saved();
+                    h.assertValueEqual(tag.getInt("cells"), 1, "one step");
+                    h.assertValueEqual(segments(tag), SEGMENTS - 1, "one segment, laid as the floor");
+                    h.assertValueEqual(output(tag), drops, "the cut's ordinary drops, once");
+                })
+                .thenIdle(Tunnelling.RETRY_TICKS)
+                .thenExecute(() -> {
+                    after.accept(site);
+                    site.release();
+                })
+                .thenSucceed();
+    }
+
+    /** Water beside the cut is no stop: the head cuts, and the water flows into the tunnel behind it. */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 3 * STEP_WAIT)
+    public static void waterBesideTheCutFloodsTheTunnel(GameTestHelper h) {
+        takesTheStepAnyway(h, 7, site -> site.set(1, 1, -1, Blocks.WATER), TWO_STONE, site -> {
+            h.assertTrue(site.state(1, 1, -1).is(Blocks.WATER), "the source is still there");
+            h.assertFalse(site.level.getFluidState(site.at(0, 1, -1)).isEmpty(), "and water runs into the cut");
+            h.assertTrue(site.state(0, 0, -1).is(MiningModule.TUNNEL_ROOT.get()), "the head lives on, wet");
+        });
+    }
+
+    /** Lava in the upper cut is no stop: there is nothing in it to cut, so only the lower block drops. */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 3 * STEP_WAIT)
+    public static void lavaInTheCutIsCutInto(GameTestHelper h) {
+        takesTheStepAnyway(h, 22, site -> site.set(0, 1, -1, Blocks.LAVA), List.of("minecraft:cobblestone 1"), site -> {
+            h.assertFalse(site.level.getFluidState(site.at(0, 1, -1)).isEmpty(), "the lava is left to flow");
+            h.assertValueEqual(site.loose(), 0, "nothing dropped loose");
+        });
+    }
+
+    /**
+     * Gravel on top of the cut is no stop: the head cuts and the gravel falls into the tunnel, landing as vanilla lands
+     * it: on the head it cannot settle, so it breaks into its item. The head lives.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 3 * STEP_WAIT)
+    public static void aLooseBlockOnTheCutFallsIntoTheTunnel(GameTestHelper h) {
+        takesTheStepAnyway(h, 8, site -> site.set(0, 2, -1, Blocks.GRAVEL), TWO_STONE, site -> {
+            h.assertFalse(site.state(0, 2, -1).is(Blocks.GRAVEL), "the gravel has left the roof");
+            int fallen = site.state(0, 1, -1).is(Blocks.GRAVEL) ? 1 : 0;
+            for (ItemEntity item : site.level.getEntitiesOfClass(ItemEntity.class, site.yard()))
+                if (item.getItem().is(Items.GRAVEL)) fallen += item.getItem().getCount();
+            h.assertValueEqual(fallen, 1, "one gravel, in the tunnel as a block or as its item");
+            h.assertTrue(site.state(0, 0, -1).is(MiningModule.TUNNEL_ROOT.get()), "the head lives");
+        });
+    }
+
+    /**
+     * A hole under the cut is no stop and gets no bridge: the head cuts the two blocks, lays no root cell over the
+     * hole and pays no segment for one, crawls onto nothing and dies. It leaves nothing behind: no head, no item, no
+     * floor over the hole. The cell where it stood and the root behind it are what the accident leaves.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 3 * STEP_WAIT)
+    public static void aHeadThatStepsOverAHoleDiesAndLeavesNothing(GameTestHelper h) {
+        Site site = Site.of(h, 23);
+        site.plant(Direction.NORTH);
+        site.supply(EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0));
+        site.set(0, -1, -1, Blocks.AIR);
+        site.set(0, -2, -1, Blocks.AIR);
+        site.due();
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(site.state(0, 1, -1).isAir(), "it cuts"))
+                .thenExecute(() -> {
+                    h.assertTrue(site.state(0, 0, -1).isAir(), "the head died where it stepped");
+                    h.assertTrue(site.state(0, 0, 0).isAir(), "it left the cell behind it");
+                    h.assertTrue(site.state(0, -1, -1).isAir(), "no root cell bridges the hole");
+                    for (BlockPos cell : BlockPos.betweenClosed(site.at(-6, -1, -6), site.at(6, 2, 6)))
+                        h.assertFalse(site.level.getBlockState(cell).is(MiningModule.TUNNEL_ROOT.get()), "no head");
+                    h.assertTrue(site.state(0, -1, 0).is(EcologyModule.LIVING_SUBSTRATE.get()), "the start stays");
+                    h.assertValueEqual(site.loose(), 0, "nothing dropped: not the head, its segments or its cut");
+                    site.release();
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * Losing the block under it kills a head, working or waiting: broken by a player, it leaves no item, no segments
+     * and no output; the head is destroyed, not paused.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 100)
+    public static void aHeadWhoseGroundIsBrokenDiesWithoutDrops(GameTestHelper h) {
+        Site site = Site.of(h, 24);
+        site.plant(Direction.NORTH);
+        site.supply(EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0));
+        site.load(tag -> {
+            ListTag output = tag.getList("output", Tag.TAG_COMPOUND);
+            CompoundTag coal = new CompoundTag();
+            coal.putString("id", "minecraft:coal");
+            coal.putInt("count", 5);
+            output.set(0, coal);
+        });
+        ServerPlayer miner = TestDrops.miner(h, new ItemStack(Items.DIAMOND_SHOVEL));
+        h.assertTrue(miner.gameMode.destroyBlock(site.at(0, -1, 0)), "a player digs out the substrate under it");
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(site.state(0, 0, 0).isAir(), "the head dies"))
+                .thenExecute(() -> {
+                    for (ItemEntity item : site.level.getEntitiesOfClass(ItemEntity.class, site.yard()))
+                        h.assertFalse(
+                                item.getItem().is(MiningModule.TUNNEL_ROOT_ITEM.get())
+                                        || item.getItem().is(MiningModule.ROOT_SEGMENT.get())
+                                        || item.getItem().is(Items.COAL),
+                                "it drops nothing of its own: " + item.getItem());
+                    site.release();
+                })
+                .thenSucceed();
     }
 
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 3 * STEP_WAIT)
@@ -661,6 +793,9 @@ public final class TunnelRootTests {
                     tick(level, head, entity.getType());
                     h.assertValueEqual(
                             menu.stopKey(), Optional.of(key(Tunnelling.UNLOADED)), "it names the unloaded ground");
+                    h.assertTrue(
+                            level.getBlockState(head).is(MiningModule.TUNNEL_ROOT.get()),
+                            "unloaded ground ahead is unknown, not missing: the head lives");
                     h.assertFalse(level.hasChunk(next.x, next.z), "and loaded nothing");
                     h.assertTrue(level.getBlockState(head.east()).is(Blocks.STONE), "and cut nothing");
                     h.assertValueEqual(menu.cells(), 0, "and laid nothing");
@@ -785,7 +920,21 @@ public final class TunnelRootTests {
             batch = "tunnel_root_unload",
             timeoutTicks = 1200)
     public static void aHeadKeepsItsStateThroughASaveToDiskAndAReload(GameTestHelper h) {
-        Site site = Site.of(h, 14);
+        savedSteering(h, false);
+    }
+
+    /** A pre-animation save keeps its NBT steering through an actual chunk save and reload. */
+    @GameTest(
+            templateNamespace = "infestusfrontier_tests",
+            template = "empty",
+            batch = "tunnel_root_legacy_unload",
+            timeoutTicks = 1200)
+    public static void aLegacyHeadKeepsItsSteeringThroughASaveToDiskAndAReload(GameTestHelper h) {
+        savedSteering(h, true);
+    }
+
+    private static void savedSteering(GameTestHelper h, boolean legacy) {
+        Site site = Site.of(h, legacy ? 32 : 14);
         site.plant(Direction.NORTH);
         ServerPlayer steward = player(h);
         site.supply(steward);
@@ -799,6 +948,14 @@ public final class TunnelRootTests {
                     site.menu(steward).clickMenuButton(steward, TunnelRootMenu.RIGHT_BUTTON);
                     before[0] = site.entity();
                     saved[0] = site.saved();
+                    if (legacy) {
+                        saved[0].putInt("steer", Steer.RIGHT.ordinal());
+                        site.level.setBlock(
+                                site.head(),
+                                site.level.getBlockState(site.head()).setValue(TunnelRootBlock.STEER, Stride.STRAIGHT),
+                                Block.UPDATE_CLIENTS);
+                        site.entity().loadWithComponents(saved[0], site.level.registryAccess());
+                    }
                     site.level.save(null, true, false);
                     site.level.setChunkForced(site.chunk.x, site.chunk.z, false);
                 })
@@ -812,8 +969,9 @@ public final class TunnelRootTests {
                 .thenExecute(() -> {
                     h.assertTrue(site.entity() != before[0], "a new block entity, read from the saved chunk");
                     CompoundTag back = site.saved();
-                    for (String key : List.of("segments", "output", "tank", "cells", "steer", "steward"))
+                    for (String key : List.of("segments", "output", "tank", "cells", "steward"))
                         h.assertValueEqual(back.get(key), saved[0].get(key), key + " survives");
+                    h.assertValueEqual(site.menu(steward).steer(), Steer.RIGHT, "the steering survives in its state");
                     h.assertValueEqual(output(back), List.of("minecraft:cobblestone 1", "minecraft:coal 1"), "drops");
                     int waited = back.getInt("ticks") - saved[0].getInt("ticks");
                     h.assertTrue(waited >= 0 && waited <= 5, "it did not work while gone: " + waited);
@@ -849,7 +1007,10 @@ public final class TunnelRootTests {
                     CompoundTag kept = site.saved();
                     h.assertValueEqual(kept.getInt("cells"), Tunnelling.MAX_CELLS + 1, "the saved bytes stay");
                     h.assertValueEqual(segments(kept), SEGMENTS, "all of them");
-                    h.assertValueEqual(kept.getInt("steer"), 0, "unchanged by the screen");
+                    h.assertValueEqual(
+                            site.state(0, 0, 0).getValue(TunnelRootBlock.STEER).name(),
+                            "STRAIGHT",
+                            "unchanged by the screen");
                     site.release();
                 })
                 .thenSucceed();
@@ -866,6 +1027,7 @@ public final class TunnelRootTests {
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
         site.supply(player);
         site.load(tag -> tag.putInt("cells", 5));
+        site.menu(player).clickMenuButton(player, TunnelRootMenu.LEFT_BUTTON);
         CompoundTag held = site.saved();
         List<ItemStack> drops = Block.getDrops(
                 site.level.getBlockState(site.start),
@@ -892,7 +1054,7 @@ public final class TunnelRootTests {
         h.assertTrue(placed.is(MiningModule.TUNNEL_ROOT.get()), "planted again");
         h.assertValueEqual(placed.getValue(TunnelRootBlock.FACING), Direction.EAST, "facing away from the player");
         CompoundTag again = site.saved();
-        for (String key : List.of("segments", "output", "tank", "cells"))
+        for (String key : List.of("segments", "output", "tank", "cells", "steer"))
             h.assertValueEqual(again.get(key), held.get(key), key + " travels on the item");
         h.assertValueEqual(again.getInt("cells"), 5, "the cells it laid");
         site.release();
@@ -962,8 +1124,9 @@ public final class TunnelRootTests {
 
     /**
      * The demo's Tunnel Root exhibit: a walkable tunnel with a turn and a head ready to cut on, a row of heads each
-     * stopped for a named reason, one of which carries on once its output is emptied, supplies, and a bud that a
-     * stone pickaxe turns into a head.
+     * stopped for a named reason, one of which carries on once its output is emptied, two accidents that do not stop
+     * a head (water it floods its tunnel with, and a hole it dies over), supplies, and a bud that a stone pickaxe turns
+     * into a head.
      */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 300)
     public static void theDemoExhibitShowsATunnelWithATurnAndEveryStop(GameTestHelper h) {
@@ -1005,9 +1168,7 @@ public final class TunnelRootTests {
                             new DemoStop(90, Tunnelling.NO_BIOMASS),
                             new DemoStop(94, Tunnelling.OUTPUT_FULL),
                             new DemoStop(98, Tunnelling.TOO_HARD),
-                            new DemoStop(102, Tunnelling.FLUID),
-                            new DemoStop(106, Tunnelling.FALLING),
-                            new DemoStop(110, Tunnelling.NO_FLOOR))) {
+                            new DemoStop(102, Tunnelling.NO_FLOOR))) {
                         BlockPos at = yard.at(new BlockPos(stop.x(), -60, -52));
                         TunnelRootMenu menu =
                                 (TunnelRootMenu) ((MenuProvider) h.getLevel().getBlockEntity(at))
@@ -1038,11 +1199,30 @@ public final class TunnelRootTests {
                             h.getLevel().getBlockState(bud).is(MiningModule.TUNNEL_ROOT.get()),
                             "the fed bud grows a head");
                 })
-                .thenWaitUntil(() -> h.assertTrue(
-                        h.getLevel()
-                                .getBlockState(yard.at(new BlockPos(94, -60, -53)))
-                                .is(MiningModule.TUNNEL_ROOT.get()),
-                        "emptied, the stopped head cuts on"))
+                .thenWaitUntil(() -> {
+                    ServerLevel level = h.getLevel();
+                    h.assertTrue(
+                            level.getBlockState(yard.at(new BlockPos(94, -60, -53)))
+                                    .is(MiningModule.TUNNEL_ROOT.get()),
+                            "emptied, the stopped head cuts on");
+                    h.assertTrue(
+                            level.getBlockState(yard.at(new BlockPos(106, -60, -53)))
+                                    .is(MiningModule.TUNNEL_ROOT.get()),
+                            "the head beside the water cut into it");
+                    h.assertTrue(
+                            level.getBlockState(yard.at(new BlockPos(107, -59, -53)))
+                                    .is(Blocks.WATER),
+                            "with the water still beside its cut, which stopped nothing");
+                    for (int z = -52; z >= -54; z--)
+                        h.assertFalse(
+                                level.getBlockState(yard.at(new BlockPos(110, -60, z)))
+                                        .is(MiningModule.TUNNEL_ROOT.get()),
+                                "the head over the hole crawled onto nothing and died");
+                    h.assertTrue(
+                            level.getBlockState(yard.at(new BlockPos(110, -59, -53)))
+                                    .isAir(),
+                            "after its cut");
+                })
                 .thenExecute(() -> {
                     yard.tidy(h);
                     yard.forget(h);

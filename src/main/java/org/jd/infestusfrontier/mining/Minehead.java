@@ -9,12 +9,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Fallable;
 import org.jd.infestusfrontier.core.foundation.Outcome;
 import org.jd.infestusfrontier.core.foundation.Refusal;
 import org.jd.infestusfrontier.core.mining.Fracturing;
 import org.jd.infestusfrontier.core.mining.Galleries;
-import org.jd.infestusfrontier.core.mining.Offset;
 import org.jd.infestusfrontier.core.mining.PlanShape;
 import org.jd.infestusfrontier.core.mining.PlanStep;
 import org.jd.infestusfrontier.core.mining.RootMutation;
@@ -124,26 +122,19 @@ final class Minehead {
     }
 
     /**
-     * The next block of {@code step} to cut, top down, or none when the step is clear; or why none may be cut: a chunk
-     * it reads is not loaded, fluid is in it or touches it, a block that falls stands over it, or there is no ground
-     * under a root cell. Reads loaded positions only; changes nothing.
+     * The next block of {@code step} to cut, top down, or none when the step is clear: nothing in it but air or fluid.
+     * Or why none may be cut: a chunk it reads is not loaded. Fluid beside the step, a block that falls onto it and a
+     * cavity under it are not judged: cutting into them is an accident the mine lives with. Reads loaded positions only;
+     * changes nothing.
      */
     private static Outcome<Optional<BlockPos>> cut(ServerLevel level, SurveyedTissueBlockEntity marker, PlanStep step) {
         List<BlockPos> cuts =
                 Rootstocking.cutOrder(step).stream().map(marker::at).toList();
         for (BlockPos cell : cuts)
             if (!Cutting.loaded(level, cell, STEP_REACH)) return Outcome.refused(Rootstocking.UNLOADED);
-        for (BlockPos cell : cuts) if (fluidAt(level, cell)) return Outcome.refused(Rootstocking.FLUID);
-        for (Offset over : Rootstocking.overheads(step))
-            if (level.getBlockState(marker.at(over)).getBlock() instanceof Fallable)
-                return Outcome.refused(Rootstocking.FALLING);
-        for (Offset under : Rootstocking.grounds(step)) {
-            BlockPos ground = marker.at(under);
-            if (!level.getBlockState(ground).isFaceSturdy(level, ground, Direction.UP))
-                return Outcome.refused(Rootstocking.CAVITY);
-        }
-        return Outcome.done(
-                cuts.stream().filter(cell -> !level.getBlockState(cell).isAir()).findFirst());
+        return Outcome.done(cuts.stream()
+                .filter(cell -> !Cutting.open(level.getBlockState(cell)))
+                .findFirst());
     }
 
     /**
@@ -221,7 +212,7 @@ final class Minehead {
             Junction junction = junctions.get(next);
             if (!walked.add(junction.root())) continue;
             for (int quarters : Galleries.sides(0)) {
-                Direction side = StructureGrowerBlockEntity.heading(junction.arrived(), quarters);
+                Direction side = MiningDirections.turn(junction.arrived(), quarters);
                 BlockPos at = junction.root().relative(side);
                 if (!level.hasChunkAt(at)) return Outcome.refused(Rootstocking.UNLOADED);
                 if (!(level.getBlockEntity(at) instanceof SurveyedTissueBlockEntity route) || route.facing() != side)
@@ -231,7 +222,7 @@ final class Minehead {
                 if (++routes > Galleries.MAX_ROUTES) return Outcome.refused(Galleries.TOO_MANY_ROUTES);
                 if (survey.isPresent() && survey.get().finished()) {
                     List<PlanStep> steps = survey.get().plan().steps();
-                    Direction leaving = StructureGrowerBlockEntity.heading(
+                    Direction leaving = MiningDirections.turn(
                             side, steps.get(steps.size() - 1).leaving());
                     junctions.add(new Junction(route.at(survey.get().plan().end()), leaving));
                 } else faces.add(route);
@@ -327,13 +318,5 @@ final class Minehead {
                 return Optional.of(cilia);
         }
         return Optional.empty();
-    }
-
-    /** True when fluid stands in {@code cell} or next to it, where it would flow into the cut. */
-    private static boolean fluidAt(ServerLevel level, BlockPos cell) {
-        if (!level.getFluidState(cell).isEmpty()) return true;
-        for (Direction side : Direction.values())
-            if (!level.getFluidState(cell.relative(side)).isEmpty()) return true;
-        return false;
     }
 }

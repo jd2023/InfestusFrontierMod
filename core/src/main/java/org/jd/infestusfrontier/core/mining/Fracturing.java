@@ -30,14 +30,12 @@ public final class Fracturing {
     public static final Refusal NO_BIOMASS = new Refusal("fracture_jaw.no_biomass");
     /** A chunk the cut reads or changes is not loaded. */
     public static final Refusal UNLOADED = new Refusal("fracture_jaw.unloaded");
-    /** Nothing stands in front of the jaw. */
+    /** Nothing stands in front of the jaw but air or fluid. */
     public static final Refusal NOTHING = new Refusal("fracture_jaw.nothing");
     /** The block in front needs a better pickaxe than stone, or cannot be broken at all. */
     public static final Refusal TOO_HARD = new Refusal("fracture_jaw.too_hard");
     /** The block in front holds a block entity, or is a piston arm. */
     public static final Refusal UNSUPPORTED = new Refusal("fracture_jaw.unsupported");
-    /** The block in front holds fluid. */
-    public static final Refusal FLUID = new Refusal("fracture_jaw.fluid");
     /** A fragile block, such as a torch or a plant, touches the block in front and could fall off loose. */
     public static final Refusal FRAGILE = new Refusal("fracture_jaw.fragile");
     /** The drops of the cut do not fit the Work Bed. */
@@ -47,7 +45,7 @@ public final class Fracturing {
 
     /** Every stop, in a fixed order: a screen names one by its index. */
     public static final List<Refusal> STOPS = List.of(
-            UNROOTED, NO_BED, NO_BIOMASS, UNLOADED, NOTHING, TOO_HARD, UNSUPPORTED, FLUID, FRAGILE, BED_FULL, NO_ORDER);
+            UNROOTED, NO_BED, NO_BIOMASS, UNLOADED, NOTHING, TOO_HARD, UNSUPPORTED, FRAGILE, BED_FULL, NO_ORDER);
 
     private Fracturing() {}
 }

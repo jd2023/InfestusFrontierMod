@@ -13,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -29,15 +31,15 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.mining.Leaching;
 import org.jd.infestusfrontier.discovery.PendingCredits;
 import org.jd.infestusfrontier.ecology.EcologyModule;
-import org.jd.infestusfrontier.mining.LeachedRockBlock;
 import org.jd.infestusfrontier.mining.LeachingPodBlock;
 import org.jd.infestusfrontier.mining.MiningModule;
 import org.jd.infestusfrontier.organ.OrganModule;
 
 /**
- * The Leaching Pod and Leached Rock: which ground a pod changes and which it leaves, the discs and layers it works, its
- * progress through a real chunk unload, and the way it is grown, taught and credited. Each pod stands in a chunk of its
- * own, far from the test structures: it digs down further than a structure is tall.
+ * The Leaching Pod, the Leached Rock it leaves and the glowing root it grows down its own column: which ground a pod
+ * changes and which it leaves, the discs and layers it works, where its root grows and where it ends, its death when
+ * the block under it goes, its progress through a real chunk unload, and the way it is grown, taught and credited. Each
+ * pod stands in a chunk of its own, far from the test structures: it digs down further than a structure is tall.
  */
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
@@ -113,6 +115,22 @@ public final class LeachingPodTests {
             return count;
         }
 
+        /** Parts of the pod's root in the yard, below the pod. */
+        int rooted() {
+            int count = 0;
+            for (int below = 0; below <= Leaching.MAX_LAYERS + 3; below++)
+                for (int dx = -BOX; dx <= BOX; dx++)
+                    for (int dz = -BOX; dz <= BOX; dz++)
+                        if (level.getBlockState(at(dx, below, dz)).is(MiningModule.LEACHING_ROOT.get())) count++;
+            return count;
+        }
+
+        /** Items lying loose around the pod's column. */
+        int loose() {
+            return level.getEntitiesOfClass(ItemEntity.class, new AABB(pod).inflate(BOX, Leaching.MAX_LAYERS + 2, BOX))
+                    .size();
+        }
+
         /** Leached Rock in layer {@code below} below the pod. */
         int leachedIn(int below) {
             int count = 0;
@@ -131,9 +149,10 @@ public final class LeachingPodTests {
 
     /**
      * Sixteen layers of mixed ground. A layer is a disc of 37 columns inside the 7-wide square; tagged ground no
-     * harder than stone becomes Leached Rock; ore, deepslate, a chest, fluids, obsidian, a block with a block entity
-     * and air stay; a layer that changes nothing costs no charge; the layer after the sixteenth and everything outside
-     * the discs stays untouched, and the pod is spent only when its layers are.
+     * harder than stone becomes Leached Rock, or in the pod's own column its root while the root above is unbroken;
+     * ore, deepslate, a chest, fluids, obsidian, a block with a block entity and air stay; a layer that changes nothing
+     * costs no charge; the layer after the sixteenth and everything outside the discs stays untouched, and the pod is
+     * spent only when its layers are. The deepslate under the root ends it for good, and no Leached Rock gives light.
      */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = RUN_TICKS + 100)
     public static void aPodLeachesOnlyTaggedSoftGroundInSevenWideDiscsDownToSixteenLayers(GameTestHelper h) {
@@ -181,8 +200,8 @@ public final class LeachingPodTests {
                 .thenWaitUntil(() -> h.assertTrue(site.spent(), "the pod has done its work"))
                 .thenExecute(() -> {
                     int[] expected = new int[Leaching.MAX_LAYERS + 2];
-                    expected[1] = Leaching.MAX_BLOCKS_PER_LAYER;
-                    expected[2] = Leaching.MAX_BLOCKS_PER_LAYER - 5;
+                    expected[1] = Leaching.MAX_BLOCKS_PER_LAYER - 1; // the root under the pod
+                    expected[2] = Leaching.MAX_BLOCKS_PER_LAYER - 5 - 1;
                     expected[3] = 0;
                     expected[4] = Leaching.MAX_BLOCKS_PER_LAYER - 1;
                     expected[5] = Leaching.MAX_BLOCKS_PER_LAYER - 1;
@@ -196,6 +215,7 @@ public final class LeachingPodTests {
                         total += expected[below];
                     }
                     h.assertValueEqual(site.leached(), total, "no Leached Rock outside the sixteen discs");
+                    h.assertValueEqual(site.rooted(), 2, "the root grew through the substrate and the stone");
                     int index = 0;
                     for (int below = -1; below <= Leaching.MAX_LAYERS + 2; below++)
                         for (int dx = -BOX; dx <= BOX; dx++)
@@ -226,8 +246,14 @@ public final class LeachingPodTests {
                             site.level.getBlockState(site.at(1, 4, 1)).is(Blocks.SUSPICIOUS_SAND),
                             "a block with a block entity stays");
                     h.assertTrue(
-                            site.level.getBlockState(site.at(0, 1, 0)).is(MiningModule.LEACHED_ROCK.get()),
-                            "the first layer includes the substrate under the pod");
+                            site.level.getBlockState(site.at(0, 1, 0)).is(MiningModule.LEACHING_ROOT.get()),
+                            "the first layer includes the substrate under the pod: it is the root's top");
+                    h.assertTrue(
+                            site.level.getBlockState(site.at(0, 2, 0)).is(MiningModule.LEACHING_ROOT.get()),
+                            "the root grows on through stone");
+                    h.assertTrue(
+                            site.level.getBlockState(site.at(0, 4, 0)).is(MiningModule.LEACHED_ROCK.get()),
+                            "under the deepslate that ended it the column is plain Leached Rock: the root never resumes");
                     h.assertTrue(
                             site.level
                                     .getBlockState(site.at(0, Leaching.MAX_LAYERS + 1, 0))
@@ -243,15 +269,18 @@ public final class LeachingPodTests {
                     h.assertValueEqual(tag.getInt("layers"), Leaching.MAX_LAYERS, "sixteen layers worked");
                     h.assertValueEqual(
                             tag.getInt("charges"), 1, "fifteen charges paid: the layer that changed nothing was free");
-                    boolean glowing = false;
-                    for (int below = 1; below <= Leaching.MAX_LAYERS && !glowing; below++)
+                    for (int below = 1; below <= Leaching.MAX_LAYERS; below++)
                         for (int dx = -3; dx <= 3; dx++)
                             for (int dz = -3; dz <= 3; dz++) {
                                 BlockState rock = site.level.getBlockState(site.at(dx, below, dz));
-                                if (rock.is(MiningModule.LEACHED_ROCK.get())
-                                        && rock.getValue(LeachedRockBlock.GLOW) > 0) glowing = true;
+                                if (rock.is(MiningModule.LEACHED_ROCK.get()))
+                                    h.assertValueEqual(rock.getLightEmission(), 0, "Leached Rock gives no light");
                             }
-                    h.assertTrue(glowing, "a share of the rock glows faintly");
+                    h.assertTrue(
+                            site.level.getBlockState(site.at(0, 1, 0)).getLightEmission() > 0,
+                            "the root lights the pit");
+                    h.assertTrue(
+                            site.level.getBlockState(site.pod).is(MiningModule.LEACHING_POD.get()), "the pod stays");
                     site.release();
                 })
                 .thenSucceed();
@@ -273,9 +302,94 @@ public final class LeachingPodTests {
         return cells;
     }
 
+    // ---- the root and the pod's support ----
+
+    /**
+     * The root grows only into ground the pod converts. At an ore it ends for good: the ore stays, and below it the
+     * pod's column is plain Leached Rock. At a cavity it ends too: nothing bridges the gap.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = RUN_TICKS)
+    public static void theRootEndsAtOreOrACavityAndNeverReplacesIt(GameTestHelper h) {
+        Site ore = Site.of(h, 8);
+        ore.plant(6, state(Blocks.STONE));
+        ore.set(0, 3, 0, state(Blocks.IRON_ORE));
+        Site cave = Site.of(h, 9);
+        cave.plant(6, state(Blocks.STONE));
+        cave.set(0, 3, 0, state(Blocks.AIR));
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(ore.spent() && cave.spent(), "both pods have done their work"))
+                .thenExecute(() -> {
+                    for (Site site : List.of(ore, cave)) {
+                        for (int below = 1; below <= 2; below++)
+                            h.assertTrue(
+                                    site.level
+                                            .getBlockState(site.at(0, below, 0))
+                                            .is(MiningModule.LEACHING_ROOT.get()),
+                                    "the root down to layer " + below);
+                        h.assertValueEqual(site.rooted(), 2, "and no further");
+                        for (int below = 4; below <= 6; below++)
+                            h.assertTrue(
+                                    site.level
+                                            .getBlockState(site.at(0, below, 0))
+                                            .is(MiningModule.LEACHED_ROCK.get()),
+                                    "below the break the column is Leached Rock, layer " + below);
+                    }
+                    h.assertTrue(ore.level.getBlockState(ore.at(0, 3, 0)).is(Blocks.IRON_ORE), "the ore is untouched");
+                    h.assertTrue(cave.level.getBlockState(cave.at(0, 3, 0)).isAir(), "the cavity stays open");
+                    ore.release();
+                    cave.release();
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * Breaking the block directly under a pod kills it, working or finished, and nothing drops: not the pod, not its
+     * root. Its root is the block under it, and does not spare it. What the pod grew below stays as it is.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = RUN_TICKS)
+    public static void aPodDiesWithoutDropsWhenTheBlockUnderItIsBroken(GameTestHelper h) {
+        Site working = Site.of(h, 6);
+        working.plant(Leaching.MAX_LAYERS, state(Blocks.STONE));
+        Site finished = Site.of(h, 7);
+        finished.plant(1, state(Blocks.STONE));
+        ServerPlayer miner = TestDrops.miner(h, new ItemStack(Items.DIAMOND_SHOVEL));
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(working.saved().getInt("layers") >= 3, "one pod is at work"))
+                .thenExecute(() -> {
+                    h.assertFalse(working.spent(), "still working");
+                    h.assertTrue(
+                            working.level.getBlockState(working.at(0, 1, 0)).is(MiningModule.LEACHING_ROOT.get()),
+                            "it stands on its root");
+                    h.assertTrue(miner.gameMode.destroyBlock(working.at(0, 1, 0)), "a player breaks the root under it");
+                })
+                .thenWaitUntil(() ->
+                        h.assertTrue(working.level.getBlockState(working.pod).isAir(), "the pod is dead"))
+                .thenExecute(() -> {
+                    h.assertValueEqual(working.loose(), 0, "nothing dropped");
+                    h.assertTrue(
+                            working.level.getBlockState(working.at(0, 2, 0)).is(MiningModule.LEACHING_ROOT.get()),
+                            "the root below stays");
+                })
+                .thenWaitUntil(() -> h.assertTrue(finished.spent(), "the other pod has finished"))
+                .thenExecute(() -> {
+                    h.assertTrue(
+                            finished.level.getBlockState(finished.at(0, 1, 0)).is(MiningModule.LEACHING_ROOT.get()),
+                            "the finished pod stands on its root too");
+                    h.assertTrue(miner.gameMode.destroyBlock(finished.at(0, 1, 0)), "a player breaks it");
+                })
+                .thenWaitUntil(() -> h.assertTrue(
+                        finished.level.getBlockState(finished.pod).isAir(), "the finished pod dies just the same"))
+                .thenExecute(() -> {
+                    h.assertValueEqual(finished.loose(), 0, "and drops nothing either");
+                    working.release();
+                    finished.release();
+                })
+                .thenSucceed();
+    }
+
     // ---- Leached Rock ----
 
-    /** Translucent and solid, breaks in a few ticks by hand, drops nothing even with a pick, glows faintly at most. */
+    /** Translucent and solid, breaks in a few ticks by hand, drops nothing even with a pick, and gives no light. */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty")
     public static void leachedRockIsTranslucentSolidBreaksByHandAndDropsNothing(GameTestHelper h) {
         BlockPos cell = new BlockPos(1, 1, 1);
@@ -295,14 +409,7 @@ public final class LeachingPodTests {
         for (ItemStack tool : List.of(ItemStack.EMPTY, new ItemStack(Items.DIAMOND_PICKAXE)))
             h.assertTrue(
                     Block.getDrops(rock, h.getLevel(), at, null, null, tool).isEmpty(), "it drops nothing for " + tool);
-        for (int glow = 0; glow <= 2; glow++) {
-            int light = rock.setValue(LeachedRockBlock.GLOW, glow).getLightEmission();
-            h.assertTrue(light <= 4, "glow " + glow + " is faint: " + light);
-            if (glow > 0)
-                h.assertTrue(
-                        light > rock.setValue(LeachedRockBlock.GLOW, glow - 1).getLightEmission(),
-                        "glow " + glow + " is brighter than the one before");
-        }
+        h.assertValueEqual(rock.getLightEmission(), 0, "it gives no light: the pod's root lights the pit");
         ServerPlayer miner = TestDrops.miner(h, ItemStack.EMPTY);
         h.assertTrue(miner.gameMode.destroyBlock(at), "a player breaks it");
         h.assertTrue(h.getBlockState(cell).isAir(), "and it is gone");
@@ -354,9 +461,10 @@ public final class LeachingPodTests {
                             Leaching.MAX_CHARGES - after.getInt("layers"),
                             "one charge a layer, none twice");
                     h.assertValueEqual(
-                            site.leached(),
+                            site.leached() + site.rooted(),
                             after.getInt("layers") * Leaching.MAX_BLOCKS_PER_LAYER,
                             "the ground matches the progress: no layer repeated, none lost");
+                    h.assertValueEqual(site.rooted(), after.getInt("layers"), "one part of root a layer");
                 })
                 .thenWaitUntil(() -> h.assertTrue(site.spent(), "it finishes its work"))
                 .thenExecute(() -> {
@@ -364,9 +472,10 @@ public final class LeachingPodTests {
                     h.assertValueEqual(done.getInt("layers"), Leaching.MAX_LAYERS, "sixteen layers");
                     h.assertValueEqual(done.getInt("charges"), 0, "sixteen charges, each paid once");
                     h.assertValueEqual(
-                            site.leached(),
+                            site.leached() + site.rooted(),
                             Leaching.MAX_LAYERS * Leaching.MAX_BLOCKS_PER_LAYER,
                             "every layer leached once");
+                    h.assertValueEqual(site.rooted(), Leaching.MAX_LAYERS, "the root runs the whole depth");
                     site.release();
                 })
                 .thenSucceed();
@@ -396,7 +505,11 @@ public final class LeachingPodTests {
                     h.assertValueEqual(
                             now.getInt("charges"), 5 - (now.getInt("layers") - 2), "paying from its charges");
                     h.assertValueEqual(site.leachedIn(1), 0, "layer one was done before, so it is not redone");
-                    h.assertValueEqual(site.leachedIn(3), Leaching.MAX_BLOCKS_PER_LAYER, "layer three is the next");
+                    h.assertValueEqual(
+                            site.leachedIn(3),
+                            Leaching.MAX_BLOCKS_PER_LAYER,
+                            "layer three is the next, all Leached Rock: the root above was never grown, so none grows"
+                                    + " below");
                 })
                 .thenIdle(2 * Leaching.LAYER_TICKS)
                 .thenExecute(() -> {
@@ -484,8 +597,8 @@ public final class LeachingPodTests {
 
     /**
      * The demo's Leaching Pod exhibit shows the whole route: a chest of materials and three buds that grow a pod, a
-     * live pod on stone and ore that starts leaching, and a finished pit whose ore stands in place inside Leached Rock
-     * and whose hand-dug column leaves nothing behind.
+     * live pod on stone and ore that starts leaching and rooting, and a finished pit whose ore stands in place inside
+     * Leached Rock, dug by hand round the pod's glowing root, whose walls leave nothing behind when broken.
      */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 400)
     public static void theDemoExhibitShowsTheStarterRouteFromBudToPit(GameTestHelper h) {
@@ -528,10 +641,19 @@ public final class LeachingPodTests {
                     h.assertTrue(
                             level.getBlockState(fed).is(MiningModule.LEACHING_POD.get()),
                             "the fed bud grows when clicked");
-                    BlockPos husk = yard.at(new BlockPos(56, -54, -56));
-                    h.assertTrue(level.getBlockState(husk).getValue(LeachingPodBlock.SPENT), "the pit's pod is spent");
-                    BlockPos centre = yard.at(new BlockPos(56, -56, -56));
-                    h.assertTrue(level.getBlockState(centre).isAir(), "the pit's column is dug");
+                    BlockPos finished = yard.at(new BlockPos(56, -54, -56));
+                    h.assertTrue(
+                            level.getBlockState(finished).getValue(LeachingPodBlock.SPENT),
+                            "the pit's pod is finished");
+                    for (int y = -55; y >= -60; y--)
+                        h.assertTrue(
+                                level.getBlockState(yard.at(new BlockPos(56, y, -56)))
+                                        .is(MiningModule.LEACHING_ROOT.get()),
+                                "its glowing root runs down the pit's middle at y " + y);
+                    h.assertTrue(
+                            level.getBlockState(yard.at(new BlockPos(55, -56, -56)))
+                                    .isAir(),
+                            "the pit around it is dug by hand");
                     for (BlockPos ore : List.of(
                             new BlockPos(58, -57, -56),
                             new BlockPos(54, -58, -57),
@@ -566,8 +688,8 @@ public final class LeachingPodTests {
                 .thenWaitUntil(() -> h.assertTrue(
                         h.getLevel()
                                 .getBlockState(yard.at(new BlockPos(45, -55, -56)))
-                                .is(MiningModule.LEACHED_ROCK.get()),
-                        "the live pod has leached its first layer"))
+                                .is(MiningModule.LEACHING_ROOT.get()),
+                        "the live pod has leached its first layer and rooted into its substrate"))
                 .thenExecute(() -> {
                     int leached = 0;
                     for (int dx = -4; dx <= 4; dx++)
@@ -575,7 +697,8 @@ public final class LeachingPodTests {
                             if (h.getLevel()
                                     .getBlockState(yard.at(new BlockPos(45 + dx, -55, -56 + dz)))
                                     .is(MiningModule.LEACHED_ROCK.get())) leached++;
-                    h.assertValueEqual(leached, Leaching.MAX_BLOCKS_PER_LAYER, "a whole seven-wide disc");
+                    h.assertValueEqual(
+                            leached, Leaching.MAX_BLOCKS_PER_LAYER - 1, "a whole seven-wide disc round its root");
                     yard.tidy(h);
                     yard.forget(h);
                 })

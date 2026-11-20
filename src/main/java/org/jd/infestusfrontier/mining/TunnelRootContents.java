@@ -18,19 +18,19 @@ import org.jd.infestusfrontier.core.storage.BiomassTank;
 import org.jd.infestusfrontier.storage.api.BiomassCodecs;
 
 /**
- * Everything a Tunnel Root head owns: its segments, its output, its biomass, its progress (the cells it has laid are
- * its history), the steering of its next step, its permanent mutations and, as a Descending Rootstock, the staircase
- * steps it has advanced, its minehead history. Saved on the block entity, carried on the
- * item when the head is broken, and handed from the old block entity to the new one when the head moves. A head saved
- * before it could mutate reads with none, and one saved before it could descend with no steps advanced. The stacks are
- * copies.
+ * Everything a Tunnel Root head owns: its segments, its output, its biomass, its progress (the steps of its root are
+ * its history), its permanent mutations and, as a Descending Rootstock, the staircase steps it has advanced, its
+ * minehead history. Saved on the block entity, carried on the item when the head is broken, and handed from the old
+ * block entity to the new one when the head moves. Steering is carried here for older saves and picked-up heads;
+ * the block state also exposes it to the renderer. Missing steering preserves the placed block state. A head saved before it could mutate reads with none, and
+ * one saved before it could descend with no steps advanced. The stacks are copies.
  */
 record TunnelRootContents(
         ItemStack segments,
         List<ItemStack> output,
         BiomassTank tank,
         TunnelProgress progress,
-        Steer steer,
+        Optional<Steer> steer,
         RootMutations mutations,
         int descended) {
     static final TunnelRootContents EMPTY = new TunnelRootContents(
@@ -38,7 +38,7 @@ record TunnelRootContents(
             List.of(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY),
             BiomassTank.empty(Biomass.of(Tunnelling.BIOMASS_CAPACITY_BU)),
             TunnelProgress.START,
-            Steer.STRAIGHT,
+            Optional.empty(),
             RootMutations.NONE,
             0);
 
@@ -56,7 +56,7 @@ record TunnelRootContents(
             BiomassTank tank,
             int cells,
             int ticks,
-            int steer,
+            Optional<Integer> steer,
             List<String> mutations,
             int descended) {}
 
@@ -66,7 +66,7 @@ record TunnelRootContents(
                             BiomassCodecs.TANK.fieldOf("tank").forGetter(Raw::tank),
                             Codec.INT.fieldOf("cells").forGetter(Raw::cells),
                             Codec.INT.fieldOf("ticks").forGetter(Raw::ticks),
-                            Codec.INT.fieldOf("steer").forGetter(Raw::steer),
+                            Codec.INT.optionalFieldOf("steer").forGetter(Raw::steer),
                             Codec.STRING
                                     .listOf()
                                     .optionalFieldOf("mutations", List.of())
@@ -82,7 +82,7 @@ record TunnelRootContents(
                 tank,
                 progress.cells(),
                 progress.ticks(),
-                steer.ordinal(),
+                steer.map(Steer::ordinal),
                 mutations.installed().stream().map(RootMutation::id).toList(),
                 descended);
     }
@@ -92,8 +92,8 @@ record TunnelRootContents(
             return DataResult.error(() -> "cells " + raw.cells());
         if (raw.ticks() < 0 || raw.ticks() > Tunnelling.STEP_TICKS)
             return DataResult.error(() -> "ticks " + raw.ticks());
-        Optional<Steer> steer = Steer.at(raw.steer());
-        if (steer.isEmpty()) return DataResult.error(() -> "steer " + raw.steer());
+        if (raw.steer().isPresent() && Steer.at(raw.steer().get()).isEmpty())
+            return DataResult.error(() -> "steer " + raw.steer().get());
         List<RootMutation> mutations = new ArrayList<>(raw.mutations().size());
         for (String id : raw.mutations()) {
             Optional<RootMutation> mutation = RootMutation.byId(id);
@@ -107,7 +107,7 @@ record TunnelRootContents(
                 raw.output(),
                 raw.tank(),
                 new TunnelProgress(raw.cells(), raw.ticks()),
-                steer.get(),
+                raw.steer().flatMap(Steer::at),
                 new RootMutations(mutations),
                 raw.descended());
         Optional<String> problem = contents.problem();

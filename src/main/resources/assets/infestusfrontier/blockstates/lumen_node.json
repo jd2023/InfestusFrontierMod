@@ -1,0 +1,57 @@
+{
+  "variants": {
+    "face=floor,facing=north": {
+      "model": "infestusfrontier:block/lumen_node"
+    },
+    "face=wall,facing=north": {
+      "model": "infestusfrontier:block/lumen_node",
+      "x": 90
+    },
+    "face=ceiling,facing=north": {
+      "model": "infestusfrontier:block/lumen_node",
+      "x": 180,
+      "y": 180
+    },
+    "face=floor,facing=east": {
+      "model": "infestusfrontier:block/lumen_node",
+      "y": 90
+    },
+    "face=wall,facing=east": {
+      "model": "infestusfrontier:block/lumen_node",
+      "x": 90,
+      "y": 90
+    },
+    "face=ceiling,facing=east": {
+      "model": "infestusfrontier:block/lumen_node",
+      "x": 180,
+      "y": 270
+    },
+    "face=floor,facing=south": {
+      "model": "infestusfrontier:block/lumen_node",
+      "y": 180
+    },
+    "face=wall,facing=south": {
+      "model": "infestusfrontier:block/lumen_node",
+      "x": 90,
+      "y": 180
+    },
+    "face=ceiling,facing=south": {
+      "model": "infestusfrontier:block/lumen_node",
+      "x": 180
+    },
+    "face=floor,facing=west": {
+      "model": "infestusfrontier:block/lumen_node",
+      "y": 270
+    },
+    "face=wall,facing=west": {
+      "model": "infestusfrontier:block/lumen_node",
+      "x": 90,
+      "y": 270
+    },
+    "face=ceiling,facing=west": {
+      "model": "infestusfrontier:block/lumen_node",
+      "x": 180,
+      "y": 90
+    }
+  }
+}

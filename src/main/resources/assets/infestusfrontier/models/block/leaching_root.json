@@ -1,0 +1,53 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "bark": "infestusfrontier:block/leaching_root",
+    "particle": "infestusfrontier:block/leaching_root"
+  },
+  "elements": [
+    {
+      "from": [4, 0, 4],
+      "to": [12, 16, 12],
+      "faces": {
+        "north": {
+          "uv": [4, 0, 12, 16],
+          "texture": "#bark",
+          "neoforge_data": {
+            "block_light": 15
+          }
+        },
+        "south": {
+          "uv": [4, 0, 12, 16],
+          "texture": "#bark",
+          "neoforge_data": {
+            "block_light": 15
+          }
+        },
+        "west": {
+          "uv": [4, 0, 12, 16],
+          "texture": "#bark",
+          "neoforge_data": {
+            "block_light": 15
+          }
+        },
+        "east": {
+          "uv": [4, 0, 12, 16],
+          "texture": "#bark",
+          "neoforge_data": {
+            "block_light": 15
+          }
+        },
+        "up": {
+          "uv": [4, 4, 12, 12],
+          "texture": "#bark",
+          "cullface": "up"
+        },
+        "down": {
+          "uv": [4, 4, 12, 12],
+          "texture": "#bark",
+          "cullface": "down"
+        }
+      }
+    }
+  ]
+}

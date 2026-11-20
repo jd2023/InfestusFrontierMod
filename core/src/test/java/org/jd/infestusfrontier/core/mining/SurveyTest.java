@@ -24,7 +24,7 @@ class SurveyTest {
     @Test
     void stepsAreBuiltInOrderUntilThePlanIsFinished() {
         Survey survey =
-                done(new Survey(new MinePlan(PlanShape.STAIRCASE, 2, Turn.NONE, Turn.NONE, false), false, 0).approve());
+                done(new Survey(new MinePlan(PlanShape.STAIRCASE, 2, Turn.NONE, Turn.NONE), false, 0).approve());
         assertThrows(IllegalStateException.class, () -> Survey.START.next(), "a draft is not built");
         assertEquals(1, survey.next().number());
         survey = survey.grown();
@@ -37,7 +37,7 @@ class SurveyTest {
 
     @Test
     void impossibleSavedNumbersDoNotConstruct() {
-        MinePlan plan = new MinePlan(PlanShape.ROUTE, 4, Turn.NONE, Turn.NONE, false);
+        MinePlan plan = new MinePlan(PlanShape.ROUTE, 4, Turn.NONE, Turn.NONE);
         assertThrows(IllegalArgumentException.class, () -> new Survey(plan, true, 5));
         assertThrows(IllegalArgumentException.class, () -> new Survey(plan, true, -1));
         assertThrows(IllegalArgumentException.class, () -> new Survey(plan, false, 1), "nothing built on a draft");

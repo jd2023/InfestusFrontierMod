@@ -11,9 +11,12 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -33,15 +36,18 @@ import org.jd.infestusfrontier.core.mining.Fracturing;
 import org.jd.infestusfrontier.core.mining.RootMutation;
 import org.jd.infestusfrontier.core.mining.Surveying;
 import org.jd.infestusfrontier.foundation.render.GhostBoxRenderer;
+import org.jd.infestusfrontier.integration.geckolib.OrganItem;
+import org.jd.infestusfrontier.integration.geckolib.OrganRenderers;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.storage.api.BiomassCapabilities;
 import org.jd.infestusfrontier.storage.api.BiomassFluids;
 import org.slf4j.Logger;
 
 /**
- * Owner of mining: the Leaching Pod and the Leached Rock it leaves, the Tunnel Root with its Root Segments, the
- * root cells it lays and the genetic constructs that mutate it, the stationary cutting organs: the Fracture Jaw, the Work Bed and the Collection Cilia, and
- * surveyed sections: the Surveyed Tissue marker that holds a plan and the Structure Grower that builds it.
+ * Owner of mining: the Leaching Pod with the Leached Rock it leaves and the glowing root it grows, the Tunnel Root with
+ * its Root Segments, the root cells it lays and the genetic constructs that mutate it, the stationary cutting organs:
+ * the Fracture Jaw, the Work Bed and the Collection Cilia, and surveyed sections: the Surveyed Tissue marker that holds
+ * a plan and the Structure Grower that builds it, with the treads, Lumen Nodes, bone ribs and cut scars it grows.
  */
 public final class MiningModule {
     static final Logger LOGGER = LogUtils.getLogger();
@@ -69,13 +75,23 @@ public final class MiningModule {
                     .strength(LeachedRockBlock.HARDNESS)
                     .sound(SoundType.AMETHYST)
                     .noOcclusion()
-                    .lightLevel(LeachedRockBlock::light)
                     .isValidSpawn((state, level, pos, type) -> false)
                     .isRedstoneConductor((state, level, pos) -> false)
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false));
 
     public static final DeferredItem<BlockItem> LEACHED_ROCK_ITEM = ITEMS.registerSimpleBlockItem(LEACHED_ROCK);
+
+    /** The glowing root a Leaching Pod grows down its column: the pit's light. Grown tissue; no item. */
+    public static final DeferredBlock<LeachingRootBlock> LEACHING_ROOT = BLOCKS.registerBlock(
+            "leaching_root",
+            LeachingRootBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_BROWN)
+                    .strength(LeachingRootBlock.HARDNESS)
+                    .sound(SoundType.ROOTED_DIRT)
+                    .lightLevel(state -> LeachingRootBlock.LIGHT)
+                    .noOcclusion());
 
     /** A one-use organ that leaches the ground below it. Grown from an Organ Bud; never picked up again. */
     public static final DeferredBlock<LeachingPodBlock> LEACHING_POD = BLOCKS.registerBlock(
@@ -231,7 +247,8 @@ public final class MiningModule {
                     .sound(SoundType.SLIME_BLOCK)
                     .noOcclusion());
 
-    public static final DeferredItem<BlockItem> COLLECTION_CILIA_ITEM = ITEMS.registerSimpleBlockItem(COLLECTION_CILIA);
+    public static final DeferredItem<OrganItem> COLLECTION_CILIA_ITEM = ITEMS.register(
+            "collection_cilia", () -> new OrganItem(COLLECTION_CILIA.get(), new Item.Properties(), "idle"));
     static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CollectionCiliaBlockEntity>>
             COLLECTION_CILIA_ENTITY = BLOCK_ENTITIES.register(
                     "collection_cilia",
@@ -249,6 +266,64 @@ public final class MiningModule {
     /** Stairs a Structure Grower lays as treads; it also needs them to be plain stair blocks. */
     public static final TagKey<Item> MINE_TREADS = TagKey.create(
             Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "mine_treads"));
+
+    /** What a Structure Grower grows a Lumen Node from, one a light. Torches it hangs as they are. */
+    public static final TagKey<Item> LIVING_LIGHTS = TagKey.create(
+            Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "living_lights"));
+
+    /** What a Structure Grower grows bone ribs from, one a column of a framed step. */
+    public static final TagKey<Item> MINE_RIBS =
+            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "mine_ribs"));
+
+    /** A mine's own grown growths on its walls, which drop nothing and so never hold a cut up. */
+    public static final TagKey<Block> MINE_GROWTHS = TagKey.create(
+            Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(InfestusFrontier.MOD_ID, "mine_growths"));
+
+    /** A grown tread: stairs of root tissue, crafted from Root Segments, for a staircase's steps. */
+    public static final DeferredBlock<StairBlock> ROOT_TREAD = BLOCKS.registerBlock(
+            "root_tread",
+            properties -> new StairBlock(ROOT_CELL.get().defaultBlockState(), properties),
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.DIRT)
+                    .strength(RootCellBlock.HARDNESS)
+                    .sound(SoundType.ROOTED_DIRT));
+
+    public static final DeferredItem<BlockItem> ROOT_TREAD_ITEM = ITEMS.registerSimpleBlockItem(ROOT_TREAD);
+
+    /** A living light a grower hangs in a mine. Grown tissue; no item. */
+    public static final DeferredBlock<LumenNodeBlock> LUMEN_NODE = BLOCKS.registerBlock(
+            "lumen_node",
+            LumenNodeBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_LIGHT_GREEN)
+                    .strength(0.2F)
+                    .sound(SoundType.SHROOMLIGHT)
+                    .lightLevel(state -> LumenNodeBlock.LIGHT)
+                    .noCollission()
+                    .pushReaction(PushReaction.DESTROY));
+
+    /** A bone rib framing a mine's passage. Grown tissue; no item. */
+    public static final DeferredBlock<BoneRibBlock> BONE_RIB = BLOCKS.registerBlock(
+            "bone_rib",
+            BoneRibBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_WHITE)
+                    .strength(0.5F)
+                    .sound(SoundType.BONE_BLOCK)
+                    .noCollission()
+                    .pushReaction(PushReaction.DESTROY));
+
+    /** Scrape marks on a mine's wall. Grown tissue; no item. */
+    public static final DeferredBlock<CutScarBlock> CUT_SCAR = BLOCKS.registerBlock(
+            "cut_scar",
+            CutScarBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_PINK)
+                    .strength(0.2F)
+                    .sound(SoundType.ROOTED_DIRT)
+                    .noCollission()
+                    .replaceable()
+                    .pushReaction(PushReaction.DESTROY));
 
     /** A flush marker at a section's entrance that holds its plan and draws its preview. Crafted. */
     public static final DeferredBlock<SurveyedTissueBlock> SURVEYED_TISSUE = BLOCKS.registerBlock(
@@ -299,6 +374,10 @@ public final class MiningModule {
 
     /** Blocks from a marker within which its preview is drawn: past the far end of the longest route. */
     private static final int PREVIEW_DISTANCE = 96;
+    /** Blocks from a Tunnel Root head within which its next cut is marked. */
+    private static final int CUT_PREVIEW_DISTANCE = 32;
+    /** The space a head's model fills in any pose: its block, the cell it crawls from and the cut ahead. */
+    private static final AABB HEAD_EXTENT = new AABB(-1, 0, -1, 2, 2, 2);
 
     private MiningModule() {}
 
@@ -325,6 +404,14 @@ public final class MiningModule {
         });
         if (FMLEnvironment.dist == Dist.CLIENT) {
             GhostBoxRenderer.register(modBus, SURVEYED_TISSUE_ENTITY, MiningModule::preview, PREVIEW_DISTANCE);
+            OrganRenderers.register(
+                    modBus,
+                    "tunnel_root",
+                    TUNNEL_ROOT_ENTITY,
+                    TUNNEL_ROOT_ITEM,
+                    HEAD_EXTENT,
+                    context -> GhostBoxRenderer.of(MiningModule::nextCut, CUT_PREVIEW_DISTANCE));
+            OrganRenderers.register(modBus, "collection_cilia", COLLECTION_CILIA_ENTITY, COLLECTION_CILIA_ITEM);
             modBus.addListener((RegisterMenuScreensEvent event) -> {
                 event.register(TUNNEL_ROOT_MENU.get(), TunnelRootScreen::new);
                 event.register(FRACTURE_JAW_MENU.get(), WorkOrganScreen::new);
@@ -343,6 +430,14 @@ public final class MiningModule {
     private static List<GhostBoxRenderer.Ghost> preview(SurveyedTissueBlockEntity marker) {
         return SurveyPreview.of(marker).stream()
                 .map(box -> new GhostBoxRenderer.Ghost(box.box(), colour(box)))
+                .toList();
+    }
+
+    /** A head's next cut, faint amber, with a strong amber arrow on its floor the way it will go. Client only. */
+    private static List<GhostBoxRenderer.Ghost> nextCut(TunnelRootBlockEntity head) {
+        return CutPreview.of(head.getBlockState()).stream()
+                .map(box -> new GhostBoxRenderer.Ghost(
+                        box.box(), box.part() == CutPreview.Part.ARROW ? 0xD0F0B030 : 0x30F0C060))
                 .toList();
     }
 

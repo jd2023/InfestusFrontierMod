@@ -11,7 +11,7 @@ import org.jd.infestusfrontier.ui.PartRow;
 import org.jd.infestusfrontier.ui.Sheet;
 
 /**
- * The grower's screen: the segment, tread and light wells on the first row, then lines for what it is doing (or why it
+ * The grower's screen: the segment, tread, light and rib wells on the first row, then lines for what it is doing (or why it
  * stopped), how far the plan under it is built and how many steps it has built in all.
  */
 final class StructureGrowerScreen extends OrganScreen<StructureGrowerMenu> {
@@ -36,6 +36,8 @@ final class StructureGrowerScreen extends OrganScreen<StructureGrowerMenu> {
                 .story(Component.translatable(KEY + "treads.story", Surveying.MAX_STOCK)));
         add(new Well(row, menu.getSlot(2), Component.empty())
                 .story(Component.translatable(KEY + "lights.story", Surveying.LIGHT_SPACING)));
+        add(new Well(row, menu.getSlot(3), Component.empty())
+                .story(Component.translatable(KEY + "ribs.story", Surveying.RIB_SPACING)));
         int width = Sheet.RIGHT_EDGE - Sheet.FIRST_PART_X;
         add(new Tally(
                 Sheet.FIRST_PART_X,

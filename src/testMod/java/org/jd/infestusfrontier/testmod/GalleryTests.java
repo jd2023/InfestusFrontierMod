@@ -154,9 +154,7 @@ public final class GalleryTests {
                     root.getValue(RootCellBlock.BEND), step.bend(), face + " step " + step.number() + " bend");
             for (Offset cell : step.passage())
                 h.assertTrue(
-                        rig.level
-                                .getBlockState(rig.at(GalleryRig.plan(face, cell)))
-                                .isAir(),
+                        RootstockTests.open(rig.level, rig.at(GalleryRig.plan(face, cell))),
                         face + " step " + step.number() + ": clear at " + cell);
         }
     }
@@ -329,9 +327,8 @@ public final class GalleryTests {
                                     "a root cell at " + root);
                             for (int up = 1; up <= Surveying.WIDE_HEADROOM; up++)
                                 h.assertTrue(
-                                        rig.level
-                                                .getBlockState(rig.at(GalleryRig.plan(Face.WEST, root.above(up))))
-                                                .isAir(),
+                                        RootstockTests.open(
+                                                rig.level, rig.at(GalleryRig.plan(Face.WEST, root.above(up)))),
                                         "clear " + up + " over " + root);
                         }
                     }
@@ -541,9 +538,7 @@ public final class GalleryTests {
                         h.assertValueEqual(root.getValue(RootCellBlock.BEND), step.bend(), "bend at " + step.number());
                         for (Offset cell : step.passage())
                             h.assertTrue(
-                                    rig.level
-                                            .getBlockState(rig.at(GalleryRig.plan(Face.NORTH, cell)))
-                                            .isAir(),
+                                    RootstockTests.open(rig.level, rig.at(GalleryRig.plan(Face.NORTH, cell))),
                                     "clear over cell " + step.number());
                     }
                     BlockPos first = rig.at(
@@ -711,9 +706,8 @@ public final class GalleryTests {
         var level = h.getLevel();
         Player player = hand(h);
         MinePlan wide =
-                new MinePlan(org.jd.infestusfrontier.core.mining.PlanShape.ROUTE, 4, Turn.NONE, Turn.NONE, false, true);
-        MinePlan narrow =
-                new MinePlan(org.jd.infestusfrontier.core.mining.PlanShape.ROUTE, 6, Turn.NONE, Turn.NONE, false);
+                new MinePlan(org.jd.infestusfrontier.core.mining.PlanShape.ROUTE, 4, Turn.NONE, Turn.NONE, true);
+        MinePlan narrow = new MinePlan(org.jd.infestusfrontier.core.mining.PlanShape.ROUTE, 6, Turn.NONE, Turn.NONE);
         int[] stone = new int[1];
         int[] ore = new int[1];
         h.startSequence()
@@ -760,8 +754,8 @@ public final class GalleryTests {
                                     "a wide root at " + root);
                             for (int up = 1; up <= Surveying.WIDE_HEADROOM; up++)
                                 h.assertTrue(
-                                        level.getBlockState(mine.at(cell(DEMO_WIDE, Direction.WEST, root.above(up))))
-                                                .isAir(),
+                                        RootstockTests.open(
+                                                level, mine.at(cell(DEMO_WIDE, Direction.WEST, root.above(up)))),
                                         "clear over " + root);
                         }
                     h.assertValueEqual(

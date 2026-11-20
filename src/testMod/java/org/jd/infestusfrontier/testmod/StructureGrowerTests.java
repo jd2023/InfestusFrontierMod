@@ -29,6 +29,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
@@ -40,6 +42,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -60,6 +63,7 @@ import org.jd.infestusfrontier.core.mining.Surveying;
 import org.jd.infestusfrontier.core.mining.Turn;
 import org.jd.infestusfrontier.discovery.PendingCredits;
 import org.jd.infestusfrontier.interaction.InteractionModule;
+import org.jd.infestusfrontier.mining.LumenNodeBlock;
 import org.jd.infestusfrontier.mining.MiningModule;
 import org.jd.infestusfrontier.mining.RootCellBlock;
 import org.jd.infestusfrontier.mining.StructureGrowerMenu;
@@ -83,10 +87,10 @@ public final class StructureGrowerTests {
     /** Ticks a due step may take: a try, a stop and a look again after the retry, with a margin. */
     private static final int WAIT = Surveying.GROW_TICKS + 3 * Surveying.RETRY_TICKS;
 
-    private static final MinePlan STAIRS = new MinePlan(PlanShape.STAIRCASE, 3, Turn.NONE, Turn.NONE, false);
+    private static final MinePlan STAIRS = new MinePlan(PlanShape.STAIRCASE, 3, Turn.NONE, Turn.NONE);
     /** Right at its third cell, left at its sixth, lit: its eighth cell gets a torch. */
     private static final MinePlan GALLERY =
-            new MinePlan(PlanShape.ROUTE, 10, new Turn(Steer.RIGHT, 3), new Turn(Steer.LEFT, 6), true);
+            new MinePlan(PlanShape.ROUTE, 10, new Turn(Steer.RIGHT, 3), new Turn(Steer.LEFT, 6));
 
     /**
      * A rig's yard around {@code start}, the first marker's place, in the middle of a chunk the yard forces. Stone is
@@ -161,7 +165,6 @@ public final class StructureGrowerTests {
                 tag.putInt("first_at", plan.first().at());
                 tag.putInt("second_way", plan.second().way().ordinal());
                 tag.putInt("second_at", plan.second().at());
-                tag.putBoolean("lit", plan.lit());
                 tag.putBoolean("approved", approved);
                 tag.putInt("built", built);
             });
@@ -252,7 +255,10 @@ public final class StructureGrowerTests {
                 h.assertFalse(
                         state.is(MiningModule.ROOT_CELL.get())
                                 || state.getBlock() instanceof StairBlock
-                                || state.is(Blocks.WALL_TORCH),
+                                || state.is(Blocks.WALL_TORCH)
+                                || state.is(MiningModule.LUMEN_NODE.get())
+                                || state.is(MiningModule.BONE_RIB.get())
+                                || state.is(MiningModule.CUT_SCAR.get()),
                         "step " + step.number() + " holds nothing grown: " + state);
             }
     }
@@ -313,6 +319,8 @@ public final class StructureGrowerTests {
                     untouched(h, site, marker, STAIRS, 3);
                     h.assertValueEqual(site.held(grower, 1), 6, "two treads paid, no more");
                     load(h, site, grower, steward, segments(5));
+                    load(h, site, grower, steward, new ItemStack(Items.TORCH, 1)); // the landing is lit
+                    load(h, site, grower, steward, new ItemStack(ProcessingModule.BONE_PLATE.get(), 2)); // and framed
                 })
                 .thenWaitUntil(() -> h.assertValueEqual(
                         site.stop(grower, steward), Optional.of(key(Surveying.FINISHED)), "the plan is built"))
@@ -331,7 +339,9 @@ public final class StructureGrowerTests {
                             h.assertValueEqual(tread.getValue(StairBlock.HALF), Half.BOTTOM, "set on its cell");
                         }
                         for (Offset clear : step.passage())
-                            h.assertTrue(site.state(Site.at(marker, clear)).isAir(), "three clear over each tread");
+                            h.assertTrue(
+                                    RootstockTests.open(site.level, Site.at(marker, clear)),
+                                    "three clear over each tread");
                     }
                     h.assertValueEqual(STAIRS.steps().size(), 4, "three treads and the landing");
                     h.assertValueEqual(site.built(marker), 4, "the marker counts every step once");
@@ -379,11 +389,39 @@ public final class StructureGrowerTests {
         site.rig(marker, GALLERY, true, 0);
         site.carve(marker, GALLERY, 1, GALLERY.length());
         site.supply(grower, segments(12));
-        site.supply(grower, new ItemStack(Items.TORCH, 2));
+        site.supply(grower, new ItemStack(Items.TORCH, 3));
+        site.supply(grower, new ItemStack(ProcessingModule.BONE_PLATE.get(), 3));
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
         h.startSequence()
                 .thenWaitUntil(() -> h.assertValueEqual(
                         site.stop(grower, player), Optional.of(key(Surveying.FINISHED)), "the route is built"))
+                .thenExecute(() -> {
+                    // walk the route: a player stands in every cell, and every cell is in reach of one of the route's
+                    // own lights along it, so ordinary block light reaches it
+                    List<BlockPos> lights = new ArrayList<>();
+                    for (PlanStep step : GALLERY.steps())
+                        step.light()
+                                .map(light -> Site.at(marker, light))
+                                .filter(light -> site.state(light).getLightEmission() > 0)
+                                .ifPresent(lights::add);
+                    h.assertValueEqual(lights.size(), 2, "both planned lights were grown");
+                    for (PlanStep step : GALLERY.steps()) {
+                        BlockPos feet = Site.at(marker, step.root()).above();
+                        h.assertTrue(
+                                site.level.noCollision(
+                                        EntityType.PLAYER.getDimensions().makeBoundingBox(Vec3.atBottomCenterOf(feet))),
+                                "a player walks cell " + step.number());
+                        int along = Integer.MAX_VALUE;
+                        for (PlanStep lit : GALLERY.steps())
+                            if (lit.light().isPresent()
+                                    && lights.contains(
+                                            Site.at(marker, lit.light().get())))
+                                along = Math.min(along, Math.abs(lit.number() - step.number()) + 1);
+                        h.assertTrue(
+                                along < Blocks.TORCH.defaultBlockState().getLightEmission(),
+                                "cell " + step.number() + " is " + along + " blocks along the route from a light");
+                    }
+                })
                 .thenExecute(() -> {
                     List<PlanStep> steps = GALLERY.steps();
                     Direction[] heading = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
@@ -391,17 +429,23 @@ public final class StructureGrowerTests {
                         BlockPos at = Site.at(marker, step.root());
                         h.assertValueEqual(at.getY(), marker.getY(), "cell " + step.number() + " is level");
                         BlockState root = site.state(at);
-                        h.assertTrue(root.is(MiningModule.ROOT_CELL.get()), "cell " + step.number() + ": root cell");
+                        h.assertTrue(
+                                root.is(MiningModule.ROOT_CELL.get()),
+                                "cell " + step.number() + ": root cell, not " + root);
                         h.assertValueEqual(root.getValue(RootCellBlock.BEND), step.bend(), "bent only at a turn");
                         if (!step.bend())
                             h.assertValueEqual(
                                     root.getValue(HorizontalDirectionalBlock.FACING),
                                     heading[step.leaving()],
                                     "cell " + step.number() + " runs with the route");
-                        for (Offset clear : step.passage())
-                            if (step.light().isEmpty()
-                                    || !clear.equals(step.light().get()))
-                                h.assertTrue(site.state(Site.at(marker, clear)).isAir(), "two clear over the root");
+                        for (Offset clear : step.passage()) {
+                            BlockPos cell = Site.at(marker, clear);
+                            h.assertTrue(
+                                    site.state(cell)
+                                            .getCollisionShape(site.level, cell)
+                                            .isEmpty(),
+                                    "two clear over the root: what grows there has no collision");
+                        }
                     }
                     h.assertTrue(steps.get(2).bend() && steps.get(5).bend(), "two bends");
                     // a bend opens towards its facing and the side clockwise of it: north-then-east opens to the
@@ -424,8 +468,28 @@ public final class StructureGrowerTests {
                     h.assertValueEqual(
                             torch.getValue(WallTorchBlock.FACING), Direction.EAST, "on the wall left of the way");
                     h.assertValueEqual(Site.at(marker, lit.light().get()).getY() - marker.getY(), 2, "at head height");
+                    h.assertTrue(
+                            site.state(Site.at(marker, steps.get(9).light().orElseThrow()))
+                                    .is(Blocks.WALL_TORCH),
+                            "and one at the route's end, where the next routes join");
+                    for (int framed : new int[] {0, 9}) {
+                        PlanStep step = steps.get(framed);
+                        h.assertTrue(
+                                step.passage().stream()
+                                        .anyMatch(cell -> site.state(Site.at(marker, cell))
+                                                .is(MiningModule.BONE_RIB.get())),
+                                "bone ribs frame step " + step.number());
+                    }
+                    for (int scarred : new int[] {2, 5, 8})
+                        h.assertTrue(
+                                site.state(Site.at(marker, steps.get(scarred).root())
+                                                        .above())
+                                                .is(MiningModule.CUT_SCAR.get())
+                                        || steps.get(scarred).framed(),
+                                "a cut scar low on a wall of step " + (scarred + 1));
                     h.assertValueEqual(site.held(grower, 0), 2, "a segment a cell");
-                    h.assertValueEqual(site.held(grower, 2), 1, "one torch");
+                    h.assertValueEqual(site.held(grower, 2), 1, "a torch for each of the two lights");
+                    h.assertValueEqual(site.held(grower, 3), 1, "a Bone Plate for each framed step");
                     h.assertValueEqual(site.built(marker), 10, "all ten counted once");
                     h.assertValueEqual(site.loose(), 0, "nothing fell loose");
                     site.release();
@@ -491,16 +555,7 @@ public final class StructureGrowerTests {
         CompoundTag over = site.entity(marker).getUpdateTag(site.level.registryAccess());
         h.assertValueEqual(
                 over.getAllKeys(),
-                Set.of(
-                        "shape",
-                        "length",
-                        "first_way",
-                        "first_at",
-                        "second_way",
-                        "second_at",
-                        "lit",
-                        "approved",
-                        "built"),
+                Set.of("shape", "length", "first_way", "first_at", "second_way", "second_at", "approved", "built"),
                 "clients get the plan's numbers and nothing else");
         for (PlanStep step : GALLERY.steps())
             site.level.setBlock(
@@ -519,20 +574,22 @@ public final class StructureGrowerTests {
     private record Obstacle(String what, Refusal reason, Consumer<Site> place, Consumer<Site> clear) {}
 
     /**
-     * A route's first cell, clear and supplied, with something in the way: a block the player put in its passage,
-     * water, a hole under the root cell, a cow where it goes. For each the grower names the reason, places nothing,
-     * pays nothing and leaves the player's block as it is; once the player clears it, it builds.
+     * A route's first cell, clear and supplied, with something in the way: a block the player put in its passage, a
+     * cow where it goes. For each the grower names the reason, places nothing, pays nothing and leaves the player's
+     * block as it is; once the player clears it, it builds.
      */
     @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 12 * WAIT)
-    public static void theGrowerRefusesOccupiedOrUnsafeStepsAndKeepsWhatThePlayerPut(GameTestHelper h) {
+    public static void theGrowerWaitsForAPlayersBlockOrACreatureAndKeepsWhatThePlayerPut(GameTestHelper h) {
         Site site = Site.of(h, 3);
         BlockPos marker = site.start;
         BlockPos grower = marker.above();
-        MinePlan route = new MinePlan(PlanShape.ROUTE, 2, Turn.NONE, Turn.NONE, false);
+        MinePlan route = new MinePlan(PlanShape.ROUTE, 2, Turn.NONE, Turn.NONE);
         site.ground(3);
         site.rig(marker, route, true, 0);
         site.carve(marker, route, 1, 1);
         site.supply(grower, segments(4));
+        site.supply(grower, new ItemStack(ProcessingModule.BONE_PLATE.get(), 4));
+        site.supply(grower, new ItemStack(Items.TORCH, 2));
         BlockPos root = Site.at(marker, route.steps().get(0).root());
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
         List<Obstacle> obstacles = List.of(
@@ -544,20 +601,6 @@ public final class StructureGrowerTests {
                             h.assertTrue(s.state(root.above(2)).is(Blocks.OAK_PLANKS), "the planks stay");
                             s.level.setBlockAndUpdate(root.above(2), Blocks.AIR.defaultBlockState());
                         }),
-                new Obstacle(
-                        "water",
-                        Surveying.FLUID,
-                        s -> s.level.setBlockAndUpdate(root, Blocks.WATER.defaultBlockState()),
-                        s -> {
-                            for (BlockPos wet : BlockPos.betweenClosed(root.offset(-1, 0, -2), root.offset(1, 2, 1)))
-                                if (!s.state(wet).getFluidState().isEmpty())
-                                    s.level.setBlock(wet, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-                        }),
-                new Obstacle(
-                        "a hole",
-                        Surveying.NO_GROUND,
-                        s -> s.level.setBlockAndUpdate(root.below(), Blocks.AIR.defaultBlockState()),
-                        s -> s.level.setBlockAndUpdate(root.below(), Blocks.STONE.defaultBlockState())),
                 new Obstacle(
                         "a cow",
                         Surveying.CREATURE,
@@ -592,73 +635,119 @@ public final class StructureGrowerTests {
     }
 
     /**
-     * Each kind of stock missing pauses the grower on the step that needs it, named, with nothing placed; supplied
-     * through its item handler, as a hopper would, it goes on. A light with no wall to hold it pauses the step too.
-     * The item handler takes and never gives.
+     * Each kind of stock missing pauses the grower on the step that needs it, named, with nothing placed: segments,
+     * then the Bone Plates that frame the entrance, then the light on the eighth step, grown as a Lumen Node from Glow
+     * Lichen under the ceiling, then the plates for the end; supplied through its item handler, as a hopper would, it
+     * goes on. The scars on the third and sixth steps cost nothing. The item handler takes and never gives.
      */
-    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 14 * WAIT)
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 20 * WAIT)
     public static void missingStockPausesTheStepWithItsReasonAndResumesWhenSupplied(GameTestHelper h) {
         Site site = Site.of(h, 4);
-        BlockPos stairs = site.start;
-        BlockPos stairsGrower = stairs.above();
-        BlockPos route = site.start.offset(-6, 0, 0);
-        BlockPos routeGrower = route.above();
-        MinePlan lit = new MinePlan(PlanShape.ROUTE, 8, Turn.NONE, Turn.NONE, true);
-        MinePlan shallow = new MinePlan(PlanShape.STAIRCASE, 1, Turn.NONE, Turn.NONE, false);
-        site.ground(0);
-        site.rig(stairs, shallow, true, 0);
-        site.carve(stairs, shallow, 1, 2);
-        site.rig(route, lit, true, 0);
-        site.carve(route, lit, 1, 8);
+        BlockPos route = site.start;
+        BlockPos grower = route.above();
+        MinePlan plan = new MinePlan(PlanShape.ROUTE, 8, Turn.NONE, Turn.NONE);
+        site.ground(3);
+        site.rig(route, plan, true, 0);
+        site.carve(route, plan, 1, 8);
         Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
-        BlockPos light = Site.at(route, lit.steps().get(7).light().orElseThrow());
+        BlockPos light = Site.at(route, plan.steps().get(7).light().orElseThrow());
         h.startSequence()
-                .thenWaitUntil(() -> {
-                    h.assertValueEqual(
-                            site.stop(stairsGrower, player), Optional.of(key(Surveying.NO_SEGMENT)), "no segment");
-                    h.assertValueEqual(
-                            site.stop(routeGrower, player), Optional.of(key(Surveying.NO_SEGMENT)), "nor here");
-                })
+                .thenWaitUntil(() -> h.assertValueEqual(
+                        site.stop(grower, player), Optional.of(key(Surveying.NO_SEGMENT)), "no segment"))
                 .thenExecute(() -> {
-                    untouched(h, site, stairs, shallow, 1);
-                    untouched(h, site, route, lit, 1);
-                    IItemHandler handler = site.stock(stairsGrower);
+                    untouched(h, site, route, plan, 1);
+                    IItemHandler handler = site.stock(grower);
                     h.assertFalse(handler.isItemValid(0, new ItemStack(Items.DIRT)), "it takes no dirt");
-                    site.supply(stairsGrower, segments(4));
-                    site.supply(routeGrower, segments(10));
+                    site.supply(grower, segments(10));
                     h.assertValueEqual(handler.extractItem(0, 4, false), ItemStack.EMPTY, "and gives nothing back");
                 })
                 .thenWaitUntil(() -> h.assertValueEqual(
-                        site.stop(stairsGrower, player), Optional.of(key(Surveying.NO_TREAD)), "no tread"))
+                        site.stop(grower, player), Optional.of(key(Surveying.NO_RIB)), "no plates for the entrance"))
                 .thenExecute(() -> {
-                    untouched(h, site, stairs, shallow, 1);
-                    h.assertValueEqual(site.held(stairsGrower, 0), 4, "nothing paid for the step");
-                    site.supply(stairsGrower, new ItemStack(Items.STONE_BRICK_STAIRS, 3));
+                    untouched(h, site, route, plan, 1);
+                    h.assertValueEqual(site.held(grower, 0), 10, "nothing paid for the step");
+                    site.supply(grower, new ItemStack(ProcessingModule.BONE_PLATE.get(), 1));
                 })
-                .thenWaitUntil(() -> h.assertValueEqual(
-                        site.stop(stairsGrower, player), Optional.of(key(Surveying.FINISHED)), "the stairs are built"))
-                .thenWaitUntil(() -> h.assertValueEqual(
-                        site.stop(routeGrower, player), Optional.of(key(Surveying.NO_LIGHT)), "no torch"))
+                .thenWaitUntil(() ->
+                        h.assertValueEqual(site.stop(grower, player), Optional.of(key(Surveying.NO_LIGHT)), "no light"))
                 .thenExecute(() -> {
                     h.assertValueEqual(site.built(route), 7, "seven cells, then the lit one waits");
-                    untouched(h, site, route, lit, 8);
-                    h.assertValueEqual(site.held(routeGrower, 0), 3, "seven segments paid");
-                    site.supply(routeGrower, new ItemStack(Items.TORCH, 1));
+                    untouched(h, site, route, plan, 8);
+                    h.assertValueEqual(site.held(grower, 0), 3, "seven segments paid");
+                    h.assertValueEqual(site.held(grower, 3), 0, "one plate for the entrance");
+                    for (int scarred : new int[] {3, 6})
+                        h.assertTrue(
+                                site.state(Site.at(
+                                                        route,
+                                                        plan.steps()
+                                                                .get(scarred - 1)
+                                                                .root())
+                                                .above())
+                                        .is(MiningModule.CUT_SCAR.get()),
+                                "a free cut scar on step " + scarred);
+                    site.supply(grower, new ItemStack(Items.GLOW_LICHEN, 1));
                 })
                 .thenWaitUntil(() -> h.assertValueEqual(
-                        site.stop(routeGrower, player), Optional.of(key(Surveying.NO_WALL)), "nothing holds it"))
+                        site.stop(grower, player), Optional.of(key(Surveying.NO_RIB)), "no plates for the end"))
                 .thenExecute(() -> {
-                    untouched(h, site, route, lit, 8);
-                    h.assertValueEqual(site.held(routeGrower, 2), 1, "the torch is kept");
-                    site.level.setBlockAndUpdate(light.east(), Blocks.COBBLESTONE.defaultBlockState());
+                    untouched(h, site, route, plan, 8);
+                    h.assertValueEqual(site.held(grower, 2), 1, "the lichen is kept");
+                    site.supply(grower, new ItemStack(ProcessingModule.BONE_PLATE.get(), 1));
                 })
                 .thenWaitUntil(() -> h.assertValueEqual(
-                        site.stop(routeGrower, player), Optional.of(key(Surveying.FINISHED)), "the route is built"))
+                        site.stop(grower, player), Optional.of(key(Surveying.FINISHED)), "the route is built"))
                 .thenExecute(() -> {
-                    h.assertTrue(site.state(light).is(Blocks.WALL_TORCH), "the torch hangs on the new wall");
-                    h.assertValueEqual(site.state(light).getValue(WallTorchBlock.FACING), Direction.WEST, "facing in");
-                    h.assertValueEqual(site.held(routeGrower, 2), 0, "paid");
-                    h.assertValueEqual(site.held(stairsGrower, 1), 2, "one tread paid");
+                    BlockState node = site.state(light);
+                    h.assertTrue(node.is(MiningModule.LUMEN_NODE.get()), "a Lumen Node grows at the end");
+                    h.assertValueEqual(node.getValue(LumenNodeBlock.FACE), AttachFace.CEILING, "under the ceiling");
+                    h.assertTrue(node.getLightEmission() > 0, "and gives light");
+                    h.assertValueEqual(site.held(grower, 2), 0, "the lichen is paid");
+                    h.assertValueEqual(site.held(grower, 3), 0, "and the plate");
+                    h.assertValueEqual(site.held(grower, 0), 2, "a segment a cell");
+                    h.assertValueEqual(site.loose(), 0, "nothing fell loose");
+                    site.release();
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * Accidents are built through, never bridged: water standing in a cell's root and a hole under the next cell's root
+     * stop nothing. The grower grows the first root cell into the water; over the hole it lays no root cell, no floor
+     * and pays no segment; then it goes on. A light with no wall or ceiling to hold it is left out even with no light stock.
+     */
+    @GameTest(templateNamespace = "infestusfrontier_tests", template = "empty", timeoutTicks = 12 * WAIT)
+    public static void waterAndHolesAreBuiltThroughWithoutABridge(GameTestHelper h) {
+        Site site = Site.of(h, 12);
+        BlockPos marker = site.start;
+        BlockPos grower = marker.above();
+        MinePlan route = new MinePlan(PlanShape.ROUTE, 3, Turn.NONE, Turn.NONE);
+        site.ground(0);
+        site.rig(marker, route, true, 0);
+        site.carve(marker, route, 1, 3);
+        BlockPos wet = Site.at(marker, route.steps().get(0).root());
+        BlockPos hole = Site.at(marker, route.steps().get(1).root());
+        BlockPos last = Site.at(marker, route.steps().get(2).root());
+        site.level.setBlockAndUpdate(wet, Blocks.WATER.defaultBlockState());
+        site.level.setBlockAndUpdate(hole.below(), Blocks.AIR.defaultBlockState());
+        site.level.setBlockAndUpdate(hole.below(2), Blocks.AIR.defaultBlockState());
+        site.supply(grower, segments(5));
+        Player player = EcologyTests.holding(h, GameType.SURVIVAL, Items.AIR, 0);
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertValueEqual(
+                        site.stop(grower, player), Optional.of(key(Surveying.FINISHED)), "the route is built"))
+                .thenExecute(() -> {
+                    h.assertTrue(site.state(wet).is(MiningModule.ROOT_CELL.get()), "a root cell grown into the water");
+                    h.assertFalse(site.state(hole).is(MiningModule.ROOT_CELL.get()), "no root cell over the hole");
+                    h.assertTrue(site.state(hole.below()).isAir(), "and nothing fills the hole");
+                    h.assertTrue(site.state(last).is(MiningModule.ROOT_CELL.get()), "the cell after it is built");
+                    h.assertValueEqual(site.built(marker), 3, "all three steps counted");
+                    h.assertValueEqual(site.held(grower, 0), 3, "two segments paid, none for the hole");
+                    h.assertTrue(
+                            site.state(Site.at(
+                                            marker, route.steps().get(2).light().orElseThrow()))
+                                    .isAir(),
+                            "nothing holds the light out here");
+                    h.assertValueEqual(site.held(grower, 2), 0, "no light stock needed where nothing can hold a light");
                     h.assertValueEqual(site.loose(), 0, "nothing fell loose");
                     site.release();
                 })
@@ -681,7 +770,7 @@ public final class StructureGrowerTests {
         Site site = Site.of(h, 5);
         BlockPos stairs = site.start;
         BlockPos route = site.start.offset(-5, 0, 0);
-        MinePlan straight = new MinePlan(PlanShape.ROUTE, 4, new Turn(Steer.LEFT, 2), Turn.NONE, false);
+        MinePlan straight = new MinePlan(PlanShape.ROUTE, 4, new Turn(Steer.LEFT, 2), Turn.NONE);
         site.ground(0);
         site.rig(stairs, STAIRS, true, 0);
         site.rig(route, straight, true, 0);
@@ -691,6 +780,8 @@ public final class StructureGrowerTests {
         for (BlockPos grower : List.of(stairs.above(), route.above())) {
             org.jd.infestusfrontier.organ.api.Organs.placedBy(site.level, grower, steward);
             site.supply(grower, segments(9));
+            site.supply(grower, new ItemStack(Items.TORCH, 2)); // for the lit ends
+            site.supply(grower, new ItemStack(ProcessingModule.BONE_PLATE.get(), 2)); // for the ribs at the landing
         }
         site.supply(stairs.above(), new ItemStack(Items.COBBLESTONE_STAIRS, 5));
         List<BlockPos> kept = List.of(stairs, stairs.above(), route, route.above());
@@ -862,7 +953,7 @@ public final class StructureGrowerTests {
             timeoutTicks = 100)
     public static void theGrowersOfADimensionShareTheirStepsEachTick(GameTestHelper h) {
         Site site = Site.of(h, 8);
-        MinePlan cell = new MinePlan(PlanShape.ROUTE, 1, Turn.NONE, Turn.NONE, false);
+        MinePlan cell = new MinePlan(PlanShape.ROUTE, 1, Turn.NONE, Turn.NONE);
         int growers = Surveying.STEPS_PER_TICK + 1;
         site.ground(0);
         List<BlockPos> markers = new ArrayList<>();
@@ -871,6 +962,7 @@ public final class StructureGrowerTests {
             site.rig(marker, cell, true, 0);
             site.carve(marker, cell, 1, 1);
             site.supply(marker.above(), segments(1));
+            site.supply(marker.above(), new ItemStack(Items.TORCH, 1)); // a one-cell route is its own lit end
             markers.add(marker);
         }
         h.startSequence()
@@ -935,8 +1027,10 @@ public final class StructureGrowerTests {
         tag.putBoolean("approved", true);
         plan.loadWithComponents(tag, level.registryAccess());
         BlockEntity grower = level.getBlockEntity(marker.above());
-        level.getCapability(Capabilities.ItemHandler.BLOCK, marker.above(), null)
-                .insertItem(0, segments(2), false);
+        var stock = level.getCapability(Capabilities.ItemHandler.BLOCK, marker.above(), null);
+        stock.insertItem(0, segments(2), false);
+        stock.insertItem(2, new ItemStack(Items.TORCH, 1), false); // a one-cell route is its own lit end
+        stock.insertItem(3, new ItemStack(ProcessingModule.BONE_PLATE.get(), 1), false); // and framed
         CompoundTag due = grower.saveWithFullMetadata(level.registryAccess());
         due.putInt("ticks", Surveying.GROW_TICKS);
         grower.loadWithComponents(due, level.registryAccess());
@@ -1004,8 +1098,17 @@ public final class StructureGrowerTests {
                         segment.copy(),
                         segment.copy()),
                 MiningModule.STRUCTURE_GROWER_ITEM.get());
+        List<ItemStack> stairShape = new ArrayList<>();
+        for (int cell = 0; cell < 9; cell++) // S.. / SS. / SSS
+        stairShape.add(List.of(0, 3, 4, 6, 7, 8).contains(cell) ? segment.copy() : ItemStack.EMPTY);
+        CraftingInput grid = CraftingInput.of(3, 3, stairShape);
+        var treadRecipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, h.getLevel());
+        h.assertTrue(treadRecipe.isPresent(), "six segments in a stair shape make Root Treads");
+        ItemStack treads = treadRecipe.get().value().assemble(grid, h.getLevel().registryAccess());
+        h.assertTrue(treads.is(MiningModule.ROOT_TREAD_ITEM.get()) && treads.getCount() == 4, "four of them");
+        h.assertTrue(treads.is(MiningModule.MINE_TREADS), "a grower lays them as treads");
         var advancements = h.getLevel().getServer().getAdvancements();
-        for (String item : List.of("surveyed_tissue", "structure_grower"))
+        for (String item : List.of("surveyed_tissue", "structure_grower", "root_tread"))
             for (String path : List.of("acquired/" + item, "recipes/" + item))
                 h.assertTrue(advancements.get(id(path)) != null, path + " exists");
         h.assertTrue(advancements.get(id("contact/surveyed_step")) != null, "the milestone exists");
@@ -1025,8 +1128,8 @@ public final class StructureGrowerTests {
                 });
         h.assertValueEqual(
                 shown,
-                List.of(id("surveyed_tissue"), id("structure_grower")),
-                "the guide renders both recipes from recipe data");
+                List.of(id("surveyed_tissue"), id("structure_grower"), id("root_tread")),
+                "the guide renders the recipes from recipe data");
         var lang = StarterAdvancementTests.lang();
         for (String page : List.of("staircase", "route"))
             h.assertTrue(

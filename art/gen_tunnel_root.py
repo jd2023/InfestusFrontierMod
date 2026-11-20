@@ -1,42 +1,72 @@
-"""Tunnel Root, Root Cells and the Root Segment. The head is a squat, bark-brown root tip on a broad foot with a pale,
-fleshy snout that points the way it cuts (north in the model; the blockstate turns it). A Root Cell is a full block of
-packed earth threaded with roots; its top shows the living root running straight along the tunnel or round a bend.
-The Root Segment icon is a short knotted root. The head's boxes match the shape in TunnelRootBlock.BOXES.
+"""Tunnel Root, Root Cells, Root Treads and the Root Segment. The head is a squat, bark-brown root tip on a broad foot
+with a pale, fleshy snout that points the way it cuts (north in the model; the block entity turns it) and two small
+hooks either side of the snout that grip the rock. A Root Cell is a full block of packed earth threaded with roots; its
+top shows the living root running straight along the tunnel or round a bend. A Root Tread is a stair of the same
+earth with a living root along its nose. The Root Segment icon is a short knotted root.
 
     python3 art/gen_tunnel_root.py
+
+The head is a GeckoLib organ. Its rest pose matches the shape in TunnelRootBlock.BOXES. It rests in one of three
+loops: idle, or leaning towards the next cut when the player steers it left or right (aim_left, aim_right). After a
+step it plays its crawl once: its body still stands in the cell it left, the snout reaches forward into the cut on a
+neck that stretches behind it, the hooks close on the rock, and the body pulls itself in after it. On a turn the body
+starts turned the old way and swings round to the new heading while it pulls. GeckoLib mirrors x and negates
+rotations about x and y (art/geo_audit.py): a positive file y turn is clockwise seen from above, and a position's x is
+mirrored, so the left of a head facing north is +x in the file.
 """
 import json
 import math
 import random
 from PIL import Image
-from organ_model import ASSETS, Painter, ball, compact, faces, folds, islands, pack, skin, write_static
+from organ_model import ASSETS, Painter, ball, compact, faces, folds, islands, pack, sampled, skin, wave, write
 
 SHEET = 64
 BARK = [(44, 30, 22), (66, 46, 32), (92, 64, 44), (120, 86, 58), (150, 112, 76), (178, 140, 98)]
 FOOT = [(36, 28, 22), (54, 42, 32), (74, 58, 42), (96, 76, 54)]
 SNOUT = [(120, 62, 64), (160, 88, 86), (196, 124, 112), (226, 168, 150), (244, 206, 186)]
+HOOK = [(150, 132, 104), (186, 168, 136), (214, 200, 170), (234, 226, 204)]
 
-# (island, origin [x from -8, y, z from -8], size, turn); north is -z
-HEAD = [('root', None, [0, 8, 0], [
-    ('foot', [-6, 0, -5], [12, 2, 12], None),
-    ('body', [-5, 2, -4], [10, 7, 10], None),
-    ('crown', [-4, 9, -2], [8, 3, 7], None),
-    ('snout', [-3, 2, -7], [6, 5, 3], None),
-    ('tip', [-2, 3, -8], [4, 3, 1], None),
-])]
+IDLE = 4.0
+CRAWL = 2.0
+# crawl beats, seconds: the snout reaches into the cut, the hooks close, the body pulls itself in, it settles
+REACH, GRIP, PULLED = 0.6, 0.85, 1.6
+CELL = 16  # the head crawls one block: its body starts this far behind its new place
+AIM = 20  # how far the snout leans towards a steered cut, degrees; it draws back a little so it stays in its block
+AIM_BACK = 1.2
+
+# (bone, parent, pivot, cubes); each cube (island, origin [x from -8, y, z from -8], size, turn); north is -z
+BONES = [
+    ('root', None, [0, 0, 0], []),
+    ('body', 'root', [0, 5, 1], [
+        ('foot', [-6, 0, -5], [12, 2, 12], None),
+        ('belly', [-5, 2, -4], [10, 7, 10], None),
+        ('crown', [-4, 9, -2], [8, 3, 7], None),
+    ]),
+    ('snout', 'root', [0, 4.5, -5.5], [
+        ('snout', [-3, 2.1, -7.25], [6, 5, 4], None),
+        ('tip', [-2, 3, -7.75], [4, 3, 1], None),
+    ]),
+    # hidden inside the snout and the belly at rest; it stretches back from the snout while the body follows
+    ('neck', 'snout', [0, 4.5, -4.3], [('neck', [-2, 3.25, -4.3], [4, 2, 1], None)]),
+    ('hook_l', 'snout', [3, 4.5, -6.5], [('hook', [2.4, 3.5, -7.9], [1, 2, 2], None)]),
+    ('hook_r', 'snout', [-3, 4.5, -6.5], [('hook', [-3.4, 3.5, -7.9], [1, 2, 2], None)]),
+]
 
 
-def head_painter():
+def head_painter(uv):
     p = Painter(SHEET, 1931)
-    uv = pack(HEAD, SHEET)
-    for island, size in islands(HEAD).items():
+    for island, size in islands(BONES).items():
         for face, rect in faces(size, uv[island]).items():
             light = 0.14 if face == 'up' else -0.16 if face == 'down' else 0
             if island == 'foot':
                 p.ramp(rect, FOOT, lambda x, y, w, h: skin(x, y, w, h) - 0.05 + light, grain=0.08, mottle=0.25)
-            elif island in ('snout', 'tip'):
+            elif island in ('snout', 'tip', 'neck'):
                 p.ramp(rect, SNOUT, lambda x, y, w, h: 0.5 * ball(x, y, w, h) + 0.5 * skin(x, y, w, h) + light,
                        grain=0.05, mottle=0.2)
+                if island == 'neck':
+                    p.vein(rect, SNOUT[0], 2, 200)
+            elif island == 'hook':
+                p.ramp(rect, HOOK, lambda x, y, w, h: skin(x, y, w, h) + light, grain=0.04, mottle=0.15)
             else:
                 p.ramp(rect, BARK, lambda x, y, w, h: skin(x, y, w, h) + folds(x, y) + light, grain=0.06,
                        mottle=0.24)
@@ -44,13 +74,66 @@ def head_painter():
     return p
 
 
+def keys(points):
+    """Keyframes from (time, value) points, held flat between them by the linear interpolation GeckoLib uses."""
+    return {('%.2f' % t if t else '0.0'): [round(v, 4) for v in value] for t, value in points}
+
+
+def breathing(t):
+    return [1 + 0.015 * wave(t, IDLE), 1 - 0.02 * wave(t, IDLE), 1 + 0.015 * wave(t, IDLE)]
+
+
+def rest(lean):
+    """A resting loop: the body breathes, the hooks twitch, and the snout and body lean `lean` degrees about y."""
+    return (IDLE, True, {
+        'body': {'scale': sampled(IDLE, 0.25, breathing),
+                 'rotation': keys([(0, [0, lean / 4, 0]), (IDLE, [0, lean / 4, 0])])},
+        'snout': {'rotation': sampled(IDLE, 0.25, lambda t: [2 * wave(t, IDLE, 0.5), lean, 0]),
+                  'position': keys([(0, [0, 0, AIM_BACK if lean else 0]), (IDLE, [0, 0, AIM_BACK if lean else 0])])},
+        'hook_l': {'rotation': sampled(IDLE, 0.25, lambda t: [0, -6 * max(0.0, wave(t, IDLE)), 0])},
+        'hook_r': {'rotation': sampled(IDLE, 0.25, lambda t: [0, 6 * max(0.0, wave(t, IDLE)), 0])},
+    })
+
+
+def crawl(turn):
+    """One step's crawl into the cell. `turn` is the old heading relative to the new, in file degrees about y: 90 when
+    the head turned left (it faced east before facing north), -90 when it turned right, 0 straight on."""
+    side = 0 if turn == 0 else (1 if turn > 0 else -1)
+    # where the snout starts: on the front of the body in the old cell, facing the old way
+    start = [-5.5 * side, 0, CELL + 5.5 * abs(side)]
+    stretch = 20 if side else 17  # neck length, in its own pixels, that spans from the cut back to the old cell
+    return (CRAWL, False, {
+        'body': {
+            'position': keys([(0, [0, 0, CELL]), (GRIP, [0, 0, CELL]), ((GRIP + PULLED) / 2, [0, 0.6, CELL / 2]),
+                              (PULLED, [0, 0, 0]), (CRAWL, [0, 0, 0])]),
+            'rotation': keys([(0, [0, turn, 0]), (GRIP, [0, turn, 0]), (PULLED, [0, 0, 0]), (CRAWL, [0, 0, 0])]),
+            'scale': keys([(0, [1, 1, 1]), (GRIP, [1, 1, 1]), ((GRIP + PULLED) / 2, [0.96, 0.9, 1.1]),
+                           (PULLED, [1.02, 0.96, 1.02]), (CRAWL, [1, 1, 1])]),
+        },
+        'snout': {
+            'position': keys([(0, start), (REACH, [0, 0, 0]), (CRAWL, [0, 0, 0])]),
+            'rotation': keys([(0, [0, turn, 0]), (REACH, [6, 0, 0]), (GRIP, [0, 0, 0]), (CRAWL, [0, 0, 0])]),
+        },
+        'neck': {'scale': keys([(0, [1, 1, 1]), (REACH, [1, 1, stretch]), (GRIP, [1, 1, stretch]),
+                                (PULLED, [1, 1, 1]), (CRAWL, [1, 1, 1])])},
+        'hook_l': {'rotation': keys([(0, [0, 0, 0]), (REACH * 0.6, [0, 32, 0]), (REACH, [0, 32, 0]),
+                                     (GRIP, [0, -6, 0]), (PULLED, [0, -6, 0]), (CRAWL, [0, 0, 0])])},
+        'hook_r': {'rotation': keys([(0, [0, 0, 0]), (REACH * 0.6, [0, -32, 0]), (REACH, [0, -32, 0]),
+                                     (GRIP, [0, 6, 0]), (PULLED, [0, 6, 0]), (CRAWL, [0, 0, 0])])},
+    })
+
+
 def head():
-    write_static('tunnel_root', HEAD, SHEET, head_painter())
-    variants = {f'facing={facing}': {'model': 'infestusfrontier:block/tunnel_root', **({'y': y} if y else {})}
-                for facing, y in (('north', 0), ('east', 90), ('south', 180), ('west', 270))}
-    (ASSETS / 'blockstates/tunnel_root.json').write_text(json.dumps({'variants': variants}, indent=2) + '\n')
-    (ASSETS / 'models/item/tunnel_root.json').write_text(
-        json.dumps({'parent': 'infestusfrontier:block/tunnel_root'}, indent=2) + '\n')
+    uv = pack(BONES, SHEET)
+    painter = head_painter(uv)
+    anims = {'idle': rest(0), 'aim_left': rest(-AIM), 'aim_right': rest(AIM),
+             'crawl': crawl(0), 'crawl_left': crawl(90), 'crawl_right': crawl(-90)}
+    particle = faces(islands(BONES)['belly'], uv['belly'])['north']
+    write('tunnel_root', BONES, SHEET, painter, anims, (particle[0], particle[1]), bounds=(3, 2, (0, 0.5, 0)))
+    (ASSETS / 'blockstates/tunnel_root.json').write_text(
+        json.dumps({'variants': {'': {'model': 'infestusfrontier:block/tunnel_root'}}}, indent=2) + '\n')
+    (ASSETS / 'models/block/tunnel_root.json').write_text(
+        json.dumps({'textures': {'particle': 'infestusfrontier:block/tunnel_root'}}, indent=2) + '\n')
 
 
 SOIL = [(46, 36, 28), (62, 48, 36), (78, 62, 46), (96, 78, 58)]
@@ -121,6 +204,38 @@ def cells():
         json.dumps({'parent': 'infestusfrontier:block/root_cell'}, indent=2) + '\n')
 
 
+def tread():
+    """A Root Tread: vanilla's stair shapes in root-cell earth, the living root running along each step's top."""
+    for name, parent in (('root_tread', 'stairs'), ('root_tread_inner', 'inner_stairs'),
+                         ('root_tread_outer', 'outer_stairs')):
+        model = {'parent': 'minecraft:block/' + parent, 'textures': {
+            'bottom': 'infestusfrontier:block/root_cell_side', 'top': 'infestusfrontier:block/root_cell_top',
+            'side': 'infestusfrontier:block/root_cell_side', 'particle': 'infestusfrontier:block/root_cell_side'}}
+        (ASSETS / 'models/block' / (name + '.json')).write_text(json.dumps(model, indent=2) + '\n')
+    # vanilla's stair blockstate: the y turn of each facing, and the extra turn of each corner shape
+    turns = {'east': 0, 'south': 90, 'west': 180, 'north': 270}
+    variants = {}
+    for facing, y in turns.items():
+        for half in ('bottom', 'top'):
+            for shape in ('straight', 'inner_left', 'inner_right', 'outer_left', 'outer_right'):
+                model = 'infestusfrontier:block/root_tread' + (
+                    '_inner' if shape.startswith('inner') else '_outer' if shape.startswith('outer') else '')
+                turn = y + (-90 if shape.endswith('left') else 0)
+                if half == 'top':
+                    turn += 90 if shape != 'straight' else 0
+                variant = {'model': model}
+                if half == 'top':
+                    variant['x'] = 180
+                if turn % 360:
+                    variant['y'] = turn % 360
+                if half == 'top' or turn % 360:
+                    variant['uvlock'] = True
+                variants[f'facing={facing},half={half},shape={shape}'] = variant
+    (ASSETS / 'blockstates/root_tread.json').write_text(json.dumps({'variants': variants}, indent=2) + '\n')
+    (ASSETS / 'models/item/root_tread.json').write_text(
+        json.dumps({'parent': 'infestusfrontier:block/root_tread'}, indent=2) + '\n')
+
+
 def segment():
     """A short root lying corner to corner, knotted in the middle, with a pale cut end."""
     img = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
@@ -145,8 +260,10 @@ def segment():
 def main():
     head()
     cells()
+    tread()
     segment()
-    print('tunnel root: 1 model, 1 texture; root cell: 2 models, 3 textures; root segment: 1 icon; 2 blockstates')
+    print('tunnel root: 1 GeckoLib model, 6 clips; root cell: 2 models, 3 textures; root tread: 3 models; '
+          'root segment: 1 icon; 3 blockstates')
 
 
 if __name__ == '__main__':

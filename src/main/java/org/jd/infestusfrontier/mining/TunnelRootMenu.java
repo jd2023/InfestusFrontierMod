@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.IntSupplier;
 import java.util.stream.Stream;
+import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +30,8 @@ import org.jd.infestusfrontier.ui.Sheet;
 
 /**
  * The Tunnel Root screen's server half: the segment slot, the four take-only output slots, and as synced ints the
- * biomass, the steering, the cells laid, the stop, the seconds to the next step and the installed mutations; for a
+ * biomass, the heading, the steering, the cells laid, the stop, the seconds to the next step and the installed
+ * mutations; for a
  * Rootstock working as a minehead also that it is one, the steps it has advanced and its section's built and planned
  * steps, and for each of its gallery faces what holds it up, its built and planned steps and whether it is wide.
  * Buttons 0, 1 and 2 steer the next step straight, left and right; the block entity checks and applies the choice.
@@ -38,9 +40,13 @@ public final class TunnelRootMenu extends OrganMenu {
     public static final int STRAIGHT_BUTTON = 0;
     public static final int LEFT_BUTTON = 1;
     public static final int RIGHT_BUTTON = 2;
-    static final int STRIPS = 3;
-    /** The output wells sit on the second row, this far apart. */
+    static final int STRIPS = 4;
+    /** The segment well and the output wells sit in one row, this far apart, under the steering and the progress. */
     static final int OUTPUT_PITCH = Sheet.SLOT.width() + Sheet.GAP;
+    /** Where the screen puts that row's slots: one pixel inside its wells. */
+    static final int WELL_SLOT_Y = 80;
+    /** The first output slot: set off from the segment well, so each well's label has room. */
+    static final int OUTPUT_X = Sheet.SLOT_X + OUTPUT_PITCH + 16;
 
     private static final int STORED = 0;
     private static final int CAPACITY = 1;
@@ -54,8 +60,10 @@ public final class TunnelRootMenu extends OrganMenu {
     private static final int BUILT = 9;
     private static final int STEPS = 10;
     private static final int FACES = 11;
+    /** The way the head faces, as a horizontal direction's 2D data value. */
+    private static final int HEADING = 12;
     /** Each face's stop, built steps, planned steps and width, from here on. */
-    private static final int FACE_DATA = 12;
+    private static final int FACE_DATA = 13;
 
     private static final int PER_FACE = 4;
     private static final int SYNCED = FACE_DATA + PER_FACE * Galleries.MAX_FACES;
@@ -105,14 +113,14 @@ public final class TunnelRootMenu extends OrganMenu {
             Optional<TunnelRootBlockEntity> head) {
         super(MiningModule.TUNNEL_ROOT_MENU.get(), id, access, MiningModule.TUNNEL_ROOT.get(), data);
         this.head = head;
-        addSlot(new SlotItemHandler(segments, 0, Sheet.SLOT_X, Sheet.SLOT_Y) {
+        addSlot(new SlotItemHandler(segments, 0, Sheet.SLOT_X, WELL_SLOT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.is(MiningModule.ROOT_SEGMENT.get()) && super.mayPlace(stack);
             }
         });
         for (int slot = 0; slot < Tunnelling.OUTPUT_SLOTS; slot++)
-            addSlot(new SlotItemHandler(output, slot, Sheet.SLOT_X + slot * OUTPUT_PITCH, Sheet.ROW2_SLOT_Y) {
+            addSlot(new SlotItemHandler(output, slot, OUTPUT_X + slot * OUTPUT_PITCH, WELL_SLOT_Y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return false;
@@ -135,6 +143,8 @@ public final class TunnelRootMenu extends OrganMenu {
         reads[BUILT] = head::built;
         reads[STEPS] = head::steps;
         reads[FACES] = () -> head.faces().size();
+        reads[HEADING] =
+                () -> head.getBlockState().getValue(TunnelRootBlock.FACING).get2DDataValue();
         for (int face = 0; face < Galleries.MAX_FACES; face++) {
             int index = face;
             int at = FACE_DATA + PER_FACE * face;
@@ -177,6 +187,16 @@ public final class TunnelRootMenu extends OrganMenu {
     /** The way the next step goes, as last synced. */
     public Steer steer() {
         return Steer.at(synced(STEER)).orElse(Steer.STRAIGHT);
+    }
+
+    /** The way the head faces, as last synced. */
+    public Direction heading() {
+        return Direction.from2DDataValue(synced(HEADING));
+    }
+
+    /** The way the next step goes: the heading turned as steered. */
+    public Direction next() {
+        return MiningDirections.turn(heading(), steer().quarters());
     }
 
     public int cells() {

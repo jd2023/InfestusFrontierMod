@@ -1,12 +1,18 @@
 """Fracture Jaw, Work Bed and Collection Cilia: temporary functional block-built models. The jaw is a squat bone-white
 body on a dark foot with two heavy jaw plates that point the way it cuts (north in the model; the blockstate turns
 it). The bed is a fleshy trough with a raised bone rim. The cilia are a pink body on a pale base with three tall
-fronds reaching forward. The boxes match FractureJawBlock.BOXES, WorkBedBlock.BOXES and CollectionCiliaBlock.BOXES.
+fronds reaching forward over a dark intake. The boxes match FractureJawBlock.BOXES, WorkBedBlock.BOXES and
+CollectionCiliaBlock.BOXES at rest.
 
     python3 art/gen_cutting_organs.py
+
+The cilia are a GeckoLib organ (north is -z; the block entity turns it). At rest they sway. While a sweep moves
+items (drawing, one loop a sweep) the fronds reach out and pull back, three cut fragments ride in from the bed to the
+intake and shrink into it, and a bulge runs down the body into the Mouth they stand on: the material going into the
+vein. GeckoLib negates rotations about x, so a positive file x tips a frond's top out towards the bed.
 """
 import json
-from organ_model import ASSETS, Painter, ball, faces, folds, islands, pack, skin, write_static
+from organ_model import ASSETS, Painter, ball, faces, folds, islands, pack, sampled, skin, squeeze, wave, write, write_static
 
 SHEET = 64
 BONE = [(122, 112, 96), (156, 146, 124), (186, 176, 152), (212, 204, 180), (232, 226, 206)]
@@ -17,7 +23,9 @@ FROND = [(150, 70, 104), (184, 98, 132), (214, 132, 160), (238, 172, 194)]
 
 def box(island, x1, y1, z1, x2, y2, z2):
     """A cube from Java block pixels (north is z = 0) to the model's coordinates (-8..8 on x and z)."""
-    return (island, [x1 - 8, y1, z1 - 8], [x2 - x1, y2 - y1, z2 - z1], None)
+    size = [x2 - x1, y2 - y1, z2 - z1]
+    assert all(float(v).is_integer() for v in size), size  # box UV needs whole sizes
+    return (island, [x1 - 8, y1, z1 - 8], [int(v) for v in size], None)
 
 
 JAW = [('jaw', None, [0, 8, 0], [
@@ -35,13 +43,24 @@ BED = [('bed', None, [0, 8, 0], [
     box('rim_ew', 14, 3, 2, 16, 8, 14),
 ])]
 
-CILIA = [('cilia', None, [0, 8, 0], [
-    box('base', 2, 0, 2, 14, 3, 14),
-    box('body', 4, 3, 5, 12, 10, 13),
-    box('frond', 3, 5, 0, 5, 13, 6),
-    box('frond_tall', 7, 5, 0, 9, 14, 6),
-    box('frond', 11, 5, 0, 13, 13, 6),
-])]
+SWEEP = 1.0  # one drawing loop is one sweep, a second
+IDLE = 4.0
+FRAGMENT = [(92, 88, 84), (120, 116, 108), (150, 146, 136)]
+INTAKE = [(40, 14, 22), (64, 26, 36), (88, 40, 50)]
+
+CILIA = [
+    ('cilia', None, [0, 0, 0], [box('base', 2, 0, 2, 14, 3, 14), box('body', 4, 3, 5, 12, 10, 13)]),
+    ('intake', 'cilia', [0, 6, -3], [box('intake', 5.5, 4.5, 4.5, 10.5, 8.5, 5.5)]),
+    # each frond hinges on its front foot, so its tip can lean out to the bed and back without leaving the block
+    ('frond_l', 'cilia', [4, 5, -7], [box('frond', 3, 5, 1, 5, 13, 7)]),
+    ('frond_c', 'cilia', [0, 5, -7], [box('frond_tall', 7, 5, 1, 9, 14, 7)]),
+    ('frond_r', 'cilia', [-4, 5, -7], [box('frond', 11, 5, 1, 13, 13, 7)]),
+    # three cut fragments, hidden at rest, that ride in from the bed; and the bulge that runs down into the Mouth
+    ('bit_a', 'cilia', [-1.5, 6, -7], [box('bit', 6, 5.5, 0.5, 7, 6.5, 1.5)]),
+    ('bit_b', 'cilia', [1.5, 7, -7], [box('bit', 9, 6.5, 0.5, 10, 7.5, 1.5)]),
+    ('bit_c', 'cilia', [0, 5, -7], [box('bit', 7.5, 4.5, 0.5, 8.5, 5.5, 1.5)]),
+    ('bulge', 'cilia', [0, 8.75, 1], [box('bulge', 3.5, 8.35, 5.6, 12.5, 9.35, 13.6)]),
+]
 
 
 def paint(bones, seed, skins):
@@ -98,19 +117,66 @@ def bed():
     item('work_bed')
 
 
+def cilia_animations():
+    def frond(lag):
+        # lean out a little towards the bed (positive file x), then sweep back hard towards the intake, then settle
+        return {'rotation': sampled(SWEEP, 0.05, lambda t: [6 * squeeze(t, SWEEP, lag) - 22 * squeeze(t, SWEEP, lag + 0.35), 0, 0])}
+
+    def bit(lag):
+        def at(t):
+            k = ((t - lag) % SWEEP) / SWEEP
+            return [0, -0.6 * k, 4.2 * k]  # from the bed's side to the intake
+
+        def size(t):
+            k = ((t - lag) % SWEEP) / SWEEP
+            shown = 1.0 if k < 0.75 else max(0.0, 1 - (k - 0.75) / 0.2)
+            return [shown] * 3
+        return {'position': sampled(SWEEP, 0.05, at), 'scale': sampled(SWEEP, 0.05, size)}
+
+    def bulge(t):
+        k = t / SWEEP
+        return [0, -8.0 * k, 0]
+
+    def bulge_size(t):
+        k = t / SWEEP
+        swell = 0.0 if k > 0.9 else min(1.0, k / 0.15) * (1 - max(0.0, k - 0.7) / 0.2)
+        return [0.94 + 0.12 * swell, swell, 0.94 + 0.12 * swell]
+
+    hidden = {'scale': {'0.0': [0, 0, 0]}}
+    idle = {
+        'cilia': {'scale': sampled(IDLE, 0.25, lambda t: [1 + 0.01 * wave(t, IDLE), 1 - 0.012 * wave(t, IDLE), 1 + 0.01 * wave(t, IDLE)])},
+        'frond_l': {'rotation': sampled(IDLE, 0.25, lambda t: [-3 - 3 * wave(t, IDLE), 0, 0])},
+        'frond_c': {'rotation': sampled(IDLE, 0.25, lambda t: [-3 - 3 * wave(t, IDLE, 0.4), 0, 0])},
+        'frond_r': {'rotation': sampled(IDLE, 0.25, lambda t: [-3 - 3 * wave(t, IDLE, 0.8), 0, 0])},
+        'bit_a': hidden, 'bit_b': hidden, 'bit_c': hidden, 'bulge': hidden,
+    }
+    drawing = {
+        'frond_l': frond(0.0), 'frond_c': frond(0.08), 'frond_r': frond(0.16),
+        'intake': {'scale': sampled(SWEEP, 0.05, lambda t: [1 + 0.25 * squeeze(t, SWEEP, 0.55)] * 2 + [1])},
+        'bit_a': bit(0.0), 'bit_b': bit(0.33), 'bit_c': bit(0.66),
+        'bulge': {'position': sampled(SWEEP, 0.05, bulge), 'scale': sampled(SWEEP, 0.05, bulge_size)},
+    }
+    return {'idle': (IDLE, True, idle), 'drawing': (SWEEP, True, drawing)}
+
+
 def cilia():
     p = paint(CILIA, 5341, {'base': (BONE, rough), 'body': (FLESH, soft), 'frond': (FROND, soft),
-                            'frond_tall': (FROND, soft)})
-    write_static('collection_cilia', CILIA, SHEET, p)
-    facing_blockstate('collection_cilia')
-    item('collection_cilia')
+                            'frond_tall': (FROND, soft), 'intake': (INTAKE, soft), 'bit': (FRAGMENT, rough),
+                            'bulge': (FLESH, soft)})
+    uv = pack(CILIA, SHEET)
+    particle = faces(islands(CILIA)['body'], uv['body'])['north']
+    write('collection_cilia', CILIA, SHEET, p, cilia_animations(), (particle[0], particle[1]))
+    (ASSETS / 'blockstates/collection_cilia.json').write_text(
+        json.dumps({'variants': {'': {'model': 'infestusfrontier:block/collection_cilia'}}}, indent=2) + '\n')
+    (ASSETS / 'models/block/collection_cilia.json').write_text(
+        json.dumps({'textures': {'particle': 'infestusfrontier:block/collection_cilia'}}, indent=2) + '\n')
 
 
 def main():
     jaw()
     bed()
     cilia()
-    print('fracture jaw, work bed, collection cilia: 3 models, 3 textures, 3 blockstates, 3 item models')
+    print('fracture jaw, work bed: 2 models, 2 textures, 2 blockstates, 2 item models; collection cilia: 1 GeckoLib model')
 
 
 if __name__ == '__main__':

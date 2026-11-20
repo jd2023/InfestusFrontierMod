@@ -64,10 +64,20 @@
       "text": "entry.infestusfrontier.circulation.surveyed_mine.recover_text"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.circulation.surveyed_mine.accidents",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.accidents_text"
+    },
+    {
       "type": "modonomicon:crafting_recipe",
       "recipe_id_1": "infestusfrontier:surveyed_tissue",
       "recipe_id_2": "infestusfrontier:structure_grower",
       "text": "entry.infestusfrontier.circulation.surveyed_mine.craft"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:root_tread",
+      "text": "entry.infestusfrontier.circulation.surveyed_mine.tread"
     }
   ]
 }

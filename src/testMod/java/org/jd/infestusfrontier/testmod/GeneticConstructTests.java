@@ -59,6 +59,7 @@ import org.jd.infestusfrontier.genetics.GeneticsModule;
 import org.jd.infestusfrontier.genetics.api.GeneticConstructRecipe;
 import org.jd.infestusfrontier.interaction.InteractionModule;
 import org.jd.infestusfrontier.mining.MiningModule;
+import org.jd.infestusfrontier.mining.Stride;
 import org.jd.infestusfrontier.mining.TunnelRootBlock;
 import org.jd.infestusfrontier.mining.TunnelRootMenu;
 import org.jd.infestusfrontier.organ.api.Organs;
@@ -443,9 +444,11 @@ public final class GeneticConstructTests {
             ListTag output = tag.getList("output", Tag.TAG_COMPOUND);
             output.set(0, new ItemStack(Items.COBBLESTONE, 7).save(site.level.registryAccess()));
             tag.putInt("cells", 9);
-            tag.putInt("steer", 1);
             tag.getCompound("tank").putInt("stored", STAIRS_COST - 100);
         });
+        site.level.setBlockAndUpdate(
+                site.start,
+                site.level.getBlockState(site.start).setValue(TunnelRootBlock.STEER, Stride.LEFT)); // steered left
         CompoundTag before = site.headSaved();
         Consumer<ItemStack> refused = construct -> {
             CompoundTag held = site.headSaved();
@@ -462,8 +465,10 @@ public final class GeneticConstructTests {
         CompoundTag rootstock = site.headSaved();
         h.assertValueEqual(mutations(rootstock), List.of("stairs"), "a Rootstock");
         h.assertValueEqual(stored(rootstock), 400, "500 BU, once");
-        for (String key : List.of("segments", "output", "cells", "ticks", "steer", "steward"))
+        for (String key : List.of("segments", "output", "cells", "ticks", "steward"))
             h.assertValueEqual(rootstock.get(key), before.get(key), key + " stays as it was");
+        h.assertValueEqual(
+                site.level.getBlockState(site.start).getValue(TunnelRootBlock.STEER), Stride.LEFT, "steering stays");
         h.assertValueEqual(site.head(), site.start, "it did not move");
         h.assertValueEqual(site.headMenu(player).mutations(), List.of(RootMutation.STAIRS), "the screen names it");
         h.assertTrue(done(h, player, "contact/rootstock"), "The Root Learns to Descend is earned");
@@ -476,8 +481,10 @@ public final class GeneticConstructTests {
         CompoundTag wide = site.headSaved();
         h.assertValueEqual(mutations(wide), List.of("stairs", "wider_section"), "a widened Rootstock");
         h.assertValueEqual(stored(wide), 50, "1000 BU, once");
-        for (String key : List.of("segments", "output", "cells", "steer", "steward"))
+        for (String key : List.of("segments", "output", "cells", "steward"))
             h.assertValueEqual(wide.get(key), before.get(key), key + " stays as it was");
+        h.assertValueEqual(
+                site.level.getBlockState(site.start).getValue(TunnelRootBlock.STEER), Stride.LEFT, "steering stays");
         h.assertTrue(done(h, player, "contact/wider_section"), "Room to Breathe is earned");
         refused.accept(wider());
         refused.accept(stairs());

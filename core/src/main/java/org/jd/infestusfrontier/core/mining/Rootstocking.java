@@ -12,8 +12,9 @@ import org.jd.infestusfrontier.core.foundation.Refusal;
  * Work Bed Collection Cilia sweep. The Rootstock orders: it names the next block of the next step of the approved
  * staircase, top down, and only of that step, so the root never goes past the last built tread. The jaw cuts it, the
  * cilia export it and the grower builds the step once it is clear; the Rootstock counts each step built as its own
- * advance. It cuts, carries and builds nothing itself. Once the landing is built it orders its gallery faces the same
- * way, see {@link Galleries}. Every number is a starting value, not measured balance.
+ * advance. It cuts, carries and builds nothing itself. It does not judge the ground: water, lava, falling blocks and
+ * cavities are accidents the mine cuts into, not reasons to wait. Once the landing is built it orders its gallery faces
+ * the same way, see {@link Galleries}. Every number is a starting value, not measured balance.
  */
 public final class Rootstocking {
     /** Loaded ticks between two looks of a minehead at its parts and its next step, for its screen. */
@@ -39,12 +40,6 @@ public final class Rootstocking {
     public static final Refusal NO_CILIA = new Refusal("rootstock.no_cilia");
     /** A chunk the minehead or the next step reads is not loaded. */
     public static final Refusal UNLOADED = new Refusal("rootstock.unloaded");
-    /** Fluid is in the next step or touches it. */
-    public static final Refusal FLUID = new Refusal("rootstock.fluid");
-    /** A block that falls stands on top of the next step. */
-    public static final Refusal FALLING = new Refusal("rootstock.falling");
-    /** No solid ground is under the next root cell: the step would open a cavity, not a tread. */
-    public static final Refusal CAVITY = new Refusal("rootstock.cavity");
 
     /** The minehead's own stops, in a fixed order; a screen adds the parts' stops after them. */
     public static final List<Refusal> STOPS = List.of(
@@ -57,10 +52,7 @@ public final class Rootstocking {
             NO_JAW,
             NO_BED,
             NO_CILIA,
-            UNLOADED,
-            FLUID,
-            FALLING,
-            CAVITY);
+            UNLOADED);
 
     private Rootstocking() {}
 
@@ -69,22 +61,6 @@ public final class Rootstocking {
         List<Offset> cells = new ArrayList<>(step.cleared());
         cells.sort(Comparator.comparingInt(Offset::up).reversed());
         return List.copyOf(cells);
-    }
-
-    /**
-     * The blocks on top of {@code step}'s columns: a block there that falls would drop into the cut. For each block of
-     * the step, the block over it when that is not part of the step.
-     */
-    public static List<Offset> overheads(PlanStep step) {
-        List<Offset> cells = step.cleared();
-        List<Offset> over = new ArrayList<>();
-        for (Offset cell : cells) if (!cells.contains(cell.above(1))) over.add(cell.above(1));
-        return List.copyOf(over);
-    }
-
-    /** The blocks under {@code step}'s root cells, which must all be solid ground. */
-    public static List<Offset> grounds(PlanStep step) {
-        return step.roots().stream().map(root -> root.above(-1)).toList();
     }
 
     /**

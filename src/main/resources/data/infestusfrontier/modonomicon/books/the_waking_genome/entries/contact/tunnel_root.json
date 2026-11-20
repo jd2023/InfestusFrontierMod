@@ -50,6 +50,11 @@
       "text": "entry.infestusfrontier.contact.tunnel_root.recover_text"
     },
     {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.tunnel_root.accidents",
+      "text": "entry.infestusfrontier.contact.tunnel_root.accidents_text"
+    },
+    {
       "type": "infestusfrontier:organ_growth",
       "recipe_id_1": "infestusfrontier:growth/tunnel_root",
       "text": "entry.infestusfrontier.contact.tunnel_root.craft"

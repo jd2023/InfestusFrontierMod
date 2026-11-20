@@ -11,7 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * or the player takes it at its screen. Any hand opens the screen and sneaking builds against it. Broken, it comes out
  * whole with what it holds.
  */
-public final class WorkBedBlock extends BaseEntityBlock {
+public final class WorkBedBlock extends MiningOrganBlock {
     private static final MapCodec<WorkBedBlock> CODEC = simpleCodec(WorkBedBlock::new);
 
     /** The model's boxes, as {x1, y1, z1, x2, y2, z2}: the floor and its four rims. The bed has no facing. */

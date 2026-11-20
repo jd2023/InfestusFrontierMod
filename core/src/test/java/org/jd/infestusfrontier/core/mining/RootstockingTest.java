@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class RootstockingTest {
     private static final MinePlan DEEPEST =
-            new MinePlan(PlanShape.STAIRCASE, Surveying.MAX_DEPTH, Turn.NONE, Turn.NONE, false);
+            new MinePlan(PlanShape.STAIRCASE, Surveying.MAX_DEPTH, Turn.NONE, Turn.NONE);
 
     @Test
     void aTreadIsCutTopDownFromItsHeadroomToItsRootCell() {
@@ -23,8 +23,6 @@ class RootstockingTest {
                         new Offset(1, 0, -1)),
                 Rootstocking.cutOrder(first),
                 "three headroom blocks, the tread, then the root cell");
-        assertEquals(List.of(new Offset(1, 0, 4)), Rootstocking.overheads(first));
-        assertEquals(List.of(new Offset(1, 0, -2)), Rootstocking.grounds(first));
     }
 
     @Test
@@ -46,7 +44,7 @@ class RootstockingTest {
         assertEquals(4, Rootstocking.cutOrder(landing).size(), "the landing's cell and its headroom");
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new MinePlan(PlanShape.STAIRCASE, Surveying.MAX_DEPTH + 1, Turn.NONE, Turn.NONE, false),
+                () -> new MinePlan(PlanShape.STAIRCASE, Surveying.MAX_DEPTH + 1, Turn.NONE, Turn.NONE),
                 "no section goes deeper");
     }
 
@@ -76,22 +74,14 @@ class RootstockingTest {
     }
 
     @Test
-    void aWideStepIsCutTopDownAcrossItsThreeColumnsOnThreeGrounds() {
-        PlanStep first = new MinePlan(PlanShape.ROUTE, 4, Turn.NONE, Turn.NONE, false, true)
+    void aWideStepIsCutTopDownAcrossItsThreeColumns() {
+        PlanStep first = new MinePlan(PlanShape.ROUTE, 4, Turn.NONE, Turn.NONE, true)
                 .steps()
                 .get(0);
         List<Offset> cuts = Rootstocking.cutOrder(first);
         assertEquals(12, cuts.size(), "three root cells and nine passage blocks");
         for (int n = 0; n < 3; n++) assertEquals(3, cuts.get(n).up(), "the top row first");
         for (int n = 9; n < 12; n++) assertEquals(0, cuts.get(n).up(), "the root cells last");
-        assertEquals(
-                List.of(new Offset(1, 0, 4), new Offset(1, -1, 4), new Offset(1, 1, 4)),
-                Rootstocking.overheads(first),
-                "a falling block over any column stops the cut");
-        assertEquals(
-                List.of(new Offset(1, 0, -1), new Offset(1, -1, -1), new Offset(1, 1, -1)),
-                Rootstocking.grounds(first),
-                "solid ground under each root cell");
     }
 
     @Test

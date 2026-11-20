@@ -1,13 +1,7 @@
 {
   "variants": {
-    "glow=0": {
+    "": {
       "model": "infestusfrontier:block/leached_rock"
-    },
-    "glow=1": {
-      "model": "infestusfrontier:block/leached_rock_dim"
-    },
-    "glow=2": {
-      "model": "infestusfrontier:block/leached_rock_glow"
     }
   }
 }

@@ -15,8 +15,6 @@ public enum PlanEdit {
     SECOND_WAY,
     SECOND_EARLIER,
     SECOND_LATER,
-    /** Lights on and off. */
-    LIGHTS,
     /** A route one column wide and three wide, the Wider Section, and back. */
     WIDTH;
 

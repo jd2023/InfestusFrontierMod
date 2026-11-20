@@ -6,9 +6,9 @@ import java.util.Optional;
 
 /**
  * One step of a plan, numbered from 1: the root cell in its floor, the root cells beside it on a wide route, the tread
- * on the root cell on a staircase, the clear passage above, and the light when this step gets one. {@code arrived}
- * and {@code leaving} are the headings into and out of the cell, in quarter turns clockwise from the marker's forward;
- * they differ where a route turns.
+ * on the root cell on a staircase, the clear passage above, the light when this step gets one, whether bone ribs frame
+ * it and whether a cut scar marks one wall. {@code arrived} and {@code leaving} are the headings into and out of the
+ * cell, in quarter turns clockwise from the marker's forward; they differ where a route turns.
  */
 public record PlanStep(
         int number,
@@ -17,6 +17,8 @@ public record PlanStep(
         Optional<Offset> tread,
         List<Offset> passage,
         Optional<Offset> light,
+        boolean framed,
+        boolean scarred,
         int arrived,
         int leaving) {
     public PlanStep {
@@ -27,6 +29,15 @@ public record PlanStep(
     /** True where the route turns: the root cell bends. */
     public boolean bend() {
         return arrived != leaving;
+    }
+
+    /**
+     * The wall a cut scar marks, in quarter turns clockwise from the way the step leaves: left on odd scars, right on
+     * even ones. Only for a scarred step.
+     */
+    public int scarSide() {
+        if (!scarred) throw new IllegalStateException("Step " + number + " has no scar");
+        return (number / Surveying.SCAR_SPACING) % 2 == 1 ? 3 : 1;
     }
 
     /** Every root cell of the step, the middle one first: each takes one Root Segment. */

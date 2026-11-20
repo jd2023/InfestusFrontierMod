@@ -44,6 +44,14 @@ public final class GhostBoxRenderer<T extends BlockEntity> implements BlockEntit
                 type.get(), context -> new GhostBoxRenderer<T>(ghosts, viewDistance)));
     }
 
+    /**
+     * A renderer of the ghosts {@code ghosts} names, to draw beside another renderer, such as after an organ's model;
+     * call it on the client only.
+     */
+    public static <T extends BlockEntity> BlockEntityRenderer<T> of(Function<T, List<Ghost>> ghosts, int viewDistance) {
+        return new GhostBoxRenderer<>(ghosts, viewDistance);
+    }
+
     @Override
     public void render(
             T entity, float partialTick, PoseStack poses, MultiBufferSource buffers, int light, int overlay) {

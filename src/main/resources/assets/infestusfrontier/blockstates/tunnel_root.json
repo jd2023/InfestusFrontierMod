@@ -1,19 +1,7 @@
 {
   "variants": {
-    "facing=north": {
+    "": {
       "model": "infestusfrontier:block/tunnel_root"
-    },
-    "facing=east": {
-      "model": "infestusfrontier:block/tunnel_root",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "infestusfrontier:block/tunnel_root",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "infestusfrontier:block/tunnel_root",
-      "y": 270
     }
   }
 }

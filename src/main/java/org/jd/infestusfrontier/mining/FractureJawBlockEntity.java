@@ -171,7 +171,6 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
         Optional<Refusal> verdict = switch (Cutting.judge(level, cut)) {
             case CUTTABLE -> Optional.empty();
             case CLEAR -> Optional.of(Fracturing.NOTHING);
-            case FLUID -> Optional.of(Fracturing.FLUID);
             case UNSUPPORTED -> Optional.of(Fracturing.UNSUPPORTED);
             case TOO_HARD -> Optional.of(Fracturing.TOO_HARD);
         };

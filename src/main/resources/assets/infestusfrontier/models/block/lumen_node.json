@@ -1,0 +1,89 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "node": "infestusfrontier:block/lumen_node",
+    "particle": "infestusfrontier:block/lumen_node"
+  },
+  "elements": [
+    {
+      "from": [7, 0, 7],
+      "to": [9, 2, 9],
+      "faces": {
+        "north": {
+          "uv": [7, 0, 9, 4],
+          "texture": "#node"
+        },
+        "south": {
+          "uv": [7, 0, 9, 4],
+          "texture": "#node"
+        },
+        "west": {
+          "uv": [7, 0, 9, 4],
+          "texture": "#node"
+        },
+        "east": {
+          "uv": [7, 0, 9, 4],
+          "texture": "#node"
+        },
+        "up": {
+          "uv": [7, 7, 9, 9],
+          "texture": "#node"
+        },
+        "down": {
+          "uv": [7, 7, 9, 9],
+          "texture": "#node"
+        }
+      }
+    },
+    {
+      "from": [5.5, 2, 5.5],
+      "to": [10.5, 7, 10.5],
+      "faces": {
+        "north": {
+          "uv": [5.5, 6, 10.5, 14],
+          "texture": "#node",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "south": {
+          "uv": [5.5, 6, 10.5, 14],
+          "texture": "#node",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "west": {
+          "uv": [5.5, 6, 10.5, 14],
+          "texture": "#node",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "east": {
+          "uv": [5.5, 6, 10.5, 14],
+          "texture": "#node",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "up": {
+          "uv": [5.5, 5.5, 10.5, 10.5],
+          "texture": "#node",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "down": {
+          "uv": [5.5, 5.5, 10.5, 10.5],
+          "texture": "#node"
+        }
+      }
+    }
+  ]
+}

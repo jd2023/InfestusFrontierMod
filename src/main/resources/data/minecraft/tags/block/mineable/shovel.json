@@ -3,6 +3,8 @@
     "infestusfrontier:living_substrate",
     "infestusfrontier:living_wall",
     "infestusfrontier:root_cell",
-    "infestusfrontier:surveyed_tissue"
+    "infestusfrontier:surveyed_tissue",
+    "infestusfrontier:root_tread",
+    "infestusfrontier:leaching_root"
   ]
 }

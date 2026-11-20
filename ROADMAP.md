@@ -50,15 +50,12 @@ empty world, and nothing new is worth building until it works.
 | 5 | BASE-5 | Defend the base with organs that shoot ground and air threats | A supplied defender kills a mob and stops when its ammunition runs out | — | done |
 | 6 | BASE-6 | Play from an empty world to a self-supplying farm using only the guide | A new player reaches BASE-3 in Survival without creative items or outside help, and the farm restarts by itself after its supply is cut | — | none |
 
-Mining revision — **to be implemented**, Ktask #71 (pending).
-`done` on MINE-1 through MINE-4 records the earlier behavior.
-The revised requirements in `docs/design/MINING_PROGRESSION.md` still need
-implementation and acceptance: crawling animation, clear steering, mining
-accidents, destruction on lost support, and the pod’s glowing root column.
-All later automated methods require physical multiblocks and supplied,
-walkable access with lighting. The same pending task includes the finished
-mine appearance specified in the mining design: floor roots, bone ribs, grown
-access, sparse excavation scars and visible collection motion.
+Mining revision — completed for MINE-1 to MINE-4 in Ktask #71:
+crawling and steering, accidents instead of hazard stops, death on lost support,
+the pod's glowing root column, supplied lights and ribs, Root Treads, cut scars
+and collection motion. The same rules bind MINE-5 to MINE-9 when they are built:
+shafts, trenches and ore-seeking branches install their supplied access and
+lighting then, as their rows below say.
 
 ## Phase 2 — First mining, wood and animals
 

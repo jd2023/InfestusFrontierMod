@@ -1,0 +1,96 @@
+{
+  "commands": [
+    "forceload add 296 296 344 312",
+    "fill 296 -61 292 344 -50 312 air",
+    "fill 296 -62 292 344 -62 312 grass_block",
+    "kill @e[type=item]",
+    "fill 300 -61 294 301 -58 304 stone",
+    "fill 301 -60 300 301 -59 304 air",
+    "fill 301 -61 301 301 -61 304 infestusfrontier:root_cell[facing=north]",
+    "setblock 301 -61 300 infestusfrontier:living_substrate[stage=mature]",
+    "setblock 301 -60 300 infestusfrontier:tunnel_root[facing=north,steer=straight]{segments:{id:\"infestusfrontier:root_segment\",count:8},output:[{},{},{},{}],tank:{stored:0,capacity:2000},cells:3,ticks:0}",
+    "fill 306 -61 296 310 -58 299 stone",
+    "fill 308 -61 300 310 -58 300 stone",
+    "fill 309 -60 300 309 -59 304 air",
+    "fill 309 -61 301 309 -61 304 infestusfrontier:root_cell[facing=north]",
+    "setblock 309 -61 300 infestusfrontier:living_substrate[stage=mature]",
+    "fill 306 -61 300 307 -58 300 stone",
+    "setblock 309 -60 300 infestusfrontier:tunnel_root[facing=north,steer=left]{segments:{id:\"infestusfrontier:root_segment\",count:8},output:[{},{},{},{}],tank:{stored:0,capacity:2000},cells:3,ticks:0}",
+    "fill 316 -61 296 320 -58 299 stone",
+    "fill 318 -61 300 320 -58 300 stone",
+    "fill 317 -60 300 317 -59 304 air",
+    "fill 317 -61 301 317 -61 304 infestusfrontier:root_cell[facing=north]",
+    "setblock 317 -61 300 infestusfrontier:living_substrate[stage=mature]",
+    "fill 316 -61 300 316 -58 300 stone",
+    "setblock 317 -60 300 infestusfrontier:tunnel_root[facing=north,steer=right]{segments:{id:\"infestusfrontier:root_segment\",count:8},output:[{},{},{},{}],tank:{stored:0,capacity:2000},cells:3,ticks:0}",
+    "fill 324 -61 296 330 -58 299 stone",
+    "fill 327 -60 300 327 -59 304 air",
+    "setblock 327 -61 300 infestusfrontier:living_substrate[stage=mature]",
+    "fill 327 -61 301 327 -61 304 infestusfrontier:root_cell[facing=north]",
+    "setblock 327 -60 300 infestusfrontier:tunnel_root[facing=north,steer=left]{segments:{},output:[{},{},{},{}],tank:{stored:0,capacity:2000},cells:3,ticks:0}",
+    "setblock 333 -60 300 infestusfrontier:tunnel_root[facing=north,steer=right]{segments:{},output:[{},{},{},{}],tank:{stored:0,capacity:2000},cells:3,ticks:0}",
+    "setblock 333 -61 300 infestusfrontier:living_substrate[stage=mature]",
+    "fill 332 -61 296 334 -58 299 stone"
+  ],
+  "views": [
+    {
+      "name": "crawl_straight",
+      "x": 303.2,
+      "y": -58.3,
+      "z": 300.0,
+      "yaw": 90,
+      "pitch": 38,
+      "frames": 10,
+      "frameTicks": 1,
+      "trigger": "data merge block 301 -60 300 {ticks:400,tank:{stored:1000,capacity:2000}}"
+    },
+    {
+      "name": "crawl_left",
+      "x": 308.9,
+      "y": -58.5,
+      "z": 302.4,
+      "yaw": 180,
+      "pitch": 35,
+      "frames": 10,
+      "frameTicks": 1,
+      "trigger": "data merge block 309 -60 300 {ticks:400,tank:{stored:1000,capacity:2000}}"
+    },
+    {
+      "name": "crawl_right",
+      "x": 317.6,
+      "y": -58.5,
+      "z": 302.4,
+      "yaw": 180,
+      "pitch": 35,
+      "frames": 10,
+      "frameTicks": 1,
+      "trigger": "data merge block 317 -60 300 {ticks:400,tank:{stored:1000,capacity:2000}}"
+    },
+    {
+      "name": "aim_left",
+      "x": 327.5,
+      "y": -58.4,
+      "z": 302.2,
+      "yaw": 180,
+      "pitch": 35,
+      "frames": 4,
+      "frameTicks": 10
+    },
+    {
+      "name": "aim_right",
+      "x": 333.5,
+      "y": -58.4,
+      "z": 302.2,
+      "yaw": 180,
+      "pitch": 35
+    },
+    {
+      "name": "after_left",
+      "x": 308.5,
+      "y": -56.8,
+      "z": 302.0,
+      "yaw": 180,
+      "pitch": 60
+    }
+  ]
+}

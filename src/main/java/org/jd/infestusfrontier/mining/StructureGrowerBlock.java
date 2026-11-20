@@ -12,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -31,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * Root Segments, stairs and torches load it by hand, any other hand opens its screen and sneaking builds against it.
  * Broken, it comes out whole with its stock and the steps it has built.
  */
-public final class StructureGrowerBlock extends BaseEntityBlock {
+public final class StructureGrowerBlock extends MiningOrganBlock {
     private static final MapCodec<StructureGrowerBlock> CODEC = simpleCodec(StructureGrowerBlock::new);
 
     /** The model's boxes, as {x1, y1, z1, x2, y2, z2}: foot, body and three spinnerets. It has no facing. */

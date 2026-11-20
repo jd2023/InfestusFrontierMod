@@ -18,7 +18,7 @@ import org.jd.infestusfrontier.foundation.menu.OrganMenu;
 import org.jd.infestusfrontier.ui.Sheet;
 
 /**
- * The Structure Grower screen's server half: the segment, tread and light slots, and as synced ints the stop, the
+ * The Structure Grower screen's server half: the segment, tread, light and rib slots, and as synced ints the stop, the
  * steps of the plan under it that are built and how many it has, the steps this grower has built in all and the
  * seconds to the next try.
  */
@@ -38,7 +38,15 @@ public final class StructureGrowerMenu extends OrganMenu {
 
     /** Server side. */
     StructureGrowerMenu(int id, Inventory inventory, StructureGrowerBlockEntity grower) {
-        this(id, inventory, grower.segments(), grower.treads(), grower.lights(), reading(reads(grower)), at(grower));
+        this(
+                id,
+                inventory,
+                grower.segments(),
+                grower.treads(),
+                grower.lights(),
+                grower.ribStock(),
+                reading(reads(grower)),
+                at(grower));
     }
 
     /** Client side. The position arrives as extra data. */
@@ -46,6 +54,7 @@ public final class StructureGrowerMenu extends OrganMenu {
         this(
                 id,
                 inventory,
+                new ItemStackHandler(1),
                 new ItemStackHandler(1),
                 new ItemStackHandler(1),
                 new ItemStackHandler(1),
@@ -59,6 +68,7 @@ public final class StructureGrowerMenu extends OrganMenu {
             IItemHandler segments,
             IItemHandler treads,
             IItemHandler lights,
+            IItemHandler ribs,
             ContainerData data,
             ContainerLevelAccess access) {
         super(MiningModule.STRUCTURE_GROWER_MENU.get(), id, access, MiningModule.STRUCTURE_GROWER.get(), data);
@@ -78,6 +88,12 @@ public final class StructureGrowerMenu extends OrganMenu {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return StructureGrowerBlockEntity.light(stack) && super.mayPlace(stack);
+            }
+        });
+        addSlot(new SlotItemHandler(ribs, 0, Sheet.SLOT_X + 3 * PITCH, Sheet.SLOT_Y) {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return StructureGrowerBlockEntity.rib(stack) && super.mayPlace(stack);
             }
         });
         addPlayer(inventory, STRIPS);

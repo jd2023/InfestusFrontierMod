@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "infestusfrontier:block/root_cell_side",
+    "top": "infestusfrontier:block/root_cell_top",
+    "side": "infestusfrontier:block/root_cell_side",
+    "particle": "infestusfrontier:block/root_cell_side"
+  }
+}

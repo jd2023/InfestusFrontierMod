@@ -1,0 +1,126 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "north": "true",
+        "thick": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib"
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "thick": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "thick": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "thick": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "axis": "x",
+        "thick": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "axis": "z",
+        "thick": "false"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib_across",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "north": "true",
+        "thick": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib_thick"
+      }
+    },
+    {
+      "when": {
+        "east": "true",
+        "thick": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib_thick",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true",
+        "thick": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib_thick",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true",
+        "thick": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib_thick",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "axis": "x",
+        "thick": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib_thick",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true",
+        "axis": "z",
+        "thick": "true"
+      },
+      "apply": {
+        "model": "infestusfrontier:block/bone_rib_across_thick",
+        "x": 270
+      }
+    }
+  ]
+}

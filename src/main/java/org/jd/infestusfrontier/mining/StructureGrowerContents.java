@@ -10,37 +10,42 @@ import org.jd.infestusfrontier.core.mining.GrowerProgress;
 import org.jd.infestusfrontier.core.mining.Surveying;
 
 /**
- * Everything a Structure Grower owns: its Root Segments, treads and lights, and its progress, whose steps are its
+ * Everything a Structure Grower owns: its Root Segments, treads, lights and ribs, and its progress, whose steps are its
  * history. Where it stands in a plan is the marker's, not the grower's. Saved on the block entity and carried on the
- * item when the grower is broken. The stacks are copies.
+ * item when the grower is broken; a grower saved before it took ribs reads with none. The stacks are copies.
  */
-record StructureGrowerContents(ItemStack segments, ItemStack treads, ItemStack lights, GrowerProgress progress) {
-    static final StructureGrowerContents EMPTY =
-            new StructureGrowerContents(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, GrowerProgress.START);
+record StructureGrowerContents(
+        ItemStack segments, ItemStack treads, ItemStack lights, ItemStack ribs, GrowerProgress progress) {
+    static final StructureGrowerContents EMPTY = new StructureGrowerContents(
+            ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, GrowerProgress.START);
 
     StructureGrowerContents {
         segments = segments.copy();
         treads = treads.copy();
         lights = lights.copy();
+        ribs = ribs.copy();
     }
 
     /** The saved numbers before they are judged; impossible ones are a decode error, never an exception. */
-    private record Raw(ItemStack segments, ItemStack treads, ItemStack lights, int steps, int ticks) {}
+    private record Raw(ItemStack segments, ItemStack treads, ItemStack lights, ItemStack ribs, int steps, int ticks) {}
 
     static final MapCodec<StructureGrowerContents> CODEC = RecordCodecBuilder.<Raw>mapCodec(instance -> instance.group(
                             ItemStack.OPTIONAL_CODEC.fieldOf("segments").forGetter(Raw::segments),
                             ItemStack.OPTIONAL_CODEC.fieldOf("treads").forGetter(Raw::treads),
                             ItemStack.OPTIONAL_CODEC.fieldOf("lights").forGetter(Raw::lights),
+                            ItemStack.OPTIONAL_CODEC
+                                    .optionalFieldOf("ribs", ItemStack.EMPTY)
+                                    .forGetter(Raw::ribs),
                             Codec.INT.fieldOf("steps").forGetter(Raw::steps),
                             Codec.INT.fieldOf("ticks").forGetter(Raw::ticks))
                     .apply(instance, Raw::new))
             .flatXmap(StructureGrowerContents::read, contents -> DataResult.success(contents.raw()));
 
     /** The saved keys, for taking them off a tag that a carried grower's item also holds. */
-    static final String[] KEYS = {"segments", "treads", "lights", "steps", "ticks"};
+    static final String[] KEYS = {"segments", "treads", "lights", "ribs", "steps", "ticks"};
 
     private Raw raw() {
-        return new Raw(segments, treads, lights, progress.steps(), progress.ticks());
+        return new Raw(segments, treads, lights, ribs, progress.steps(), progress.ticks());
     }
 
     private static DataResult<StructureGrowerContents> read(Raw raw) {
@@ -48,7 +53,7 @@ record StructureGrowerContents(ItemStack segments, ItemStack treads, ItemStack l
         if (raw.ticks() < 0 || raw.ticks() > Surveying.GROW_TICKS)
             return DataResult.error(() -> "ticks " + raw.ticks());
         StructureGrowerContents contents = new StructureGrowerContents(
-                raw.segments(), raw.treads(), raw.lights(), new GrowerProgress(raw.steps(), raw.ticks()));
+                raw.segments(), raw.treads(), raw.lights(), raw.ribs(), new GrowerProgress(raw.steps(), raw.ticks()));
         Optional<String> problem = contents.problem();
         return problem.isPresent() ? DataResult.error(problem::get) : DataResult.success(contents);
     }
@@ -61,6 +66,8 @@ record StructureGrowerContents(ItemStack segments, ItemStack treads, ItemStack l
             return Optional.of("treads " + treads);
         if (!lights.isEmpty() && (!StructureGrowerBlockEntity.light(lights) || over(lights)))
             return Optional.of("lights " + lights);
+        if (!ribs.isEmpty() && (!StructureGrowerBlockEntity.rib(ribs) || over(ribs)))
+            return Optional.of("ribs " + ribs);
         return Optional.empty();
     }
 

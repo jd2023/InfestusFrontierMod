@@ -5,6 +5,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import org.jd.infestusfrontier.InfestusFrontier;
 import org.jd.infestusfrontier.ui.Bounds;
 import org.jd.infestusfrontier.ui.Sheet;
@@ -32,6 +33,11 @@ final class Draw {
 
     static void ink(GuiGraphics graphics, Component text, int x, int y) {
         graphics.drawString(font(), text, x, y, Sheet.INK, false);
+    }
+
+    /** One wrapped line of ink. */
+    static void ink(GuiGraphics graphics, FormattedCharSequence line, int x, int y) {
+        graphics.drawString(font(), line, x, y, Sheet.INK, false);
     }
 
     static void centered(GuiGraphics graphics, Component text, int centerX, int y) {

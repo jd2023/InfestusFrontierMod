@@ -1,19 +1,7 @@
 {
   "variants": {
-    "facing=north": {
+    "": {
       "model": "infestusfrontier:block/collection_cilia"
-    },
-    "facing=east": {
-      "model": "infestusfrontier:block/collection_cilia",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "infestusfrontier:block/collection_cilia",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "infestusfrontier:block/collection_cilia",
-      "y": 270
     }
   }
 }

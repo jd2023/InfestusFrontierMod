@@ -17,10 +17,6 @@ public record Turn(Steer way, int at) {
 
     /** Quarter turns clockwise this turn adds to the heading. */
     int quarter() {
-        return switch (way) {
-            case STRAIGHT -> 0;
-            case LEFT -> 3;
-            case RIGHT -> 1;
-        };
+        return way.quarters();
     }
 }

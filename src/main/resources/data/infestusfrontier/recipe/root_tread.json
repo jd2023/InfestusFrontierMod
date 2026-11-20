@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "S  ",
+    "SS ",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "infestusfrontier:root_segment"
+    }
+  },
+  "result": {
+    "id": "infestusfrontier:root_tread",
+    "count": 4
+  }
+}
