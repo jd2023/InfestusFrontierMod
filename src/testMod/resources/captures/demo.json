@@ -1853,14 +1853,15 @@
     "setblock 213 -60 17 infestusfrontier:fracture_jaw[facing=north]{tank:{stored:1000,capacity:2000},cuts:0,ticks:0}",
     "setblock 213 -60 18 infestusfrontier:work_bed",
     "setblock 213 -60 16 diamond_ore",
-    "setblock 204 -60 16 chest{Items:[{Slot:0b,id:\"infestusfrontier:hot_heat_capsule\",count:1},{Slot:1b,id:\"infestusfrontier:hot_heat_capsule\",count:1},{Slot:2b,id:\"infestusfrontier:heat_capsule\",count:1},{Slot:3b,id:\"infestusfrontier:charge_cell\",count:1},{Slot:4b,id:\"infestusfrontier:charge_cell\",count:1},{Slot:5b,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:6b,id:\"minecraft:water_bucket\",count:1},{Slot:7b,id:\"infestusfrontier:vigil_egg\",count:1}]}",
-    "setblock 200 -60 16 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"VIGIL NEST\"','\"Open: choose chunks\"','\"then Wake / rest\"','\"Biomass pays upkeep\"']}}",
+    "setblock 204 -60 16 chest{Items:[{Slot:0b,id:\"infestusfrontier:hot_heat_capsule\",count:1},{Slot:1b,id:\"infestusfrontier:hot_heat_capsule\",count:1},{Slot:2b,id:\"infestusfrontier:heat_capsule\",count:1},{Slot:3b,id:\"infestusfrontier:charge_cell\",count:1},{Slot:4b,id:\"infestusfrontier:charge_cell\",count:1},{Slot:5b,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:6b,id:\"minecraft:water_bucket\",count:1},{Slot:7b,id:\"infestusfrontier:vigil_egg\",count:1},{Slot:8b,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:9b,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:10b,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:11b,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:12b,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:13b,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:14b,id:\"infestusfrontier:biomass_bucket\",count:1},{Slot:15b,id:\"infestusfrontier:biomass_bucket\",count:1}]}",
+    "setblock 200 -60 16 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"VIGIL NEST\"','\"Open: choose chunks\"','\"then Wake / rest\"','\"Keep it fed or dies\"']}}",
     "setblock 210 -60 15 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"POWER RECEIVER\"','\"Hot capsules in\"','\"Heat; empty cells\"','\"in Cell to charge\"']}}",
     "setblock 216 -60 15 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"NETHER HEART\"','\"This one is cold.\"','\"Build it in Nether\"','\"with lava below fin\"']}}",
     "setblock 214 -60 20 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"STEAM DRIVER\"','\"This supplied jaw\"','\"can cut diamond.\"','\"Refill through pipes\"']}}",
     "forceload add 220 22 228 29",
     "execute in minecraft:the_nether run forceload add 16 0 47 31",
-    "execute in minecraft:the_nether run function infestusfrontier_tests:nether_power_demo"
+    "execute in minecraft:the_nether run function infestusfrontier_tests:nether_power_demo",
+    "setblock 200 -60 18 oak_sign[rotation=0]{is_waxed:1b,front_text:{messages:['\"VIGIL GROWTH\"','\"One egg + 8,000 BU\"','\"Rest keeps injuries\"','\"Starvation kills\"']}}"
   ],
   "play": [
     "advancement revoke @s from infestusfrontier:contact/root"

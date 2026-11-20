@@ -40,6 +40,7 @@ public final class VigilTests {
     }
 
     private static void supply(NestRig nest, int fuel) {
+        nest.insert(Biomass.of(8000), false);
         nest.seed();
         nest.insert(Biomass.of(fuel), false);
     }
@@ -97,34 +98,167 @@ public final class VigilTests {
                 .thenSucceed();
     }
 
-    @GameTest(template = "empty", timeoutTicks = 260)
-    public static void exhaustedFuelStopsAfterPaidLoadedTicks(GameTestHelper h) {
+    @GameTest(template = "empty")
+    public static void growthChargesEightThousandOnceAndRefusalKeepsTheEgg(GameTestHelper h) {
+        NestRig nest = nest(h);
+        nest.insert(Biomass.of(7999), false);
+        h.assertFalse(nest.seed(), "insufficient growth biomass keeps egg");
+        h.assertValueEqual(nest.tank().stored().units(), 7999, "refusal takes no biomass");
+        h.assertValueEqual(nest.stop(), 10, "growth cost explained");
+        nest.insert(Biomass.of(1), false);
+        h.assertTrue(nest.seed(), "funded growth consumes egg");
+        h.assertValueEqual(nest.tank().stored().units(), 0, "growth costs 8000 BU");
+        h.assertFalse(nest.seed(), "existing keeper cannot consume another egg");
+        nest.insert(Biomass.of(100), false);
+        nest.action(9);
+        h.assertTrue(nest.enabled(), "grown keeper needs only upkeep to wake");
+        nest.action(9);
+        nest.action(9);
+        h.assertTrue(nest.enabled(), "rest does not repeat growth cost");
+        h.assertValueEqual(nest.tank().stored().units(), 80, "two ordinary wake payments");
+        nest.action(9);
+        h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 850)
+    public static void exhaustedFuelInjuresThenKillsInsteadOfSheltering(GameTestHelper h) {
         NestRig nest = nest(h);
         supply(nest, 10);
         nest.action(9);
+        VigilKeeper keeper = (VigilKeeper) h.getLevel().getEntity(nest.saved().getUUID("keeper"));
         h.startSequence()
-                .thenWaitUntil(() -> h.assertFalse(nest.enabled(), "prepayment expires"))
+                .thenIdle(180)
+                .thenExecute(() -> h.assertValueEqual(keeper.getHealth(), 30F, "prepaid time feeds keeper"))
+                .thenWaitUntil(() -> h.assertTrue(keeper.getHealth() < 30, "starvation visibly injures"))
                 .thenExecute(() -> {
-                    h.assertValueEqual(nest.tank().stored().units(), 0, "no debt");
-                    h.assertTrue(nest.egg(), "unpaid keeper sheltered");
-                    h.assertValueEqual(nest.stop(), 4, "fuel stop named");
+                    h.assertTrue(nest.enabled(), "starving keeper is not sheltered");
+                    h.assertValueEqual(nest.stop(), 4, "missing food named");
+                })
+                .thenWaitUntil(() -> h.assertFalse(nest.enabled(), "starvation eventually kills"))
+                .thenExecute(() -> {
+                    h.assertFalse(keeper.isAlive(), "real entity died");
+                    h.assertFalse(nest.egg(), "no free replacement after starvation");
+                    h.assertValueEqual(nest.tank().stored().units(), 0, "no fuel debt");
+                    h.assertFalse(nest.seed(), "replacement also requires growth biomass");
                 })
                 .thenSucceed();
     }
 
-    @GameTest(template = "empty")
-    public static void removingARequiredFeederStopsTheWholeTerritory(GameTestHelper h) {
+    @GameTest(template = "empty", timeoutTicks = 300)
+    public static void restoringARequiredFeederStopsDamageWithoutHealing(GameTestHelper h) {
         NestRig nest = nest(h);
         supply(nest, 100);
         BlockPos part = nest.getBlockPos().east();
         h.getLevel().setBlockAndUpdate(part, VigilModule.FEEDER.get().defaultBlockState());
         nest.action(0);
         nest.action(9);
-        h.assertTrue(nest.enabled(), "expanded nest wakes");
+        VigilKeeper keeper = (VigilKeeper) h.getLevel().getEntity(nest.saved().getUUID("keeper"));
         h.getLevel().removeBlock(part, false);
         h.startSequence()
-                .thenWaitUntil(() -> h.assertFalse(nest.enabled(), "lost part stops"))
-                .thenExecute(() -> h.assertValueEqual(nest.stop(), 3, "part stop named"))
+                .thenWaitUntil(() -> h.assertTrue(keeper.getHealth() < 30, "missing feeder causes damage"))
+                .thenExecute(() -> {
+                    h.assertTrue(nest.enabled(), "lost part does not shelter");
+                    h.assertValueEqual(nest.stop(), 3, "missing part named");
+                    keeper.setHealth(12.5F);
+                    h.getLevel()
+                            .setBlockAndUpdate(part, VigilModule.FEEDER.get().defaultBlockState());
+                })
+                .thenIdle(45)
+                .thenExecute(() -> {
+                    h.assertValueEqual(keeper.getHealth(), 12.5F, "repair stops damage without healing");
+                    h.assertValueEqual(nest.saved().getInt("hungry"), 0, "supplied again");
+                    nest.action(9);
+                    h.assertValueEqual(nest.saved().getFloat("health"), 12.5F, "rest preserves fractional health");
+                    nest.action(9);
+                    VigilKeeper awake =
+                            (VigilKeeper) h.getLevel().getEntity(nest.saved().getUUID("keeper"));
+                    h.assertValueEqual(awake.getHealth(), 12.5F, "waking cannot heal");
+                    var drops = Block.getDrops(
+                            h.getLevel().getBlockState(nest.getBlockPos()),
+                            h.getLevel(),
+                            nest.getBlockPos(),
+                            nest.entity());
+                    var components = ((CompoundTag)
+                                    drops.getFirst().save(h.getLevel().registryAccess()))
+                            .getCompound("components");
+                    h.assertValueEqual(
+                            components
+                                    .getCompound("infestusfrontier:vigil_nest")
+                                    .getFloat("health"),
+                            12.5F,
+                            "carrying preserves injuries");
+                    h.getLevel().removeBlock(nest.getBlockPos(), false);
+                    h.getLevel()
+                            .setBlockAndUpdate(
+                                    nest.getBlockPos(), VigilModule.NEST.get().defaultBlockState());
+                    var placed = h.getLevel().getBlockEntity(nest.getBlockPos());
+                    placed.applyComponents(
+                            drops.getFirst().getComponents(), net.minecraft.core.component.DataComponentPatch.EMPTY);
+                    NestRig moved = new NestRig(placed);
+                    moved.action(9);
+                    h.assertTrue(moved.enabled(), "carried keeper wakes without a second growth charge");
+                    h.assertValueEqual(
+                            ((VigilKeeper) h.getLevel().getEntity(moved.saved().getUUID("keeper"))).getHealth(),
+                            12.5F,
+                            "placing carried nest cannot heal");
+                    moved.action(9);
+                })
+                .thenSucceed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 300)
+    public static void feedingAStarvingKeeperSavesItWithoutHealing(GameTestHelper h) {
+        NestRig nest = nest(h);
+        supply(nest, 10);
+        nest.action(9);
+        VigilKeeper keeper = (VigilKeeper) h.getLevel().getEntity(nest.saved().getUUID("keeper"));
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(keeper.getHealth() < 30, "food ran out"))
+                .thenExecute(() -> {
+                    keeper.setHealth(12.5F);
+                    nest.insert(Biomass.of(10), false);
+                })
+                .thenIdle(40)
+                .thenExecute(() -> {
+                    h.assertTrue(nest.enabled(), "refill saves keeper");
+                    h.assertValueEqual(keeper.getHealth(), 12.5F, "food is not free healing");
+                    h.assertValueEqual(nest.tank().stored().units(), 0, "rescue paid normal upkeep");
+                    nest.action(9);
+                })
+                .thenSucceed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 1400, batch = "vigil_starvation_unload")
+    public static void evenAnInvulnerableKeeperCannotLoadForeverWithoutFood(GameTestHelper h) {
+        ServerLevel level = h.getLevel();
+        BlockPos pos = new BlockPos(830008, 100, 830008);
+        ChunkPos chunk = new ChunkPos(pos);
+        for (int x = -2; x <= 2; x++) for (int z = -2; z <= 2; z++) level.getChunk(chunk.x + x, chunk.z + z);
+        level.setBlockAndUpdate(
+                pos.below(), EcologyModule.LIVING_SUBSTRATE.get().defaultBlockState());
+        for (BlockPos at : BlockPos.betweenClosed(pos, pos.above(5)))
+            level.setBlock(at, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        level.setBlockAndUpdate(pos, VigilModule.NEST.get().defaultBlockState());
+        NestRig nest = new NestRig(level.getBlockEntity(pos));
+        supply(nest, 10);
+        nest.action(9);
+        VigilKeeper keeper = (VigilKeeper) level.getEntity(nest.saved().getUUID("keeper"));
+        keeper.setInvulnerable(true);
+        h.startSequence()
+                .thenWaitUntil(() ->
+                        h.assertTrue(nest.saved().getInt("hungry") >= 40, "remote chunk ticks through food exhaustion"))
+                .thenExecute(() -> {
+                    h.assertTrue(level.hasChunkAt(pos), "emergency tickets keep remote keeper present");
+                    h.assertTrue(nest.enabled(), "not automatically sheltered");
+                })
+                .thenWaitUntil(() ->
+                        h.assertValueEqual(nest.saved().getInt("hungry"), 800, "finite starvation allowance expires"))
+                .thenExecute(() -> {
+                    h.assertTrue(keeper.isAlive() && nest.enabled(), "expiry does not shelter or discard creature");
+                    level.save(null, true, false);
+                })
+                .thenWaitUntil(() -> h.assertFalse(
+                        level.hasChunkAt(pos), "unpaid remote chunk actually unloads despite healing immunity"))
                 .thenSucceed();
     }
 
@@ -268,6 +402,27 @@ public final class VigilTests {
         h.assertTrue(keeper.isRemoved(), "in-place corrupt reload releases the old living service");
         h.assertValueEqual(nest.saved(), raw, "unreadable replacement preserved exactly");
         h.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 1050)
+    public static void replacingAnExpiredHungryNestStillRemovesItsOldKeeper(GameTestHelper h) {
+        NestRig nest = nest(h);
+        supply(nest, 10);
+        nest.action(9);
+        VigilKeeper keeper = (VigilKeeper) h.getLevel().getEntity(nest.saved().getUUID("keeper"));
+        keeper.setInvulnerable(true);
+        h.startSequence()
+                .thenWaitUntil(
+                        () -> h.assertValueEqual(nest.saved().getInt("hungry"), 800, "starvation tickets expired"))
+                .thenExecute(() -> {
+                    h.assertTrue(keeper.isAlive(), "living keeper remains bound without tickets");
+                    CompoundTag raw = nest.saved();
+                    raw.putInt("mask", 0);
+                    nest.loadWithComponents(raw, h.getLevel().registryAccess());
+                    h.assertTrue(keeper.isRemoved(), "in-place replacement cleans old creature even without tickets");
+                    h.assertValueEqual(nest.saved(), raw, "corrupt replacement retained exactly");
+                })
+                .thenSucceed();
     }
 
     @GameTest(template = "empty")

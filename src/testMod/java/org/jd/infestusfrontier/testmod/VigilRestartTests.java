@@ -24,12 +24,14 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jd.infestusfrontier.core.foundation.Biomass;
 import org.jd.infestusfrontier.ecology.EcologyModule;
 import org.jd.infestusfrontier.power.PowerModule;
+import org.jd.infestusfrontier.vigil.VigilKeeper;
 import org.jd.infestusfrontier.vigil.VigilModule;
 
 @GameTestHolder("infestusfrontier_tests")
 @PrefixGameTestTemplate(false)
 public final class VigilRestartTests {
     private static final BlockPos HOME = new BlockPos(918008, 100, 918008);
+    private static final BlockPos STARVING = new BlockPos(928008, 100, 928008);
     private static final BlockPos NETHER = new BlockPos(2584, 100, 2584);
     private static final String PHASE = "infestusfrontier.restart.phase";
 
@@ -44,6 +46,7 @@ public final class VigilRestartTests {
                 pos.below(), EcologyModule.LIVING_SUBSTRATE.get().defaultBlockState());
         level.setBlockAndUpdate(pos, VigilModule.NEST.get().defaultBlockState());
         NestRig nest = new NestRig(level.getBlockEntity(pos));
+        nest.insert(Biomass.of(8000), false);
         nest.seed();
         nest.insert(Biomass.of(16000), false);
         nest.action(9);
@@ -63,6 +66,9 @@ public final class VigilRestartTests {
         ServerLevel nether = h.getLevel().getServer().getLevel(Level.NETHER);
         NestRig home = build(h.getLevel(), HOME);
         NestRig remote = build(nether, NETHER);
+        NestRig sheltered = build(h.getLevel(), HOME.south(6));
+        ((VigilKeeper) h.getLevel().getEntity(sheltered.saved().getUUID("keeper"))).setHealth(12.5F);
+        sheltered.action(9);
         h.assertTrue(home.enabled() && remote.enabled(), "both bases explicitly paid");
         BlockPos core = NETHER.east(4);
         nether.setBlockAndUpdate(
@@ -130,6 +136,17 @@ public final class VigilRestartTests {
                     h.assertTrue(nether.hasChunkAt(NETHER), "Nether loaded only by restored nest tickets");
                 })
                 .thenExecute(() -> {
+                    NestRig sheltered = new NestRig(h.getLevel().getBlockEntity(HOME.south(6)));
+                    h.assertValueEqual(
+                            sheltered.saved().getFloat("health"), 12.5F, "sheltered injuries survive server restart");
+                    sheltered.action(9);
+                    h.assertValueEqual(
+                            ((VigilKeeper) h.getLevel()
+                                            .getEntity(sheltered.saved().getUUID("keeper")))
+                                    .getHealth(),
+                            12.5F,
+                            "waking restored nest cannot heal");
+                    sheltered.action(9);
                     NestRig home = new NestRig(h.getLevel().getBlockEntity(HOME));
                     NestRig remote = new NestRig(nether.getBlockEntity(NETHER));
                     h.assertTrue(home.enabled() && remote.enabled(), "both still paid and active");
@@ -155,6 +172,78 @@ public final class VigilRestartTests {
                             "saved keeper passed startup validation");
                     new NestRig(h.getLevel().getBlockEntity(HOME)).action(9);
                     new NestRig(nether.getBlockEntity(NETHER)).action(9);
+                })
+                .thenSucceed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_restart", template = "empty", timeoutTicks = 280)
+    public static void beforeRestartLeaveAStarvingKeeperAlive(GameTestHelper h) {
+        if (!"before".equals(System.getProperty(PHASE))) {
+            h.succeed();
+            return;
+        }
+        NestRig nest = build(h.getLevel(), STARVING);
+        nest.extract(nest.tank().stored(), false);
+        VigilKeeper keeper = (VigilKeeper) h.getLevel().getEntity(nest.saved().getUUID("keeper"));
+        keeper.setHealth(12.5F);
+        keeper.setInvulnerable(true);
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(
+                        nest.saved().getInt("hungry") >= 40, "starving remote keeper has begun emergency allowance"))
+                .thenExecute(() -> {
+                    Properties evidence = new Properties();
+                    evidence.setProperty("keeper", keeper.getUUID().toString());
+                    evidence.setProperty("hungry", Integer.toString(nest.saved().getInt("hungry")));
+                    try (Writer out = Files.newBufferedWriter(
+                            h.getLevel().getServer().getServerDirectory().resolve("vigil-hunger.properties"))) {
+                        evidence.store(out, "starving keeper, no vanilla force tickets");
+                    } catch (IOException e) {
+                        throw new IllegalStateException(e);
+                    }
+                })
+                .thenSucceed();
+    }
+
+    @GameTest(templateNamespace = "infestusfrontier_restart", template = "empty", timeoutTicks = 340)
+    public static void afterRestartHungerAndInjuriesPersistUntilDeath(GameTestHelper h) {
+        if (!"after".equals(System.getProperty(PHASE))) {
+            h.succeed();
+            return;
+        }
+        Properties evidence = new Properties();
+        try (Reader in = Files.newBufferedReader(
+                h.getLevel().getServer().getServerDirectory().resolve("vigil-hunger.properties"))) {
+            evidence.load(in);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        h.startSequence()
+                .thenWaitUntil(() -> h.assertTrue(
+                        h.getLevel().hasChunkAt(STARVING), "finite emergency tickets restored remote nest"))
+                .thenWaitUntil(() -> h.assertTrue(
+                        h.getLevel().getEntity(java.util.UUID.fromString(evidence.getProperty("keeper")))
+                                instanceof VigilKeeper,
+                        "same saved entity loaded"))
+                .thenExecute(() -> {
+                    NestRig nest = new NestRig(h.getLevel().getBlockEntity(STARVING));
+                    h.assertTrue(
+                            nest.saved().getInt("hungry") >= Integer.parseInt(evidence.getProperty("hungry")) + 40,
+                            "restart consumes emergency allowance instead of resetting it");
+                    VigilKeeper keeper =
+                            (VigilKeeper) h.getLevel().getEntity(nest.saved().getUUID("keeper"));
+                    h.assertValueEqual(keeper.getHealth(), 12.5F, "active injuries survived");
+                    // Startup may already spend most of the finite ticket allowance. Keep this test's
+                    // chunk loaded ordinarily so it can observe damage even after those tickets expire.
+                    ChunkPos chunk = new ChunkPos(STARVING);
+                    h.getLevel().setChunkForced(chunk.x, chunk.z, true);
+                    keeper.setInvulnerable(false);
+                })
+                .thenWaitUntil(() -> h.assertFalse(
+                        new NestRig(h.getLevel().getBlockEntity(STARVING)).egg(),
+                        "restored starvation kills keeper and consumes egg"))
+                .thenExecute(() -> {
+                    ChunkPos chunk = new ChunkPos(STARVING);
+                    h.getLevel().setChunkForced(chunk.x, chunk.z, false);
                 })
                 .thenSucceed();
     }

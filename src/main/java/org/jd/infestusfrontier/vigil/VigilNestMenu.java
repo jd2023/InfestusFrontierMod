@@ -25,12 +25,14 @@ public final class VigilNestMenu extends OrganMenu {
                         () -> nest.enabled() ? 1 : 0,
                         nest::stop,
                         nest::capacity,
-                        () -> nest.egg() ? 1 : 0),
+                        () -> nest.egg() ? 1 : 0,
+                        nest::health,
+                        () -> nest.hungry() ? 1 : 0),
                 Optional.of(nest));
     }
 
     public VigilNestMenu(int id, Inventory inventory, RegistryFriendlyByteBuf extra) {
-        this(id, inventory, at(inventory, extra), new SimpleContainerData(7), Optional.empty());
+        this(id, inventory, at(inventory, extra), new SimpleContainerData(9), Optional.empty());
     }
 
     private VigilNestMenu(
@@ -79,6 +81,14 @@ public final class VigilNestMenu extends OrganMenu {
 
     public int allowance() {
         return synced(5);
+    }
+
+    public int health() {
+        return synced(7);
+    }
+
+    public boolean hungry() {
+        return synced(8) != 0;
     }
 
     public boolean egg() {

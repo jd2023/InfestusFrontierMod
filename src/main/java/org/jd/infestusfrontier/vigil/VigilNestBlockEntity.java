@@ -99,7 +99,7 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
         if (unreadable.isPresent()) return Outcome.refused(Persistence.CORRUPT);
         if (!live()) return Outcome.refused(new org.jd.infestusfrontier.core.foundation.Refusal("vigil.unloaded"));
         if (!simulate && result instanceof Outcome.Done<BiomassTank>(BiomassTank tank)) {
-            contents = new NestContents(tank, mask(), paid(), enabled(), egg(), contents.keeper());
+            contents = contents.withTank(tank);
             setChanged();
         }
         return result;
@@ -107,7 +107,18 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
 
     boolean seed() {
         if (unreadable.isPresent() || egg()) return false;
-        contents = new NestContents(tank(), mask(), 0, false, true, Optional.empty());
+        if (level == null || !Organs.hasFoundation(level, worldPosition)) {
+            stop = 1;
+            return false;
+        }
+        Outcome<BiomassTank> growth = tank().drain(Biomass.of(NestContents.GROWTH_COST));
+        if (!(growth instanceof Outcome.Done<BiomassTank> done)) {
+            stop = 10;
+            return false;
+        }
+        contents =
+                new NestContents(done.value(), mask(), 0, false, true, Optional.empty(), NestContents.FULL_HEALTH, 0);
+        stop = 0;
         setChanged();
         return true;
     }
@@ -134,12 +145,18 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
                 stop = 3;
                 return;
             }
-            contents = new NestContents(tank(), next.mask(), 0, false, egg(), Optional.empty());
+            contents = new NestContents(
+                    tank(), next.mask(), 0, false, egg(), Optional.empty(), contents.health(), contents.hungry());
             stop = 0;
             setChanged();
         } else if (button == 9) {
-            if (enabled()) shutdown(server, false, 0);
-            else start(server);
+            if (enabled()) {
+                if (grace > 0 && contents.keeper().map(server::getEntity).isEmpty()) {
+                    stop = 11;
+                    return;
+                }
+                shutdown(server, false, 0);
+            } else start(server);
         }
     }
 
@@ -179,6 +196,7 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
             stop = 5;
             return;
         }
+        keeper.setHealth(contents.health());
         keeper.bind(worldPosition);
         keeper.setPos(worldPosition.getX() + 0.5, worldPosition.getY() + 2.5, worldPosition.getZ() + 0.5);
         if (!server.addFreshEntity(keeper)) {
@@ -187,7 +205,15 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
             return;
         }
         BiomassTank after = ((Outcome.Done<BiomassTank>) tank().drain(Biomass.of(territory.payment()))).value();
-        contents = new NestContents(after, mask(), Territory.PAYMENT_TICKS, true, true, Optional.of(keeper.getUUID()));
+        contents = new NestContents(
+                after,
+                mask(),
+                Territory.PAYMENT_TICKS,
+                true,
+                true,
+                Optional.of(keeper.getUUID()),
+                NestContents.FULL_HEALTH,
+                0);
         admitted = true;
         tickets.acquire(server, worldPosition, territory);
         stop = 0;
@@ -195,21 +221,28 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
         steward.worked(server, VigilModule.NEST.getId());
     }
 
-    /** Called only by the bounded persisted-ticket validator. Startup uses real prepaid ticks. */
+    /** Startup spends either prepaid time or the finite starvation ticket allowance. */
     boolean resume(Territory territory) {
         if (unreadable.isPresent() || !enabled() || contents.keeper().isEmpty() || mask() != territory.mask())
             return false;
-        int remaining = paid();
-        BiomassTank reserve = tank();
-        if (remaining <= STARTUP_GRACE) {
-            Outcome<BiomassTank> payment = reserve.drain(Biomass.of(territory.payment()));
-            if (!(payment instanceof Outcome.Done<BiomassTank> done)) return false;
-            reserve = done.value();
-            remaining = Territory.PAYMENT_TICKS;
-        }
-        contents = new NestContents(
-                reserve, mask(), Math.subtractExact(remaining, STARTUP_GRACE), true, egg(), contents.keeper());
         grace = STARTUP_GRACE;
+        int remaining = paid();
+        int hungry = contents.hungry();
+        BiomassTank reserve = tank();
+        if (hungry == 0 && remaining <= STARTUP_GRACE) {
+            Outcome<BiomassTank> payment = reserve.drain(Biomass.of(territory.payment()));
+            if (payment instanceof Outcome.Done<BiomassTank> done) {
+                reserve = done.value();
+                remaining = Territory.PAYMENT_TICKS;
+            } else hungry = 1;
+        }
+        if (hungry > 0) {
+            if (hungry > NestContents.HUNGER_TICKETS - STARTUP_GRACE) return false;
+            hungry = Math.addExact(hungry, STARTUP_GRACE);
+        }
+        remaining = Math.max(0, remaining - STARTUP_GRACE);
+        contents =
+                new NestContents(reserve, mask(), remaining, true, egg(), contents.keeper(), contents.health(), hungry);
         admitted = true;
         setChanged();
         return true;
@@ -217,18 +250,6 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
 
     static void tick(Level level, BlockPos pos, BlockState state, VigilNestBlockEntity nest) {
         if (!(level instanceof ServerLevel server) || nest.unreadable.isPresent() || !nest.enabled()) return;
-        if (!nest.admitted) {
-            nest.shutdown(server, false, 6);
-            return;
-        }
-        if (!Organs.hasFoundation(server, pos)) {
-            nest.shutdown(server, false, 1);
-            return;
-        }
-        if (new Territory(nest.mask()).chunks() > nest.capacity()) {
-            nest.shutdown(server, false, 3);
-            return;
-        }
         Entity creature = nest.contents.keeper().map(server::getEntity).orElse(null);
         if (!(creature instanceof VigilKeeper keeper) || !keeper.isAlive() || !keeper.belongsTo(pos)) {
             if (nest.grace > 0 && creature == null) {
@@ -239,20 +260,89 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
             return;
         }
         nest.grace = 0;
+        Territory territory = new Territory(nest.mask());
+        if (!Organs.hasFoundation(server, pos)) {
+            nest.starve(server, keeper, 1);
+            return;
+        }
+        if (territory.chunks() > nest.capacity()) {
+            nest.starve(server, keeper, 3);
+            return;
+        }
         int paid = nest.paid();
         BiomassTank tank = nest.tank();
         if (paid == 0) {
-            Outcome<BiomassTank> payment = tank.drain(Biomass.of(new Territory(nest.mask()).payment()));
+            Outcome<BiomassTank> payment = tank.drain(Biomass.of(territory.payment()));
             if (!(payment instanceof Outcome.Done<BiomassTank> done)) {
-                nest.shutdown(server, false, 4);
+                nest.starve(server, keeper, 4);
                 return;
             }
             tank = done.value();
             paid = Territory.PAYMENT_TICKS;
         }
-        nest.contents =
-                new NestContents(tank, nest.mask(), Math.decrementExact(paid), true, true, nest.contents.keeper());
+        if (!nest.admitted) {
+            VigilTickets tickets = VigilTickets.forLevel(server);
+            if (!tickets.admit(server, pos, territory)) {
+                nest.shutdown(server, false, 6);
+                return;
+            }
+            tickets.acquire(server, pos, territory);
+            nest.admitted = true;
+        }
+        nest.contents = new NestContents(
+                tank,
+                nest.mask(),
+                Math.decrementExact(paid),
+                true,
+                true,
+                nest.contents.keeper(),
+                NestContents.FULL_HEALTH,
+                0);
+        nest.stop = 0;
         nest.setChanged();
+    }
+
+    private void starve(ServerLevel server, VigilKeeper keeper, int reason) {
+        int hungry = Math.min(NestContents.HUNGER_TICKETS, Math.incrementExact(contents.hungry()));
+        contents = new NestContents(
+                tank(),
+                mask(),
+                Math.max(0, paid() - 1),
+                true,
+                true,
+                contents.keeper(),
+                NestContents.FULL_HEALTH,
+                hungry);
+        stop = reason;
+        // World time keeps damage cadence across saves without charging for offline time.
+        if (server.getGameTime() % NestContents.DAMAGE_INTERVAL == 0)
+            keeper.hurt(server.damageSources().starve(), 1);
+        if (!keeper.isAlive()) {
+            shutdown(server, true, 7);
+            return;
+        }
+        // Even external healing cannot turn starvation into an unlimited free loader.
+        if (admitted && hungry >= NestContents.HUNGER_TICKETS) {
+            VigilTickets.forLevel(server).release(server, worldPosition);
+            admitted = false;
+        }
+        setChanged();
+    }
+
+    int health() {
+        return egg() ? (int) Math.ceil(shelteredHealth()) : 0;
+    }
+
+    boolean hungry() {
+        return enabled() && contents.hungry() > 0;
+    }
+
+    private float shelteredHealth() {
+        if (enabled() && level instanceof ServerLevel server) {
+            Entity creature = contents.keeper().map(server::getEntity).orElse(null);
+            if (creature instanceof VigilKeeper keeper && keeper.isAlive()) return keeper.getHealth();
+        }
+        return contents.health();
     }
 
     /** A dead or missing keeper cannot be sheltered by breaking the nest between server ticks. */
@@ -261,17 +351,19 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
         if (!(level instanceof ServerLevel server)) return false;
         Optional<Entity> creature = contents.keeper().map(server::getEntity);
         if (creature.isPresent()) return creature.get().isAlive();
-        return grace > 0 && !server.areEntitiesLoaded(new net.minecraft.world.level.ChunkPos(worldPosition).toLong());
+        return false;
     }
 
     void shutdown(ServerLevel server, boolean dead, int reason) {
         boolean sheltered = !dead && sheltered();
+        float health = shelteredHealth();
         VigilTickets.forLevel(server).release(server, worldPosition);
         contents.keeper()
                 .map(server::getEntity)
                 .filter(entity -> entity instanceof VigilKeeper keeper && keeper.belongsTo(worldPosition))
+                .filter(Entity::isAlive)
                 .ifPresent(Entity::discard);
-        contents = new NestContents(tank(), mask(), 0, false, sheltered, Optional.empty());
+        contents = new NestContents(tank(), mask(), 0, false, sheltered, Optional.empty(), health, contents.hungry());
         admitted = false;
         grace = 0;
         stop = reason;
@@ -280,7 +372,7 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (admitted && level instanceof ServerLevel server) shutdown(server, false, 0);
+        if ((admitted || enabled()) && level instanceof ServerLevel server) shutdown(server, false, 0);
         super.loadAdditional(tag, registries);
         Optional<NestContents> read = Persistence.read(
                 NestContents.CODEC,
@@ -291,6 +383,7 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
                 NestContents::problem);
         unreadable = read.isPresent() ? Optional.empty() : Optional.of(tag.copy());
         contents = read.orElse(NestContents.EMPTY);
+        grace = enabled() ? STARTUP_GRACE : 0;
         steward.load(tag);
     }
 
@@ -312,7 +405,15 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
         else
             components.set(
                     VigilModule.CONTENTS.get(),
-                    new NestContents(tank(), mask(), 0, false, sheltered(), Optional.empty()));
+                    new NestContents(
+                            tank(),
+                            mask(),
+                            0,
+                            false,
+                            sheltered(),
+                            Optional.empty(),
+                            shelteredHealth(),
+                            contents.hungry()));
     }
 
     @Override
@@ -338,7 +439,8 @@ final class VigilNestBlockEntity extends BlockEntity implements MenuProvider, Bi
 
     @Override
     public void removeComponentsFromTag(CompoundTag tag) {
-        for (String key : List.of("tank", "mask", "paid", "enabled", "egg", "keeper")) tag.remove(key);
+        for (String key : List.of("tank", "mask", "paid", "enabled", "egg", "keeper", "health", "hungry"))
+            tag.remove(key);
     }
 
     @Override

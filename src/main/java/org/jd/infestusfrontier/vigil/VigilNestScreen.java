@@ -48,12 +48,17 @@ final class VigilNestScreen extends OrganScreen<VigilNestMenu> {
                 Sheet.LEFT_X,
                 Sheet.ROW2_Y + 72,
                 Sheet.RIGHT_EDGE - Sheet.LEFT_X,
-                () -> menu.stop() != 0
+                () -> menu.hungry()
+                        ? Component.translatable(KEY + "starving", menu.health())
+                        : menu.stop() != 0
+                                ? Component.translatable(KEY + "stop." + menu.stop())
+                                : Component.translatable(
+                                        KEY + "state." + (menu.enabled() ? "active" : menu.egg() ? "resting" : "egg"),
+                                        menu.paid() / 20,
+                                        menu.health()),
+                () -> menu.hungry()
                         ? Component.translatable(KEY + "stop." + menu.stop())
-                        : Component.translatable(
-                                KEY + "state." + (menu.enabled() ? "active" : menu.egg() ? "resting" : "egg"),
-                                menu.paid() / 20),
-                () -> Component.translatable(KEY + "state.story")));
+                        : Component.translatable(KEY + "state.story")));
         add(new Tally(
                 Sheet.LEFT_X,
                 Sheet.ROW2_Y + 61,

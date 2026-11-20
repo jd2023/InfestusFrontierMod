@@ -60,7 +60,7 @@ setblock 23 80 23 infestusfrontier:vigil_feeder
 setblock 22 80 22 infestusfrontier:vigil_feeder
 setblock 22 80 24 infestusfrontier:vigil_feeder
 setblock 22 80 26 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['"VIGIL NEST"','"Egg and biomass in"','"Open: select chunks"','"then Wake"']}}
-setblock 36 80 25 chest{Items:[{Slot:0b,id:"infestusfrontier:thermal_heart",count:1},{Slot:1b,id:"infestusfrontier:heat_collector",count:1},{Slot:2b,id:"infestusfrontier:boiler_chamber",count:1},{Slot:3b,id:"infestusfrontier:generating_chamber",count:1},{Slot:4b,id:"infestusfrontier:pressure_outlet",count:1},{Slot:5b,id:"infestusfrontier:heat_capsule",count:1},{Slot:6b,id:"infestusfrontier:charge_cell",count:1},{Slot:7b,id:"infestusfrontier:vigil_egg",count:1},{Slot:8b,id:"minecraft:water_bucket",count:1},{Slot:9b,id:"infestusfrontier:biomass_bucket",count:1},{Slot:10b,id:"minecraft:diamond_ore",count:16}]}
+setblock 36 80 25 chest{Items:[{Slot:0b,id:"infestusfrontier:thermal_heart",count:1},{Slot:1b,id:"infestusfrontier:heat_collector",count:1},{Slot:2b,id:"infestusfrontier:boiler_chamber",count:1},{Slot:3b,id:"infestusfrontier:generating_chamber",count:1},{Slot:4b,id:"infestusfrontier:pressure_outlet",count:1},{Slot:5b,id:"infestusfrontier:heat_capsule",count:1},{Slot:6b,id:"infestusfrontier:charge_cell",count:1},{Slot:7b,id:"infestusfrontier:vigil_egg",count:1},{Slot:8b,id:"minecraft:water_bucket",count:1},{Slot:9b,id:"infestusfrontier:biomass_bucket",count:1},{Slot:10b,id:"minecraft:diamond_ore",count:16},{Slot:11b,id:"infestusfrontier:biomass_bucket",count:1},{Slot:12b,id:"infestusfrontier:biomass_bucket",count:1},{Slot:13b,id:"infestusfrontier:biomass_bucket",count:1},{Slot:14b,id:"infestusfrontier:biomass_bucket",count:1},{Slot:15b,id:"infestusfrontier:biomass_bucket",count:1},{Slot:16b,id:"infestusfrontier:biomass_bucket",count:1},{Slot:17b,id:"infestusfrontier:biomass_bucket",count:1},{Slot:18b,id:"infestusfrontier:biomass_bucket",count:1}]}
 setblock 36 80 26 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['"SUPPLIES"','"Boilers start full"','"Refill outer faces"','"with water buckets"']}}
 fill 26 79 4 29 83 4 obsidian
 fill 27 80 4 28 82 4 nether_portal[axis=x]
@@ -69,3 +69,5 @@ execute in minecraft:overworld run fill 220 -61 22 228 -61 29 polished_blackston
 execute in minecraft:overworld run fill 222 -61 24 225 -57 24 obsidian
 execute in minecraft:overworld run fill 223 -60 24 224 -58 24 nether_portal[axis=x]
 execute in minecraft:overworld run setblock 221 -60 23 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['"NETHER WORKSHOP"','"Working multiblocks"','"Heat > Steam > FE"','"Step into portal"']}}
+
+setblock 24 80 26 oak_sign[rotation=8]{is_waxed:1b,front_text:{messages:['"KEEP VIGIL FED"','"Starvation kills"','"To grow: an egg"','"and 8,000 BU"']}}

@@ -24,7 +24,7 @@ public final class VigilKeeper extends PathfinderMob {
 
     public static AttributeSupplier.Builder attributes() {
         return PathfinderMob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 30)
+                .add(Attributes.MAX_HEALTH, NestContents.FULL_HEALTH)
                 .add(Attributes.MOVEMENT_SPEED, 0);
     }
 
@@ -39,7 +39,7 @@ public final class VigilKeeper extends PathfinderMob {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) return;
+        if (level().isClientSide || !isAlive()) return;
         if (nest.isEmpty()) {
             discard();
             return;
