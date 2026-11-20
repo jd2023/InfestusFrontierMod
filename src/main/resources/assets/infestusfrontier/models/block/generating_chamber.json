@@ -1,0 +1,68 @@
+{
+  "textures": {
+    "skin": "infestusfrontier:block/generating_chamber",
+    "particle": "infestusfrontier:block/generating_chamber"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 2, 16],
+      "faces": {
+        "up": {
+          "uv": [2.0, 3.875, 4.0, 5.875],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [4.0, 3.875, 6.0, 5.875],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [0.0, 5.875, 2.0, 6.125],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [2.0, 5.875, 4.0, 6.125],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [4.0, 5.875, 6.0, 6.125],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [6.0, 5.875, 8.0, 6.125],
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "from": [0, 2, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "up": {
+          "uv": [2.0, 0.0, 4.0, 2.0],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [4.0, 0.0, 6.0, 2.0],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [0.0, 2.0, 2.0, 3.75],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [2.0, 2.0, 4.0, 3.75],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [4.0, 2.0, 6.0, 3.75],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [6.0, 2.0, 8.0, 3.75],
+          "texture": "#skin"
+        }
+      }
+    }
+  ]
+}

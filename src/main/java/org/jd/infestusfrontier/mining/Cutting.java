@@ -43,10 +43,14 @@ final class Cutting {
      * removing it breaks its piston with drops whatever the update flags, so the piston would drop loose or twice.
      */
     static Verdict judge(Level level, BlockPos cut) {
+        return judge(level, cut, new ItemStack(Items.STONE_PICKAXE));
+    }
+
+    static Verdict judge(Level level, BlockPos cut, ItemStack tool) {
         BlockState state = level.getBlockState(cut);
         if (open(state)) return Verdict.CLEAR;
         if (state.hasBlockEntity() || state.getBlock() instanceof PistonHeadBlock) return Verdict.UNSUPPORTED;
-        if (!withinGrade(state, level, cut)) return Verdict.TOO_HARD;
+        if (!withinGrade(state, level, cut, tool)) return Verdict.TOO_HARD;
         return Verdict.CUTTABLE;
     }
 
@@ -55,18 +59,20 @@ final class Cutting {
         return state.isAir() || state.getBlock() instanceof LiquidBlock;
     }
 
-    /** True for a breakable block a stone pickaxe harvests: one that needs no tool, or one stone is enough for. */
-    static boolean withinGrade(BlockState state, Level level, BlockPos pos) {
+    private static boolean withinGrade(BlockState state, Level level, BlockPos pos, ItemStack tool) {
         return state.getDestroySpeed(level, pos) >= 0
-                && (!state.requiresCorrectToolForDrops()
-                        || new ItemStack(Items.STONE_PICKAXE).isCorrectToolForDrops(state));
+                && (!state.requiresCorrectToolForDrops() || tool.isCorrectToolForDrops(state));
     }
 
     /** The ordinary drops of the block at {@code cut}, rolled once in its real loot context with a stone pickaxe. */
     static List<ItemStack> loot(ServerLevel level, BlockPos cut) {
+        return loot(level, cut, new ItemStack(Items.STONE_PICKAXE));
+    }
+
+    static List<ItemStack> loot(ServerLevel level, BlockPos cut, ItemStack tool) {
         BlockState state = level.getBlockState(cut);
         if (state.isAir()) return List.of();
-        return Block.getDrops(state, level, cut, null, null, new ItemStack(Items.STONE_PICKAXE));
+        return Block.getDrops(state, level, cut, null, null, tool);
     }
 
     /**

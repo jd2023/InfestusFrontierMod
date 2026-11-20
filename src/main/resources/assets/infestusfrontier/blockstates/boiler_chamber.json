@@ -1,0 +1,29 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "infestusfrontier:block/boiler_chamber"
+    },
+    "facing=up": {
+      "model": "infestusfrontier:block/boiler_chamber",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "infestusfrontier:block/boiler_chamber",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "infestusfrontier:block/boiler_chamber",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "infestusfrontier:block/boiler_chamber",
+      "x": 90,
+      "y": 270
+    },
+    "facing=east": {
+      "model": "infestusfrontier:block/boiler_chamber",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

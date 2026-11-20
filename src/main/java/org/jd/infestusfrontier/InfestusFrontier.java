@@ -38,6 +38,8 @@ public final class InfestusFrontier {
         DefenseModule.register(modBus);
         InteractionModule.register(modBus);
         DiscoveryModule.register(modBus);
+        org.jd.infestusfrontier.vigil.VigilModule.register(modBus);
+        org.jd.infestusfrontier.power.PowerModule.register(modBus);
         GuidePages.register(modBus);
     }
 }

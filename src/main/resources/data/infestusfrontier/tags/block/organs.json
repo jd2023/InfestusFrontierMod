@@ -32,6 +32,10 @@
     "infestusfrontier:work_bed",
     "infestusfrontier:collection_cilia",
     "infestusfrontier:structure_grower",
-    "infestusfrontier:dna_bank"
+    "infestusfrontier:dna_bank",
+    "infestusfrontier:vigil_nest",
+    "infestusfrontier:thermal_heart",
+    "infestusfrontier:thermal_receiver",
+    "infestusfrontier:steam_driver"
   ]
 }

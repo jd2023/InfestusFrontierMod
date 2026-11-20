@@ -32,7 +32,7 @@ Not here: the behavior, recipes and numbers of a single block or item. Code, dat
 
 ## Chunks and time
 
-- Never load a chunk to do work. Create no chunk tickets.
+- Never load a chunk to do ordinary work. Only the explicitly built, paid Vigil Nest service may create chunk tickets; its bounded startup validator may load admitted nest owners to check saved supplies. Travel, freight, power and mining never load chunks themselves.
 - Check that a position is loaded before every world read, including indirect ones: the other half of a two-block object, the block a survival check will read.
 - Do not let a block update propagate into an unloaded chunk.
 - Unloaded means paused. Work counts loaded server ticks only. There is no offline catch-up and no burst on load.
@@ -150,6 +150,6 @@ Nothing is duplicated, nothing is lost, and the player is told why work stopped,
 These are intended directions. Each needs a reviewed design under [design/](design/) before work starts.
 
 - **Multiblock organs.** The original core keeps identity, history, branch and contents. Parts are real placed blocks that store only their role and their core. Only the core ticks. All ports share the core's reservations and work budget. A missing or unloaded part pauses the body; it is never dismantled automatically. Rebuilding never resets or duplicates the core.
-- **Chunk loading.** The only acceptable form is a separate, explicit, paid, capped service the player builds. Unattended supply across dimensions can depend on this service. Travel, freight and mining routes never load chunks themselves. Unloaded systems still pause without offline work or catch-up.
+- **Unattended cross-dimension supply.** Connections may depend on the explicit paid chunk-loading service. Unloaded systems still pause without offline work or catch-up.
 - **Freight between sites.** A reserved batch with one accounted owner that waits locally until both ends are loaded. This is a different model from the passive vein network. Each base runs on local production and does not need another base loaded.
 - **Ownership.** The steward decides credit only. There is no access or team model yet; do not assume one.

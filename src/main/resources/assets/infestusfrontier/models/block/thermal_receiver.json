@@ -1,0 +1,98 @@
+{
+  "textures": {
+    "skin": "infestusfrontier:block/thermal_receiver",
+    "particle": "infestusfrontier:block/thermal_receiver"
+  },
+  "elements": [
+    {
+      "from": [1, 0, 1],
+      "to": [15, 2, 15],
+      "faces": {
+        "up": {
+          "uv": [7.875, 0.0, 9.625, 1.75],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [9.625, 0.0, 11.375, 1.75],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [6.125, 1.75, 7.875, 2.0],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [7.875, 1.75, 9.625, 2.0],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [9.625, 1.75, 11.375, 2.0],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [11.375, 1.75, 13.125, 2.0],
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "from": [2, 2, 2],
+      "to": [14, 10, 14],
+      "faces": {
+        "up": {
+          "uv": [1.5, 0.0, 3.0, 1.5],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [3.0, 0.0, 4.5, 1.5],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [0.0, 1.5, 1.5, 2.5],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [1.5, 1.5, 3.0, 2.5],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [3.0, 1.5, 4.5, 2.5],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [4.5, 1.5, 6.0, 2.5],
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "from": [4, 10, 4],
+      "to": [12, 15, 12],
+      "faces": {
+        "up": {
+          "uv": [1.0, 2.625, 2.0, 3.625],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [2.0, 2.625, 3.0, 3.625],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [0.0, 3.625, 1.0, 4.25],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [1.0, 3.625, 2.0, 4.25],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [2.0, 3.625, 3.0, 4.25],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [3.0, 3.625, 4.0, 4.25],
+          "texture": "#skin"
+        }
+      }
+    }
+  ]
+}

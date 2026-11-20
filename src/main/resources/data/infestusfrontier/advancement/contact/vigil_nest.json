@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/organ_bud",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:vigil_nest"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.vigil_nest.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.vigil_nest.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "worked": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:vigil_nest"
+      }
+    }
+  }
+}

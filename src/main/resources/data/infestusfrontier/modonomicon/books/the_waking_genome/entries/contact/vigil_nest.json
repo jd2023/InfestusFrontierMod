@@ -1,0 +1,48 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.vigil_nest.name",
+  "description": "entry.infestusfrontier.contact.vigil_nest.description",
+  "icon": "infestusfrontier:vigil_nest",
+  "x": -10,
+  "y": 18,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/organ_bud"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:advancement",
+    "advancement_id": "infestusfrontier:contact/organ_bud"
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.vigil_nest.title0",
+      "text": "entry.infestusfrontier.contact.vigil_nest.text0"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.vigil_nest.title1",
+      "text": "entry.infestusfrontier.contact.vigil_nest.text1"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.vigil_nest.title2",
+      "text": "entry.infestusfrontier.contact.vigil_nest.text2"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.vigil_nest.title3",
+      "text": "entry.infestusfrontier.contact.vigil_nest.text3"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:vigil_nest",
+      "recipe_id_2": "infestusfrontier:vigil_feeder"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:vigil_egg"
+    }
+  ]
+}

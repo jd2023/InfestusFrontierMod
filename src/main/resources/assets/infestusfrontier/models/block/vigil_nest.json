@@ -1,0 +1,68 @@
+{
+  "textures": {
+    "skin": "infestusfrontier:block/vigil_nest",
+    "particle": "infestusfrontier:block/vigil_nest"
+  },
+  "elements": [
+    {
+      "from": [1, 0, 1],
+      "to": [15, 3, 15],
+      "faces": {
+        "up": {
+          "uv": [1.75, 0.0, 3.5, 1.75],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [3.5, 0.0, 5.25, 1.75],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [0.0, 1.75, 1.75, 2.125],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [1.75, 1.75, 3.5, 2.125],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [3.5, 1.75, 5.25, 2.125],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [5.25, 1.75, 7.0, 2.125],
+          "texture": "#skin"
+        }
+      }
+    },
+    {
+      "from": [3, 3, 3],
+      "to": [13, 8, 13],
+      "faces": {
+        "up": {
+          "uv": [8.375, 0.0, 9.625, 1.25],
+          "texture": "#skin"
+        },
+        "down": {
+          "uv": [9.625, 0.0, 10.875, 1.25],
+          "texture": "#skin"
+        },
+        "east": {
+          "uv": [7.125, 1.25, 8.375, 1.875],
+          "texture": "#skin"
+        },
+        "north": {
+          "uv": [8.375, 1.25, 9.625, 1.875],
+          "texture": "#skin"
+        },
+        "west": {
+          "uv": [9.625, 1.25, 10.875, 1.875],
+          "texture": "#skin"
+        },
+        "south": {
+          "uv": [10.875, 1.25, 12.125, 1.875],
+          "texture": "#skin"
+        }
+      }
+    }
+  ]
+}

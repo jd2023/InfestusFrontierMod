@@ -1,0 +1,29 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "infestusfrontier:block/pressure_outlet"
+    },
+    "facing=up": {
+      "model": "infestusfrontier:block/pressure_outlet",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "infestusfrontier:block/pressure_outlet",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "infestusfrontier:block/pressure_outlet",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "infestusfrontier:block/pressure_outlet",
+      "x": 90,
+      "y": 270
+    },
+    "facing=east": {
+      "model": "infestusfrontier:block/pressure_outlet",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

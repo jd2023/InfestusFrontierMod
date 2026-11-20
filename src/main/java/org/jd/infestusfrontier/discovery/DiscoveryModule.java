@@ -77,6 +77,35 @@ public final class DiscoveryModule {
                         output.accept(MiningModule.ROOT_CELL_ITEM.get());
                         output.accept(MiningModule.ROOT_TREAD_ITEM.get());
                         output.accept(MiningModule.FRACTURE_JAW_ITEM.get());
+                        output.accept(org.jd.infestusfrontier.vigil.VigilModule.NEST_ITEM.get());
+                        output.accept(org.jd.infestusfrontier.vigil.VigilModule.FEEDER_ITEM.get());
+                        output.accept(org.jd.infestusfrontier.vigil.VigilModule.EGG.get());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.HEART
+                                .get()
+                                .asItem());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.RECEIVER
+                                .get()
+                                .asItem());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.DRIVER
+                                .get()
+                                .asItem());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.COLLECTOR
+                                .get()
+                                .asItem());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.BOILER
+                                .get()
+                                .asItem());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.GENERATOR
+                                .get()
+                                .asItem());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.OUTLET
+                                .get()
+                                .asItem());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.HEAT_CAPSULE.get());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.HOT_CAPSULE.get());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.CELL.get());
+                        output.accept(org.jd.infestusfrontier.power.PowerModule.CHARGED_CELL.get());
+
                         output.accept(MiningModule.WORK_BED_ITEM.get());
                         output.accept(MiningModule.COLLECTION_CILIA_ITEM.get());
                         output.accept(MiningModule.SURVEYED_TISSUE_ITEM.get());

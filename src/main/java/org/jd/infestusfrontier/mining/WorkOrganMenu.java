@@ -26,7 +26,12 @@ import org.jd.infestusfrontier.logistics.api.ItemAccess;
 public final class WorkOrganMenu extends OrganMenu {
     /** Which organ the screen shows. */
     public enum Kind {
-        JAW(Fracturing.STOPS),
+        JAW(Stream.concat(
+                        Fracturing.STOPS.stream(),
+                        Stream.of(
+                                org.jd.infestusfrontier.power.api.SteamDrive.NO_STEAM,
+                                org.jd.infestusfrontier.power.api.SteamDrive.UNROOTED))
+                .toList()),
         CILIA(Stream.concat(
                         Collecting.STOPS.stream(),
                         Stream.of(

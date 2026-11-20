@@ -1,0 +1,68 @@
+{
+  "category": "infestusfrontier:contact",
+  "name": "entry.infestusfrontier.contact.nether_power.name",
+  "description": "entry.infestusfrontier.contact.nether_power.description",
+  "icon": "infestusfrontier:thermal_heart",
+  "x": -8,
+  "y": 18,
+  "parents": [
+    {
+      "entry": "infestusfrontier:contact/organ_bud"
+    }
+  ],
+  "condition": {
+    "type": "modonomicon:advancement",
+    "advancement_id": "infestusfrontier:contact/organ_bud"
+  },
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.nether_power.title0",
+      "text": "entry.infestusfrontier.contact.nether_power.text0"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.nether_power.title1",
+      "text": "entry.infestusfrontier.contact.nether_power.text1"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.nether_power.title2",
+      "text": "entry.infestusfrontier.contact.nether_power.text2"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.nether_power.title3",
+      "text": "entry.infestusfrontier.contact.nether_power.text3"
+    },
+    {
+      "type": "modonomicon:text",
+      "title": "entry.infestusfrontier.contact.nether_power.title4",
+      "text": "entry.infestusfrontier.contact.nether_power.text4"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:thermal_heart",
+      "recipe_id_2": "infestusfrontier:heat_collector"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:thermal_receiver",
+      "recipe_id_2": "infestusfrontier:boiler_chamber"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:pressure_outlet",
+      "recipe_id_2": "infestusfrontier:generating_chamber"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:steam_driver",
+      "recipe_id_2": "infestusfrontier:heat_capsule"
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "recipe_id_1": "infestusfrontier:charge_cell"
+    }
+  ]
+}

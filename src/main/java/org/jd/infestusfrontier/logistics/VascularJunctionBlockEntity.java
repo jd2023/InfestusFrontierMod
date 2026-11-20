@@ -72,10 +72,10 @@ final class VascularJunctionBlockEntity extends BlockEntity
         super(LogisticsModule.VASCULAR_JUNCTION_ENTITY.get(), pos, state);
     }
 
-    /** A fluid cool enough for unlined tissue: water, biomass, not lava. */
+    /** Sealed tissue carries liquids and steam below its heat limit, never lava. */
     static boolean isCool(FluidStack stack) {
         FluidType type = stack.getFluidType();
-        return !type.isLighterThanAir() && type.getTemperature(stack) < HOT_KELVIN;
+        return type.getTemperature(stack) < HOT_KELVIN;
     }
 
     Port port(Direction side) {

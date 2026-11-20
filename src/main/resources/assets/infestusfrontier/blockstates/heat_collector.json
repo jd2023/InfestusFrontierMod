@@ -1,0 +1,29 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "infestusfrontier:block/heat_collector"
+    },
+    "facing=up": {
+      "model": "infestusfrontier:block/heat_collector",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "infestusfrontier:block/heat_collector",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "infestusfrontier:block/heat_collector",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "infestusfrontier:block/heat_collector",
+      "x": 90,
+      "y": 270
+    },
+    "facing=east": {
+      "model": "infestusfrontier:block/heat_collector",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

@@ -274,7 +274,8 @@ tasks.named('runGameTestServer') {
 def restartLog = layout.projectDirectory.file('runs/gametest-restart/logs/latest.log')
 def resetGameTestRestart = tasks.register('resetGameTestRestart', Delete) {
     delete layout.projectDirectory.dir('runs/gametest-restart/world'),
-            layout.projectDirectory.file('runs/gametest-restart/gallery-restart.properties')
+            layout.projectDirectory.file('runs/gametest-restart/gallery-restart.properties'),
+            layout.projectDirectory.file('runs/gametest-restart/vigil-restart.properties')
 }
 def prepareGameTestRestart = tasks.register('prepareGameTestRestart', Copy) {
     dependsOn resetGameTestRestart

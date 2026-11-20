@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "infestusfrontier:membrane_sheet"
+    },
+    {
+      "item": "minecraft:bowl"
+    },
+    {
+      "item": "infestusfrontier:root_segment"
+    }
+  ],
+  "result": {
+    "id": "infestusfrontier:vigil_feeder",
+    "count": 1
+  }
+}

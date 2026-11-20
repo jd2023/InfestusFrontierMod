@@ -13,6 +13,8 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,6 +29,7 @@ import org.jd.infestusfrontier.organ.OrganModule;
 import org.jd.infestusfrontier.organ.api.Organs;
 import org.jd.infestusfrontier.organ.api.Steward;
 import org.jd.infestusfrontier.organ.api.Stewarded;
+import org.jd.infestusfrontier.power.api.SteamDrive;
 import org.jd.infestusfrontier.storage.api.BiomassHandler;
 
 /**
@@ -122,7 +125,11 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
 
     private void tryCut(ServerLevel level, BlockPos pos, Direction facing) {
         BlockPos back = pos.relative(facing.getOpposite());
-        Outcome<BlockPos> judged = judge(level, pos, pos.relative(facing), back);
+        Optional<SteamDrive> drive = drive(level, pos);
+        boolean powered = drive.filter(value -> value.pay(true) instanceof Outcome.Done<?>)
+                .isPresent();
+        ItemStack tool = new ItemStack(powered ? Items.IRON_PICKAXE : Items.STONE_PICKAXE);
+        Outcome<BlockPos> judged = judge(level, pos, pos.relative(facing), back, tool, drive);
         if (judged instanceof Outcome.Refused<BlockPos>(Refusal why)) {
             stopped(why);
             return;
@@ -131,9 +138,13 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
         // admitted before the roll, so a cut over the shared limit rolls nothing
         if (!level.getData(MiningModule.JAW_CUTS).take(level.getGameTime())) return;
         WorkBedBlockEntity bed = (WorkBedBlockEntity) level.getBlockEntity(back);
-        Optional<WorkBedContents> after = bed.with(Cutting.loot(level, cut));
+        Optional<WorkBedContents> after = bed.with(Cutting.loot(level, cut, tool));
         if (after.isEmpty()) {
             stopped(Fracturing.BED_FULL);
+            return;
+        }
+        if (powered && drive.get().pay(false) instanceof Outcome.Refused<Integer>(Refusal why)) {
+            stopped(why);
             return;
         }
         level.destroyBlock(cut, false);
@@ -152,9 +163,15 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
 
     /**
      * The block the jaw at {@code pos} is to cut into the bed at {@code back} now: {@code front}, or the block the
-     * Rootstock or gallery face standing there orders; or why it cannot cut. Reads loaded positions only and changes nothing.
+     * Rootstock or gallery face standing there orders; or why it cannot cut. Reads loaded positions only; requesting an ordered cut advances the minehead’s shared turn once.
      */
-    private Outcome<BlockPos> judge(ServerLevel level, BlockPos pos, BlockPos front, BlockPos back) {
+    private Outcome<BlockPos> judge(
+            ServerLevel level,
+            BlockPos pos,
+            BlockPos front,
+            BlockPos back,
+            ItemStack tool,
+            Optional<SteamDrive> drive) {
         if (!Organs.hasFoundation(level, pos)) return Outcome.refused(Fracturing.UNROOTED);
         if (!Cutting.loaded(level, pos, REACH)) return Outcome.refused(Fracturing.UNLOADED);
         if (!(level.getBlockEntity(back) instanceof WorkBedBlockEntity bed) || bed.unreadable())
@@ -168,15 +185,34 @@ final class FractureJawBlockEntity extends BlockEntity implements BiomassHandler
         else target = Outcome.done(front);
         if (!(target instanceof Outcome.Done<BlockPos>(BlockPos cut))) return target;
         if (!Cutting.loaded(level, cut, CUT_REACH)) return Outcome.refused(Fracturing.UNLOADED);
-        Optional<Refusal> verdict = switch (Cutting.judge(level, cut)) {
+        Optional<Refusal> verdict = switch (Cutting.judge(level, cut, tool)) {
             case CUTTABLE -> Optional.empty();
             case CLEAR -> Optional.of(Fracturing.NOTHING);
             case UNSUPPORTED -> Optional.of(Fracturing.UNSUPPORTED);
-            case TOO_HARD -> Optional.of(Fracturing.TOO_HARD);
+            case TOO_HARD -> {
+                if (drive.isPresent()
+                        && Cutting.judge(level, cut, new ItemStack(Items.IRON_PICKAXE)) == Cutting.Verdict.CUTTABLE
+                        && drive.get().pay(true) instanceof Outcome.Refused<Integer>(Refusal supply))
+                    yield Optional.of(supply);
+                yield Optional.of(Fracturing.TOO_HARD);
+            }
         };
         if (verdict.isPresent()) return Outcome.refused(verdict.get());
         if (Cutting.touchesFragile(level, cut)) return Outcome.refused(Fracturing.FRAGILE);
         return target;
+    }
+
+    private static Optional<SteamDrive> drive(ServerLevel level, BlockPos pos) {
+        Optional<SteamDrive> empty = Optional.empty();
+        for (Direction side : Direction.values()) {
+            BlockPos at = pos.relative(side);
+            if (!level.hasChunkAt(at)) continue;
+            SteamDrive drive = level.getCapability(SteamDrive.BLOCK, at, side.getOpposite());
+            if (drive == null) continue;
+            if (drive.pay(true) instanceof Outcome.Done<?>) return Optional.of(drive);
+            empty = Optional.of(drive);
+        }
+        return empty;
     }
 
     // ---- saved state ----

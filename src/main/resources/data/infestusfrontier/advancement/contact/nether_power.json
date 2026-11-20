@@ -1,0 +1,23 @@
+{
+  "parent": "infestusfrontier:contact/organ_bud",
+  "display": {
+    "icon": {
+      "id": "infestusfrontier:thermal_heart"
+    },
+    "title": {
+      "translate": "advancement.infestusfrontier.contact.nether_power.title"
+    },
+    "description": {
+      "translate": "advancement.infestusfrontier.contact.nether_power.description"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "worked": {
+      "trigger": "infestusfrontier:automatic_work",
+      "conditions": {
+        "organ": "infestusfrontier:thermal_heart"
+      }
+    }
+  }
+}

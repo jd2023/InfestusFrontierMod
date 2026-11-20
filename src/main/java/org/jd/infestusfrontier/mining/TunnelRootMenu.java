@@ -78,6 +78,9 @@ public final class TunnelRootMenu extends OrganMenu {
                     Rootstocking.STOPS,
                     Galleries.STOPS,
                     Fracturing.STOPS,
+                    List.of(
+                            org.jd.infestusfrontier.power.api.SteamDrive.NO_STEAM,
+                            org.jd.infestusfrontier.power.api.SteamDrive.UNROOTED),
                     Surveying.STOPS,
                     WorkOrganMenu.Kind.CILIA.stops)
             .flatMap(List::stream)

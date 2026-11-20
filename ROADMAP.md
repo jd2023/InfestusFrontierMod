@@ -96,11 +96,15 @@ The player builds a second, larger base where heat is free. It gives heat-proof 
 Paid chunk loading arrives with steam, before heavy mining, so the Nether
 supply base can work while the player is elsewhere. It is a separate, supplied
 service with a bounded area; miners and transport never load chunks themselves.
-Its energy cost, area limit and restart reserve still need design. The early
-energy connection between dimensions also needs design; loading alone does not
-move energy.
+Task 90 delivers the approved nest-and-creature service and Nether power
+plant. The guide owns its current costs, limits and operation. Energy capsules
+travel through ordinary portals first; automated portal exchange remains planned.
+Aura districts remain undecided. The owner brought this power and loading work
+forward; local Nether food and heat-proof materials remain later work.
+Steam now upgrades the existing jaw. The complete heavy-mining route in MINE-5
+and the first electrical consumer in POWER-1 remain unfinished.
 
-Design gap: what the player makes here that is worth staying for, and how the base feeds itself, are not designed. Settle both before NETHER-1.
+Design gap: renewable local food and water, heat-proof materials and later exports still need design before NETHER-1. Nether heat and power are the first implemented exports.
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
@@ -108,8 +112,8 @@ Design gap: what the player makes here that is worth staying for, and how the ba
 | 26 | NETHER-2 | Grow a heat-proof lining that can only be made in the Nether | A batch is made from local fungus and local heat | NETHER-1 | none |
 | 27 | WOOD-4 | Grow wood in the Nether from giant fungus | A Nether grove supplies stems with no logs brought from the Overworld | WOOD-2, NETHER-1 | none |
 | 28 | NETHER-3 | Rebuild the furnace into a hotter one that makes hardened plates and smelts faster | A hardened plate is made; the furnace keeps its experience and path | NETHER-2, EVOLVE-1 | none |
-| 29 | NETHER-4 | Boil water with lava to make steam and run a machine on it | One machine runs on steam; closing the outlet triggers the pressure relief instead of a failure | NETHER-2 | none |
-| 30 | LINK-4 | Keep a chosen Nether supply outpost running while working in another dimension, for a running cost | Only the chosen capped area stays loaded; its plant works and pays locally while the player is in the Overworld; unpaid loading stops, and paid loading restores correctly after a server restart | NETHER-4 | none |
+| 29 | NETHER-4 | Boil water with lava to make steam and run a machine on it | One machine runs on steam; full stores pause production without losing inputs | NETHER-2 | done |
+| 30 | LINK-4 | Keep a chosen Nether supply outpost running while working in another dimension, for a running cost | Only the chosen capped area stays loaded; its plant works and pays locally while the player is in the Overworld; unpaid loading stops, and paid loading restores correctly after a server restart | NETHER-4 | done |
 | 31 | NETHER-5 | Research Nether creatures' DNA in a lab built in the Nether | One Nether species is fully researched there | NETHER-1, GENE-1 | none |
 | 32 | MINE-5 | Cut hard rock that the first cutter cannot, using a steam-driven cutter | A staircase mine passes through rock that stopped MINE-3 | MINE-3, NETHER-4 | none |
 | 33 | MINE-6 | Sink a vertical shaft on a platform that lowers itself and carries the player | A supplied multiblock digs a shaft to a marked depth and installs lights and climbing access; the player rides down and climbs out | MINE-5 | none |
@@ -125,7 +129,7 @@ Open decision for POWER-5: whether a vessel ruptures at random or fails visibly 
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
-| 37 | POWER-1 | Generate electricity from biomass, carry it through the base, store it and run one machine on it | A machine runs from stored charge after the generator is turned off, then stops when the charge is gone | BASE-3 | none |
+| 37 | POWER-1 | Expand the Nether steam plant into electrical generation, carry and store charge, and run one machine on it | A machine runs from stored charge after the generator is turned off, then stops when the charge is gone | BASE-3 | none |
 | 38 | POWER-2 | Get more metal from each ore by adding an electric separation step | The same ore gives more ingots with the step than without; the step costs electricity, water and waste space, and skipping it stays cheaper per ingot | POWER-1, BASE-4, NETHER-3 | none |
 | 39 | POWER-3 | Get more DNA progress from each sample by adding an electric reading step | The same sample gives more research progress with the step than without | POWER-1, GENE-1 | none |
 | 40 | POWER-4 | Start and stop machines on a schedule and read the factory's state on a display | A line runs only in its set window; a display shows which store is full and which machine is blocked | POWER-1 | none |
