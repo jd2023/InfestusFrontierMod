@@ -5,7 +5,10 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.StairBlock;
 import org.jd.infestusfrontier.core.mining.GrowerProgress;
 import org.jd.infestusfrontier.core.mining.Surveying;
 
@@ -62,13 +65,33 @@ record StructureGrowerContents(
     Optional<String> problem() {
         if (!segments.isEmpty() && (!segments.is(MiningModule.ROOT_SEGMENT.get()) || over(segments)))
             return Optional.of("segments " + segments);
-        if (!treads.isEmpty() && (!StructureGrowerBlockEntity.tread(treads) || over(treads)))
-            return Optional.of("treads " + treads);
-        if (!lights.isEmpty() && (!StructureGrowerBlockEntity.light(lights) || over(lights)))
-            return Optional.of("lights " + lights);
-        if (!ribs.isEmpty() && (!StructureGrowerBlockEntity.rib(ribs) || over(ribs)))
-            return Optional.of("ribs " + ribs);
+        if (!treads.isEmpty() && (!tread(treads) || over(treads))) return Optional.of("treads " + treads);
+        if (!lights.isEmpty() && (!light(lights) || over(lights))) return Optional.of("lights " + lights);
+        if (!ribs.isEmpty() && (!rib(ribs) || over(ribs))) return Optional.of("ribs " + ribs);
         return Optional.empty();
+    }
+
+    /** True for stairs a grower lays as treads: tagged, a plain stair block with no block entity. */
+    static boolean tread(ItemStack stack) {
+        return stack.is(MiningModule.MINE_TREADS)
+                && stack.getItem() instanceof BlockItem item
+                && item.getBlock() instanceof StairBlock
+                && !item.getBlock().defaultBlockState().hasBlockEntity();
+    }
+
+    /** True for what a grower lights a step with: a torch, or what it grows a Lumen Node from. */
+    static boolean light(ItemStack stack) {
+        return stack.is(Items.TORCH) || stack.is(MiningModule.LIVING_LIGHTS);
+    }
+
+    /** True for what a grower frames a step with, one a column: Bone Plates. */
+    static boolean rib(ItemStack stack) {
+        return stack.is(MiningModule.MINE_RIBS);
+    }
+
+    /** True for what the grower takes from a hand. */
+    static boolean loads(ItemStack stack) {
+        return stack.is(MiningModule.ROOT_SEGMENT.get()) || tread(stack) || light(stack) || rib(stack);
     }
 
     private static boolean over(ItemStack stack) {

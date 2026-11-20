@@ -81,19 +81,19 @@ public final class StructureGrowerMenu extends OrganMenu {
         addSlot(new SlotItemHandler(treads, 0, Sheet.SLOT_X + PITCH, Sheet.SLOT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return StructureGrowerBlockEntity.tread(stack) && super.mayPlace(stack);
+                return StructureGrowerContents.tread(stack) && super.mayPlace(stack);
             }
         });
         addSlot(new SlotItemHandler(lights, 0, Sheet.SLOT_X + 2 * PITCH, Sheet.SLOT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return StructureGrowerBlockEntity.light(stack) && super.mayPlace(stack);
+                return StructureGrowerContents.light(stack) && super.mayPlace(stack);
             }
         });
         addSlot(new SlotItemHandler(ribs, 0, Sheet.SLOT_X + 3 * PITCH, Sheet.SLOT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return StructureGrowerBlockEntity.rib(stack) && super.mayPlace(stack);
+                return StructureGrowerContents.rib(stack) && super.mayPlace(stack);
             }
         });
         addPlayer(inventory, STRIPS);
@@ -104,7 +104,7 @@ public final class StructureGrowerMenu extends OrganMenu {
         reads[STOP] = () ->
                 grower.stop().map(stop -> Surveying.STOPS.indexOf(stop) + 1).orElse(0);
         reads[BUILT] = () -> grower.survey().map(Survey::built).orElse(0);
-        reads[STEPS] = () -> grower.survey().map(s -> s.plan().steps().size()).orElse(0);
+        reads[STEPS] = () -> grower.survey().map(s -> s.plan().stepCount()).orElse(0);
         reads[GROWN] = () -> Math.min(Short.MAX_VALUE, grower.progress().steps());
         reads[SECONDS] =
                 () -> (Surveying.GROW_TICKS - grower.progress().ticks() + TICKS_PER_SECOND - 1) / TICKS_PER_SECOND;

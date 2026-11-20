@@ -58,6 +58,11 @@ public record MinePlan(PlanShape shape, int length, Turn first, Turn second, boo
 
     // ---- geometry ----
 
+    /** Number of construction steps, including a staircase's landing, without generating their geometry. */
+    public int stepCount() {
+        return shape == PlanShape.STAIRCASE ? length + 1 : length;
+    }
+
     /** Every step in building order. */
     public List<PlanStep> steps() {
         return shape == PlanShape.STAIRCASE

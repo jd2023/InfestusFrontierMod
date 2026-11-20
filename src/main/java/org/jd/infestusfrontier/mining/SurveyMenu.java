@@ -143,13 +143,8 @@ public final class SurveyMenu extends OrganMenu {
 
     /** Where the plan as last synced ends in the world: its landing or its last cell. */
     public Optional<BlockPos> end() {
-        return survey().map(survey -> {
-            Direction forward = facing();
-            var end = survey.plan().end();
-            return pos().relative(forward, end.forward())
-                    .relative(forward.getClockWise(), end.right())
-                    .above(end.up());
-        });
+        return survey().map(survey ->
+                MiningDirections.at(pos(), facing(), survey.plan().end()));
     }
 
     /** The marker's position. */

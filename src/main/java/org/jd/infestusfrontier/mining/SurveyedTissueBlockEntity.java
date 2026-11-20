@@ -50,11 +50,7 @@ final class SurveyedTissueBlockEntity extends BlockEntity implements MenuProvide
 
     /** Where {@code offset} of the plan lies in the world. */
     BlockPos at(Offset offset) {
-        Direction forward = facing();
-        return worldPosition
-                .relative(forward, offset.forward())
-                .relative(forward.getClockWise(), offset.right())
-                .above(offset.up());
+        return MiningDirections.at(worldPosition, facing(), offset);
     }
 
     /** Changes the draft as {@code player} asked, or shows them why not. */

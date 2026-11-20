@@ -132,7 +132,7 @@ final class SurveyScreen extends OrganScreen<SurveyMenu> {
     }
 
     private static Component status(Survey survey) {
-        int steps = survey.plan().steps().size();
+        int steps = survey.plan().stepCount();
         if (!survey.approved()) return Component.translatable(KEY + "draft");
         if (survey.finished()) return Component.translatable(KEY + "finished", steps);
         return Component.translatable(KEY + "approved", survey.built(), steps);

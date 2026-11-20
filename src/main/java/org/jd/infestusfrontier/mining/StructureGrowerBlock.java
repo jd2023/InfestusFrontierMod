@@ -96,7 +96,7 @@ public final class StructureGrowerBlock extends MiningOrganBlock {
             InteractionHand hand,
             BlockHitResult hit) {
         if (level.getBlockEntity(pos) instanceof StructureGrowerBlockEntity grower
-                && StructureGrowerBlockEntity.loads(stack)) {
+                && StructureGrowerContents.loads(stack)) {
             if (!level.isClientSide) grower.load(player, hand);
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }

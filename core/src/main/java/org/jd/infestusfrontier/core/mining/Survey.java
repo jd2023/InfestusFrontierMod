@@ -10,7 +10,7 @@ public record Survey(MinePlan plan, boolean approved, int built) {
     public static final Survey START = new Survey(MinePlan.START, false, 0);
 
     public Survey {
-        if (built < 0 || built > plan.steps().size()) throw new IllegalArgumentException("Built: " + built);
+        if (built < 0 || built > plan.stepCount()) throw new IllegalArgumentException("Built: " + built);
         if (built > 0 && !approved) throw new IllegalArgumentException("Built on a draft");
     }
 
@@ -28,7 +28,7 @@ public record Survey(MinePlan plan, boolean approved, int built) {
 
     /** True when every step of an approved plan is built. */
     public boolean finished() {
-        return approved && built == plan.steps().size();
+        return approved && built == plan.stepCount();
     }
 
     /** The next step to build. Only for an approved plan that is not finished. */

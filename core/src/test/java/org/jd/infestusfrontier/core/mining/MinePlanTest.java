@@ -23,6 +23,22 @@ class MinePlanTest {
     }
 
     @Test
+    void stepCountsMatchGeometryAcrossLengthsWidthsAndTurns() {
+        for (int depth = 1; depth <= Surveying.MAX_DEPTH; depth++) {
+            MinePlan plan = stairs(depth);
+            assertEquals(plan.steps().size(), plan.stepCount(), "includes the landing: " + plan);
+        }
+        for (int length = 1; length <= Surveying.MAX_ROUTE_LENGTH; length++) {
+            List<Turn> turns = length == 1
+                    ? List.of(Turn.NONE)
+                    : List.of(Turn.NONE, new Turn(Steer.LEFT, 1), new Turn(Steer.RIGHT, 1));
+            for (Turn turn : turns)
+                for (MinePlan plan : List.of(route(length, turn, Turn.NONE), wide(length, turn, Turn.NONE)))
+                    assertEquals(plan.steps().size(), plan.stepCount(), plan.toString());
+        }
+    }
+
+    @Test
     void aStaircaseDescendsOneBlockAStepToALandingItsDepthBelowTheMarker() {
         List<PlanStep> steps = stairs(3).steps();
         assertEquals(4, steps.size(), "three treads and a landing");

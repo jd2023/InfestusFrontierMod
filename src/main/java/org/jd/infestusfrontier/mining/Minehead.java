@@ -282,7 +282,7 @@ final class Minehead {
         BlockPos growerAt = marker.getBlockPos().above();
         Optional<Survey> survey = marker.survey();
         int built = survey.map(Survey::built).orElse(0);
-        int steps = survey.map(s -> s.plan().steps().size()).orElse(0);
+        int steps = survey.map(s -> s.plan().stepCount()).orElse(0);
         boolean wide = survey.map(s -> s.plan().wide()).orElse(false);
         Outcome<Face> found = face(level, marker);
         if (found instanceof Outcome.Refused<Face>(Refusal why))

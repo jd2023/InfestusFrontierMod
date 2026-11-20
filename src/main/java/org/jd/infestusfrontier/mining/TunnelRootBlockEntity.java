@@ -383,7 +383,7 @@ final class TunnelRootBlockEntity extends BlockEntity implements Stewarded, Menu
                         : Optional.empty();
         Optional<Survey> survey = marker.flatMap(SurveyedTissueBlockEntity::survey);
         built = survey.map(Survey::built).orElse(0);
-        steps = survey.map(s -> s.plan().steps().size()).orElse(0);
+        steps = survey.map(s -> s.plan().stepCount()).orElse(0);
         faces = List.of();
         if (marker.isEmpty() || survey.isEmpty() || !survey.get().finished()) return;
         Outcome<List<SurveyedTissueBlockEntity>> walked = Minehead.galleries(level, marker.get());
