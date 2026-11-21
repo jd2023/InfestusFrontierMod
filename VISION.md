@@ -47,7 +47,7 @@ The colony spans the Overworld, Nether and End. Each dimension needs a developed
 - Original names and art. Vanilla items stay useful. Advancements and an in-game guide ship with the mod.
 - We use vanilla and NeoForge behavior as it is. We do not patch, bypass or re-implement the engine.
 - Keep early machinery useful through alternative production routes. Later advancement must remain harder even with better technology; it requires automation, coordinated supply chains and increasing resources, not repeated manual grinding.
-- Establish local renewable biomass and power in every dimension. The Overworld is the starter/agricultural base; the Nether becomes the larger industrial base, and the End develops native spatial industry. Connections carry both players and materials, not permanent Overworld fuel dependence.
+- Establish local renewable biomass and power in every dimension. The Overworld is the starter/agricultural base; the Nether becomes the larger industrial base, and the End develops native spatial industry. The Nether imports its water from the Overworld. Cross-dimensional logistics is expensive to grow and requires Enderman DNA through the genome and genetic-construct system. This supply connection arrives before a developed End base.
 
 ## Not in scope now
 

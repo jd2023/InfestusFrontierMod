@@ -3,6 +3,15 @@
 Read this top to bottom. That is the order of work. Each phase finishes before
 the next one starts, and inside a phase the rows are in build order.
 
+Proposed next batch, following the owner's water and DNA requirements:
+finish the Power and Vigil visuals, then deliver
+Overworld-to-Nether water freight using expensive Enderman-derived logistics.
+This brings the first fluid route of LINK-2 forward into Phase 4, before NETHER-1;
+it does not require the later End-built player gate. Water is carried in containers
+through an ordinary portal while establishing the first outpost. Local Nether
+biomass production follows this supply route. The BASE-6 Survival checkpoint
+remains unfinished; aura districts remain undecided.
+
 Every milestone is one thing the player can do that they could not do before.
 It is small enough to plan, build and test by itself. Designs, blocks and
 numbers live in `docs/design`, not here.
@@ -98,17 +107,17 @@ supply base can work while the player is elsewhere. It is a separate, supplied
 service with a bounded area; miners and transport never load chunks themselves.
 Task 90 delivers the approved nest-and-creature service and Nether power
 plant. The guide owns its current costs, limits and operation. Energy capsules
-travel through ordinary portals first; automated portal exchange remains planned.
+travel through ordinary portals first; automated water freight is the next planned supply connection.
 Aura districts remain undecided. The owner brought this power and loading work
 forward; local Nether food and heat-proof materials remain later work.
 Steam now upgrades the existing jaw. The complete heavy-mining route in MINE-5
 and the first electrical consumer in POWER-1 remain unfinished.
 
-Design gap: renewable local food and water, heat-proof materials and later exports still need design before NETHER-1. Nether heat and power are the first implemented exports.
+Design gap: renewable local food, heat-proof materials and later exports still need design before NETHER-1. Water comes from the Overworld; Nether farming must not create a replacement water source. The first LINK-2 route needs a reviewed design for its multiblocks, costly Enderman-derived recipe and bounded transfers. Nether heat and power are the first implemented exports.
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
-| 25 | NETHER-1 | Grow colony ground in the Nether and farm fungus on it for biomass and water | A fungus farm covers its own biomass and water use for three harvests | BASE-6 | none |
+| 25 | NETHER-1 | Grow colony ground in the Nether and farm fungus for biomass using imported Overworld water | A fungus farm covers its own biomass use for three harvests with water delivered from the Overworld | BASE-6, first LINK-2 water route | none |
 | 26 | NETHER-2 | Grow a heat-proof lining that can only be made in the Nether | A batch is made from local fungus and local heat | NETHER-1 | none |
 | 27 | WOOD-4 | Grow wood in the Nether from giant fungus | A Nether grove supplies stems with no logs brought from the Overworld | WOOD-2, NETHER-1 | none |
 | 28 | NETHER-3 | Rebuild the furnace into a hotter one that makes hardened plates and smelts faster | A hardened plate is made; the furnace keeps its experience and path | NETHER-2, EVOLVE-1 | none |
@@ -119,7 +128,7 @@ Design gap: renewable local food and water, heat-proof materials and later expor
 | 33 | MINE-6 | Sink a vertical shaft on a platform that lowers itself and carries the player | A supplied multiblock digs a shaft to a marked depth and installs lights and climbing access; the player rides down and climbs out | MINE-5 | none |
 | 34 | MINE-7 | Cut a long narrow trench down from a line on the surface | A supplied multiblock digs a marked trench to its depth, installs lights and access, and stops there; the player walks in and climbs out | MINE-5 | none |
 | 35 | MINE-8 | Dissolve the rock in a sealed pit and leave the ore standing | A marked pit is cleared of rock; every ore block remains; spent liquid is drained to storage | MINE-1, NETHER-2 | none |
-| 36 | NETHER-6 | Run the Nether base with no deliveries from the Overworld and send goods back | The base runs an hour and restarts after a full shutdown on its own reserves, and exports lining and plates | NETHER-1 to NETHER-4 | none |
+| 36 | NETHER-6 | Run the Nether base on local biomass and power, import water automatically and send goods back | The base runs an hour without hand deliveries, restarts from its reserves after a supply interruption, and exports lining and plates | NETHER-1 to NETHER-4, LINK-2 | none |
 
 ## Phase 5 — Electricity
 
@@ -138,7 +147,7 @@ Open decision for POWER-5: whether a vessel ruptures at random or fails visibly 
 
 ## Phase 6 — The End base
 
-The third base. The End gives materials that bend space, which make travel and freight possible.
+The third base. The End gives materials that bend space for later player gates and spatial upgrades. The earlier Overworld-to-Nether water route uses Enderman-derived logistics.
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
@@ -149,12 +158,12 @@ The third base. The End gives materials that bend space, which make travel and f
 
 ## Phase 7 — Connecting the bases
 
-Three bases become one colony when players and goods move between them.
+Three bases become one colony when players and goods move between them. LINK-2 starts earlier with Overworld-to-Nether water freight; this phase extends the connection to the full three-base supply chain.
 
 | Step | ID | Player can | Done when | Needs | Status |
 |---|---|---|---|---|---|
 | 47 | LINK-1 | Travel between two bases through a built gate | A player steps in at one base and arrives safely at the other | END-2 | none |
-| 48 | LINK-2 | Ship items and fluids between bases | A batch sent while the far base is unloaded arrives once, whole, when it loads | LINK-1 | none |
+| 48 | LINK-2 | Ship water from the Overworld to the Nether, then extend freight to other items and fluids | Expensive multiblock endpoints require an Enderman-derived genetic construct; a batch sent while the far base is unloaded arrives once, whole, when it loads | GENE-2, LINK-4 | planned |
 | 49 | LINK-3 | See what is stored at every base from one place | The view shows local stock and stock in transit separately | LINK-2 | none |
 | 50 | LINK-5 | Recall lost armor to a base | An armor piece dropped on death returns to its nest | END-3 | none |
 | 51 | LINK-6 | Make one product that needs all three bases | The product is made with one input from each dimension, shipped by LINK-2 | LINK-2, NETHER-6, END-4 | none |
